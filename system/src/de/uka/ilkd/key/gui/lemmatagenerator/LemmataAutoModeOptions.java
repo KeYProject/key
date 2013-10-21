@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import java.io.File;
@@ -67,8 +80,8 @@ public class LemmataAutoModeOptions {
         public LemmataAutoModeOptions(CommandLine cl, String internalVersion) {
                 super();
                 try{
-                	if(cl.isSet(Main.JPATH_OF_RULE_FILE)){
-                		this.pathOfRuleFile = cl.getString(Main.JPATH_OF_RULE_FILE, null);
+                	if(cl.isSet(Main.JUSTIFY_RULES)){
+                		this.pathOfRuleFile = cl.getString(Main.JUSTIFY_RULES, null);
                 	
                 	}
                 	if(cl.isSet(Main.JTIMEOUT)){
@@ -78,7 +91,7 @@ public class LemmataAutoModeOptions {
                 	if(cl.isSet(Main.JMAX_RULES)){
                 		this.maxRules =  cl.getInteger(Main.JMAX_RULES, DEFAULT_MAXRULES);
                 	}
-                	if(cl.isSet(Main.JPATH_OF_RESULT) && cl.isSet(Main.JPATH_OF_RULE_FILE)){
+                	if(cl.isSet(Main.JPATH_OF_RESULT) && cl.isSet(Main.JUSTIFY_RULES)){
                 		this.pathOfResult = generatePath(cl.getString(Main.JPATH_OF_RESULT, null), pathOfRuleFile);
                 	}
                 	}catch(CommandLineException cle){
@@ -115,7 +128,7 @@ public class LemmataAutoModeOptions {
                 if (cl.isSet(Main.JPATH_OF_RESULT)) {
                 	pathOfResult = cl.getString(Main.JPATH_OF_RESULT, null);
                 }
-                if (cl.isSet(Main.JPATH_OF_RULE_FILE)) {
+                if (cl.isSet(Main.JUSTIFY_RULES)) {
                 	pathOfRuleFile = cl.getString(Main.JUSTIFY_RULES, null);
                 }
                 if (cl.isSet(Main.JTIMEOUT)) {

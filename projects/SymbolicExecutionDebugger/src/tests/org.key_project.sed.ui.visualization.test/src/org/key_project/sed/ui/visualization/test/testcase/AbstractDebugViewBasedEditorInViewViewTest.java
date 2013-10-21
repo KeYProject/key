@@ -1,28 +1,43 @@
-package org.key_project.sed.ui.visualization.test.testcase;
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 
-import junit.framework.TestCase;
+package org.key_project.sed.ui.visualization.test.testcase;
 
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.ui.IPerspectiveDescriptor;
+import org.junit.Before;
 import org.junit.Test;
 import org.key_project.sed.ui.visualization.test.view.LoggingDebugViewBasedEditorInViewView;
 import org.key_project.sed.ui.visualization.test.view.LoggingDebugViewBasedEditorInViewView.LogEntry;
 import org.key_project.sed.ui.visualization.view.AbstractDebugViewBasedEditorInViewView;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.test.perspective.EmptyTestPerspectiveFactory;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests for {@link AbstractDebugViewBasedEditorInViewView}.
  * @author Martin Hentschel
  */
-public class AbstractDebugViewBasedEditorInViewViewTest extends TestCase {
+public class AbstractDebugViewBasedEditorInViewViewTest extends AbstractSetupTestCase {
    /**
     * {@inheritDoc}
     */
+   @Before
    @Override
    public void setUp() throws Exception {
+      super.setUp();
       TestUtilsUtil.closeWelcomeView();
    }
 

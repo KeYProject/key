@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.Iterator;
@@ -14,8 +27,12 @@ import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Node.NodeIterator;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.util.Pair;
 
@@ -33,16 +50,23 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
     * The {@link Sort} of the uncaught exception.
     */
    private Sort exceptionSort;
+
+   /**
+    * The {@link TerminationKind}.
+    */
+   private TerminationKind terminationKind;
    
    /**
     * Constructor.
     * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param exceptionVariable Contains the exception variable which is used to check if the executed program in proof terminates normally.
+    * @param terminationKind The {@link TerminationKind} or {@code null} to compute it when it is requested the first time (normal or exceptional termination only).
     */
-   public ExecutionTermination(KeYMediator mediator, Node proofNode, IProgramVariable exceptionVariable) {
+   public ExecutionTermination(KeYMediator mediator, Node proofNode, IProgramVariable exceptionVariable, TerminationKind terminationKind) {
       super(mediator, proofNode);
       this.exceptionVariable = exceptionVariable;
+      this.terminationKind = terminationKind;
    }
 
    /**
@@ -50,9 +74,11 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
     */
    @Override
    protected String lazyComputeName() {
-      return isExceptionalTermination() ? 
-             INTERNAL_NODE_NAME_START + "uncaught " + exceptionSort + INTERNAL_NODE_NAME_END : 
-             DEFAULT_TERMINATION_NODE_NAME;
+      switch (getTerminationKind()) {
+         case EXCEPTIONAL : return INTERNAL_NODE_NAME_START + "uncaught " + exceptionSort + INTERNAL_NODE_NAME_END;
+         case LOOP_BODY : return LOOP_BODY_TERMINATION_NODE_NAME;
+         default : return NORMAL_TERMINATION_NODE_NAME;
+      }
    }
 
    /**
@@ -67,7 +93,18 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
     * {@inheritDoc}
     */
    @Override
-   public boolean isExceptionalTermination() {
+   public TerminationKind getTerminationKind() {
+      if (terminationKind == null) {
+         terminationKind = isExceptionalTermination() ? TerminationKind.EXCEPTIONAL : TerminationKind.NORMAL;
+      }
+      return terminationKind;
+   }
+
+   /**
+    * Checks if is an exceptional termination.
+    * @return {@code true} exceptional termination, {@code false} normal termination.
+    */
+   protected boolean isExceptionalTermination() {
       Sort sort = getExceptionSort();
       return sort != null && !(sort instanceof NullSort);
    }
@@ -138,6 +175,55 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
     */
    @Override
    public String getElementType() {
-      return isExceptionalTermination() ? "Exceptional Termination" : "Termination";
+      switch (getTerminationKind()) {
+         case EXCEPTIONAL : return "Exceptional Termination";
+         case LOOP_BODY : return "Loop Body Termination";
+         default : return "Termination";
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isBranchVerified() {
+      if (!isDisposed()) {
+         // Find uninterpreted predicate
+         Term predicate = null;
+         ProofOblInput problem = getServices().getSpecificationRepository().getProofOblInput(getProof());
+         if (problem instanceof AbstractOperationPO) {
+            AbstractOperationPO operationPO = (AbstractOperationPO)problem;
+            if (operationPO.isAddUninterpretedPredicate()) {
+               predicate = operationPO.getUninterpretedPredicate();
+            }
+         }
+         // Check if node can be treated as verified/closed
+         if (predicate != null) {
+            boolean verified = true;
+            NodeIterator leafsIter = getProofNode().leavesIterator();
+            while (verified && leafsIter.hasNext()) {
+               Node leaf = leafsIter.next();
+               if (!leaf.isClosed()) {
+                  final Term toSearch = predicate;
+                  SequentFormula topLevelPredicate = JavaUtil.search(leaf.sequent().succedent(), new IFilter<SequentFormula>() {
+                     @Override
+                     public boolean select(SequentFormula element) {
+                        return toSearch.op() == element.formula().op();
+                     }
+                  });
+                  if (topLevelPredicate == null) {
+                     verified = false;
+                  }
+               }
+            }
+            return verified;
+         }
+         else {
+            return getProofNode().isClosed();
+         }
+      }
+      else {
+         return false;
+      }
    }
 }

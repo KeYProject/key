@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.core.test.testcase;
 
 import java.util.LinkedList;
@@ -16,13 +29,14 @@ import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
 import org.key_project.sed.core.util.ISEDIterator;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 /**
  * Provides the basic methods a {@link TestCase} of an
  * {@link ISEDIterator} implementation needs.
  * @author Martin Hentschel
  */
-public abstract class AbstractSEDIteratorTest extends TestCase {
+public abstract class AbstractSEDIteratorTest extends AbstractSetupTestCase {
    /**
     * Tests one empty {@link ISEDDebugNode} only for debugging purpose.
     */

@@ -70,6 +70,7 @@
                       <adapt
                             type="org.eclipse.core.resources.IResource">
                          <test
+                               forcePluginActivation="true"
                                property="org.eclipse.core.resources.projectNature"
                                value="org.eclipse.jdt.core.javanature">
                          </test>
@@ -127,6 +128,12 @@
             id="org.key_project.sed.key.ui.visualizeConfigurationsCommand"
             name="Visualize Configurations">
       </command>
+      <command
+            categoryId="org.eclipse.debug.ui.category.run"
+            description="Opens KeY&apos;s proof from which the symbolic execution tree was extracted."
+            id="org.key_project.sed.key.ui.openProofCommand"
+            name="Open Proof">
+      </command>
    </extension>
       <extension
             point="org.eclipse.ui.commandImages">
@@ -141,6 +148,10 @@
          <image
                commandId="org.key_project.sed.key.ui.visualizeConfigurationsCommand"
                icon="icons/configurations_object_diagram.gif">
+         </image>
+         <image
+               commandId="org.key_project.sed.key.ui.openProofCommand"
+               icon="icons/logo16.gif">
          </image>
       </extension>
       <extension
@@ -158,6 +169,7 @@
                               value="org.eclipse.debug.core.ILaunch">
                         </instanceof>
                         <test
+                              args="notTerminated"
                               forcePluginActivation="true"
                               property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
                         </test>
@@ -167,6 +179,7 @@
                               value="org.eclipse.debug.core.model.IDebugElement">
                         </instanceof>
                         <test
+                              args="notTerminated"
                               forcePluginActivation="true"
                               property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
                         </test>
@@ -189,7 +202,39 @@
                         </instanceof>
                         <test
                               forcePluginActivation="true"
-                              property="org.key_project.sed.key.core.keySedDebugNodeHasExecutionStateNode">
+                              property="org.key_project.sed.key.ui.canVisualizeConfigurations">
+                        </test>
+                     </and>
+                  </or>
+               </iterate>
+            </enabledWhen>
+         </handler>
+         <handler
+               class="org.key_project.sed.key.ui.command.OpenProofHandler"
+               commandId="org.key_project.sed.key.ui.openProofCommand">
+            <enabledWhen>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <or>
+                     <and>
+                        <instanceof
+                              value="org.eclipse.debug.core.ILaunch">
+                        </instanceof>
+                        <test
+                              args="notTerminated, notKeYMainWindow"
+                              forcePluginActivation="true"
+                              property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
+                        </test>
+                     </and>
+                     <and>
+                        <instanceof
+                              value="org.eclipse.debug.core.model.IDebugElement">
+                        </instanceof>
+                        <test
+                              args="notTerminated, notKeYMainWindow"
+                              forcePluginActivation="true"
+                              property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
                         </test>
                      </and>
                   </or>
@@ -216,6 +261,12 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+C">
+      </key>
+      <key
+            commandId="org.key_project.sed.key.ui.openProofCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+M3+P">
       </key>
    </extension>
       <extension
@@ -334,7 +385,7 @@
                            </instanceof>
                            <test
                                  forcePluginActivation="true"
-                                 property="org.key_project.sed.key.core.keySedDebugNodeHasExecutionStateNode">
+                                 property="org.key_project.sed.key.ui.canVisualizeConfigurations">
                            </test>
                         </and>
                      </or>
@@ -356,6 +407,7 @@
                                  value="org.eclipse.debug.core.ILaunch">
                            </instanceof>
                            <test
+                                 args="notTerminated"
                                  forcePluginActivation="true"
                                  property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
                            </test>
@@ -365,8 +417,51 @@
                                  value="org.eclipse.debug.core.model.IDebugElement">
                            </instanceof>
                            <test
+                                 args="notTerminated"
                                  forcePluginActivation="true"
                                  property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
+                           </test>
+                        </and>
+                     </or>
+                  </iterate>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.key_project.sed.key.ui.openProofCommand"
+                  icon="icons/logo16.gif"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="true">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <or>
+                        <and>
+                           <instanceof
+                                 value="org.eclipse.debug.core.ILaunch">
+                           </instanceof>
+                           <test
+                                 args="notTerminated"
+                                 forcePluginActivation="true"
+                                 property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
+                           </test>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.key_project.key4eclipse.common.ui.proofStarterAvailable">
+                           </test>
+                        </and>
+                        <and>
+                           <instanceof
+                                 value="org.eclipse.debug.core.model.IDebugElement">
+                           </instanceof>
+                           <test
+                                 args="notTerminated"
+                                 forcePluginActivation="true"
+                                 property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
+                           </test>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.key_project.key4eclipse.common.ui.proofStarterAvailable">
                            </test>
                         </and>
                      </or>
@@ -390,6 +485,13 @@
                namespace="org.key_project.sed.key.ui"
                properties="isSingleKeyDebugTarget"
                type="org.eclipse.debug.core.model.IDebugElement">
+         </propertyTester>
+         <propertyTester
+               class="org.key_project.sed.key.ui.propertyTester.CanVisualizeConfigurationsPropertyTester"
+               id="org.key_project.sed.key.ui.canVisualizeConfigurationsPropertyTester"
+               namespace="org.key_project.sed.key.ui"
+               properties="canVisualizeConfigurations"
+               type="java.lang.Object">
          </propertyTester>
       </extension>
       <extension

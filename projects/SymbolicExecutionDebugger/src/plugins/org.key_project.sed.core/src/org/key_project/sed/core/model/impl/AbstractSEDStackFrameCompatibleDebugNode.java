@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.core.model.impl;
 
 import org.eclipse.debug.core.DebugException;
@@ -7,7 +20,7 @@ import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.ISourceNameProvider;
+import org.key_project.sed.core.model.ISourcePathProvider;
 
 /**
  * Provides a basic implementation of {@link ISEDDebugNode}s which
@@ -15,7 +28,7 @@ import org.key_project.sed.core.model.ISourceNameProvider;
  * with the Eclipse debug API.
  * @author Martin Hentschel
  */
-public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractSEDTerminateCompatibleDebugNode implements IStackFrame, ISourceNameProvider {
+public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractSEDTerminateCompatibleDebugNode implements IStackFrame, ISourcePathProvider {
    /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this node is contained.
@@ -153,7 +166,7 @@ public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractS
    @SuppressWarnings("rawtypes")
    @Override
    public Object getAdapter(Class adapter) {
-      if (ISourceNameProvider.class.equals(adapter)) {
+      if (ISourcePathProvider.class.equals(adapter)) {
          return this;
       }
       else {

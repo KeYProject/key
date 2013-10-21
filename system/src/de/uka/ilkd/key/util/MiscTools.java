@@ -11,7 +11,6 @@
 // Public License. See LICENSE.TXT for details.
 // 
 
-
 package de.uka.ilkd.key.util;
 
 import java.io.File;
@@ -19,7 +18,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -40,14 +42,11 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.RuleCollection;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 
 /**
@@ -55,11 +54,11 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
  * the weissInvariants side branch.
  */
 public final class MiscTools {
-       
-    
+
+
     private MiscTools() {}
-    
-    
+
+
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
@@ -76,7 +75,7 @@ public final class MiscTools {
         }
     }
 
-    
+
     /**
      * Returns the receiver term of the passed method frame, or null if
      * the frame belongs to a static method.
@@ -90,41 +89,41 @@ public final class MiscTools {
 	    return null;
 	}
     }
-    
-    public static ImmutableSet<ProgramVariable> getLocalIns(ProgramElement pe, 
+
+    public static ImmutableSet<ProgramVariable> getLocalIns(ProgramElement pe,
 	    					     	    Services services) {
 	final ReadPVCollector rpvc = new ReadPVCollector(pe, services);
 	rpvc.start();
 	return rpvc.result();
-    }    
-    
-    
+    }
+
+
     public static ImmutableSet<ProgramVariable> getLocalOuts(
-	    					ProgramElement pe, 
+	    					ProgramElement pe,
 	    			                Services services) {
 	final WrittenPVCollector wpvc = new WrittenPVCollector(pe, services);
 	wpvc.start();
 	return wpvc.result();
     }
-    
-    
-    public static ImmutableSet<Pair<Sort,IObserverFunction>> 
+
+
+    public static ImmutableSet<Pair<Sort,IObserverFunction>>
     						collectObservers(Term t) {
-	ImmutableSet<Pair<Sort, IObserverFunction>> result 
+	ImmutableSet<Pair<Sort, IObserverFunction>> result
 		= DefaultImmutableSet.nil();
 	if(t.op() instanceof IObserverFunction) {
 	    final IObserverFunction obs = (IObserverFunction)t.op();
-	    final Sort s = obs.isStatic() 
-	             	   ? obs.getContainerType().getSort() 
+	    final Sort s = obs.isStatic()
+	             	   ? obs.getContainerType().getSort()
 	                   : t.sub(1).sort();
-	    result = result.add(new Pair<Sort,IObserverFunction>(s, obs));	    
+	    result = result.add(new Pair<Sort,IObserverFunction>(s, obs));
 	}
 	for(Term sub : t.subs()) {
 	    result = result.union(collectObservers(sub));
 	}
 	return result;
     }
-    
+
     /**
      * True if both are <code>null</code> or <code>a.equals(b)</code> with <code>equals</code> from type T.
      */
@@ -135,7 +134,7 @@ public final class MiscTools {
             return a.equals(b);
         }
     }
-    
+
     public static <T> boolean equalsOrNull(T a, Object... bs){
         boolean result = true;
         for (Object b: bs){
@@ -143,12 +142,45 @@ public final class MiscTools {
         }
         return result;
     }
-    
-    
+
+
+    // =======================================================
+    // Methods operating on Collections
+    // =======================================================
+
+    /** Combine two maps by function application.
+     * Values of <code>m0</code> which are not keys of <code>m1</code>
+     * are dropped.
+     * This implementation tries to use the same implementation of {@link java.util.Map}
+     * (provided in Java SE) as <code>m0</code>.
+     */
+    public static <S,T,U> Map<S,U> apply(Map<S,? extends T> m0, Map<T,U> m1) {
+        Map<S,U> res = null;
+        final int size = m0.size() < m1.size()? m0.size(): m1.size();
+        // try to use more specific implementation
+        if (m0 instanceof java.util.TreeMap)
+            res = new java.util.TreeMap<S,U>();
+        else if (m0 instanceof java.util.concurrent.ConcurrentHashMap)
+            res = new java.util.concurrent.ConcurrentHashMap<S,U>(size);
+        else if (m0 instanceof java.util.IdentityHashMap)
+            res = new java.util.IdentityHashMap<S, U>(size);
+        else if (m0 instanceof java.util.WeakHashMap)
+            res = new java.util.WeakHashMap<S,U>(size);
+        else res = new HashMap<S,U>(size);
+
+        for (Entry<S, ? extends T> e: m0.entrySet()) {
+            final U value = m1.get(e.getValue());
+            if (value != null)
+                res.put(e.getKey(), value);
+        }
+        return res;
+    }
+
+
     // =======================================================
     // Methods operating on Strings
     // =======================================================
-    
+
     /**
      * Separates the single directory entries in a filename.
      * The first element is an empty String iff the filename is absolute.
@@ -193,7 +225,7 @@ public final class MiscTools {
         }
         return res;
     }
-    
+
     /** Returns a filename relative to another one.
      * The second parameter needs to be absolute and is expected to refer to directory
      * This method only operates on Strings, not on real files!
@@ -203,7 +235,7 @@ public final class MiscTools {
     public static String makeFilenameRelative(String origFilename, String toFilename){
         String[] a = disectFilename(origFilename).toArray(new String[0]);
         String[] b = disectFilename(toFilename).toArray(new String[0]);
-        
+
         // check for Windows paths
         if (File.separatorChar == '\\' &&
                 a[0].length() == 2 && a[0].charAt(1) == ':') {
@@ -216,17 +248,17 @@ public final class MiscTools {
         int i;
         String s = "";
         String t = "";
-        
+
         if (a[0].equals("")) { // not already relative
-        if (!b[0].equals("")) 
+        if (!b[0].equals(""))
             throw new RuntimeException("\""+toFilename+ "\" is a relative path. Please use absolute paths to make others relative to them.");
-        
+
         // remove ".." from paths
         a = removeDotDot(a);
         b = removeDotDot(b);
-        
+
         // FIXME: there may be leading ..'s
-        
+
         i = 1; boolean diff= false;
         while (i < b.length){
             // shared until i
@@ -235,7 +267,7 @@ public final class MiscTools {
             // and collect the remaining elements of a
             if (diff) {
                 s = s + "../";
-                if (i < a.length) 
+                if (i < a.length)
                     t = t + (a[i].equals("")? "" : "/")+ a[i];
             }
             i++;
@@ -274,8 +306,8 @@ public final class MiscTools {
         s = s.replaceAll("\\s|\\.|::\\$|::|<|>|/", "_");
         return new Name(s);
     }
-    
-    
+
+
     public static String toValidFileName(String s) {
         s = s.replace("\\", "_")
              .replace("$", "_")
@@ -295,14 +327,14 @@ public final class MiscTools {
     /**
      * Join the string representations of a collection of objects into onw
      * string. The individual elements are separated by a delimiter.
-     * 
+     *
      * {@link Object#toString()} is used to turn the objects into strings.
-     * 
+     *
      * @param collection
      *            an arbitrary non-null collection
      * @param delimiter
      *            a non-null string which is put between the elements.
-     * 
+     *
      * @return the concatenation of all string representations separated by the
      *         delimiter
      */
@@ -314,21 +346,21 @@ public final class MiscTools {
             }
             sb.append(obj);
         }
-        
+
         return sb.toString();
     }
-    
+
     /**
      * Join the string representations of an array of objects into one
      * string. The individual elements are separated by a delimiter.
-     * 
+     *
      * {@link Object#toString()} is used to turn the objects into strings.
-     * 
+     *
      * @param collection
      *            an arbitrary non-null array of objects
      * @param delimiter
      *            a non-null string which is put between the elements.
-     * 
+     *
      * @return the concatenation of all string representations separated by the
      *         delimiter
      */
@@ -339,15 +371,15 @@ public final class MiscTools {
     /**
      * Takes a string and returns a string which is potentially shorter and
      * contains a sub-collection of the original characters.
-     * 
+     *
      * All alphabetic characters (A-Z and a-z) are copied to the result while
      * all other characters are removed.
-     * 
+     *
      * @param string
      *            an arbitrary string
      * @return a string which is a sub-structure of the original character
      *         sequence
-     * 
+     *
      * @author mattias ulbrich
      */
     public static /*@NonNull*/ String filterAlphabetic(/*@NonNull*/ String string) {
@@ -360,7 +392,7 @@ public final class MiscTools {
         }
         return res.toString();
     }
-    
+
     /** Checks whether a string contains another one as a whole word
      * (i.e., separated by whitespaces or a semicolon at the end).
      * @param s string to search in
@@ -381,7 +413,7 @@ public final class MiscTools {
         }
         return false;
     }
-    
+
 
     /** There are different kinds of JML markers.
      * See Section 4.4 "Annotation markers" of the JML reference manual.
@@ -398,10 +430,10 @@ public final class MiscTools {
             return false;
         }
     }
-    
+
     /**
      * <p>
-     * Returns the name of the applied rule in the given {@link Node} of
+     * Returns the display name of the applied rule in the given {@link Node} of
      * the proof tree in KeY.
      * </p>
      * <p>
@@ -418,10 +450,10 @@ public final class MiscTools {
        }
        return name;
     }
-    
+
     /**
      * <p>
-     * Returns the name of the {@link RuleApp}.
+     * Returns the display name of the {@link RuleApp}.
      * </p>
      * <p>
      * This method is required for the symbolic execution tree extraction,
@@ -442,31 +474,85 @@ public final class MiscTools {
     }
     
     /**
-     * Searches the {@link OneStepSimplifier} which is used in the 
-     * {@link ProofEnvironment} of the current proof which is not in general
-     * {@link OneStepSimplifier#INSTANCE}. For instance uses the
-     * symbolic execution tree extraction its own instances of 
-     * {@link OneStepSimplifier} in site proofs for parallelization. 
-     * @return The found {@link OneStepSimplifier}.
+     * <p>
+     * Returns the name of the applied rule in the given {@link Node} of
+     * the proof tree in KeY.
+     * </p>
+     * <p>
+     * This method is required for the symbolic execution tree extraction,
+     * e.g. used in the Symbolic Execution Tree Debugger.
+     * </p>
+     * @param node The given {@link Node}.
+     * @return The display name of the applied rule in the given {@link Node} or {@code null} if no one exists.
+     */
+    public static String getRuleName(Node node) {
+       String name = null;
+       if (node != null) {
+          name = getRuleName(node.getAppliedRuleApp());
+       }
+       return name;
+    }
+    
+    /**
+     * <p>
+     * Returns the name of the {@link RuleApp}.
+     * </p>
+     * <p>
+     * This method is required for the symbolic execution tree extraction,
+     * e.g. used in the Symbolic Execution Tree Debugger.
+     * </p>
+     * @param ruleApp The given {@link RuleApp}.
+     * @return The display name of the {@link RuleApp} or {@code null} if no one exists.
+     */
+    public static String getRuleName(RuleApp ruleApp) {
+       String name = null;
+       if (ruleApp != null) {
+          Rule rule = ruleApp.rule();
+          if (rule != null) {
+             name = rule.name().toString();
+          }
+       }
+       return name;
+    }
+    
+    /**
+     * Returns the {@link OneStepSimplifier} used in the given {@link Proof}.
+     * @param proof The {@link Proof} to get its used {@link OneStepSimplifier}.
+     * @return The used {@link OneStepSimplifier} or {@code null} if not available.
      */
     public static OneStepSimplifier findOneStepSimplifier(Proof proof) {
-       RuleCollection rc = proof.env().getInitConfig().getProfile().getStandardRules();
-       return (OneStepSimplifier)JavaUtil.search(rc.getStandardBuiltInRules(), new IFilter<BuiltInRule>() {
-         @Override
-         public boolean select(BuiltInRule element) {
-            return element instanceof OneStepSimplifier;
-         }
-       });
+       if (proof != null && !proof.isDisposed()) {
+          Profile profile = proof.env().getInitConfig().getProfile();
+          return findOneStepSimplifier(profile);
+       }
+       else {
+          return null;
+       }
     }
+    
+    /**
+     * Returns the {@link OneStepSimplifier} used in the given {@link Profile}.
+     * @param profile The {@link Profile} to get its used {@link OneStepSimplifier}.
+     * @return The used {@link OneStepSimplifier} or {@code null} if not available.
+     */
+    public static OneStepSimplifier findOneStepSimplifier(Profile profile) {
+       if (profile instanceof JavaProfile) {
+          return ((JavaProfile) profile).getOneStepSimpilifier();
+       }
+       else {
+          return null;
+       }
+    }
+
     //-------------------------------------------------------------------------
     //inner classes
-    //-------------------------------------------------------------------------    
-    
+    //-------------------------------------------------------------------------
+
     private static final class ReadPVCollector extends JavaASTVisitor {
-	private ImmutableSet<ProgramVariable> result 
+	private ImmutableSet<ProgramVariable> result
 		= DefaultImmutableSet.<ProgramVariable>nil();
 
-	private ImmutableSet<ProgramVariable> declaredPVs 
+	private ImmutableSet<ProgramVariable> declaredPVs
 		= DefaultImmutableSet.<ProgramVariable>nil();
 
 	public ReadPVCollector(ProgramElement root, Services services) {
@@ -479,7 +565,7 @@ public final class MiscTools {
 		ProgramVariable pv = (ProgramVariable) node;
 		if(!pv.isMember() && !declaredPVs.contains(pv)) {
 		    result = result.add(pv);
-		}		    
+		}
 	    } else if(node instanceof VariableSpecification) {
 		VariableSpecification vs = (VariableSpecification) node;
 		ProgramVariable pv = (ProgramVariable) vs.getProgramVariable();
@@ -495,20 +581,20 @@ public final class MiscTools {
 	    return result;
 	}
     }
-    
-       
+
+
     private static final class WrittenPVCollector extends JavaASTVisitor {
-	private ImmutableSet<ProgramVariable> result 
+	private ImmutableSet<ProgramVariable> result
 		= DefaultImmutableSet.<ProgramVariable>nil();
 
-	private ImmutableSet<ProgramVariable> declaredPVs 
+	private ImmutableSet<ProgramVariable> declaredPVs
 		= DefaultImmutableSet.<ProgramVariable>nil();
 
 	public WrittenPVCollector(ProgramElement root, Services services) {
 	    super(root, services);
 	}
 
-	@Override	
+	@Override
 	protected void doDefaultAction(SourceElement node) {
 	    if(node instanceof Assignment) {
 		ProgramElement lhs = ((Assignment) node).getChildAt(0);
@@ -516,7 +602,7 @@ public final class MiscTools {
 		    ProgramVariable pv = (ProgramVariable) lhs;
 		    if(!pv.isMember() && !declaredPVs.contains(pv)) {
 			result = result.add(pv);
-		    }		    
+		    }
 		}
 	    } else if(node instanceof VariableSpecification) {
 		VariableSpecification vs = (VariableSpecification) node;
@@ -536,7 +622,7 @@ public final class MiscTools {
 
     /**
      * read an input stream to its end into a string.
-     * 
+     *
      * @param is
      *            a non-null open input stream
      * @return the string created from the input of the stream

@@ -41,7 +41,7 @@ import de.uka.ilkd.key.util.GuiUtilities;
 
 public class RuleView extends JSplitPane implements TreeSelectionListener, java.io.Serializable {
 
-    private static final String DESC_RESOURCE = "de/uka/ilkd/key/gui/help/ruleExplanations.xml";
+    private static final String DESC_RESOURCE = "/de/uka/ilkd/key/gui/help/ruleExplanations.xml";
     private static final long serialVersionUID = 911181673407907024L;
     private RuleTreeModel ruleViewModel;
     private JTree ruleTree;
@@ -86,6 +86,9 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
             Taclet tac = (Taclet) userObj;
             contentPane.setText(toString(tac));
         } else {
+            final int parenIdx = displayName.lastIndexOf("(");
+            if (parenIdx >= 0) // strip number of taclets
+                displayName = displayName.substring(0, parenIdx-1).intern();
             contentPane.setText(getRuleDescription(displayName));
         }
 
@@ -125,6 +128,7 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
         ruleViewModel = model;
 
         if (ruleViewModel != null) {
+            ruleViewModel.updateTacletCount();
             ruleTree.setModel(ruleViewModel);
         }
     }
@@ -225,7 +229,7 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
     public Properties getDescriptions() {
         if (descriptions == null) {
             descriptions = new Properties();
-            InputStream is = ClassLoader.getSystemResourceAsStream(DESC_RESOURCE);
+            InputStream is = getClass().getResourceAsStream(DESC_RESOURCE);
             try {
                 if (is == null) {
                     throw new FileNotFoundException(DESC_RESOURCE + " not found");

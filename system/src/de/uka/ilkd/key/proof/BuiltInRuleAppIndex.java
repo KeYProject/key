@@ -18,6 +18,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 
 public class BuiltInRuleAppIndex {
 
@@ -84,16 +85,14 @@ public class BuiltInRuleAppIndex {
     private void scanSimplificationRule ( Goal       goal,
 					  NewRuleListener listener ) {
         for (BuiltInRule builtInRule : index.rules()) {
-            final BuiltInRule bir = builtInRule;
-            
-            if(bir.isApplicable(goal, null)) {
-                IBuiltInRuleApp app = bir.createApp( null );                            
+            if(builtInRule.isApplicable(goal, null)) {
+                IBuiltInRuleApp app = builtInRule.createApp( null );                            
                 listener.ruleAdded ( app, null );
             }
             
             
-            scanSimplificationRule(bir, goal, false, listener);
-            scanSimplificationRule(bir, goal, true, listener);
+            scanSimplificationRule(builtInRule, goal, false, listener);
+            scanSimplificationRule(builtInRule, goal, true, listener);
         }
     }
 
@@ -120,7 +119,7 @@ public class BuiltInRuleAppIndex {
                                           NewRuleListener listener ) {
         final PosInOccurrence    pos = new PosInOccurrence 
 		( cfma, PosInTerm.TOP_LEVEL, antec );
-        if(rule instanceof UseDependencyContractRule || rule instanceof QueryExpand) {//HACK
+        if(rule instanceof UseDependencyContractRule || rule instanceof QueryExpand || rule instanceof QuerySideProofRule) {//HACK
             scanSimplificationRule(rule, goal, pos, listener);
         } else if (rule.isApplicable ( goal, pos ) ) {
             IBuiltInRuleApp app = rule.createApp( pos );                            

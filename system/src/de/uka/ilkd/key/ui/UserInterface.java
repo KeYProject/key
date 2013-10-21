@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
@@ -8,15 +21,16 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
-import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -93,9 +107,10 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * This method is used by nearly all Eclipse based product that
      * uses KeY.
      * </p>
+     * @param profile The {@link Profile} to use.
      * @return The instantiated {@link ProblemInitializer}.
      */
-    ProblemInitializer createProblemInitializer();
+    ProblemInitializer createProblemInitializer(Profile profile);
     
     /**
      * Returns the used {@link KeYMediator}.
@@ -106,13 +121,14 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
     /**
      * Opens a java file in this {@link UserInterface} and returns the instantiated {@link DefaultProblemLoader}
      * which can be used to instantiated proofs programmatically.
+     * @param profile An optional {@link Profile} to use. If it is {@code null} the default profile {@link KeYMediator#getDefaultProfile()} is used.
      * @param file The java file to open.
      * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
      * @return The opened {@link DefaultProblemLoader}.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    DefaultProblemLoader load(File file, List<File> classPaths, File bootClassPath) throws ProblemLoaderException;
+    DefaultProblemLoader load(Profile profile, File file, List<File> classPaths, File bootClassPath) throws ProblemLoaderException;
     
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterface} for the given

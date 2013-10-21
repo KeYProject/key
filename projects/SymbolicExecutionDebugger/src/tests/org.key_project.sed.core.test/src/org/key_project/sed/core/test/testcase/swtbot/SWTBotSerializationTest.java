@@ -1,11 +1,22 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.core.test.testcase.swtbot;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -22,13 +33,14 @@ import org.key_project.sed.core.model.serialization.SEDXMLReader;
 import org.key_project.sed.core.model.serialization.SEDXMLWriter;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests {@link SEDXMLWriter} and {@link SEDXMLReader}.
  * @author Martin Hentschel
  */
-public class SWTBotSerializationTest extends TestCase {
+public class SWTBotSerializationTest extends AbstractSetupTestCase {
    /**
     * Tests the reading and writing process via
     * {@link SEDXMLWriter#toXML(IDebugTarget[], String)},

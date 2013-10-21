@@ -1,6 +1,17 @@
-package org.key_project.sed.ui.test.testcase.swtbot;
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 
-import junit.framework.TestCase;
+package org.key_project.sed.ui.test.testcase.swtbot;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -12,14 +23,15 @@ import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
-import org.key_project.sed.ui.test.util.SWTBotTabbedPropertyList;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
+import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Provides the basic functionality to test property tabs.
  * @author Martin Hentschel
  */
-public class AbstractSWTBotPropertyTabTest extends TestCase {
+public class AbstractSWTBotPropertyTabTest extends AbstractSetupTestCase {
    /**
     * Does some test steps on the fixed example model.
     * @param steps The test steps to execute.
@@ -43,7 +55,7 @@ public class AbstractSWTBotPropertyTabTest extends TestCase {
          debugTree = debugView.bot().tree();
          TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Get properties view
-         final SWTBotView propertiesView = TestSedCoreUtil.getPropertiesView(bot);
+         SWTBotView propertiesView = TestUtilsUtil.getPropertiesView(bot);
          // Make sure that all nodes to test are loaded and that the automatic selection set to the debug target by the Debug API is done.
          selectDebugTarget(debugTree);
          selectThread(debugTree);

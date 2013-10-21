@@ -14,15 +14,14 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -44,8 +43,7 @@ public final class ProofCorrectnessMgt {
     private final DefaultMgtProofTreeListener proofTreeListener
 	= new DefaultMgtProofTreeListener();
 
-    private KeYMediator mediator;
-    private Set<RuleApp> cachedRuleApps = new HashSet<RuleApp>();
+    private Set<RuleApp> cachedRuleApps = new LinkedHashSet<RuleApp>();
     private ProofStatus proofStatus = ProofStatus.OPEN;
     
     
@@ -57,6 +55,7 @@ public final class ProofCorrectnessMgt {
 	this.proof = p;
         this.specRepos = p.getServices().getSpecificationRepository();
 	proof.addProofTreeListener(proofTreeListener);
+	proof.addRuleAppListener(proofListener);
     }
     
 
@@ -198,12 +197,14 @@ public final class ProofCorrectnessMgt {
 	//mark open proofs as open, all others as presumably closed 
 	ImmutableSet<Proof> presumablyClosed = DefaultImmutableSet.nil();
 	for(Proof p : all) {
-	    if(p.openGoals().size() > 0) {
-		p.mgt().proofStatus = ProofStatus.OPEN;
-	    } else {
-		p.mgt().proofStatus = ProofStatus.CLOSED;
-		presumablyClosed = presumablyClosed.add(p);
-	    }
+	   if (!p.isDisposed()) {
+	       if(p.openGoals().size() > 0) {
+	          p.mgt().proofStatus = ProofStatus.OPEN;
+	       } else {
+	          p.mgt().proofStatus = ProofStatus.CLOSED;
+	          presumablyClosed = presumablyClosed.add(p);
+	       }
+	   }
 	}
 	
 	//revert status of all "presumably closed" proofs for which at least one
@@ -274,25 +275,9 @@ public final class ProofCorrectnessMgt {
         }
 	return result;
     }
-
-    
-    public void setMediator(KeYMediator p_mediator) {
-	if(mediator != null) {
-	    mediator.removeRuleAppListener(proofListener);
-	}
-
-	mediator = p_mediator;
-
-	if(mediator != null) {
-	    mediator.addRuleAppListener(proofListener);
-	}
-    }
-    
     
     public void removeProofListener(){
-        if(mediator != null) {
-          mediator.removeRuleAppListener(proofListener);
-        }
+       proof.removeRuleAppListener(proofListener);
     }
 
         
@@ -300,11 +285,10 @@ public final class ProofCorrectnessMgt {
 	return proofStatus;
     }
     
-    
-    public void finalize() {
-        if(mediator != null) {
-            mediator.removeRuleAppListener(proofListener);
-        }
+    @Override
+    protected void finalize() throws Throwable {
+       removeProofListener();
+       super.finalize();
     }
 
     
@@ -315,12 +299,9 @@ public final class ProofCorrectnessMgt {
     
     private class DefaultMgtProofListener implements RuleAppListener {
 	public void ruleApplied(ProofEvent e) {
-	    if(proof == e.getSource()) {
-                //%% actually I only want to listen to events of one proof
 		ProofCorrectnessMgt.this.ruleApplied
 		    (e.getRuleAppInfo().getRuleApp());
 	    }
-	}
     }
 
     

@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -59,7 +72,7 @@ public class InvariantConfigurator {
      */
     private InvariantConfigurator() {
         invariants = new ArrayList<Map<String,String>[]>();
-        mapLoopsToInvariants = new HashMap<LoopStatement, List<Map<String,String>[]>>();
+        mapLoopsToInvariants = new LinkedHashMap<LoopStatement, List<Map<String,String>[]>>();
     }
 
     /**
@@ -451,15 +464,15 @@ public class InvariantConfigurator {
 
                 JTabbedPane invPane = new JTabbedPane(JTabbedPane.BOTTOM);
                 JTabbedPane modPane = new JTabbedPane(JTabbedPane.BOTTOM);
-                for(Name h : HeapLDT.VALID_HEAP_NAMES ) {
-                    String k = h.toString();
-                    String title = String.format("Invariant%s - Status: ", k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                    final String k = heap.name().toString();
+                    String title = String.format("Invariant%s - Status: ", heap == services.getTypeConverter().getHeapLDT().getHeap() ? "" : "["+k+"]");
                     String errorMessage = invMsgs == null? "OK" : invMsgs.get(k);
                     Color invColor = invColors == null? Color.GREEN : invColors.get(k);
                     JTextArea textArea = createErrorTextField(title, errorMessage,
                             invColor);
                     invPane.add(k, textArea);
-                    title = String.format("Modifies%s - Status: ", k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
+                    title = String.format("Modifies%s - Status: ", heap == services.getTypeConverter().getHeapLDT().getHeap() ? "" : "["+k+"]");
                     String errorMessage2 = modMsgs == null? "OK" : modMsgs.get(k);
                     Color modColor = modColors == null? Color.GREEN : modColors.get(k);
                     textArea = createErrorTextField(title, errorMessage2,
@@ -492,8 +505,9 @@ public class InvariantConfigurator {
                 Map<String,Color> modColors = new LinkedHashMap<String,Color>();
                 Map<String,String> varMsgs = new LinkedHashMap<String,String>();
                 Map<String,Color> varColors = new LinkedHashMap<String,Color>();
-                for(Name h : HeapLDT.VALID_HEAP_NAMES ) {
-                    String k = h.toString();
+                
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                    final String k = heap.name().toString();
                     setOK(invMsgs, invColors, k);
                     setOK(modMsgs, modColors, k);
                 }
@@ -680,7 +694,7 @@ public class InvariantConfigurator {
                         setOK(varErrors,varCols,DEFAULT);
 
                     }
-                } catch (ParserException e) {
+                } catch (Exception e) {
                     setError(varErrors,varCols,DEFAULT,e.getMessage());
                 }
 

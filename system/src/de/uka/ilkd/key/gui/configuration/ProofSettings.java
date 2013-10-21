@@ -14,15 +14,19 @@
 
 package de.uka.ilkd.key.gui.configuration;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringBufferInputStream;
 import java.net.URL;
 import java.util.Properties;
 
-
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -42,8 +46,6 @@ import de.uka.ilkd.key.util.KeYResourceManager;
  * </code>
  */
 public class ProofSettings {
-
-
     public static final File PROVER_CONFIG_FILE;
     public static final URL PROVER_CONFIG_FILE_TEMPLATE;
     public static final ProofSettings DEFAULT_SETTINGS;
@@ -66,9 +68,6 @@ public class ProofSettings {
     /** the default listener to settings */
     private ProofSettingsListener listener = new ProofSettingsListener();
 
-    
-    /** profile */
-    private Profile profile;
 
 //    private final static int STRATEGY_SETTINGS = 0;
 //    private final static int GENERAL_SETTINGS  = 1;
@@ -76,7 +75,7 @@ public class ProofSettings {
 //    private final static int SMT_SETTINGS      = 3;
 //    private final static int VIEW_SETTINGS      = 4;
     private final static int STRATEGY_SETTINGS = 0;
-    private final static int CHOICE_SETTINGS    = 1;
+    private final static int CHOICE_SETTINGS   = 1;
     private final static int SMT_SETTINGS      = 2;
 
     
@@ -91,7 +90,6 @@ public class ProofSettings {
 	    new ChoiceSettings(),
 	    ProofDependentSMTSettings.getDefaultSettingsData(),
 	 //   new ViewSettings()
-
 	};
 	
 	for (int i = 0; i < settings.length; i++) { 
@@ -113,8 +111,6 @@ public class ProofSettings {
             settings[i].readSettings(this,result);
         }
         initialized = true;
-
-        setProfile(toCopy.getProfile());
     }
 
    
@@ -123,22 +119,6 @@ public class ProofSettings {
 	    loadSettings();
 	    initialized=true;	
 	}
-    }
-    
-    
-    public void setProfile(Profile profile) {
-        this.profile = profile;
-        profile.updateSettings(this);
-        ensureInitialized();
-    }
-
-    public Profile getProfile() {                
-        if (profile == null) {
-            //the following line should be removed
-            setProfile(new JavaProfile());
-            
-        }
-        return profile;
     }
     
     /** 

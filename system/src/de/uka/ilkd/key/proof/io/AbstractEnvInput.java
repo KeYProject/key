@@ -19,6 +19,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
 
@@ -33,6 +34,7 @@ public abstract class AbstractEnvInput implements EnvInput {
     protected final List<File> classPath;
     protected final File bootClassPath;
     protected final Includes includes;    
+    protected final Profile profile;
     
     protected InitConfig initConfig;
     
@@ -44,12 +46,15 @@ public abstract class AbstractEnvInput implements EnvInput {
     public AbstractEnvInput(String name,
 	    		    String javaPath,
 	    		    List<File> classPath,
-	    		    File bootClassPath) {
+	    		    File bootClassPath,
+	    		    Profile profile) {
+   assert profile != null;
 	this.name     = name;
 	this.javaPath = javaPath;
 	this.classPath = classPath;
 	this.bootClassPath = bootClassPath;
 	this.includes = new Includes();
+	this.profile = profile;
     }
 
 
@@ -97,5 +102,10 @@ public abstract class AbstractEnvInput implements EnvInput {
     @Override
     public File readBootClassPath() {
         return bootClassPath;
+    }
+    
+    @Override
+    public Profile getProfile() {
+        return profile;
     }
 }

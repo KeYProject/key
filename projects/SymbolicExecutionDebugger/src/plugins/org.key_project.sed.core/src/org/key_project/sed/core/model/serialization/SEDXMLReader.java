@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.core.model.serialization;
 
 import java.io.ByteArrayInputStream;
@@ -27,18 +40,19 @@ import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
 import org.key_project.sed.core.model.memory.ISEDMemoryStackFrameCompatibleDebugNode;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
-import org.key_project.sed.core.model.memory.SEDMemoryBranchNode;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
+import org.key_project.sed.core.model.memory.SEDMemoryLoopBodyTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
-import org.key_project.sed.core.model.memory.SEDMemoryLoopNode;
+import org.key_project.sed.core.model.memory.SEDMemoryLoopStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
-import org.key_project.sed.core.model.memory.SEDMemoryUseLoopInvariant;
-import org.key_project.sed.core.model.memory.SEDMemoryUseOperationContract;
+import org.key_project.sed.core.model.memory.SEDMemoryLoopInvariant;
+import org.key_project.sed.core.model.memory.SEDMemoryMethodContract;
 import org.key_project.sed.core.model.memory.SEDMemoryValue;
 import org.key_project.sed.core.model.memory.SEDMemoryVariable;
 import org.xml.sax.Attributes;
@@ -368,17 +382,20 @@ public class SEDXMLReader {
       else if (SEDXMLWriter.TAG_BRANCH_CONDITION.equals(qName)) {
          return createBranchCondition(target, parent, thread, uri, localName, qName, attributes);
       }
-      else if (SEDXMLWriter.TAG_BRANCH_NODE.equals(qName)) {
-         return createBranchNode(target, parent, thread, uri, localName, qName, attributes);
+      else if (SEDXMLWriter.TAG_BRANCH_STATEMENT.equals(qName)) {
+         return createBranchStatement(target, parent, thread, uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_EXCEPTIONAL_TERMINATION.equals(qName)) {
          return createExceptionalTermination(target, parent, thread, uri, localName, qName, attributes);
       }
+      else if (SEDXMLWriter.TAG_LOOP_BODY_TERMINATION.equals(qName)) {
+         return createLoopBodyTermination(target, parent, thread, uri, localName, qName, attributes);
+      }
       else if (SEDXMLWriter.TAG_LOOP_CONDITION.equals(qName)) {
          return createLoopCondition(target, parent, thread, uri, localName, qName, attributes);
       }
-      else if (SEDXMLWriter.TAG_LOOP_NODE.equals(qName)) {
-         return createLoopNode(target, parent, thread, uri, localName, qName, attributes);
+      else if (SEDXMLWriter.TAG_LOOP_STATEMENT.equals(qName)) {
+         return createLoopStatement(target, parent, thread, uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_METHOD_CALL.equals(qName)) {
          return createMethodCall(target, parent, thread, uri, localName, qName, attributes);
@@ -401,11 +418,11 @@ public class SEDXMLReader {
       else if (SEDXMLWriter.TAG_VALUE.equals(qName)) {
          return createValue(target, uri, localName, qName, attributes);
       }
-      else if (SEDXMLWriter.TAG_USE_OPERATION_CONTRACT.equals(qName)) {
-         return createUseOperationContract(target, parent, thread, uri, localName, qName, attributes);
+      else if (SEDXMLWriter.TAG_METHOD_CONTRACT.equals(qName)) {
+         return createMethodContract(target, parent, thread, uri, localName, qName, attributes);
       }
-      else if (SEDXMLWriter.TAG_USE_LOOP_INVARIANT.equals(qName)) {
-         return createUseLoopInvariant(target, parent, thread, uri, localName, qName, attributes);
+      else if (SEDXMLWriter.TAG_LOOP_INVARIANT.equals(qName)) {
+         return createLoopInvariant(target, parent, thread, uri, localName, qName, attributes);
       }
       else {
          throw new SAXException("Unknown tag \"" + qName + "\".");
@@ -440,9 +457,9 @@ public class SEDXMLReader {
     * @return The created {@link SEDMemoryBranchCondition}.
     */
    protected SEDMemoryBranchCondition createBranchCondition(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
-      SEDMemoryBranchCondition termination = new SEDMemoryBranchCondition(target, parent, thread);
-      fillDebugNode(termination, attributes);
-      return termination;
+      SEDMemoryBranchCondition branchCondition = new SEDMemoryBranchCondition(target, parent, thread);
+      fillDebugNode(branchCondition, attributes);
+      return branchCondition;
    }
    
    /**
@@ -462,7 +479,7 @@ public class SEDXMLReader {
    }
 
    /**
-    * Creates a {@link SEDMemoryBranchNode} instance for the content in the given tag.
+    * Creates a {@link SEDMemoryBranchStatement} instance for the content in the given tag.
     * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
     * @param parent The parent {@link ISEDDebugNode} or {@code null} if not available.
     * @param thread The parent {@link ISEDThread} or {@code null} if not available.
@@ -470,14 +487,14 @@ public class SEDXMLReader {
     * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
     * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
     * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
-    * @return The created {@link SEDMemoryBranchNode}.
+    * @return The created {@link SEDMemoryBranchStatement}.
     * @throws SAXException Occurred Exception.
     */   
-   protected SEDMemoryBranchNode createBranchNode(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
-      SEDMemoryBranchNode methodReturn = new SEDMemoryBranchNode(target, parent, thread);
-      fillDebugNode(methodReturn, attributes);
-      fillStackFrame(methodReturn, attributes);
-      return methodReturn;
+   protected SEDMemoryBranchStatement createBranchStatement(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      SEDMemoryBranchStatement branchStatement = new SEDMemoryBranchStatement(target, parent, thread);
+      fillDebugNode(branchStatement, attributes);
+      fillStackFrame(branchStatement, attributes);
+      return branchStatement;
    }
    
    /**
@@ -492,7 +509,24 @@ public class SEDXMLReader {
     * @return The created {@link SEDMemoryExceptionalTermination}.
     */   
    protected SEDMemoryExceptionalTermination createExceptionalTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
-      SEDMemoryExceptionalTermination termination = new SEDMemoryExceptionalTermination(target, parent, thread);
+      SEDMemoryExceptionalTermination termination = new SEDMemoryExceptionalTermination(target, parent, thread, isVerified(attributes));
+      fillDebugNode(termination, attributes);
+      return termination;
+   }
+   
+   /**
+    * Creates a {@link SEDMemoryLoopBodyTermination} instance for the content in the given tag.
+    * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
+    * @param parent The parent {@link ISEDDebugNode} or {@code null} if not available.
+    * @param thread The parent {@link ISEDThread} or {@code null} if not available.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
+    * @return The created {@link SEDMemoryLoopBodyTermination}.
+    */   
+   protected SEDMemoryLoopBodyTermination createLoopBodyTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
+      SEDMemoryLoopBodyTermination termination = new SEDMemoryLoopBodyTermination(target, parent, thread, isVerified(attributes));
       fillDebugNode(termination, attributes);
       return termination;
    }
@@ -510,14 +544,14 @@ public class SEDXMLReader {
     * @throws SAXException Occurred Exception.
     */   
    protected SEDMemoryLoopCondition createLoopCondition(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
-      SEDMemoryLoopCondition methodReturn = new SEDMemoryLoopCondition(target, parent, thread);
-      fillDebugNode(methodReturn, attributes);
-      fillStackFrame(methodReturn, attributes);
-      return methodReturn;
+      SEDMemoryLoopCondition loopCondition = new SEDMemoryLoopCondition(target, parent, thread);
+      fillDebugNode(loopCondition, attributes);
+      fillStackFrame(loopCondition, attributes);
+      return loopCondition;
    }
    
    /**
-    * Creates a {@link SEDMemoryLoopNode} instance for the content in the given tag.
+    * Creates a {@link SEDMemoryLoopStatement} instance for the content in the given tag.
     * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
     * @param parent The parent {@link ISEDDebugNode} or {@code null} if not available.
     * @param thread The parent {@link ISEDThread} or {@code null} if not available.
@@ -525,14 +559,14 @@ public class SEDXMLReader {
     * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
     * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
     * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
-    * @return The created {@link SEDMemoryLoopNode}.
+    * @return The created {@link SEDMemoryLoopStatement}.
     * @throws SAXException Occurred Exception.
     */   
-   protected SEDMemoryLoopNode createLoopNode(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
-      SEDMemoryLoopNode methodReturn = new SEDMemoryLoopNode(target, parent, thread);
-      fillDebugNode(methodReturn, attributes);
-      fillStackFrame(methodReturn, attributes);
-      return methodReturn;
+   protected SEDMemoryLoopStatement createLoopStatement(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      SEDMemoryLoopStatement loopStatement = new SEDMemoryLoopStatement(target, parent, thread);
+      fillDebugNode(loopStatement, attributes);
+      fillStackFrame(loopStatement, attributes);
+      return loopStatement;
    }
    
    /**
@@ -548,10 +582,10 @@ public class SEDXMLReader {
     * @throws SAXException Occurred Exception.
     */   
    protected SEDMemoryMethodCall createMethodCall(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
-      SEDMemoryMethodCall methodReturn = new SEDMemoryMethodCall(target, parent, thread);
-      fillDebugNode(methodReturn, attributes);
-      fillStackFrame(methodReturn, attributes);
-      return methodReturn;
+      SEDMemoryMethodCall methodCall = new SEDMemoryMethodCall(target, parent, thread);
+      fillDebugNode(methodCall, attributes);
+      fillStackFrame(methodCall, attributes);
+      return methodCall;
    }
    
    /**
@@ -593,7 +627,7 @@ public class SEDXMLReader {
    }
    
    /**
-    * Creates a {@link SEDMemoryUseOperationContract} instance for the content in the given tag.
+    * Creates a {@link SEDMemoryMethodContract} instance for the content in the given tag.
     * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
     * @param parent The parent {@link ISEDDebugNode} or {@code null} if not available.
     * @param thread The parent {@link ISEDThread} or {@code null} if not available.
@@ -604,18 +638,18 @@ public class SEDXMLReader {
     * @return The created {@link SEDMemoryStatement}.
     * @throws SAXException Occurred Exception.
     */   
-   protected SEDMemoryUseOperationContract createUseOperationContract(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
-      SEDMemoryUseOperationContract useOperationContract = new SEDMemoryUseOperationContract(target, parent, thread);
-      fillDebugNode(useOperationContract, attributes);
-      fillStackFrame(useOperationContract, attributes);
-      useOperationContract.setPreconditionComplied(isPreconditionComplied(attributes));
-      useOperationContract.setHasNotNullCheck(hasNotNullCheck(attributes));
-      useOperationContract.setNotNullCheckComplied(isNotNullCheckComplied(attributes));
-      return useOperationContract;
+   protected SEDMemoryMethodContract createMethodContract(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      SEDMemoryMethodContract methodContract = new SEDMemoryMethodContract(target, parent, thread);
+      fillDebugNode(methodContract, attributes);
+      fillStackFrame(methodContract, attributes);
+      methodContract.setPreconditionComplied(isPreconditionComplied(attributes));
+      methodContract.setHasNotNullCheck(hasNotNullCheck(attributes));
+      methodContract.setNotNullCheckComplied(isNotNullCheckComplied(attributes));
+      return methodContract;
    }
    
    /**
-    * Creates a {@link SEDMemoryUseLoopInvariant} instance for the content in the given tag.
+    * Creates a {@link SEDMemoryLoopInvariant} instance for the content in the given tag.
     * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
     * @param parent The parent {@link ISEDDebugNode} or {@code null} if not available.
     * @param thread The parent {@link ISEDThread} or {@code null} if not available.
@@ -626,12 +660,12 @@ public class SEDXMLReader {
     * @return The created {@link SEDMemoryStatement}.
     * @throws SAXException Occurred Exception.
     */   
-   protected SEDMemoryUseLoopInvariant createUseLoopInvariant(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
-      SEDMemoryUseLoopInvariant useLoopInvariant = new SEDMemoryUseLoopInvariant(target, parent, thread);
-      fillDebugNode(useLoopInvariant, attributes);
-      fillStackFrame(useLoopInvariant, attributes);
-      useLoopInvariant.setInitiallyValid(isInitiallyValid(attributes));
-      return useLoopInvariant;
+   protected SEDMemoryLoopInvariant createLoopInvariant(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      SEDMemoryLoopInvariant loopInvariant = new SEDMemoryLoopInvariant(target, parent, thread);
+      fillDebugNode(loopInvariant, attributes);
+      fillStackFrame(loopInvariant, attributes);
+      loopInvariant.setInitiallyValid(isInitiallyValid(attributes));
+      return loopInvariant;
    }
    
    /**
@@ -646,7 +680,7 @@ public class SEDXMLReader {
     * @return The created {@link SEDMemoryTermination}.
     */   
    protected SEDMemoryTermination createTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
-      SEDMemoryTermination termination = new SEDMemoryTermination(target, parent, thread);
+      SEDMemoryTermination termination = new SEDMemoryTermination(target, parent, thread, isVerified(attributes));
       fillDebugNode(termination, attributes);
       return termination;
    }
@@ -795,6 +829,15 @@ public class SEDXMLReader {
     */
    protected boolean isAllocated(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(SEDXMLWriter.ATTRIBUTE_ALLOCATED));
+   }
+   
+   /**
+    * Returns the verified value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isVerified(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(SEDXMLWriter.ATTRIBUTE_VERIFIED));
    }
    
    /**

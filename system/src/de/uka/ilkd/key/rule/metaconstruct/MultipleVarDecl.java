@@ -15,10 +15,9 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.VariableDeclaration;
@@ -60,12 +59,11 @@ public class MultipleVarDecl extends ProgramTransformer {
 	    tailVars[i] = variables.get(i+1);
 
 	if (pe instanceof LocalVariableDeclaration) {	    	    
-	    LocalVariableDeclaration newVarDecl = 
-		new LocalVariableDeclaration(modifiers, tref, headVar);
-	    LocalVariableDeclaration newVarDeclList =
-		new LocalVariableDeclaration(modifiers, tref, tailVars);
-	    return new StatementBlock(new ImmutableArray<Statement>
-		(new Statement[]{newVarDecl, newVarDeclList}));
+	    LocalVariableDeclaration newVarDecl = KeYJavaASTFactory.declare(
+		    modifiers, tref, headVar);
+	    LocalVariableDeclaration newVarDeclList = KeYJavaASTFactory
+		    .declare(modifiers, tref, tailVars);
+	    return KeYJavaASTFactory.block(newVarDecl, newVarDeclList);
 	} 
 	throw new RuntimeException("Meta-construct MultipleVarDecl could "+
 				   "not handle program element "+pe);

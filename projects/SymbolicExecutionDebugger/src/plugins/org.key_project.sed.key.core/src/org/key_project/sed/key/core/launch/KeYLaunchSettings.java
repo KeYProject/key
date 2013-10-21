@@ -1,10 +1,28 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.core.launch;
+
+import java.io.File;
+import java.util.List;
 
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
+import org.key_project.sed.key.core.util.KeySEDUtil;
 
 import de.uka.ilkd.key.java.Position;
 
@@ -30,6 +48,11 @@ public class KeYLaunchSettings {
     * The {@link IMethod} to debug.
     */
    private IMethod method;
+   
+   /**
+    * The signature of {@link #method} computed via {@link KeySEDUtil#getMethodValue(IMethod)}.
+    */
+   private String methodSignature;
    
    /**
     * Use an existing contract or generate default contract?
@@ -84,6 +107,21 @@ public class KeYLaunchSettings {
    private Position methodRangeEnd;
 
    /**
+    * The launched location.
+    */
+   private File location;
+   
+   /**
+    * The used class path entries.
+    */
+   private List<File> classPaths;
+   
+   /**
+    * The used boot class path.
+    */
+   private File bootClassPath;
+   
+   /**
     * Constructor.
     * @param newDebugSession {@code true} new debug session, {@code false} continue existing *.proof file.
     * @param proofFileToContinue The path to the proof file to continue.
@@ -98,6 +136,10 @@ public class KeYLaunchSettings {
     * @param executeMethodRange {@code true} execute method range, {@code false} execute complete method body.
     * @param methodRangeStart The start of the method range to execute.
     * @param methodRangeEnd The end of the method range to execute.
+    * @param location The launched location.
+    * @param classPaths The used class path entries.
+    * @param bootClassPath The used boot class path.
+    * @throws JavaModelException Occurred Exception.
     */
    public KeYLaunchSettings(boolean newDebugSession,
                             String proofFileToContinue,
@@ -111,10 +153,14 @@ public class KeYLaunchSettings {
                             boolean mergeBranchConditions,
                             boolean executeMethodRange,
                             Position methodRangeStart,
-                            Position methodRangeEnd) {
+                            Position methodRangeEnd,
+                            File location,
+                            List<File> classPaths,
+                            File bootClassPath) throws JavaModelException {
       this.newDebugSession = newDebugSession;
       this.proofFileToContinue = proofFileToContinue;
       this.method = method;
+      this.methodSignature = KeySEDUtil.getMethodValue(method); // It can't be done later because the method might be renamed and JDT throws than an exception. But now the method exists definitively.
       this.useExistingContract = useExistingContract;
       this.existingContract = existingContract;
       this.precondition = precondition;
@@ -125,8 +171,11 @@ public class KeYLaunchSettings {
       this.executeMethodRange = executeMethodRange;
       this.methodRangeStart = methodRangeStart;
       this.methodRangeEnd = methodRangeEnd;
+      this.location = location;
+      this.classPaths = classPaths;
+      this.bootClassPath = bootClassPath;
    }
-   
+
    /**
     * Checks if a new debug session should be started or an existing one continued.
     * @return {@code true} new debug session, {@code false} continue existing *.proof file.
@@ -149,6 +198,14 @@ public class KeYLaunchSettings {
     */
    public IMethod getMethod() {
       return method;
+   }
+   
+   /**
+    * Returns the signature of {@link #getMethod()} computed via {@link KeySEDUtil#getMethodValue(IMethod)}.
+    * @return The signature of {@link #getMethod()} computed via {@link KeySEDUtil#getMethodValue(IMethod)}.
+    */
+   public String getMethodSignature() {
+      return methodSignature;
    }
 
    /**
@@ -229,5 +286,29 @@ public class KeYLaunchSettings {
     */
    public Position getMethodRangeEnd() {
       return methodRangeEnd;
+   }
+
+   /**
+    * Returns the launched location.
+    * @return The launched location.
+    */
+   public File getLocation() {
+      return location;
+   }
+
+   /**
+    * Returns the used class path entries.
+    * @return The used class path entries.
+    */
+   public List<File> getClassPaths() {
+      return classPaths;
+   }
+
+   /**
+    * Returns the used boot class path.
+    * @return The used boot class path.
+    */
+   public File getBootClassPath() {
+      return bootClassPath;
    }
 }

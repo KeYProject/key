@@ -20,7 +20,6 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
@@ -30,10 +29,16 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.label.ITermLabelWorker;
 import de.uka.ilkd.key.strategy.StrategyFactory;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooserBuilder;
 
 public abstract class AbstractProfile implements Profile {
+    /**
+     * The default profile which is used if no profile is defined in custom problem files (loaded via {@link KeYUserProblemFile}).
+     */
+    private static Profile defaultProfile = JavaProfile.getDefaultInstance();
 
     private final RuleCollection       standardRules;
 
@@ -44,9 +49,10 @@ public abstract class AbstractProfile implements Profile {
 
     private GoalChooserBuilder prototype;
 
+    private final ImmutableList<ITermLabelWorker> labelInstantiators;
+    
     protected AbstractProfile(String standardRuleFilename,
             ImmutableSet<GoalChooserBuilder> supportedGCB) {
-
         standardRules = new RuleCollection(RuleSource
                 .initRuleFile(standardRuleFilename),
                 initBuiltInRules());
@@ -55,10 +61,16 @@ public abstract class AbstractProfile implements Profile {
         this.supportedGC = extractNames(supportedGCB);
         this.prototype = getDefaultGoalChooserBuilder();
         assert( this.prototype!=null );
-
+        this.labelInstantiators = computeLabelInstantiators();
     }
 
-    private static
+   /**
+    * Computes the {@link ITermLabelWorker} to use in this {@link Profile}.
+    * @return The {@link ITermLabelWorker} to use in this {@link Profile}.
+    */
+   protected abstract ImmutableList<ITermLabelWorker> computeLabelInstantiators();
+
+   private static
         ImmutableSet<String> extractNames(ImmutableSet<GoalChooserBuilder> supportedGCB) {
 
         ImmutableSet<String> result = DefaultImmutableSet.<String>nil();
@@ -190,13 +202,6 @@ public abstract class AbstractProfile implements Profile {
      public RuleJustification getJustification(Rule r) {
          return AxiomJustification.INSTANCE;
      }
-
-     /**
-      * sets the given settings to some default depending on the profile
-      */
-     public void updateSettings(ProofSettings settings) {
-	 //settings.getSMTSettings().updateSMTRules(this);
-     }
      
      
      @Override
@@ -209,4 +214,53 @@ public abstract class AbstractProfile implements Profile {
      public String getInternalClasslistFilename() {
 	 return "JAVALANG.TXT";
      }
+
+   /**
+    * <p>
+    * Returns the {@link Profile} for the given name.
+    * </p>
+    * <p>
+    * It is typically used in the {@link Thread} of the user interface.
+    * Other instances of this class are typically only required to 
+    * use them in different {@link Thread}s (not the UI {@link Thread}).
+    * </p>
+    * @param name The name of the requested {@link Profile}.
+    * @return The {@link Profile} with the given name for usage in the {@link Thread} of the user interface or {@code null} if not available.
+    */
+   public static Profile getDefaultInstanceForName(String name) {
+      if (JavaProfile.NAME.equals(name)) {
+         return JavaProfile.getDefaultInstance();
+      }
+      else if (SymbolicExecutionJavaProfile.NAME.equals(name)) {
+         return SymbolicExecutionJavaProfile.getDefaultInstance();
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Returns the default profile which is used if no profile is defined in custom problem files (loaded via {@link KeYUserProblemFile}).
+    * @return The default profile which is used if no profile is defined in custom problem files (loaded via {@link KeYUserProblemFile}).
+    */
+   public static Profile getDefaultProfile() {
+      return defaultProfile;
+   }
+
+   /**
+    * Sets the default profile which is used if no profile is defined in custom problem files (loaded via {@link KeYUserProblemFile}).
+    * @param defaultProfile The default profile which is used if no profile is defined in custom problem files (loaded via {@link KeYUserProblemFile}).
+    */
+   public static void setDefaultProfile(Profile defaultProfile) {
+      assert defaultProfile != null;
+      AbstractProfile.defaultProfile = defaultProfile;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ImmutableList<ITermLabelWorker> getLabelInstantiators() {
+      return labelInstantiators;
+   }
 }

@@ -17,7 +17,9 @@ package de.uka.ilkd.key.util.install;
 public abstract class KeYInstallerUI extends KeYInstaller {
 
 
-    public KeYInstallerUI ( String keyHome, 
+    protected static final String EXAMPLES_JAR_FILE = "examples.jar";
+
+public KeYInstallerUI ( String keyHome, 
 			    String keyLib, 
 			    String javaHome, 
 			    String keyJarPath,			  

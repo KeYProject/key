@@ -164,7 +164,7 @@ public class VariableNameProposer implements InstantiationProposer {
 	final String basename = name + SKOLEMTERM_VARIABLE_NAME_POSTFIX;
 	do {
 	    name = basename + services.getCounter(SKOLEMTERMVARCOUNTER_PREFIX + name)
-		.getCountPlusPlusWithParent(undoAnchor);	    
+		.getCountPlusPlus();	    
 	    l_name = new Name(name);
 	} while (nss.lookup(l_name) != null &&
                 !previousProposals.contains(name));
@@ -184,7 +184,7 @@ public class VariableNameProposer implements InstantiationProposer {
             if (name.length() > 0) {
                 name = basename + 
                 services.getCounter(GENERALNAMECOUNTER_PREFIX + name)
-                .getCountPlusPlusWithParent(undoAnchor);
+                .getCountPlusPlus();
             } else {
                 name = basename.length() > 0 ? basename : "gen";
             }
@@ -249,7 +249,7 @@ public class VariableNameProposer implements InstantiationProposer {
         String proposal;         
         do {
             proposal = LABEL_NAME_PREFIX + services.getCounter(LABELCOUNTER_NAME)
-            .getCountPlusPlusWithParent(undoAnchor);
+            .getCountPlusPlus();
         } while (lc.contains(new ProgramElementName(proposal)) ||
                 previousProposals.contains(proposal));
         

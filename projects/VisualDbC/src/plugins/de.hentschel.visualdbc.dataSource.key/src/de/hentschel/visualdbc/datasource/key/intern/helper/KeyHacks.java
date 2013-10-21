@@ -1,12 +1,14 @@
 /*******************************************************************************
- * Copyright (c) 2011 Martin Hentschel.
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    Martin Hentschel - initial API and implementation
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
 package de.hentschel.visualdbc.datasource.key.intern.helper;
@@ -22,6 +24,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
@@ -92,9 +95,15 @@ public final class KeyHacks {
             return StringUtil.trim(pres); // Trim the text to remove line breaks in the end
          }
          else {
-            Term originalPre = ObjectUtil.get(contract, "originalPre");
-            String inv = LogicPrinter.quickPrintTerm(originalPre, services);
-            return StringUtil.trim(inv); // Trim the text to remove line breaks in the end
+            Map<LocationVariable, Term> originalPres = ObjectUtil.get(contract, "originalPres");
+            String pres = "";
+            for(LocationVariable h : originalPres.keySet()) {
+               Term originalPre = originalPres.get(h);
+               if(originalPre != null) {
+                    pres = pres + "["+h+"] "+LogicPrinter.quickPrintTerm(originalPre, services);
+               }
+            }
+            return StringUtil.trim(pres); // Trim the text to remove line breaks in the end
          }
       }
       catch (Exception e) {
@@ -146,9 +155,18 @@ public final class KeyHacks {
          // An alternative possible solution will be to convert the HTML text back to plain text.
          // This realization is implemented, because it is easier and more performant. 
          Assert.isNotNull(dependencyContract);
-         Term originalDep = ObjectUtil.get(dependencyContract, "originalDep");
-         String inv = LogicPrinter.quickPrintTerm(originalDep, services);
-         return StringUtil.trim(inv); // Trim the text to remove line breaks in the end
+         Map<ProgramVariable,Term> originalDeps = ObjectUtil.get(dependencyContract, "originalDeps");
+         String deps = "";
+         for(ProgramVariable h : originalDeps.keySet()) {
+             if(h.name().toString().endsWith("AtPre") && dependencyContract.getTarget().getStateCount() == 1) {
+                  continue;
+             }
+             Term originalDep = originalDeps.get(h);
+             if(originalDep != null) {
+                 deps = deps + "["+h+"] "+LogicPrinter.quickPrintTerm(originalDep, services);
+             }
+         }
+         return StringUtil.trim(deps); // Trim the text to remove line breaks in the end
       }
       catch (Exception e) {
          throw new DSException("Can't read dep condition from axiom contract: " + dependencyContract, e);
@@ -176,7 +194,7 @@ public final class KeyHacks {
          for(LocationVariable h : heapLDT.getAllHeaps()) {
             if(originalMods.get(h) != null) {
                mods = mods + "mod[" + h + "]: " + LogicPrinter.quickPrintTerm(originalMods.get(h), services);
-               if(h == baseHeap && !contract.hasModifiesClause()) {
+               if(h == baseHeap && !contract.hasModifiesClause(h)) {
                   mods = mods + ", creates no new objects";
                }
             }

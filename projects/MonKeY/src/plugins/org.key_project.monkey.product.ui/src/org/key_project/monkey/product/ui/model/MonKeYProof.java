@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.monkey.product.ui.model;
 
 import java.io.File;
@@ -6,6 +19,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.Assert;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.starter.core.util.ProofUserManager;
+import org.key_project.monkey.product.ui.util.MonKeYUtil;
 import org.key_project.util.bean.Bean;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.SwingUtil;
@@ -15,15 +30,14 @@ import org.key_project.util.java.thread.IRunnableWithResult;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.proof.DefaultProblemLoader;
-import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.util.MiscTools;
@@ -58,9 +72,9 @@ public class MonKeYProof extends Bean {
      * Bean property {@link #getReuseStatus()}.
      */
     public static final String PROP_REUSE_STATUS = "reuseStatus";
-
+    
     /**
-     * The {@link KeYEnvironment} that contains the {@link OperationContract} to proof.
+     * The {@link KeYEnvironment} to use.
      */
     private KeYEnvironment<?> environment;
 
@@ -124,7 +138,7 @@ public class MonKeYProof extends Bean {
      * @param typeName The type.
      * @param targetName The target. 
      * @param contractName The contract.
-     * @param environment The {@link KeYEnvironment} that contains the {@link OperationContract} to proof.
+     * @param environment The {@link KeYEnvironment} to use.
      * @param contract The {@link Contract} to proof.
      */
     public MonKeYProof(String typeName, 
@@ -132,7 +146,6 @@ public class MonKeYProof extends Bean {
                        String contractName,
                        KeYEnvironment<?> environment,
                        Contract contract) {
-        super();
         Assert.isNotNull(environment);
         Assert.isNotNull(contract);
         this.typeName = typeName;
@@ -187,7 +200,7 @@ public class MonKeYProof extends Bean {
           // Check if the proof is still valid
           if (proof != null && !proof.isDisposed()) {
              // proof is invalid, reset this automatic proof instance
-             proof = null; 
+             removeProof(); 
              setResult(MonKeYProofResult.UNKNOWN);
              updateStatistics();
           }
@@ -199,8 +212,9 @@ public class MonKeYProof extends Bean {
                       try {
                           ProofOblInput input = contract.createProofObl(environment.getInitConfig(), contract);
                           Assert.isNotNull(input);
-                          Proof proof = environment.createProof(input);
+                          Proof proof = environment.getUi().createProof(environment.getInitConfig(), input);
                           Assert.isNotNull(proof);
+                          ProofUserManager.getInstance().addUser(proof, environment, MonKeYProof.this);
                           setResult(proof);
                       }
                       catch (Exception e) {
@@ -236,12 +250,12 @@ public class MonKeYProof extends Bean {
                    proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
                    // Make sure that the new options are used
                    ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);
-                   proof.setActiveStrategy(environment.getProfile().getDefaultStrategyFactory().create(proof, sp));
+                   proof.setActiveStrategy(environment.getMediator().getProfile().getDefaultStrategyFactory().create(proof, sp));
                 }
              });
              // Start interactive proof automatically
              proofStartTime = System.currentTimeMillis();
-             if (isMainWindowEnvironment()) {
+             if (MonKeYUtil.isMainWindowEnvironment(environment)) {
                 KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof); // Run auto mode without result dialog
              }
              else {
@@ -251,15 +265,6 @@ public class MonKeYProof extends Bean {
              updateStatistics();
           }
        }
-    }
-    
-    /**
-     * Checks if the {@link KeYEnvironment} is shown in KeY's {@link MainWindow}.
-     * @return {@code true} {@link KeYEnvironment} is shown in {@link MainWindow}, {@code false} {@link KeYEnvironment} is not shown in {@link MainWindow}.
-     */
-    protected boolean isMainWindowEnvironment() {
-       return MainWindow.hasInstance() && 
-              MainWindow.getInstance().getUserInterface() == environment.getUi();
     }
 
     /**
@@ -391,15 +396,16 @@ public class MonKeYProof extends Bean {
           Runnable run = new Runnable() {
              @Override
              public void run() {
-                environment.getUi().removeProof(proofToRemove);
+                ProofUserManager.getInstance().removeUserAndDispose(proofToRemove, MonKeYProof.this);
              }
           };
-          if (isMainWindowEnvironment()) {
+          if (MonKeYUtil.isMainWindowEnvironment(environment)) {
              SwingUtil.invokeAndWait(run);
           }
           else {
              run.run();
           }
+          proofToRemove.dispose();
        }
     }
 
@@ -479,17 +485,17 @@ public class MonKeYProof extends Bean {
                public void run() {
                    try {
                        final File bootClassPathFile = !StringUtil.isTrimmedEmpty(bootClassPath) ? new File(bootClassPath) : null;
-                       if (isMainWindowEnvironment()) {
+                       if (MonKeYUtil.isMainWindowEnvironment(environment)) {
                           KeYUtil.runWithoutResultDialog(new KeYUtil.IRunnableWithMainWindow() {
                              @Override
                              public void run(MainWindow main) throws Exception {
-                                DefaultProblemLoader loader = main.getUserInterface().load(new File(proofDirectory, getProofFileName()), null, bootClassPathFile);
+                                DefaultProblemLoader loader = main.getUserInterface().load(null, new File(proofDirectory, getProofFileName()), null, bootClassPathFile);
                                 setResult(loader.getProof());
                              }
                           });
                        }
                        else {
-                          DefaultProblemLoader loader = environment.getUi().load(new File(proofDirectory, getProofFileName()), null, bootClassPathFile);
+                          DefaultProblemLoader loader = environment.getUi().load(null, new File(proofDirectory, getProofFileName()), null, bootClassPathFile);
                           setResult(loader.getProof());
                        }
                    }
@@ -537,5 +543,21 @@ public class MonKeYProof extends Bean {
     */
    public boolean isReused() {
       return "Loaded Proof".equals(getReuseStatus());
+   }
+
+   /**
+    * Returns the {@link Proof} instance if available.
+    * @return The {@link Proof} instance if available.
+    */
+   public Proof getProof() {
+      return proof;
+   }
+
+   /**
+    * Returns the used {@link KeYEnvironment}.
+    * @return The used {@link KeYEnvironment}.
+    */
+   public KeYEnvironment<?> getEnvironment() {
+      return environment;
    }
 }

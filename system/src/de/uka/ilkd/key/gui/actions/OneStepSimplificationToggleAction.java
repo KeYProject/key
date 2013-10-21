@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.Image;
@@ -11,7 +24,9 @@ import javax.swing.KeyStroke;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.util.MiscTools;
 
 public class OneStepSimplificationToggleAction extends MainWindowAction {
 
@@ -43,7 +58,14 @@ public class OneStepSimplificationToggleAction extends MainWindowAction {
 	ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(b);
 //	ProofSettings.DEFAULT_SETTINGS.getGeneralSettings()
 //	        .setOneStepSimplification(b);
-	OneStepSimplifier.INSTANCE.refresh(getMediator().getSelectedProof());
+	OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(getMediator().getProfile());
+	if (simplifier != null) {
+	   simplifier.refresh(getMediator().getSelectedProof());
+	}
     }
 
+   @Override
+   public boolean isEnabled() {
+      return super.isEnabled() && getMediator().getProfile() instanceof JavaProfile;
+   }
 }

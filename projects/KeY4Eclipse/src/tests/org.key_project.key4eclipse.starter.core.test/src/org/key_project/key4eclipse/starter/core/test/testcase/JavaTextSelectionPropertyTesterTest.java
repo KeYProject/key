@@ -1,6 +1,17 @@
-package org.key_project.key4eclipse.starter.core.test.testcase;
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 
-import junit.framework.TestCase;
+package org.key_project.key4eclipse.starter.core.test.testcase;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -15,13 +26,14 @@ import org.key_project.key4eclipse.starter.core.expression.JavaTextSelectionProp
 import org.key_project.key4eclipse.starter.core.test.Activator;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests for {@link JavaTextSelectionPropertyTester}.
  * @author Martin Hentschel
  */
-public class JavaTextSelectionPropertyTesterTest extends TestCase {
+public class JavaTextSelectionPropertyTesterTest extends AbstractSetupTestCase {
     /**
      * Tests {@link JavaTextSelectionPropertyTester#test(Object, String, Object[], Object)}.
      */

@@ -33,8 +33,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
  * <code>PrefixTermTacletAppIndexCacheImpl</code> (different proofs, different
  * proof branches, different locations).
  */
-abstract class PrefixTermTacletAppIndexCacheImpl extends
-                                                 PrefixTermTacletAppIndexCache {
+public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTacletAppIndexCache {
 
     private final Map<CacheKey, TermTacletAppIndex> cache;
     
@@ -92,7 +91,7 @@ abstract class PrefixTermTacletAppIndexCacheImpl extends
     
     private final CacheKey queryCacheKey = new CacheKey ( this, null );
     
-    private static class CacheKey {
+    public static class CacheKey {
         private final PrefixTermTacletAppIndexCacheImpl parent;
         public Term analysedTerm;
 

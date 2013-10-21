@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KeY Resources UI Test
+Bundle-SymbolicName: org.key_project.key4eclipse.resources.ui.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.key4eclipse.resources.ui.test.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.7.101",
+ org.junit;bundle-version="4.8.2",
+ org.eclipse.swtbot.eclipse.finder;bundle-version="2.0.4",
+ org.eclipse.swtbot.go;bundle-version="2.0.4",
+ org.key_project.util.test;bundle-version="1.0.0",
+ org.key_project.util;bundle-version="1.0.0",
+ org.eclipse.jdt.core;bundle-version="3.7.3",
+ org.eclipse.jdt.ui;bundle-version="3.7.2",
+ org.key_project.key4eclipse.resources.ui;bundle-version="1.0.0",
+ org.key_project.key4eclipse.resources;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: KeY Project

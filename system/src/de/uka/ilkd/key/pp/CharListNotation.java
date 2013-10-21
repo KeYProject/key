@@ -60,7 +60,7 @@ public final class CharListNotation extends Notation {
 	} catch (NumberFormatException ex) {
 	    throw new IllegalArgumentException(result +" is not of type char");
 	} 		
-	return new Character(charVal).toString();
+	return ""+charVal;
     }
 
     /** translates a term that represents a string literal into a string

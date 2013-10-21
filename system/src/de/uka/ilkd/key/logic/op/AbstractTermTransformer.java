@@ -15,7 +15,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import java.util.HashMap;
-
+import java.util.LinkedHashMap;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.*;
@@ -35,7 +35,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
                                            implements TermTransformer {
 
     private static final HashMap<String, AbstractTermTransformer> name2metaop 
-    	= new HashMap<String, AbstractTermTransformer>(70);
+    	= new LinkedHashMap<String, AbstractTermTransformer>(70);
     
     //must be first
     public static final Sort METASORT = new SortImpl(new Name("Meta"));    
@@ -81,8 +81,6 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer META_LONG_SHIFTLEFT = new MetaJavaLongShiftLeft();
 
     public static final AbstractTermTransformer META_LONG_UNSIGNEDSHIFTRIGHT = new MetaJavaLongUnsignedShiftRight();
-
-    public static final AbstractTermTransformer WHILE_INV_RULE = new WhileInvRule();
 
     public static final AbstractTermTransformer ARRAY_BASE_INSTANCE_OF = new ArrayBaseInstanceOf();
 

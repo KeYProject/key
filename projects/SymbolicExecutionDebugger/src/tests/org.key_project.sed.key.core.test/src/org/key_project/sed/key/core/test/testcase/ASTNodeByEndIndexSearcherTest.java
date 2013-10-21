@@ -1,6 +1,17 @@
-package org.key_project.sed.key.core.test.testcase;
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 
-import junit.framework.TestCase;
+package org.key_project.sed.key.core.test.testcase;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -16,6 +27,7 @@ import org.junit.Test;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.ASTNodeByEndIndexSearcher;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
@@ -23,7 +35,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 @SuppressWarnings("restriction")
-public class ASTNodeByEndIndexSearcherTest extends TestCase {
+public class ASTNodeByEndIndexSearcherTest extends AbstractSetupTestCase {
    /**
     * Tests the search result of the search process via
     * {@link ASTNodeByEndIndexSearcher#search(org.eclipse.jdt.core.dom.ASTNode, int)}.

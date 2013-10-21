@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.po;
 
 import java.io.IOException;
@@ -24,6 +37,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.java.visitor.UndeclaredProgramVariableCollector;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -40,8 +54,8 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
  * </p>
  * <p>
  * To select statements by its end position is required, because KeY's recorder
- * includes also leading space and leading comments into a statements position. 
- * Another drawback is that the end position of the previous statement is 
+ * includes also leading space and leading comments into a statements position.
+ * Another drawback is that the end position of the previous statement is
  * exactly the start position of the following statement.
  * </p>
  * <p>
@@ -78,17 +92,17 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     * Contains all undeclared variables used in the method part to execute.
     */
    private UndeclaredProgramVariableCollector undeclaredVariableCollector;
-   
+
    /**
     * The start position.
     */
    private Position startPosition;
-   
+
    /**
     * The end position.
     */
    private Position endPosition;
-   
+
    /**
     * Constructor.
     * @param initConfig The {@link InitConfig} to use.
@@ -98,19 +112,19 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     * @param startPosition The start position.
     * @param endPosition The end position.
     */
-   public ProgramMethodSubsetPO(InitConfig initConfig, 
-                       String name, 
-                       IProgramMethod pm, 
-                       String precondition,
-                       Position startPosition,
-                       Position endPosition) {
+   public ProgramMethodSubsetPO(InitConfig initConfig,
+                                String name,
+                                IProgramMethod pm,
+                                String precondition,
+                                Position startPosition,
+                                Position endPosition) {
       super(initConfig, name, pm, precondition);
       assert startPosition != null;
       assert endPosition != null;
       this.startPosition = startPosition;
       this.endPosition = endPosition;
    }
-   
+
    /**
     * Constructor.
     * @param initConfig The {@link InitConfig} to use.
@@ -120,27 +134,29 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     * @param startPosition The start position.
     * @param endPosition The end position.
     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate, {@code false} uninterpreted predicate is not contained in postcondition.
+    * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel} to the modality, {@code false} to not label the modality.
     */
-   public ProgramMethodSubsetPO(InitConfig initConfig, 
-                       String name, 
-                       IProgramMethod pm, 
-                       String precondition,
-                       Position startPosition,
-                       Position endPosition,
-                       boolean addUninterpretedPredicate) {
-      super(initConfig, name, pm, precondition, addUninterpretedPredicate);
+   public ProgramMethodSubsetPO(InitConfig initConfig,
+                                String name,
+                                IProgramMethod pm,
+                                String precondition,
+                                Position startPosition,
+                                Position endPosition,
+                                boolean addUninterpretedPredicate,
+                                boolean addSymbolicExecutionLabel) {
+      super(initConfig, name, pm, precondition, addUninterpretedPredicate, addSymbolicExecutionLabel);
       assert startPosition != null;
       assert endPosition != null;
       this.startPosition = startPosition;
       this.endPosition = endPosition;
    }
-   
+
    /**
     * {@inheritDoc}
     */
    @Override
-   protected StatementBlock buildOperationBlock(ImmutableList<LocationVariable> formalParVars,
-                                                ProgramVariable selfVar, 
+   protected ImmutableList<StatementBlock> buildOperationBlocks(ImmutableList<LocationVariable> formalParVars,
+                                                ProgramVariable selfVar,
                                                 ProgramVariable resultVar) {
       // Get program method to execute
       KeYJavaType type = getCalleeKeYJavaType();
@@ -150,8 +166,8 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
       collectStatementsToExecute(statementsToExecute, pm.getBody());
       Statement[] statements = statementsToExecute.toArray(new Statement[statementsToExecute.size()]);
       StatementBlock blockToExecute = new StatementBlock(statements);
-      MethodFrame mf = new MethodFrame(endsWithReturn(statements) ? resultVar : null, 
-                                       new ExecutionContext(new TypeRef(type), pm, selfVar), 
+      MethodFrame mf = new MethodFrame(endsWithReturn(statements) ? resultVar : null,
+                                       new ExecutionContext(new TypeRef(type), pm, selfVar),
                                        blockToExecute);
       StatementBlock result = new StatementBlock(mf);
       // Collect undeclared variables
@@ -162,7 +178,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
       for (LocationVariable x : undeclaredVariables) {
          register(x);
       }
-      return result;
+      return ImmutableSLList.<StatementBlock>nil().prepend(null, result, null, null);
    }
 
    /**
@@ -194,7 +210,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
          }
       }
    }
-   
+
    /**
     * Checks if the last statement is a {@link Return} statement.
     * @param statements The statements to check.
@@ -213,10 +229,10 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     * {@inheritDoc}
     */
    @Override
-   protected Term getPre(List<LocationVariable> modHeaps, 
-                         ProgramVariable selfVar, 
-                         ImmutableList<ProgramVariable> paramVars, 
-                         Map<LocationVariable, LocationVariable> atPreVars, 
+   protected Term getPre(List<LocationVariable> modHeaps,
+                         ProgramVariable selfVar,
+                         ImmutableList<ProgramVariable> paramVars,
+                         Map<LocationVariable, LocationVariable> atPreVars,
                          Services services) {
       ImmutableList<ProgramVariable> paramVarsList = convert(undeclaredVariableCollector.result());
       return super.getPre(modHeaps, selfVar, paramVarsList, atPreVars, services);
@@ -226,9 +242,9 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     * {@inheritDoc}
     */
    @Override
-   protected Term buildFreePre(ProgramVariable selfVar, 
-                               KeYJavaType selfKJT, 
-                               ImmutableList<ProgramVariable> paramVars, 
+   protected Term buildFreePre(ProgramVariable selfVar,
+                               KeYJavaType selfKJT,
+                               ImmutableList<ProgramVariable> paramVars,
                                List<LocationVariable> heaps) {
       ImmutableList<ProgramVariable> paramVarsList = convert(undeclaredVariableCollector.result());
       return super.buildFreePre(selfVar, selfKJT, paramVarsList, heaps);
@@ -238,13 +254,13 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     * {@inheritDoc}
     */
    @Override
-   protected Term buildUninterpretedPredicate(ImmutableList<ProgramVariable> paramVars, 
+   protected Term buildUninterpretedPredicate(ImmutableList<ProgramVariable> paramVars,
                                               ProgramVariable exceptionVar,
                                               String name) {
       ImmutableList<ProgramVariable> paramVarsList = convert(undeclaredVariableCollector.result());
       return super.buildUninterpretedPredicate(paramVarsList, exceptionVar, name);
    }
-   
+
    /**
     * Converts the given {@link Collection} into an {@link ImmutableList}.
     * @param c The {@link Collection} to convert.
@@ -257,14 +273,14 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
       }
       return result;
    }
-   
+
    /**
     * {@inheritDoc}
     */
    @Override
    public int hashCode() {
-      return super.hashCode() + 
-             (getStartPosition() != null ? getStartPosition().hashCode() : 0) + 
+      return super.hashCode() +
+             (getStartPosition() != null ? getStartPosition().hashCode() : 0) +
              (getEndPosition() != null ? getEndPosition().hashCode() : 0);
    }
 
@@ -325,12 +341,13 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     */
    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException {
       return new LoadedPOContainer(new ProgramMethodSubsetPO(initConfig,
-                                                             getName(properties), 
-                                                             getProgramMethod(initConfig, properties), 
+                                                             getName(properties),
+                                                             getProgramMethod(initConfig, properties),
                                                              getPrecondition(properties),
                                                              getStartPosition(properties),
                                                              getEndPosition(properties),
-                                                             isAddUninterpretedPredicate(properties)));
+                                                             isAddUninterpretedPredicate(properties),
+                                                             isAddSymbolicExecutionLabel(properties)));
    }
 
    /**
@@ -370,7 +387,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
       }
       return new Position(lineValue, columnValue);
    }
-   
+
    /**
     * Extracts the end position from the given {@link Properties}.
     * @param properties The proof obligation settings to read from.

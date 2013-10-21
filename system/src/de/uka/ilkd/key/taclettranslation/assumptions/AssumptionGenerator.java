@@ -1,9 +1,24 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -44,7 +59,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
         protected final static TermFactory tf = TermFactory.DEFAULT;
 
-        protected HashMap<String, LogicVariable> usedVariables = new HashMap<String, LogicVariable>();
+        protected HashMap<String, LogicVariable> usedVariables = new LinkedHashMap<String, LogicVariable>();
 
         protected Collection<TranslationListener> listener = new LinkedList<TranslationListener>();
 
@@ -170,7 +185,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         }
 
         static public HashSet<GenericSort> collectGenerics(Term term) {
-                HashSet<GenericSort> genericSorts = new HashSet<GenericSort>();
+                HashSet<GenericSort> genericSorts = new LinkedHashSet<GenericSort>();
                 collectGenerics(term, genericSorts);
                 return genericSorts;
         }

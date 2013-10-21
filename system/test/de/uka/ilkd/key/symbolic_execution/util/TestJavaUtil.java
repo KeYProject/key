@@ -1,8 +1,24 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.util;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -11,6 +27,34 @@ import junit.framework.TestCase;
  * @author Martin Hentschel
  */
 public class TestJavaUtil extends TestCase {
+   /**
+    * Tests for {@link JavaUtil#toSortedString(java.util.Map)}
+    */
+   public void testSoSortedString() {
+      // Test equality to toString() of maps
+      Map<String, String> emptyMap = new HashMap<String, String>();
+      Map<String, String> oneElementMap = new LinkedHashMap<String, String>();
+      oneElementMap.put("A", "Value of A");
+      Map<String, String> twoElementMap = new LinkedHashMap<String, String>();
+      twoElementMap.put("B", "Value of B");
+      twoElementMap.put("A", "Value of A");
+      Map<String, String> threeElementMap = new LinkedHashMap<String, String>();
+      threeElementMap.put("A", "Value of A");
+      threeElementMap.put("B", "Value of B");
+      threeElementMap.put("C", "Value of C");
+      assertEquals(null, JavaUtil.toSortedString(null));
+      assertEquals(emptyMap.toString(), JavaUtil.toSortedString(emptyMap));
+      assertEquals(oneElementMap.toString(), JavaUtil.toSortedString(oneElementMap));
+      assertEquals(threeElementMap.toString(), JavaUtil.toSortedString(threeElementMap));
+      // Test sorting
+      Map<String, String> fourElementMap = new LinkedHashMap<String, String>();
+      fourElementMap.put("B", "Value of B");
+      fourElementMap.put("A", "Value of A");
+      fourElementMap.put("D", "Value of D");
+      fourElementMap.put("C", "Value of C");
+      assertEquals("{A=Value of A, B=Value of B, C=Value of C, D=Value of D}", JavaUtil.toSortedString(fourElementMap));
+   }
+   
    /**
     * Tests for {@link JavaUtil#searchAndRemove(Iterable, IFilter)}.
     */

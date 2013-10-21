@@ -1,11 +1,31 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.monkey.product.ui.view;
 
+import java.io.File;
+
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
+import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
+import org.key_project.key4eclipse.starter.core.util.IProofProvider;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.monkey.product.ui.composite.MonKeYComposite;
 
 /**
@@ -13,7 +33,7 @@ import org.key_project.monkey.product.ui.composite.MonKeYComposite;
  * @author Martin Hentschel
  */
 public class MonKeYView extends ViewPart {
-    /**
+   /**
      * The ID of this view.
      */
     public static final String ID = "org.key_project.monkey.product.ui.view.MonKeYView";
@@ -27,7 +47,18 @@ public class MonKeYView extends ViewPart {
      * The {@link IMemento} to load the last state from.
      */
     private IMemento mementoToLoadFrom;
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void dispose() {
+        if (composite != null) {
+            composite.dispose();
+        }
+        super.dispose();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -65,5 +96,32 @@ public class MonKeYView extends ViewPart {
     public void saveState(IMemento memento) {
         composite.saveState(memento);
         super.saveState(memento);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
+        if (IProofProvider.class.equals(adapter)) {
+            return composite;
+        }
+        else {
+            return super.getAdapter(adapter);
+        }
+    }
+
+    /**
+     * Loads the given {@link IProject} in MonKeY.
+     * @param project The {@link IProject} to load.
+     * @throws CoreException Occurred Exception.
+     */
+    public void loadProject(IProject project) throws CoreException {
+        if (composite != null && !composite.isDisposed()) {
+           File location = KeYUtil.getSourceLocation(project);
+           composite.setLocation(location != null ? location.getAbsolutePath() : null);
+           composite.setBootClassPath(KeYResourceProperties.getBootClassPath(project));
+           composite.loadSource();
+        }
     }
 }

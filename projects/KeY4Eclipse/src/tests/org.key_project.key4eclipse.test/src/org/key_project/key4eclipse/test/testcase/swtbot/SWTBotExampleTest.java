@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.key4eclipse.test.testcase.swtbot;
 
 import java.lang.reflect.InvocationTargetException;
@@ -13,6 +26,7 @@ import org.key_project.swtbot.swing.bot.SwingBotJDialog;
 import org.key_project.swtbot.swing.bot.SwingBotJFrame;
 import org.key_project.swtbot.swing.bot.SwingBotJList;
 import org.key_project.swtbot.swing.bot.SwingBotJMenu;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
 
@@ -22,7 +36,7 @@ import de.uka.ilkd.key.gui.MainWindow;
  * Tests the example dialog in the Eclipse integration.
  * @author Martin Hentschel
  */
-public class SWTBotExampleTest extends TestCase {
+public class SWTBotExampleTest extends AbstractSetupTestCase {
     /**
      * Opens the example wizard, selects an example and loads it.
      */
@@ -48,7 +62,7 @@ public class SWTBotExampleTest extends TestCase {
             loadButton.clickAndWait();
             // Start proof
             TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-            TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MyClass", "MyClass", "MyClass()", "0", null), TestKeY4EclipseUtil.createOperationContractId("MyClass", "MyClass", "MyClass()", "0", null));
+            TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("Cell", "Cell", "Cell()", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("Cell", "Cell", "Cell()", "0", "normal_behavior"));
             // Finish proof automatically
             TestUtilsUtil.keyFinishSelectedProofAutomatically(frame, MethodTreatment.EXPAND);
             // Clear proof list

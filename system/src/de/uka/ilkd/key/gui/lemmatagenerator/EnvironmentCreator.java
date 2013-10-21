@@ -1,9 +1,21 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
@@ -32,10 +44,10 @@ public class EnvironmentCreator  {
         ProofInputException {
                 File dummyFile = createDummyKeYFile(pathForDummyFile);
                 keyFile = new KeYUserProblemFile(
-                                dummyFile.getName(), dummyFile, null);
+                                dummyFile.getName(), dummyFile, null, profile);
 
-                ProblemInitializer pi = new ProblemInitializer(monitor, profile,
-                                new Services(new KeYRecoderExcHandler()),
+                ProblemInitializer pi = new ProblemInitializer(monitor, 
+                                new Services(profile, new KeYRecoderExcHandler()),
                                 false, listener );
                
                 return pi.prepare(keyFile).getProofEnv();

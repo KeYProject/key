@@ -16,6 +16,7 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -37,7 +38,7 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
  */
 public class RuleSetDispatchFeature implements Feature {
 
-    private final Map<RuleSet, Feature> rulesetToFeature = new HashMap<RuleSet, Feature> ();
+    private final Map<RuleSet, Feature> rulesetToFeature = new LinkedHashMap<RuleSet, Feature> ();
     
     private RuleSetDispatchFeature() {}
     
@@ -72,7 +73,7 @@ public class RuleSetDispatchFeature implements Feature {
         if ( combinedF == null )
             combinedF = f;
         else
-            combinedF = BinarySumFeature.createSum ( combinedF, f );
+            combinedF = SumFeature.createSum ( combinedF, f );
 
         rulesetToFeature.put ( ruleSet, combinedF );
     }
@@ -82,5 +83,14 @@ public class RuleSetDispatchFeature implements Feature {
      */
     public void clear(RuleSet ruleSet) {
         rulesetToFeature.remove ( ruleSet );
+    }
+    
+    /**
+     * Returns the used {@link Feature} for the given {@link RuleSet}.
+     * @param ruleSet The {@link RuleSet} to get its {@link Feature}.
+     * @return The {@link Feature} used for the given {@link RuleSet} or {@code null} if not available.
+     */
+    public Feature get(RuleSet ruleSet) {
+       return rulesetToFeature.get(ruleSet);
     }
 }

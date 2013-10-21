@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.ByteArrayInputStream;
@@ -14,19 +27,21 @@ import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessBranchNode;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessLoopCondition;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessLoopNode;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessMethodCall;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStartNode;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessMethodReturnValue;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStart;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStatement;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessTermination;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessUseLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessUseOperationContract;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessLoopInvariant;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessOperationContract;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessValue;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessVariable;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 
 /**
  * Tests {@link ExecutionNodeWriter} and {@link ExecutionNodeReader}
@@ -36,29 +51,57 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
    /**
     * Tests the reading and writing process without variables and without call stack.
     */
-   public void testWritingAndReading_withoutVariables_and_withoutCallStack() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
-      doTestWritingAndReading(false, false);
+   public void testWritingAndReading_withoutVariables_and_withoutCallStack_withReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+      doTestWritingAndReading(false, false, true);
    }
    
    /**
     * Tests the reading and writing process without call stack.
     */
-   public void testWritingAndReading_withoutCallStack() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
-      doTestWritingAndReading(true, false);
+   public void testWritingAndReading_withoutCallStack_withReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+      doTestWritingAndReading(true, false, true);
    }
    
    /**
     * Tests the reading and writing process without variables.
     */
-   public void testWritingAndReading_withoutVariables() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
-      doTestWritingAndReading(false, true);
+   public void testWritingAndReading_withoutVariables_withReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+      doTestWritingAndReading(false, true, true);
    }
 
    /**
     * Tests the reading and writing process.
     */
-   public void testWritingAndReading() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
-      doTestWritingAndReading(true, true);
+   public void testWritingAndReading_withReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+      doTestWritingAndReading(true, true, true);
+   }
+   
+   /**
+    * Tests the reading and writing process without variables and without call stack.
+    */
+   public void testWritingAndReading_withoutVariables_and_withoutCallStack_noReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+      doTestWritingAndReading(false, false, false);
+   }
+   
+   /**
+    * Tests the reading and writing process without call stack.
+    */
+   public void testWritingAndReading_withoutCallStack_noReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+      doTestWritingAndReading(true, false, false);
+   }
+   
+   /**
+    * Tests the reading and writing process without variables.
+    */
+   public void testWritingAndReading_withoutVariables_noReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+      doTestWritingAndReading(false, true, false);
+   }
+
+   /**
+    * Tests the reading and writing process.
+    */
+   public void testWritingAndReading_noReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+      doTestWritingAndReading(true, true, false);
    }
    
    /**
@@ -68,33 +111,35 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
     * {@link #testWritingAndReading_withoutVariables_and_withoutCallStack()}.
     * @param saveVariabes Save variables?
     * @param saveCallStack Save call stack?
+    * @param saveReturnValues Save method return values?
     */
    protected void doTestWritingAndReading(boolean saveVariabes, 
-                                          boolean saveCallStack) throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+                                          boolean saveCallStack,
+                                          boolean saveReturnValues) throws ProofInputException, ParserConfigurationException, SAXException, IOException {
       // Create model
       IExecutionNode expectedNode = createModel();
       // Serialize model to XML string
       ExecutionNodeWriter writer = new ExecutionNodeWriter();
-      String xml = writer.toXML(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, saveVariabes, saveCallStack);
+      String xml = writer.toXML(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, saveVariabes, saveCallStack, saveReturnValues);
       // Read from XML string
       ExecutionNodeReader reader = new ExecutionNodeReader();
       IExecutionNode currentNode = reader.read(new ByteArrayInputStream(xml.getBytes(Charset.forName(ExecutionNodeWriter.DEFAULT_ENCODING))));
-      TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes, saveCallStack, true);
+      TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes, saveCallStack, true, saveReturnValues);
       // Serialize model to output stream
       ByteArrayOutputStream out = new ByteArrayOutputStream();
-      writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, out, saveVariabes, saveCallStack);
+      writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, out, saveVariabes, saveCallStack, saveReturnValues);
       // Read from input stream
       currentNode = reader.read(new ByteArrayInputStream(out.toByteArray()));
-      TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes, saveCallStack, true);
+      TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes, saveCallStack, true, saveReturnValues);
       // Serialize model to temporary file
       File tempFile = File.createTempFile("TestExecutionNodeWriterAndReader", "testWritingAndReading");
       try {
          tempFile.delete();
-         writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, tempFile, saveVariabes, saveCallStack);
+         writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, tempFile, saveVariabes, saveCallStack, saveReturnValues);
          assertTrue(tempFile.isFile());
          // Read from tempoary file
          currentNode = reader.read(tempFile);
-         TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes, saveCallStack, true);
+         TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes, saveCallStack, true, saveReturnValues);
       }
       finally {
          tempFile.delete();
@@ -106,17 +151,19 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
     * @return The root of the example symbolic execution tree.
     */
    protected IExecutionNode createModel() {
-      KeYlessStartNode root = new KeYlessStartNode("start", "pc1", true);
+      KeYlessStart root = new KeYlessStart("start", "pc1", true);
       root.addCallStackEntry(root);
-      KeYlessBranchCondition bc = new KeYlessBranchCondition(root, "bc", "pc2", false, "condition of bc", true);
+      KeYlessBranchCondition bc = new KeYlessBranchCondition(root, "bc", "pc2", false, "condition of bc", true, true, "myCustomBC");
       bc.addCallStackEntry(root);
       bc.addCallStackEntry(bc);
       root.addChild(bc);
-      KeYlessTermination ttrue = new KeYlessTermination(root, "t true", "pc3", true, false);
-      root.addChild(ttrue);
-      KeYlessTermination tfalse = new KeYlessTermination(root, "t false", "pc4", false, true);
-      root.addChild(tfalse);
-      KeYlessBranchNode bn = new KeYlessBranchNode(root, "bn", "pc5", true);
+      KeYlessTermination tNormal = new KeYlessTermination(root, "t normal", "pc3", true, TerminationKind.NORMAL, true);
+      root.addChild(tNormal);
+      KeYlessTermination tExceptional = new KeYlessTermination(root, "t exceptional", "pc4", false, TerminationKind.EXCEPTIONAL, false);
+      root.addChild(tExceptional);
+      KeYlessTermination tloop = new KeYlessTermination(root, "t loop", "pcLoopTermination", false, TerminationKind.LOOP_BODY, true);
+      root.addChild(tloop);
+      KeYlessBranchStatement bn = new KeYlessBranchStatement(root, "bn", "pc5", true);
       bn.addCallStackEntry(root);
       bn.addCallStackEntry(bc);
       root.addChild(bn);
@@ -130,20 +177,22 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       bn.addVariable(bnVar2);
       KeYlessValue bnVar2Value = new KeYlessValue(bnVar2, "myTypeAgain", "myValueAgain", "value of bnVar2", false, true, "c3");
       bnVar2.addValue(bnVar2Value);
-      KeYlessLoopNode ln = new KeYlessLoopNode(root, "ln", "pc6", true);
+      KeYlessLoopStatement ln = new KeYlessLoopStatement(root, "ln", "pc6", true);
       root.addChild(ln);
       KeYlessLoopCondition lc = new KeYlessLoopCondition(ln, "lc", "pc7", false);
       ln.addChild(lc);
       KeYlessMethodCall mc = new KeYlessMethodCall(ln, "mc", "pc8", false);
       mc.addCallStackEntry(mc);
       ln.addChild(mc);
-      KeYlessMethodReturn mr = new KeYlessMethodReturn(mc, "mr", "pc9", true, "mc with return value");
+      KeYlessMethodReturn mr = new KeYlessMethodReturn(mc, "mr", "pc9", true, "mc with return value", true);
+      mr.addReturnValue(new KeYlessMethodReturnValue("rv1", "rv1String", false, null));
+      mr.addReturnValue(new KeYlessMethodReturnValue("rv2", "rv2String", true, "c2String"));
       mc.addCallStackEntry(mc);
       mc.addChild(mr);
-      KeYlessUseOperationContract useContract = new KeYlessUseOperationContract(root, "useOperationContract", "pcUse", true, false, true, false);
-      root.addChild(useContract);
-      KeYlessUseLoopInvariant useInvariant = new KeYlessUseLoopInvariant(root, "useLoppInvariant", "pcUseLoopInvariant", false, true);
-      root.addChild(useInvariant);
+      KeYlessOperationContract contract = new KeYlessOperationContract(root, "useOperationContract", "pcUse", true, false, true, false);
+      root.addChild(contract);
+      KeYlessLoopInvariant invariant = new KeYlessLoopInvariant(root, "useLoppInvariant", "pcUseLoopInvariant", false, true);
+      root.addChild(invariant);
       KeYlessStatement s = new KeYlessStatement(root, "s", "pc10", true);
       root.addChild(s);
       KeYlessVariable sVar1 = new KeYlessVariable(null, true, 2, "sVar1");

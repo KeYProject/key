@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.declaration.modifier.Static;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -35,6 +36,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -544,13 +546,16 @@ public class Recoder2KeYTypeConverter {
         final KeYJavaType integerType = getKeYJavaType(getServiceConfiguration()
                 .getNameInfo().getIntType());
         final KeYJavaType objectType = javaInfo.getJavaLangObject();
-        Sort heapSort = typeConverter.getHeapLDT() == null
+        final HeapLDT heapLDT = typeConverter.getHeapLDT(); 
+        Sort heapSort =  heapLDT == null
                         ? Sort.ANY
-                        : typeConverter.getHeapLDT().targetSort();
+                        : heapLDT.targetSort();
+        int heapCount = (heapLDT == null) ? 1 : (heapLDT.getAllHeaps().size() - 1); 
         arrayMethodBuilder 
         	= new CreateArrayMethodBuilder(integerType,
         				       objectType,
-        				       heapSort);
+        				       heapSort,
+        				       heapCount);
     }
     
     public TypeConverter getTypeConverter() {

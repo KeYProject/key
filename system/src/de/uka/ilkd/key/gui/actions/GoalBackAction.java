@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.Toolkit;
@@ -111,13 +124,16 @@ public final class GoalBackAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {            
         Goal selGoal = getMediator().getSelectedGoal();
         
-        final Node selNode = getMediator().getSelectedNode();
-        if(!selNode.isClosed()){
-       	    if (selGoal == null) {
-       		    assert(selNode != null);
+        if (selGoal == null) { // determine one goal from the subtree below
+            final Node selNode = getMediator().getSelectedNode();
+            
+            if(selNode != null && !selNode.isClosed()){
        		    selGoal = getMediator().getSelectedProof().getSubtreeGoals(selNode).reverse().head();
        	    }        
-       	    getMediator().setBack(selGoal);
+        }
+
+        if (selGoal != null) {
+            getMediator().setBack(selGoal);            
         }
     }   	
 }

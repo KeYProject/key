@@ -24,6 +24,9 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.proof.rulefilter.AnyRuleSetTacletFilter;
+import de.uka.ilkd.key.proof.rulefilter.NotRuleFilter;
+import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -60,15 +63,17 @@ public final class RuleAppIndex  {
                
 
     public RuleAppIndex(TacletAppIndex      p_tacletAppIndex, 
-			BuiltInRuleAppIndex p_builtInRuleAppIndex) {
-	this ( p_tacletAppIndex.tacletIndex(), p_builtInRuleAppIndex );
+			BuiltInRuleAppIndex p_builtInRuleAppIndex,
+			Services            services) {
+	this ( p_tacletAppIndex.tacletIndex(), p_builtInRuleAppIndex, services );
     }
 
     public RuleAppIndex ( TacletIndex         p_tacletIndex,
-			  BuiltInRuleAppIndex p_builtInRuleAppIndex ) {
+			  BuiltInRuleAppIndex p_builtInRuleAppIndex,
+			  Services            services) {
 	tacletIndex               = p_tacletIndex;
-	automatedTacletAppIndex   = new TacletAppIndex ( tacletIndex );
-	interactiveTacletAppIndex = new TacletAppIndex ( tacletIndex );
+	automatedTacletAppIndex   = new TacletAppIndex ( tacletIndex, services );
+	interactiveTacletAppIndex = new TacletAppIndex ( tacletIndex, services );
 	builtInRuleAppIndex       = p_builtInRuleAppIndex;
 	// default to false to keep compatibility with old code
 	autoMode                  = false;

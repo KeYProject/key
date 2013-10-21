@@ -1,14 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2011 Martin Hentschel.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *    Martin Hentschel - initial API and implementation
- *******************************************************************************/
-
 package paycard;
 
 public class PayCard {
@@ -36,7 +25,7 @@ public class PayCard {
       unsuccessfulOperations = 0;
    }
 
-   /*@
+   /*@ normal_behavior
      @ ensures \result.limit==100;
      @*/
    public static PayCard createJuniorCard() {
@@ -64,6 +53,7 @@ public class PayCard {
      @
      @ public exceptional_behavior
      @ requires amount <= 0;
+     @ signals_only IllegalArgumentException;
      @*/
    public boolean charge(int amount) throws IllegalArgumentException {
       if (amount <= 0) {

@@ -1,8 +1,23 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.gui.smt;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Map.Entry;
@@ -46,7 +61,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
 
 
         private final HashMap<SolverType,SolverData> dataOfSolvers =
-                new HashMap<SolverType,SolverData>();
+                new LinkedHashMap<SolverType,SolverData>();
         public boolean showResultsAfterExecution    = false;
         public boolean storeSMTTranslationToFile    = false;
         public boolean storeTacletTranslationToFile = false;
@@ -60,7 +75,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
         public String   pathForTacletTranslation   = "";
         public String   activeSolver               = "";
     
-        private Collection<SettingsListener> listeners = new HashSet<SettingsListener>();
+        private Collection<SettingsListener> listeners = new LinkedHashSet<SettingsListener>();
 
         private SolverTypeCollection activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
         private LinkedList<SolverTypeCollection> solverUnions = new LinkedList<SolverTypeCollection>();

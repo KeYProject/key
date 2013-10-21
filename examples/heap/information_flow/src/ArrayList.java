@@ -30,7 +30,7 @@ final class ArrayList {
       @   requires arrayDep == \singleton(array);
       @   requires sizeDep == \singleton(size);
       @   requires (\forall int i; arraySlotDep[i] == \singleton(array[i]));
-      @   ensures \subset(resultDep, \old(footprint));
+      @   ensures \subset(ArrayList.resultDep, \old(footprint));
       @   diverges true;
       @*/    
     public /*@helper@*/ boolean contains(/*@nullable@*/ Object o) {
@@ -51,7 +51,7 @@ final class ArrayList {
 	while(i < size) {
 	    //@ set pcDep = \set_union(pcDep, \set_union(arrayDep, \set_union(iDep, \set_union(oDep, arraySlotDep[i])))); //entering conditional
 	    if(array[i] == o) {
-		//@ set resultDep = pcDep; //return
+		//@ set ArrayList.resultDep = pcDep; //return
 		return true;
 	    }
 	    
@@ -62,7 +62,7 @@ final class ArrayList {
 	    ; //workaround for RecodeR bug
 	}
 	
-	//@ set resultDep = pcDep; //return
+	//@ set ArrayList.resultDep = pcDep; //return
 	return false;
     }
 
@@ -74,7 +74,7 @@ final class ArrayList {
       @   requires arrayDep == \singleton(array);
       @   requires sizeDep == \singleton(size);
       @   requires (\forall int i; arraySlotDep[i] == \singleton(array[i]));      
-      @   ensures \subset(resultDep, \old(footprint));
+      @   ensures \subset(ArrayList.resultDep, \old(footprint));
       @*/    
     public /*@nullable helper@*/ Object get(int index) {
 	//@ ghost \locset pcDep = \empty;
@@ -82,11 +82,11 @@ final class ArrayList {
 	
 	//@ set pcDep = \set_union(indexDep, sizeDep); //entering conditional
 	if(index < 0 || size <= index) {
-	    //@ set resultDep = pcDep; //return
+	    //@ set ArrayList.resultDep = pcDep; //return
 	    throw new IndexOutOfBoundsException();
 	}
 	
-	//@ set resultDep = \set_union(pcDep, \set_union(arrayDep, \set_union(indexDep, arraySlotDep[index]))); //return
+	//@ set ArrayList.resultDep = \set_union(pcDep, \set_union(arrayDep, \set_union(indexDep, arraySlotDep[index]))); //return
 	return array[index];
     }
     
@@ -97,12 +97,12 @@ final class ArrayList {
       @   requires arrayDep == \singleton(array);
       @   requires sizeDep == \singleton(size);
       @   requires (\forall int i; arraySlotDep[i] == \singleton(array[i]));      
-      @   ensures \subset(resultDep, \old(footprint));
+      @   ensures \subset(ArrayList.resultDep, \old(footprint));
       @*/
     public /*@helper@*/ int size() {
 	//@ ghost \locset pcDep = \empty;	
 	
-	//@ set resultDep = \set_union(pcDep, sizeDep);
+	//@ set ArrayList.resultDep = \set_union(pcDep, sizeDep);
 	return size;
     }
 }

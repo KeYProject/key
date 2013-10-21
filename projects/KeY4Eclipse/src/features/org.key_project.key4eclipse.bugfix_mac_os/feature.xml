@@ -5,12 +5,42 @@
       version="1.0.0.qualifier"
       provider-name="KeY Project">
 
-   <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+   <description>
+      Provides required Eclipse plug-ins missing in features on Mac OS.
    </description>
 
-   <copyright url="http://www.example.com/copyright">
-      [Enter Copyright Description here.]
+   <copyright>
+      KeY - INTEGRATED DEDUCTIVE SOFTWARE DESIGN
+
+Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+                        Universitaet Koblenz-Landau, Germany
+                        Chalmers University of Technology, Sweden
+Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+                        Technical University Darmstadt, Germany
+                        Chalmers University of Technology, Sweden
+
+Karlsruhe Institute of Technology
+Institute for Theoretical Computer Science
+Prof. Dr. Bernhard Beckert / Prof. Dr. Peter H. Schmitt
+Am Fasanengarten 5
+D-76131 Karlsruhe
+Germany
+
+Technische Universität Darmstadt
+Fachgebiet Software Engineering
+Hochschulstr. 10
+D-64289 Darmstadt 
+Germany
+
+Chalmers University of Technology
+Department of Computing Science
+Eklandagatan 86
+SE-41296 Gothenburg
+Sweden
+
+
+WWW: http://key-project.org
+e-mail: key@ira.uka.de
    </copyright>
 
    <license url="http://www.eclipse.org/legal/epl/notice.html">

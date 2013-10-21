@@ -1,16 +1,28 @@
-package org.key_project.sed.key.ui.test.testcase;
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 
-import junit.framework.TestCase;
+package org.key_project.sed.key.ui.test.testcase;
 
 import org.eclipse.swt.graphics.Image;
 import org.junit.Test;
 import org.key_project.sed.key.ui.util.KeYSEDImages;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 /**
  * Contains tests for {@link KeYSEDImages}.
  * @author Martin Hentschel
  */
-public class KeYSEDImagesTest extends TestCase {
+public class KeYSEDImagesTest extends AbstractSetupTestCase {
     /**
      * Tests {@link KeYSEDImages#getImage(String)}
      */

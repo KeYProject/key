@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.core.test.testcase.swtbot;
 
 import java.io.File;
@@ -6,8 +19,6 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.debug.core.DebugException;
@@ -26,8 +37,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Before;
-import org.key_project.key4eclipse.starter.core.test.util.TestStarterCoreUtil;
-import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.serialization.SEDXMLWriter;
 import org.key_project.sed.core.test.util.DebugTargetResumeSuspendListener;
@@ -40,17 +49,17 @@ import org.key_project.sed.ui.visualization.view.ExecutionTreeView;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 import org.xml.sax.SAXException;
 
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Provides the functionality to test {@link KeYDebugTarget}s.
  * @author Martin Hentschel
  */
-public class AbstractKeYDebugTargetTestCase extends TestCase {
+public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
    /**
     * <p>
     * If this constant is {@code true} a temporary directory is created with
@@ -529,13 +538,64 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
                                        Boolean mergeBranchConditions,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
+      doKeYDebugTargetTest(projectName, 
+                           plugin, 
+                           pathInBundle, 
+                           null, 
+                           closePropertiesView, 
+                           closeExecutionTreeViews, 
+                           selector, 
+                           useExistingContract, 
+                           preconditionOrExistingContract, 
+                           showMethodReturnValues, 
+                           showVariablesOfSelectedDebugNode, 
+                           showKeYMainWindow, 
+                           mergeBranchConditions, 
+                           timeoutFactor, 
+                           executor);
+   }
+   
+   /**
+    * Performs a test on a {@link KeYDebugTarget}. This methods setups
+    * the environment an the real test is done in the given {@link IKeYDebugTargetTestExecutor}.
+    * @param projectName The project name.
+    * @param plugin The plug-in which contains the test data.
+    * @param pathInBundle The path to the test files in bundle.
+    * @param projectConfigurator An optional {@link IProjectConfigurator}.
+    * @param closePropertiesView Close properties sheet page?
+    * @param closeExecutionTreeViews Close the views which visualizes the symbolic execution tree? Will increase the test perforamnce.
+    * @param selector The {@link IMethodSelector} to select the {@link IMethod} to debug.
+    * @param useExistingContract Use existing contract? Use {@code null} to use default value.
+    * @param preconditionOrExistingContract Optional precondition or the ID of the existing contract to use Use {@code null} to use default value.
+    * @param showMethodReturnValues Show method return values?
+    * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
+    * @param showKeYMainWindow Show KeY's main window?
+    * @param mergeBranchConditions Merge branch conditions?
+    * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
+    * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
+    * @throws Exception Occurred Exception.
+    */
+   protected void doKeYDebugTargetTest(String projectName,
+                                       String plugin,
+                                       String pathInBundle,
+                                       IProjectConfigurator projectConfigurator,
+                                       boolean closePropertiesView,
+                                       boolean closeExecutionTreeViews,
+                                       IMethodSelector selector,
+                                       Boolean useExistingContract,
+                                       String preconditionOrExistingContract,
+                                       Boolean showMethodReturnValues,
+                                       Boolean showVariablesOfSelectedDebugNode,
+                                       Boolean showKeYMainWindow,
+                                       Boolean mergeBranchConditions,
+                                       int timeoutFactor,
+                                       IKeYDebugTargetTestExecutor executor) throws Exception {
       // Create bot
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       // Get current settings to restore them in finally block
       IPerspectiveDescriptor defaultPerspective = TestUtilsUtil.getActivePerspective();
       SWTBotTree debugTree = null;
       long originalTimeout = SWTBotPreferences.TIMEOUT;
-      String originalRuntimeExceptions = null;
       boolean restoreExecutionTreeView = false;
       boolean restoreThumbinalExecutionTreeView = false;
       boolean restorePropertiesView = false;
@@ -553,19 +613,15 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          // Create test project
          IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
          BundleUtil.extractFromBundleToWorkspace(plugin, pathInBundle, project.getProject().getFolder("src"));
+         if (projectConfigurator != null) {
+            projectConfigurator.configure(project);
+         }
          // Get method
          assertNotNull(selector);
          IMethod method = selector.getMethod(project);
          String targetName = TestSEDKeyCoreUtil.computeTargetName(method);
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * timeoutFactor;
-         // Store original settings of KeY which requires that at least one proof was instantiated.
-         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
-            KeYUtil.clearProofList(MainWindow.getInstance());
-         }
-         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
-         assertNotNull(originalRuntimeExceptions);
          // Set choice settings in KeY.
          SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          assertEquals(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
@@ -582,10 +638,6 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
       finally {
          // Restore timeout
          SWTBotPreferences.TIMEOUT = originalTimeout;
-         // Restore runtime option
-         if (originalRuntimeExceptions != null) {
-            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
-         }
          // Terminate and remove all launches
          TestSedCoreUtil.terminateAndRemoveAll(debugTree);
          // Make sure that all jobs are done because otherwise older jobs may influence the next test execution
@@ -610,6 +662,18 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          // Restore perspective
          TestUtilsUtil.openPerspective(defaultPerspective);
       }
+   }
+   
+   /**
+    * Instances of this class can be used to configure an {@link IJavaProject}.
+    * @author Martin Hentschel
+    */
+   protected static interface IProjectConfigurator {
+      /**
+       * Configures the given {@link IJavaProject}.
+       * @param javaProject The {@link IJavaProject} to configure.
+       */
+      public void configure(IJavaProject javaProject) throws Exception;
    }
    
    /**

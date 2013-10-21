@@ -1,8 +1,19 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.core.test.testcase;
 
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -19,6 +30,7 @@ import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.java.Position;
@@ -27,7 +39,7 @@ import de.uka.ilkd.key.java.Position;
  * Tests for {@link KeySEDUtil}.
  * @author Martin Hentschel
  */
-public class KeySEDUtilTest extends TestCase {
+public class KeySEDUtilTest extends AbstractSetupTestCase {
     /**
      * Tests {@link KeySEDUtil#searchLaunchConfigurations(IMethod, Position, Position)} and
      * {@link KeySEDUtil#searchLaunchConfigurations(org.eclipse.core.resources.IFile)}.

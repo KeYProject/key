@@ -27,6 +27,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
+import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -896,7 +898,7 @@ public class TestApplyTaclet extends TestCase{
 	final BuiltInRuleAppIndex birIndex = new BuiltInRuleAppIndex
 	    ( new BuiltInRuleIndex () );
 	final RuleAppIndex ruleAppIndex = new RuleAppIndex
-	    ( tacletIndex, birIndex );
+	    ( tacletIndex, birIndex, n.proof().getServices() );
 	final Goal goal = new Goal ( n, ruleAppIndex );
 	return goal;
     }

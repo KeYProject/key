@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.key4eclipse.starter.core.test.suite;
 
 import org.junit.runner.RunWith;
@@ -6,6 +19,7 @@ import org.key_project.key4eclipse.starter.core.test.testcase.JavaElementResourc
 import org.key_project.key4eclipse.starter.core.test.testcase.JavaTextSelectionPropertyTesterTest;
 import org.key_project.key4eclipse.starter.core.test.testcase.KeYUtilTest;
 import org.key_project.key4eclipse.starter.core.test.testcase.LogUtilTest;
+import org.key_project.key4eclipse.starter.core.test.testcase.ProofUserManagerTest;
 
 /**
  * Run all contained JUnit 4 test cases.
@@ -16,7 +30,8 @@ import org.key_project.key4eclipse.starter.core.test.testcase.LogUtilTest;
     JavaElementResourceAdapterFactoryTest.class,
     JavaTextSelectionPropertyTesterTest.class,
     KeYUtilTest.class,
-    LogUtilTest.class
+    LogUtilTest.class,
+    ProofUserManagerTest.class
 })
 public class AllStarterCoreTests {
 }

@@ -30,6 +30,8 @@ import javax.swing.ImageIcon;
 
 public class KeYResourceManager {
 
+    private static final String DEFAULT_VERSION = "x.z.y";
+
     /** the unique instance */
     private static final KeYResourceManager instance 
 	= new KeYResourceManager();
@@ -54,19 +56,27 @@ public class KeYResourceManager {
     private String readVersionString(URL url) {
 	String result = "";
 	if (url != null) {
+        InputStream io = null;
 	    try {
-		final InputStream io = 
-                    new BufferedInputStream(url.openStream()); 
+                  io = new BufferedInputStream(url.openStream()); 
 		int c;
 		while ((c=io.read()) !=-1) {
 		    result += (char)c;
 		}
 	    } catch (IOException ioe) {
 		// who cares it is just a version number
-		result = "x.z.y";
+		result = DEFAULT_VERSION;
+	    } finally {
+	        if (io != null) {
+	            try {
+                    io.close();
+                } catch (IOException e) {
+                    // then leave it open
+                }
+	        }
 	    }
 	} else {
-	    result = "x.z.y";
+	    result = DEFAULT_VERSION;
 	}
 	return result.trim();
     }
@@ -185,8 +195,10 @@ public class KeYResourceManager {
 	    File targetFile = new File(targetLocation);
 	    if (overwrite || !targetFile.exists()){
 		result = true;
-		if (targetFile.getParentFile() != null) {
-		    targetFile.getParentFile().mkdirs();
+		if (targetFile.getParentFile() != null && !targetFile.getParentFile().exists()) {
+		    if (!targetFile.getParentFile().mkdirs()) {
+		        throw new IOException("Could not create " + targetFile.getParentFile());
+		    }
 		}
 		targetFile.createNewFile();	    
 		targetFile.deleteOnExit();

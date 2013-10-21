@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.debug.core.DebugException;
@@ -28,6 +41,7 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeStyleUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * Provides a basic implementation of {@link IAddFeature} for {@link ISEDDebugNode}s.
@@ -195,7 +209,7 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
     */
    public static int computeInitialHeight(Diagram targetDiagram, String text, Font font) {
       int minHeight = computeMinHeight(targetDiagram);
-      IDimension textSize = GraphitiUtil.calculateTextSize(text, font);
+      IDimension textSize = GraphitiUtil.calculateTextSize(text != null ? text : StringUtil.EMPTY_STRING, font);
       if (textSize.getHeight() < minHeight) {
          return minHeight;
       }
@@ -213,7 +227,7 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
     */
    public static int computeInitialWidth(Diagram targetDiagram, String text, Font font) {
       int minWidth = computeMinWidth(targetDiagram);
-      IDimension textSize = GraphitiUtil.calculateTextSize(text, font);
+      IDimension textSize = GraphitiUtil.calculateTextSize(text != null ? text : StringUtil.EMPTY_STRING, font);
       textSize.setWidth(textSize.getWidth() + MARGIN + IMAGE_WIDTH + MARGIN + MARGIN);
       if (textSize.getWidth() < minWidth) {
          return minWidth;

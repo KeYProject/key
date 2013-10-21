@@ -1,10 +1,14 @@
 # This file is part of KeY - Integrated Deductive Software Design 
-# Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
-#                         Universitaet Koblenz-Landau, Germany
-#                         Chalmers University of Technology, Sweden 
 #
-# The KeY system is protected by the GNU General Public License. 
-# See LICENSE.TXT for details.
+# Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+#                         Universitaet Koblenz-Landau, Germany
+#                         Chalmers University of Technology, Sweden
+# Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+#                         Technical University Darmstadt, Germany
+#                         Chalmers University of Technology, Sweden
+#
+# The KeY system is protected by the GNU General 
+# Public License. See LICENSE.TXT for details.
 
 SHELL=/bin/sh
 # comon prefix
@@ -65,7 +69,7 @@ ifneq "$(GIT)" ""
    ifeq "$(KEY_VERSION_SHORT)" "0.0.0" 
      KEY_VERSION_SHORT:=$(shell $(GIT) log --pretty=one | wc -l)
      KEY_VERSION_SHORT:=$(wordlist 1,1,$(KEY_VERSION_SHORT))
-     KEY_VERSION_SHORT:=1.7.$(KEY_VERSION_SHORT)
+     KEY_VERSION_SHORT:=2.1.$(KEY_VERSION_SHORT)
    endif
 endif
 
@@ -91,7 +95,7 @@ endif
 ifeq ($(JAVAC),ajc)
   OPTIONS=$(COMMON_OPTIONS) -nowarn -classpath $(ASPECTJRTPATH):$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
 else
-  OPTIONS=$(COMMON_OPTIONS) -J-Xmx512m -nowarn -source 1.6 -target 1.6 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
+  OPTIONS=$(COMMON_OPTIONS) -J-Xmx512m -nowarn -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
 endif
 
 JAVACC_MAIN=javacc
@@ -146,10 +150,10 @@ doc: argfile
 ## didn't want to use perl ;)
 	@find $(SRC) -name '*.java' | xargs grep -h "^package\|^overview" |\
 	cut -d" " -f2 | cut -d";" -f1 | sort | uniq | grep "^de.uka" | \
-	xargs $(JAVADOC) $(JAVADOC_OPTIONS) -source 1.6 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) \
+	xargs $(JAVADOC) $(JAVADOC_OPTIONS) -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) \
 	-sourcepath $(GENERATED_SRC_PATH):$(SRC):$(TEST) -d doc \
 	-link http://recoder.sourceforge.net/doc/api \
-	-link http://download.oracle.com/javase/6/docs/api/ \
+	-link http://docs.oracle.com/javase/7/docs/api/ \
 	-link http://www.antlr2.org/javadoc/ \
 	-windowtitle "KeY API Documentation" \
 	-doctitle "KeY API Documentation ($(KEY_VERSION_LONG))" \
@@ -178,7 +182,9 @@ dist:	branding all
 	@echo "[creating jar-file]"
 	@jar cfm key.jar resources/MANIFEST.MF -C dist/key/ .
 	@jar cfm setup.jar resources/de/uka/ilkd/key/util/install/MANIFEST.MF -C dist/setup/ .
-	@tar -czvf ../dist/KeY-$(KEY_VERSION_LONG).tgz key.jar setup.jar -C ../ LICENSE.TXT
+	@tar -czvf ../dist/KeY-$(KEY_VERSION_LONG).tgz key.jar setup.jar \
+			-C ../ LICENSE.TXT -C system/dist/key examples.jar 
+	@zip -j ../dist/KeY-${KEY_VERSION_LONG}.zip key.jar setup.jar dist/key/examples.jar ../LICENSE.TXT 
 	@cp ../README.install.bytecode ../dist/README-$(KEY_VERSION_LONG).txt
 	@echo "[deleting distribution directory structure]"
 	@rm -rf dist

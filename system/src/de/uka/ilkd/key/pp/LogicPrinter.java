@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.Stack;
 import java.util.StringTokenizer;
@@ -31,7 +32,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -43,9 +46,11 @@ import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -69,6 +74,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
@@ -128,7 +134,11 @@ public final class LogicPrinter {
 
     private SVInstantiations instantiations
     	= SVInstantiations.EMPTY_SVINSTANTIATIONS;
-    
+
+    private enum QuantifiableVariablePrintMode {NORMAL, WITH_OUT_DECLARATION}
+    private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
+            QuantifiableVariablePrintMode.NORMAL;
+
     
     public static String quickPrintTerm(Term t, Services services) {
         final NotationInfo ni = new NotationInfo();
@@ -290,12 +300,10 @@ public final class LogicPrinter {
      *   (the actual taken linewidth is the max of
      *   {@link LogicPrinter#DEFAULT_LINE_WIDTH} and the given value
      */
-    public void update(Sequent seq, 
-	    	       SequentPrintFilter filter,
-	    	       int lineWidth) {
+    public void update(SequentPrintFilter filter, int lineWidth) {
         setLineWidth(lineWidth);
         reset();
-        printSequent(seq, filter);
+        printSequent(filter);
     }
 
 
@@ -316,7 +324,7 @@ public final class LogicPrinter {
     
     private static Set<SchemaVariable> collectSchemaVars(Taclet t) {
 	
-	Set<SchemaVariable> result = new HashSet<SchemaVariable>();
+	Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
 	OpCollector oc = new OpCollector();
 	
 	//find, assumes
@@ -363,6 +371,7 @@ public final class LogicPrinter {
                             boolean showWholeTaclet,
                             boolean declareSchemaVars) {
 	instantiations = sv;
+        quantifiableVariablePrintMode = QuantifiableVariablePrintMode.WITH_OUT_DECLARATION;
 	try {
 	    Debug.log4jDebug(taclet.name().toString(),
 		    	     LogicPrinter.class.getName());
@@ -402,6 +411,7 @@ public final class LogicPrinter {
 		    	    LogicPrinter.class.getName());
 	}
 	instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+        quantifiableVariablePrintMode = QuantifiableVariablePrintMode.NORMAL;
     }
 
     /**
@@ -561,17 +571,18 @@ public final class LogicPrinter {
                 layouter.brk(1,-2).print(")").end();
     }
 
-    protected void printTextSequent(Sequent seq,
-                                    String text,
-                                    boolean frontbreak) throws IOException{
+    protected void printTextSequent(Sequent seq, String text,
+            boolean frontbreak) throws IOException {
 
-                if (frontbreak) {
-                    layouter.brk();
-                }
+        if (frontbreak) {
+            layouter.brk();
+        }
 
-                layouter.beginC(2).print(text).print(" (");
-                printSequent(seq, null, false);
-                layouter.brk(1,-2).print(")").end();
+        layouter.beginC(2).print(text).print(" (");
+        if (seq != null) {
+            printSequent(seq, false);
+        }
+        layouter.brk(1, -2).print(")").end();
     }
 
     protected void printGoalTemplates(Taclet taclet) throws IOException{
@@ -726,27 +737,6 @@ public final class LogicPrinter {
         layouter.brk(1,-2).print(")").end();
     }
 
-
-    /**
-     * Pretty-print a sequent.
-     * The sequent arrow is rendered as <code>==&gt;</code>.  If the
-     * sequent doesn't fit in one line, a line break is inserted after each
-     * formula, the sequent arrow is on a line of its own, and formulae
-     * are indented w.r.t. the arrow.
-     * @param seq The Sequent to be pretty-printed
-     * @param filter The SequentPrintFilter for seq
-     * @param finalbreak Print an additional line-break at the end of the sequent.
-     */
-    public void printSequent(Sequent seq,
-                             SequentPrintFilter filter,
-                             boolean finalbreak) {
-        if ( seq != null ) {
-            printSequent(seq,finalbreak);
-        } else if ( filter != null ) {
-            printSequent(filter,finalbreak);
-        }
-    }
-
     public void printSequent(SequentPrintFilter filter,
                              boolean finalbreak) {
         try {
@@ -807,8 +797,10 @@ public final class LogicPrinter {
      * @param seq The Sequent to be pretty-printed
      * @param filter The SequentPrintFilter for seq
      */
-    public void printSequent(Sequent seq, SequentPrintFilter filter) {
-        printSequent(seq, filter, true);
+    public void printSequent(SequentPrintFilter filter) {
+        if (filter != null) {
+            printSequent(filter, true);
+        }
     }
 
     /**
@@ -884,8 +876,42 @@ public final class LogicPrinter {
             startTerm(0);
             layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
         } else {
+            if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+                layouter.print("(");
+            }
             notationInfo.getNotation(t.op(), services).print(t,this);
+            if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+                layouter.print(")");
+            }
         }
+        if (t.hasLabels()) {
+            printLabels(t);
+        }
+    }
+
+    public void printLabels(Term t) throws IOException {
+        layouter.beginC().print("<<");
+        boolean afterFirst = false;
+        for (ITermLabel l : t.getLabels()) {
+            if (afterFirst) {
+               layouter.print(",").brk(1, 0);
+            }
+            else {
+               afterFirst = true;
+            }
+            layouter.print(l.name().toString());
+            if (l.getChildCount()>0) {
+               layouter.print("(").beginC(2);
+               for (int i = 0; i < l.getChildCount(); i++) {
+                  layouter.print("\"" + l.getChild(i).toString() + "\"");
+                  if (i < l.getChildCount() - 1) {
+                     layouter.print(",").ind(1, 2);
+                  }
+               }
+               layouter.end().print(")");
+            }
+        }
+        layouter.end().print(">>");
     }
 
     /**
@@ -929,7 +955,16 @@ public final class LogicPrinter {
      *
      * @param t the Term to be printed */
     public void printTermContinuingBlock(Term t) throws IOException {
-        notationInfo.getNotation(t.op(), services).printContinuingBlock(t,this);
+       if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+           layouter.print("(");
+       }
+       notationInfo.getNotation(t.op(), services).printContinuingBlock(t,this);
+       if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+           layouter.print(")");
+       }
+       if (t.hasLabels()) {
+          printLabels(t);
+       }
     }
 
 
@@ -962,7 +997,7 @@ public final class LogicPrinter {
             layouter.print(name);
             if(!t.boundVars().isEmpty()) {
         	layouter.print("{").beginC(0);
-        	printVariables(t.boundVars());
+        	printVariables(t.boundVars(), quantifiableVariablePrintMode);
         	layouter.print("}").end();
             }
             if(t.arity() > 0) {
@@ -1003,15 +1038,24 @@ public final class LogicPrinter {
 			        : services.getTypeConverter().getHeapLDT();
         if(NotationInfo.PRETTY_SYNTAX
             && heapLDT != null
-            && t.sub(0).op() == heapLDT.getHeap()) {
+            && t.sub(0).op().sort(t.subs()).equals(
+               services.getNamespaces().sorts().lookup(new Name("Heap")))) {
             startTerm(3);
             
             final Term objectTerm = t.sub(1);
             final Term fieldTerm  = t.sub(2);
                 
-            markStartSub();
+            final boolean printHeap = t.sub(0).op() != heapLDT.getHeap();
+            if (printHeap) {
+                markStartSub();
+                printTerm(t.sub(0));
+                markEndSub();
+                layouter.print("[");
+            } else {
+                markStartSub();
             //heap not printed
             markEndSub();
+            }
 
             if(objectTerm.equals(TermBuilder.DF.NULL(services))
                 && fieldTerm.op() instanceof Function
@@ -1065,6 +1109,9 @@ public final class LogicPrinter {
             } else {
         	printFunctionTerm(t.op().name().toString(), t);
             }	
+            if (printHeap) {
+                layouter.print("]");
+            }
         } else {
             printFunctionTerm(t.op().name().toString(), t);
         }
@@ -1097,18 +1144,38 @@ public final class LogicPrinter {
 			        : services.getTypeConverter().getHeapLDT();	
 	if(NotationInfo.PRETTY_SYNTAX
            && heapLDT != null 
-           && t.sub(0).op() == heapLDT.getHeap()) {
-	    final IObserverFunction obs = (IObserverFunction) t.op();
+           && t.sub(0).op().sort(t.subs()).equals(
+                services.getNamespaces().sorts().lookup(new Name("Heap")))) {
+	    final ObserverFunction obs = (ObserverFunction) t.op();
             startTerm(t.arity());
-            markStartSub();
-            //heap not printed
-            markEndSub();
+
+            int numHeaps = obs.getHeapCount(services);
+            final int stateCount = obs.getStateCount();
+            final boolean printHeaps = 
+            		(stateCount == 1 && t.sub(0).op() != heapLDT.getHeap()) 
+                 || numHeaps > 1 || stateCount > 1;
+            final int totalHeaps = stateCount * numHeaps;
+            if (printHeaps) {
+            	if(totalHeaps > 1) layouter.print("{");
+                for(int i=0;i<totalHeaps;i++) {
+                  markStartSub();
+                  if(i>0) layouter.print(",");
+                  printTerm(t.sub(i));
+                  markEndSub();
+                }
+            	if(totalHeaps > 1) layouter.print("}");
+                layouter.print("[");
+            } else {
+                markStartSub();
+                //heaps not printed
+                markEndSub();
+            }
             
-            if(!obs.isStatic()) {
-        	markStartSub();
-        	printTerm(t.sub(1));
-        	markEndSub();
-        	layouter.print(".");
+            if(!obs.isStatic() ) {
+        	  markStartSub();
+        	  printTerm(t.sub(totalHeaps));
+        	  markEndSub();
+        	  layouter.print(".");
             }
             
             final String prettyFieldName 
@@ -1128,6 +1195,9 @@ public final class LogicPrinter {
                     }
         	}
         	layouter.print(")").end();
+            }
+            if (printHeaps) {
+                layouter.print("]");
             }
         } else {
             printFunctionTerm(t.op().name().toString(), t);            
@@ -1393,7 +1463,8 @@ public final class LogicPrinter {
     }
     
 
-    protected void printVariables (ImmutableArray<QuantifiableVariable> vars)
+    protected void printVariables (ImmutableArray<QuantifiableVariable> vars,
+                                   QuantifiableVariablePrintMode mode)
                                             throws IOException {
         int size = vars.size ();
         for(int j = 0; j != size; j++) {
@@ -1401,11 +1472,14 @@ public final class LogicPrinter {
             if(v instanceof LogicVariable) {
                 Term t =
                     TermFactory.DEFAULT.createTerm(v);
+                if (mode != QuantifiableVariablePrintMode.WITH_OUT_DECLARATION) {
+                    // do not print declarations in taclets...
+                    layouter.print(v.sort().name().toString() + " ");
+                }
                 if(notationInfo.getAbbrevMap().containsTerm(t)) {
-                    layouter.print (v.sort().name().toString() + " " +
-                                    notationInfo.getAbbrevMap().getAbbrev(t));
+                    layouter.print (notationInfo.getAbbrevMap().getAbbrev(t));
                 } else {
-                    layouter.print (v.sort().name() + " " + v.name ());
+                    layouter.print (v.name().toString());
                 }
             } else {
                 layouter.print (v.name().toString());
@@ -1427,7 +1501,7 @@ public final class LogicPrinter {
 
         if ( t.varsBoundHere ( 0 ).size () > 0 ) {
             layouter.print ( " " );
-            printVariables ( t.varsBoundHere ( 0 ) );
+            printVariables ( t.varsBoundHere ( 0 ), quantifiableVariablePrintMode );
         }
         
         layouter.print( " (" );
@@ -1478,7 +1552,8 @@ public final class LogicPrinter {
         throws IOException
     {
         layouter.beginC(2).print(l);
-        printVariables(new ImmutableArray<QuantifiableVariable>(v));
+        printVariables(new ImmutableArray<QuantifiableVariable>(v),
+                       quantifiableVariablePrintMode);
         startTerm(2);
         maybeParens(t, ass2);
         layouter.print(r).brk(0);
@@ -1511,7 +1586,7 @@ public final class LogicPrinter {
         throws IOException {
         layouter.beginC(2);
         layouter.print(name).print(" ");
-        printVariables(vars);
+        printVariables(vars, quantifiableVariablePrintMode);
         layouter.brk();
         startTerm(1);
         maybeParens(phi,ass);
@@ -1718,7 +1793,7 @@ public final class LogicPrinter {
                 return layouter.mark(o);
         }
     }
-
+    
     /**
      * returns the PositionTable representing position information on
      * the sequent of this LogicPrinter. Subclasses may overwrite
@@ -1726,6 +1801,19 @@ public final class LogicPrinter {
      * is not computed there.
      */
     public InitialPositionTable getPositionTable() {
+        if (pure) {
+            return null;
+        }
+        return ((PosTableStringBackend)backend).getPositionTable();
+    }
+
+    /**
+     * returns the PositionTable representing position information on
+     * the sequent of this LogicPrinter. Subclasses may overwrite
+     * this method with a null returning body if position information
+     * is not computed there.
+     */
+    public InitialPositionTable getInitialPositionTable() {
         if (pure) {
             return null;
         }

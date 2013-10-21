@@ -3,10 +3,10 @@ public class VariablesStaticTest {
 	public static int z;
 	
 	public int main() {
-		z = 2;
+		VariablesStaticTest.z = 2;
 		StaticFields.a = 4;
 		StaticFields.b = 8;
-		return z + StaticFields.a + StaticFields.b; 
+		return VariablesStaticTest.z + StaticFields.a + StaticFields.b; 
 	}
 }
 

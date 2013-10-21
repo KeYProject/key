@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.core.test.util;
 
 import java.io.IOException;
@@ -30,7 +43,7 @@ import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.jdt.JDTUtil;
 import org.xml.sax.SAXException;
 
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 
 /**
  * Provides static methods that makes testing easier.
@@ -220,7 +233,7 @@ public final class TestSEDKeyCoreUtil {
       target.setName(targetName);
       // Add thread
       SEDMemoryThread thread = new SEDMemoryThread(target);
-      thread.setName(IExecutionStartNode.DEFAULT_START_NODE_NAME);
+      thread.setName(IExecutionStart.DEFAULT_START_NODE_NAME);
       target.addSymbolicThread(thread);
       return target;
    }

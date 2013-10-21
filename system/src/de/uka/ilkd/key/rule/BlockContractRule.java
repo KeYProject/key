@@ -1,5 +1,19 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -75,7 +89,7 @@ public class BlockContractRule implements BuiltInRule {
         }
         return filterAppliedContracts(collectedContracts, block, goal);
     }
-    
+
     private static ImmutableSet<BlockContract> filterAppliedContracts(final ImmutableSet<BlockContract> collectedContracts,
                                                                       final StatementBlock block,
                                                                       final Goal goal)
@@ -107,7 +121,7 @@ public class BlockContractRule implements BuiltInRule {
         }
         return false;
     }
-    
+
     private BlockContractRule() {
     }
 
@@ -150,8 +164,8 @@ public class BlockContractRule implements BuiltInRule {
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables = MiscTools.getLocalIns(instantiation.block, services);
         final ImmutableSet<ProgramVariable> localOutVariables = MiscTools.getLocalOuts(instantiation.block, services);
-        final boolean isStrictlyPure = !application.getContract().hasModifiesClause();
-        final Map<LocationVariable, Function> anonymisationHeaps = createAndRegisterAnonymisationVariables(heaps, isStrictlyPure, services);
+        // final boolean isStrictlyPure = !application.getContract().hasModifiesClause();
+        final Map<LocationVariable, Function> anonymisationHeaps = createAndRegisterAnonymisationVariables(heaps, application.getContract(), services);
         //final Map<LocationVariable, Function> anonymisationLocalVariables = createAndRegisterAnonymisationVariables(localOutVariables, services);
 
         final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(
@@ -195,11 +209,11 @@ public class BlockContractRule implements BuiltInRule {
         return result;
     }
 
-    private Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables, final boolean isStrictlyPure, final Services services)
+    private Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables, final BlockContract contract, final Services services)
     {
-        Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>();
-        if (!isStrictlyPure) {
-            for (LocationVariable variable : variables) {
+        Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>(40);
+        for (LocationVariable variable : variables) {
+            if(contract.hasModifiesClause(variable)) {
                 final String anonymisationName = TB.newName(services, ANONYMISATION_PREFIX + variable.name());
                 final Function anonymisationFunction = new Function(new Name(anonymisationName), variable.sort());
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
@@ -458,7 +472,7 @@ public class BlockContractRule implements BuiltInRule {
                 Term anonymisationUpdate = skip();
                 final Term modifiesClause = modifiesClauses.get(anonymisationHeap.getKey());
                 if (!modifiesClause.equals(strictlyNothing())) {
-                    anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause, func(anonymisationHeap.getValue()));
+                    anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause, TB.label(TB.func(anonymisationHeap.getValue()), AnonHeapTermLabel.INSTANCE));
                 }
                 result = parallel(result, anonymisationUpdate);
             }
@@ -572,7 +586,7 @@ public class BlockContractRule implements BuiltInRule {
             for (LocationVariable heap : heaps) {
                 final Term modifiesClause = modifiesClauses.get(heap);
                 final Term frameCondition;
-                if (modifiesClause.equals(strictlyNothing()) && heap == getBaseHeap()) {
+                if (modifiesClause.equals(strictlyNothing())) {
                     frameCondition = frameStrictlyEmpty(var(heap), remembranceVariables.get(heap));
                 }
                 else {
@@ -606,7 +620,7 @@ public class BlockContractRule implements BuiltInRule {
         {
             Term result = tt();
             for (Function anonymisationFunction : anonymisationHeaps.values()) {
-                result = and(result, wellFormed(func(anonymisationFunction)));
+                result = and(result, wellFormed(TB.label(TB.func(anonymisationFunction), AnonHeapTermLabel.INSTANCE)));
             }
             return result;
         }
@@ -717,7 +731,7 @@ public class BlockContractRule implements BuiltInRule {
         public void setUpPreconditionGoal(final Goal goal, final Term update, final Term[] preconditions)
         {
             goal.setBranchLabel("Precondition");
-            goal.changeFormula(new SequentFormula(TB.apply(update, TB.and(preconditions))), occurrence);
+            goal.changeFormula(new SequentFormula(TB.apply(update, TB.and(preconditions), null)), occurrence);
         }
 
         public void setUpUsageGoal(final Goal goal, final Term[] updates, final Term[] assumptions)

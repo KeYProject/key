@@ -1,7 +1,21 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -28,7 +42,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * managed by this {@link IGoalChooser}. The idea is that on each {@link Goal}
  * a new symbolic execution tree node is created before on one {@link Goal}
  * a second one will be created. This has the affect that for instance on all 
- * branches of a branch node the next statement is evaluated before the first  
+ * branches of a branch statement the next statement is evaluated before the first  
  * branch executes the second statement.
  * </p>
  * <p>
@@ -53,7 +67,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
     * that on all {@link Goal}s a symbolic execution tree node was created.
     * Then the process starts again.
     */
-   private Set<Goal> goalsToPrefer = new HashSet<Goal>();
+   private Set<Goal> goalsToPrefer = new LinkedHashSet<Goal>();
    
    /**
     * The optional custom stop condition used in the current proof.
@@ -82,7 +96,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
             }
          }
          // Select goal
-         Set<Goal> goalsWhereStopConditionDoNotAllowNextRule = new HashSet<Goal>();
+         Set<Goal> goalsWhereStopConditionDoNotAllowNextRule = new LinkedHashSet<Goal>();
          do {
             Goal next = super.getNextGoal();
             if (next == null) {

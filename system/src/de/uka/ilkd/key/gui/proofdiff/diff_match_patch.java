@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 /*
  * Diff Match and Patch
  *
@@ -25,6 +38,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -513,7 +527,7 @@ public class diff_match_patch {
    */
   protected LinesToCharsResult diff_linesToChars(String text1, String text2) {
     List<String> lineArray = new ArrayList<String>();
-    Map<String, Integer> lineHash = new HashMap<String, Integer>();
+    Map<String, Integer> lineHash = new LinkedHashMap<String, Integer>();
     // e.g. linearray[4] == "Hello\n"
     // e.g. linehash.get("Hello\n") == 4
 
@@ -1700,7 +1714,7 @@ public class diff_match_patch {
    * @return Hash of character locations.
    */
   protected Map<Character, Integer> match_alphabet(String pattern) {
-    Map<Character, Integer> s = new HashMap<Character, Integer>();
+    Map<Character, Integer> s = new LinkedHashMap<Character, Integer>();
     char[] char_pattern = pattern.toCharArray();
     for (char c : char_pattern) {
       s.put(c, 0);

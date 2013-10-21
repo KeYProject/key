@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.LinkedList;
@@ -24,7 +37,7 @@ public class AutomaticProver {
         private ReentrantLock awaitShutdown = new ReentrantLock();
 
         /**
-         * Starts the prover with the following parameters. 
+         * Starts the prover with the following parameters.
          * @param proof
          * @param maxNumberOfRules
          * @param timeout
@@ -37,7 +50,7 @@ public class AutomaticProver {
                 Worker worker = new Worker(proof, maxNumberOfRules);
                 lock.lock();
                 try {  // start the prover and wait until the prover has finished its job.
-                        Thread thread = new Thread(worker);
+                        Thread thread = new Thread(worker,"Prover");
                         thread.start();
                         if (timeout < 0) {
                                 sleepCondition.await();
@@ -52,8 +65,8 @@ public class AutomaticProver {
                         lock.unlock();
                         awaitShutdown.lock();
                         try {
-                        	if (worker.getException() != null) {                       
-                                if (worker.getException() 
+                        	if (worker.getException() != null) {
+                                if (worker.getException()
                                                 instanceof InterruptedException) {
                                         throw (InterruptedException) worker
                                                         .getException();
@@ -67,7 +80,7 @@ public class AutomaticProver {
                 }
         }
 
-        
+
         /**
          * The core of the automatic prover runs in an own thread.
          */

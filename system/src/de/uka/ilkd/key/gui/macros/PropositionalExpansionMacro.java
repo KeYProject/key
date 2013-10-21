@@ -37,7 +37,8 @@ public class PropositionalExpansionMacro extends AbstractPropositionalExpansionM
     }
 
     private static final String[] ADMITTED_RULES = {
-        "andLeft", "orRight", "impRight", "notLeft", "notRight", "close"
+        "andLeft", "orRight", "impRight", "notLeft", "notRight", "close",
+        "closeTrue", "closeFalse", "true_left", "false_right"
     };
 
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
