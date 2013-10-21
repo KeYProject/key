@@ -5,11 +5,13 @@ import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.pp.TermLabelPreferences;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.Map.Entry;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 
@@ -32,11 +34,11 @@ public class TermLabelMenu extends JMenu {
 
         if (mediator.getSelectedProof() != null) {
             addSeparator();
-            Set<Class> termLabels = ITermLabel.getRegisteredTermLabels();
-            for (Class c : termLabels) {
-                TermLabelCheckBox checkBox = new TermLabelCheckBox(c) {
+            Map<Class<ITermLabel>, Name> termLabels = ITermLabel.getRegisteredTermLabels();
+            for (Entry<Class<ITermLabel>, Name> e : termLabels.entrySet()) {
+                TermLabelCheckBox checkBox = new TermLabelCheckBox(e.getKey(), e.getValue().toString()) {
                 };
-                checkBox.setSelected(!termLabelPreferences.hiddenTermLabels.contains(c));
+                checkBox.setSelected(!termLabelPreferences.hiddenTermLabels.contains(e.getKey()));
                 checkBox.setEnabled(!hideAllTermLabels.isSelected());
                 checkBoxList.add(checkBox);
             }
@@ -96,10 +98,10 @@ public class TermLabelMenu extends JMenu {
 
     private class TermLabelCheckBox extends KeYMenuCheckBox implements Comparable<TermLabelCheckBox> {
 
-        Class c;
+        Class<ITermLabel> c;
 
-        TermLabelCheckBox(Class c) {
-            super(mainWindow, c.getSimpleName());
+        TermLabelCheckBox(Class<ITermLabel> c, String label) {
+            super(mainWindow, label);
             this.c = c;
         }
 
@@ -115,7 +117,7 @@ public class TermLabelMenu extends JMenu {
 
         @Override
         public int compareTo(TermLabelCheckBox t) {
-            return this.mainWindowAction.getName().compareTo(t.mainWindowAction.getName());
+            return this.mainWindowAction.getName().toLowerCase().compareTo(t.mainWindowAction.getName().toLowerCase());
         }
 
     }

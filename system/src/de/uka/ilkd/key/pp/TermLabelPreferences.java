@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.pp;
 
+import de.uka.ilkd.key.logic.ITermLabel;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,7 +12,7 @@ import java.util.Set;
  */
 public abstract class TermLabelPreferences {
 
-    public final Set<Class> hiddenTermLabels = new HashSet();
+    public final Set<Class<ITermLabel>> hiddenTermLabels = new HashSet();
 
     public abstract boolean hideAllTermLabels();
 
