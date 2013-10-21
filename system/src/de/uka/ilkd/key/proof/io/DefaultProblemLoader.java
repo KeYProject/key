@@ -39,7 +39,6 @@ import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.ui.UserInterface;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 /**
  * <p>
@@ -126,8 +125,6 @@ public class DefaultProblemLoader {
     * Executes the loading process and tries to instantiate a proof
     * and to re-apply rules on it if possible.
     * @param registerProof Register loaded {@link Proof} in {@link GlobalProofMgt}?
-    * @throws ProofInputException Occurred Exception.
-    * @throws IOException Occurred Exception.
     */
    public ProblemLoaderException load(boolean registerProof) throws ProblemLoaderException {
       try {
@@ -162,7 +159,10 @@ public class DefaultProblemLoader {
       catch (ProblemLoaderException e) {
           throw(e);
       }
-      catch (Exception e) { // TODO give more specific exception message
+      catch (IOException e) {
+         throw new ProblemLoaderException(this, e);
+      }
+      catch (ProofInputException e) {
          throw new ProblemLoaderException(this, e);
       }
    }

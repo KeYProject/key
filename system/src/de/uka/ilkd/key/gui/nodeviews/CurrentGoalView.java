@@ -26,6 +26,7 @@ import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
@@ -238,16 +239,18 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     /** sets the LogicPrinter to use in case there is no proof available.
      */
     public void setPrinterNoProof() {
-    	printer = new GUILogicPrinter(new ProgramPrinter(null), null, null);
+    	printer = new LogicPrinter(getTermLabelPreferences());
     }
     
-    /** sets the GUILogicPrinter to use
+    /** 
+     * sets the GUILogicPrinter to use
      */
     public void setPrinter(Goal goal) {
         filter = new IdentitySequentPrintFilter(goal.sequent());
-        printer = new GUILogicPrinter(new ProgramPrinter(null),
+        printer = new LogicPrinter(new ProgramPrinter(null),
                 getMediator().getNotationInfo(),
-                mediator.getServices());
+                mediator.getServices(),
+                getTermLabelPreferences());
     }
 
     protected SequentPrintFilter getSequentPrintFilter() {

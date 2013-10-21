@@ -6,7 +6,7 @@ import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.TermLabelPreferences;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,6 +23,7 @@ public class TermLabelMenu extends JMenu {
     public final List<JCheckBoxMenuItem> checkBoxList;
     private final KeYMediator mediator;
     private final MainWindow mainWindow;
+    public final TermLabelPreferences termLabelPreferences;
 
     private void rebuildMenu() {
         removeAll();
@@ -45,15 +46,15 @@ public class TermLabelMenu extends JMenu {
                     @Override
                     public void handleClickEvent() {
                         if (isSelected()) {
-                            LogicPrinter.hiddenTermLabels.remove(name);
+                            termLabelPreferences.hiddenTermLabels.remove(name);
                         } else {
-                            LogicPrinter.hiddenTermLabels.add(name);
+                            termLabelPreferences.hiddenTermLabels.add(name);
                         }
                         mainWindow.makePrettyView();
                     }
                 };
                 checkBox.setName(name);
-                checkBox.setSelected(!LogicPrinter.hiddenTermLabels.contains(name));
+                checkBox.setSelected(!termLabelPreferences.hiddenTermLabels.contains(name));
                 checkBox.setEnabled(!hideAllTermLabels.isSelected());
                 add(checkBox);
                 checkBoxList.add(checkBox);
@@ -67,6 +68,13 @@ public class TermLabelMenu extends JMenu {
         checkBoxList = new LinkedList();
         this.mainWindow = mainWindow;
         this.mediator = mediator;
+
+        this.termLabelPreferences = new TermLabelPreferences() {
+            @Override
+            public boolean hideAllTermLabels() {
+                return hideAllTermLabels.isSelected();
+            }
+        };
 
         hideAllTermLabels = new TermLabelToggleAction(mainWindow);
         hideAllTermLabels.setName("toggleTerms");

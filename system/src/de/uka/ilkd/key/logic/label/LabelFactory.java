@@ -14,9 +14,9 @@ package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.UnknownLabelException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 
 /**
@@ -26,8 +26,8 @@ import java.util.TreeSet;
  * the label factory in package rule.label
  */
 public class LabelFactory {
-    private static Set<ITermLabel> createdLabels = new TreeSet<ITermLabel>();
 
+    private static final Set<ITermLabel> createdLabels = new HashSet<ITermLabel>();
 
     public static Set<ITermLabel> getCreatedLabels() {
         return createdLabels;

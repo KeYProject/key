@@ -21,7 +21,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.Stack;
 import java.util.StringTokenizer;
-import java.util.HashSet;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -100,7 +99,7 @@ import java.util.List;
  *
  *
  */
-public class LogicPrinter {
+public final class LogicPrinter {
 
     /**
      * The default and minimal value o fthe
@@ -140,16 +139,12 @@ public class LogicPrinter {
             QuantifiableVariablePrintMode.NORMAL;
     
     /* 
-     * List of term labels that will not be printed out.
-     * It doesn't have an influence in case hideAllTermLabels() returns true.
+     * Preferences for ITermLabel visibility.
      */
-    public static final Set<String> hiddenTermLabels = new HashSet();
+    private final TermLabelPreferences termLabelPreferences;
 
-    /*
-     This function can be overridden by other LogicPrinters, otherwise it just returns false.
-     */
-    public boolean hideAllTermLabels() {
-        return false;
+    public TermLabelPreferences getTermLabelPreferences() {
+        return termLabelPreferences;
     }
     
     public static String quickPrintTerm(Term t, Services services) {
@@ -209,23 +204,33 @@ public class LogicPrinter {
      * @param backend      the Backend for the output
      * @param purePrint    if true the PositionTable will not be calculated
                     (simulates the behaviour of the former PureSequentPrinter)
+     * @param termLabelPreferences Preferences for ITermLabel visibility.
      */
     public LogicPrinter(ProgramPrinter prgPrinter,
-                        NotationInfo notationInfo,
-                        Backend backend, 
-                        Services services,
-                        boolean purePrint) {
-	this.backend      = backend;
-	this.layouter     = new Layouter(backend,2);
-	this.prgPrinter   = prgPrinter;
-	this.notationInfo = notationInfo;
-	this.services     = services;
-	this.pure         = purePrint;
-	if(services != null) {
-	    notationInfo.refresh(services);
-	}
-    }    
+            NotationInfo notationInfo,
+            Backend backend,
+            Services services,
+            boolean purePrint,
+            TermLabelPreferences termLabelPreferences) {
+        this.backend = backend;
+        this.layouter = new Layouter(backend, 2);
+        this.prgPrinter = prgPrinter;
+        this.notationInfo = notationInfo;
+        this.services = services;
+        this.pure = purePrint;
+        this.termLabelPreferences = termLabelPreferences;
+        if (services != null) {
+            notationInfo.refresh(services);
+        }
+    }
     
+    public LogicPrinter(ProgramPrinter prgPrinter,
+            NotationInfo notationInfo,
+            Backend backend,
+            Services services,
+            boolean purePrint) {
+        this(prgPrinter,notationInfo,backend,services,purePrint,TermLabelPreferences.getDefaults());
+    }
 
     /**
      * Creates a LogicPrinter.  Sets the sequent to be printed, as
@@ -243,7 +248,29 @@ public class LogicPrinter {
              notationInfo, 
              new PosTableStringBackend(DEFAULT_LINE_WIDTH), 
              services, 
-             false);
+             false,
+             TermLabelPreferences.getDefaults());
+    }
+    
+    public LogicPrinter(ProgramPrinter prgPrinter,
+                        NotationInfo notationInfo,
+                        Services services,
+                        TermLabelPreferences termLabelPreferences) {
+	this(prgPrinter, 
+             notationInfo, 
+             new PosTableStringBackend(DEFAULT_LINE_WIDTH), 
+             services, 
+             false,
+             termLabelPreferences);
+    }
+    
+    public LogicPrinter(TermLabelPreferences termLabelPreferences) {
+	this(new ProgramPrinter(null), 
+             null, 
+             new PosTableStringBackend(DEFAULT_LINE_WIDTH), 
+             null, 
+             false, 
+             termLabelPreferences);
     }
 
     /**
@@ -258,17 +285,29 @@ public class LogicPrinter {
      * @param services     the Services object               
      */
     public LogicPrinter(ProgramPrinter prgPrinter,
-                        NotationInfo notationInfo, 
-                        Services services,
-                        boolean purePrint) {
-	this(prgPrinter, 
-	     notationInfo,
-	     new PosTableStringBackend(DEFAULT_LINE_WIDTH), 
-	     services,
-	     purePrint);
+            NotationInfo notationInfo,
+            Services services,
+            boolean purePrint) {
+        this(prgPrinter,
+                notationInfo,
+                new PosTableStringBackend(DEFAULT_LINE_WIDTH),
+                services,
+                purePrint,
+                TermLabelPreferences.getDefaults());
     }
 
-
+    public LogicPrinter(ProgramPrinter prgPrinter,
+            NotationInfo notationInfo,
+            Services services,
+            boolean purePrint,
+            TermLabelPreferences termLabelPreferences) {
+        this(prgPrinter,
+                notationInfo,
+                new PosTableStringBackend(DEFAULT_LINE_WIDTH),
+                services,
+                purePrint,
+                termLabelPreferences);
+    }
 
 
     /**
@@ -903,13 +942,13 @@ public class LogicPrinter {
     }
 
     public void printLabels(Term t) throws IOException {
-        if (hideAllTermLabels()) {
+        if (termLabelPreferences.hideAllTermLabels()) {
             return;
         }
 
         List<ITermLabel> termLabelList = new LinkedList();
         for (ITermLabel l : t.getLabels()) {
-            if (!hiddenTermLabels.contains(l.name().toString())) {
+            if (!termLabelPreferences.hiddenTermLabels.contains(l.name().toString())) {
                 termLabelList.add(l);
             }
         }

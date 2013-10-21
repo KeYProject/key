@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import de.uka.ilkd.key.gui.GUILogicPrinter;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
@@ -24,10 +23,13 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.pp.LogicPrinter;
+
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.TermLabelPreferences;
 import de.uka.ilkd.key.util.Debug;
 import java.awt.Color;
 import java.awt.Font;
@@ -71,9 +73,13 @@ public abstract class SequentView extends JTextArea
         return lineWidth;
     }
     
+    public static TermLabelPreferences getTermLabelPreferences(){
+        return MainWindow.getInstance().termLabelMenu.termLabelPreferences;
+    }
+    
     private ConfigChangeListener configChangeListener;
     SequentPrintFilter filter;
-    GUILogicPrinter printer;
+    LogicPrinter printer;
     public boolean refreshHighlightning = true;
     private boolean showTermInfo = false;
     

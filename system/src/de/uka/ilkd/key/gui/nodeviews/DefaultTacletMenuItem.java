@@ -54,9 +54,10 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         
         WriterBackend backend = new WriterBackend(w, 68);
         LogicPrinter tp = new LogicPrinter(new ProgramPrinter(w,
-    							  connectedTo.instantiations()),
-    				       notationInfo, backend, null,
-    				       true);
+                connectedTo.instantiations()),
+                notationInfo, backend, null,
+                true,
+                SequentView.getTermLabelPreferences());
         tp.printTaclet(connectedTo.taclet(), 
         	       connectedTo.instantiations(),
         	       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
