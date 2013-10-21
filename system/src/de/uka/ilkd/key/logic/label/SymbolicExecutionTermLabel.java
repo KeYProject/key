@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.Name;
  * Currently realized as singleton. In case one wants to track and distinguish 
  * different lines of execution, this needs to be changed.
  */
-public class SymbolicExecutionTermLabel implements ITermLabel {
+public class SymbolicExecutionTermLabel extends ITermLabel {
    /**
     * The unique name of this label.
     */

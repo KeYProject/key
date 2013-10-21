@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.Name;
  * Label attached to anonymisation heap function symbols as for instance
  * introduce in UseOperationContractRule or WhileInvariantRule.
  */
-public class AnonHeapTermLabel implements ITermLabel {
+public class AnonHeapTermLabel extends ITermLabel {
 
     /**
      * The unique name of this label.

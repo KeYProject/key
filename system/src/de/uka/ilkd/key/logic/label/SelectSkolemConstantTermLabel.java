@@ -19,7 +19,7 @@ import de.uka.ilkd.key.logic.Name;
 /**
  * Label attached to skolem constants introduced by the rule pullOutSelect.
  */
-public class SelectSkolemConstantTermLabel implements ITermLabel {
+public class SelectSkolemConstantTermLabel extends ITermLabel {
 
     /**
      * The unique name of this label.

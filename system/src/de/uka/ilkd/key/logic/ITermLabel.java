@@ -53,7 +53,7 @@ import de.uka.ilkd.key.proof.init.Profile;
  * </ol>
  * </p>
  */
-public interface ITermLabel extends Named {
+public abstract class ITermLabel implements Named {
     /**
      * A term label may have structure, i.e., parameterized
      * @param i the i-th parameter (from 0 to max nr of parameters)
