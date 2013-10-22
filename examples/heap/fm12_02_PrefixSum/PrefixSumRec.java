@@ -104,7 +104,7 @@ final class PrefixSumRec {
       @   requires 0 <= k;
       @   ensures \result == pow2(min(k));
       @   ensures 0 < \result && \result <= k+1;
-      @   measured_by k, 2;
+      @   measured_by k + 2;
       @   accessible \nothing;
       @*/
     private /*@ helper strictly_pure @*/ static int f ( int k ) {
@@ -122,7 +122,7 @@ final class PrefixSumRec {
       @   ensures (\forall int k; 0 <= k && k < 2*(right-left);
       @            a[k+leftMost(left,right)] == (\sum int i; k-f(k)+1 <= i && i < k+1; \old(a[i+leftMost(left,right)])));
       @   //ensures a[right] == (\sum int i; leftMost(left,right) <= i && i < right+1; \old(a[i])); // the simple side-condition
-      @   measured_by right - left + a.length, 3;
+      @   measured_by right - left + a.length + 3;
       @   assignable \infinite_union(int k; leftMost(left,right) <= k 
       @              && k <= right && !even(k); \singleton(a[k]));
       @*/
@@ -150,7 +150,7 @@ public void upsweep(int left, int right) {
       @   requires !even(left) || right-left==1;
       @// ensures (\forall int k; leftMost(left,right) <= k && k <= right;
       @//             a[k] == (\sum int i; 0 <= i && i < binWeight(k-leftMost(left,right)); \old(a[i+leftMost+xxx])) + \old(a[right]));
-      @   measured_by right - left + a.length, 3;
+      @   measured_by right - left + a.length + 3;
       @   assignable \infinite_union(int k; leftMost(left,right) <= k
       @                              && k <= right; \singleton(a[k]));
       @*/
