@@ -85,7 +85,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                     final Proof.Statistics stat = info.getProof().statistics();
                     System.out.println("Proof steps: "+stat.nodes);
                     System.out.println("Branches: "+stat.branches);
-                    System.out.println("Time: "+stat.autoModeTime+"ms");
+                    System.out.println("Automode Time: "+stat.autoModeTime+"ms");
                 }
                 System.out.println("Number of goals remaining open: " +
                         openGoals);
