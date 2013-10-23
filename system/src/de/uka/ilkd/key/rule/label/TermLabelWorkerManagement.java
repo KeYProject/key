@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.TermLabelUtil;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -71,7 +72,7 @@ public final class TermLabelWorkerManagement {
     * Constructor.
     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten. 
     * @param rule The {@link Rule} which is applied. 
-    * @param labelInstantiators The available {@link TermLabelInstantiator}.
+    * @param globalLabelInstantiator The available global {@link TermLabelInstantiator}.
     */
    public TermLabelWorkerManagement(PosInOccurrence applicationPosInOccurrence, 
                                           Rule rule, 
@@ -127,9 +128,9 @@ public final class TermLabelWorkerManagement {
    }
    
    /**
-    * Returns all {@link TermLabelInstantiator} contained in the {@link Proof} of the given {@link Services}.
+    * Returns the global {@link TermLabelInstantiator} contained in the {@link Proof} of the given {@link Services}.
     * @param services The {@link Services} which contains the proof to read {@link TermLabelInstantiator}s from.
-    * @return The {@link TermLabelInstantiator}s contained in the {@link Proof} of the given {@link Services}.
+    * @return The global {@link TermLabelInstantiator} contained in the {@link Proof} of the given {@link Services}.
     */
    public static TermLabelInstantiator getGlobalLabelInstantiator(Services services) {
        TermLabelInstantiator result = null;
@@ -156,8 +157,8 @@ public final class TermLabelWorkerManagement {
    
    /**
     * Computes the {@link TermLabel} to add to a new {@link Term} with
-    * help of the given {@link TermLabelInstantiator}s.
-    * @param labelInstantiators The available {@link TermLabelInstantiator}.
+    * help of the {@link TermLabelInstantiator}s of the terms and the global {@link TermLabelInstantiator}.
+    * @param labelInstantiators The available global {@link TermLabelInstantiator}.
     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten. 
     * @param rule The {@link Rule} which is applied. 
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
@@ -269,9 +270,16 @@ public final class TermLabelWorkerManagement {
          newLabels.add(oldLabel);
       }
 
-      // Give all ITermLabelWorker instances the chance to remove or to add labels from/to the list 
-      if (globalInstantiator != null) {
-          globalInstantiator.updateLabels(tacletTerm, applicationPosInOccurrence, term, rule, goal, newLabels);
+      // Give all ITermLabelWorker instances the chance to remove or to add labels from/to the list
+      List<TermLabelInstantiator> relevantInstantiators = new LinkedList<TermLabelInstantiator>();
+      extractRelevantInstantiators(tacletTerm, relevantInstantiators);
+      extractRelevantInstantiators(term, relevantInstantiators);
+      if(globalInstantiator != null) {
+          relevantInstantiators.add(globalInstantiator);
+      }
+
+      for(TermLabelInstantiator instantiator : relevantInstantiators) {
+          instantiator.updateLabels(tacletTerm, applicationPosInOccurrence, term, rule, goal, newLabels);
       }
 
       return new ImmutableArray<TermLabel>(newLabels);

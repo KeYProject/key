@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.TermLabelUtil;
 import de.uka.ilkd.key.rule.label.TermLabelInstantiator;
 
 
@@ -30,7 +32,7 @@ import de.uka.ilkd.key.rule.label.TermLabelInstantiator;
  * e.g. if it is used in a Taclet definition or if a cut rule is applied.
  * For convenience parameters are always printed as {@link String}s
  * and have to be parsed individually into the required {@link Object} instances
- * via {@link LabelFactory#createLabel(String, java.util.List)}.
+ * via {@link LabelFactory#getLabel(String, java.util.List)}.
  * </p>
  * <p>
  * {@link Term}s with or without term labels are still unmodifiable.
@@ -42,30 +44,49 @@ import de.uka.ilkd.key.rule.label.TermLabelInstantiator;
  * maintain or remove existing term labels or to add new one.
  * </p>
  * <p>
- * To implement a new term label the following steps are required:
- * <ol>
- *    <li>Create a subclass of {@link TermLabel}.</li>
- *    <li>Modify {@link LabelFactory#createLabel(String, java.util.List)} to ensure that instances of the new {@link TermLabel} sub class are created when a {@link String} is parsed into a {@link Term}.</li>
- *    <li>If required implement an {@link de.uka.ilkd.key.rule.label.TermLabelInstantiator} which maintains the new term labels during proof. Ensure that this {@link de.uka.ilkd.key.rule.label.TermLabelInstantiator} instance is registered in {@link de.uka.ilkd.key.proof.init.Profile#getLabelInstantiators()}.
- *        Typically this is achieved by adding the new {@link de.uka.ilkd.key.rule.label.TermLabelInstantiator} instance in
- *        {@link de.uka.ilkd.key.proof.init.AbstractProfile#computeLabelInstantiators()}.</li>
- * </ol>
+ * Please see information in {@link TermLabelUtil} on how to introduce new label types.
  * </p>
+ * 
+ * @see TermLabelInstantiator
+ * @see TermLabelManager
+ * @see TermLabelUtil
+ * 
+ * @author Martin Hentschel
  */
 public interface TermLabel extends Named {
+    
     /**
-     * A term label may have structure, i.e., parameterized
-     * @param i the i-th parameter (from 0 to max nr of parameters)
+     * Retrieves the i-th parameter object of this term label.
+     * 
+     * <p>
+     * A term label may have structure, i.e. can be parameterized.
+     * 
+     * @param i
+     *            the number of the parameter to retrieve (
+     *            {@code 0 <= i < getChildCount()})
      * @return the selected parameter
-     * @throw an {@link IndexOutOfBoundsException} if the given parameter number is negative or greater-or-equal the number of parameters returned by {@link #getChildCount()}
+     * @throw an {@link IndexOutOfBoundsException} if the given parameter number
+     *        <tt>i</tt> is negative or greater-or-equal the number of
+     *        parameters returned by {@link #getChildCount()}
      */
     public Object getChild(int i);
 
     /**
-     * number of parameters (non-negative number)
-     * @return the number of parameters
+     * Gets the number of parameters of this term label.
+     *  
+     * @return the number of parameters (a non-negative number)
      */
     public int getChildCount();
     
+    /**
+     * Gets the instantiator associated to this label.
+     * 
+     * <p>
+     * Every term label <i>can</i> have a {@link TermLabelInstantiator}
+     * associated with it. If it does not, this method returns
+     * <code>null</code>.
+     * 
+     * @return the associated instantiator or <code>null</code>
+     */
     public TermLabelInstantiator getInstantiator();
 }

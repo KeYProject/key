@@ -22,7 +22,12 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.TermLabel;
 import de.uka.ilkd.key.logic.Term;
 
-public class TermLabelOperationsInterpreter {
+/**
+ * A collection of static methods to deal with {@link TermLabel}.
+ * 
+ * @author Richard Bubel
+ */
+class TermLabelOperationsInterpreter {
 
    public static ImmutableArray<TermLabel> intersection(
            ImmutableArray<TermLabel> left, ImmutableArray<TermLabel> right) {

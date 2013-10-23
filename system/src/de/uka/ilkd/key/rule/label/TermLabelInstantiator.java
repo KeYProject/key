@@ -40,7 +40,7 @@ import de.uka.ilkd.key.rule.UseOperationContractRule;
  * </p>
  * <p>
  * Global term label instantiators can be added to the {@link TermLabelManager} 
- * using {@link TermLabelManager#addGlobalWorker(TermLabelInstantiator)}.
+ * using {@link TermLabelManager#addGlobalInstantiator(TermLabelInstantiator)}.
  * </p>
  * <p>
  * During proof the class {@link TermLabelWorkerManagement} is responsible to
