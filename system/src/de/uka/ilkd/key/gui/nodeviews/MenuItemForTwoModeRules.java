@@ -27,9 +27,9 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 public class MenuItemForTwoModeRules extends JMenu implements
         BuiltInRuleMenuItem {
 
-    private static final long serialVersionUID = 2183229438545523499L;
-    
-
+    private static final int EXPAND_DELAY = 200;
+	private static final long serialVersionUID = 2183229438545523499L;
+	
     // without selecting one the options above take unforced mode as default
     private static final boolean DEFAULT_FORCE = false;
     
@@ -91,7 +91,7 @@ public class MenuItemForTwoModeRules extends JMenu implements
         });
 
         // wait a bit longer before expanding submenus
-        setDelay(getDelay() + 500);
+        setDelay(getDelay() + EXPAND_DELAY);
         
         super.addMouseListener(new MouseAdapter() {            
             @Override
