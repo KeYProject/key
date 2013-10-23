@@ -54,30 +54,6 @@ final class MapImplementation implements Map2 {
         return keys.length == 0;
     }
 
-    public Object put(Object k, Object v) {
-        Object old = get(k);
-        if (!containsKey(k)) {
-            Object keysNew[] = new Object[keys.length + 1];
-            Object valuesNew[] = new Object[keys.length + 1];
-            for (int i = 0; i < keys.length; i++) {
-                keysNew[i] = keys[i];
-                valuesNew[i] = values[i];
-            }
-            keysNew[keys.length] = k;
-            valuesNew[keys.length] = v;
-
-            keys = keysNew;
-            values = valuesNew;
-        } else {
-            for (int i = 0; i < keys.length; i++) {
-                if (keys[i] == k) {
-                    values[i] = v;
-                }
-            }
-        }
-        return old;
-    }
-
     public boolean containsKey(Object o) {
         /*@ loop_invariant 0 <= i && i <= keys.length;
          @  loop_invariant (\forall int x; 0 <= x && x < i; o != keys[x]);
@@ -105,11 +81,12 @@ final class MapImplementation implements Map2 {
         }
         return false;
     }
-
-    public Object remove(Object key) {
-
+    
+    public Object put(Object key, Object value) {
+        
         int index = -1;
         int i;
+        Object ret = null;
 
          /*@ loop_invariant 0 <= i && i <= keys.length;
          @ loop_invariant (\forall int x; 0 <= x && x < i; key != keys[x]);
@@ -119,42 +96,81 @@ final class MapImplementation implements Map2 {
         for (i = 0; i < keys.length; i++) {
             if (key == keys[i]) {
                 index = i;
+                ret = values[i];
+                values[i] = value;
             }
         }
         
-        if(index == -1){
-            return null;
-        }
+        if (index == -1) {
 
-        Object ret = values[index];
-        Object keysNew[] = new Object[keys.length - 1];
-        Object valuesNew[] = new Object[keys.length - 1];
-
-        /*@ loop_invariant 0 <= i && i <= keys.length;
-         @ loop_invariant (\forall int x; 0 <= x && x < i;
-         @ ( (x < index) ==> ( keysNew[x] == keys[x] && valuesNew[x] == values[x] )) && 
-         @ ( (x > index) ==> ( keysNew[x] == keys[x - 1] && valuesNew[x] == values[x - 1] ))
-         @ );
-         @ decreases keys.length - i;
-         @ assignable footprint;
-         @*/
-        for (i = 0; i < keys.length; i++) {
-            if (i < index) {
+            Object keysNew[] = new Object[keys.length + 1];
+            Object valuesNew[] = new Object[keys.length + 1];
+            for (i = 0; i < keys.length; i++) {
                 keysNew[i] = keys[i];
                 valuesNew[i] = values[i];
             }
-            if (i > index) {
-                keysNew[i] = keys[i - 1];
-                valuesNew[i] = values[i - 1];
+            keysNew[keys.length] = key;
+            valuesNew[keys.length] = value;
+
+            keys = keysNew;
+            values = valuesNew;
+
+        }
+        
+        //@ set map = \dl_mapUpdate(map, key, value);
+        //@ set footprint = \set_union(\set_union(\all_fields(keys), \all_fields(values)), \all_fields(this));
+        return ret;
+    }
+
+    public Object remove(Object key) {
+
+        int index = -1;
+        int i;
+        Object ret = null;
+
+        /*@ loop_invariant 0 <= i && i <= keys.length;
+         @ loop_invariant (\forall int x; 0 <= x && x < i; key != keys[x]);
+         @ decreases keys.length - i;
+         @ assignable \strictly_nothing;
+         @*/
+        for (i = 0; i < keys.length; i++) {
+            if (key == keys[i]) {
+                index = i;
+                ret = values[i];
             }
         }
 
-        keys = keysNew;
-        values = valuesNew;
-        
+        if (index != -1) {
+
+            Object keysNew[] = new Object[keys.length - 1];
+            Object valuesNew[] = new Object[keys.length - 1];
+
+            /*@ loop_invariant 0 <= i && i <= keys.length;
+             @ loop_invariant (\forall int x; 0 <= x && x < i;
+             @ ( (x < index) ==> ( keysNew[x] == keys[x] && valuesNew[x] == values[x] )) && 
+             @ ( (x > index) ==> ( keysNew[x] == keys[x - 1] && valuesNew[x] == values[x - 1] ))
+             @ );
+             @ decreases keys.length - i;
+             @ assignable footprint;
+             @*/
+            for (i = 0; i < keys.length; i++) {
+                if (i < index) {
+                    keysNew[i] = keys[i];
+                    valuesNew[i] = values[i];
+                }
+                if (i > index) {
+                    keysNew[i] = keys[i - 1];
+                    valuesNew[i] = values[i - 1];
+                }
+            }
+
+            keys = keysNew;
+            values = valuesNew;
+
+        }
+
         //@ set map = \dl_mapRemove(map, key);
         //@ set footprint = \set_union(\set_union(\all_fields(keys), \all_fields(values)), \all_fields(this));
-        
         return ret;
     }
 

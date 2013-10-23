@@ -54,8 +54,10 @@ public interface Map2 {
     
     /*@ public normal_behaviour
      @ assignable footprint;
-     @ ensures \dl_mapGet(map,key) == value && \result == \old(\dl_mapGet(map,key)) &&
-     @ ( \forall Object o; (\fresh(o) ==> \dl_mapGet(map,o) == null) && 
+     @ ensures \dl_mapGet(map,key) == value &&
+     @ \dl_inDomain(map, key) &&
+     @ \result == \old((\dl_inDomain(map, key)?\dl_mapGet(map, key):null)) &&
+     @ (\forall Object o; (\fresh(o) ==> !\dl_inDomain(map,o)) &&
      @ (!\fresh(o) && o != key ==> \dl_mapGet(map,o) == \old(\dl_mapGet(map,o)))
      @ );
      @*/
