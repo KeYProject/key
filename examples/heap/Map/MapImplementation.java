@@ -88,10 +88,11 @@ final class MapImplementation implements Map2 {
         int i;
         Object ret = null;
 
-         /*@ loop_invariant 0 <= i && i <= keys.length;
-         @ loop_invariant (\forall int x; 0 <= x && x < i; key != keys[x]);
+        /*@ loop_invariant 0 <= i && i <= keys.length;
+         @ loop_invariant (\forall int x; 0 <= x && x < i; 
+         @ (key == keys[x] ==> ( index == x && ret == values[x])));
          @ decreases keys.length - i;
-         @ assignable \strictly_nothing;
+         @ assignable footprint;
          @*/
         for (i = 0; i < keys.length; i++) {
             if (key == keys[i]) {
@@ -129,9 +130,10 @@ final class MapImplementation implements Map2 {
         Object ret = null;
 
         /*@ loop_invariant 0 <= i && i <= keys.length;
-         @ loop_invariant (\forall int x; 0 <= x && x < i; key != keys[x]);
+         @ loop_invariant (\forall int x; 0 <= x && x < i; 
+         @ (key == keys[x] ==> ( index == x && ret == values[x])));
          @ decreases keys.length - i;
-         @ assignable \strictly_nothing;
+         @ assignable footprint;
          @*/
         for (i = 0; i < keys.length; i++) {
             if (key == keys[i]) {
