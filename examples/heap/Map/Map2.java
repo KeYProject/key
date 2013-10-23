@@ -24,9 +24,9 @@ public interface Map2 {
     
     /*@ public normal_behaviour
     @ accessible footprint;
-    @ ensures \result == (\dl_inDomain(map, o)?\dl_mapGet(map, o):null);
+    @ ensures \result == (\dl_inDomain(map, key)?\dl_mapGet(map, key):null);
     @*/
-    public /*@pure nullable@*/ Object get(Object o);
+    public /*@pure nullable@*/ Object get(Object key);
 
     /*@ public normal_behaviour
      @ accessible footprint;
@@ -61,10 +61,15 @@ public interface Map2 {
      @*/
     public /*@nullable@*/ Object put(Object key, Object value);
 
+    /* What if keys.length == 1 before remove? 
+     * Have to set map = mapEmpty?
+     */
+    
     /*@ public normal_behaviour
      @ assignable footprint;
-     @   ensures \dl_mapGet(map,key) == null && \result == \old(\dl_mapGet(map,key)) &&
-     @ ( \forall Object o; (\fresh(o) ==> \dl_mapGet(map,o) == null) && 
+     @ ensures !\dl_inDomain(map,key) &&
+     @ \result == \old((\dl_inDomain(map, key)?\dl_mapGet(map, key):null)) &&
+     @ (\forall Object o; (\fresh(o) ==> !\dl_inDomain(map,o)) &&
      @ (!\fresh(o) && o != key ==> \dl_mapGet(map,o) == \old(\dl_mapGet(map,o)))
      @ );
      @*/
