@@ -402,7 +402,7 @@ public final class MainWindow extends JFrame  {
         final boolean stupidMode =
         		  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
 //            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().tacletFilter();
-        mediator.setStupidMode(stupidMode);
+        mediator.setMinimizeInteraction(stupidMode);
 
         // set up actions
         autoModeAction            = new AutoModeAction(this);

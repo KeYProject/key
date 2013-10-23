@@ -95,7 +95,7 @@ public class KeYMediator {
 
     private KeYExceptionHandler defaultExceptionHandler;
 
-    private boolean stupidMode; // minimize user interaction
+    private boolean minimizeInteraction; // minimize user interaction
 
     private TacletFilter filterForInteractiveProving;
     
@@ -219,12 +219,12 @@ public class KeYMediator {
     }
 
     /** simplified user interface? */
-    public boolean stupidMode() {
-       return stupidMode;
+    public boolean minimizeInteraction() {
+       return minimizeInteraction;
     }
 
-    public void setStupidMode(boolean b) {
-       stupidMode = b;
+    public void setMinimizeInteraction(boolean b) {
+       minimizeInteraction = b;
     }
 
     public boolean ensureProofLoaded() {
@@ -431,7 +431,7 @@ public class KeYMediator {
 	    TacletApp firstApp = it.next();
             boolean ifSeqInteraction =
                !firstApp.taclet().ifSequent().isEmpty() ;
-            if (stupidMode && !firstApp.complete()) {
+            if (minimizeInteraction && !firstApp.complete()) {
                 ImmutableList<TacletApp> ifSeqCandidates =
                     firstApp.findIfFormulaInstantiations(goal.sequent(),
 		        getServices());
