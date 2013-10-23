@@ -92,7 +92,7 @@ final class MapImplementation implements Map2 {
          @ loop_invariant (\forall int x; 0 <= x && x < i; 
          @ (key == keys[x] ==> ( index == x && ret == values[x])));
          @ decreases keys.length - i;
-         @ assignable footprint;
+         @ assignable \set_union(values[*], ret);
          @*/
         for (i = 0; i < keys.length; i++) {
             if (key == keys[i]) {
@@ -109,9 +109,9 @@ final class MapImplementation implements Map2 {
             
             /*@ loop_invariant 0 <= i && i <= keys.length;
              @ loop_invariant (\forall int x; 0 <= x && x < i; 
-             @ (keysNew[x] == keys[x] && valuesNew[x] == values[x]);
+             @ (keysNew[x] == keys[x] && valuesNew[x] == values[x]));
              @ decreases keys.length - i;
-             @ assignable footprint;
+             @ assignable \set_union(keysNew[*], valuesNew[*]);
              @*/
             for (i = 0; i < keys.length; i++) {
                 keysNew[i] = keys[i];
@@ -140,7 +140,7 @@ final class MapImplementation implements Map2 {
          @ loop_invariant (\forall int x; 0 <= x && x < i; 
          @ (key == keys[x] ==> ( index == x && ret == values[x])));
          @ decreases keys.length - i;
-         @ assignable footprint;
+         @ assignable \set_union(values[*], ret);
          @*/
         for (i = 0; i < keys.length; i++) {
             if (key == keys[i]) {
@@ -160,7 +160,7 @@ final class MapImplementation implements Map2 {
              @ ( (x > index) ==> ( keysNew[x] == keys[x - 1] && valuesNew[x] == values[x - 1] ))
              @ );
              @ decreases keys.length - i;
-             @ assignable footprint;
+             @ assignable \set_union(keysNew[*], valuesNew[*]);
              @*/
             for (i = 0; i < keys.length; i++) {
                 if (i < index) {
