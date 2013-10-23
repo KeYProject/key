@@ -58,7 +58,19 @@ import de.uka.ilkd.key.util.GuiUtilities;
  */
 class TacletMenu extends JMenu {
 
-    /**
+    private static final String MORE_RULES = "More rules";
+	private static final String COPY_TO_CLIPBOARD = "Copy to clipboard";
+	private static final String CREATE_ABBREVIATION = "Create abbreviation";
+	private static final String ENABLE_ABBREVIATION = "Enable abbreviation";
+	private static final String DISABLE_ABBREVIATION = "Disable abbreviation";
+	private static final String CHANGE_ABBREVIATION = "Change abbreviation";
+	private static final String APPLY_CONTRACT = "Apply Contract";
+	private static final String CHOOSE_AND_APPLY_CONTRACT = "Choose and Apply Contract";
+	private static final String ENTER_LOOP_SPECIFICATION = "Enter Loop Specification";
+	private static final String APPLY_RULE = "Apply Rule";
+	private static final String NO_RULES_APPLICABLE = "No rules applicable.";
+	private static final String OBSOLETE = "obsolete";
+	/**
      *
      */
     private static final long serialVersionUID = -4659105575090816693L;
@@ -132,7 +144,7 @@ class TacletMenu extends JMenu {
         for (TacletApp ta: list) {
             boolean isObsolete = false;
             for (RuleSet rs: ta.taclet().getRuleSets()) {
-                if (rs.name().equals(new Name("obsolete"))) {
+                if (rs.name().equals(new Name(OBSOLETE))) {
                     isObsolete = true;
                     break;
                 }
@@ -185,7 +197,7 @@ class TacletMenu extends JMenu {
 	if (rulesAvailable) {
             createMenuItems(toAdd, control);
         } else {
-	    createSection("No rules applicable.");
+	    createSection(NO_RULES_APPLICABLE);
 	}
 
 	createBuiltInRuleMenu(builtInList, control);
@@ -273,21 +285,21 @@ class TacletMenu extends JMenu {
         if (builtInRule == WhileInvariantRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(builtInRule.displayName(),
-                    "Apply Rule", "Applies a known and complete loop specification immediately.",
-                    "Enter Loop Specification", "Allows to modify an existing or to enter a new loop specification.", builtInRule);
+                    APPLY_RULE, "Applies a known and complete loop specification immediately.",
+                    ENTER_LOOP_SPECIFICATION, "Allows to modify an existing or to enter a new loop specification.", builtInRule);
             item.addActionListener(control);
             add(item);
         } else if (builtInRule == BlockContractRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(builtInRule.displayName(),
-                    "Apply Rule", "Applies a known and complete block specification immediately.",
-                    "Choose and Apply Contract", "Asks to select the contract to be applied.", builtInRule);
+                    APPLY_RULE, "Applies a known and complete block specification immediately.",
+                    CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.", builtInRule);
             item.addActionListener(control);
             add(item);
         } else if (builtInRule == UseOperationContractRule.INSTANCE) {
             item = new MenuItemForTwoModeRules(builtInRule.displayName(),
-                    "Apply Contract", "All available contracts of the method are combined and applied.",
-                    "Choose and Apply Contract", "Asks to select the contract to be applied.", builtInRule);
+                    APPLY_CONTRACT, "All available contracts of the method are combined and applied.",
+                    CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.", builtInRule);
             item.addActionListener(control);
             add(item);
         } else {
@@ -329,16 +341,16 @@ class TacletMenu extends JMenu {
 	AbbrevMap scm = mediator.getNotationInfo().getAbbrevMap();
 	JMenuItem sc = null;
 	if(scm.containsTerm(t)){
-	    sc = new JMenuItem("Change abbreviation");
+	    sc = new JMenuItem(CHANGE_ABBREVIATION);
 	    sc.addActionListener(control);
 	    add(sc);
 	    if(scm.isEnabled(t)){
-		sc = new JMenuItem("Disable abbreviation");
+		sc = new JMenuItem(DISABLE_ABBREVIATION);
 	    }else{
-		sc = new JMenuItem("Enable abbreviation");
+		sc = new JMenuItem(ENABLE_ABBREVIATION);
 	    }
 	}else{
-	    sc = new JMenuItem("Create abbreviation");
+	    sc = new JMenuItem(CREATE_ABBREVIATION);
 	}
 	sc.addActionListener(control);
 	add(sc);
@@ -363,7 +375,7 @@ class TacletMenu extends JMenu {
 
     private void addClipboardItem(MenuControl control) {
 	addSeparator();
-	JMenuItem item = new JMenuItem("copy to clipboard");
+	JMenuItem item = new JMenuItem(COPY_TO_CLIPBOARD);
 	item.addActionListener(control);
 	add(item);
     }
@@ -406,7 +418,7 @@ class TacletMenu extends JMenu {
             insSystemInvItem.addActionListener(control);
         }
 
-        JMenu more = new JMenu("More rules");
+        JMenu more = new JMenu(MORE_RULES);
 
         for (final TacletApp app : taclets) {
             final Taclet taclet = app.taclet();
@@ -499,21 +511,19 @@ class TacletMenu extends JMenu {
 	            .startFocussedAutoMode ( pos.getPosInOccurrence (),
 	                                     mediator.getSelectedGoal () );
 	    } else {
+		// TODO: change to switch statement once development switches to Java7
 		if (((JMenuItem)e.getSource()).getText()
-		    .startsWith("copy to clipboard")){
+		    .startsWith(COPY_TO_CLIPBOARD)){
                     GuiUtilities.copyHighlightToClipboard(sequentView, pos);
 		} else if(((JMenuItem)e.getSource()).getText().
-			  startsWith("Pop method frame")){
-		    //                        mediator.popMethodFrame();
-		} else if(((JMenuItem)e.getSource()).getText().
-			  startsWith("Disable abbreviation")){
+			  startsWith(DISABLE_ABBREVIATION)){
 		    PosInOccurrence occ = pos.getPosInOccurrence();
 		    if (occ != null && occ.posInTerm() != null) {
 			mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(),false);
 			sequentView.printSequent();
 		    }
 		}else if(((JMenuItem)e.getSource()).getText().
-			 startsWith("Enable abbreviation")){
+			 startsWith(ENABLE_ABBREVIATION)){
 		    PosInOccurrence occ = pos.getPosInOccurrence();
 		    if (occ != null && occ.posInTerm() != null) {
 			mediator.getNotationInfo().
@@ -521,7 +531,7 @@ class TacletMenu extends JMenu {
 			sequentView.printSequent();
 		    }
 		}else if(((JMenuItem)e.getSource()).getText().
-			 startsWith("Create abbreviation")){
+			 startsWith(CREATE_ABBREVIATION)){
 		    PosInOccurrence occ = pos.getPosInOccurrence();
 		    if (occ != null && occ.posInTerm() != null) {
 			String abbreviation = (String)JOptionPane.showInputDialog
@@ -553,7 +563,7 @@ class TacletMenu extends JMenu {
 		    }
 
 		}else if(((JMenuItem)e.getSource()).getText().
-			 startsWith("Change abbreviation")){
+			 startsWith(CHANGE_ABBREVIATION)){
 		    PosInOccurrence occ = pos.getPosInOccurrence();
 		    if (occ != null && occ.posInTerm() != null) {
 			String abbreviation = (String)JOptionPane.showInputDialog
@@ -607,13 +617,14 @@ class TacletMenu extends JMenu {
 
 
     static class FocussedRuleApplicationMenuItem extends JMenuItem {
-        /**
+        private static final String APPLY_RULES_AUTOMATICALLY_HERE = "Apply rules automatically here";
+		/**
          *
          */
         private static final long serialVersionUID = -6486650015103963268L;
 
         public FocussedRuleApplicationMenuItem () {
-            super("Apply rules automatically here");
+            super(APPLY_RULES_AUTOMATICALLY_HERE);
             setToolTipText("<html>Initiates and restricts automatic rule applications on the " +
                         "highlighted formula, term or sequent.<br> "+
                         "'Shift + left mouse click' on the highlighted " +
