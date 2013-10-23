@@ -205,6 +205,7 @@ public final class PosInOccurrence {
      *         It is not tested whether this position exists within <code>p_newFormula</code>
      */
     public PosInOccurrence replaceConstrainedFormula (SequentFormula p_newFormula) {
+        assert p_newFormula != null;
         final PIOPathIterator it = iterator ();
         Term newTerm = p_newFormula.formula ();
         PosInTerm newPosInTerm = PosInTerm.TOP_LEVEL;
