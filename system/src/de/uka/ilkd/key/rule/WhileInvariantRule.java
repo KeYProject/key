@@ -697,11 +697,6 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                               TB.and(new Term[]{invTerm,
                                                                                 reachableOut,
                                                                                 variantNonNeg}));
-
-   if (TermLabelWorkerManagement.hasInstantiators(services)) {
-      TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, initGoal);
-   }
-
 	final WhileInvariantTransformer wir = new WhileInvariantTransformer();
         SVInstantiations svInst
         = SVInstantiations.EMPTY_SVINSTANTIATIONS.replace(null, null,
@@ -803,6 +798,9 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                                   TB.and(invTerm, reachableState)),
                                                            null)),
                                ruleApp.posInOccurrence());
+        if (TermLabelWorkerManagement.hasInstantiators(services)) {
+           TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, initGoal);
+        }
 
         // "Use Case":
         // \replacewith (==> #introNewAnonUpdate(#modifies, inv ->

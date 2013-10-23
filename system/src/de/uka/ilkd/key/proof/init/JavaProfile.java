@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
+import de.uka.ilkd.key.rule.AnonHeapTermLabelInstantiator;
 import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
@@ -30,6 +31,7 @@ import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.label.ITermLabelWorker;
+import de.uka.ilkd.key.rule.label.PostConditionTermLabelInstantiator;
 import de.uka.ilkd.key.rule.label.SelectSkolemConstantTermLabelInstantiator;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -151,6 +153,8 @@ public class JavaProfile extends AbstractProfile {
     protected ImmutableList<ITermLabelWorker> computeLabelInstantiators() {
        ImmutableList<ITermLabelWorker> result = ImmutableSLList.nil();
        result = result.prepend(SelectSkolemConstantTermLabelInstantiator.INSTANCE);
+       result = result.append(AnonHeapTermLabelInstantiator.INSTANCE);
+       result = result.append(PostConditionTermLabelInstantiator.INSTANCE);
        return result;
     }
 

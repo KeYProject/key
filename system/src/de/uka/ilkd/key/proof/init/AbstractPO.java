@@ -289,12 +289,6 @@ public abstract class AbstractPO implements IPersistablePO {
                                 initConfig.getSettings() != null
                                 ? initConfig.getSettings()
                                 : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
-        if (!labelInstantiators.contains(AnonHeapTermLabelInstantiator.INSTANCE)) {
-           labelInstantiators = labelInstantiators.append(AnonHeapTermLabelInstantiator.INSTANCE);
-        }
-        if (!labelInstantiators.contains(PostConditionTermLabelInstantiator.INSTANCE)) {
-           labelInstantiators = labelInstantiators.append(PostConditionTermLabelInstantiator.INSTANCE);
-        }
         assert proof.openGoals().size() == 1 : "expected one first open goal";
         final boolean isInfFlowProof =
                 (this instanceof InfFlowRelatedPO) ||
