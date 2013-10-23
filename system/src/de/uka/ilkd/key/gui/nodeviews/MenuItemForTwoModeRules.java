@@ -29,8 +29,12 @@ public class MenuItemForTwoModeRules extends JMenu implements
 
     private static final long serialVersionUID = 2183229438545523499L;
     
+
+    // without selecting one the options above take unforced mode as default
+    private static final boolean DEFAULT_FORCE = false;
+    
     private final BuiltInRule rule;
-    private boolean forcedMode = true;
+    private boolean forcedMode = DEFAULT_FORCE;
     // we support only one listener
     private ActionListener listener;
     
@@ -75,13 +79,12 @@ public class MenuItemForTwoModeRules extends JMenu implements
         });
         
         
-        // without selecting one the options above take forced mode as default
         
         super.addActionListener(new ActionListener() {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                forcedMode = true;
+                forcedMode = DEFAULT_FORCE;
                 listener.actionPerformed(new ActionEvent(MenuItemForTwoModeRules.this, 
                         ActionEvent.ACTION_PERFORMED, e.getActionCommand()));
             }
@@ -93,7 +96,7 @@ public class MenuItemForTwoModeRules extends JMenu implements
         super.addMouseListener(new MouseAdapter() {            
             @Override
             public void mouseClicked(MouseEvent e) {
-                forcedMode = true;
+                forcedMode = DEFAULT_FORCE;
                 
                 listener.actionPerformed(new ActionEvent(MenuItemForTwoModeRules.this, 
                         ActionEvent.ACTION_PERFORMED, getText()));                
