@@ -33,7 +33,6 @@ import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
-import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractUserInterface;
