@@ -36,7 +36,7 @@ public interface Map2 {
     
     /*@ public normal_behaviour
      @ accessible footprint;
-     @   ensures \result == (\sum Object key; \dl_mapGet(map,key) != null; 1);
+     @   ensures \result == (\sum Object key; \dl_inDomain(map,key); 1);
      @*/
     public /*@pure@*/ int size();
 
