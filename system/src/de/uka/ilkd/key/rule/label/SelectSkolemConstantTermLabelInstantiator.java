@@ -19,8 +19,8 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermLabel;
-import de.uka.ilkd.key.logic.label.TermLabelUtil;
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabels;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -61,9 +61,9 @@ public final class SelectSkolemConstantTermLabelInstantiator implements TermLabe
                                               JavaBlock newTermJavaBlock) {
         if (tacletTerm != null &&
             tacletTerm.arity() == 0 && // tacletTerm is a constant
-            tacletTerm.containsLabel(TermLabelUtil.SELECT_SKOLEM_LABEL)) {
+            tacletTerm.containsLabel(TermLabels.SELECT_SKOLEM_LABEL)) {
             // keep SelectSkolemConstantTermLabel
-            return Collections.<TermLabel>singletonList(TermLabelUtil.SELECT_SKOLEM_LABEL);
+            return Collections.<TermLabel>singletonList(TermLabels.SELECT_SKOLEM_LABEL);
 
         } else {
             // in all other cases the tacletTerm cannot contain the

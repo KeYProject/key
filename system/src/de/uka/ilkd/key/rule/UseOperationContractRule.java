@@ -55,7 +55,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.TermLabelUtil;
+import de.uka.ilkd.key.logic.label.TermLabels;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -315,7 +315,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	final Name anonHeapName = new Name(TB.newName(services, "anon_" + heap + "_" + pm.getName()));
 	final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-	final Term anonHeap = TB.label(TB.func(anonHeapFunc), TermLabelUtil.ANON_HEAP_LABEL);
+	final Term anonHeap = TB.label(TB.func(anonHeapFunc), TermLabels.ANON_HEAP_LABEL);
 	final Term assumption = TB.equals(TB.anon(services,
                                                   TB.var(heap),
                                                   mod,

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.TermLabel;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.label.CompositeTermLabelInstantiator;
@@ -39,7 +38,7 @@ import de.uka.ilkd.key.util.LinkedHashMap;
  * 
  * <p>
  * The term label manager is initialised by static methods in the class
- * {@link TermLabelUtil}. They register {@link TermLabelFactory} instances and
+ * {@link TermLabels}. They register {@link TermLabelFactory} instances and
  * global {@link TermLabelInstantiator} objects using
  * <ul>
  * <li>{@link #addFactory(TermLabelFactory)}
@@ -47,11 +46,11 @@ import de.uka.ilkd.key.util.LinkedHashMap;
  * </ul>
  * 
  * <p>
- * Please see information in {@link TermLabelUtil} on how to introduce new label types.
+ * Please see information in {@link TermLabels} on how to introduce new label types.
  * </p>
  * 
  * @see TermLabel
- * @see TermLabelUtil
+ * @see TermLabels
  * @see TermLabelInstantiator
  * 
  * @author Mattias Ulbrich

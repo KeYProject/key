@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.TermLabel;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.label.LoopBodyTermLabelInstantiator;
@@ -33,12 +32,10 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
  * If you create a new a {@link Profile} implementation, consider adding new 
  * static configuration methods. 
  * 
- * 
- * TODO Rename to TermLabelConfiguration
  * @see Profile
  * @author Mattias Ulbrich
  */
-public final class TermLabelUtil {
+public final class TermLabels {
 
     // ---------- Symbolic Execution
 
@@ -93,7 +90,7 @@ public final class TermLabelUtil {
             new SimpleTermLabel(LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME,
                     LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
 
-    private TermLabelUtil() {
+    private TermLabels() {
         // only static methods
     }
 

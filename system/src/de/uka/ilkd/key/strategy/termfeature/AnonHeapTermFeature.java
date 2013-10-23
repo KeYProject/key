@@ -13,7 +13,7 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabelUtil;
+import de.uka.ilkd.key.logic.label.TermLabels;
 import de.uka.ilkd.key.logic.op.Function;
 
 
@@ -29,7 +29,7 @@ public final class AnonHeapTermFeature extends BinaryTermFeature {
         return  // the heap term is an anon heap symbol
                 // (for instance an anonHeap function)
                 t.hasLabels() &&
-                t.containsLabel(TermLabelUtil.ANON_HEAP_LABEL) &&
+                t.containsLabel(TermLabels.ANON_HEAP_LABEL) &&
                 t.op().arity() == 0 &&
                 t.op() instanceof Function;
     }

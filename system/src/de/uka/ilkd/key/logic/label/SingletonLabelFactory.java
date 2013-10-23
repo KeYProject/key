@@ -3,7 +3,6 @@ package de.uka.ilkd.key.logic.label;
 import java.util.List;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.TermLabel;
 
 /**
  * A factory for creating singleton term label.

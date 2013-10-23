@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.rule.label;
 
-import de.uka.ilkd.key.logic.TermLabel;
-import de.uka.ilkd.key.logic.label.TermLabelUtil;
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabels;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -49,6 +49,6 @@ public final class LoopInvariantNormalBehaviorTermLabelInstantiator extends Abst
     */
    @Override
    protected TermLabel getTermLabel(Term applicationTerm) {
-      return TermLabelUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL;
+      return TermLabels.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL;
    }
 }

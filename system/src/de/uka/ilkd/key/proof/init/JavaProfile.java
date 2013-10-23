@@ -17,7 +17,7 @@ package de.uka.ilkd.key.proof.init;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
-import de.uka.ilkd.key.logic.label.TermLabelUtil;
+import de.uka.ilkd.key.logic.label.TermLabels;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -149,7 +149,7 @@ public class JavaProfile extends AbstractProfile {
     
     protected static TermLabelManager createTermLabelManager() {
         TermLabelManager result = new TermLabelManager();
-        TermLabelUtil.registerJavaTermLabels(result);
+        TermLabels.registerJavaTermLabels(result);
         return result;
     }
     

@@ -28,7 +28,7 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.label.TermLabelUtil;
+import de.uka.ilkd.key.logic.label.TermLabels;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfThenElse;
@@ -597,11 +597,11 @@ public class TestTermParser extends TestCase {
     
     public void testParseTermsWithLabels() {
         // First register the labels ...
-        TermLabelUtil.registerSymbolicExecutionTermLabels(serv.getProfile().getTermLabelManager());
+        TermLabels.registerSymbolicExecutionTermLabels(serv.getProfile().getTermLabelManager());
 
-        Term t = parseTerm("(3 + 2)<<" + TermLabelUtil.LOOP_BODY_LABEL_NAME + ">>");
+        Term t = parseTerm("(3 + 2)<<" + TermLabels.LOOP_BODY_LABEL_NAME + ">>");
         assertTrue(t.hasLabels());
-        t = parseTerm("3 + 2<<" + TermLabelUtil.LOOP_BODY_LABEL_NAME + ">>");
+        t = parseTerm("3 + 2<<" + TermLabels.LOOP_BODY_LABEL_NAME + ">>");
         assertFalse(t.hasLabels());
         assertTrue(t.sub(1).hasLabels());
         

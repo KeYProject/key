@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.logic.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /**

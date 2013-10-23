@@ -41,9 +41,9 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.TermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabelUtil;
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabels;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -323,12 +323,12 @@ public final class WhileInvariantTransformer {
        ImmutableArray<TermLabel> labels = TermLabelWorkerManagement.instantiateLabels(services, applicationPos, rule, goal, null, loopBodyModality, new ImmutableArray<Term>(result), null, mainJavaBlock);
        // Add loop body term label if not already present and loop body instantiator is available
        TermLabel[] newLabels;
-       if (!labels.contains(TermLabelUtil.LOOP_BODY_LABEL) &&
+       if (!labels.contains(TermLabels.LOOP_BODY_LABEL) &&
                services.getProfile().getTermLabelManager().getSupportedLabelNames().
-                 contains(TermLabelUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME)) {
+                 contains(TermLabels.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME)) {
           newLabels = new TermLabel[labels.size() + 1];
           labels.arraycopy(0, newLabels, 0, labels.size());
-          newLabels[newLabels.length - 1] = TermLabelUtil.LOOP_BODY_LABEL;
+          newLabels[newLabels.length - 1] = TermLabels.LOOP_BODY_LABEL;
        }
        else {
           newLabels = new TermLabel[labels.size()];
@@ -544,12 +544,12 @@ public final class WhileInvariantTransformer {
        ImmutableArray<TermLabel> labels = TermLabelWorkerManagement.instantiateLabels(services, applicationPos, rule, goal, null, operator, subs, null, null);
        // Add loop body term label if not already present and loop body instantiator is available
        TermLabel[] newLabels;
-       if (!labels.contains(TermLabelUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL) &&
+       if (!labels.contains(TermLabels.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL) &&
                services.getProfile().getTermLabelManager().getSupportedLabelNames().
-                  contains(TermLabelUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME)) {
+                  contains(TermLabels.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME)) {
           newLabels = new TermLabel[labels.size() + 1];
           labels.arraycopy(0, newLabels, 0, labels.size());
-          newLabels[newLabels.length - 1] = TermLabelUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL;
+          newLabels[newLabels.length - 1] = TermLabels.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL;
        }
        else {
           newLabels = new TermLabel[labels.size()];

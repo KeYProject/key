@@ -13,7 +13,7 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabelUtil;
+import de.uka.ilkd.key.logic.label.TermLabels;
 import de.uka.ilkd.key.logic.op.Function;
 
 
@@ -34,7 +34,7 @@ public final class IsSelectSkolemConstantTermFeature extends BinaryTermFeature {
     @Override
     protected boolean filter(Term t) {
         return t.hasLabels() &&
-               t.containsLabel(TermLabelUtil.SELECT_SKOLEM_LABEL) &&
+               t.containsLabel(TermLabels.SELECT_SKOLEM_LABEL) &&
                t.op().arity() == 0 &&
                t.op() instanceof Function;
     }

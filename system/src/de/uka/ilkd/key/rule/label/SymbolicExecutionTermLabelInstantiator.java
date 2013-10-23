@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.rule.label;
 
-import de.uka.ilkd.key.logic.TermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 

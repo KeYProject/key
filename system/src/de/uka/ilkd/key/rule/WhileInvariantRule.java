@@ -43,7 +43,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.TermLabelUtil;
+import de.uka.ilkd.key.logic.label.TermLabels;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -172,7 +172,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final Function anonHeapFunc = new Function(anonHeapName,
 					     heapLDT.targetSort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-        final Term anonHeapTerm = TB.label(TB.func(anonHeapFunc), TermLabelUtil.ANON_HEAP_LABEL);
+        final Term anonHeapTerm = TB.label(TB.func(anonHeapFunc), TermLabels.ANON_HEAP_LABEL);
 	
 	// check for strictly pure loops
 	final Term anonUpdate;

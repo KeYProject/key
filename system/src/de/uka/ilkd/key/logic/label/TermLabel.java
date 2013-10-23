@@ -11,10 +11,10 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package de.uka.ilkd.key.logic.label;
 
-import de.uka.ilkd.key.logic.label.TermLabelManager;
-import de.uka.ilkd.key.logic.label.TermLabelUtil;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.label.TermLabelInstantiator;
 
 
@@ -44,12 +44,12 @@ import de.uka.ilkd.key.rule.label.TermLabelInstantiator;
  * maintain or remove existing term labels or to add new one.
  * </p>
  * <p>
- * Please see information in {@link TermLabelUtil} on how to introduce new label types.
+ * Please see information in {@link TermLabels} on how to introduce new label types.
  * </p>
  * 
  * @see TermLabelInstantiator
  * @see TermLabelManager
- * @see TermLabelUtil
+ * @see TermLabels
  * 
  * @author Martin Hentschel
  */

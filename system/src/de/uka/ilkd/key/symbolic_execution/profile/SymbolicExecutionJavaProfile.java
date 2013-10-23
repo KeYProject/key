@@ -4,7 +4,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
-import de.uka.ilkd.key.logic.label.TermLabelUtil;
+import de.uka.ilkd.key.logic.label.TermLabels;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -49,7 +49,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
 
    protected static TermLabelManager createTermLabelManager() {
         TermLabelManager result = JavaProfile.createTermLabelManager();
-        TermLabelUtil.registerSymbolicExecutionTermLabels(result);
+        TermLabels.registerSymbolicExecutionTermLabels(result);
         return result;
     }
 

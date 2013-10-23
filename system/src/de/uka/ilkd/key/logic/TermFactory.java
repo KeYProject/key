@@ -18,6 +18,7 @@ package de.uka.ilkd.key.logic;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.LRUCache;
 

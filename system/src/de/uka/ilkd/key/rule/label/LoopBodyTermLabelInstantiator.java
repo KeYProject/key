@@ -14,9 +14,9 @@
 package de.uka.ilkd.key.rule.label;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabelUtil;
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabels;
 
 /**
  * The {@link TermLabelInstantiator} used during prove to define how a
@@ -42,7 +42,7 @@ public final class LoopBodyTermLabelInstantiator extends AbstractSymbolicExecuti
     */
    @Override
    protected TermLabel getTermLabel(Term applicationTerm) {
-      return TermLabelUtil.LOOP_BODY_LABEL;
+      return TermLabels.LOOP_BODY_LABEL;
    }
 
 }

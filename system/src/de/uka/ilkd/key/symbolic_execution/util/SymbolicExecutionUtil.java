@@ -75,9 +75,9 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.TermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabelUtil;
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabels;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -1040,7 +1040,7 @@ public final class SymbolicExecutionUtil {
          Term term = ruleApp.posInOccurrence().subTerm();
          if (term != null) {
             term = TermBuilder.DF.goBelowUpdates(term);
-            return term.containsLabel(TermLabelUtil.LOOP_BODY_LABEL);
+            return term.containsLabel(TermLabels.LOOP_BODY_LABEL);
          }
          else {
             return false;
@@ -1059,7 +1059,7 @@ public final class SymbolicExecutionUtil {
    public static boolean hasLoopBodyTerminationLabel(RuleApp ruleApp) {
       if (ruleApp != null && ruleApp.posInOccurrence() != null) {
          Term term = ruleApp.posInOccurrence().subTerm();
-         return term.containsLabel(TermLabelUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL);
+         return term.containsLabel(TermLabels.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL);
       }
       else {
          return false;
@@ -2290,7 +2290,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} is skolem {@link Term}, {@code false} is not a skolem {@link Term}.
     */
    public static boolean isSkolemConstant(Term term) {
-      return term.containsLabel(TermLabelUtil.SELECT_SKOLEM_LABEL);
+      return term.containsLabel(TermLabels.SELECT_SKOLEM_LABEL);
    }
    
    /**

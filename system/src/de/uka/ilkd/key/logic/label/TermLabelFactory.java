@@ -4,7 +4,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.TermLabel;
 
 /**
  * A factory for creating TermLabel objects.
@@ -20,7 +19,7 @@ import de.uka.ilkd.key.logic.TermLabel;
  * will be delegated to the factory with the same name.
  * 
  * <p>
- * Please see information in {@link TermLabelUtil} on how to introduce new label
+ * Please see information in {@link TermLabels} on how to introduce new label
  * types.
  * </p>
  * 
