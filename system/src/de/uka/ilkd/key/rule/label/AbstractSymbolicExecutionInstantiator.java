@@ -11,14 +11,17 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.rule.label;
 
-import de.uka.ilkd.key.rule.label.ITermLabelWorker;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
+
 import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.logic.TermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -29,17 +32,17 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 
 /**
- * Provides the basic functionality of {@link ITermLabelWorker}s
- * which treat {@link ITermLabelWorker} added to modalities to 
+ * Provides the basic functionality of {@link TermLabelInstantiator}s
+ * which treat {@link TermLabelInstantiator} added to modalities to 
  * track symbolic execution.
  * @author Martin Hentschel
  */
-public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabelWorker {
+public abstract class AbstractSymbolicExecutionInstantiator implements TermLabelInstantiator {
    /**
     * {@inheritDoc}
     */
    @Override
-   public List<ITermLabel> instantiateLabels(Term tacletTerm,
+   public List<TermLabel> instantiateLabels(Term tacletTerm,
                                              PosInOccurrence applicationPosInOccurrence, 
                                              Term applicationTerm,
                                              Rule rule, 
@@ -48,11 +51,11 @@ public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabe
                                              ImmutableArray<Term> newTermSubs,
                                              ImmutableArray<QuantifiableVariable> newTermBoundVars,
                                              JavaBlock newTermJavaBlock) {
-      List<ITermLabel> instantiatedLabels = new LinkedList<ITermLabel>();
+      List<TermLabel> instantiatedLabels = new LinkedList<TermLabel>();
       if (checkOperator(newTermOp)) {
          if (applicationTerm != null) {
             applicationTerm = TermBuilder.DF.goBelowUpdates(applicationTerm);
-            ITermLabel termLabel = getTermLabel(applicationTerm);
+            TermLabel termLabel = getTermLabel(applicationTerm);
             if (termLabel != null && applicationTerm.containsLabel(termLabel)) {
                instantiatedLabels.add(termLabel);
             }
@@ -79,19 +82,19 @@ public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabe
                             Term termToUpdate, 
                             Rule rule,
                             Goal goal,
-                            List<ITermLabel> newLabels) {
+                            List<TermLabel> newLabels) {
       // Remove label from the pre branch of the UseOperationContractRule
       if (rule instanceof UseOperationContractRule &&
           (goal.node().getNodeInfo().getBranchLabel().startsWith("Pre") || 
            goal.node().getNodeInfo().getBranchLabel().startsWith("Null reference"))) {
-         ITermLabel termLabel = getTermLabel(termToUpdate);
+         TermLabel termLabel = getTermLabel(termToUpdate);
          if (termLabel != null) {
             newLabels.remove(termLabel);
          }
       }
       if (rule instanceof WhileInvariantRule &&
           goal.node().getNodeInfo().getBranchLabel().startsWith("Invariant Initially Valid")) {
-         ITermLabel termLabel = getTermLabel(termToUpdate);
+         TermLabel termLabel = getTermLabel(termToUpdate);
          if (termLabel != null) {
             newLabels.remove(termLabel);
          }
@@ -99,9 +102,9 @@ public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabe
    }
 
    /**
-    * Returns the {@link ITermLabel} to work with.
+    * Returns the {@link TermLabel} to work with.
     * @param applicationTerm The {@link Term} to rewrite.
-    * @return The {@link ITermLabel} to work with.
+    * @return The {@link TermLabel} to work with.
     */
-   protected abstract ITermLabel getTermLabel(Term applicationTerm);
+   protected abstract TermLabel getTermLabel(Term applicationTerm);
 }

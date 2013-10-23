@@ -843,7 +843,7 @@ public abstract class Taclet implements Rule, Named {
 	final SyntacticalReplaceVisitor srVisitor = 
 	    new SyntacticalReplaceVisitor(services,
                                      mc.getInstantiations(),
-                                     new TermLabelWorkerManagement(applicationPosInOccurrence, this, TermLabelWorkerManagement.getLabelInstantiators(services)));
+                                     new TermLabelWorkerManagement(applicationPosInOccurrence, this, TermLabelWorkerManagement.getGlobalLabelInstantiator(services)));
 	term.execPostOrder(srVisitor);
 
 	return srVisitor.getTerm();

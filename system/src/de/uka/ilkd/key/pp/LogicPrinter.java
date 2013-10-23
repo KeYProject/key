@@ -32,7 +32,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.logic.TermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.OpCollector;
@@ -892,7 +892,7 @@ public final class LogicPrinter {
     public void printLabels(Term t) throws IOException {
         layouter.beginC().print("<<");
         boolean afterFirst = false;
-        for (ITermLabel l : t.getLabels()) {
+        for (TermLabel l : t.getLabels()) {
             if (afterFirst) {
                layouter.print(",").brk(1, 0);
             }

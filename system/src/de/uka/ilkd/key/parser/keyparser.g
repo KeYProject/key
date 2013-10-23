@@ -2901,7 +2901,7 @@ accesstermlist returns [HashSet accessTerms = new LinkedHashSet()] {Term t = nul
 
 atom returns [Term a = null]
 {
-  ImmutableArray<ITermLabel> labels;
+  ImmutableArray<TermLabel> labels;
 }
     :
 (        {isTermTransformer()}? a = specialTerm
@@ -2923,37 +2923,40 @@ atom returns [Term a = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-label returns [ImmutableArray<ITermLabel> labels = new ImmutableArray<ITermLabel>()] 
+label returns [ImmutableArray<TermLabel> labels = new ImmutableArray<TermLabel>()] 
 {
-  ArrayList<ITermLabel> labelList = new ArrayList<ITermLabel>();
-  ITermLabel label;
+  ArrayList<TermLabel> labelList = new ArrayList<TermLabel>();
+  TermLabel label;
 }
 :
    label=single_label {labelList.add(label);} (COMMA label=single_label {labelList.add(label);})*
    {
-   	labels = new ImmutableArray<ITermLabel>((ITermLabel[])labelList.toArray(new ITermLabel[labelList.size()]));
+   	labels = new ImmutableArray<TermLabel>((TermLabel[])labelList.toArray(new TermLabel[labelList.size()]));
    }
 ;
 
-single_label returns [ITermLabel label=null]
+single_label returns [TermLabel label=null]
 {
   String labelName = "";
-  ITermLabel left = null;
-  ITermLabel right = null;
+  TermLabel left = null;
+  TermLabel right = null;
   List<String> parameters = new LinkedList<String>();
 }
 :
   (name:IDENT {labelName=name.getText();} | star:STAR {labelName=star.getText();} ) (LPAREN param1:STRING_LITERAL {parameters.add(param1.getText().substring(1,param1.getText().length()-1));} (COMMA param2:STRING_LITERAL {parameters.add(param2.getText().substring(1,param2.getText().length()-1));})* RPAREN)? 
   {
-  	label = LabelFactory.createLabel(labelName, parameters);
+      try {
+          label = parserConfig.services().getProfile().
+                   getTermLabelManager().parseLabel(labelName, parameters);
+      } catch(TermLabelException ex) {
+          Exception semEx = new KeYSemanticException(ex.getMessage(), getFilename(), getLine(), getColumn());
+          semEx.initCause(ex);
+          keh.reportException(semEx);
+      }
   }
- 
-;  exception
-        catch [UnknownLabelException ex] {
-              keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getFilename(), getLine(), getColumn()));
-        }
+  ; 
+
+       
 
 
 abbreviation returns [Term a=null]

@@ -17,9 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -28,6 +26,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -40,7 +40,7 @@ import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 
 /**
  * <p>
- * This class provides static methods to manage {@link ITermLabelWorker}s.
+ * This class provides static methods to manage {@link TermLabelInstantiator}s.
  * </p>
  * <p>
  * In case of taclet rules, an instance of this class is used to collect the
@@ -48,8 +48,8 @@ import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
  * in the {@link SyntacticalReplaceVisitor}.
  * </p>
  * @author Martin Hentschel
- * @see ITermLabelWorker
- * @see ITermLabel
+ * @see TermLabelInstantiator
+ * @see TermLabel
  */
 public final class TermLabelWorkerManagement {
    /**
@@ -63,47 +63,47 @@ public final class TermLabelWorkerManagement {
    private Rule rule;
 
    /**
-    * The available {@link ITermLabelWorker}.
+    * The available {@link TermLabelInstantiator}.
     */
-   private ImmutableList<ITermLabelWorker> labelInstantiators;
+   private TermLabelInstantiator globalLabelInstantiator;
    
    /**
     * Constructor.
     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten. 
     * @param rule The {@link Rule} which is applied. 
-    * @param labelInstantiators The available {@link ITermLabelWorker}.
+    * @param labelInstantiators The available {@link TermLabelInstantiator}.
     */
    public TermLabelWorkerManagement(PosInOccurrence applicationPosInOccurrence, 
                                           Rule rule, 
-                                          ImmutableList<ITermLabelWorker> labelInstantiators) {
+                                          TermLabelInstantiator globalLabelInstantiator) {
       this.applicationPosInOccurrence = applicationPosInOccurrence;
       this.rule = rule;
-      this.labelInstantiators = labelInstantiators;
+      this.globalLabelInstantiator = globalLabelInstantiator;
    }
    
    /**
-    * Computes the {@link ITermLabel} to add to a new {@link Term} with
-    * help of the {@link ITermLabelWorker}s available via {@link #labelInstantiators}.
+    * Computes the {@link TermLabel} to add to a new {@link Term} with
+    * help of the {@link TermLabelInstantiator}s available via {@link #labelInstantiators}.
     * @param tacletTerm The {@link Term} in the taclet which is responsible to instantiate the new {@link Term} or {@code null} in case of build in rules. 
     * @param newTermOp The new {@link Operator} of the {@link Term} to create.
     * @param newTermSubs The optional children of the {@link Term} to create.
     * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
-    * @return The {@link ITermLabel}s to add to the new {@link Term} which should be created.
-    * @return The {@link ITermLabel}s to add to the new {@link Term} which should be created.
+    * @return The {@link TermLabel}s to add to the new {@link Term} which should be created.
+    * @return The {@link TermLabel}s to add to the new {@link Term} which should be created.
     */
-   public ImmutableArray<ITermLabel> instantiateLabels(Term tacletTerm, 
+   public ImmutableArray<TermLabel> instantiateLabels(Term tacletTerm, 
                                                        Operator newTermOp, 
                                                        ImmutableArray<Term> newTermSubs, 
                                                        ImmutableArray<QuantifiableVariable> newTermBoundVars,
                                                        JavaBlock newTermJavaBlock) {
-      return instantiateLabels(labelInstantiators, applicationPosInOccurrence, rule, null, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock);
+      return instantiateLabels(globalLabelInstantiator, applicationPosInOccurrence, rule, null, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock);
    }
    
    /**
-    * Computes the {@link ITermLabel} to add to a new {@link Term} with
-    * help of the {@link ITermLabelWorker}s provided by {@link Proof} of the given {@link Services}.
-    * @param services The {@link Services} which contains the {@link Proof} that provides the {@link ITermLabelWorker}s to use.
+    * Computes the {@link TermLabel} to add to a new {@link Term} with
+    * help of the {@link TermLabelInstantiator}s provided by {@link Proof} of the given {@link Services}.
+    * @param services The {@link Services} which contains the {@link Proof} that provides the {@link TermLabelInstantiator}s to use.
     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten. 
     * @param rule The {@link Rule} which is applied. 
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
@@ -112,9 +112,9 @@ public final class TermLabelWorkerManagement {
     * @param newTermSubs The optional children of the {@link Term} to create.
     * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
-    * @return The {@link ITermLabel}s to add to the new {@link Term} which should be created.
+    * @return The {@link TermLabel}s to add to the new {@link Term} which should be created.
     */
-   public static ImmutableArray<ITermLabel> instantiateLabels(Services services,
+   public static ImmutableArray<TermLabel> instantiateLabels(Services services,
                                                               PosInOccurrence applicationPosInOccurrence,
                                                               Rule rule,
                                                               Goal goal,
@@ -123,38 +123,41 @@ public final class TermLabelWorkerManagement {
                                                               ImmutableArray<Term> newTermSubs, 
                                                               ImmutableArray<QuantifiableVariable> newTermBoundVars,
                                                               JavaBlock newTermJavaBlock) {
-      return instantiateLabels(getLabelInstantiators(services), applicationPosInOccurrence, rule, goal, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock);
+      return instantiateLabels(getGlobalLabelInstantiator(services), applicationPosInOccurrence, rule, goal, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock);
    }
    
    /**
-    * Returns all {@link ITermLabelWorker} contained in the {@link Proof} of the given {@link Services}.
-    * @param services The {@link Services} which contains the proof to read {@link ITermLabelWorker}s from.
-    * @return The {@link ITermLabelWorker}s contained in the {@link Proof} of the given {@link Services}.
+    * Returns all {@link TermLabelInstantiator} contained in the {@link Proof} of the given {@link Services}.
+    * @param services The {@link Services} which contains the proof to read {@link TermLabelInstantiator}s from.
+    * @return The {@link TermLabelInstantiator}s contained in the {@link Proof} of the given {@link Services}.
     */
-   public static ImmutableList<ITermLabelWorker> getLabelInstantiators(Services services) {
-      ImmutableList<ITermLabelWorker> result = null;
-      if (services != null) {
-         Proof proof = services.getProof();
-         if (proof != null) {
-            ProofEnvironment env = proof.env();
-            if (env != null) {
-               InitConfig initConfig = env.getInitConfig();
-               if (initConfig != null) {
-                  Profile profile = initConfig.getProfile();
-                  if (profile != null) {
-                     result = profile.getLabelInstantiators();
-                  }
+   public static TermLabelInstantiator getGlobalLabelInstantiator(Services services) {
+       TermLabelInstantiator result = null;
+       if (services != null) {
+           Proof proof = services.getProof();
+           if (proof != null) {
+               ProofEnvironment env = proof.env();
+               if (env != null) {
+                   InitConfig initConfig = env.getInitConfig();
+                   if (initConfig != null) {
+                       Profile profile = initConfig.getProfile();
+                       if (profile != null) {
+                           TermLabelManager manager = profile.getTermLabelManager();
+                           if(manager != null) {
+                               result = manager.getGlobalInstantiator();
+                           }
+                       }
+                   }
                }
-            }
-         }
-      }
-      return result;
+           }
+       }
+       return result;
    }
    
    /**
-    * Computes the {@link ITermLabel} to add to a new {@link Term} with
-    * help of the given {@link ITermLabelWorker}s.
-    * @param labelInstantiators The available {@link ITermLabelWorker}.
+    * Computes the {@link TermLabel} to add to a new {@link Term} with
+    * help of the given {@link TermLabelInstantiator}s.
+    * @param labelInstantiators The available {@link TermLabelInstantiator}.
     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten. 
     * @param rule The {@link Rule} which is applied. 
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
@@ -163,46 +166,48 @@ public final class TermLabelWorkerManagement {
     * @param newTermSubs The optional children of the {@link Term} to create.
     * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
-    * @return The {@link ITermLabel}s to add to the new {@link Term} which should be created.
+    * @return The {@link TermLabel}s to add to the new {@link Term} which should be created.
     */
-   public static ImmutableArray<ITermLabel> instantiateLabels(ImmutableList<ITermLabelWorker> labelInstantiators,
-                                                              PosInOccurrence applicationPosInOccurrence,
-                                                              Rule rule,
-                                                              Goal goal,
-                                                              Term tacletTerm, 
-                                                              Operator newTermOp, 
-                                                              ImmutableArray<Term> newTermSubs, 
-                                                              ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                                              JavaBlock newTermJavaBlock) {
-      List<ITermLabel> instantiatedLabels = new LinkedList<ITermLabel>();
-      if (labelInstantiators != null) {
-         for (ITermLabelWorker instantiator : labelInstantiators) {
-            List<ITermLabel> labels = instantiator.instantiateLabels(tacletTerm, applicationPosInOccurrence, applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null, rule, goal, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock);
-            if (labels != null) {
-               instantiatedLabels.addAll(labels);
-            }
-         }
-      }
-      return new ImmutableArray<ITermLabel>(instantiatedLabels);
+   public static ImmutableArray<TermLabel> instantiateLabels(
+           TermLabelInstantiator globalInstantiator,
+           PosInOccurrence applicationPosInOccurrence,
+           Rule rule,
+           Goal goal,
+           Term tacletTerm, 
+           Operator newTermOp, 
+           ImmutableArray<Term> newTermSubs, 
+           ImmutableArray<QuantifiableVariable> newTermBoundVars,
+           JavaBlock newTermJavaBlock) {
+       Term applicationTerm = applicationPosInOccurrence != null ? 
+               applicationPosInOccurrence.subTerm() : null;
+
+       List<TermLabelInstantiator> relevantInstantiators = new LinkedList<TermLabelInstantiator>();
+       extractRelevantInstantiators(tacletTerm, relevantInstantiators);
+       extractRelevantInstantiators(applicationTerm, relevantInstantiators);
+       if(globalInstantiator != null) {
+           relevantInstantiators.add(globalInstantiator);
+       }
+
+       List<TermLabel> instantiatedLabels = new LinkedList<TermLabel>();
+       for (TermLabelInstantiator instantiator : relevantInstantiators) {
+           List<TermLabel> labels = instantiator.instantiateLabels(tacletTerm, applicationPosInOccurrence, applicationTerm, rule, goal, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock);
+           assert labels != null : "Instantiators must not return null";
+           instantiatedLabels.addAll(labels);
+       }
+
+       return new ImmutableArray<TermLabel>(instantiatedLabels);
    }
 
-   /**
-    * Checks if the given {@link ITermLabelWorker} is used in the {@link Proof} of the given {@link Services}.
-    * @param services The {@link Services} which provides the {@link Proof}.
-    * @param instantiator The {@link ITermLabelWorker} to look for.
-    * @return {@code true} {@link ITermLabelWorker} is available, {@code false} {@link ITermLabelWorker} is not available.
-    */
-   public static boolean hasInstantiator(Services services, ITermLabelWorker instantiator) {
-      return getLabelInstantiators(services).contains(instantiator);
-   }
-
-   /**
-    * Checks if at least one {@link ITermLabelWorker} is available in the {@link Proof} of the given {@link Services}.
-    * @param services The {@link Services} which provides the {@link Proof}.
-    * @return {@code true} at least one {@link ITermLabelWorker} is available, {@code false} if no {@link ITermLabelWorker}s are available.
-    */
-   public static boolean hasInstantiators(Services services) {
-      return !getLabelInstantiators(services).isEmpty();
+   private static void extractRelevantInstantiators(Term term,
+           List<TermLabelInstantiator> relevantInstantiators) {
+       if(term != null) {
+           for (TermLabel label : term.getLabels()) {
+               TermLabelInstantiator instantiator = label.getInstantiator();
+               if(!relevantInstantiators.contains(instantiator)) {
+                   relevantInstantiators.add(instantiator);
+               }
+           }
+       }
    }
 
    /**
@@ -218,7 +223,7 @@ public final class TermLabelWorkerManagement {
                                    Goal goal) {
       if (goal != null) {
          Sequent sequent = goal.sequent();
-         ImmutableList<ITermLabelWorker> instantiators = getLabelInstantiators(goal.node().proof().getServices());
+         TermLabelInstantiator instantiators = getGlobalLabelInstantiator(goal.node().proof().getServices());
          updateLabels(tacletTerm, applicationPosInOccurrence, rule, goal, sequent.antecedent(), true, instantiators);
          updateLabels(tacletTerm, applicationPosInOccurrence, rule, goal, sequent.succedent(), false, instantiators);
       }
@@ -230,9 +235,9 @@ public final class TermLabelWorkerManagement {
                                     Goal goal, 
                                     Semisequent semisequent, 
                                     boolean inAntec, 
-                                    ImmutableList<ITermLabelWorker> instantiators) {
+                                    TermLabelInstantiator globalInstantiator) {
       for (SequentFormula sfa : semisequent) {
-         Term updatedTerm = updateLabelsRecursive(tacletTerm, applicationPosInOccurrence, rule, goal, sfa.formula(), instantiators);
+         Term updatedTerm = updateLabelsRecursive(tacletTerm, applicationPosInOccurrence, rule, goal, sfa.formula(), globalInstantiator);
          goal.changeFormula(new SequentFormula(updatedTerm), 
                             new PosInOccurrence(sfa, PosInTerm.TOP_LEVEL, inAntec));
       }
@@ -243,32 +248,32 @@ public final class TermLabelWorkerManagement {
                                              Rule rule, 
                                              Goal goal, 
                                              Term term, 
-                                             ImmutableList<ITermLabelWorker> labelInstantiators) {
+                                             TermLabelInstantiator globalInstantiator) {
       Term[] newSubs = new Term[term.arity()];
       for (int i = 0; i < newSubs.length; i++) {
-         newSubs[i] = updateLabelsRecursive(tacletTerm, applicationPosInOccurrence, rule, goal, term.sub(i), labelInstantiators);
+         newSubs[i] = updateLabelsRecursive(tacletTerm, applicationPosInOccurrence, rule, goal, term.sub(i), globalInstantiator);
       }
-      ImmutableArray<ITermLabel> newLabels = updateLabels(tacletTerm, applicationPosInOccurrence, rule, goal, term, labelInstantiators);
+      ImmutableArray<TermLabel> newLabels = updateLabels(tacletTerm, applicationPosInOccurrence, rule, goal, term, globalInstantiator);
       return TermFactory.DEFAULT.createTerm(term.op(), newSubs, term.boundVars(), term.javaBlock(), newLabels);
    }
 
-   private static ImmutableArray<ITermLabel> updateLabels(Term tacletTerm, 
+   private static ImmutableArray<TermLabel> updateLabels(Term tacletTerm, 
                                                           PosInOccurrence applicationPosInOccurrence,
                                                           Rule rule, 
                                                           Goal goal,
                                                           Term term,
-                                                          ImmutableList<ITermLabelWorker> labelInstantiators) {
+                                                          TermLabelInstantiator globalInstantiator) {
       // Create list with all old labels
-      List<ITermLabel> newLabels = new LinkedList<ITermLabel>();
-      for (ITermLabel oldLabel : term.getLabels()) {
+      List<TermLabel> newLabels = new LinkedList<TermLabel>();
+      for (TermLabel oldLabel : term.getLabels()) {
          newLabels.add(oldLabel);
       }
+
       // Give all ITermLabelWorker instances the chance to remove or to add labels from/to the list 
-      if (labelInstantiators != null) {
-         for (ITermLabelWorker instantiator : labelInstantiators) {
-            instantiator.updateLabels(tacletTerm, applicationPosInOccurrence, term, rule, goal, newLabels);
-         }
+      if (globalInstantiator != null) {
+          globalInstantiator.updateLabels(tacletTerm, applicationPosInOccurrence, term, rule, goal, newLabels);
       }
-      return new ImmutableArray<ITermLabel>(newLabels);
+
+      return new ImmutableArray<TermLabel>(newLabels);
    }
 }

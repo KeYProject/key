@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.label.LabelFactory;
+import de.uka.ilkd.key.rule.label.TermLabelInstantiator;
+
 
 /**
  * <p>
@@ -33,36 +34,38 @@ import de.uka.ilkd.key.logic.label.LabelFactory;
  * </p>
  * <p>
  * {@link Term}s with or without term labels are still unmodifiable.
- * It is recommended to implement {@link ITermLabel}s also unmodifiable.
- * This means also that it is recommended that parameters of {@link ITermLabel}s are also unmodifiable.
+ * It is recommended to implement {@link TermLabel}s also unmodifiable.
+ * This means also that it is recommended that parameters of {@link TermLabel}s are also unmodifiable.
  * </p>
  * <p>
- * During proof it is the responsibility of {@link de.uka.ilkd.key.rule.label.ITermLabelWorker} instances to
+ * During proof it is the responsibility of {@link de.uka.ilkd.key.rule.label.TermLabelInstantiator} instances to
  * maintain or remove existing term labels or to add new one.
  * </p>
  * <p>
  * To implement a new term label the following steps are required:
  * <ol>
- *    <li>Create a subclass of {@link ITermLabel}.</li>
- *    <li>Modify {@link LabelFactory#createLabel(String, java.util.List)} to ensure that instances of the new {@link ITermLabel} sub class are created when a {@link String} is parsed into a {@link Term}.</li>
- *    <li>If required implement an {@link de.uka.ilkd.key.rule.label.ITermLabelWorker} which maintains the new term labels during proof. Ensure that this {@link de.uka.ilkd.key.rule.label.ITermLabelWorker} instance is registered in {@link de.uka.ilkd.key.proof.init.Profile#getLabelInstantiators()}.
- *        Typically this is achieved by adding the new {@link de.uka.ilkd.key.rule.label.ITermLabelWorker} instance in
+ *    <li>Create a subclass of {@link TermLabel}.</li>
+ *    <li>Modify {@link LabelFactory#createLabel(String, java.util.List)} to ensure that instances of the new {@link TermLabel} sub class are created when a {@link String} is parsed into a {@link Term}.</li>
+ *    <li>If required implement an {@link de.uka.ilkd.key.rule.label.TermLabelInstantiator} which maintains the new term labels during proof. Ensure that this {@link de.uka.ilkd.key.rule.label.TermLabelInstantiator} instance is registered in {@link de.uka.ilkd.key.proof.init.Profile#getLabelInstantiators()}.
+ *        Typically this is achieved by adding the new {@link de.uka.ilkd.key.rule.label.TermLabelInstantiator} instance in
  *        {@link de.uka.ilkd.key.proof.init.AbstractProfile#computeLabelInstantiators()}.</li>
  * </ol>
  * </p>
  */
-public interface ITermLabel extends Named {
+public interface TermLabel extends Named {
     /**
      * A term label may have structure, i.e., parameterized
      * @param i the i-th parameter (from 0 to max nr of parameters)
      * @return the selected parameter
      * @throw an {@link IndexOutOfBoundsException} if the given parameter number is negative or greater-or-equal the number of parameters returned by {@link #getChildCount()}
      */
-    public abstract Object getChild(int i);
+    public Object getChild(int i);
 
     /**
      * number of parameters (non-negative number)
      * @return the number of parameters
      */
-    public abstract int getChildCount();
+    public int getChildCount();
+    
+    public TermLabelInstantiator getInstantiator();
 }

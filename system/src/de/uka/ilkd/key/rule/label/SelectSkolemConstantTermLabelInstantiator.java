@@ -16,11 +16,11 @@ import java.util.Collections;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.label.SelectSkolemConstantTermLabel;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelUtil;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -28,11 +28,11 @@ import de.uka.ilkd.key.rule.Rule;
 
 
 /**
- * The {@link ITermLabelWorker} used during prove to define how a
+ * The {@link TermLabelInstantiator} used during prove to define how a
  * {@link AuxiliaryTermLabel} is maintained.
  * @author Christoph Scheben
  */
-public final class SelectSkolemConstantTermLabelInstantiator implements ITermLabelWorker {
+public final class SelectSkolemConstantTermLabelInstantiator implements TermLabelInstantiator {
 
     /**
      * The only instance of this class.
@@ -50,15 +50,7 @@ public final class SelectSkolemConstantTermLabelInstantiator implements ITermLab
      * {@inheritDoc}
      */
     @Override
-    public String getName() {
-        return SelectSkolemConstantTermLabel.NAME.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<ITermLabel> instantiateLabels(Term tacletTerm,
+    public List<TermLabel> instantiateLabels(Term tacletTerm,
                                               PosInOccurrence applicationPosInOccurrence,
                                               Term applicationTerm,
                                               Rule rule,
@@ -69,15 +61,15 @@ public final class SelectSkolemConstantTermLabelInstantiator implements ITermLab
                                               JavaBlock newTermJavaBlock) {
         if (tacletTerm != null &&
             tacletTerm.arity() == 0 && // tacletTerm is a constant
-            tacletTerm.containsLabel(SelectSkolemConstantTermLabel.INSTANCE)) {
+            tacletTerm.containsLabel(TermLabelUtil.SELECT_SKOLEM_LABEL)) {
             // keep SelectSkolemConstantTermLabel
-            return Collections.<ITermLabel>singletonList(SelectSkolemConstantTermLabel.INSTANCE);
+            return Collections.<TermLabel>singletonList(TermLabelUtil.SELECT_SKOLEM_LABEL);
 
         } else {
             // in all other cases the tacletTerm cannot contain the
             // SelectSkolemConstantTermLabel, because it is attached only
             // to constants
-            return null;
+            return Collections.emptyList();
         }
     }
 
@@ -90,7 +82,7 @@ public final class SelectSkolemConstantTermLabelInstantiator implements ITermLab
                              Term termToUpdate,
                              Rule rule,
                              Goal goal,
-                             List<ITermLabel> newLabels) {
+                             List<TermLabel> newLabels) {
         // since we'd like to keep the SelectSkolemConstantTermLabel, there is
         // nothing to do here
     }

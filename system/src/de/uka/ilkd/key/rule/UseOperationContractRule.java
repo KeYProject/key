@@ -14,7 +14,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +47,6 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -57,6 +55,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.TermLabelUtil;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -71,6 +70,7 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
+import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
@@ -315,7 +315,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	final Name anonHeapName = new Name(TB.newName(services, "anon_" + heap + "_" + pm.getName()));
 	final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-	final Term anonHeap = TB.label(TB.func(anonHeapFunc), AnonHeapTermLabel.INSTANCE);
+	final Term anonHeap = TB.label(TB.func(anonHeapFunc), TermLabelUtil.ANON_HEAP_LABEL);
 	final Term assumption = TB.equals(TB.anon(services,
                                                   TB.var(heap),
                                                   mod,
@@ -756,9 +756,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         	                                	   	     reachableState,
         	                                	   	     mbyOk}))),
                               ruleApp.posInOccurrence());
-        if (TermLabelWorkerManagement.hasInstantiators(services)) {
-           TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, preGoal);
-        }
+
+        TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, preGoal);
 
         //create "Post" branch
 	final StatementBlock resultAssign;
@@ -815,9 +814,9 @@ public final class UseOperationContractRule implements BuiltInRule {
             nullGoal.changeFormula(new SequentFormula(TB.apply(inst.u, actualSelfNotNull, null)),
         	                   ruleApp.posInOccurrence());
         }
-        if (TermLabelWorkerManagement.hasInstantiators(services)) {
-           TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, nullGoal);
-        }
+
+        TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, nullGoal);
+
 
 
         //create justification

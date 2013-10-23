@@ -23,12 +23,12 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.label.LoopBodyTermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.label.TermLabelUtil;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfThenElse;
@@ -39,7 +39,6 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.DefaultExceptionHandler;
@@ -597,11 +596,21 @@ public class TestTermParser extends TestCase {
      }
     
     public void testParseTermsWithLabels() {
-        Term t = parseTerm("(3 + 2)<<" + LoopBodyTermLabel.NAME + ">>");
+        // First register the labels ...
+        TermLabelUtil.registerSymbolicExecutionTermLabels(serv.getProfile().getTermLabelManager());
+
+        Term t = parseTerm("(3 + 2)<<" + TermLabelUtil.LOOP_BODY_LABEL_NAME + ">>");
         assertTrue(t.hasLabels());
-        t = parseTerm("3 + 2<<" + LoopBodyTermLabel.NAME + ">>");
+        t = parseTerm("3 + 2<<" + TermLabelUtil.LOOP_BODY_LABEL_NAME + ">>");
         assertFalse(t.hasLabels());
         assertTrue(t.sub(1).hasLabels());
+        
+        try {
+            t = parseTerm("(3 + 2)<<unknownLabel>>");
+            fail("Term " + t + " should not have been parsed");
+        } catch(Exception ex) {
+            // expected
+        }
     }
     
 }

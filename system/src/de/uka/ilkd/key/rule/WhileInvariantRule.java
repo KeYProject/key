@@ -14,7 +14,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +35,6 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -45,6 +43,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.TermLabelUtil;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -55,6 +54,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvariantTransformer;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -172,7 +172,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final Function anonHeapFunc = new Function(anonHeapName,
 					     heapLDT.targetSort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-        final Term anonHeapTerm = TB.label(TB.func(anonHeapFunc), AnonHeapTermLabel.INSTANCE);
+        final Term anonHeapTerm = TB.label(TB.func(anonHeapFunc), TermLabelUtil.ANON_HEAP_LABEL);
 	
 	// check for strictly pure loops
 	final Term anonUpdate;
@@ -424,9 +424,9 @@ public final class WhileInvariantRule implements BuiltInRule {
 		                 TB.apply(inst.u, TB.and(variantNonNeg, 
                        TB.and(invTerm, reachableState)), null)),
 			         ruleApp.posInOccurrence());
-   if (TermLabelWorkerManagement.hasInstantiators(services)) {
-      TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, initGoal);
-   }
+
+	TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, initGoal);
+
 
 	//"Body Preserves Invariant":
         // \replacewith (==>  #atPreEqs(anon1) 

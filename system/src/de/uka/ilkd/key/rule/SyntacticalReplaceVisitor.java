@@ -38,7 +38,7 @@ import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.logic.TermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -376,7 +376,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                 assert neededsubs.length == 1;
                 Term newTerm = TermBuilder.DF.elementary(services,
                         elementaryUpdateLhs, neededsubs[0]);
-                ImmutableArray<ITermLabel> labels = instantiateLabels(visited, newTerm.op(), newTerm.subs(), newTerm.boundVars(), newTerm.javaBlock());
+                ImmutableArray<TermLabel> labels = instantiateLabels(visited, newTerm.op(), newTerm.subs(), newTerm.boundVars(), newTerm.javaBlock());
                 if (labels.size() != 0) {
                     newTerm = TermBuilder.DF.label(newTerm, labels);
                 }
@@ -384,12 +384,12 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
             } else if (boundVars != visited.boundVars() || jblockChanged
                     || operatorInst
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
-               ImmutableArray<ITermLabel> labels = instantiateLabels(visited, newOp, new ImmutableArray<Term>(neededsubs), boundVars, jb);
+               ImmutableArray<TermLabel> labels = instantiateLabels(visited, newOp, new ImmutableArray<Term>(neededsubs), boundVars, jb);
                Term newTerm = tf.createTerm(newOp, neededsubs, boundVars, jb, labels);
                 pushNew(resolveSubst(newTerm));
             } else {
                 Term t;
-                ImmutableArray<ITermLabel> labels = instantiateLabels(visited, visited.op(), visited.subs(), visited.boundVars(), visited.javaBlock());
+                ImmutableArray<TermLabel> labels = instantiateLabels(visited, visited.op(), visited.subs(), visited.boundVars(), visited.javaBlock());
                 if (!visited.hasLabels() && labels != null && labels.isEmpty()) {
                    t = visited;
                 }
@@ -406,7 +406,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
         }
     }
 
-    private ImmutableArray<ITermLabel> instantiateLabels(Term tacletTerm, 
+    private ImmutableArray<TermLabel> instantiateLabels(Term tacletTerm, 
                                                          Operator newTermOp, 
                                                          ImmutableArray<Term> newTermSubs, 
                                                          ImmutableArray<QuantifiableVariable> newTermBoundVars,

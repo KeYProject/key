@@ -13,14 +13,13 @@
 
 package de.uka.ilkd.key.rule.label;
 
-import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.logic.TermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.rule.AbstractSymbolicExecutionInstantiator;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * The {@link ITermLabelWorker} used during prove to define how a
+ * The {@link TermLabelInstantiator} used during prove to define how a
  * {@link SymbolicExecutionTermLabel} is maintained.
  * @author Martin Hentschel
  */
@@ -40,15 +39,8 @@ public final class SymbolicExecutionTermLabelInstantiator extends AbstractSymbol
     * {@inheritDoc}
     */
    @Override
-   protected ITermLabel getTermLabel(Term applicationTerm) {
+   protected TermLabel getTermLabel(Term applicationTerm) {
       return SymbolicExecutionUtil.getSymbolicExecutionLabel(applicationTerm);
    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getName() {
-      return SymbolicExecutionTermLabel.NAME.toString();
-   }
 }

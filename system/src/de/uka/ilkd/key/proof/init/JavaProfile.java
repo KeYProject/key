@@ -15,8 +15,9 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.TermLabelUtil;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -29,8 +30,6 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.rule.label.ITermLabelWorker;
-import de.uka.ilkd.key.rule.label.SelectSkolemConstantTermLabelInstantiator;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
@@ -57,14 +56,18 @@ public class JavaProfile extends AbstractProfile {
         new JavaCardDLStrategy.Factory();
 
     private OneStepSimplifier oneStepSimpilifier;
-    
+
     protected JavaProfile(String standardRules, ImmutableSet<GoalChooserBuilder> gcb) {
-        super(standardRules, gcb);
-     }
+        super(standardRules, gcb, createTermLabelManager());
+    }
 
     protected JavaProfile(String standardRules) {
-        super(standardRules);
-     }
+        super(standardRules, createTermLabelManager());
+    }
+
+    public JavaProfile(TermLabelManager manager) {
+        super("standardRules.key", manager);
+    }
 
     public JavaProfile() {
         this("standardRules.key");
@@ -144,16 +147,12 @@ public class JavaProfile extends AbstractProfile {
         return DEFAULT;
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ImmutableList<ITermLabelWorker> computeLabelInstantiators() {
-       ImmutableList<ITermLabelWorker> result = ImmutableSLList.nil();
-       result = result.prepend(SelectSkolemConstantTermLabelInstantiator.INSTANCE);
-       return result;
+    protected static TermLabelManager createTermLabelManager() {
+        TermLabelManager result = new TermLabelManager();
+        TermLabelUtil.registerJavaTermLabels(result);
+        return result;
     }
-
+    
     /**
      * <p>
      * Returns the default instance of this class.
@@ -171,4 +170,5 @@ public class JavaProfile extends AbstractProfile {
         }
        return defaultInstance;
     }
+
 }

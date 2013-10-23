@@ -13,15 +13,14 @@
 
 package de.uka.ilkd.key.rule.label;
 
-import de.uka.ilkd.key.logic.ITermLabel;
-import de.uka.ilkd.key.logic.label.LoopInvariantNormalBehaviorTermLabel;
+import de.uka.ilkd.key.logic.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelUtil;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.rule.AbstractSymbolicExecutionInstantiator;
 
 /**
- * The {@link ITermLabelWorker} used during prove to define how a
+ * The {@link TermLabelInstantiator} used during prove to define how a
  * {@link LoopInvariantNormalBehaviorTermLabel} is maintained.
  * @author Martin Hentschel
  */
@@ -49,15 +48,7 @@ public final class LoopInvariantNormalBehaviorTermLabelInstantiator extends Abst
     * {@inheritDoc}
     */
    @Override
-   protected ITermLabel getTermLabel(Term applicationTerm) {
-      return LoopInvariantNormalBehaviorTermLabel.INSTANCE;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getName() {
-      return LoopInvariantNormalBehaviorTermLabel.NAME.toString();
+   protected TermLabel getTermLabel(Term applicationTerm) {
+      return TermLabelUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL;
    }
 }

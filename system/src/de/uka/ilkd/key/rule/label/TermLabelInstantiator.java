@@ -16,41 +16,50 @@ package de.uka.ilkd.key.rule.label;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 
 /**
  * <p>
- * An {@link ITermLabelWorker} defines for one concrete {@link ITermLabel}
- * how it is maintained during proof, more concrete when a {@link Rule} is applied.
+ * A {@link TermLabelInstantiator} defines for one concrete {@link TermLabel}
+ * how it is maintained during proof, more concrete when a {@link Rule} is
+ * applied.
  * </p>
  * <p>
- * Which {@link ITermLabelWorker} instances are available during proof is defined
- * by the {@link Profile} always available via {@code proof.env().getInitConfig().getProfile()}.
+ * Each {@link TermLabel} has got a reference to 'its' according
+ * {@link TermLabelInstantiator} via {@link TermLabel#getInstantiator()}.
+ * </p>
+ * <p>
+ * Global term label instantiators can be added to the {@link TermLabelManager} 
+ * using {@link TermLabelManager#addGlobalWorker(TermLabelInstantiator)}.
  * </p>
  * <p>
  * During proof the class {@link TermLabelWorkerManagement} is responsible to
- * use the available {@link ITermLabelWorker} to maintain {@link ITermLabel}s.
+ * use the available {@link TermLabelInstantiator} to maintain {@link TermLabel}
+ * s. To do so, the instantiators of present labels are taken into account as well
+ * as the global instantiator
  * </p>
  * <p>
- * Instructions how to implement new term labels can be found in the
- * interface documentation of {@link ITermLabel}.
+ * Instructions how to implement new term labels can be found in the interface
+ * documentation of {@link TermLabel}.
  * </p>
+ * 
  * @author Martin Hentschel
- * @see TermLabelWorkerManagement
- * @see ITermLabel
- * @see Profile#getLabelInstantiators()
+ * @see TermLabel
+ * @see TermLabelManager
+ * @see TermLabelWorkerManagement 
  */
-public interface ITermLabelWorker {
+
+public interface TermLabelInstantiator {
    /**
     * This method is called before a new {@link Term} is created during proof
     * to compute the labels it will contain.
@@ -63,9 +72,10 @@ public interface ITermLabelWorker {
     * @param newTermSubs The optional children of the {@link Term} to create.
     * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
-    * @return The {@link ITermLabel}s to add to the new {@link Term} which should be created.
+    * @return The {@link TermLabel}s to add to the new {@link Term} which should be created,
+    *         not <code>null</code>
     */
-   public List<ITermLabel> instantiateLabels(Term tacletTerm, 
+   public List<TermLabel> instantiateLabels(Term tacletTerm, 
                                              PosInOccurrence applicationPosInOccurrence,
                                              Term applicationTerm,
                                              Rule rule,
@@ -84,19 +94,13 @@ public interface ITermLabelWorker {
     * @param termToUpdate The {@link Term} to update its labels.
     * @param rule The {@link Rule} which is applied. 
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
-    * @param newLabels This {@link List} defines the new {@link ITermLabel} and can be modified by this method.
+    * @param newLabels This {@link List} defines the new {@link TermLabel} and can be modified by this method.
     */
    public void updateLabels(Term tacletTerm, 
                             PosInOccurrence applicationPosInOccurrence,
                             Term termToUpdate,
                             Rule rule,
                             Goal goal,
-                            List<ITermLabel> newLabels);
+                            List<TermLabel> newLabels);
 
-   /**
-    * Returns the unique name of this {@link ITermLabelWorker} which should
-    * be identical with the name of the label for which it is responsible.
-    * @return The unique name of this {@link ITermLabelWorker}.
-    */
-   public String getName();
 }

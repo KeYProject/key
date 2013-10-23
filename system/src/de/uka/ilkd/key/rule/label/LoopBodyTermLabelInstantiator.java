@@ -13,22 +13,23 @@
 
 package de.uka.ilkd.key.rule.label;
 
-import de.uka.ilkd.key.logic.ITermLabel;
-import de.uka.ilkd.key.logic.label.LoopBodyTermLabel;
-import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.rule.AbstractSymbolicExecutionInstantiator;
+import de.uka.ilkd.key.logic.TermLabel;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelUtil;
 
 /**
- * The {@link ITermLabelWorker} used during prove to define how a
+ * The {@link TermLabelInstantiator} used during prove to define how a
  * {@link SymbolicExecutionTermLabel} is maintained.
  * @author Martin Hentschel
  */
 public final class LoopBodyTermLabelInstantiator extends AbstractSymbolicExecutionInstantiator {
+
    /**
     * The only instance of this class.
     */
-   public static final LoopBodyTermLabelInstantiator INSTANCE = new LoopBodyTermLabelInstantiator();
+   public static final LoopBodyTermLabelInstantiator INSTANCE = 
+           new LoopBodyTermLabelInstantiator();
 
    /**
     * Constructor to forbid multiple instances.
@@ -40,15 +41,8 @@ public final class LoopBodyTermLabelInstantiator extends AbstractSymbolicExecuti
     * {@inheritDoc}
     */
    @Override
-   protected ITermLabel getTermLabel(Term applicationTerm) {
-      return LoopBodyTermLabel.INSTANCE;
+   protected TermLabel getTermLabel(Term applicationTerm) {
+      return TermLabelUtil.LOOP_BODY_LABEL;
    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getName() {
-      return LoopBodyTermLabel.NAME.toString();
-   }
 }

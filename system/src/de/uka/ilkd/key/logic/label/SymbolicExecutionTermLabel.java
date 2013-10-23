@@ -14,15 +14,17 @@
 package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.logic.TermLabel;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.rule.label.SymbolicExecutionTermLabelInstantiator;
+import de.uka.ilkd.key.rule.label.TermLabelInstantiator;
 
 /**
  * Label attached to a symbolic execution thread. 
  * Currently realized as singleton. In case one wants to track and distinguish 
  * different lines of execution, this needs to be changed.
  */
-public class SymbolicExecutionTermLabel implements ITermLabel {
+public class SymbolicExecutionTermLabel implements TermLabel {
    /**
     * The unique name of this label.
     */
@@ -94,5 +96,10 @@ public class SymbolicExecutionTermLabel implements ITermLabel {
    @Override
    public Name name() {
       return NAME;
+   }
+
+   @Override 
+   public TermLabelInstantiator getInstantiator() {
+       return SymbolicExecutionTermLabelInstantiator.INSTANCE;
    }
 }
