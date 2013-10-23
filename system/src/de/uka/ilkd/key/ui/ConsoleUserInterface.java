@@ -57,14 +57,14 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 	private int progressMax = 0;
 
     public boolean isAutoMode() {
-      return autoMode;
-   }
+        return autoMode;
+    }
 
    public ConsoleUserInterface(BatchMode batchMode, boolean useAutoSaver, byte verbosity) {
     	this.batchMode = batchMode;
     	this.verbosity = verbosity;
         this.mediator  = new KeYMediator(this, useAutoSaver);
-    }
+   }
 
    public ConsoleUserInterface(BatchMode batchMode, boolean useAutoSaver, boolean verbose) {
        this(batchMode, useAutoSaver, verbose? DEBUG: NORMAL);

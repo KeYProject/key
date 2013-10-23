@@ -44,7 +44,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
@@ -95,7 +94,7 @@ public class KeYMediator {
 
     private KeYExceptionHandler defaultExceptionHandler;
 
-    private boolean stupidMode; // minimize user interaction
+    private boolean minimizeInteraction; // minimize user interaction
 
     private TacletFilter filterForInteractiveProving;
     
@@ -105,7 +104,7 @@ public class KeYMediator {
      * than the {@link Proof} before.
      */
     private OneStepSimplifier currentOneStepSimplifier;
-    
+
     /**
      * An optional used {@link AutoSaver}.
      */
@@ -114,26 +113,26 @@ public class KeYMediator {
 
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
-    */
+     */
     public KeYMediator(UserInterface ui, boolean useAutoSaver) {
-	this.ui             = ui;
-   if (useAutoSaver) {
-      autoSaver = new AutoSaver();
-   }
+    	this.ui             = ui;
+    	if (useAutoSaver) {
+    		autoSaver = new AutoSaver();
+    	}
 
-	notationInfo        = new NotationInfo();
-	proofListener       = new KeYMediatorProofListener();
-	proofTreeListener   = new KeYMediatorProofTreeListener();
-	keySelectionModel   = new KeYSelectionModel();
-	interactiveProver   = new InteractiveProver(this);
+    	notationInfo        = new NotationInfo();
+    	proofListener       = new KeYMediatorProofListener();
+    	proofTreeListener   = new KeYMediatorProofTreeListener();
+    	keySelectionModel   = new KeYSelectionModel();
+    	interactiveProver   = new InteractiveProver(this);
 
-	addAutoModeListener(proofListener);
+    	addAutoModeListener(proofListener);
 
-	defaultExceptionHandler = new KeYRecoderExcHandler();
+    	defaultExceptionHandler = new KeYRecoderExcHandler();
 
-	// There may be other interruption listeners, but the interaction
-	// engine listens by default.
-	addInterruptedListener(interactiveProver);
+    	// There may be other interruption listeners, but the interaction
+    	// engine listens by default.
+    	addInterruptedListener(interactiveProver);
     }
 
 
@@ -219,12 +218,12 @@ public class KeYMediator {
     }
 
     /** simplified user interface? */
-    public boolean stupidMode() {
-       return stupidMode;
+    public boolean minimizeInteraction() {
+       return minimizeInteraction;
     }
 
-    public void setStupidMode(boolean b) {
-       stupidMode = b;
+    public void setMinimizeInteraction(boolean b) {
+       minimizeInteraction = b;
     }
 
     public boolean ensureProofLoaded() {
@@ -431,7 +430,7 @@ public class KeYMediator {
 	    TacletApp firstApp = it.next();
             boolean ifSeqInteraction =
                !firstApp.taclet().ifSequent().isEmpty() ;
-            if (stupidMode && !firstApp.complete()) {
+            if (minimizeInteraction && !firstApp.complete()) {
                 ImmutableList<TacletApp> ifSeqCandidates =
                     firstApp.findIfFormulaInstantiations(goal.sequent(),
 		        getServices());

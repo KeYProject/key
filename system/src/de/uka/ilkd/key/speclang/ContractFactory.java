@@ -311,7 +311,7 @@ public class ContractFactory {
         for(LocationVariable h : t.originalPres.keySet()) {
            pres.put(h, t.originalPres.get(h));
         }
-        Term mby = t.originalMby;
+        Term mby = t.originalMby; // TODO: what about the others?
         Map<LocationVariable,Boolean> hasMod = new LinkedHashMap<LocationVariable,Boolean>();
         Map<LocationVariable,Term> posts = new LinkedHashMap<LocationVariable,Term>(t.originalPosts.size());
         for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
@@ -325,7 +325,7 @@ public class ContractFactory {
         }
 
         Map<LocationVariable,Term> axioms = new LinkedHashMap<LocationVariable,Term>();
-        if(t.originalAxioms != null) {
+        if(t.originalAxioms != null) { // TODO: what about the others?
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 Term oriAxiom = t.originalAxioms.get(h);
                 if(oriAxiom != null) {
@@ -334,7 +334,7 @@ public class ContractFactory {
             }
         }
         Map<LocationVariable,Term> mods = t.originalMods;
-        Modality moda = t.modality;
+        Modality moda = t.modality; // TODO: what about the others?
         for(FunctionalOperationContract other : others) {
             Term otherMby = other.hasMby()
                         ? other.getMby(t.originalSelfVar,
