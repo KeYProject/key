@@ -90,7 +90,7 @@ final class MapImplementation implements Map2 {
 
         /*@ loop_invariant 0 <= i && i <= keys.length;
          @ loop_invariant (\forall int x; 0 <= x && x < i; 
-         @ (key == keys[x] ==> ( index == x && ret == values[x])));
+         @ (key == keys[x] ==> ( index == x && value == values[x])));
          @ decreases keys.length - i;
          @ assignable \set_union(values[*], ret);
          @*/
