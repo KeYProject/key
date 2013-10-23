@@ -350,6 +350,7 @@ provable: ./heap/vstte10_05_Queue/LinkedList_tail.key
 provable: ./heap/WeideEtAl_01_AddAndMultiply/AddAndMultiply_add.key
 provable: ./heap/WeideEtAl_01_AddAndMultiply/AddAndMultiply_mul.key
 provable: ./heap/WeideEtAl_02_BinarySearch/BinarySearch_search.key
+provable: ./heap/Wellfounded/ackermann.key
 provable: ./heap/strictly_pure/strictlyPureMethod.key
 provable: ./heap/strictly_pure/useStrictlyPureMethod.key
 provable: ./standard_key/arith/binomial1.key

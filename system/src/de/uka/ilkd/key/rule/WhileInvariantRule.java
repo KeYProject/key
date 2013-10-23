@@ -529,6 +529,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         final KeYJavaType intKJT =
                 services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
 
+        final KeYJavaType anyKJT 
+                = services.getJavaInfo().getKeYJavaType(Sort.ANY);
+
         //get instantiation
         final Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);
 
@@ -572,20 +575,23 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
 
         //prepare variant
-        final ProgramElementName variantName =
-                new ProgramElementName(TB.newName(services, "variant"));
-        final LocationVariable variantPV = new LocationVariable(variantName, intKJT);
-        services.getNamespaces().programVariables().addSafely(variantPV);
-
-        final boolean dia = ((Modality)inst.progPost.op()).terminationSensitive();
-        final Term variantUpdate =
-                dia ? TB.elementary(services, variantPV, variant) : TB.skip();
-        final Term variantNonNeg =
-                dia ? TB.leq(TB.zero(services), variant, services) : TB.tt();
-        final Term variantPO = dia ?
-                TB.and(variantNonNeg, TB.lt(variant, TB.var(variantPV), services))
-                : TB.tt();
-
+	final ProgramElementName variantName 
+		= new ProgramElementName(TB.newName(services, "variant"));
+	final LocationVariable variantPV = new LocationVariable(variantName, Sort.ANY);
+								//intKJT);
+	services.getNamespaces().programVariables().addSafely(variantPV);
+	
+	final boolean dia = ((Modality)inst.progPost.op()).terminationSensitive();
+	final Term variantUpdate 
+		= dia ? TB.elementary(services, variantPV, variant) : TB.skip();
+	final Term variantNonNeg 
+		= TB.tt(); // ? TB.leq(TB.zero(services), variant, services) : TB.tt();
+	final Term variantPO
+		= dia ? TB.prec(variant, TB.var(variantPV), services)
+//		        TB.and(variantNonNeg, 
+//			       TB.lt(variant, TB.var(variantPV), services)) 
+                      : TB.tt();
+        
         //prepare guard
         final ProgramElementName guardVarName = new ProgramElementName(TB.newName(services, "b"));
         final LocationVariable guardVar = new LocationVariable(guardVarName, booleanKJT);
@@ -692,6 +698,9 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                                                 reachableOut,
                                                                                 variantNonNeg}));
 
+   if (TermLabelWorkerManagement.hasInstantiators(services)) {
+      TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, initGoal);
+   }
 
 	final WhileInvariantTransformer wir = new WhileInvariantTransformer();
         SVInstantiations svInst

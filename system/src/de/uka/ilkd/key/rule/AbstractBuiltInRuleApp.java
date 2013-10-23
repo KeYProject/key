@@ -101,6 +101,11 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     @Override
     public abstract AbstractBuiltInRuleApp tryToInstantiate(Goal goal);
 
+    @Override
+    public AbstractBuiltInRuleApp forceInstantiate(Goal goal) {
+    	return tryToInstantiate(goal);
+    }
+    
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.rule.IBuiltInRuleApp#isSufficientlyComplete()
      */

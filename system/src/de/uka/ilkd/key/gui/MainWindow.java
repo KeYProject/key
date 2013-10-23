@@ -284,7 +284,7 @@ public final class MainWindow extends JFrame  {
         proofListener = new MainProofListener(this);
         guiListener = new MainGUIListener();
         userInterface = new WindowUserInterface(this);
-        setMediator(new KeYMediator(userInterface));
+        setMediator(new KeYMediator(userInterface, true));
         initNotification();
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);
@@ -405,7 +405,7 @@ public final class MainWindow extends JFrame  {
         final boolean stupidMode = ProofIndependentSettings.DEFAULT_INSTANCE
                                         .getGeneralSettings().tacletFilter();
 //            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().tacletFilter();
-        mediator.setStupidMode(stupidMode);
+        mediator.setMinimizeInteraction(stupidMode);
 
         // set up actions
         autoModeAction            = new AutoModeAction(this);

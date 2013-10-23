@@ -831,8 +831,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 		          .getPOForProof(goal.proof());
 	final Term mbyOk;
 	if(po != null && po.getMbyAtPre() != null && mby != null ) {
-    	mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
-    			       TB.lt(mby, po.getMbyAtPre(), services));
+//    	mbyOk = TB.and(TB.leq(TB.zero(services), mby, services), 
+//    			       TB.lt(mby, po.getMbyAtPre(), services));
+	    mbyOk = TB.prec(mby, po.getMbyAtPre(), services);
 	} else {
 	    mbyOk = TB.tt();
 	}
@@ -908,6 +909,10 @@ public final class UseOperationContractRule implements BuiltInRule {
         					actualSelfNotNull)),
         	                   ruleApp.posInOccurrence());
         }
+        if (TermLabelWorkerManagement.hasInstantiators(services)) {
+           TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, nullGoal);
+        }
+
 
         //create justification
         final RuleJustificationBySpec just

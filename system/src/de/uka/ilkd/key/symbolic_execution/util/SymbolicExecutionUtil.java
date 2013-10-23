@@ -99,6 +99,7 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
@@ -118,9 +119,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.label.ITermLabelWorker;
-import de.uka.ilkd.key.rule.label.LoopBodyTermLabelInstantiator;
-import de.uka.ilkd.key.rule.label.LoopInvariantNormalBehaviorTermLabelInstantiator;
-import de.uka.ilkd.key.rule.label.SymbolicExecutionTermLabelInstantiator;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
@@ -129,6 +127,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -238,14 +237,28 @@ public final class SymbolicExecutionUtil {
     */
    public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(Proof source) {
       assert source != null;
+      assert !source.isDisposed();
       // Get required source instances
-      ProofEnvironment sourceEnv = source.env();
+      final ProofEnvironment sourceEnv = source.env();
       InitConfig sourceInitConfig = sourceEnv.getInitConfig();
       RuleJustificationInfo sourceJustiInfo = sourceEnv.getJustifInfo();
       // Create new profile which has separate OneStepSimplifier instance
-      JavaProfile profile = new JavaProfile();
+      JavaProfile profile = new JavaProfile() {
+         @Override
+         protected ImmutableList<ITermLabelWorker> computeLabelInstantiators() {
+            Profile sourceProfile = sourceEnv.getInitConfig().getProfile();
+            if (sourceProfile instanceof SymbolicExecutionJavaProfile) {
+               ImmutableList<ITermLabelWorker> result = super.computeLabelInstantiators();
+               result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionLabelInstantiators()); // Make sure that the term label worker of symbolic execution are also used in the new proof environment.
+               return result;
+            }
+            else {
+               return super.computeLabelInstantiators();
+            }
+         }
+      };
       // Create new InitConfig and initialize it with value from initial one.
-      InitConfig initConfig = new InitConfig(source.getServices().copy(profile));
+      InitConfig initConfig = new InitConfig(source.getServices().copy(profile, true));
       initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
       initConfig.setSettings(sourceInitConfig.getSettings());
       initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
@@ -477,13 +490,10 @@ public final class SymbolicExecutionUtil {
       // Make sure that valid parameters are given
       assert sequentToProve != null;
       // Create ProofStarter
-      ProofStarter starter = new ProofStarter();
+      ProofStarter starter = new ProofStarter(false);
       // Configure ProofStarter
       ProofEnvironment env = SymbolicExecutionUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(proof); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
       starter.init(sequentToProve, env);
-      if (!proof.isDisposed()) {
-         starter.getProof().getSettings().getLabelSettings().setLabelInstantiators(proof.getSettings().getLabelSettings().getLabelInstantiators()); // Use label instantiators of original proof also in side proof.
-      }
       return starter;
    }
    
@@ -2662,26 +2672,6 @@ public final class SymbolicExecutionUtil {
          assert sp != null;
          ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
-      }
-   }
-
-   /**
-    * Configures the proof for symbolic execution.
-    * @param proof The proof to configure.
-    */
-   public static void configureProof(Proof proof) {
-      if (proof != null) {
-         ImmutableList<ITermLabelWorker> labelInstantiators = proof.getSettings().getLabelSettings().getLabelInstantiators();
-         if (!labelInstantiators.contains(SymbolicExecutionTermLabelInstantiator.INSTANCE)) {
-            labelInstantiators = labelInstantiators.append(SymbolicExecutionTermLabelInstantiator.INSTANCE);
-         }
-         if (!labelInstantiators.contains(LoopBodyTermLabelInstantiator.INSTANCE)) {
-            labelInstantiators = labelInstantiators.append(LoopBodyTermLabelInstantiator.INSTANCE);
-         }
-         if (!labelInstantiators.contains(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE)) {
-            labelInstantiators = labelInstantiators.append(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
-         }
-         proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
       }
    }
    

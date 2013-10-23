@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,8 +20,13 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.RuleAppListener;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
@@ -81,10 +85,6 @@ public final class Goal  {
 
     /** a goal has been excluded from automatic rule application iff automatic == false */
     private boolean automatic = true;
-
-    /** list of rule app listeners */
-    private static List<RuleAppListener> ruleAppListenerList =
-        Collections.synchronizedList(new ArrayList<RuleAppListener>(10));
 
     /**
      * If an application of a rule added some information for the strategy,
@@ -593,17 +593,6 @@ public final class Goal  {
         node.getNodeInfo().setBranchLabel(s);
     }
 
-
-    /** fires the event that a rule has been applied */
-    protected void fireRuleApplied( ProofEvent p_e ) {
-	synchronized(ruleAppListenerList) {
-	    Iterator<RuleAppListener> it = ruleAppListenerList.iterator();
-	    while (it.hasNext()) {
-		it.next().ruleApplied(p_e);
-	    }
-	}
-    }
-
     void pruneToParent(){
             setNode(node().parent());
             removeLastAppliedRuleApp();
@@ -668,7 +657,7 @@ public final class Goal  {
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(p_ruleApp);
 
         if ( goalList != null )
-            fireRuleApplied( new ProofEvent ( proof, ruleAppInfo ) );
+            proof.fireRuleApplied( new ProofEvent ( proof, ruleAppInfo ) );
         return goalList;
     }
 
@@ -676,19 +665,6 @@ public final class Goal  {
     public String toString() {
 	String result = node.sequent().prettyprint(proof().getServices()).toString();
 	return result;
-    }
-
-
-    public static void addRuleAppListener(RuleAppListener p) {
-	synchronized(ruleAppListenerList) {
-	    ruleAppListenerList.add(p);
-	}
-    }
-
-    public static void removeRuleAppListener(RuleAppListener p) {
-	synchronized(ruleAppListenerList) {
-	    ruleAppListenerList.remove(p);
-	}
     }
 
     private <T extends Named> ImmutableSet<Name> names(ImmutableSet<T> set) {

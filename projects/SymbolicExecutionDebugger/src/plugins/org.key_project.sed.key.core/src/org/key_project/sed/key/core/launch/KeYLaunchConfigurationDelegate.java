@@ -231,7 +231,6 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           // Create proof
           proof = ui.createProof(initConfig, input);
        }
-       SymbolicExecutionUtil.configureProof(proof);
        // Create symbolic execution tree builder
        SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, settings.isMergeBranchConditions());
        builder.analyse();

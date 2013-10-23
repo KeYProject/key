@@ -57,10 +57,6 @@ public class IconFactory {
         getImage("images/toolbar/autoModeStop.png");
     private static Image autoModeConfigArrow = 
     getImage("images/toolbar/autoModeConfigArrow.png");
-    private static Image decisionProcedureICS = 
-	getImage("images/toolbar/decisionProcedureICS.png");
-    private static Image decisionProcedureSimplify = 
-	getImage("images/toolbar/decisionProcedureSimplify.png");
     private static Image decisionProcedureConfigArrow = 
 	    getImage("images/toolbar/decProcArrow.png");
 
@@ -138,10 +134,6 @@ public class IconFactory {
     public static ImageIcon selectDecProcArrow(int size) {
         return scaleIcon(decisionProcedureConfigArrow, size / 2, size);
     }
-
-    public static ImageIcon simplifyLogo(int size) {
-	return scaleIcon(decisionProcedureSimplify, size, size);
-    }
     
     public static Icon oneStepSimplifier(int size) {
         return scaleIcon(oneStepSimplifier, size, size);
@@ -157,10 +149,6 @@ public class IconFactory {
     
     public static ImageIcon umlLogo(int size) {
         return scaleIcon(uml, size, size);
-    }
-
-    public static ImageIcon icsLogo(int size) {
-	return scaleIcon(decisionProcedureICS, size, size);
     }
     
     public static ImageIcon pruneLogo(int size) {

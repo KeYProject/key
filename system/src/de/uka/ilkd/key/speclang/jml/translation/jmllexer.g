@@ -54,6 +54,7 @@ tokens {
     SECURE_FOR      = "secure_for";
     SIGNALS         = "signals";
     SIGNALS_ONLY    = "signals_only";
+    DECREASES       = "decreases";
 
     NULLABLE        = "nullable";
     NON_NULL        = "non_null";
