@@ -2946,7 +2946,7 @@ single_label returns [TermLabel label=null]
   (name:IDENT {labelName=name.getText();} | star:STAR {labelName=star.getText();} ) (LPAREN param1:STRING_LITERAL {parameters.add(param1.getText().substring(1,param1.getText().length()-1));} (COMMA param2:STRING_LITERAL {parameters.add(param2.getText().substring(1,param2.getText().length()-1));})* RPAREN)? 
   {
       try {
-          label = parserConfig.services().getProfile().
+          label = getServices().getProfile().
                    getTermLabelManager().parseLabel(labelName, parameters);
       } catch(TermLabelException ex) {
           Exception semEx = new KeYSemanticException(ex.getMessage(), getFilename(), getLine(), getColumn());

@@ -204,7 +204,7 @@ public final class TermLabelWorkerManagement {
        if(term != null) {
            for (TermLabel label : term.getLabels()) {
                TermLabelInstantiator instantiator = label.getInstantiator();
-               if(!relevantInstantiators.contains(instantiator)) {
+               if(instantiator != null && !relevantInstantiators.contains(instantiator)) {
                    relevantInstantiators.add(instantiator);
                }
            }
