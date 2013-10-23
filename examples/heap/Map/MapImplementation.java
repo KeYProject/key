@@ -36,14 +36,14 @@ final class MapImplementation implements Map2 {
         return keys.length;
     }
 
-    public Object get(Object o) {
+    public Object get(Object key) {
         /*@ loop_invariant 0 <= i && i <= keys.length;
-         @ loop_invariant (\forall int x; 0 <= x && x < i; o != keys[x]);
+         @ loop_invariant (\forall int x; 0 <= x && x < i; key != keys[x]);
          @ decreases keys.length - i;
          @ assignable \strictly_nothing;
          @*/
         for (int i = 0; i < keys.length; i++) {
-            if (o == keys[i]) {
+            if (key == keys[i]) {
                 return values[i];
             }
         }
@@ -54,28 +54,28 @@ final class MapImplementation implements Map2 {
         return keys.length == 0;
     }
 
-    public boolean containsKey(Object o) {
+    public boolean containsKey(Object key) {
         /*@ loop_invariant 0 <= i && i <= keys.length;
-         @  loop_invariant (\forall int x; 0 <= x && x < i; o != keys[x]);
+         @  loop_invariant (\forall int x; 0 <= x && x < i; key != keys[x]);
          @ decreases keys.length - i;
          @ assignable \strictly_nothing;
          @*/
         for (int i = 0; i < keys.length; i++) {
-            if (o == keys[i]) {
+            if (key == keys[i]) {
                 return true;
             }
         }
         return false;
     }
 
-    public boolean containsValue(Object o) {
+    public boolean containsValue(Object value) {
         /*@ loop_invariant 0 <= i && i <= keys.length
-          @    && (\forall int x; x < 0 || x >= i || o != values[x]);
+          @    && (\forall int x; x < 0 || x >= i || value != values[x]);
           @ decreases keys.length - i;
           @ assignable \strictly_nothing;
           @*/
         for (int i = 0; i < keys.length; i++) {
-            if (o == values[i]) {
+            if (value == values[i]) {
                 return true;
             }
         }
