@@ -106,6 +106,13 @@ final class MapImplementation implements Map2 {
 
             Object keysNew[] = new Object[keys.length + 1];
             Object valuesNew[] = new Object[keys.length + 1];
+            
+            /*@ loop_invariant 0 <= i && i <= keys.length;
+             @ loop_invariant (\forall int x; 0 <= x && x < i; 
+             @ (keysNew[x] == keys[x] && valuesNew[x] == values[x]);
+             @ decreases keys.length - i;
+             @ assignable footprint;
+             @*/
             for (i = 0; i < keys.length; i++) {
                 keysNew[i] = keys[i];
                 valuesNew[i] = values[i];
