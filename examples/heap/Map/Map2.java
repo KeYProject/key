@@ -28,13 +28,13 @@ public interface Map2 {
 
     /*@ public normal_behaviour
      @ accessible footprint;
-     @   ensures \result == (map == \dl_mapEmpty());
+     @ ensures \result == (map == \dl_mapEmpty());
      @*/
     public /*@pure@*/ boolean isEmpty();
     
     /*@ public normal_behaviour
      @ accessible footprint;
-     @   ensures \result == (\sum Object key; \dl_inDomain(map,key); 1);
+     @ ensures \result == (\sum Object key; \dl_inDomain(map,key); 1);
      @*/
     public /*@pure@*/ int size();
 
@@ -62,7 +62,7 @@ public interface Map2 {
     public /*@nullable@*/ Object put(Object key, Object value);
 
     /* What if keys.length == 1 before remove? 
-     * Have to set map = mapEmpty?
+     * Do I have to set map = mapEmpty in that case?
      */
     
     /*@ public normal_behaviour
