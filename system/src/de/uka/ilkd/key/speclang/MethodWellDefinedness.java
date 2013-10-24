@@ -194,11 +194,34 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    Function generateMbyAtPreDef(Services services) {
+    Function generateMbyAtPreFunc(Services services) {
         return hasMby() ?
                 new Function(new Name(TB.newName(services, "mbyAtPre")),
                              services.getTypeConverter().getIntegerLDT().targetSort()) :
                 null;
+    }
+
+    Term generateMbyAtPreDef(ParsableVariable self,
+                             ImmutableList<ParsableVariable> params,
+                             Function mbyAtPreFunc,
+                             Services services) {
+        final Term mbyAtPreDef;
+        if (hasMby()) {
+            final Term mbyAtPre = TB.func(mbyAtPreFunc);
+            assert params != null;
+            final ProgramVariable selfVar =
+                    self instanceof ProgramVariable ? (ProgramVariable)self : null;
+            ImmutableList<ProgramVariable> paramVars = ImmutableSLList.<ProgramVariable>nil();
+            for (ParsableVariable pv: params) {
+                assert pv instanceof ProgramVariable : pv.toString();
+                paramVars = paramVars.append((ProgramVariable)pv);
+            }
+            final Term mby = contract.getMby(selfVar, paramVars, services);
+            mbyAtPreDef = TB.equals(mbyAtPre, mby);
+        } else {
+            mbyAtPreDef = TB.tt();
+        }
+        return mbyAtPreDef;
     }
 
     ImmutableList<Term> getRest() {

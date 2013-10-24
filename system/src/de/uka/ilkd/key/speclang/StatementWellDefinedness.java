@@ -71,7 +71,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    final Function generateMbyAtPreDef(Services services) {
+    final Function generateMbyAtPreFunc(Services services) {
         return null;
     }
 

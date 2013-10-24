@@ -60,7 +60,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    Function generateMbyAtPreDef(Services services) {
+    Function generateMbyAtPreFunc(Services services) {
         return null;
     }
 

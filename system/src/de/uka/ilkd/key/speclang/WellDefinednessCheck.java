@@ -644,7 +644,14 @@ public abstract class WellDefinednessCheck implements Contract {
         final Term paramsOK = generateParamsOK(params, services);
 
         // initial value of measured_by clause
-        final Function mbyAtPre = generateMbyAtPreDef(services);
+        final Function mbyAtPreFunc = generateMbyAtPreFunc(services);
+        final Term mbyAtPreDef;
+        if (!taclet && type().equals(Type.OPERATION_CONTRACT)) {
+            MethodWellDefinedness mwd = (MethodWellDefinedness)this;
+            mbyAtPreDef = mwd.generateMbyAtPreDef(self, params, mbyAtPreFunc, services);
+        } else {
+            mbyAtPreDef = TB.tt();
+        }
 
         final Term wellFormed = TB.wellFormed(TB.var(heap), services);
 
@@ -655,7 +662,7 @@ public abstract class WellDefinednessCheck implements Contract {
         if (!taclet) {
             result = new Term[]
                     { wellFormed, selfNotNull, selfCreated, selfExactType,
-                      invTerm, paramsOK, implicitPre };
+                      invTerm, paramsOK, implicitPre, mbyAtPreDef };
         } else {
             result = new Term[]
                     { wellFormed, paramsOK, implicitPre };
@@ -663,7 +670,7 @@ public abstract class WellDefinednessCheck implements Contract {
         for (Term t: result) {
             resList = resList.append(t);
         }
-        return new TermListAndFunc(resList, mbyAtPre);
+        return new TermListAndFunc(resList, mbyAtPreFunc);
     }
 
     final static RewriteTaclet createTaclet(String name,
@@ -721,7 +728,7 @@ public abstract class WellDefinednessCheck implements Contract {
         return (RewriteTaclet) tb.getTaclet();
     }
 
-    abstract Function generateMbyAtPreDef(Services services);
+    abstract Function generateMbyAtPreFunc(Services services);
 
     final Term replace(Term t, OriginalVariables newVars) {
         return replace(t, newVars, this);
@@ -785,6 +792,14 @@ public abstract class WellDefinednessCheck implements Contract {
             setAccessible(acc);
         } else if (acc == null) {
             setAccessible(accPre);
+        } else if (acc.equals(TB.allLocs(services)) || accPre.equals(TB.allLocs(services))) {
+            // This case is necessary since KeY defaults most method contracts with allLocs
+            final Term allLocs = TB.allLocs(services);
+            if (acc.equals(allLocs)) {
+                setAccessible(accPre);
+            } else if (accPre.equals(allLocs)) {
+                setAccessible(acc);
+            }
         } else {
             setAccessible(TB.union(services, acc, accPre));
         }
@@ -871,7 +886,7 @@ public abstract class WellDefinednessCheck implements Contract {
         }
         if (this.hasMby() && wdc.hasMby()) {
             final Term mby = wdc.replace(wdc.getMby(), this.getOrigVars());
-            setMby(TB.add(services, mby, this.getMby()));
+            setMby(TB.pair(mby, this.getMby(), services));
         } else if (wdc.hasMby()) {
             final Term mby = wdc.replace(wdc.getMby(), this.getOrigVars());
             setMby(mby);
