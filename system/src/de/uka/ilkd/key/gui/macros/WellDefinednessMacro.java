@@ -13,6 +13,11 @@
 
 package de.uka.ilkd.key.gui.macros;
 
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+
+import javax.swing.KeyStroke;
+
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -54,8 +59,22 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         return new WellDefinednessStrategy();
     }
 
+    /** FIXME: Somehow currently doesn't work (but keytroke still gets shown) as
+     *         {@link #canApplyTo(KeYMediator, PosInOccurrence)} returns false on
+     *         instantiation.
+     */
+    @Override
+    public KeyStroke getKeyStroke () {
+        return KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.SHIFT_DOWN_MASK);
+    }
+
     @Override
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
+        if (mediator.getSelectedProof() == null
+                || mediator.getServices() == null
+                || mediator.getServices().getSpecificationRepository() == null) {
+            return false;
+        }
         final ContractPO po =
                 mediator.getServices().getSpecificationRepository()
                         .getPOForProof(mediator.getSelectedProof());
@@ -65,7 +84,8 @@ public class WellDefinednessMacro extends StrategyProofMacro {
             return false;
         }
         Node n = mediator.getSelectedNode();
-        while(n != null) {
+        while (n != null) {
+            // Check if we are in a well-definedness branch (e.g. of a loop statement)
             if (n.getNodeInfo().getBranchLabel() != null
                     && n.getNodeInfo().getBranchLabel().equals(WD_BRANCH)) {
                 return true;

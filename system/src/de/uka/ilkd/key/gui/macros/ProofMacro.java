@@ -82,7 +82,7 @@ public interface ProofMacro {
     public String getDescription();
 
     /**
-     * Can apply this macro be applied?
+     * Can this macro be applied?
      * 
      * This method should not make any changes but check if the macro can be
      * applied or not in the given context.
