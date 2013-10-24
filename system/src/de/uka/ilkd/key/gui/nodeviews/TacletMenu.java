@@ -69,7 +69,6 @@ class TacletMenu extends JMenu {
 	private static final String ENTER_LOOP_SPECIFICATION = "Enter Loop Specification";
 	private static final String APPLY_RULE = "Apply Rule";
 	private static final String NO_RULES_APPLICABLE = "No rules applicable.";
-	private static final String OBSOLETE = "obsolete";
 	/**
      *
      */
@@ -81,6 +80,7 @@ class TacletMenu extends JMenu {
 
     static {
         CLUTTER_RULESETS.add(new Name("notHumanReadable"));
+        CLUTTER_RULESETS.add(new Name("obsolete"));
         CLUTTER_RULESETS.add(new Name("pullOutQuantifierAll"));
         CLUTTER_RULESETS.add(new Name("pullOutQuantifierEx"));
     }
@@ -126,34 +126,12 @@ class TacletMenu extends JMenu {
 	this.sequentView = sequentView;
 	this.mediator = sequentView.getMediator();
  	this.pos = pos;
- 	findList = removeObsolete(findList);
-    rewriteList = removeObsolete(rewriteList);
-    noFindList = removeObsolete(noFindList);
 	// delete RewriteTaclet from findList because they will be in
 	// the rewrite list and concatenate both lists
 	createTacletMenu(removeRewrites(findList).prepend(rewriteList),
 			 noFindList, builtInList, new MenuControl());
     }
 
-    /** Remove rules which belong to rule set "obsolete".
-     * Obsolete rules are sound, but are discouraged to use in
-     * both automated and interactive proofs, mostly because of proof complexity issues.
-     */
-    private ImmutableList<TacletApp> removeObsolete(ImmutableList<TacletApp> list) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
-        for (TacletApp ta: list) {
-            boolean isObsolete = false;
-            for (RuleSet rs: ta.taclet().getRuleSets()) {
-                if (rs.name().equals(new Name(OBSOLETE))) {
-                    isObsolete = true;
-                    break;
-                }
-            }
-            if (!isObsolete)
-                result = result.append(ta);
-        }
-        return result;
-    }
 
     /** removes RewriteTaclet from list
      * @param list the IList<Taclet> from where the RewriteTaclet are
