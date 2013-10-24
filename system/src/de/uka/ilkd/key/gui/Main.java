@@ -175,6 +175,9 @@ public final class Main {
             evaluateOptions(cl);
             UserInterface userInterface = createUserInterface();
             loadCommandLineFile(userInterface);
+        } catch (ExceptionInInitializerError e) {
+        	System.err.println("D'oh! It seems that KeY was not built properly!");
+        	System.exit(777);
         } catch (CommandLineException e) {
             printHeader(); // exception before verbosity option could be read
             if (Debug.ENABLE_DEBUG) {
