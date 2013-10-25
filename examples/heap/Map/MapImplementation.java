@@ -102,8 +102,8 @@ final class MapImplementation implements Map2 {
         }
         
         if (index != -1) {
-            ret = values[i];
-            values[i] = value;
+            ret = values[index];
+            values[index] = value;
         }
         else {
 
@@ -141,18 +141,19 @@ final class MapImplementation implements Map2 {
 
         /*@ loop_invariant 0 <= i && i <= keys.length;
          @ loop_invariant (\forall int x; 0 <= x && x < i; 
-         @ (key == keys[x] ==> ( index == x && ret == values[x])));
+         @ (key == keys[x] ==> ( index == x )));
          @ decreases keys.length - i;
          @ assignable \strictly_nothing;
          @*/
         for (i = 0; i < keys.length; i++) {
             if (key == keys[i]) {
                 index = i;
-                ret = values[i];
             }
         }
 
         if (index != -1) {
+            
+            ret = values[index];
 
             Object keysNew[] = new Object[keys.length - 1];
             Object valuesNew[] = new Object[keys.length - 1];
