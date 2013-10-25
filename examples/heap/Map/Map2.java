@@ -29,7 +29,7 @@ public interface Map2 {
     
     /*@ public normal_behaviour
      @ accessible footprint;
-     @ ensures \result == (\sum Object key; \dl_inDomain(map,key); 1);
+     @ ensures \result == \dl_mapSize(map);
      @*/
     public /*@pure@*/ int size();
 
@@ -47,12 +47,8 @@ public interface Map2 {
     
     /*@ public normal_behaviour
      @ assignable footprint;
-     @ ensures \dl_mapGet(map,key) == value &&
-     @ \dl_inDomain(map, key) &&
-     @ \result == \old((\dl_inDomain(map, key)?\dl_mapGet(map, key):null)) &&
-     @ (\forall Object o; (\fresh(o) ==> !\dl_inDomain(map,o)) &&
-     @ (!\fresh(o) && o != key ==> \dl_mapGet(map,o) == \old(\dl_mapGet(map,o)))
-     @ );
+     @ ensures map == \dl_mapUpdate(map, key, value) &&
+                 \result == (\dl_inDomain(map, key)?\dl_mapGet(map, key):null);
      @*/
     public /*@nullable@*/ Object put(Object key, Object value);
 
@@ -62,11 +58,8 @@ public interface Map2 {
     
     /*@ public normal_behaviour
      @ assignable footprint;
-     @ ensures !\dl_inDomain(map,key) &&
-     @ \result == \old((\dl_inDomain(map, key)?\dl_mapGet(map, key):null)) &&
-     @ (\forall Object o; (\fresh(o) ==> !\dl_inDomain(map,o)) &&
-     @ (!\fresh(o) && o != key ==> \dl_mapGet(map,o) == \old(\dl_mapGet(map,o)))
-     @ );
+     @ ensures map == \dl_mapRemove(map, key) &&
+                 \result == (\dl_inDomain(map, key)?\dl_mapGet(map, key):null);
      @*/
     public /*@nullable@*/ Object remove(Object key);
 
