@@ -459,19 +459,18 @@ public class SymbolicConfigurationExtractor {
     * Applies cut rules to the given side proofs to compute equivalence classes.
     * </p>
     * <p>
-    * For each possible combination (without identity) of the given objects is one cut performed.
+    * For each possible combination (without identity and ignoring the order) of the given objects is one cut performed.
     * </p>
     * @param starter The {@link ProofStarter} which provides the side proof.
     * @param symbolicObjects The symbolic objects to compute equivalence classes for.
     */
    protected void applyCutRules(ProofStarter starter, Set<Term> symbolicObjects) {
+      List<Term> objectsCopy = new ArrayList<Term>(symbolicObjects);
       int maxProofSteps = 8000;
-      for (Term first : symbolicObjects) {
-         for (Term second : symbolicObjects) {
-            if (!first.equals(second)) {
-               Term equalTerm = TermBuilder.DF.equals(first, second);
-               applyCut(starter, equalTerm, maxProofSteps);
-            }
+      for (int i = 0; i < objectsCopy.size(); i++) {
+         for (int j = i + 1; j < objectsCopy.size(); j++) {
+            Term equalTerm = TermBuilder.DF.equals(objectsCopy.get(i), objectsCopy.get(j));
+            applyCut(starter, equalTerm, maxProofSteps);
          }
       }
       starter.setMaxRuleApplications(maxProofSteps);
