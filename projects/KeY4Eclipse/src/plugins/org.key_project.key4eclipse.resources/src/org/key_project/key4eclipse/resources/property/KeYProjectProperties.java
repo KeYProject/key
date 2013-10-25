@@ -103,7 +103,7 @@ public final class KeYProjectProperties {
          }
       }
       else {
-         return -1;
+         return 0;
       }
    }
    

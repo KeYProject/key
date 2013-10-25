@@ -269,6 +269,10 @@ public class ProofManager {
       proofsToDo = Collections.synchronizedList(cloneLinkedList(proofElements));
 
       int numOfThreads = KeYProjectProperties.getNumberOfThreads(project);
+      int numOfProofs = proofElements.size();
+      if(numOfProofs < numOfThreads){
+         numOfThreads = numOfProofs;
+      }
       if (KeYProjectProperties.isEnableMultiThreading(project) && numOfThreads >= 2) {
          Thread[] threads = new Thread[numOfThreads];
          for (int i = 0; i < numOfThreads; i++) {
@@ -481,19 +485,21 @@ public class ProofManager {
     * @throws CoreException
     */
    private void cleanProofFolder(LinkedList<IFile> proofFiles, IFolder folder) throws CoreException{
-      IResource[] members = folder.members();
-      for(IResource res : members){
-         if(res.getType() == IResource.FILE){
-            if(!proofFiles.contains(res)){
-               res.delete(true, null);
+      if(folder.exists()){
+         IResource[] members = folder.members();
+         for(IResource res : members){
+            if(res.getType() == IResource.FILE){
+               if(!proofFiles.contains(res)){
+                  res.delete(true, null);
+               }
+            }
+            else if(res.getType() == IResource.FOLDER){
+               cleanProofFolder(proofFiles, (IFolder) res);
             }
          }
-         else if(res.getType() == IResource.FOLDER){
-            cleanProofFolder(proofFiles, (IFolder) res);
+         if(folder.members().length == 0){
+            folder.delete(true, null);
          }
-      }
-      if(folder.members().length == 0){
-         folder.delete(true, null);
       }
    }
    

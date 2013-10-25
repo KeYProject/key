@@ -53,7 +53,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
             proofManager = new ProofManager(project);
             proofManager.runProofs(monitor);
          }
-         else if(kind == IncrementalProjectBuilder.INCREMENTAL_BUILD){
+         else if(kind == IncrementalProjectBuilder.AUTO_BUILD){
             IResourceDelta delta = getDelta(project);
             if (delta != null && KeYProjectProperties.isEnableBuildProofs(project)) {
                proofManager = new ProofManager(project);
