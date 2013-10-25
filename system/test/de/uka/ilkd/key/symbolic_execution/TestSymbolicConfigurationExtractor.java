@@ -63,7 +63,26 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //             ".xml",
 //             "x != null & x.next != null & x.next.next != null & a != null & a.x == 42 & b != null");
 //   }
-
+   
+   /**
+    * Tests "configurationExtractorInstanceCreationTest" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testInstanceCreationTest_OnReturnNode() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorInstanceCreationTest/test/InstanceCreationTest.java",
+             "InstanceCreationTest",
+             "examples/_testcase/set/configurationExtractorInstanceCreationTest/oracle/",
+             "InstanceCreationTest.xml",
+             "testInstanceCreationTest_onReturnNode_initial",
+             ".xml",
+             "testInstanceCreationTest_onReturnNode_current",
+             ".xml",
+             null,
+             5,
+             2,
+             false,
+             false);
+   }
 
    /**
     * Tests "configurationExtractorWithOperationContractsTest" without precondition.
@@ -567,6 +586,48 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
                          int numberOfReturnNodeInMostLeftBranch,
                          int expectedNumberOfConfigurations,
                          boolean useOperationContracts) throws Exception {
+      doTest(javaPathInkeyRepDirectory, 
+             containerTypeName, 
+             oraclePathInBaseDir, 
+             symbolicExecutionOracleFileName, 
+             initialStatesOraclePrefix, 
+             initialStatesOracleFileExtension, 
+             currentStatesOraclePrefix, 
+             currentStatesOracleFileExtension, 
+             precondition, 
+             numberOfReturnNodeInMostLeftBranch, 
+             expectedNumberOfConfigurations, 
+             useOperationContracts, 
+             true);
+   }
+   
+   /**
+    * Executes the test steps.
+    * @param javaPathInkeyRepDirectory The path to the Java file.
+    * @param containerTypeName The class name.
+    * @param oraclePathInBaseDir The path to the oracle directory.
+    * @param symbolicExecutionOracleFileName File name of the symbolic execution oracle file.
+    * @param initialStatesOraclePrefix Prefix for initial configuration oracles.
+    * @param initialStatesOracleFileExtension Initial configuration oracle file extension.
+    * @param currentStatesOraclePrefix Prefix for current configuration oracles.
+    * @param currentStatesOracleFileExtension Current configuration oracle file extension.
+    * @param precondition An optional precondition.
+    * @param useOperationContracts Use operation contracts?
+    * @throws Exception Occurred Exception.
+    */
+   protected void doTest(String javaPathInkeyRepDirectory,
+                         String containerTypeName,
+                         String oraclePathInBaseDir,
+                         String symbolicExecutionOracleFileName,
+                         String initialStatesOraclePrefix,
+                         String initialStatesOracleFileExtension,
+                         String currentStatesOraclePrefix,
+                         String currentStatesOracleFileExtension,
+                         String precondition,
+                         int numberOfReturnNodeInMostLeftBranch,
+                         int expectedNumberOfConfigurations,
+                         boolean useOperationContracts,
+                         boolean onReturnStatementNode) throws Exception {
       HashMap<String, String> originalTacletOptions = null;
       SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = null;
       try {
@@ -588,18 +649,25 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
             }
          }
          assertTrue(returnNode instanceof IExecutionMethodReturn);
-         // Get the return statement which is returned in returnNode
-         IExecutionNode returnStatement = returnNode.getParent();
-         while (!(returnStatement instanceof IExecutionStatement)) {
-            if (returnStatement instanceof IExecutionStatement) {
-               foundReturnStatement++;
+         IExecutionNode nodeToTest;
+         if (onReturnStatementNode) {
+            // Get the return statement which is returned in returnNode
+            IExecutionNode returnStatement = returnNode.getParent();
+            while (!(returnStatement instanceof IExecutionStatement)) {
+               if (returnStatement instanceof IExecutionStatement) {
+                  foundReturnStatement++;
+               }
+               returnStatement = returnStatement.getParent();
             }
-            returnStatement = returnStatement.getParent();
+            assertNotNull(returnStatement);
+            assertTrue(returnStatement.getName().startsWith("return"));
+            nodeToTest = returnStatement;
          }
-         assertNotNull(returnStatement);
-         assertTrue(returnStatement.getName().startsWith("return"));
+         else {
+            nodeToTest = returnNode;
+         }
          // Extract possible heaps
-         SymbolicConfigurationExtractor extractor = new SymbolicConfigurationExtractor(returnStatement.getProofNode());
+         SymbolicConfigurationExtractor extractor = new SymbolicConfigurationExtractor(nodeToTest.getProofNode());
          extractor.analyse();
          // Test the initial configurations (first time with lazy computation)
          List<ISymbolicConfiguration> initialConfigurationsFirstTime = new ArrayList<ISymbolicConfiguration>(extractor.getConfigurationsCount());

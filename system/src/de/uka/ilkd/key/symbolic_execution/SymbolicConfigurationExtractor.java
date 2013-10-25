@@ -55,7 +55,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -645,7 +644,8 @@ public class SymbolicConfigurationExtractor {
          Sort sort = heapLDT.getSortOfSelect(term.op());
          if (sort != null) {
             Term selectTerm = term.sub(1);
-            if (!objectsToIgnore.contains(selectTerm)) {
+            if (!objectsToIgnore.contains(selectTerm) &&
+                !SymbolicExecutionUtil.isSkolemConstant(selectTerm)) {
                ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, term.sub(2));
                if (var != null) {
                   if (!isImplicitProgramVariable(var)) {
