@@ -1013,8 +1013,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
     * </p>
     */
-/*
    public void testWhileWithMethodCallAsCondition_preMethodContract() throws Exception {
+/*
       doSETTest(keyRepDirectory, 
                 "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/test/WhileWithMethodCallAsCondition.java", 
                 "WhileWithMethodCallAsCondition", 
@@ -1030,8 +1030,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 true,
                 false,
                 false);
-   }
 */
+   }
    
    /**
     * <p>
