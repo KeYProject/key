@@ -175,7 +175,7 @@ SEQCONCAT : "\\seq_concat";
 SEQSUB : "\\seq_sub";
 SEQREVERSE : "\\seq_reverse";
 SEQREPLACE : "\\seq_put";
-INDEXOF : "\\indexOf";
+INDEXOF : "\\seq_indexOf";
 SEQDEF : "\\seq_def";
 
 
