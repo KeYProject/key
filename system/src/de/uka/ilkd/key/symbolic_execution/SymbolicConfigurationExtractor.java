@@ -278,7 +278,7 @@ public class SymbolicConfigurationExtractor {
             // Compute objects for equivalence check from path condition
             Set<Term> symbolicObjectsResultingInCurrentState = collectSymbolicObjectsFromTerm(pathCondition, objectsToIgnore);
             symbolicObjectsResultingInCurrentState.addAll(filterOutObjectsToIgnore(updateValueObjects, objectsToIgnore));
-            symbolicObjectsResultingInCurrentState.addAll(collectObjectsFromConditionsInAntecedent(node.sequent(), objectsToIgnore));
+            symbolicObjectsResultingInCurrentState.addAll(collectObjectsFromConditions(node.sequent(), objectsToIgnore));
             symbolicObjectsResultingInCurrentState.add(TermBuilder.DF.NULL(getServices())); // Add null because it can happen that a object is null and this option must be included in equivalence class computation
             // Compute a sequent with the initial conditions of the proof without modality
             Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation(pathCondition);
@@ -1116,16 +1116,16 @@ public class SymbolicConfigurationExtractor {
    }
 
    /**
-    * Collects all objects which are used in the conditions of the antecedent. 
+    * Collects all objects which are used in the conditions of the {@link Sequent}. 
     * @param sequent The {@link Sequent} which provides the conditions to collect objects from.
     * @param objectsToIgnore Objects which should be excluded in the result.
     * @return The found objects.
     * @throws ProofInputException Occurred Exception.
     */
-   protected Set<Term> collectObjectsFromConditionsInAntecedent(Sequent sequent, 
-                                                                Set<Term> objectsToIgnore) throws ProofInputException {
+   protected Set<Term> collectObjectsFromConditions(Sequent sequent, 
+                                                    Set<Term> objectsToIgnore) throws ProofInputException {
       Set<Term> result = new LinkedHashSet<Term>();
-      for (SequentFormula sf : sequent.antecedent()) {
+      for (SequentFormula sf : sequent) {
          if (!SymbolicExecutionUtil.isSkolemEquality(sf)) {
             result.addAll(collectSymbolicObjectsFromTerm(sf.formula(), objectsToIgnore));
          }
@@ -1258,32 +1258,10 @@ public class SymbolicConfigurationExtractor {
       // Create objects
       Map<Term, SymbolicObject> objects = new LinkedHashMap<Term, SymbolicObject>();
       for (ExecutionVariableValuePair pair : pairs) {
-         Term parent = pair.getParent();
-         if (parent != null) {
-            SymbolicObject object = objects.get(parent);
-            if (object == null) {
-               ISymbolicEquivalenceClass equivalentClass = findEquivalentClass(equivalentClasses, parent);
-               if (equivalentClass == null || // New created object which is not part of the path condition
-                   equivalentClass.getRepresentative() == parent) { // Representative object part of path condition
-                  object = new SymbolicObject(getServices(), parent);
-                  objects.put(parent, object);
-                  result.addObject(object);
-               }
-            }
-         }
-         Term value = pair.getValue();
-         if (value != null && SymbolicExecutionUtil.hasReferenceSort(getServices(), value)) {
-            SymbolicObject object = objects.get(value);
-            if (object == null) {
-               ISymbolicEquivalenceClass equivalentClass = findEquivalentClass(equivalentClasses, value);
-               if (equivalentClass == null || // New created object which is not part of the path condition
-                   equivalentClass.getRepresentative() == value) { // Representative object part of path condition
-                  object = new SymbolicObject(getServices(), value);
-                  objects.put(value, object);
-                  result.addObject(object);
-               }
-            }
-         }
+         // Create object for parent of current value
+         createObjectForTerm(objects, equivalentClasses, result, pair.getParent());
+         // Create object for current value
+         createObjectForTerm(objects, equivalentClasses, result, pair.getValue());
       }
       // Fill objects and state with association and values
       for (ExecutionVariableValuePair pair : pairs) {
@@ -1359,6 +1337,31 @@ public class SymbolicConfigurationExtractor {
       return result;
    }
    
+   /**
+    * Creates for the object defined by the given {@link Term} an {@link SymbolicObject} instance if not already available.
+    * @param objects The already available {@link SymbolicObject}s.
+    * @param equivalentClasses The available {@link ISymbolicEquivalenceClass}.
+    * @param result The {@link SymbolicConfiguration} to add the {@link SymbolicObject} to.
+    * @param objectTerm The {@link Term} which represents the {@link Object} a {@link SymbolicObject} should be created for.
+    */
+   protected void createObjectForTerm(Map<Term, SymbolicObject> objects, 
+                                      ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, 
+                                      SymbolicConfiguration result, 
+                                      Term objectTerm) {
+      if (objectTerm != null && SymbolicExecutionUtil.hasReferenceSort(getServices(), objectTerm)) {
+         ISymbolicEquivalenceClass equivalentClass = findEquivalentClass(equivalentClasses, objectTerm);
+         if (equivalentClass != null) {
+            objectTerm = equivalentClass.getRepresentative();
+         }
+         SymbolicObject object = objects.get(objectTerm);
+         if (object == null) {
+            object = new SymbolicObject(getServices(), objectTerm);
+            objects.put(objectTerm, object);
+            result.addObject(object);
+         }
+      }
+   }
+
    /**
     * Returns the {@link Proof} of the analyzed {@link Node}.
     * @return The {@link Proof} of the analyzed {@link Node}.
