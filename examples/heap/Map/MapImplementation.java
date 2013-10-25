@@ -22,6 +22,7 @@ final class MapImplementation implements Map2 {
      @*/
     
     // @ private invariant (keys.length == 0) <==> (map == \dl_mapEmpty());
+    //@ private invariant \dl_mapSize(map) == keys.length;
 
     /*@ normal_behaviour
      @   ensures map == \dl_mapEmpty() && \fresh(footprint);
