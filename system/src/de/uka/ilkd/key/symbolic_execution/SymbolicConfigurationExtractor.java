@@ -14,6 +14,8 @@
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -53,6 +55,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -279,6 +282,7 @@ public class SymbolicConfigurationExtractor {
             Set<Term> symbolicObjectsResultingInCurrentState = collectSymbolicObjectsFromTerm(pathCondition, objectsToIgnore);
             symbolicObjectsResultingInCurrentState.addAll(filterOutObjectsToIgnore(updateValueObjects, objectsToIgnore));
             symbolicObjectsResultingInCurrentState.addAll(collectObjectsFromConditions(node.sequent(), objectsToIgnore));
+            symbolicObjectsResultingInCurrentState = sortTerms(symbolicObjectsResultingInCurrentState); // Sort terms alphabetically. This guarantees that in equivalence classes the representative term is for instance self.next and not self.next.next. 
             symbolicObjectsResultingInCurrentState.add(TermBuilder.DF.NULL(getServices())); // Add null because it can happen that a object is null and this option must be included in equivalence class computation
             // Compute a sequent with the initial conditions of the proof without modality
             Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation(pathCondition);
@@ -307,6 +311,24 @@ public class SymbolicConfigurationExtractor {
    }
    
    /**
+    * Sorts the given {@link Term}s alphabetically.
+    * @param terms The {@link Term}s to sort.
+    * @return The sorted {@link Term}s.
+    */
+   protected Set<Term> sortTerms(Set<Term> terms) {
+      List<Term> list = new LinkedList<Term>(terms);
+      Collections.sort(list, new Comparator<Term>() {
+         @Override
+         public int compare(Term o1, Term o2) {
+            String o1s = o1.toString();
+            String o2s = o2.toString();
+            return o1s.length() - o2s.length();
+         }
+      });
+      return new LinkedHashSet<Term>(list);
+   }
+
+   /**
     * <p>
     * Computes objects which should be ignored in the state because
     * they are part of the proof obligation and not of the source code.
@@ -324,7 +346,7 @@ public class SymbolicConfigurationExtractor {
       if (excVar instanceof ProgramVariable) {
          result.add(TermBuilder.DF.var((ProgramVariable)excVar));
       }
-      // Add initial updates which are used as backup of the heap and method arguments. They are nto part of the source code and should be ignored.
+      // Add initial updates which are used as backup of the heap and method arguments. They are not part of the source code and should be ignored.
       Sequent sequent = getRoot().sequent();
       for (SequentFormula sf : sequent.succedent()) {
          Term term = sf.formula();

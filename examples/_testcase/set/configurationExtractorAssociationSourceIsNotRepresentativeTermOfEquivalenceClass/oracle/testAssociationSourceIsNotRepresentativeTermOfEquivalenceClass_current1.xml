@@ -5,10 +5,10 @@
       <term term="current.right.left"/>
    </equivalenceClass>
    <equivalenceClass representativeTerm="null">
+      <term term="current.parent"/>
       <term term="\if (current.right.left = current)
     \then (current.right.left)
     \else (current.parent)"/>
-      <term term="current.parent"/>
       <term term="null"/>
    </equivalenceClass>
    <state name="return current;">
