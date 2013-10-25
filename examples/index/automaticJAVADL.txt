@@ -21,6 +21,7 @@ provable: ./heap/comprehensions/sum1.key
 provable: ./heap/comprehensions/sum2.key
 provable: ./heap/comprehensions/sum3.key
 provable: ./heap/comprehensions/segsum.key
+provable: ./heap/comprehensions/bsum_negative.key
 provable: ./heap/comprehensions/bsumSplit.key
 provable: ./heap/comprehensions/bprodSplit.key
 notprovable: ./heap/comprehensions/bsumSplitInvalid.key
