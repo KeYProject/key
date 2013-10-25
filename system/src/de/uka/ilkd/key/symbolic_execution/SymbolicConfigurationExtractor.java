@@ -266,7 +266,7 @@ public class SymbolicConfigurationExtractor {
             // Get path condition
             pathCondition = SymbolicExecutionUtil.computePathCondition(node, true);
             pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
-            // Compute all locations used in path conditions and updates.
+            // Compute all locations used in path conditions and updates. The values of the locations will be later computed in the state computation (and finally shown in a symbolic configuration).
             Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractLocationParameter>();
             objectsToIgnore = computeInitialObjectsToIgnore(); // Contains all objects which should be ignored, like exc of the proof obligation and created objects during symbolic execution
             Set<Term> updateCreatedObjects = new LinkedHashSet<Term>(); // Contains all objects which are created during symbolic execution
@@ -277,15 +277,15 @@ public class SymbolicConfigurationExtractor {
             initialLocations.addAll(extractLocationsFromSequent(node.sequent(), objectsToIgnore));
             currentLocations = new LinkedHashSet<ExtractLocationParameter>(initialLocations);
             currentLocations.addAll(temporaryCurrentLocations);
-            // Compute objects for equivalence check from path condition
+            // Compute objects for equivalence check.
             Set<Term> symbolicObjectsResultingInCurrentState = collectSymbolicObjectsFromTerm(pathCondition, objectsToIgnore);
             symbolicObjectsResultingInCurrentState.addAll(filterOutObjectsToIgnore(updateValueObjects, objectsToIgnore));
             symbolicObjectsResultingInCurrentState.addAll(collectObjectsFromConditions(node.sequent(), objectsToIgnore));
             symbolicObjectsResultingInCurrentState = sortTerms(symbolicObjectsResultingInCurrentState); // Sort terms alphabetically. This guarantees that in equivalence classes the representative term is for instance self.next and not self.next.next. 
             symbolicObjectsResultingInCurrentState.add(TermBuilder.DF.NULL(getServices())); // Add null because it can happen that a object is null and this option must be included in equivalence class computation
-            // Compute a sequent with the initial conditions of the proof without modality
+            // Compute a Sequent with the initial conditions of the proof without modality
             Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation(pathCondition);
-            // Instantiate proof in which equivalent classes of symbolic objects in path conditions are computed
+            // Instantiate proof in which equivalent classes of symbolic objects are computed.
             ProofStarter equivalentClassesProofStarter = SymbolicExecutionUtil.createSideProof(getProof(), initialConditionsSequent);
             try {
                // Apply cut rules to compute equivalent classes
