@@ -142,7 +142,7 @@ final class MapImplementation implements Map2 {
          @ loop_invariant (\forall int x; 0 <= x && x < i; 
          @ (key == keys[x] ==> ( index == x && ret == values[x])));
          @ decreases keys.length - i;
-         @ assignable \set_union(values[*], ret);
+         @ assignable \strictly_nothing;
          @*/
         for (i = 0; i < keys.length; i++) {
             if (key == keys[i]) {
@@ -180,7 +180,7 @@ final class MapImplementation implements Map2 {
 
         }
 
-        //@ set map = \dl_mapRemove(map, key);
+        //@ set map = (keys.length > 0) ? \dl_mapRemove(map, key) : \dl_mapEmpty();
         //@ set footprint = \set_union(\set_union(\all_fields(keys), \all_fields(values)), \all_fields(this));
         return ret;
     }
