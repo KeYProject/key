@@ -8,7 +8,7 @@ public interface Map2 {
     //@ public instance invariant \subset(\singleton(this.map), footprint);
     //@ public instance invariant \subset(\singleton(this.footprint), footprint);
     
-    // @ public instance invariant \dl_isFinite(map);
+    //@ public instance invariant \dl_isFinite(map);
     
     // -----
     // Method signatures + specs

@@ -21,7 +21,6 @@ final class MapImplementation implements Map2 {
      @ (\exists int i; i >= 0 && i < keys.length && keys[i] == o) <==> \dl_inDomain(map, o));
      @*/
     
-    // @ private invariant (keys.length == 0) <==> (map == \dl_mapEmpty());
     //@ private invariant \dl_mapSize(map) == keys.length;
 
     /*@ normal_behaviour
