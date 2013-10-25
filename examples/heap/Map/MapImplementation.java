@@ -6,8 +6,8 @@ final class MapImplementation implements Map2 {
     private Object values[];
 
     /*@
-     @ private invariant (\forall int i1; 0 <= i1 && i1 <= keys.length;
-     @                   (\forall int i2; 0 <= i2 && i2 <= keys.length && i1 != i2; keys[i1] != keys[i2]));
+     @ private invariant (\forall int i1; 0 <= i1 && i1 < keys.length;
+     @                   (\forall int i2; 0 <= i2 && i2 < keys.length && i1 != i2; keys[i1] != keys[i2]));
      @ private invariant keys != null;
      @ private invariant values != null;
      @ private invariant footprint == \set_union(\set_union(this.*,keys[*]),values[*]);
@@ -22,6 +22,7 @@ final class MapImplementation implements Map2 {
      @*/
     
     //@ private invariant \dl_mapSize(map) == keys.length;
+    //@ private invariant (\forall int i; i>=0 && i<keys.length; \dl_inDomain(map, keys[i]));
 
     /*@ normal_behaviour
      @   ensures map == \dl_mapEmpty() && \fresh(footprint);
@@ -83,6 +84,40 @@ final class MapImplementation implements Map2 {
         return false;
     }
     
+    /*@ private normal_behavior
+     @   requires l >= 0;
+     @   ensures \typeof(\result) == \type(Object[]);
+     @   ensures \result.length == l;
+     @   ensures \fresh(\result);
+     @   ensures \result != null;
+     @   assignable \nothing;
+     @*/
+    private /*@helper*/ /*@nullable*/ Object[] newArray(int l) {
+        // This function is taken from ArrayList.java
+        return new Object[l];
+    }
+    
+    /*@ private normal_behavior
+     @ accessible footprint;
+     @ ensures \dl_inDomain(map, key)?(keys[\result] == key):(\result == -1);
+     @*/
+    private /*@strictly_pure@*/ int getIndexOfKey(Object key) {
+        int index = -1;
+        /*@ loop_invariant 0 <= i && i <= keys.length;
+         @ loop_invariant ((index != -1) ==> (keys[index] == key && \dl_inDomain(map, key)));
+         @ loop_invariant ((index == -1) ==> (\forall int x; x>=0 && x<i; keys[x] != key));
+         @ decreases keys.length - i;
+         @ assignable \strictly_nothing;
+         @ accessible footprint;
+         @*/
+        for (int i = 0; i < keys.length; i++) {
+            if (key == keys[i]) {
+                index = i;
+            }
+        }
+        return index;
+    }
+    
     public Object put(Object key, Object value) {
         
         int index = -1;
@@ -90,8 +125,8 @@ final class MapImplementation implements Map2 {
         Object ret = null;
 
         /*@ loop_invariant 0 <= i && i <= keys.length;
-         @ loop_invariant (\forall int x; 0 <= x && x < i; 
-         @ (key == keys[x] ==> ( index == x )));
+         @ loop_invariant ((index != -1) ==> (keys[index] == key && \dl_inDomain(map, key)));
+         @ loop_invariant ((index == -1) ==> (\forall int x; x>=0 && x<i; keys[x] != key));
          @ decreases keys.length - i;
          @ assignable \strictly_nothing;
          @*/
