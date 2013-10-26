@@ -122,6 +122,27 @@ final class MapImplementation implements Map2 {
         return index;
     }
     
+    /*@ private normal_behaviour
+     @ requires 0 <= numberCopies &&
+     @ 0 <= beginTarget && beginTarget + numberCopies <= target.length &&
+     @ 0 <= beginSource && beginSource + numberCopies <= source.length;
+     @ ensures (\forall int index; 0 <= index && index < numberCopies; 
+     @                         target[beginTarget + index] == source[beginSource + index]);
+     @ assignable target[*];
+     @*/
+    private void copyArray(Object[] target, Object[] source, int beginTarget, int beginSource,
+            int numberCopies) {
+        /*@ loop_invariant 0 <= i && i <= numberCopies;
+         @ loop_invariant (\forall int x; 0 <= x && x < i; 
+         @ (target[beginTarget + x] == source[beginSource + x]));
+         @ decreases -i;
+         @ assignable target[*];
+         @*/
+        for (int i = 0; i < numberCopies; i++) {
+            target[beginTarget + i] = source[beginSource + i];
+        }
+    }
+    
     public Object put(Object key, Object value) {
         
         int index = getIndexOfKey(key);
@@ -136,16 +157,9 @@ final class MapImplementation implements Map2 {
             Object keysNew[] = newArray(keys.length + 1);
             Object valuesNew[] = newArray(keys.length + 1);
             
-            /*@ loop_invariant 0 <= i && i <= keys.length;
-             @ loop_invariant (\forall int x; 0 <= x && x < i; 
-             @ (keysNew[x] == keys[x] && valuesNew[x] == values[x]));
-             @ decreases keys.length - i;
-             @ assignable \set_union(keysNew[*], valuesNew[*]);
-             @*/
-            for (int i = 0; i < keys.length; i++) {
-                keysNew[i] = keys[i];
-                valuesNew[i] = values[i];
-            }
+            copyArray(keysNew, keys, keys.length, 0, 0);
+            copyArray(valuesNew, values, keys.length, 0, 0);
+            
             keysNew[keys.length] = key;
             valuesNew[keys.length] = value;
 
@@ -173,27 +187,11 @@ final class MapImplementation implements Map2 {
             
             int i;
 
-            /*@ loop_invariant 0 <= i && i <= index && index < keys.length;
-             @ loop_invariant (\forall int x; 0 <= x && x < i;
-             @ (keysNew[x] == keys[x] && valuesNew[x] == values[x]));
-             @ decreases keys.length - i;
-             @ assignable \set_union(keysNew[*], valuesNew[*]);
-             @*/
-            for (i = 0; i < index; i++) {
-                    keysNew[i] = keys[i];
-                    valuesNew[i] = values[i];
-            }
+            copyArray(keysNew, keys, index, 0, 0);
+            copyArray(valuesNew, values, index, 0, 0);
             
-            /*@ loop_invariant index + 1 <= i && i <= keys.length && index < keys.length;
-             @ loop_invariant (\forall int x; index + 1 <= x && x < i;
-             @ (keysNew[x] == keys[x - 1] && valuesNew[x] == values[x - 1]));
-             @ decreases keys.length - i;
-             @ assignable \set_union(keysNew[*], valuesNew[*]);
-             @*/
-            for (i = index + 1; i < keys.length; i++) {
-                keysNew[i] = keys[i - 1];
-                valuesNew[i] = values[i - 1];
-            }
+            copyArray(keysNew, keys, keys.length - (index + 1), index, index + 1);
+            copyArray(keysNew, keys, keys.length - (index + 1), index, index + 1);
 
             keys = keysNew;
             values = valuesNew;
