@@ -100,8 +100,10 @@ final class MapImplementation implements Map2 {
     
     /*@ private normal_behavior
      @ ensures \dl_inDomain(map, key) ? 
-                (\result >= 0 && \result < keys.length && keys[\result] == key) : 
-                (\result == -1);
+     @           (\result >= 0 && \result < keys.length && keys[\result] == key) : 
+     @           (\result == -1);
+     @ ensures (\forall int j; j >= 0 && j < keys.length; 
+     @           (j != \result <==> keys[j] != key ));
      @*/
     private /*@strictly_pure@*/ int getIndexOfKey(Object key) {
         int index = -1;
