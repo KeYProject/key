@@ -7,7 +7,8 @@ final class MapImplementation implements Map2 {
 
     /*@
      @ private invariant (\forall int i1; 0 <= i1 && i1 < keys.length;
-     @                   (\forall int i2; 0 <= i2 && i2 < keys.length && i1 != i2; keys[i1] != keys[i2]));
+     @                   (\forall int i2; 0 <= i2 && i2 < keys.length;
+                            (keys[i1] == keys[i2]) ==> (i1 == i2)));
      @ private invariant keys != null;
      @ private invariant values != null;
      @ private invariant footprint == \set_union(\set_union(this.*,keys[*]),values[*]);
@@ -98,8 +99,7 @@ final class MapImplementation implements Map2 {
     }
     
     /*@ private normal_behavior
-     @ accessible footprint;
-     @ ensures \dl_inDomain(map, key)?(keys[\result] == key):(\result == -1);
+     @ ensures \dl_inDomain(map, key) ? (keys[\result] == key) : (\result == -1);
      @*/
     private /*@strictly_pure@*/ int getIndexOfKey(Object key) {
         int index = -1;
@@ -108,7 +108,6 @@ final class MapImplementation implements Map2 {
          @ loop_invariant ((index == -1) ==> (\forall int x; x>=0 && x<i; keys[x] != key));
          @ decreases keys.length - i;
          @ assignable \strictly_nothing;
-         @ accessible footprint;
          @*/
         for (int i = 0; i < keys.length; i++) {
             if (key == keys[i]) {
