@@ -125,7 +125,6 @@ final class MapImplementation implements Map2 {
     public Object put(Object key, Object value) {
         
         int index = getIndexOfKey(key);
-        int i;
         Object ret = null;
         
         if (index != -1) {
@@ -143,7 +142,7 @@ final class MapImplementation implements Map2 {
              @ decreases keys.length - i;
              @ assignable \set_union(keysNew[*], valuesNew[*]);
              @*/
-            for (i = 0; i < keys.length; i++) {
+            for (int i = 0; i < keys.length; i++) {
                 keysNew[i] = keys[i];
                 valuesNew[i] = values[i];
             }
@@ -162,28 +161,15 @@ final class MapImplementation implements Map2 {
 
     public Object remove(Object key) {
 
-        int index = -1;
-        int i;
+        int index = getIndexOfKey(key);
         Object ret = null;
-
-        /*@ loop_invariant 0 <= i && i <= keys.length;
-         @ loop_invariant (\forall int x; 0 <= x && x < i; 
-         @ (key == keys[x] ==> ( index == x )));
-         @ decreases keys.length - i;
-         @ assignable \strictly_nothing;
-         @*/
-        for (i = 0; i < keys.length; i++) {
-            if (key == keys[i]) {
-                index = i;
-            }
-        }
 
         if (index != -1) {
             
             ret = values[index];
 
-            Object keysNew[] = new Object[keys.length - 1];
-            Object valuesNew[] = new Object[keys.length - 1];
+            Object keysNew[] = newArray(keys.length - 1);
+            Object valuesNew[] = newArray(keys.length - 1);
 
             /*@ loop_invariant 0 <= i && i <= keys.length;
              @ loop_invariant (\forall int x; 0 <= x && x < i;
@@ -193,7 +179,7 @@ final class MapImplementation implements Map2 {
              @ decreases keys.length - i;
              @ assignable \set_union(keysNew[*], valuesNew[*]);
              @*/
-            for (i = 0; i < keys.length; i++) {
+            for (int i = 0; i < keys.length; i++) {
                 if (i < index) {
                     keysNew[i] = keys[i];
                     valuesNew[i] = values[i];
