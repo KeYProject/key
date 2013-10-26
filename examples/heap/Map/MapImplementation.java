@@ -128,7 +128,7 @@ final class MapImplementation implements Map2 {
      @ 0 <= beginSource && beginSource + numberCopies <= source.length;
      @ ensures (\forall int index; 0 <= index && index < numberCopies; 
      @                         target[beginTarget + index] == source[beginSource + index]);
-     @ assignable target[*];
+     @ assignable target[beginTarget..beginTarget + numberCopies - 1];
      @*/
     private void copyArray(Object[] target, Object[] source, int beginTarget, int beginSource,
             int numberCopies) {
@@ -136,7 +136,7 @@ final class MapImplementation implements Map2 {
          @ loop_invariant (\forall int x; 0 <= x && x < i; 
          @ (target[beginTarget + x] == source[beginSource + x]));
          @ decreases -i;
-         @ assignable target[*];
+         @ assignable target[beginTarget..beginTarget + numberCopies - 1];
          @*/
         for (int i = 0; i < numberCopies; i++) {
             target[beginTarget + i] = source[beginSource + i];
