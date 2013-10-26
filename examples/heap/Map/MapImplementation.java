@@ -99,12 +99,15 @@ final class MapImplementation implements Map2 {
     }
     
     /*@ private normal_behavior
-     @ ensures \dl_inDomain(map, key) ? (keys[\result] == key) : (\result == -1);
+     @ ensures \dl_inDomain(map, key) ? 
+                (\result >= 0 && \result < keys.length && keys[\result] == key) : 
+                (\result == -1);
      @*/
     private /*@strictly_pure@*/ int getIndexOfKey(Object key) {
         int index = -1;
         /*@ loop_invariant 0 <= i && i <= keys.length;
          @ loop_invariant ((index != -1) ==> (keys[index] == key && \dl_inDomain(map, key)));
+         @ loop_invariant ((index != -1) ==> index < keys.length && index >= 0);
          @ loop_invariant ((index == -1) ==> (\forall int x; x>=0 && x<i; keys[x] != key));
          @ decreases keys.length - i;
          @ assignable \strictly_nothing;
@@ -119,21 +122,9 @@ final class MapImplementation implements Map2 {
     
     public Object put(Object key, Object value) {
         
-        int index = -1;
+        int index = getIndexOfKey(key);
         int i;
         Object ret = null;
-
-        /*@ loop_invariant 0 <= i && i <= keys.length;
-         @ loop_invariant ((index != -1) ==> (keys[index] == key && \dl_inDomain(map, key)));
-         @ loop_invariant ((index == -1) ==> (\forall int x; x>=0 && x<i; keys[x] != key));
-         @ decreases keys.length - i;
-         @ assignable \strictly_nothing;
-         @*/
-        for (i = 0; i < keys.length; i++) {
-            if (key == keys[i]) {
-                index = i;
-            }
-        }
         
         if (index != -1) {
             ret = values[index];
@@ -141,8 +132,8 @@ final class MapImplementation implements Map2 {
         }
         else {
 
-            Object keysNew[] = new Object[keys.length + 1];
-            Object valuesNew[] = new Object[keys.length + 1];
+            Object keysNew[] = newArray(keys.length + 1);
+            Object valuesNew[] = newArray(keys.length + 1);
             
             /*@ loop_invariant 0 <= i && i <= keys.length;
              @ loop_invariant (\forall int x; 0 <= x && x < i; 
