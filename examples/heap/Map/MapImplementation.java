@@ -170,24 +170,29 @@ final class MapImplementation implements Map2 {
 
             Object keysNew[] = newArray(keys.length - 1);
             Object valuesNew[] = newArray(keys.length - 1);
+            
+            int i;
 
-            /*@ loop_invariant 0 <= i && i <= keys.length;
+            /*@ loop_invariant 0 <= i && i <= index && index < keys.length;
              @ loop_invariant (\forall int x; 0 <= x && x < i;
-             @ ( (x < index) ==> ( keysNew[x] == keys[x] && valuesNew[x] == values[x] )) && 
-             @ ( (x > index) ==> ( keysNew[x] == keys[x - 1] && valuesNew[x] == values[x - 1] ))
-             @ );
+             @ (keysNew[x] == keys[x] && valuesNew[x] == values[x]));
              @ decreases keys.length - i;
              @ assignable \set_union(keysNew[*], valuesNew[*]);
              @*/
-            for (int i = 0; i < keys.length; i++) {
-                if (i < index) {
+            for (i = 0; i < index; i++) {
                     keysNew[i] = keys[i];
                     valuesNew[i] = values[i];
-                }
-                if (i > index) {
-                    keysNew[i] = keys[i - 1];
-                    valuesNew[i] = values[i - 1];
-                }
+            }
+            
+            /*@ loop_invariant index + 1 <= i && i <= keys.length && index < keys.length;
+             @ loop_invariant (\forall int x; index + 1 <= x && x < i;
+             @ (keysNew[x] == keys[x - 1] && valuesNew[x] == values[x - 1]));
+             @ decreases keys.length - i;
+             @ assignable \set_union(keysNew[*], valuesNew[*]);
+             @*/
+            for (i = index + 1; i < keys.length; i++) {
+                keysNew[i] = keys[i - 1];
+                valuesNew[i] = values[i - 1];
             }
 
             keys = keysNew;
