@@ -19,7 +19,7 @@ final class MapImplementation implements Map2 {
      @ private invariant keys.length == values.length;
      @ private invariant (\forall int i; i < 0 || i >= keys.length || \dl_mapGet(map, keys[i]) == values[i]);
      @ private invariant (\forall Object o;
-     @ (\exists int i; i >= 0 && i < keys.length && keys[i] == o) <==> \dl_inDomain(map, o));
+     @ (\exists int i; 0 <= i && i < keys.length; keys[i] == o) <==> \dl_inDomain(map, o));
      @*/
     
     //@ private invariant \dl_mapSize(map) == keys.length;
@@ -127,6 +127,7 @@ final class MapImplementation implements Map2 {
      @ 0 <= numberCopies &&
      @ 0 <= beginTarget && beginTarget + numberCopies <= target.length &&
      @ 0 <= beginSource && beginSource + numberCopies <= source.length;
+     @ requires \typeof(target) == \typeof(source);
      @ ensures (\forall int index; 0 <= index && index < numberCopies; 
      @                         target[beginTarget + index] == source[beginSource + index]);
      @ assignable target[beginTarget..beginTarget + numberCopies - 1];
@@ -136,7 +137,8 @@ final class MapImplementation implements Map2 {
         /*@ loop_invariant 0 <= i && i <= numberCopies;
          @ loop_invariant (\forall int x; 0 <= x && x < i; 
          @ (target[beginTarget + x] == source[beginSource + x]));
-         @ decreases -i;
+         @ loop_invariant (\forall Object o; !\fresh(o));
+         @ decreases numberCopies-i;
          @ assignable target[beginTarget..beginTarget + numberCopies - 1];
          @*/
         for (int i = 0; i < numberCopies; i++) {
