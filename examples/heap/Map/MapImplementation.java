@@ -123,7 +123,8 @@ final class MapImplementation implements Map2 {
     }
     
     /*@ private normal_behaviour
-     @ requires 0 <= numberCopies &&
+     @ requires target != source && target != keys && target != values &&
+     @ 0 <= numberCopies &&
      @ 0 <= beginTarget && beginTarget + numberCopies <= target.length &&
      @ 0 <= beginSource && beginSource + numberCopies <= source.length;
      @ ensures (\forall int index; 0 <= index && index < numberCopies; 
