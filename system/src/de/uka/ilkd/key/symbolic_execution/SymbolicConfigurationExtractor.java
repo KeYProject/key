@@ -278,9 +278,9 @@ public class SymbolicConfigurationExtractor {
             currentLocations = new LinkedHashSet<ExtractLocationParameter>(initialLocations);
             currentLocations.addAll(temporaryCurrentLocations);
             // Compute objects for equivalence check.
-            Set<Term> symbolicObjectsResultingInCurrentState = collectSymbolicObjectsFromTerm(pathCondition, objectsToIgnore);
+            Set<Term> symbolicObjectsResultingInCurrentState = new LinkedHashSet<Term>();
             symbolicObjectsResultingInCurrentState.addAll(filterOutObjectsToIgnore(updateValueObjects, objectsToIgnore));
-            symbolicObjectsResultingInCurrentState.addAll(collectObjectsFromConditions(node.sequent(), objectsToIgnore));
+            symbolicObjectsResultingInCurrentState.addAll(collectObjectsFromSequent(node.sequent(), objectsToIgnore));
             symbolicObjectsResultingInCurrentState = sortTerms(symbolicObjectsResultingInCurrentState); // Sort terms alphabetically. This guarantees that in equivalence classes the representative term is for instance self.next and not self.next.next. 
             symbolicObjectsResultingInCurrentState.add(TermBuilder.DF.NULL(getServices())); // Add null because it can happen that a object is null and this option must be included in equivalence class computation
             // Compute a Sequent with the initial conditions of the proof without modality
@@ -1144,8 +1144,8 @@ public class SymbolicConfigurationExtractor {
     * @return The found objects.
     * @throws ProofInputException Occurred Exception.
     */
-   protected Set<Term> collectObjectsFromConditions(Sequent sequent, 
-                                                    Set<Term> objectsToIgnore) throws ProofInputException {
+   protected Set<Term> collectObjectsFromSequent(Sequent sequent, 
+                                                 Set<Term> objectsToIgnore) throws ProofInputException {
       Set<Term> result = new LinkedHashSet<Term>();
       for (SequentFormula sf : sequent) {
          if (!SymbolicExecutionUtil.isSkolemEquality(sf)) {
