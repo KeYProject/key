@@ -62,11 +62,54 @@ post: (   i &lt; 0 &amp; heapBefore_goOnNice_5[x.&lt;inv&gt;]
               \else (FALSE)
       &amp; x.&lt;inv&gt;
       &amp; exc_8 = null)
-mod: allLocs \cup allLocs \cup allLocs
-               \cup allLocs
-          \cup allLocs
-     \cup allLocs
-\cup allLocs
+mod: \if (true)
+         \then (     \if (true)
+                         \then (     \if (true)
+                                         \then (     \if (true)
+                                                         \then (     \if (true)
+                                                                         \then (     \if (true)
+                                                                                         \then (allLocs)
+                                                                                         \else (allLocs)
+                                                                                \cap \if (  !  array
+                                                                                             = null
+                                                                                          &amp;    i
+                                                                                            &gt;= 0
+                                                                                          &amp; x.&lt;inv&gt;)
+                                                                                         \then (allLocs)
+                                                                                         \else (allLocs))
+                                                                         \else (allLocs)
+                                                                \cap \if (  !  array
+                                                                             = null
+                                                                          &amp;    i
+                                                                            &gt;= 0
+                                                                          &amp; x.&lt;inv&gt;)
+                                                                         \then (allLocs)
+                                                                         \else (allLocs))
+                                                         \else (allLocs)
+                                                \cap \if (  !  array
+                                                             = null
+                                                          &amp;    i
+                                                            &gt;= 0
+                                                          &amp; x.&lt;inv&gt;)
+                                                         \then (allLocs)
+                                                         \else (allLocs))
+                                         \else (allLocs)
+                                \cap \if (  !  array
+                                             = null
+                                          &amp; i &gt;= 0
+                                          &amp; x.&lt;inv&gt;)
+                                         \then (allLocs)
+                                         \else (allLocs))
+                         \else (allLocs)
+                \cap \if (  !array = null
+                          &amp; i &gt;= 0
+                          &amp; x.&lt;inv&gt;)
+                         \then (allLocs)
+                         \else (allLocs))
+         \else (allLocs)
+\cap \if (!array = null &amp; i &gt;= 0 &amp; x.&lt;inv&gt;)
+         \then (allLocs)
+         \else (allLocs)
 termination: diamond" pathCondition="   array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
@@ -190,11 +233,54 @@ post: (   i &lt; 0 &amp; heapBefore_goOnNice_5[x.&lt;inv&gt;]
               \else (FALSE)
       &amp; x.&lt;inv&gt;
       &amp; exc_9 = null)
-mod: allLocs \cup allLocs \cup allLocs
-               \cup allLocs
-          \cup allLocs
-     \cup allLocs
-\cup allLocs
+mod: \if (true)
+         \then (     \if (true)
+                         \then (     \if (true)
+                                         \then (     \if (true)
+                                                         \then (     \if (true)
+                                                                         \then (     \if (true)
+                                                                                         \then (allLocs)
+                                                                                         \else (allLocs)
+                                                                                \cap \if (  !  array
+                                                                                             = null
+                                                                                          &amp;    i
+                                                                                            &gt;= 0
+                                                                                          &amp; x.&lt;inv&gt;)
+                                                                                         \then (allLocs)
+                                                                                         \else (allLocs))
+                                                                         \else (allLocs)
+                                                                \cap \if (  !  array
+                                                                             = null
+                                                                          &amp;    i
+                                                                            &gt;= 0
+                                                                          &amp; x.&lt;inv&gt;)
+                                                                         \then (allLocs)
+                                                                         \else (allLocs))
+                                                         \else (allLocs)
+                                                \cap \if (  !  array
+                                                             = null
+                                                          &amp;    i
+                                                            &gt;= 0
+                                                          &amp; x.&lt;inv&gt;)
+                                                         \then (allLocs)
+                                                         \else (allLocs))
+                                         \else (allLocs)
+                                \cap \if (  !  array
+                                             = null
+                                          &amp; i &gt;= 0
+                                          &amp; x.&lt;inv&gt;)
+                                         \then (allLocs)
+                                         \else (allLocs))
+                         \else (allLocs)
+                \cap \if (  !array = null
+                          &amp; i &gt;= 0
+                          &amp; x.&lt;inv&gt;)
+                         \then (allLocs)
+                         \else (allLocs))
+         \else (allLocs)
+\cap \if (!array = null &amp; i &gt;= 0 &amp; x.&lt;inv&gt;)
+         \then (allLocs)
+         \else (allLocs)
 termination: diamond" pathCondition="   array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)

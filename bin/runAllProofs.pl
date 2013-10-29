@@ -92,14 +92,6 @@ my @automatic_JAVADL;
 open (AUTOMATIC, $testFile) or die $testFile . " couldn't be opened.";
 @automatic_JAVADL = <AUTOMATIC>;
 close AUTOMATIC;
-# see http://www.somacon.com/p114.php
-sub trim($) {
-    my $string = shift;
-    chomp $string;
-    $string =~ s/^\s+//;
-    $string =~ s/\s+$//;
-    return $string;
-}
 
 my $counter = 0;
 my $total = trim(`grep provable "$path_to_index" | grep -v "\#" | wc -l`);
