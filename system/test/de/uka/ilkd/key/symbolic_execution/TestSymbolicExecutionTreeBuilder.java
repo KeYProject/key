@@ -1014,7 +1014,6 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * </p>
     */
    public void testWhileWithMethodCallAsCondition_preMethodContract() throws Exception {
-/*
       doSETTest(keyRepDirectory, 
                 "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/test/WhileWithMethodCallAsCondition.java", 
                 "WhileWithMethodCallAsCondition", 
@@ -1030,7 +1029,6 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 true,
                 false,
                 false);
-*/
    }
    
    /**
