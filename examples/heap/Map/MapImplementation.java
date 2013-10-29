@@ -150,6 +150,31 @@ final class MapImplementation implements Map2 {
         }
     }
     
+    /*@ public normal_behaviour
+     @ requires 0 <= index && index < keys.length;
+     @ assignable values[index];
+     @ ensures map == \dl_mapUpdate(map, keys[index], value);
+     @ ensures (\forall Object o; !\fresh(o));
+     @*/
+    private void putOverwrite2(int index, Object value){
+        values[index] = value;
+        //@ set map = \dl_mapUpdate(map, keys[index], value);
+    }
+    
+    /*@ public normal_behaviour
+     @ requires 0 <= index && index < keys.length;
+     @ assignable values[index];
+     @ ensures map == \dl_mapUpdate(map, keys[index], value) &&
+     @           \result == (\dl_mapGet(\old(map), keys[index]));
+     @*/
+    private Object putOverwrite(int index, Object value){
+        Object ret = values[index];
+        values[index] = value;
+        //@ set map = \dl_mapUpdate(map, keys[index], value);
+        //@ set footprint = \set_union(\set_union(\all_fields(keys), \all_fields(values)), \all_fields(this));
+        return ret;
+    }
+    
     public Object put(Object key, Object value) {
         
         int index = getIndexOfKey(key);
