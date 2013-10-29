@@ -24,6 +24,7 @@ final class MapImplementation implements Map2 {
     
     //@ private invariant \dl_mapSize(map) == keys.length;
     //@ private invariant (\forall int i; i>=0 && i<keys.length; \dl_inDomain(map, keys[i]));
+    //@ private invariant keys != values;
 
     /*@ normal_behaviour
      @   ensures map == \dl_mapEmpty() && \fresh(footprint);
@@ -59,7 +60,7 @@ final class MapImplementation implements Map2 {
 
     public boolean containsKey(Object key) {
         /*@ loop_invariant 0 <= i && i <= keys.length;
-         @  loop_invariant (\forall int x; 0 <= x && x < i; key != keys[x]);
+         @ loop_invariant (\forall int x; 0 <= x && x < i; key != keys[x]);
          @ decreases keys.length - i;
          @ assignable \strictly_nothing;
          @*/
@@ -104,6 +105,7 @@ final class MapImplementation implements Map2 {
      @           (\result == -1);
      @ ensures (\forall int j; j >= 0 && j < keys.length; 
      @           (j != \result <==> keys[j] != key ));
+     @ ensures (\forall Object o; !\fresh(o));
      @*/
     private /*@strictly_pure@*/ int getIndexOfKey(Object key) {
         int index = -1;
@@ -111,6 +113,7 @@ final class MapImplementation implements Map2 {
          @ loop_invariant ((index != -1) ==> (keys[index] == key && \dl_inDomain(map, key)));
          @ loop_invariant ((index != -1) ==> index < keys.length && index >= 0);
          @ loop_invariant ((index == -1) ==> (\forall int x; x>=0 && x<i; keys[x] != key));
+         @ loop_invariant (\forall Object o; !\fresh(o));
          @ decreases keys.length - i;
          @ assignable \strictly_nothing;
          @*/
@@ -130,6 +133,7 @@ final class MapImplementation implements Map2 {
      @ requires \typeof(target) == \typeof(source);
      @ ensures (\forall int index; 0 <= index && index < numberCopies; 
      @                         target[beginTarget + index] == source[beginSource + index]);
+     @ ensures (\forall Object o; !\fresh(o));
      @ assignable target[beginTarget..beginTarget + numberCopies - 1];
      @*/
     private void copyArray(Object[] target, Object[] source, int beginTarget, int beginSource,
@@ -138,7 +142,7 @@ final class MapImplementation implements Map2 {
          @ loop_invariant (\forall int x; 0 <= x && x < i; 
          @ (target[beginTarget + x] == source[beginSource + x]));
          @ loop_invariant (\forall Object o; !\fresh(o));
-         @ decreases numberCopies-i;
+         @ decreases numberCopies - i;
          @ assignable target[beginTarget..beginTarget + numberCopies - 1];
          @*/
         for (int i = 0; i < numberCopies; i++) {
