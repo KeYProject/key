@@ -1285,11 +1285,12 @@ public abstract class Taclet implements Rule, Named {
      * in this taclet (that is, these schema variables occur as
      * arguments of a substitution operator)
      */
-    public SchemaVariable getNameCorrespondent ( SchemaVariable p ) {
+    public SchemaVariable getNameCorrespondent ( SchemaVariable p,
+                                                 Services services) {
 	// should be synchronized
 	if ( svNameCorrespondences == null ) {
 	    final SVNameCorrespondenceCollector c =
-		new SVNameCorrespondenceCollector ();
+		new SVNameCorrespondenceCollector (services.getTypeConverter().getHeapLDT());
 	    c.visit ( this, true );
 	    svNameCorrespondences = c.getCorrespondences ();
 	}

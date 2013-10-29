@@ -21,7 +21,23 @@ post: (   value &lt; 0 &amp; value &gt;= javaUnaryMinusInt(10)
 &amp; (   value &gt;= 0 &amp; value &lt; 10
    -&gt; result_0 = 42 &amp; exc_0 = null)
 &amp; (value &gt;= 10 -&gt; result_0 = 84 &amp; exc_0 = null)
-mod: allLocs \cup allLocs \cup allLocs \cup allLocs
+mod: \if (true)
+         \then (     \if (true)
+                         \then (     \if (true)
+                                         \then (allLocs)
+                                         \else (allLocs)
+                                \cap \if (  value
+                                          &lt; javaUnaryMinusInt(10))
+                                         \then (allLocs)
+                                         \else (allLocs))
+                         \else (allLocs)
+                \cap \if (value &gt;= 0 &amp; value &lt; 10)
+                         \then (allLocs)
+                         \else (allLocs))
+         \else (allLocs)
+\cap \if (value &gt;= 10)
+         \then (allLocs)
+         \else (allLocs)
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="!value &lt;= -1" pathCondition="!value &lt;= -1" pathConditionChanged="true" branchCondition="!value &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                <statement name="int magicNumberCopy = magicNumber;" pathCondition="!value &lt;= -1" pathConditionChanged="false">

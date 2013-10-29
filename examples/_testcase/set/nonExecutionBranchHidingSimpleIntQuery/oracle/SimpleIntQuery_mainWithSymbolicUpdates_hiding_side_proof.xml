@@ -10,12 +10,12 @@ mod: {}
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of SimpleIntQuery.mainWithSymbolicUpdates(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	-4711 {!x &gt;= -11}, 
-	42 {!x &lt;= -12}
+	42 {!x &lt;= -12},
+	-4711 {!x &gt;= -11}
 as result of SimpleIntQuery.mainWithSymbolicUpdates(x);&gt;" isReturnValueComputed="true">
-                     <methodReturnValue name="-4711 {!x &gt;= -11}" returnValueString="-4711" hasCondition="true" conditionString="!x &gt;= -11">
-                     </methodReturnValue>
                      <methodReturnValue name="42 {!x &lt;= -12}" returnValueString="42" hasCondition="true" conditionString="!x &lt;= -12">
+                     </methodReturnValue>
+                     <methodReturnValue name="-4711 {!x &gt;= -11}" returnValueString="-4711" hasCondition="true" conditionString="!x &gt;= -11">
                      </methodReturnValue>
                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>

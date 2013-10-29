@@ -405,6 +405,8 @@ public final class Main {
                     System.exit(-1);
                 }
             });
+            if (fileNameOnStartUp == null)
+                printUsageAndExit(true, "Error: No file to load from.", -4);
             BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
 
             ui = new ConsoleUserInterface(batch, true, verbosity);
