@@ -159,6 +159,7 @@ final class MapImplementation implements Map2 {
     private void putOverwrite2(int index, Object value){
         values[index] = value;
         //@ set map = \dl_mapUpdate(map, keys[index], value);
+        //@ set footprint = \set_union(\set_union(\all_fields(keys), \all_fields(values)), \all_fields(this));
     }
     
     /*@ public normal_behaviour
