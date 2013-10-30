@@ -158,7 +158,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
                              ImmutableList<Term> rest, Term anonWdPost, Services services) {
             this.context = context;
             this.pre = pre;
-            this.wfAnon = TB.wellFormed(anonHeap, services);
+            this.wfAnon = anonHeap != null ? TB.wellFormed(anonHeap, services) : TB.tt();
             this.wdMod = TB.wd(mod, services);
             this.wdRest = TB.and(TB.wd(rest, services));
             this.anonWdPost = anonWdPost;

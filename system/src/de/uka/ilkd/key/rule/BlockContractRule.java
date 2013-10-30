@@ -780,7 +780,7 @@ public class BlockContractRule implements BuiltInRule {
             final BlockWellDefinedness bwd = new BlockWellDefinedness(contract, localIns, services);
             services.getSpecificationRepository().addWdStatement(bwd);
             final LocationVariable heapAtPre = variables.remembranceHeaps.get(heap);
-            final Term anon = TB.func(anonHeap);
+            final Term anon = anonHeap != null ? TB.func(anonHeap) : null;
             final SequentFormula wdBlock = bwd.generateSequent(variables.self, variables.exception,
                                                                variables.result, heap, heapAtPre,
                                                                anon, localIns, update, services);
