@@ -9,21 +9,16 @@ final class MapImplementation implements Map2 {
      @ private invariant (\forall int i1; 0 <= i1 && i1 < keys.length;
      @                   (\forall int i2; 0 <= i2 && i2 < keys.length;
                             (keys[i1] == keys[i2]) ==> (i1 == i2)));
-     @ private invariant keys != null;
-     @ private invariant values != null;
      @ private invariant footprint == \set_union(\set_union(this.*,keys[*]),values[*]);
-     @ private invariant (\forall int i; 0 <= i && i < keys.length; keys[i] != null);
-     @ private invariant (\forall int i; 0 <= i && i < keys.length; values[i] != null);
      @ private invariant \typeof(keys) == \type(Object[]);
      @ private invariant \typeof(values) == \type(Object[]);
      @ private invariant keys.length == values.length;
-     @ private invariant (\forall int i; i < 0 || i >= keys.length || \dl_mapGet(map, keys[i]) == values[i]);
+     @ private invariant (\forall int i; 0 <= i && i < keys.length; \dl_mapGet(map, keys[i]) == values[i]);
      @ private invariant (\forall Object o;
-     @ (\exists int i; 0 <= i && i < keys.length; keys[i] == o) <==> \dl_inDomain(map, o));
+     @          (\exists int i; 0 <= i && i < keys.length; keys[i] == o) <==> \dl_inDomain(map, o));
      @*/
     
     //@ private invariant \dl_mapSize(map) == keys.length;
-    //@ private invariant (\forall int i; i>=0 && i<keys.length; \dl_inDomain(map, keys[i]));
     //@ private invariant keys != values;
 
     /*@ normal_behaviour
