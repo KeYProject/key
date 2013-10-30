@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -63,9 +64,8 @@ public class SeqSub extends Operator {
     
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	final TypeConverter tc=javaServ.getTypeConverter();
-	return tc.getPromotedType
-	    (tc.getKeYJavaType((de.uka.ilkd.key.java.Expression)getChildAt(0), ec),
-	     tc.getKeYJavaType((de.uka.ilkd.key.java.Expression)getChildAt(1), ec));
-    }    
+        // bugfix, this used to return the join for the the first two arguments'
+        // types.
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+    }
 }
