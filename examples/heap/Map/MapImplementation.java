@@ -8,7 +8,7 @@ final class MapImplementation implements Map2 {
     /*@
      @ private invariant (\forall int i1; 0 <= i1 && i1 < keys.length;
      @                   (\forall int i2; 0 <= i2 && i2 < keys.length;
-                            (keys[i1] == keys[i2]) ==> (i1 == i2)));
+     @                       (keys[i1] == keys[i2]) ==> (i1 == i2)));
      @ private invariant footprint == \set_union(\set_union(this.*,keys[*]),values[*]);
      @ private invariant \typeof(keys) == \type(Object[]);
      @ private invariant \typeof(values) == \type(Object[]);
