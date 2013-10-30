@@ -15,8 +15,7 @@ package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.rule.label.SymbolicExecutionTermLabelInstantiator;
-import de.uka.ilkd.key.rule.label.TermLabelInstantiator;
+import de.uka.ilkd.key.logic.Sequent;
 
 /**
  * Label attached to a symbolic execution thread. 
@@ -95,10 +94,5 @@ public class SymbolicExecutionTermLabel implements TermLabel {
    @Override
    public Name name() {
       return NAME;
-   }
-
-   @Override 
-   public TermLabelInstantiator getInstantiator() {
-       return SymbolicExecutionTermLabelInstantiator.INSTANCE;
    }
 }

@@ -15,7 +15,6 @@ package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.rule.label.TermLabelInstantiator;
 
 
 /**
@@ -77,16 +76,4 @@ public interface TermLabel extends Named {
      * @return the number of parameters (a non-negative number)
      */
     public int getChildCount();
-    
-    /**
-     * Gets the instantiator associated to this label.
-     * 
-     * <p>
-     * Every term label <i>can</i> have a {@link TermLabelInstantiator}
-     * associated with it. If it does not, this method returns
-     * <code>null</code>.
-     * 
-     * @return the associated instantiator or <code>null</code>
-     */
-    public TermLabelInstantiator getInstantiator();
 }

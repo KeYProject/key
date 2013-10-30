@@ -2,9 +2,6 @@ package de.uka.ilkd.key.logic.label;
 
 import java.util.List;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-
 /**
  * A factory for creating TermLabel objects.
  * 
@@ -30,18 +27,7 @@ import de.uka.ilkd.key.logic.Named;
  * @author Mattias Ulbrich
  * 
  */
-interface TermLabelFactory<T extends TermLabel> extends Named {
-
-     /**
-     * Returns the name of this term label factory.
-     * 
-     * Use the same name for term labels and their factories.
-     * 
-     * @return the name of the factory, not <code>null</code>
-     */
-    @Override
-    public Name name();
-
+public interface TermLabelFactory<T extends TermLabel> {
     /**
      * Parses the arguments and produces a term label.
      * 
@@ -60,22 +46,4 @@ interface TermLabelFactory<T extends TermLabel> extends Named {
      *             if the parameters were illegally formatted
      */
     public T parseInstance(List<String> arguments) throws TermLabelException;
-
-    /**
-     * Returns the term label for the given parameters.
-     * 
-     * <p>
-     * An implementation should throw a {@link TermLabelException} if the
-     * arguments are not suitable for this type.
-     * 
-     * @param parameters
-     *            the parameters for the term label 
-     *
-     * @return the according term label with the given arguments, not <code>null</code>
-     * 
-     * @throws TermLabelException
-     *             if the parameters were illegal
-     */
-    public T getInstance(List<?> parameters) throws TermLabelException;
-
 }

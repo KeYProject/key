@@ -75,9 +75,10 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.label.SimpleTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.label.TermLabels;
+import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -117,7 +118,6 @@ import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.label.TermLabelInstantiator;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
@@ -241,9 +241,20 @@ public final class SymbolicExecutionUtil {
       InitConfig sourceInitConfig = sourceEnv.getInitConfig();
       RuleJustificationInfo sourceJustiInfo = sourceEnv.getJustifInfo();
       // Create new profile which has separate OneStepSimplifier instance
-      Profile sourceProfile = sourceEnv.getInitConfig().getProfile();
-      JavaProfile profile = new JavaProfile(sourceProfile.getTermLabelManager());
-      
+      JavaProfile profile = new JavaProfile() {
+         @Override
+         protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
+            Profile sourceProfile = sourceEnv.getInitConfig().getProfile();
+            if (sourceProfile instanceof SymbolicExecutionJavaProfile) {
+               ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
+               result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations()); // Make sure that the term labels of symbolic execution are also supported by the new environment.
+               return result;
+            }
+            else {
+               return super.computeTermLabelConfiguration();
+            }
+         }
+      };
       // Create new InitConfig and initialize it with value from initial one.
       InitConfig initConfig = new InitConfig(source.getServices().copy(profile, true));
       initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
@@ -1040,7 +1051,7 @@ public final class SymbolicExecutionUtil {
          Term term = ruleApp.posInOccurrence().subTerm();
          if (term != null) {
             term = TermBuilder.DF.goBelowUpdates(term);
-            return term.containsLabel(TermLabels.LOOP_BODY_LABEL);
+            return term.containsLabel(SimpleTermLabel.LOOP_BODY_LABEL);
          }
          else {
             return false;
@@ -1059,7 +1070,7 @@ public final class SymbolicExecutionUtil {
    public static boolean hasLoopBodyTerminationLabel(RuleApp ruleApp) {
       if (ruleApp != null && ruleApp.posInOccurrence() != null) {
          Term term = ruleApp.posInOccurrence().subTerm();
-         return term.containsLabel(TermLabels.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL);
+         return term.containsLabel(SimpleTermLabel.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL);
       }
       else {
          return false;
@@ -2075,7 +2086,7 @@ public final class SymbolicExecutionUtil {
                                                            Semisequent semisequent) {
       ImmutableList<Term> terms = ImmutableSLList.nil();
       for (SequentFormula sf : semisequent) {
-         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, svInst, null);
+         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, svInst, null, null);
          sf.formula().execPostOrder(visitor);
          terms = terms.append(visitor.getTerm());
       }
@@ -2290,7 +2301,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} is skolem {@link Term}, {@code false} is not a skolem {@link Term}.
     */
    public static boolean isSkolemConstant(Term term) {
-      return term.containsLabel(TermLabels.SELECT_SKOLEM_LABEL);
+      return term.containsLabel(SimpleTermLabel.SELECT_SKOLEM_LABEL);
    }
    
    /**

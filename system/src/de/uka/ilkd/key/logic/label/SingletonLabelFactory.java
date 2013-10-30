@@ -2,8 +2,6 @@ package de.uka.ilkd.key.logic.label;
 
 import java.util.List;
 
-import de.uka.ilkd.key.logic.Name;
-
 /**
  * A factory for creating singleton term label.
  * 
@@ -14,7 +12,7 @@ import de.uka.ilkd.key.logic.Name;
  * @param <T>
  *            the type of the wrapped term label can be narrowed.
  */
-final class SingletonLabelFactory<T extends TermLabel> implements TermLabelFactory<T> {
+public final class SingletonLabelFactory<T extends TermLabel> implements TermLabelFactory<T> {
 
     /**
      * The label around which the factory is built.
@@ -35,16 +33,6 @@ final class SingletonLabelFactory<T extends TermLabel> implements TermLabelFacto
     /**
      * {@inheritDoc}
      * 
-     * <p>This factory implementation returns the name of the stored label. 
-     */
-    @Override 
-    public Name name() {
-        return simpleLabel.name();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * <p>This implementation does not accept arguments and returns the stored label
      */
     @Override 
@@ -52,22 +40,7 @@ final class SingletonLabelFactory<T extends TermLabel> implements TermLabelFacto
         if (arguments.isEmpty()) {
             return simpleLabel;
         } else {
-            throw new TermLabelException("Label " + name() + " does not expect arguments");
+            throw new TermLabelException("Label " + simpleLabel.name() + " does not expect arguments");
         }
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * <p>This implementation does not accept arguments and returns the stored label
-     */
-    @Override 
-    public T getInstance(List<?> parameters) throws TermLabelException {
-        if (parameters.isEmpty()) {
-            return simpleLabel;
-        } else {
-            throw new TermLabelException("Label " + name() + " does not expect arguments");
-        }
-    }
-
 }

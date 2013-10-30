@@ -55,7 +55,8 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.TermLabels;
+import de.uka.ilkd.key.logic.label.SimpleTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -70,7 +71,6 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
-import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
@@ -315,7 +315,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	final Name anonHeapName = new Name(TB.newName(services, "anon_" + heap + "_" + pm.getName()));
 	final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-	final Term anonHeap = TB.label(TB.func(anonHeapFunc), TermLabels.ANON_HEAP_LABEL);
+	final Term anonHeap = TB.label(TB.func(anonHeapFunc), SimpleTermLabel.ANON_HEAP_LABEL);
 	final Term assumption = TB.equals(TB.anon(services,
                                                   TB.var(heap),
                                                   mod,
@@ -757,7 +757,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         	                                	   	     mbyOk}))),
                               ruleApp.posInOccurrence());
 
-        TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, preGoal);
+        TermLabelManager.updateLabels(services, null, ruleApp.posInOccurrence(), this, preGoal);
 
         //create "Post" branch
 	final StatementBlock resultAssign;
@@ -775,7 +775,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                          TB.prog(inst.mod,
                                                  postJavaBlock,
                                                  inst.progPost.sub(0),
-                                                 TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, postGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock)),
+                                                 TermLabelManager.instantiateLabels(services, ruleApp.posInOccurrence(), inst.progPost, this, postGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock)),
                                          null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon),
         	            true,
@@ -794,7 +794,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                       TB.prog(inst.mod,
                                               excJavaBlock,
                                               inst.progPost.sub(0),
-                                              TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, excPostGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock)),
+                                              TermLabelManager.instantiateLabels(services, ruleApp.posInOccurrence(), inst.progPost, this, excPostGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock)),
                                       null);
         final Term excPost = globalDefs==null? originalExcPost: TB.apply(globalDefs, originalExcPost);
         excPostGoal.addFormula(new SequentFormula(wellFormedAnon),
@@ -815,7 +815,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         	                   ruleApp.posInOccurrence());
         }
 
-        TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, nullGoal);
+        TermLabelManager.updateLabels(services, null, ruleApp.posInOccurrence(), this, nullGoal);
 
 
 

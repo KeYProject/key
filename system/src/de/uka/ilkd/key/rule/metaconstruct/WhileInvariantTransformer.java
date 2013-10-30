@@ -41,9 +41,10 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.label.SimpleTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.label.TermLabels;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -58,7 +59,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 
 
 public final class WhileInvariantTransformer {
@@ -320,15 +320,15 @@ public final class WhileInvariantTransformer {
                                                                      JavaBlock mainJavaBlock, 
                                                                      Sequent applicationSequent) {
        // Compute labels
-       ImmutableArray<TermLabel> labels = TermLabelWorkerManagement.instantiateLabels(services, applicationPos, rule, goal, null, loopBodyModality, new ImmutableArray<Term>(result), null, mainJavaBlock);
+       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(services, applicationPos, null, rule, goal, null, loopBodyModality, new ImmutableArray<Term>(result), null, mainJavaBlock);
        // Add loop body term label if not already present and loop body instantiator is available
        TermLabel[] newLabels;
-       if (!labels.contains(TermLabels.LOOP_BODY_LABEL) &&
+       if (!labels.contains(SimpleTermLabel.LOOP_BODY_LABEL) &&
                services.getProfile().getTermLabelManager().getSupportedLabelNames().
-                 contains(TermLabels.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME)) {
+                 contains(SimpleTermLabel.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME)) {
           newLabels = new TermLabel[labels.size() + 1];
           labels.arraycopy(0, newLabels, 0, labels.size());
-          newLabels[newLabels.length - 1] = TermLabels.LOOP_BODY_LABEL;
+          newLabels[newLabels.length - 1] = SimpleTermLabel.LOOP_BODY_LABEL;
        }
        else {
           newLabels = new TermLabel[labels.size()];
@@ -443,7 +443,7 @@ public final class WhileInvariantTransformer {
         Term executeReturn = TermBuilder.DF.prog(modality, 
                                                  returnJavaBlock, 
                                                  post,
-                                                 TermLabelWorkerManagement.instantiateLabels(services, applicationPos, rule, goal, null, modality, new ImmutableArray<Term>(post), null, returnJavaBlock));
+                                                 TermLabelManager.instantiateLabels(services, applicationPos, null, rule, goal, null, modality, new ImmutableArray<Term>(post), null, returnJavaBlock));
         
         return TermBuilder.DF.imp(TermBuilder.DF.equals(typeConv.convertToLogicElement(returnFlag), typeConv.getBooleanLDT().getTrueTerm()),
                                   executeReturn);
@@ -473,7 +473,7 @@ public final class WhileInvariantTransformer {
         Term executeBreak = TermBuilder.DF.prog(modality, 
                                                 executeJavaBlock, 
                                                 post,
-                                                TermLabelWorkerManagement.instantiateLabels(services, applicationPos, rule, goal, null, modality, new ImmutableArray<Term>(post), null, executeJavaBlock));
+                                                TermLabelManager.instantiateLabels(services, applicationPos, null, rule, goal, null, modality, new ImmutableArray<Term>(post), null, executeJavaBlock));
         return TermBuilder.DF.imp(TermBuilder.DF.equals(typeConv.convertToLogicElement(breakFlag), 
                                 typeConv.getBooleanLDT().getTrueTerm()), 
                                 executeBreak); 
@@ -541,15 +541,15 @@ public final class WhileInvariantTransformer {
                                                                        ImmutableArray<Term> subs, 
                                                                        Sequent applicationSequent) {
        // Compute labels
-       ImmutableArray<TermLabel> labels = TermLabelWorkerManagement.instantiateLabels(services, applicationPos, rule, goal, null, operator, subs, null, null);
+       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(services, applicationPos, null, rule, goal, null, operator, subs, null, null);
        // Add loop body term label if not already present and loop body instantiator is available
        TermLabel[] newLabels;
-       if (!labels.contains(TermLabels.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL) &&
+       if (!labels.contains(SimpleTermLabel.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL) &&
                services.getProfile().getTermLabelManager().getSupportedLabelNames().
-                  contains(TermLabels.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME)) {
+                  contains(SimpleTermLabel.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME)) {
           newLabels = new TermLabel[labels.size() + 1];
           labels.arraycopy(0, newLabels, 0, labels.size());
-          newLabels[newLabels.length - 1] = TermLabels.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL;
+          newLabels[newLabels.length - 1] = SimpleTermLabel.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL;
        }
        else {
           newLabels = new TermLabel[labels.size()];
@@ -570,7 +570,7 @@ public final class WhileInvariantTransformer {
         Term throwException = TermBuilder.DF.prog(modality, 
                                                   throwJavaBlock, 
                                                   post,
-                                                  TermLabelWorkerManagement.instantiateLabels(services, applicationPos, rule, goal, null, modality, new ImmutableArray<Term>(post), null, throwJavaBlock));
+                                                  TermLabelManager.instantiateLabels(services, applicationPos, null, rule, goal, null, modality, new ImmutableArray<Term>(post), null, throwJavaBlock));
         return TermBuilder.DF.imp( 
               TermBuilder.DF.equals(typeConv.convertToLogicElement(excFlag), 
         	       typeConv.getBooleanLDT().getTrueTerm()), 

@@ -22,6 +22,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
@@ -30,7 +31,6 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.label.TermLabelInstantiator;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooserBuilder;
@@ -66,8 +66,7 @@ public abstract class AbstractProfile implements Profile {
     }
 
     protected AbstractProfile(String standardRuleFilename,
-            ImmutableSet<GoalChooserBuilder> supportedGCB, 
-            TermLabelManager termLabelManager) {
+            ImmutableSet<GoalChooserBuilder> supportedGCB) {
         standardRules = new RuleCollection(RuleSource
                 .initRuleFile(standardRuleFilename),
                 initBuiltInRules());
@@ -76,17 +75,23 @@ public abstract class AbstractProfile implements Profile {
         this.supportedGC = extractNames(supportedGCB);
         this.prototype = getDefaultGoalChooserBuilder();
         assert( this.prototype!=null );
-        this.termLabelManager = termLabelManager;
+        this.termLabelManager = new TermLabelManager(computeTermLabelConfiguration());
     }
 
-    public AbstractProfile(String standardRuleFilename, TermLabelManager termLabelManager) {
+    public AbstractProfile(String standardRuleFilename) {
         this(standardRuleFilename,
                 DefaultImmutableSet.<GoalChooserBuilder>nil().
                 add(new DefaultGoalChooserBuilder()).
                 add(new DepthFirstGoalChooserBuilder()).
-                add(new SymbolicExecutionGoalChooserBuilder()), termLabelManager);
+                add(new SymbolicExecutionGoalChooserBuilder()));
     }
 
+    /**
+     * Computes the {@link TermLabelConfiguration} to use in this {@link Profile}.
+     * @return The {@link TermLabelConfiguration} to use in this {@link Profile}.
+     */
+    protected abstract ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration();
+    
     public RuleCollection getStandardRules() {
         return standardRules;
     }

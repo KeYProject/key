@@ -15,9 +15,12 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.logic.label.TermLabelManager;
-import de.uka.ilkd.key.logic.label.TermLabels;
+import de.uka.ilkd.key.logic.label.SimpleTermLabel;
+import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -58,19 +61,26 @@ public class JavaProfile extends AbstractProfile {
     private OneStepSimplifier oneStepSimpilifier;
 
     protected JavaProfile(String standardRules, ImmutableSet<GoalChooserBuilder> gcb) {
-        super(standardRules, gcb, createTermLabelManager());
+        super(standardRules, gcb);
     }
 
     protected JavaProfile(String standardRules) {
-        super(standardRules, createTermLabelManager());
-    }
-
-    public JavaProfile(TermLabelManager manager) {
-        super("standardRules.key", manager);
+        super(standardRules);
     }
 
     public JavaProfile() {
         this("standardRules.key");
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
+       ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
+       result = result.prepend(new TermLabelConfiguration(SimpleTermLabel.ANON_HEAP_LABEL_NAME, new SingletonLabelFactory<TermLabel>(SimpleTermLabel.ANON_HEAP_LABEL)));
+       result = result.prepend(new TermLabelConfiguration(SimpleTermLabel.SELECT_SKOLEM_LABEL_NAME, new SingletonLabelFactory<TermLabel>(SimpleTermLabel.SELECT_SKOLEM_LABEL)));
+       return result;
     }
 
     protected ImmutableSet<StrategyFactory> getStrategyFactories() {
@@ -147,12 +157,6 @@ public class JavaProfile extends AbstractProfile {
         return DEFAULT;
     }
     
-    protected static TermLabelManager createTermLabelManager() {
-        TermLabelManager result = new TermLabelManager();
-        TermLabels.registerJavaTermLabels(result);
-        return result;
-    }
-    
     /**
      * <p>
      * Returns the default instance of this class.
@@ -170,5 +174,4 @@ public class JavaProfile extends AbstractProfile {
         }
        return defaultInstance;
     }
-
 }
