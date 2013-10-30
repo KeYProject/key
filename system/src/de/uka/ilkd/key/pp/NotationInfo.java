@@ -22,7 +22,6 @@ import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -327,6 +326,7 @@ public final class NotationInfo {
         tbl.put(setLDT.getSetMinus(), new Notation.Infix(""+UnicodeHelper.SETMINUS, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
         tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation(" " + UnicodeHelper.IN + " "));
         tbl.put(setLDT.getSubset(), new Notation.Infix(""+UnicodeHelper.SUBSET, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(services.getTypeConverter().getHeapLDT().getPrec(), new Notation.Infix(""+UnicodeHelper.PRECEDES, PRIORITY_ATOM,PRIORITY_TOP, PRIORITY_TOP));
         this.notationTable = tbl;
     }
 
