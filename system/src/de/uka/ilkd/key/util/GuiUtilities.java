@@ -31,7 +31,7 @@ import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 import de.uka.ilkd.key.pp.PosInSequent;
 
-public class GuiUtilities {
+public final class GuiUtilities {
 
     private static TextArea clipBoardTextArea;
     

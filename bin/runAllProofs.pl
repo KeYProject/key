@@ -25,6 +25,16 @@ my $time_limit = 30*60;
 # output of the time command
 #my $time_format = '   user %U sec\n system %S sec\nelapsed %E sec\nMax. size %M kB\nAvg. size %t kB';
 
+
+# see http://www.somacon.com/p114.php
+sub trim($) {
+    my $string = shift;
+    chomp $string;
+    $string =~ s/^\s+//;
+    $string =~ s/\s+$//;
+    return $string;
+}
+
 #
 # Command line options
 my %option = ();
@@ -84,7 +94,7 @@ open (AUTOMATIC, $testFile) or die $testFile . " couldn't be opened.";
 close AUTOMATIC;
 
 my $counter = 0;
-my $total = `grep provable "$path_to_index" | grep -v "\#" | wc -l`;
+my $total = trim(`grep provable "$path_to_index" | grep -v "\#" | wc -l`);
 my $correct = 0;
 my $failures = 0;
 my $errors = 0;
@@ -373,11 +383,10 @@ sub runAuto {
   if ($option{'silent'}) { $verbosity = "--verbose 0"; }
   if ($option{'verbose'}) { $verbosity = "--verbose 2"; }
   my $command = "'" . $path_to_key . "/bin/runProver' --auto $verbosity $statisticsCmd '$dk'";
-   print "Command is: $command\n";
+  print "Command is: $command\n" unless $option{'silent'};
   my $starttime = time();
   my $result = &system_timeout($time_limit, $command);
-  print "Time elapsed: " . (time() - $starttime) . " sec\n";
-#  print "\nReturn value: $result\n";
+  print "Total time elapsed: " . (time() - $starttime) . " sec\n" unless $option{'silent'};
   return $result;
 }
 
@@ -472,12 +481,4 @@ sub calculateSummas {
     return @sum;
 }
 
-# see http://www.somacon.com/p114.php
-sub trim($) {
-    my $string = shift;
-    chomp $string;
-    $string =~ s/^\s+//;
-    $string =~ s/\s+$//;
-    return $string;
-}
 
