@@ -55,7 +55,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.SimpleTermLabel;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -315,7 +315,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	final Name anonHeapName = new Name(TB.newName(services, "anon_" + heap + "_" + pm.getName()));
 	final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-	final Term anonHeap = TB.label(TB.func(anonHeapFunc), SimpleTermLabel.ANON_HEAP_LABEL);
+	final Term anonHeap = TB.label(TB.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
 	final Term assumption = TB.equals(TB.anon(services,
                                                   TB.var(heap),
                                                   mod,
@@ -757,7 +757,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         	                                	   	     mbyOk}))),
                               ruleApp.posInOccurrence());
 
-        TermLabelManager.updateLabels(services, null, ruleApp.posInOccurrence(), this, preGoal);
+        TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, preGoal, null);
 
         //create "Post" branch
 	final StatementBlock resultAssign;
@@ -775,7 +775,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                          TB.prog(inst.mod,
                                                  postJavaBlock,
                                                  inst.progPost.sub(0),
-                                                 TermLabelManager.instantiateLabels(services, ruleApp.posInOccurrence(), inst.progPost, this, postGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock)),
+                                                 TermLabelManager.instantiateLabels(services, ruleApp.posInOccurrence(), this, postGoal, "PostModality", null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock)),
                                          null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon),
         	            true,
@@ -794,7 +794,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                       TB.prog(inst.mod,
                                               excJavaBlock,
                                               inst.progPost.sub(0),
-                                              TermLabelManager.instantiateLabels(services, ruleApp.posInOccurrence(), inst.progPost, this, excPostGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock)),
+                                              TermLabelManager.instantiateLabels(services, ruleApp.posInOccurrence(), this, excPostGoal, "ExceptionalPostModality", null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock)),
                                       null);
         final Term excPost = globalDefs==null? originalExcPost: TB.apply(globalDefs, originalExcPost);
         excPostGoal.addFormula(new SequentFormula(wellFormedAnon),
@@ -815,7 +815,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         	                   ruleApp.posInOccurrence());
         }
 
-        TermLabelManager.updateLabels(services, null, ruleApp.posInOccurrence(), this, nullGoal);
+        TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, nullGoal, null);
 
 
 

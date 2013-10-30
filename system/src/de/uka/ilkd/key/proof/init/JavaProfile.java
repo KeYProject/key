@@ -17,7 +17,7 @@ package de.uka.ilkd.key.proof.init;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.logic.label.SimpleTermLabel;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
@@ -78,8 +78,8 @@ public class JavaProfile extends AbstractProfile {
     @Override
     protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
        ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
-       result = result.prepend(new TermLabelConfiguration(SimpleTermLabel.ANON_HEAP_LABEL_NAME, new SingletonLabelFactory<TermLabel>(SimpleTermLabel.ANON_HEAP_LABEL)));
-       result = result.prepend(new TermLabelConfiguration(SimpleTermLabel.SELECT_SKOLEM_LABEL_NAME, new SingletonLabelFactory<TermLabel>(SimpleTermLabel.SELECT_SKOLEM_LABEL)));
+       result = result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.ANON_HEAP_LABEL_NAME, new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL)));
+       result = result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.SELECT_SKOLEM_LABEL_NAME, new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.SELECT_SKOLEM_LABEL)));
        return result;
     }
 

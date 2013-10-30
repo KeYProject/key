@@ -3,7 +3,7 @@ package de.uka.ilkd.key.logic.label;
 import java.util.List;
 
 /**
- * A factory for creating SymbolicExecutionTermLabel objects.
+ * A factory for creating {@link SymbolicExecutionTermLabel} objects.
  */
 public class SymbolicExecutionTermLabelFactory implements TermLabelFactory<SymbolicExecutionTermLabel> {
     /**

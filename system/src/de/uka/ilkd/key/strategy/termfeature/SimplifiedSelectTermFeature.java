@@ -14,7 +14,7 @@ package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.SimpleTermLabel;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 
 
@@ -45,7 +45,7 @@ public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
                     (   t.sub(0).op() instanceof Function &&
                         t.sub(0).op().arity() == 0 &&
                         t.sub(0).hasLabels() &&
-                        t.sub(0).containsLabel(SimpleTermLabel.ANON_HEAP_LABEL));
+                        t.sub(0).containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL));
 
     }
 }

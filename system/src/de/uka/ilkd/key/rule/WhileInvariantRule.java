@@ -43,7 +43,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.SimpleTermLabel;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -172,7 +172,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final Function anonHeapFunc = new Function(anonHeapName,
 					     heapLDT.targetSort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-        final Term anonHeapTerm = TB.label(TB.func(anonHeapFunc), SimpleTermLabel.ANON_HEAP_LABEL);
+        final Term anonHeapTerm = TB.label(TB.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
 	
 	// check for strictly pure loops
 	final Term anonUpdate;
@@ -425,7 +425,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                        TB.and(invTerm, reachableState)), null)),
 			         ruleApp.posInOccurrence());
 
-	TermLabelManager.updateLabels(services, null, ruleApp.posInOccurrence(), this, initGoal);
+	TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, initGoal, null);
 
 
 	//"Body Preserves Invariant":
@@ -493,7 +493,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
 
 	JavaBlock useJavaBlock = JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
-	Term restPsi = TB.prog((Modality)inst.progPost.op(), useJavaBlock, inst.progPost.sub(0), TermLabelManager.instantiateLabels(services, ruleApp.posInOccurrence(), inst.progPost, this, useGoal, null, inst.progPost.op(), new ImmutableArray<Term>(inst.progPost.sub(0)), null, useJavaBlock));
+	Term restPsi = TB.prog((Modality)inst.progPost.op(), useJavaBlock, inst.progPost.sub(0), TermLabelManager.instantiateLabels(services, ruleApp.posInOccurrence(), this, useGoal, "UseModality", null, inst.progPost.op(), new ImmutableArray<Term>(inst.progPost.sub(0)), null, useJavaBlock));
 	Term guardFalseRestPsi = TB.box(guardJb, 
 					TB.imp(guardFalseTerm, restPsi));
 	useGoal.changeFormula(new SequentFormula(TB.applySequential(

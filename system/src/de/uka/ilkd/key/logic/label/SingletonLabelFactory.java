@@ -3,7 +3,7 @@ package de.uka.ilkd.key.logic.label;
 import java.util.List;
 
 /**
- * A factory for creating singleton term label.
+ * A factory for creating singleton {@link TermLabel}.
  * 
  * <p>
  * The resulting factory does not accept arguments for the builder methods and
@@ -17,17 +17,17 @@ public final class SingletonLabelFactory<T extends TermLabel> implements TermLab
     /**
      * The label around which the factory is built.
      */
-    private final T simpleLabel;
+    private final T singletonLabel;
 
     /**
      * Instantiates a new singleton label factory for a label.
      * 
-     * @param simpleLabel
+     * @param singletonLabel
      *            the label to be wrapped, not <code>null</code>.
      */
-    public SingletonLabelFactory(T simpleLabel) {
-        assert simpleLabel != null;
-        this.simpleLabel = simpleLabel;
+    public SingletonLabelFactory(T singletonLabel) {
+        assert singletonLabel != null;
+        this.singletonLabel = singletonLabel;
     }
 
     /**
@@ -38,9 +38,9 @@ public final class SingletonLabelFactory<T extends TermLabel> implements TermLab
     @Override 
     public T parseInstance(List<String> arguments) throws TermLabelException {
         if (arguments.isEmpty()) {
-            return simpleLabel;
+            return singletonLabel;
         } else {
-            throw new TermLabelException("Label " + simpleLabel.name() + " does not expect arguments");
+            throw new TermLabelException("Label " + singletonLabel.name() + " does not expect arguments.");
         }
     }
 }

@@ -16,7 +16,7 @@ package de.uka.ilkd.key.logic.label;
 import de.uka.ilkd.key.logic.Name;
 
 /**
- * The Class SimpleTermLabel can be used to define labels without parameters.
+ * The Class {@link ParameterlessTermLabel} can be used to define labels without parameters.
  * 
  * You can use a {@link SingletonLabelFactory} to create a factory for an
  * instance of this class.
@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.Name;
  * 
  * @author mattias ulbrich
  */
-public final class SimpleTermLabel implements TermLabel {
+public final class ParameterlessTermLabel implements TermLabel {
    /**
     * Name of {@link #ANON_HEAP_LABEL}.
     */
@@ -35,7 +35,7 @@ public final class SimpleTermLabel implements TermLabel {
     * Label attached to anonymisation heap function symbols as for instance
     * introduce in UseOperationContractRule or WhileInvariantRule.
     */
-   public static final TermLabel ANON_HEAP_LABEL = new SimpleTermLabel(ANON_HEAP_LABEL_NAME);
+   public static final TermLabel ANON_HEAP_LABEL = new ParameterlessTermLabel(ANON_HEAP_LABEL_NAME);
 
    /**
     * Name of {@link #SELECT_SKOLEM_LABEL}.
@@ -45,7 +45,7 @@ public final class SimpleTermLabel implements TermLabel {
    /**
     * Label attached to skolem constants introduced by the rule pullOutSelect.
     */
-   public static final TermLabel SELECT_SKOLEM_LABEL = new SimpleTermLabel(SELECT_SKOLEM_LABEL_NAME);
+   public static final TermLabel SELECT_SKOLEM_LABEL = new ParameterlessTermLabel(SELECT_SKOLEM_LABEL_NAME);
 
    /**
     * Name of {@link #LOOP_BODY_LABEL}.
@@ -56,7 +56,7 @@ public final class SimpleTermLabel implements TermLabel {
     * Label attached to the modality which executes a loop body in branch
     * "Body Preserves Invariant" of applied "Loop Invariant" rules.
     */
-   public static final TermLabel LOOP_BODY_LABEL = new SimpleTermLabel(LOOP_BODY_LABEL_NAME);
+   public static final TermLabel LOOP_BODY_LABEL = new ParameterlessTermLabel(LOOP_BODY_LABEL_NAME);
 
    /**
     * Name of {@link #LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL}.
@@ -69,7 +69,7 @@ public final class SimpleTermLabel implements TermLabel {
     * "Body Preserves Invariant" of applied "Loop Invariant" rules to show the
     * loop invariant.
     */
-   public static final TermLabel LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL = new SimpleTermLabel(LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME);
+   public static final TermLabel LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL = new ParameterlessTermLabel(LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME);
 
     /**
      * The unique name of this label.
@@ -85,7 +85,7 @@ public final class SimpleTermLabel implements TermLabel {
      * @param instantiator
      *            the fixed associated instantiator, may be <code>null</code>.
      */
-    public SimpleTermLabel(Name name) {
+    public ParameterlessTermLabel(Name name) {
         assert name != null;
         this.name = name;
     }
@@ -126,13 +126,13 @@ public final class SimpleTermLabel implements TermLabel {
     /**
      * {@inheritDoc}
      * 
-     * <p>This object is equal to another {@link SimpleTermLabel} iff they
+     * <p>This object is equal to another {@link ParameterlessTermLabel} iff they
      * bear the same name.
      */
     @Override 
     public boolean equals(Object obj) {
-        if (obj instanceof SimpleTermLabel) {
-            SimpleTermLabel other = (SimpleTermLabel) obj;
+        if (obj instanceof ParameterlessTermLabel) {
+            ParameterlessTermLabel other = (ParameterlessTermLabel) obj;
             return name.equals(other.name);
         }
         else {
