@@ -22,11 +22,6 @@ import de.uka.ilkd.key.rule.Rule;
  * should be re-added to the new {@link Term} or not. 
  * </p>
  * <p>
- * The decision is based
- * on the previous {@link Term} (children and grandchildren are not considered)
- * and the information about the new term and the currently active rule.
- * </p>
- * <p>
  * For more information about {@link TermLabel}s and how they are maintained
  * during prove read the documentation of interface {@link TermLabel}.
  * </p>
@@ -36,10 +31,9 @@ import de.uka.ilkd.key.rule.Rule;
  */
 public interface TermLabelPolicy {
    /**
-    * Decides to keep or to drop the given {@link TermLabel} with help of
-    * the given best matching {@link Term} and the application {@link Term}.
-    * The information about the new term and the currently active well can be considered as well.
-    * But it is <b>not allowed to iterate over children of terms</b>.
+    * Decides to keep (add to term which will be created) or to 
+    * drop (do not add label to new term) the given {@link TermLabel} 
+    * provided by the application {@link Term}.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten. 
     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.

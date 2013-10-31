@@ -175,7 +175,6 @@ public class TermLabelManager {
     * </p>
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten. 
-    * @param bestMatchTerm Optionally the best matching {@link Term} in the previous {@link Sequent} from which the new {@link Term} will be created. This might be a child or grandchild of the {@link Term} defined by the {@link PosInOccurrence}.
     * @param rule The {@link Rule} which is applied. 
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created. 

@@ -32,10 +32,8 @@ import de.uka.ilkd.key.rule.Rule;
  */
 public interface TermLabelUpdate {
    /**
-    * Decides to keep or to drop the given {@link TermLabel} with help of
-    * the given best matching {@link Term} and the application {@link Term}.
-    * The information about the new term and the currently active well can be considered as well.
-    * But it is <b>not allowed to iterate over children of terms</b>.
+    * This method can freely add, remove or sort the given {@link TermLabel}
+    * which will be added to the new {@link Term}. 
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten. 
     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
