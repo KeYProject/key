@@ -537,8 +537,8 @@ public final class SpecificationRepository {
                     final FunctionalOperationContract iniContr = cf.func(pm,
                             inv);
                     addContractNoInheritance(iniContr);
-                    assert getContracts(kjt, pm).size() == 2 + oldContracts
-                            .size();
+                    assert getContracts(kjt, pm).size() ==
+                            (WellDefinednessCheck.isOn() ? 2 : 1) + oldContracts.size();
                 } else {
                     for (FunctionalOperationContract c : oldFuncContracts) {
                         unregisterContract(c);
