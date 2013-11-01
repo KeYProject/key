@@ -53,28 +53,28 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     * {@inheritDoc}
     */
    @Override
-   public boolean isRefactoringRequired(Services services,
-                                        PosInOccurrence applicationPosInOccurrence,
-                                        Term applicationTerm,
-                                        Rule rule,
-                                        Goal goal,
-                                        Term tacletTerm) {
+   public RefactoringScope defineRefactoringScope(Services services,
+                                                  PosInOccurrence applicationPosInOccurrence,
+                                                  Term applicationTerm,
+                                                  Rule rule,
+                                                  Goal goal,
+                                                  Term tacletTerm) {
       if (goal != null) {
          if (rule instanceof UseOperationContractRule &&
                (goal.node().getNodeInfo().getBranchLabel().startsWith("Pre") || 
                 goal.node().getNodeInfo().getBranchLabel().startsWith("Null reference"))) {
-            return true;
+            return RefactoringScope.SEQUENT;
          }
          if (rule instanceof WhileInvariantRule &&
              goal.node().getNodeInfo().getBranchLabel().startsWith("Invariant Initially Valid")) {
-            return true;
+            return RefactoringScope.SEQUENT;
          }
          else {
-            return false;
+            return RefactoringScope.NONE;
          }
       }
       else {
-         return false;
+         return RefactoringScope.NONE;
       }
    }
 

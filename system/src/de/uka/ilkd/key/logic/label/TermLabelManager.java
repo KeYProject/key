@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.logic.label;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +29,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
+import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
@@ -268,11 +268,26 @@ public class TermLabelManager {
    }
 
    /**
+    * Returns the {@link Name}s of the supported {@link TermLabel}s.
+    * @param services The {@link Services} used by the {@link Proof} on which the {@link Name}s of supported {@link TermLabel}s are requested.
+    * @return The {@link Name}s of the supported {@link TermLabel}s.
+    */
+   public static ImmutableList<Name> getSupportedTermLabelNames(Services services) {
+      TermLabelManager manager = getTermLabelManager(services); 
+      if (manager != null) {
+         return manager.getSupportedTermLabelNames();
+      }
+      else {
+         return ImmutableSLList.nil();
+      }
+   }
+
+   /**
     * Returns the {@link Name}s of all supported {@link TermLabel}s.
     * @return The {@link Name}s of all supported {@link TermLabel}s.
     */
-   public Collection<Name> getSupportedTermLabelNames() {
-      return factoryMap.keySet();
+   public ImmutableList<Name> getSupportedTermLabelNames() {
+      return supportedTermLabelnames;
    }
 
    /**
@@ -635,10 +650,12 @@ public class TermLabelManager {
       applicationTerm.execPreOrder(new DefaultVisitor() {
          @Override
          public void visit(Term visited) {
-            for (TermLabel label : visited.getLabels()) {
-               ChildTermLabelPolicy policy = policies.get(label.name());
-               if (policy != null && policy.addLabel(services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, visited, label)) {
-                  newLabels.add(label);
+            if (visited != applicationTerm) {
+               for (TermLabel label : visited.getLabels()) {
+                  ChildTermLabelPolicy policy = policies.get(label.name());
+                  if (policy != null && policy.addLabel(services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, visited, label)) {
+                     newLabels.add(label);
+                  }
                }
             }
          }
@@ -736,27 +753,86 @@ public class TermLabelManager {
                               Goal goal,
                               Term tacletTerm) {
       // Compute active refactorings
-      ImmutableList<TermLabelRefactoring> activeRefactorings = ImmutableSLList.nil();
+      ImmutableList<TermLabelRefactoring> sequentRefactorings = ImmutableSLList.nil();
+      ImmutableList<TermLabelRefactoring> childAndGrandchildRefactorings = ImmutableSLList.nil();
+      ImmutableList<TermLabelRefactoring> directChildRefactorings = ImmutableSLList.nil();
       if (rule != null) {
          ImmutableList<TermLabelRefactoring> ruleRefactorings = ruleSpecificRefactorings.get(rule.name());
          if (ruleRefactorings != null) {
             for (TermLabelRefactoring refactoring : ruleRefactorings) {
-               if (refactoring.isRefactoringRequired(services, applicationPosInOccurrence, applicationTerm, rule, goal, tacletTerm)) {
-                  activeRefactorings = activeRefactorings.prepend(refactoring);
+               RefactoringScope scope = refactoring.defineRefactoringScope(services, applicationPosInOccurrence, applicationTerm, rule, goal, tacletTerm); 
+               if (RefactoringScope.SEQUENT.equals(scope)) {
+                  sequentRefactorings = sequentRefactorings.prepend(refactoring);
+               }
+               else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE.equals(scope)) {
+                  childAndGrandchildRefactorings = childAndGrandchildRefactorings.prepend(refactoring);
+               }
+               else if (RefactoringScope.APPLICATION_DIRECT_CHILDREN.equals(scope)) {
+                  directChildRefactorings = directChildRefactorings.prepend(refactoring);
                }
             }
          }
       }
       for (TermLabelRefactoring refactoring : allRulesRefactorings) {
-         if (refactoring.isRefactoringRequired(services, applicationPosInOccurrence, applicationTerm, rule, goal, tacletTerm)) {
-            activeRefactorings = activeRefactorings.prepend(refactoring);
+         RefactoringScope scope = refactoring.defineRefactoringScope(services, applicationPosInOccurrence, applicationTerm, rule, goal, tacletTerm); 
+         if (RefactoringScope.SEQUENT.equals(scope)) {
+            sequentRefactorings = sequentRefactorings.prepend(refactoring);
+         }
+         else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE.equals(scope)) {
+            childAndGrandchildRefactorings = childAndGrandchildRefactorings.prepend(refactoring);
+         }
+         else if (RefactoringScope.APPLICATION_DIRECT_CHILDREN.equals(scope)) {
+            directChildRefactorings = directChildRefactorings.prepend(refactoring);
          }
       }
-      // Do refactoring only if required
-      if (!activeRefactorings.isEmpty()) {
+      if (applicationTerm != null && 
+          (!directChildRefactorings.isEmpty() || !childAndGrandchildRefactorings.isEmpty())) {
+         Term newApplicationTerm = applicationTerm;
+         // Do direct child refactoring if required
+         if (!directChildRefactorings.isEmpty()) {
+            Term[] newSubs = new Term[newApplicationTerm.arity()];
+            for (int i = 0; i < newSubs.length; i++) {
+               Term sub = newApplicationTerm.sub(i);
+               ImmutableArray<TermLabel> newLabels = performRefactoring(services, applicationPosInOccurrence, applicationTerm, rule, goal, tacletTerm, sub, directChildRefactorings);
+               newSubs[i] = TermFactory.DEFAULT.createTerm(sub.op(), sub.subs(), sub.boundVars(), sub.javaBlock(), newLabels);
+            }
+            newApplicationTerm = TermFactory.DEFAULT.createTerm(newApplicationTerm.op(), newSubs, newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(), newApplicationTerm.getLabels());
+         }
+         // Do child and grandchild refactoring if required
+         if (!childAndGrandchildRefactorings.isEmpty()) {
+            Term[] newSubs = new Term[newApplicationTerm.arity()];
+            for (int i = 0; i < newSubs.length; i++) {
+               Term sub = newApplicationTerm.sub(i);
+               newSubs[i] = refactorLabelsRecursive(services, applicationPosInOccurrence, applicationTerm, rule, goal, tacletTerm, sub, childAndGrandchildRefactorings);
+            }
+            newApplicationTerm = TermFactory.DEFAULT.createTerm(newApplicationTerm.op(), newSubs, newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(), newApplicationTerm.getLabels());
+         }
+         // Update goal
+         PosInOccurrence pio = applicationPosInOccurrence;
+         Term root = newApplicationTerm;
+         do {
+            if (pio.isTopLevel()) {
+               pio = null;
+            }
+            else {
+               int childIndex = pio.getIndex();
+               pio = pio.up();
+               Term newChild = root;
+               root = pio.subTerm();
+               
+               Term[] newSubs = root.subs().toArray(new Term[root.arity()]);
+               newSubs[childIndex] = newChild;
+               
+               root = TermFactory.DEFAULT.createTerm(root.op(), new ImmutableArray<Term>(newSubs), root.boundVars(), root.javaBlock(), root.getLabels());
+            }
+         } while (pio != null);
+         goal.changeFormula(new SequentFormula(root), applicationPosInOccurrence.topLevel());
+      }
+      // Do sequent refactoring if required
+      if (!sequentRefactorings.isEmpty()) {
          Sequent sequent = goal.sequent();
-         refactorLabels(services, applicationPosInOccurrence, applicationTerm, rule, goal, tacletTerm, sequent.antecedent(), true, activeRefactorings);
-         refactorLabels(services, applicationPosInOccurrence, applicationTerm, rule, goal, tacletTerm, sequent.succedent(), false, activeRefactorings);
+         refactorLabels(services, applicationPosInOccurrence, applicationTerm, rule, goal, tacletTerm, sequent.antecedent(), true, sequentRefactorings);
+         refactorLabels(services, applicationPosInOccurrence, applicationTerm, rule, goal, tacletTerm, sequent.succedent(), false, sequentRefactorings);
       }
    }
    
