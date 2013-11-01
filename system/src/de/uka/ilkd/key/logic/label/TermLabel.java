@@ -86,14 +86,14 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
  *       <ul>
  *          <li>{@code a(b<<l>>) ~~> c(b<<l>>)}: {@code b} is a constant which is never rewritten by rules. The label stays on the {@link Term} and will be dropped when the {@link Term} is dropped. Nothing to be done.</li>
  *          <li>{@code a ~~> b<<l>>}: The taclet rewrites {@code a} into {@code b<<l>>}. {@link TermLabel}s defined by taclets are automatically considered during rule application. Nothing to be done.</li>
- *          <li>{@code a<<l>> ~~> b<<l>>} The application {@link Term} {@code a} contains the label before. Use an application {@link TermLabelPolicy} to ensure that it is maintained. Implementations should not iterate over subterms!</li>
- *          <li>{@code Update[...]<<l>> ~~> Update[...new...]<<l>>} The application {@link Term} {@code Update} contains a {@link Modality}. Use a modality {@link TermLabelPolicy} to ensure that it is maintained. Implementations should not iterate over subterms!</li>
- *          <li>{@code 2 + 3 ~~> 5<>a>>}: Implement a {@link TermLabelUpdate} which adds, sorts or removes {@link TermLabel} before a new {@link Term} is created.</li>
- *          <li>{@code 2<<a>> + 3<<b>> ~~> 5<<a>>}: TODO: Only possible with a {@link TermLabelUpdate}.</li>
- *          <li>{@code 2 + (3<<a>> - 1<<b>>) ~~> 4<<a>>}: TODO: Only possible with a {@link TermLabelUpdate}.</li>
- *          <li>Change labels on the whole {@link Sequent}: Implement a {@link TermLabelRefactoring} which can freely add or remove {@link TermLabel}s on any {@link Term} of the {@link Sequent}.</li>
+ *          <li>{@code a<<l>> ~~> b<<l>>} The application {@link Term} {@code a} contains the label before. Use an application {@link TermLabelPolicy} to ensure that it is maintained.</li>
+ *          <li>{@code Update[...]<<l>> ~~> Update[...new...]<<l>>} The application {@link Term} {@code Update} contains a {@link Modality}. Use a modality {@link TermLabelPolicy} to ensure that it is maintained.</li>
+ *          <li>{@code 2 + 3 ~~> 5<>a>>}: A new label has to be added which is not provided by the rule. Implement a {@link TermLabelUpdate} which adds, sorts or removes {@link TermLabel} before a new {@link Term} is created.</li>
+ *          <li>{@code 2<<a>> + 3<<b>> ~~> 5<<a>>}: A direct child of the application {@link Term} {@code a} contains the label before. Use a direct {@link ChildTermLabelPolicy} to ensure that it is added also to the new term.</li>
+ *          <li>{@code 2 + (3<<a>> - 1<<b>>) ~~> 4<<a>>}: A child or grandchild of the application {@link Term} {@code a} contains the label before. Use a direct {@link ChildTermLabelPolicy} to ensure that it is added also to the new term.</li>
  *          <li>{@code 2 + (3<<a>> - 1<<b>>) ~~> 2 * (3<<a>> - 1)}: TODO: Only possible with a {@link TermLabelRefactoring}.</li>
  *          <li>{@code 2<<a>> + 3<<b>> ~~> 2<<a>> - 3}: TODO: Only possible with a {@link TermLabelRefactoring}.</li>
+ *          <li>Change labels on the whole {@link Sequent}: Implement a {@link TermLabelRefactoring} which can freely add or remove {@link TermLabel}s on any {@link Term} of the {@link Sequent}.</li>
  *       </ul>
  *    </li>
  *    <li>

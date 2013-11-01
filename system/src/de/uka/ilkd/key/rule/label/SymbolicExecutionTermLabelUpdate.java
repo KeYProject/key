@@ -3,8 +3,11 @@ package de.uka.ilkd.key.rule.label;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
@@ -23,6 +26,14 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
  * @author Martin Hentschel
  */
 public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ImmutableList<Name> getSupportedRuleNames() {
+      return ImmutableSLList.<Name>nil().append(WhileInvariantRule.INSTANCE.name());
+   }
+   
    /**
     * {@inheritDoc}
     */

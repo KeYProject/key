@@ -30,7 +30,7 @@ import de.uka.ilkd.key.rule.Rule;
  * @see TermLabel
  * @see TermLabelManager
  */
-public interface TermLabelUpdate {
+public interface TermLabelUpdate extends RuleSpecificTask {
    /**
     * This method can freely add, remove or sort the given {@link TermLabel}
     * which will be added to the new {@link Term}. 

@@ -90,18 +90,24 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
                                                          new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.LOOP_BODY_LABEL),
                                                          null,
                                                          symExcPolicies,
+                                                         null,
+                                                         null,
                                                          lbUps,
                                                          lbRefs));
       result = result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME, 
                                                          new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL),
                                                          null,
                                                          symExcPolicies,
+                                                         null,
+                                                         null,
                                                          nbUps,
                                                          nbRefs));
       result = result.prepend(new TermLabelConfiguration(SymbolicExecutionTermLabel.NAME, 
                                                          new SymbolicExecutionTermLabelFactory(),
                                                          null,
                                                          symExcPolicies,
+                                                         null,
+                                                         null,
                                                          seUps,
                                                          seRefs));
       return result;

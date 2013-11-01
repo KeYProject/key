@@ -26,7 +26,7 @@ import de.uka.ilkd.key.rule.Rule;
  * @see TermLabel
  * @see TermLabelManager
  */
-public interface TermLabelRefactoring {
+public interface TermLabelRefactoring extends RuleSpecificTask {
    /**
     * Decides if a refactoring is required based on the applied rule.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.

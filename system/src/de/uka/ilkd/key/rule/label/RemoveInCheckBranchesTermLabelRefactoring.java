@@ -3,6 +3,8 @@ package de.uka.ilkd.key.rule.label;
 import java.util.Iterator;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -36,6 +38,15 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
    public RemoveInCheckBranchesTermLabelRefactoring(Name termLabelNameToRemove) {
       assert termLabelNameToRemove != null;
       this.termLabelNameToRemove = termLabelNameToRemove;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ImmutableList<Name> getSupportedRuleNames() {
+      return ImmutableSLList.<Name>nil().append(UseOperationContractRule.INSTANCE.name())
+                                        .append(WhileInvariantRule.INSTANCE.name());
    }
 
    /**
