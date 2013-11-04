@@ -148,18 +148,6 @@ final class MapImplementation implements Map2 {
     /*@ public normal_behaviour
      @ requires 0 <= index && index < keys.length;
      @ assignable values[index], map, footprint;
-     @ ensures map == \dl_mapUpdate(map, keys[index], value);
-     @ ensures (\forall Object o; !\fresh(o));
-     @*/
-    private void putOverwrite2(int index, Object value){
-        values[index] = value;
-        //@ set map = \dl_mapUpdate(map, keys[index], value);
-        //@ set footprint = \set_union(\set_union(\all_fields(keys), \all_fields(values)), \all_fields(this));
-    }
-    
-    /*@ public normal_behaviour
-     @ requires 0 <= index && index < keys.length;
-     @ assignable values[index], map, footprint;
      @ ensures map == \dl_mapUpdate(map, keys[index], value) &&
      @           \result == (\dl_mapGet(\old(map), keys[index]));
      @*/
@@ -172,35 +160,32 @@ final class MapImplementation implements Map2 {
     }
     
     public Object put(Object key, Object value) {
-        
+
         int index = getIndexOfKey(key);
-        Object ret = null;
-        
+
         if (index != -1) {
-            ret = values[index];
-            values[index] = value;
-        }
-        else {
+            return putOverwrite(index, value);
+        } else {
 
             Object keysNew[] = newArray(keys.length + 1);
             Object valuesNew[] = newArray(keys.length + 1);
 //            Object keysNew[] = new Object[keys.length + 1];
 //            Object valuesNew[] = new Object[keys.length + 1];
-            
+
             copyArray(keysNew, keys, keys.length, 0, 0);
             copyArray(valuesNew, values, keys.length, 0, 0);
-            
+
             keysNew[keys.length] = key;
             valuesNew[keys.length] = value;
 
             keys = keysNew;
             values = valuesNew;
 
+            //@ set map = \dl_mapUpdate(map, key, value);
+            //@ set footprint = \set_union(\set_union(\all_fields(keys), \all_fields(values)), \all_fields(this));
+            return null;
         }
-        
-        //@ set map = \dl_mapUpdate(map, key, value);
-        //@ set footprint = \set_union(\set_union(\all_fields(keys), \all_fields(values)), \all_fields(this));
-        return ret;
+
     }
 
     public Object remove(Object key) {
