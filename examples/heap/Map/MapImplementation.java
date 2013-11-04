@@ -99,8 +99,6 @@ final class MapImplementation implements Map2 {
      @ ensures \dl_inDomain(map, key) ? 
      @           (\result >= 0 && \result < keys.length && keys[\result] == key) : 
      @           (\result == -1);
-     @ ensures (\forall int j; j >= 0 && j < keys.length; 
-     @           (j == \result <==> keys[j] == key ));
      @ ensures (\forall Object o; !\fresh(o));
      @*/
     private /*@strictly_pure@*/ int getIndexOfKey(Object key) {
