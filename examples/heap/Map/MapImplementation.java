@@ -87,6 +87,7 @@ final class MapImplementation implements Map2 {
      @   ensures \result.length == l;
      @   ensures \fresh(\result);
      @   ensures \result != null;
+     @   ensures (\forall int i; 0 <= i && i < \result.length; \result[i] == null);
      @   assignable \nothing;
      @*/
     private /*@helper*/ /*@nullable*/ Object[] newArray(int l) {
@@ -99,7 +100,7 @@ final class MapImplementation implements Map2 {
      @           (\result >= 0 && \result < keys.length && keys[\result] == key) : 
      @           (\result == -1);
      @ ensures (\forall int j; j >= 0 && j < keys.length; 
-     @           (j != \result <==> keys[j] != key ));
+     @           (j == \result <==> keys[j] == key ));
      @ ensures (\forall Object o; !\fresh(o));
      @*/
     private /*@strictly_pure@*/ int getIndexOfKey(Object key) {
@@ -126,12 +127,13 @@ final class MapImplementation implements Map2 {
      @ 0 <= beginTarget && beginTarget + numberCopies <= target.length &&
      @ 0 <= beginSource && beginSource + numberCopies <= source.length;
      @ requires \typeof(target) == \typeof(source);
+     @ requires target != null;
      @ ensures (\forall int index; 0 <= index && index < numberCopies; 
      @                         target[beginTarget + index] == source[beginSource + index]);
      @ ensures (\forall Object o; !\fresh(o));
      @ assignable target[beginTarget..beginTarget + numberCopies - 1];
      @*/
-    private void copyArray(Object[] target, Object[] source, int beginTarget, int beginSource,
+    private void copyArray(Object[] /*@ nullable */ target, Object[] source, int beginTarget, int beginSource,
             int numberCopies) {
         /*@ loop_invariant 0 <= i && i <= numberCopies;
          @ loop_invariant (\forall int x; 0 <= x && x < i; 
@@ -147,7 +149,7 @@ final class MapImplementation implements Map2 {
     
     /*@ public normal_behaviour
      @ requires 0 <= index && index < keys.length;
-     @ assignable values[index];
+     @ assignable values[index], map, footprint;
      @ ensures map == \dl_mapUpdate(map, keys[index], value);
      @ ensures (\forall Object o; !\fresh(o));
      @*/
@@ -159,7 +161,7 @@ final class MapImplementation implements Map2 {
     
     /*@ public normal_behaviour
      @ requires 0 <= index && index < keys.length;
-     @ assignable values[index];
+     @ assignable values[index], map, footprint;
      @ ensures map == \dl_mapUpdate(map, keys[index], value) &&
      @           \result == (\dl_mapGet(\old(map), keys[index]));
      @*/
@@ -182,8 +184,10 @@ final class MapImplementation implements Map2 {
         }
         else {
 
-            Object keysNew[] = newArray(keys.length + 1);
-            Object valuesNew[] = newArray(keys.length + 1);
+//            Object keysNew[] = newArray(keys.length + 1);
+//            Object valuesNew[] = newArray(keys.length + 1);
+            Object keysNew[] = new Object[keys.length + 1];
+            Object valuesNew[] = new Object[keys.length + 1];
             
             copyArray(keysNew, keys, keys.length, 0, 0);
             copyArray(valuesNew, values, keys.length, 0, 0);
