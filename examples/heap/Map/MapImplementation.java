@@ -182,10 +182,10 @@ final class MapImplementation implements Map2 {
         }
         else {
 
-//            Object keysNew[] = newArray(keys.length + 1);
-//            Object valuesNew[] = newArray(keys.length + 1);
-            Object keysNew[] = new Object[keys.length + 1];
-            Object valuesNew[] = new Object[keys.length + 1];
+            Object keysNew[] = newArray(keys.length + 1);
+            Object valuesNew[] = newArray(keys.length + 1);
+//            Object keysNew[] = new Object[keys.length + 1];
+//            Object valuesNew[] = new Object[keys.length + 1];
             
             copyArray(keysNew, keys, keys.length, 0, 0);
             copyArray(valuesNew, values, keys.length, 0, 0);
