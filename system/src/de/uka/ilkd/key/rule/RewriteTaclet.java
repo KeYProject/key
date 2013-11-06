@@ -171,7 +171,7 @@ public final class RewriteTaclet extends FindTaclet {
 	while ( it.next () != -1 ) {
 	    final Term t = it.getSubTerm ();
 	    op = t.op ();
-	    if (op instanceof TransformerFunction) {
+	    if (op instanceof TransformerProcedure) {
 	        return null;
 	    } else  if (op instanceof UpdateApplication &&
 	            it.getChild () == UpdateApplication.targetPos() &&

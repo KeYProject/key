@@ -50,6 +50,12 @@ public class TermLabelCondition extends VariableConditionAdapter {
         return negated ? !hasLabel : hasLabel;
     }
 
+    /**
+     * Checks if an array of label contains the label specified in this condition
+     * @param labels array of labels in the term to be matched
+     * @param name name of the label specified in this condition
+     * @return true if label matches, false if not
+     */
     static boolean hasLabel(ImmutableArray<?> labels, Name name) {
         boolean found = false;
         for (Object o: labels) {

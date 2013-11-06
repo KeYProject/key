@@ -38,7 +38,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.TransformerFunction;
+import de.uka.ilkd.key.logic.op.TransformerProcedure;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -119,56 +119,67 @@ public abstract class WellDefinednessCheck implements Contract {
     // Internal Methods
     //-------------------------------------------------------------------------
 
+    /**
+     * Splits and sorts a (specification) term in such a way that implicit parts are in the
+     * first and explicit parts in the second list.
+     * @param spec specification term
+     * @return two lists for implicit and explicit specification parts
+     */
     private static Pair<ImmutableList<Term>, ImmutableList<Term>> sort(Term spec) {
         assert spec != null;
         ImmutableList<Term> implicit = ImmutableSLList.<Term>nil();
         ImmutableList<Term> explicit = ImmutableSLList.<Term>nil();
         if (spec.arity() > 0
-                && spec.op().equals(Junctor.AND)) {
+                && spec.op().equals(Junctor.AND)) { // Conjunctions
             assert spec.arity() == 2;
             if (spec.hasLabels() && spec.containsLabel(ShortcutEvaluationTermLabel.INSTANCE)) {
+                // Specification conjuncted with short-circuit operator
                 for (Term sub: spec.subs()) {
-                    if(sub.hasLabels()
+                    if(sub.hasLabels() // Found implicit subterms
                             && sub.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
                         final Pair<ImmutableList<Term>, ImmutableList<Term>> p = sort(sub);
                         implicit = implicit.append(p.first).append(p.second);
-                    } else {
+                    } else { // Subterm not labeled as implicit
                         final Pair<ImmutableList<Term>, ImmutableList<Term>> p = sort(sub);
                         implicit = implicit.append(p.first);
                         explicit = explicit.append(p.second);
                     }
                 }
-            } else {
+            } else { // Specification conjuncted with symmetric operator
                 final Condition c1 = split(spec.sub(0));
                 final Condition c2 = split(spec.sub(1));
                 final Term a1 = TB.andSC(c1.implicit, c1.explicit);
                 final Term a2 = TB.andSC(c2.implicit, c2.explicit);
                 final Term a;
                 if (a2.hasLabels() && a2.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
+                    // Implicit term first
                     a = TB.and(a2, a1);
                 } else {
                     a = TB.and(a1, a2);
                 }
                 if (spec.hasLabels() && spec.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
+                    // Handled specification is already implicit
                     implicit = implicit.append(a);
                 } else {
                     explicit = explicit.append(a);
                 }
             }
         } else if (spec.arity() > 0
-                && spec.op().equals(Junctor.IMP)) {
+                && spec.op().equals(Junctor.IMP)) { // Implications
             assert spec.arity() == 2;
             final Condition c1 = split(spec.sub(0));
             final Condition c2 = split(spec.sub(1));
             final Term i1 = TB.andSC(c1.implicit, c1.explicit);
             final Term i2 = TB.andSC(c2.implicit, c2.explicit);
             if (spec.hasLabels() && spec.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
+                // Handled specification is already implicit
                 implicit = implicit.append(TB.imp(i1, i2));
             } else {
                 explicit = explicit.append(TB.imp(i1, i2));
             }
-        } else {
+        } else { // Other operator
             if (spec.hasLabels() && spec.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
+                // Handled specification is already implicit
                 implicit = implicit.append(spec);
             } else {
                 explicit = explicit.append(spec);
@@ -333,6 +344,13 @@ public abstract class WellDefinednessCheck implements Contract {
         return result;
     }
 
+    /**
+     * Splits a (specification) term into implicit and explicit parts (i.e. as written
+     * in the specification) and reforms the conjunction in a sorted way, where implicit
+     * parts appear first, and also labeled with the short-circuit term label.
+     * @param spec specification term
+     * @return sorted and short-circuit conjuncted specification term
+     */
     private static Condition split(Term spec) {
         Pair<ImmutableList<Term>, ImmutableList<Term>> p = sort(spec);
         ImmutableList<Term> implicit = p.first;
@@ -375,6 +393,12 @@ public abstract class WellDefinednessCheck implements Contract {
         return type().toString().toLowerCase().replace("_", " ");
     }
 
+    /**
+     * Return String to display contract in proof management dialog
+     * @param includeHtmlMarkup
+     * @param services
+     * @return String to display
+     */
     private String getText(boolean includeHtmlMarkup, Services services) {
         final StringBuffer sig = new StringBuffer();
         OriginalVariables origVars = getOrigVars();
@@ -534,6 +558,15 @@ public abstract class WellDefinednessCheck implements Contract {
         }
     }
 
+    /**
+     * Non-helper constructor methods cannot assume the free precondition, but
+     * establish it.
+     * @param pre specified precondition
+     * @param self self variable
+     * @param heap heap variable
+     * @param services
+     * @return specified precondition appended with free precondition
+     */
     private Term appendFreePre(Term pre,
                                ParsableVariable self,
                                ParsableVariable heap,
@@ -616,10 +649,13 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     /**
-     * Builds the "general assumption" using the self variable (self),
-     * the {@link KeYJavaType} of the self variable (selfKJT),
-     * the parameters {@link ProgramVariable}s (paramVars), the heaps (heaps), and
-     * @param the implicit precondition
+     * Builds the "general assumption"
+     * @param implicitPre the implicit precondition
+     * @param self self variable
+     * @param heap heap variable
+     * @param params list of parameter variables
+     * @param taclet boolean is true if used for a wd-taclet
+     * @param services
      * @return The {@link Term} containing the general assumptions.
      */
     private TermListAndFunc buildFreePre(Term implicitPre, ParsableVariable self,
@@ -673,14 +709,24 @@ public abstract class WellDefinednessCheck implements Contract {
         return new TermListAndFunc(resList, mbyAtPreFunc);
     }
 
+    /**
+     * Conjoins two well-definedness taclets for pure method invocations
+     * @param name taclet name
+     * @param find1 first find term
+     * @param find2 second find term
+     * @param goal1 first precondition
+     * @param goal2 second precondition
+     * @param services
+     * @return conjoined taclet
+     */
     final static RewriteTaclet createTaclet(String name,
                                             Term find1,
                                             Term find2,
                                             Term goal1,
                                             Term goal2,
                                             Services services) {
-        assert find1.op().name().equals(TransformerFunction.wdAny(services).name());
-        assert find2.op().name().equals(TransformerFunction.wdAny(services).name());
+        assert find1.op().name().equals(TransformerProcedure.wdAny(services).name());
+        assert find2.op().name().equals(TransformerProcedure.wdAny(services).name());
         assert find1.sub(0).op().name().equals(find2.sub(0).op().name());
         assert find1.sub(0).arity() == find2.sub(0).arity();
 
@@ -701,6 +747,17 @@ public abstract class WellDefinednessCheck implements Contract {
         return (RewriteTaclet) tb.getTaclet();
     }
 
+    /**
+     * Creates new well-definedness taclet for either an invariant reference or a pure
+     * method invocation.
+     * @param name taclet name
+     * @param callee the receiver variable as a term
+     * @param callTerm the whole invocation term
+     * @param pre the method's or invariant's precondition
+     * @param isStatic a boolean to tell if the method is static
+     * @param services
+     * @return created taclet
+     */
     final static RewriteTaclet createTaclet(String name,
                                             Term callee,
                                             Term callTerm,
@@ -717,6 +774,14 @@ public abstract class WellDefinednessCheck implements Contract {
         return (RewriteTaclet) tb.getTaclet();
     }
 
+    /**
+     * Creates new well-definedness taclet for a pure method invocation, which can
+     * potentially throw an exception.
+     * @param name taclet name
+     * @param callTerm the whole invocation term
+     * @param services
+     * @return created taclet with false as replacewith term
+     */
     final static RewriteTaclet createExcTaclet(String name,
                                                Term callTerm,
                                                Services services) {
@@ -824,6 +889,11 @@ public abstract class WellDefinednessCheck implements Contract {
         return this.type;
     }
 
+    /**
+     * Collects all remaining (implicitly or explicity) specified clauses
+     * (except for pre-condition, post-condition and assignable-clause).
+     * @return a list of all remaining clauses
+     */
     ImmutableList<Term> getRest() {
         ImmutableList<Term> rest = ImmutableSLList.<Term>nil();
         final Term accessible = this.accessible;
@@ -845,12 +915,31 @@ public abstract class WellDefinednessCheck implements Contract {
     // Public Interface
     //-------------------------------------------------------------------------
 
+    /**
+     * Detects the specification element's behaviour
+     * @return behaviour string
+     */
     public abstract String getBehaviour();
 
+    /**
+     * Detects if the specification element is a true (i.e. not an invariant) model field
+     * @return true for model fields
+     */
     public abstract boolean modelField();
 
+    /**
+     * Only for contracts with model_behaviour, the result is different from null.
+     * @return the return value of a model method (null otherwise)
+     */
     public abstract Term getAxiom();
 
+    /**
+     * Combines two well-definedness checks having the same name, id, target, type,
+     * behaviour and are either both model fields or both not a model field.
+     * @param wdc the well-definedness check to be combined with the current one
+     * @param services
+     * @return the combined well-definedness contract
+     */
     public WellDefinednessCheck combine(WellDefinednessCheck wdc, Services services) {
         assert this.getName().equals(wdc.getName());
         assert this.id() == wdc.id();
@@ -932,6 +1021,17 @@ public abstract class WellDefinednessCheck implements Contract {
         return this;
     }
 
+    /**
+     * Gets the full valid precondition, which holds in the element's pre-state.
+     * @param pre the precondition with the original variables
+     * @param self the new self variable
+     * @param heap the new heap variable
+     * @param parameters the new parameter list
+     * @param taclet is true if the precondition will be used in a taclet
+     * @param services
+     * @return the full valid pre-condition assumed in the pre-state
+     * including the measured-by function
+     */
     public final TermAndFunc getPre(final Condition pre,
                                     ParsableVariable self,
                                     ParsableVariable heap,
@@ -959,6 +1059,13 @@ public abstract class WellDefinednessCheck implements Contract {
         }
     }
 
+    /**
+     * Gets the full valid post-condition
+     * @param post post-condition with original variables
+     * @param result the new result variable
+     * @param services
+     * @return the full valid post-condition
+     */
     public final Term getPost(final Condition post, ParsableVariable result,
                               Services services) {
         final Term reachable;
@@ -971,6 +1078,16 @@ public abstract class WellDefinednessCheck implements Contract {
         return TB.andSC(reachable, post.implicit, post.explicit);
     }
 
+    /**
+     * Gets the necessary updates applicable to the post-condition
+     * @param mod the assignable-clause
+     * @param heap the current heap variable
+     * @param heapAtPre the current variable for the heap of the pre-state
+     * @param anonHeap the anonymous heap term
+     * @param services
+     * @return the applicable update term including an update for
+     * old-expressions and the anonymisation update
+     */
     public final Term getUpdates(Term mod, LocationVariable heap,
                                  ProgramVariable heapAtPre,
                                  Term anonHeap, Services services) {
@@ -1214,6 +1331,11 @@ public abstract class WellDefinednessCheck implements Contract {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
+    /**
+     * A static data structure for passing a term list with a function.
+     *
+     * @author Michael Kirsten
+     */
     private final static class TermListAndFunc {
         private final ImmutableList<Term> terms;
         private final Function func;
@@ -1224,6 +1346,12 @@ public abstract class WellDefinednessCheck implements Contract {
         }
     }
 
+    /**
+     * A static data structure for storing and passing two terms, denoting the implicit
+     * and the explicit part of a pre- or post-condition.
+     *
+     * @author Michael Kirsten
+     */
     final static class Condition {
         final Term implicit;
         final Term explicit;
@@ -1234,6 +1362,11 @@ public abstract class WellDefinednessCheck implements Contract {
         }
     }
 
+    /**
+     * A static data structure for passing a term with a function.
+     *
+     * @author Michael Kirsten
+     */
     public final static class TermAndFunc {
         public final Term term;
         public final Function func;
@@ -1244,6 +1377,13 @@ public abstract class WellDefinednessCheck implements Contract {
         }
     }
 
+    /**
+     * A data structure for storing and passing all specifications of a
+     * specification element includinf pre- and post-condition, an
+     * assignable-clause and a list of all other clauses specified.
+     *
+     * @author Michael Kirsten
+     */
     public final static class POTerms {
         public final Condition pre;
         public final Term mod;

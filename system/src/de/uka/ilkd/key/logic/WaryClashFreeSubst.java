@@ -112,7 +112,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 	    if ( t.op () instanceof UpdateApplication )
 		return applyOnUpdate   ( t );
 	}
-	if ( t.op() instanceof TransformerFunction)
+	if ( t.op() instanceof TransformerProcedure)
 	    return applyOnTransformer ( t );
 	return super.apply1 ( t );
     }

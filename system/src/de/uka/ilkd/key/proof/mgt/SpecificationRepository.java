@@ -434,6 +434,7 @@ public final class SpecificationRepository {
                     getOperationContracts(targetKJT,
                             (IProgramMethod) targetMethod).add(
                             (FunctionalOperationContract) contract));
+            // Create new well-definedness check
             final MethodWellDefinedness mwd =
                     new MethodWellDefinedness((FunctionalOperationContract) contract, services);
             registerContract(mwd);
@@ -441,6 +442,7 @@ public final class SpecificationRepository {
                 && ((DependencyContract) contract).getOrigVars().atPres.isEmpty()
                 && targetMethod.getContainerType().equals(
                         services.getJavaInfo().getJavaLangObject())) {
+            // Create or extend a well-definedness check for a class invariant
             final Term deps = contract.getAccessible(services
                     .getTypeConverter().getHeapLDT().getHeap());
             final Term mby = contract.getMby();
@@ -462,6 +464,7 @@ public final class SpecificationRepository {
             registerContract(cwd);
         } else if (contract instanceof DependencyContract
                 && ((DependencyContract) contract).getOrigVars().atPres.isEmpty()) {
+            // Create or extend a well-definedness check for a model field
             MethodWellDefinedness mwd =
                     new MethodWellDefinedness((DependencyContract) contract, services);
             final ImmutableSet<MethodWellDefinedness> mwds =
@@ -614,7 +617,7 @@ public final class SpecificationRepository {
 
     /**
      * Returns all registered (atomic) well-definedness checks for the passed
-     * target.
+     * target and kjt.
      */
     private ImmutableSet<WellDefinednessCheck> getWdChecks(KeYJavaType kjt,
                                                            IObserverFunction target) {
@@ -658,6 +661,10 @@ public final class SpecificationRepository {
         return result;
     }
 
+    /**
+     * Returns all registered (atomic) well-definedness method checks for the passed
+     * target and kjt.
+     */
     private ImmutableSet<MethodWellDefinedness> getWdMethodChecks(KeYJavaType kjt,
                                                                   IObserverFunction target) {
         assert kjt != null;
@@ -672,6 +679,10 @@ public final class SpecificationRepository {
         return result;
     }
 
+    /**
+     * Returns all registered (atomic) well-definedness class checks for the
+     * passed kjt.
+     */
     private ImmutableSet<ClassWellDefinedness> getWdClassChecks(KeYJavaType kjt) {
         ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt);
         ImmutableSet<ClassWellDefinedness> invs = DefaultImmutableSet

@@ -54,6 +54,7 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
         setEnsures(inv.getInternalInvariants().get(h));
     }
 
+    @Override
     SequentFormula generateSequent(SequentTerms seq, Services services) {
         // wd(phi) & (phi & wf(anon) -> wd(mod) & wd(variant) & {anon^mod}(wd(phi) & wd(variant)))
         final Term imp = TB.imp(TB.and(seq.pre, seq.wfAnon),

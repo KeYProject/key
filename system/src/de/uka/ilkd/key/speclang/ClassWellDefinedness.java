@@ -69,6 +69,13 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         return super.getRest();
     }
 
+    /**
+     * Creates a well-definedness taclet for an invariant reference. Actually we should
+     * be able to statically denote this taclet in the rule folder, but somehow the type
+     * java.lang.Object is not available there in the required manner.
+     * @param services
+     * @return the well-definedness taclet for an invariant reference
+     */
     public static ImmutableSet<RewriteTaclet> createInvTaclet(Services services) {
         final KeYJavaType kjt = services.getJavaInfo().getJavaLangObject();
         final String prefix = WellDefinednessCheck.INV_TACLET;

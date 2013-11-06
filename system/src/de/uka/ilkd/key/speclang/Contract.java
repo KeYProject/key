@@ -229,6 +229,11 @@ public interface Contract extends SpecificationElement {
             }
         }
 
+        /**
+         * Adds a list of parameters and deletes the prior ones (if any).
+         * @param newParams
+         * @return the changed original variables
+         */
         public OriginalVariables add(ImmutableList<ProgramVariable> newParams) {
             return new OriginalVariables(self, result, exception, atPres, newParams);
         }

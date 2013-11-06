@@ -26,7 +26,7 @@ import de.uka.ilkd.key.logic.label.ShortcutEvaluationTermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.TransformerFunction;
+import de.uka.ilkd.key.logic.op.TransformerProcedure;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.label.ITermLabelWorker;
 
@@ -65,10 +65,10 @@ public class ShortcutEvaluationTermLabelInstantiator implements ITermLabelWorker
                 && (tacletTerm.op().equals(Junctor.AND)
                         || tacletTerm.op().equals(Junctor.OR))
                 && tacletTerm.containsLabel(ShortcutEvaluationTermLabel.INSTANCE)
-                && TransformerFunction.inTransformer(applicationPosInOccurrence)) {
-            final TransformerFunction t =
-                    TransformerFunction.getTransformer(applicationPosInOccurrence);
-            if (TransformerFunction.inTransformer(applicationPosInOccurrence)
+                && TransformerProcedure.inTransformer(applicationPosInOccurrence)) {
+            final TransformerProcedure t =
+                    TransformerProcedure.getTransformer(applicationPosInOccurrence);
+            if (TransformerProcedure.inTransformer(applicationPosInOccurrence)
                     && (t.name().equals(new Name("wd"))
                             || t.name().equals(new Name("WD")))) {
                 // keep ShortcutEvaluationTermLabel
@@ -98,9 +98,9 @@ public class ShortcutEvaluationTermLabelInstantiator implements ITermLabelWorker
                              Goal goal,
                              List<ITermLabel> newLabels) {
         // Keep label only in transformer functions "WD" and "wd"
-        if (TransformerFunction.inTransformer(applicationPosInOccurrence)) {
-            final TransformerFunction t =
-                    TransformerFunction.getTransformer(applicationPosInOccurrence);
+        if (TransformerProcedure.inTransformer(applicationPosInOccurrence)) {
+            final TransformerProcedure t =
+                    TransformerProcedure.getTransformer(applicationPosInOccurrence);
             if (t.name().equals(new Name("wd")) || t.name().equals(new Name("WD"))) {
                 return;
             }

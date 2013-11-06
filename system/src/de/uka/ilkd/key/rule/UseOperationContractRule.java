@@ -62,7 +62,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.TransformerFunction;
+import de.uka.ilkd.key.logic.op.TransformerProcedure;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -534,7 +534,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	}
 
 	// abort if inside of transformer
-        if (TransformerFunction.inTransformer(pio)) {
+        if (TransformerProcedure.inTransformer(pio)) {
             return false;
         }
 

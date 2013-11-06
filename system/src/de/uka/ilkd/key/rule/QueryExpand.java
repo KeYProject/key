@@ -57,7 +57,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.TransformerFunction;
+import de.uka.ilkd.key.logic.op.TransformerProcedure;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -624,7 +624,7 @@ public class QueryExpand implements BuiltInRule {
               return false;
             }
             // abort if inside of transformer
-            if (TransformerFunction.inTransformer(pio)) {
+            if (TransformerProcedure.inTransformer(pio)) {
                 return false;
             }
             final Sort nullSort = goal.proof().getJavaInfo().nullSort();

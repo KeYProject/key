@@ -59,12 +59,9 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         return new WellDefinednessStrategy();
     }
 
-    /** FIXME: Somehow currently doesn't work (but keytroke still gets shown) as
-     *         {@link #canApplyTo(KeYMediator, PosInOccurrence)} returns false on
-     *         instantiation.
-     */
     @Override
     public KeyStroke getKeyStroke () {
+        // FIXME: Does apparently not work for the moment.
         return KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.SHIFT_DOWN_MASK);
     }
 
@@ -78,14 +75,14 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         final ContractPO po =
                 mediator.getServices().getSpecificationRepository()
                         .getPOForProof(mediator.getSelectedProof());
-        if (po instanceof WellDefinednessPO) {
+        if (po instanceof WellDefinednessPO) { // applicable for all well-definedness checks
             return true;
         } else if (!(po instanceof FunctionalOperationContractPO)) {
             return false;
         }
         Node n = mediator.getSelectedNode();
         while (n != null) {
-            // Check if we are in a well-definedness branch (e.g. of a loop statement)
+            // Applicable in a well-definedness branch (e.g. of a loop statement or a block contract)
             if (n.getNodeInfo().getBranchLabel() != null
                     && n.getNodeInfo().getBranchLabel().equals(WD_BRANCH)) {
                 return true;

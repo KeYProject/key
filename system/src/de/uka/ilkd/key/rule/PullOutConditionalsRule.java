@@ -21,7 +21,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.TransformerFunction;
+import de.uka.ilkd.key.logic.op.TransformerProcedure;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -117,7 +117,7 @@ public final class PullOutConditionalsRule implements BuiltInRule {
 	}
 
 	// abort if inside of transformer
-        if (TransformerFunction.inTransformer(pio)) {
+        if (TransformerProcedure.inTransformer(pio)) {
             return false;
         }
 

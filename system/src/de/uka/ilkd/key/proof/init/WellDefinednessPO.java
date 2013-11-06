@@ -152,7 +152,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     /**
      * This should only be executed once per proof.
-     * @return new variables
+     * @param check the underlying well-definedness check
+     * @param services
+     * @return new variables to be used in the actual check
      */
     private static Variables buildVariables(WellDefinednessCheck check,
                                             Services services) {
@@ -197,6 +199,10 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return new Variables(self, result, exception, atPres, params, heap, anonHeap);
     }
 
+    /**
+     * Registers the new variables
+     * @param vars variables to be used in the check
+     */
     private void register(Variables vars) {
         register((Function)vars.anonHeap.op());
         register(vars.self);
@@ -317,6 +323,14 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
        }
     }
 
+    /**
+     * A static data structure for storing and passing the variables used in the actual proof.
+     * This includes a self variable, a result variable, an exception variable, a mapping of
+     * heaps to the according preconditions, a list of parameter variables, a base heap,
+     * a heap for the pre-state and an anonymous heap.
+     *
+     * @author Michael Kirsten
+     */
     public static class Variables {
         public final ProgramVariable self;
         public final ProgramVariable result;

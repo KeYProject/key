@@ -390,7 +390,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	}
 
 	// abort if inside of transformer
-        if (TransformerFunction.inTransformer(pio)) {
+        if (TransformerProcedure.inTransformer(pio)) {
             return false;
         }
 

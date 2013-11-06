@@ -155,6 +155,14 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     // Internal Methods
     //-------------------------------------------------------------------------
 
+    /**
+     * Gets the argument list for the operator of the method
+     * @param sv schema variable for self
+     * @param heap schema variable for the heap
+     * @param isStatic information whether this is a static method
+     * @param params schema variables for the parameters
+     * @return the term array of arguments used to construct the method term
+     */
     private static Term[] getArgs(SchemaVariable sv, ParsableVariable heap,
                                   boolean isStatic,
                                   ImmutableList<ParsableVariable> params) {
@@ -171,6 +179,13 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         return args;
     }
 
+    /**
+     * Finds an -on top level- conjuncted term of the form (exc = null) in the given term.
+     * @param t the term to be searched in
+     * @param exc the exception variable
+     * @param services
+     * @return true if the term guarantees exc to be equal to null
+     */
     private static boolean findExcNull(Term t, ProgramVariable exc, Services services) {
         assert t != null;
         if (t.op().equals(Junctor.AND)) {
@@ -183,6 +198,10 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         return false;
     }
 
+    /**
+     * Converts the original parameters into schema variables
+     * @return a list of schema variables
+     */
     private ImmutableList<ParsableVariable> paramsSV() {
         ImmutableList<ParsableVariable> paramsSV =
                 ImmutableSLList.<ParsableVariable>nil();
@@ -201,6 +220,14 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                 null;
     }
 
+    /**
+     * Generates a term of the form (mbyAtPre = mby) if mby is specified.
+     * @param self the self variable
+     * @param params the list of parameters
+     * @param mbyAtPreFunc the measured-by function
+     * @param services
+     * @return the measured by at pre equation for the precondition
+     */
     Term generateMbyAtPreDef(ParsableVariable self,
                              ImmutableList<ParsableVariable> params,
                              Function mbyAtPreFunc,
@@ -224,6 +251,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         return mbyAtPreDef;
     }
 
+    @Override
     ImmutableList<Term> getRest() {
         ImmutableList<Term> rest = super.getRest();
         final Term globalDefs = getGlobalDefs();
@@ -245,6 +273,11 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         return this.contract;
     }
 
+    /**
+     * Creates a well-definedness for a (pure) method invocation of this method.
+     * @param services
+     * @return the taclet
+     */
     public RewriteTaclet createOperationTaclet(Services services) {
         final String prefix;
         final IObserverFunction target = getTarget();
@@ -283,6 +316,13 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         }
     }
 
+    /**
+     * Combines two well-definedness taclets for (pure) method invocations.
+     * @param t1 taclet one
+     * @param t2 taclet two
+     * @param services
+     * @return the combined taclet
+     */
     public RewriteTaclet combineTaclets(RewriteTaclet t1, RewriteTaclet t2, Services services) {
         assert t1.goalTemplates().size() == 1;
         assert t2.goalTemplates().size() == 1;

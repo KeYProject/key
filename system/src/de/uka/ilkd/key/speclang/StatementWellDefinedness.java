@@ -58,10 +58,22 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
               assignable, accessible, ensures, mby, rep);
     }
 
+    /**
+     * This formula creates the sequent formula for the well-definedness of a jml statement
+     * in the specific way, in which it is required for the specific jml statement.
+     * @param seqTerms
+     * @param services
+     * @return
+     */
     abstract SequentFormula generateSequent(SequentTerms seqTerms, Services services);
 
     public abstract SpecificationElement getStatement();
 
+    /**
+     * Converts a set of parameter variables into a list of parameter variables
+     * @param set a set of parameter variables
+     * @return a list of the parameter variables
+     */
     final static ImmutableList<ProgramVariable> convertParams(ImmutableSet<ProgramVariable> set) {
         ImmutableList<ProgramVariable> list = ImmutableSLList.<ProgramVariable>nil();
         for (ProgramVariable pv: set) {
@@ -80,6 +92,15 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         return super.getRest();
     }
 
+    /**
+     * Aggregates and preprocesses the proof obligation data into the according terms for the
+     * well-definedness sequent of the jml statement.
+     * @param po the proof obligation terms of the statement
+     * @param vars the new (current) variables
+     * @param leadingUpdate the context update of the program before the statement
+     * @param services
+     * @return the actual terms used in the well-definedness sequent
+     */
     final SequentTerms createSeqTerms(POTerms po, Variables vars,
                                       Term leadingUpdate, Services services) {
         final Term pre = getPre(po.pre, vars.self, vars.heap, vars.params, false, services).term;
@@ -120,6 +141,18 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         return generateSequent(seqTerms, services);
     }
 
+    /**
+     * This is where the proof sequent is built, however with a smaller set of variables,
+     * due to the nature of the jml statement. This means no exception variable, no result
+     * variable and variable for the heap of the pre-state.
+     * @param self self variable
+     * @param heap heap variable
+     * @param anonHeap anonymised heap
+     * @param ps set of parameter variables
+     * @param leadingUpdate the context update
+     * @param services
+     * @return The proof seuqne t for the well-definedness check
+     */
     public SequentFormula generateSequent(ProgramVariable self, LocationVariable heap,
                                           Term anonHeap, ImmutableSet<ProgramVariable> ps,
                                           Term leadingUpdate, Services services) {
@@ -146,6 +179,16 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         return false;
     }
 
+    /**
+     * A data structure to pass the needed terms for the well-definedness sequent of a jml
+     * statement, including the context update, pre-condition for the statement, well-formedness
+     * condition for the anonymous heap, well-definedness term for the statement's assignable-clause,
+     * well-definedness term for other clauses in the statement and the well-definedness term for
+     * the statement's post-condition with the according updates (heap of pre-state becomes current
+     * heap and the current heap gets anonymised) applied to it.
+     *
+     * @author Michael Kirsten
+     */
     final class SequentTerms {
         final Term context;
         final Term pre;

@@ -52,7 +52,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.TransformerFunction;
+import de.uka.ilkd.key.logic.op.TransformerProcedure;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -212,7 +212,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             return false;
         }
         // abort if inside of transformer
-        if (TransformerFunction.inTransformer(pio)) {
+        if (TransformerProcedure.inTransformer(pio)) {
             return false;
         }
         Pair<Term, Term> up = applyUpdates(pio.subTerm());

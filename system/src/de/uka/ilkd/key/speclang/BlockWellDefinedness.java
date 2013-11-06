@@ -54,6 +54,7 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
         setEnsures(block.getEnsures(h));
     }
 
+    @Override
     SequentFormula generateSequent(SequentTerms seq, Services services) {
         // wd(pre) & (pre & wf(anon) -> wd(mod) & {anon^mod}(wd(post)))
         final Term imp = TB.imp(TB.and(seq.pre, seq.wfAnon),
