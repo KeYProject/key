@@ -24,7 +24,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * Functions with a restricted/special rule set only applicable for the top level
- * of the transformer function and not directly for its arguments.
+ * of the transformer function and not directly for its arguments, prohibiting any rule
+ * applications to sub arguments as well as applications from outside such as update applications.
  *
  * @author Michael Kirsten
  */
