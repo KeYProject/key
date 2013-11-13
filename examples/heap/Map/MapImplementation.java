@@ -126,7 +126,7 @@ final class MapImplementation implements Map2 {
      @ 0 <= beginSource && beginSource + numberCopies <= source.length;
      @ requires \typeof(target) == \typeof(source);
      @ requires target != null;
-     @ ensures (\forall int index; 0 <= index && index < numberCopies; 
+     @ ensures (\forall int index; 0 <= index && index < numberCopies;
      @                         target[beginTarget + index] == source[beginSource + index]);
      @ ensures (\forall Object o; !\fresh(o));
      @ assignable target[beginTarget..beginTarget + numberCopies - 1];
@@ -147,9 +147,10 @@ final class MapImplementation implements Map2 {
     
     /*@ public normal_behaviour
      @ requires 0 <= index && index < keys.length;
+     @ ensures map == \dl_mapUpdate(\old(map), keys[index], value);
+     @ ensures \result == (\dl_mapGet(\old(map), keys[index]));
+     @ ensures (\forall Object o; !\fresh(o));
      @ assignable values[index], map, footprint;
-     @ ensures map == \dl_mapUpdate(map, keys[index], value) &&
-     @           \result == (\dl_mapGet(\old(map), keys[index]));
      @*/
     private Object putOverwrite(int index, Object value){
         Object ret = values[index];
@@ -159,33 +160,59 @@ final class MapImplementation implements Map2 {
         return ret;
     }
     
+    /*@ public normal_behaviour
+     @ requires !\dl_inDomain(map, key);
+     @ assignable footprint;
+     @ ensures map == \dl_mapUpdate(\old(map), key, value);
+     @ ensures \result == null;
+     @ ensures \fresh(keys, values);
+     @ ensures !\dl_inDomain(map, keys);
+     @ ensures !\dl_inDomain(map, values);
+     @*/
+    private Object putCreateNew(Object key, Object value) {
+
+        Object keysNew[] = newArray(keys.length + 1);
+        Object valuesNew[] = newArray(keys.length + 1);
+//      Object keysNew[] = new Object[keys.length + 1];
+//      Object valuesNew[] = new Object[keys.length + 1];
+
+        copyArray(keysNew, keys, keys.length, 0, 0);
+        copyArray(valuesNew, values, keys.length, 0, 0);
+
+        keysNew[keys.length] = key;
+        valuesNew[keys.length] = value;
+
+        keys = keysNew;
+        values = valuesNew;
+
+        //@ set map = \dl_mapUpdate(map, key, value);
+        //@ set footprint = \set_union(\set_union(\all_fields(keys), \all_fields(values)), \all_fields(this));
+        return null;
+    }
+
     public Object put(Object key, Object value) {
-
         int index = getIndexOfKey(key);
-
         if (index != -1) {
             return putOverwrite(index, value);
         } else {
-
-            Object keysNew[] = newArray(keys.length + 1);
-            Object valuesNew[] = newArray(keys.length + 1);
-//            Object keysNew[] = new Object[keys.length + 1];
-//            Object valuesNew[] = new Object[keys.length + 1];
-
-            copyArray(keysNew, keys, keys.length, 0, 0);
-            copyArray(valuesNew, values, keys.length, 0, 0);
-
-            keysNew[keys.length] = key;
-            valuesNew[keys.length] = value;
-
-            keys = keysNew;
-            values = valuesNew;
-
-            //@ set map = \dl_mapUpdate(map, key, value);
-            //@ set footprint = \set_union(\set_union(\all_fields(keys), \all_fields(values)), \all_fields(this));
-            return null;
+            return putCreateNew(key, value);
         }
-
+    }
+    
+    /*@ private normal_behavior
+     @   ensures \typeof(\result) == \type(Object[]);
+     @   ensures \result.length == source.length + 1;
+     @   ensures \fresh(\result);
+     @   ensures (\forall int i; 0 <= i && i < source.length; \result[i] == source[i]);
+     @   ensures \result[source.length] == newValue;
+     @   ensures \result != keys && \result != values && \result != source;
+     @   assignable \nothing;
+     @*/
+    private Object[] enlargeArray(Object[] source, Object newValue) {
+        Object ret[] = newArray(source.length + 1);
+        copyArray(ret, source, source.length, 0, 0);
+        ret[source.length] = newValue;
+        return ret;
     }
 
     public Object remove(Object key) {
@@ -193,29 +220,30 @@ final class MapImplementation implements Map2 {
         int index = getIndexOfKey(key);
         Object ret = null;
 
-        if (index != -1) {
-            
+        if (index == -1) {
+            return null;
+        } else {
+
             ret = values[index];
 
             Object keysNew[] = newArray(keys.length - 1);
             Object valuesNew[] = newArray(keys.length - 1);
-            
+
             int i;
 
             copyArray(keysNew, keys, index, 0, 0);
             copyArray(valuesNew, values, index, 0, 0);
-            
+
             copyArray(keysNew, keys, keys.length - (index + 1), index, index + 1);
             copyArray(keysNew, keys, keys.length - (index + 1), index, index + 1);
 
             keys = keysNew;
             values = valuesNew;
 
+            //@ set map = (keys.length > 0) ? \dl_mapRemove(map, key) : \dl_mapEmpty();
+            //@ set footprint = \set_union(\set_union(\all_fields(keys), \all_fields(values)), \all_fields(this));
+            return ret;
         }
-
-        //@ set map = (keys.length > 0) ? \dl_mapRemove(map, key) : \dl_mapEmpty();
-        //@ set footprint = \set_union(\set_union(\all_fields(keys), \all_fields(values)), \all_fields(this));
-        return ret;
     }
 
     public void clear() {

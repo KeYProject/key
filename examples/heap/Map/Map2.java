@@ -46,7 +46,7 @@ public interface Map2 {
     
     /*@ public normal_behaviour
      @ assignable footprint;
-     @ ensures map == \dl_mapUpdate(map, key, value) &&
+     @ ensures map == \dl_mapUpdate(\old(map), key, value) &&
      @           \result == (\dl_inDomain(\old(map), key)?\dl_mapGet(\old(map), key):null);
      @*/
     public /*@nullable@*/ Object put(Object key, Object value);
