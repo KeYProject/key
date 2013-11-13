@@ -88,6 +88,7 @@ final class MapImplementation implements Map2 {
      @   ensures \fresh(\result);
      @   ensures \result != null;
      @   ensures (\forall int i; 0 <= i && i < \result.length; \result[i] == null);
+     @   ensures !\dl_inDomain(map, \result);
      @   assignable \nothing;
      @*/
     private /*@helper*/ /*@nullable*/ Object[] newArray(int l) {
@@ -221,7 +222,6 @@ final class MapImplementation implements Map2 {
      @   ensures \fresh(\result);
      @   ensures (\forall int i; 0 <= i && i < source.length; \result[i] == source[i]);
      @   ensures \result[source.length] == newValue;
-     @   ensures \result != keys && \result != values && \result != source;
      @   assignable \nothing;
      @*/
     private Object[] enlargeArray(Object[] source, Object newValue) {
@@ -234,13 +234,12 @@ final class MapImplementation implements Map2 {
     public Object remove(Object key) {
 
         int index = getIndexOfKey(key);
-        Object ret = null;
 
         if (index == -1) {
             return null;
         } else {
 
-            ret = values[index];
+            Object ret = values[index];
 
             Object keysNew[] = newArray(keys.length - 1);
             Object valuesNew[] = newArray(keys.length - 1);
