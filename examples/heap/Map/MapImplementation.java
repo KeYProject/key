@@ -120,12 +120,14 @@ final class MapImplementation implements Map2 {
     }
     
     /*@ private normal_behaviour
-     @ requires target != source && target != keys && target != values &&
-     @ 0 <= numberCopies &&
-     @ 0 <= beginTarget && beginTarget + numberCopies <= target.length &&
-     @ 0 <= beginSource && beginSource + numberCopies <= source.length;
-     @ requires \typeof(target) == \typeof(source);
+     @ requires target != source;
+     @ requires target != keys;
+     @ requires target != values;
      @ requires target != null;
+     @ requires 0 <= numberCopies;
+     @ requires 0 <= beginTarget && beginTarget + numberCopies <= target.length;
+     @ requires 0 <= beginSource && beginSource + numberCopies <= source.length;
+     @ requires \typeof(target) == \typeof(source);
      @ ensures (\forall int index; 0 <= index && index < numberCopies;
      @                         target[beginTarget + index] == source[beginSource + index]);
      @ ensures (\forall Object o; !\fresh(o));
@@ -160,6 +162,8 @@ final class MapImplementation implements Map2 {
     }
     
     /*@ public normal_behaviour
+    @ requires valuesNew != null;
+    @ requires keysNew != null;
     @ requires keysNew.length == keys.length + 1;
     @ requires valuesNew.length == values.length + 1;
     @ assignable keysNew[*], valuesNew[*];
