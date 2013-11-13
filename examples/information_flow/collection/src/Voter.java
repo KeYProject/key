@@ -28,14 +28,27 @@ public class Voter {
                  low_sendSuccessful;    @*/
     void secure_voting() {
         int high_vote = inputVote();
-        if (isValid(high_vote)) {
-            high_voteValid = true;
-            low_sendSuccessful = sendVote(high_vote);
-        } else {
-            high_voteValid = false;
-            low_sendSuccessful = sendVote(0);
+        /*@ normal_behavior
+            separates low_outputStream,
+                     low_outputStreamAvailable,
+                     low_NUM_OF_VOTERS,
+                     low_numOfVotes,
+                     low_sendSuccessful;    @*/
+        {   if (isValid(high_vote)) {
+                high_voteValid = true;
+                low_sendSuccessful = sendVote(high_vote);
+            } else {
+                high_voteValid = false;
+                low_sendSuccessful = sendVote(0);
+            }
         }
-        low_numOfVotes = (low_sendSuccessful ? low_numOfVotes + 1 : low_numOfVotes);
+        /*@ normal_behavior
+            separates low_outputStream,
+                     low_outputStreamAvailable,
+                     low_NUM_OF_VOTERS,
+                     low_numOfVotes,
+                     low_sendSuccessful;    @*/
+        { low_numOfVotes = (low_sendSuccessful ? low_numOfVotes + 1 : low_numOfVotes); }
         publishVoterParticipation();
     }
     
