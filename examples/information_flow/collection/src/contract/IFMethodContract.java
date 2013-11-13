@@ -19,26 +19,26 @@ public class IFMethodContract {
 //--------
 
     
-    //@ respects low;
+    //@ separates low;
     void secure_sequential_n1_n2() {
         n1();
         n2();
     }
     
     //@ normal_behavior
-    //@ respects low;
+    //@ separates low;
     void n1() {
         low = 27;
     }
     
     //@ normal_behavior
-    //@ respects low;
+    //@ separates low;
     void n2() {
         low = low + 13;
     }
     
     
-    //@ respects low;
+    //@ separates low;
     void secure_assignments_n2() {
         low = 45;
         high = high * high;
@@ -46,7 +46,7 @@ public class IFMethodContract {
     }
     
     
-    //@ respects low;
+    //@ separates low;
     void insecure_assignment_n2() {
         low = high;
         n2();
@@ -56,7 +56,7 @@ public class IFMethodContract {
 //--------
 
     
-    //@ respects low;
+    //@ separates low;
     void secure_sequential_n3_precond_n4() {
         n3();
         n4();
@@ -64,7 +64,7 @@ public class IFMethodContract {
     
     /*@ normal_behavior
       @ ensures high > 0;
-      @ respects low;
+      @ separates low;
       @*/
     void n3() {
         high = 8;
@@ -72,7 +72,7 @@ public class IFMethodContract {
     
     /*@ normal_behavior
       @ requires high > 0;
-      @ respects low;
+      @ separates low;
       @*/
     void n4() {
         if (high > 0) {
@@ -86,7 +86,7 @@ public class IFMethodContract {
 //--------
 
     
-    //@ respects low;
+    //@ separates low;
     void secure_n5() {
         low = n5(high);
     }
@@ -95,7 +95,7 @@ public class IFMethodContract {
 //--------
 
     
-    //@ respects low;
+    //@ separates low;
     void secure_if_high_n1() {
         if (high > 0) {
             high = 2 * high;
@@ -106,7 +106,7 @@ public class IFMethodContract {
     }
     
     
-    //@ respects low;
+    //@ separates low;
     void secure_if_high_n5_n1() {
         if (high > 0) {
             low = n5(high);
@@ -118,14 +118,14 @@ public class IFMethodContract {
     }
     
     //@ normal_behavior
-    //@ respects low, \result;
+    //@ separates low, \result;
     int n5(int x) {
         high = 2 * x;
         return 15;
     }
     
     
-    //@ respects low;
+    //@ separates low;
     void insecure_if_high_n5_n1() {
         if (high > 0) {
             low = n5(high);
@@ -139,7 +139,7 @@ public class IFMethodContract {
 //--------
     
     
-    //@ respects low;
+    //@ separates low;
     void secure_assignment_0_n9() {
         high = 0;
         n9();
@@ -160,7 +160,7 @@ public class IFMethodContract {
 
     /*@ requires a.length > 0;
       @ requires 0 <= pos && pos < a.length;
-      @ respects pos, (\seq_def int i; 0; a.length; a[i] == 0);
+      @ separates pos, (\seq_def int i; 0; a.length; a[i] == 0);
       @*/
     void secure_array_param(int[] a, int pos) {
         a[pos] = secure_array_param_helper();
@@ -180,7 +180,7 @@ public class IFMethodContract {
 
     
     /*@ requires high != 0;
-      @ respects low;
+      @ separates low;
       @*/
     void secure_n6() {
         n6();
@@ -188,7 +188,7 @@ public class IFMethodContract {
  
     /*@ normal_behavior
       @ requires high != 0;
-      @ respects low;
+      @ separates low;
       @*/
     void n6() {
         high = low / high;
@@ -198,7 +198,7 @@ public class IFMethodContract {
 //--------
 
     
-    //@ respects low;
+    //@ separates low;
     void secure_catch_exception() {
         try {
             n7();
@@ -207,7 +207,7 @@ public class IFMethodContract {
         }
     }
     
-//    /*@ respects low, \exception;
+//    /*@ separates low, \exception;
 //      @*/
     void n7() {
         throw new NullPointerException();
@@ -219,7 +219,7 @@ public class IFMethodContract {
     
 //    /*@ requires        high != 0;
 //      @ signals_only    NullPointerException;
-//      @ respects        low, \exception;
+//      @ separates        low, \exception;
 //      @*/
     void n8() {
         high = low / high;
@@ -233,7 +233,7 @@ public class IFMethodContract {
     /*@ normal_behavior
       @ requires    x >= 0;
       @ measured_by x;
-      @ respects    low, x;
+      @ separates    low, x;
       @*/
     void secure_recursion(int x) {
         if (x > 0) {
@@ -246,7 +246,7 @@ public class IFMethodContract {
     /*@ normal_behavior
       @ requires    x >= 0;
       @ measured_by x;
-      @ respects    low, x, (\seq_def int i; 0; a.length; a[i]);
+      @ separates    low, x, (\seq_def int i; 0; a.length; a[i]);
       @ assignable  low;
       @*/
     void secure_recursion_2(int[] a, int x) {
@@ -260,11 +260,11 @@ public class IFMethodContract {
     
     
     /*@ requires    x >= 0;
-      @ respects    low, x;
+      @ separates    low, x;
       @*/
     void secure_while(int x) {
         /*@ loop_invariant 0 <= x;
-          @ respects low, x;
+          @ separates low, x;
           @ decreases x;
           @ assignable low;
           @*/

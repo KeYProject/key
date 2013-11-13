@@ -13,14 +13,14 @@ public class AliasingExamples {
     int x;
     
     /*@ requires a != b;
-      @ respects \result, b.x;
+      @ separates \result, b.x;
       @*/
     int secure_1(AliasingExamples a, AliasingExamples b, int h) {
         a.x = h;
         return b.x;
     }
     
-    /*@ respects \result, b.x;
+    /*@ separates \result, b.x;
       @*/
     int insecure_1(AliasingExamples a, AliasingExamples b, int h) {
         a.x = h;

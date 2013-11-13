@@ -16,10 +16,10 @@ public class DifferenceSeqLocset {
     //@ invariant l1 != l2;
     
     /*@ normal_behavior
-      @     respects    \locset(l1.b, l2.b, l3.b);
+      @     separates    \locset(l1.b, l2.b, l3.b);
       @
       @ normal_behavior
-      @     respects    l1.b, l2.b, l3.b;
+      @     separates    l1.b, l2.b, l3.b;
       @*/
     void m() {
         if (b) {

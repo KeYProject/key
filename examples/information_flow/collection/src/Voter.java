@@ -1,5 +1,4 @@
 
-import java.io.IOException;
 
 /*
  * To change this template, choose Tools | Templates
@@ -21,7 +20,7 @@ public class Voter {
     
     private boolean high_voteValid;
     
-    /*@ respects low_outputStream,
+    /*@ separates low_outputStream,
                  low_outputStreamAvailable,
                  low_NUM_OF_VOTERS,
                  low_numOfVotes,
@@ -39,7 +38,7 @@ public class Voter {
         publishVoterParticipation();
     }
     
-    /*@ respects low_outputStream,
+    /*@ separates low_outputStream,
                  low_outputStreamAvailable,
                  low_NUM_OF_VOTERS,
                  low_numOfVotes,
@@ -48,7 +47,7 @@ public class Voter {
         return high_inputStream;
     }
     
-    /*@ respects low_outputStream,
+    /*@ separates low_outputStream,
                  low_outputStreamAvailable,
                  low_NUM_OF_VOTERS,
                  low_numOfVotes,
@@ -63,7 +62,7 @@ public class Voter {
         }
     }
     
-    /*@ respects low_outputStream,
+    /*@ separates low_outputStream,
                  low_outputStreamAvailable,
                  low_NUM_OF_VOTERS,
                  low_numOfVotes,
@@ -73,7 +72,7 @@ public class Voter {
         return 0 < high_vote && high_vote <= 255;
     }
     
-    /*@ respects low_outputStream,
+    /*@ separates low_outputStream,
                  low_outputStreamAvailable,
                  low_NUM_OF_VOTERS,
                  low_numOfVotes,
@@ -83,7 +82,7 @@ public class Voter {
     }
     
     
-    /*@ respects low_outputStream,
+    /*@ separates low_outputStream,
                  low_outputStreamAvailable,
                  low_NUM_OF_VOTERS,
                  low_numOfVotes,

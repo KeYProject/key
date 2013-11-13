@@ -43,9 +43,9 @@ class SecurePasswordFile {
 //      @                 );
 //      @     accessible  footprint;
 //      @     modifies    \nothing;
-//      @     respects    names[userIndex];
-//      @     respects    names[userIndex], passwords[userIndex];
-//      @     respects    user, password, result;
+//      @     separates    names[userIndex];
+//      @     separates    names[userIndex], passwords[userIndex];
+//      @     separates    user, password, result;
 //      @     declassify  (   \exists int i;
 //      @                     0 <= i && i < names.length;
 //      @                     names[i] == user && passwords[i] == password
