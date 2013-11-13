@@ -20,7 +20,8 @@ public class Voter {
     
     private boolean high_voteValid;
     
-    /*@ separates low_outputStream,
+    /*@ normal_behavior
+        separates low_outputStream,
                  low_outputStreamAvailable,
                  low_NUM_OF_VOTERS,
                  low_numOfVotes,
@@ -38,7 +39,8 @@ public class Voter {
         publishVoterParticipation();
     }
     
-    /*@ separates low_outputStream,
+    /*@ normal_behavior
+        separates low_outputStream,
                  low_outputStreamAvailable,
                  low_NUM_OF_VOTERS,
                  low_numOfVotes,
@@ -47,7 +49,8 @@ public class Voter {
         return high_inputStream;
     }
     
-    /*@ separates low_outputStream,
+    /*@ normal_behavior
+        separates low_outputStream,
                  low_outputStreamAvailable,
                  low_NUM_OF_VOTERS,
                  low_numOfVotes,
@@ -62,7 +65,8 @@ public class Voter {
         }
     }
     
-    /*@ separates low_outputStream,
+    /*@ normal_behavior
+        separates low_outputStream,
                  low_outputStreamAvailable,
                  low_NUM_OF_VOTERS,
                  low_numOfVotes,
@@ -72,7 +76,8 @@ public class Voter {
         return 0 < high_vote && high_vote <= 255;
     }
     
-    /*@ separates low_outputStream,
+    /*@ normal_behavior
+        separates low_outputStream,
                  low_outputStreamAvailable,
                  low_NUM_OF_VOTERS,
                  low_numOfVotes,
@@ -82,7 +87,8 @@ public class Voter {
     }
     
     
-    /*@ separates low_outputStream,
+    /*@ normal_behavior
+        separates low_outputStream,
                  low_outputStreamAvailable,
                  low_NUM_OF_VOTERS,
                  low_numOfVotes,
