@@ -52,7 +52,7 @@ public interface Map2 {
     public /*@nullable@*/ Object put(Object key, Object value);
 
     /* What if keys.length == 1 before remove? 
-     * Do I have to set map = mapEmpty in that case?
+     * Do I have to set map = mapEmpty in case inDomain(map, key)?
      */
     
     /*@ public normal_behaviour
