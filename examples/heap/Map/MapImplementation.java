@@ -160,6 +160,20 @@ final class MapImplementation implements Map2 {
     }
     
     /*@ public normal_behaviour
+    @ requires keysNew.length == keys.length + 1;
+    @ requires valuesNew.length == values.length + 1;
+    @ assignable keysNew[*], valuesNew[*];
+    @ ensures (\forall Object o; !\fresh(o));
+    @ ensures (\forall int i; 0<=i && i<keys.length; keysNew[i] == keys[i] &&
+    @                                valuesNew[i] == values[i]);
+    @*/
+    private void putCopyToNewArray(/*@nullable*/ Object[] keysNew,
+            /*@nullable*/ Object[] valuesNew){
+        copyArray(keysNew, keys, keys.length, 0, 0);
+        copyArray(valuesNew, values, values.length, 0, 0);
+    }
+    
+    /*@ public normal_behaviour
      @ requires !\dl_inDomain(map, key);
      @ assignable footprint;
      @ ensures map == \dl_mapUpdate(\old(map), key, value);
@@ -175,8 +189,7 @@ final class MapImplementation implements Map2 {
 //      Object keysNew[] = new Object[keys.length + 1];
 //      Object valuesNew[] = new Object[keys.length + 1];
 
-        copyArray(keysNew, keys, keys.length, 0, 0);
-        copyArray(valuesNew, values, keys.length, 0, 0);
+        putCopyToNewArray(keysNew, valuesNew);
 
         keysNew[keys.length] = key;
         valuesNew[keys.length] = value;
