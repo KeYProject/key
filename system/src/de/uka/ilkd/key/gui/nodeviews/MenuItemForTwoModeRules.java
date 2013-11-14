@@ -27,10 +27,14 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 public class MenuItemForTwoModeRules extends JMenu implements
         BuiltInRuleMenuItem {
 
+    private static final int EXPAND_DELAY = 200;
     private static final long serialVersionUID = 2183229438545523499L;
+	
+    // without selecting one the options above take unforced mode as default
+    private static final boolean DEFAULT_FORCE = true;
     
     private final BuiltInRule rule;
-    private boolean forcedMode = true;
+    private boolean forcedMode = DEFAULT_FORCE;
     // we support only one listener
     private ActionListener listener;
     
@@ -81,19 +85,19 @@ public class MenuItemForTwoModeRules extends JMenu implements
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                forcedMode = true;
+                forcedMode = DEFAULT_FORCE;
                 listener.actionPerformed(new ActionEvent(MenuItemForTwoModeRules.this, 
                         ActionEvent.ACTION_PERFORMED, e.getActionCommand()));
             }
         });
 
         // wait a bit longer before expanding submenus
-        setDelay(getDelay() + 500);
+        setDelay(getDelay() + EXPAND_DELAY);
         
         super.addMouseListener(new MouseAdapter() {            
             @Override
             public void mouseClicked(MouseEvent e) {
-                forcedMode = true;
+                forcedMode = DEFAULT_FORCE;
                 
                 listener.actionPerformed(new ActionEvent(MenuItemForTwoModeRules.this, 
                         ActionEvent.ACTION_PERFORMED, getText()));                

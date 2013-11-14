@@ -16,8 +16,6 @@ package de.uka.ilkd.key.rule.label;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.gui.configuration.LabelSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -26,7 +24,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
 
 /**
  * <p>
@@ -34,18 +34,21 @@ import de.uka.ilkd.key.rule.Rule;
  * how it is maintained during proof, more concrete when a {@link Rule} is applied.
  * </p>
  * <p>
- * Which {@link ITermLabelWorker} are available during proof are defined
- * by the {@link LabelSettings} as part of the {@link ProofSettings}. This
- * means that they are also saved in *.proof files. 
+ * Which {@link ITermLabelWorker} instances are available during proof is defined
+ * by the {@link Profile} always available via {@code proof.env().getInitConfig().getProfile()}.
  * </p>
  * <p>
- * During proof and for persistence the class {@link TermLabelWorkerManagement}
- * is responsible.
+ * During proof the class {@link TermLabelWorkerManagement} is responsible to
+ * use the available {@link ITermLabelWorker} to maintain {@link ITermLabel}s.
+ * </p>
+ * <p>
+ * Instructions how to implement new term labels can be found in the
+ * interface documentation of {@link ITermLabel}.
  * </p>
  * @author Martin Hentschel
  * @see TermLabelWorkerManagement
  * @see ITermLabel
- * @see LabelSettings
+ * @see Profile#getLabelInstantiators()
  */
 public interface ITermLabelWorker {
    /**

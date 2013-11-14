@@ -78,7 +78,7 @@ final class PrefixSumRec {
 	return 2*left - right + 1;
     }
 
-    /*@ normal_behavior //ß\label{lst:min-begin}ß
+    /*@ normal_behavior 
       @   requires k >= 0;
       @   ensures 0 <= \result && \result <= k;
       @   ensures pow2(\result) <= k+1;
@@ -98,9 +98,9 @@ final class PrefixSumRec {
           @*/
         while ( k% pow2(n+1) != pow2(n)-1 ) n++;
         return n;
-    }//ß\label{lst:min-end}ß
+    }
 
-    /*@ normal_behavior //ß\label{lst:eff-begin}ß
+    /*@ normal_behavior
       @   requires 0 <= k;
       @   ensures \result == pow2(min(k));
       @   ensures 0 < \result && \result <= k+1;
@@ -109,7 +109,7 @@ final class PrefixSumRec {
       @*/
     private /*@ helper strictly_pure @*/ static int f ( int k ) {
         return even(k)? 1: f(div2(k-1));
-    }//ß\label{lst:eff-end}ß
+    }
 
 
     /*@ public normal_behavior

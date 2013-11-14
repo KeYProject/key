@@ -19,7 +19,9 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.collection.DefaultImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -40,6 +42,13 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
      */
     private ImmutableMap<SchemaVariable,SchemaVariable> nameCorrespondences =
 	DefaultImmutableMap.<SchemaVariable,SchemaVariable>nilMap();
+
+    private final HeapLDT heapLDT;
+
+
+    SVNameCorrespondenceCollector(HeapLDT heapLDT) {
+        this.heapLDT = heapLDT;
+    }
 
 
     /** is called by the execPostOrder-method of a term 
@@ -109,8 +118,12 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
 	if (taclet instanceof FindTaclet) {
 	    final Term findTerm = ( (FindTaclet)taclet ).find ();
             findTerm.execPostOrder ( this );
-            if ( findTerm.op () instanceof SchemaVariable )
+            if ( findTerm.op () instanceof SchemaVariable ) {
                 findSV = (SchemaVariable)findTerm.op ();
+            } else if (findTerm.op() instanceof Function &&
+                    heapLDT.containsFunction((Function)findTerm.op())) {
+                findSV = (SchemaVariable)findTerm.sub(2).op();
+            }
 	}
         for (TacletGoalTemplate tacletGoalTemplate : taclet.goalTemplates()) {
             TacletGoalTemplate gt = tacletGoalTemplate;

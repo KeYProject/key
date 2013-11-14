@@ -77,7 +77,6 @@ public class ProofSettings {
     private final static int STRATEGY_SETTINGS = 0;
     private final static int CHOICE_SETTINGS   = 1;
     private final static int SMT_SETTINGS      = 2;
-    private final static int LABEL_SETTINGS    = 3;
 
     
     /** create a proof settings object. 
@@ -91,7 +90,6 @@ public class ProofSettings {
 	    new ChoiceSettings(),
 	    ProofDependentSMTSettings.getDefaultSettingsData(),
 	 //   new ViewSettings()
-       new LabelSettings()
 	};
 	
 	for (int i = 0; i < settings.length; i++) { 
@@ -233,15 +231,6 @@ public class ProofSettings {
     public StrategySettings getStrategySettings() {
         ensureInitialized();
         return (StrategySettings) settings[STRATEGY_SETTINGS];
-    }
-
-    /**
-     * Returns the {@link LabelSettings}.
-     * @return The {@link LabelSettings}.
-     */
-    public LabelSettings getLabelSettings() {
-        ensureInitialized();
-        return (LabelSettings) settings[LABEL_SETTINGS];
     }
 
     /** returns the ChoiceSettings object
