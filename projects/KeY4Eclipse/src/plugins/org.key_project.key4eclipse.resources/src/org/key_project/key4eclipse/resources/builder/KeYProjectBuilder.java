@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.key_project.key4eclipse.resources.log.KeYProjectLogger;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 
@@ -47,17 +48,21 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    @Override
    protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
       IProject project = getProject();
+      IResourceDelta delta = getDelta(project);
+      //Log
+      long buildTimeSart = System.currentTimeMillis();
+      KeYProjectLogger.logBuild(project, delta);
+      //
       ProofManager proofManager = null;
       try{
          if(kind == IncrementalProjectBuilder.FULL_BUILD){
             proofManager = new ProofManager(project);
             proofManager.runProofs(monitor);
          }
-         else if(kind == IncrementalProjectBuilder.AUTO_BUILD){
-            IResourceDelta delta = getDelta(project);
+         else if(kind == IncrementalProjectBuilder.AUTO_BUILD || kind == IncrementalProjectBuilder.INCREMENTAL_BUILD){
             if (delta != null && KeYProjectProperties.isEnableBuildProofs(project)) {
                proofManager = new ProofManager(project);
-               if (!KeYProjectProperties.isEnableBuildProofsEfficient(project)) {
+               if (!KeYProjectProperties.isEnableBuildRequiredProofsOnly(project)) {
                   proofManager.runProofs(monitor);
                }
                else {
@@ -74,6 +79,9 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
          if (proofManager != null) {
             proofManager.dispose();
          }
+         //Log
+         long buildTimeEnd = System.currentTimeMillis();
+         KeYProjectLogger.logBuild3(project, buildTimeSart, buildTimeEnd);
       }
       return null;
    }

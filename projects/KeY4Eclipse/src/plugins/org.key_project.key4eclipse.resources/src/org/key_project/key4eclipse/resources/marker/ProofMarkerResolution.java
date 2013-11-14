@@ -38,16 +38,19 @@ public class ProofMarkerResolution implements IMarkerResolution2{
    
    /**
     * Initializes the global variables depending on the given {@link IMarker#getType()}.
-    * @param markerType - the given {@link IMarker#getType()}
+    * @param marker - the given {@link IMarker}
+    * @throws CoreException 
     */
-   public ProofMarkerResolution(String markerType) {
-      if(markerType.equals(MarkerManager.CLOSEDMARKER_ID)){
-         description = "Open proof";
+   public ProofMarkerResolution(IMarker marker) throws CoreException {
+      IFile proofFile = getProofFile(marker);
+      String proofFileName = proofFile.getFullPath().lastSegment();
+      if(MarkerManager.CLOSEDMARKER_ID.equals(marker.getType())){
+         description = "Open proof: " + proofFileName;
       }
-      else if(markerType.equals(MarkerManager.NOTCLOSEDMARKER_ID)){
-         description = "Open proof to close it manually";
+      else if(MarkerManager.NOTCLOSEDMARKER_ID.equals(marker.getType())){
+         description = "Open proof to close it manually: " + proofFileName;
       }
-      this.label = "Open proof";
+      this.label = "Open proof: " + proofFileName;
    }
    
    /**

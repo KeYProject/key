@@ -59,7 +59,7 @@ public class ProofMetaFileWriter {
       try{
          this.addedTypes = new LinkedHashSet<String>();
          doc = createDoument();
-         
+
          TransformerFactory transFactory = TransformerFactory.newInstance();
          Transformer transformer = transFactory.newTransformer();
          DOMSource source = new DOMSource(doc);
@@ -98,7 +98,6 @@ public class ProofMetaFileWriter {
       String md5 = KeY4EclipseResourcesUtil.computeContentMD5(pe.getProofFile());
       proofFileMD5.appendChild(doc.createTextNode(md5));
       rootElement.appendChild(proofFileMD5);
-      createTypeElement(getKeYJavaTypeFromEnv(pe.getContract().getKJT(), pe.getKeYEnvironment()));
       LinkedHashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
       for(IProofReference<?> proofRef : proofReferences){
          KeYJavaType kjt = getKeYJavaType(proofRef);

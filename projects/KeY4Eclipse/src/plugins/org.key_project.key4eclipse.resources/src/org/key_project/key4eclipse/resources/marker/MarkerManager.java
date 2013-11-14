@@ -87,7 +87,7 @@ public class MarkerManager {
     * @throws CoreException
     */
    public void setCycleDetectedMarker(LinkedList<ProofElement> cycle) throws CoreException{
-      ProofElement pe = cycle.get(0);
+      ProofElement pe = cycle.get(0);//TODO: muss hier nicht ne schleife hin??
       IMarker  curMarker = getOldProofMarkerForPe(pe);
       if(curMarker != null){
          curMarker.delete();
@@ -142,6 +142,7 @@ public class MarkerManager {
     * @throws CoreException
     */
    public IMarker getOldProofMarkerForPe(ProofElement pe) throws CoreException{
+      //TODO: Add Recursionmarker
       LinkedList<IMarker> markerList = getAllkeYMarkerForScl(pe.getJavaFile(), pe.getSourceLocation());
       for(IMarker marker : markerList){
          if(CLOSEDMARKER_ID.equals(marker.getType()) || NOTCLOSEDMARKER_ID.equals(marker.getType())){

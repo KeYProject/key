@@ -44,6 +44,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileTypeElement;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
+import org.key_project.key4eclipse.resources.log.KeYProjectLogger;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
@@ -100,7 +101,14 @@ public class ProofManager {
    private LinkedList<IFile> changedJavaFiles;
    private List<ProofElement> proofsToDo = Collections.synchronizedList(new LinkedList<ProofElement>());
    private List<Pair<ByteArrayOutputStream, ProofElement>> proofsToSave = Collections.synchronizedList(new LinkedList<Pair<ByteArrayOutputStream, ProofElement>>());
-
+   //Log
+   private List<Integer> LogList = Collections.synchronizedList(new LinkedList<Integer>());
+   private long parseTimeStart;
+   private long parseTimeEnd;
+   private long proofTimeStart;
+   private long proofTimeEnd;
+   //
+   
    /**
     * The Constructor that loads the {@link KeYEnvironment}. If that fails the problemLoaderException will be set.
     * @param project - the {@link IProject} to use
@@ -111,6 +119,9 @@ public class ProofManager {
       markerManager = new MarkerManager();
       mainProofFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(project.getFullPath().append("proofs"));
       this.project = project;
+      //Log
+      parseTimeStart = System.currentTimeMillis();
+      //
       try {
          File location = KeYUtil.getSourceLocation(project);
          File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
@@ -121,6 +132,9 @@ public class ProofManager {
          handleProblemLoaderException(e);
          throw e;
       }
+      //Log
+      parseTimeEnd = System.currentTimeMillis();
+      //      
    }
    
    
@@ -151,16 +165,23 @@ public class ProofManager {
     * @throws Exception
     */
    public void runProofs(LinkedList<IFile> changedJavaFiles, IProgressMonitor monitor) throws Exception{
+      //Log
+      proofTimeStart = System.currentTimeMillis();
+      //
       LinkedList<ProofElement> proofElements = getAllProofElements();
+      
       this.changedJavaFiles = changedJavaFiles;
       markerManager.deleteKeYMarker(project, IResource.DEPTH_ZERO);
       markerManager.deleteKeYMarkerByType(project, MarkerManager.CYCLEDETECTEDMARKER_ID, IResource.DEPTH_INFINITE);
       //set up monitor
       monitor.beginTask("Build all proofs", proofElements.size());
       initThreads(proofElements, changedJavaFiles, monitor);
-      
       checkContractRecursion(proofElements);
       cleanMarker(proofElements);
+      //Log
+      proofTimeEnd = System.currentTimeMillis();
+      KeYProjectLogger.logBuild2(project, proofElements.size(), LogList, parseTimeStart, parseTimeEnd, proofTimeStart, proofTimeEnd);
+      //
       if(KeYProjectProperties.isAutoDeleteProofFiles(project)){
          cleanProofFolder(getAllFiles(proofElements), mainProofFolder);
       }
@@ -292,7 +313,7 @@ public class ProofManager {
          
       }
       else {
-         ProofRunnable run = new ProofRunnable(cloneEnvironment(), monitor);
+         ProofRunnable run = new ProofRunnable(cloneEnvironment(), monitor); //TODO: why clone?
          run.run();
          saveProofsFormList();
       }
@@ -514,7 +535,7 @@ public class ProofManager {
       markerManager.deleteKeYMarker(project, IResource.DEPTH_ZERO);
       LinkedList<IFile> allFiles = collectAllJavaFilesForProject();
       for(IFile file : allFiles){
-         markerManager.deleteKeYMarker(file, IResource.DEPTH_ZERO);
+         markerManager.deleteKeYMarker(file, IResource.DEPTH_ZERO);//TODO: warum doppelt?? 
       }
       //add the ProblemExceptionMarker
       markerManager.setProblemLoaderExceptionMarker(project, e.getMessage());
@@ -693,7 +714,7 @@ public class ProofManager {
          Proof proof = loadEnv.getLoadedProof();
          if (proof != null) {
             if (!proof.closed()){
-               loadEnv.getUi().startAndWaitForAutoMode(proof);
+               loadEnv.getUi().startAndWaitForAutoMode(proof);//TODO: Remove automode
             }
             pe.setProof(proof);
             pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
@@ -903,6 +924,9 @@ public class ProofManager {
       @Override
       public void run() {
          try{
+            //Log
+            int i = 0;
+            //
             ProofElement pe;
             while ((pe = getProofToDo()) != null) {
 
@@ -913,8 +937,11 @@ public class ProofManager {
                
                monitor.subTask("Building " + pe.getProofObl().name());
                
-               if(!KeYProjectProperties.isEnableBuildProofsEfficient(project)){
-                  processProof(pe);                
+               if(!KeYProjectProperties.isEnableBuildRequiredProofsOnly(project)){
+                  processProof(pe);
+                  //Log
+                  i++;
+                  //
                   
                }
                else{
@@ -925,21 +952,32 @@ public class ProofManager {
                         LinkedList<IType> javaTypes = collectAllJavaITypes();
                         if(MD5changed(pe.getProofFile(), pmfr) || typeOrSubTypeChanged(pmfr, javaTypes) || superTypeChanged(pe.getContract().getKJT(), changedJavaFiles, javaTypes)){
                            processProof(pe);
+                           //Log
+                           i++;
+                           //
                         }
                      } catch (Exception e) {
                         LogUtil.getLogger().createErrorStatus(e); // TODO: You do nothing with the created status. I guess you mean LogUtil.getLogger().logError(e); which writes the exception into the eclipse log
                         processProof(pe);
+                        //Log
+                        i++;
+                        //
                      }
                   }
                   else{
                      processProof(pe);
+                     //Log
+                     i++;
+                     //
                   }
                }
                
                monitor.worked(1);
             }
             environment.dispose();
-      
+            //Log
+            LogList.add(i);
+            //
          } catch(Exception e){
             LogUtil.getLogger().logError(e);
             LogUtil.getLogger().createErrorStatus(e); // TODO: You do nothing with the created status. I guess you mean LogUtil.getLogger().logError(e); which writes the exception into the eclipse log
