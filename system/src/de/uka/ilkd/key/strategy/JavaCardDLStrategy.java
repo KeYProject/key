@@ -55,6 +55,7 @@ import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
 import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
 import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
+import de.uka.ilkd.key.strategy.feature.ContainsTermFeature;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
 import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
 import de.uka.ilkd.key.strategy.feature.CountPosDPathFeature;
@@ -639,7 +640,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                       // been replaced by it's computed value
                       add( applyTF( "auxiliarySK", IsSelectSkolemConstantTermFeature.INSTANCE),
                            applyTF( "result", rec( any(), add( SimplifiedSelectTermFeature.create(heapLDT),
-                                                                     not( ff.ifThenElse ) ) ) ),
+                                                               not( ff.ifThenElse ) ) ) ),
+                           not( ContainsTermFeature.create( instOf("result"),
+                                                            instOf("auxiliarySK") ) ),
                            longConst(-5400) ) );
         bindRuleSet ( d, "hide_auxiliary_eq_const",
                       // hide auxiliary equation after the skolem constatns have
@@ -2412,7 +2415,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                    isInstantiated("s"),
                    applyTF("s", rec( any(),
                                      add( SimplifiedSelectTermFeature.create(heapLDT),
-                                          not( ff.ifThenElse ) ) ) ) ) );
+                                          not( ff.ifThenElse ) ) ) ),
+                   not( ContainsTermFeature.create( instOf("s"),
+                                                    instOf("t1") ) ) ) );
 
         return d;
     }

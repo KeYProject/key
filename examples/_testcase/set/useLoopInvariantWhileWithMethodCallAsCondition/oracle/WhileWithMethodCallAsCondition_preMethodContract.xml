@@ -49,7 +49,24 @@ post: (   i &lt; 0
               \then (TRUE)
               \else (FALSE)
       &amp; exc_3 = null)
-mod: allLocs \cup allLocs \cup allLocs \cup allLocs
+mod: \if (true)
+         \then (     \if (true)
+                         \then (     \if (true)
+                                         \then (allLocs)
+                                         \else (allLocs)
+                                \cap \if (  !  array
+                                             = null
+                                          &amp; i &gt;= 0)
+                                         \then (allLocs)
+                                         \else (allLocs))
+                         \else (allLocs)
+                \cap \if (!array = null &amp; i &gt;= 0)
+                         \then (allLocs)
+                         \else (allLocs))
+         \else (allLocs)
+\cap \if (!array = null &amp; i &gt;= 0)
+         \then (allLocs)
+         \else (allLocs)
 termination: diamond" pathCondition="!(  array.length &gt;= 0
   &amp; (    !i_0 = 0
        &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
