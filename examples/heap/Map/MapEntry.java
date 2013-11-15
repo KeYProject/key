@@ -10,11 +10,4 @@ final class MapEntry {
         this.value = value;
     }
 
-    /*@ public normal_behaviour
-     @   ensures \result == ( key == mapEntry.key && value == mapEntry.value );
-     @*/
-    public /*strictly_pure*/ boolean equals(MapEntry mapEntry) {
-        return key == mapEntry.key && value == mapEntry.value;
-    }
-
 }

@@ -45,12 +45,6 @@ public interface MapInterface {
     public /*@pure@*/ boolean isEmpty();
     
     /*@ public normal_behaviour
-     @ accessible footprint;
-     @ ensures \result == \dl_mapSize(map);
-     @*/
-    public /*@pure@*/ int size();
-    
-    /*@ public normal_behaviour
      @ assignable footprint;
      @ ensures map == \dl_mapUpdate(\old(map), key, value);
      @ ensures \result == (\dl_inDomain(\old(map), key) ? \dl_mapGet(\old(map), key) : null);
@@ -67,5 +61,11 @@ public interface MapInterface {
      @ ensures \result == (\dl_inDomain(\old(map), key) ? \dl_mapGet(\old(map), key) : null);
      @*/
     public /*@nullable@*/ Object remove(Object key);
+    
+    /*@ public normal_behaviour
+     @ accessible footprint;
+     @ ensures \result == \dl_mapSize(map);
+     @*/
+    public /*@pure@*/ int size();
     
 }

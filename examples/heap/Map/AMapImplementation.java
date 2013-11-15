@@ -34,6 +34,23 @@ final class AMapImplementation extends AbstractMap {
         }
         return false;
     }
+    
+    void copyMapEntries(MapEntry[] target,
+            int beginTarget,
+            int beginEntry,
+            int numberCopies) {
+        /*@ loop_invariant 0 <= i && i <= numberCopies;
+         @ loop_invariant (\forall int x; 0 <= x && x < i; 
+         @               ( target[beginTarget + x].key == entry[beginEntry + x].key ) &&
+         @               ( target[beginTarget + x].value == entry[beginEntry + x].value ) );
+         @ loop_invariant (\forall Object o; !\fresh(o));
+         @ decreases numberCopies - i;
+         @ assignable target[beginTarget..beginTarget + numberCopies - 1];
+         @*/
+        for (int i = 0; i < numberCopies; i++) {
+            target[beginTarget + i] = entry[beginEntry + i];
+        }
+    }
 
     public Object get(Object key) {
         int index = getIndexOfKey(key);
@@ -66,22 +83,6 @@ final class AMapImplementation extends AbstractMap {
     MapEntry[] getMapEntryArray(int l) {
         // This function is modeled after ArrayList.newArray()
         return new MapEntry[l];
-    }
-
-    void copyMapEntries(Object[] target,
-            int beginTarget,
-            int beginEntry,
-            int numberCopies) {
-        /*@ loop_invariant 0 <= i && i <= numberCopies;
-         @ loop_invariant ( \forall int x; 0 <= x && x < i; 
-         @          ( target[beginTarget + x].equals(entry[beginEntry + x] )));
-         @ loop_invariant (\forall Object o; !\fresh(o));
-         @ decreases numberCopies - i;
-         @ assignable target[beginTarget..beginTarget + numberCopies - 1];
-         @*/
-        for (int i = 0; i < numberCopies; i++) {
-            target[beginTarget + i] = entry[beginEntry + i];
-        }
     }
 
     Object putInDomain(int index, Object value) {
