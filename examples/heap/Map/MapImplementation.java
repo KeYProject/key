@@ -1,232 +1,153 @@
 package MapCaseStudy;
 
-class MapImplementation extends AbstractMap {
+final class MapImplementation extends AbstractMap {
 
     /*@ normal_behaviour
      @ ensures map == \dl_mapEmpty();
-     @ ensures \fresh(footprint);
      @*/
     public /*@pure@*/ MapImplementation() {
-        keys = new Object[0];
-        values = new Object[0];
-        //@ set map = \dl_mapEmpty();
-        //@ set footprint = \set_union(\set_union(\all_fields(keys), \all_fields(values)), \all_fields(this));
+        clear();
     }
 
     public int size() {
-        return keys.length;
+        return entry.length;
     }
 
     public Object get(Object key) {
-        /*@ loop_invariant 0 <= i && i <= keys.length;
-         @ loop_invariant (\forall int x; 0 <= x && x < i; key != keys[x]);
-         @ decreases keys.length - i;
-         @ assignable \strictly_nothing;
-         @*/
-        for (int i = 0; i < keys.length; i++) {
-            if (key == keys[i]) {
-                return values[i];
-            }
+        int index = getIndexOfKey(key);
+        if (index != -1) {
+            return getValue(index);
+        } else {
+            return null;
         }
-        return null;
     }
 
     public boolean isEmpty() {
-        return keys.length == 0;
+        return size() == 0;
     }
 
     public boolean containsKey(Object key) {
-        /*@ loop_invariant 0 <= i && i <= keys.length;
-         @ loop_invariant (\forall int x; 0 <= x && x < i; key != keys[x]);
-         @ decreases keys.length - i;
-         @ assignable \strictly_nothing;
-         @*/
-        for (int i = 0; i < keys.length; i++) {
-            if (key == keys[i]) {
-                return true;
-            }
-        }
-        return false;
+        return getIndexOfKey(key) != -1;
     }
 
     public boolean containsValue(Object value) {
-        /*@ loop_invariant 0 <= i && i <= keys.length;
-         @ loop_invariant (\forall int x; x < 0 || x >= i || value != values[x]);
-         @ decreases keys.length - i;
+        /*@ loop_invariant 0 <= i && i <= size();
+         @ loop_invariant (\forall int x; 0 <= x && x < i; value != getValue(x));
+         @ decreases size() - i;
          @ assignable \strictly_nothing;
          @*/
-        for (int i = 0; i < keys.length; i++) {
-            if (value == values[i]) {
+        for (int i = 0; i < size(); i++) {
+            if (value == getValue(i)) {
                 return true;
             }
         }
         return false;
     }
 
-    Object[] newArray(int l) {
-        // This function is taken from ArrayList.java
-        return new Object[l];
+    MapEntryImplementation[] getMapEntryArray(int l) {
+        // This function is modeled after ArrayList.newArray()
+        return new MapEntryImplementation[l];
     }
 
     int getIndexOfKey(Object key) {
         int index = -1;
-        /*@ loop_invariant 0 <= i && i <= keys.length;
-         @ loop_invariant ((index != -1) ==> (keys[index] == key && \dl_inDomain(map, key)));
-         @ loop_invariant ((index != -1) ==> index < keys.length && index >= 0);
-         @ loop_invariant ((index == -1) ==> (\forall int x; x>=0 && x<i; keys[x] != key));
+        /*@ loop_invariant 0 <= i && i <= size();
+         @ loop_invariant (index >= -1 && index < size());
+         @ loop_invariant ((index > -1) ==> (getKey(index) == key
+         @                                          && \dl_inDomain(map, key) 
+         @                                          && i >= size() ));
+         @ loop_invariant ((index == -1) ==> (\forall int x; x>=0 && x<i; getKey(x) != key));
          @ loop_invariant (\forall Object o; !\fresh(o));
-         @ decreases keys.length - i;
+         @ decreases size() - i;
          @ assignable \strictly_nothing;
          @*/
-        for (int i = 0; i < keys.length; i++) {
-            if (key == keys[i]) {
+        for (int i = 0; i < size(); i++) {
+            if (key == entry[i].getKey()) {
                 index = i;
+                i = size();
             }
         }
         return index;
     }
 
-    void copyArray(Object[] target,
-            Object[] source,
+    void copyMapEntries(Object[] target,
             int beginTarget,
-            int beginSource,
+            int beginEntry,
             int numberCopies) {
         /*@ loop_invariant 0 <= i && i <= numberCopies;
-         @ loop_invariant (\forall int x; 0 <= x && x < i; 
-         @          (target[beginTarget + x] == source[beginSource + x]));
+         @ loop_invariant ( \forall int x; 0 <= x && x < i; 
+         @          ( target[beginTarget + x].equals(entry[beginEntry + x] )));
          @ loop_invariant (\forall Object o; !\fresh(o));
          @ decreases numberCopies - i;
          @ assignable target[beginTarget..beginTarget + numberCopies - 1];
          @*/
         for (int i = 0; i < numberCopies; i++) {
-            target[beginTarget + i] = source[beginSource + i];
+            target[beginTarget + i] = entry[beginEntry + i];
         }
     }
 
     Object putInDomain(int index, Object value) {
-        Object ret = values[index];
-        values[index] = value;
-        //@ set map = \dl_mapUpdate(map, keys[index], value);
+        Object ret = getValue(index);
+        entry[index].setValue(value);
+        //@ set map = \dl_mapUpdate(map, getKey(index), value);
         return ret;
     }
 
-    void putCopy(Object[] keysNew, Object[] valuesNew) {
-        copyArray(keysNew, keys, 0, 0, keys.length);
-        copyArray(valuesNew, values, 0, 0, keys.length);
-    }
-
     Object putNotInDomain(Object key, Object value) {
-
-        Object[] keysNew = newArray(keys.length + 1);
-        Object[] valuesNew = newArray(keys.length + 1);
-//      Object[] keysNew = new Object[keys.length + 1];
-//      Object[] valuesNew = new Object[keys.length + 1];
-
-        putCopy(keysNew, valuesNew);
-
-        keysNew[keys.length] = key;
-        valuesNew[keys.length] = value;
-
-        keys = keysNew;
-        values = valuesNew;
-
+        MapEntryImplementation[] entryNew = getMapEntryArray(size() + 1);
+        copyMapEntries(entryNew, 0, 0, size());
+        entryNew[size()] = new MapEntryImplementation(key, value);
+        entry = entryNew;
         //@ set map = \dl_mapUpdate(map, key, value);
-        //@ set footprint = \set_union(\set_union(\all_fields(keys), \all_fields(values)), \all_fields(this));
         return null;
     }
 
     public Object put(Object key, Object value) {
         int index = getIndexOfKey(key);
-        if (index != -1) {
-            return putInDomain(index, value);
-        } else {
+        if (index == -1) {
             return putNotInDomain(key, value);
+
+        } else {
+            return putInDomain(index, value);
         }
     }
 
-    /*@ public normal_behaviour
-     @ requires keysNew != valuesNew;
-     @ requires valuesNew != null;
-     @ requires keysNew != null;
-     @ requires keysNew.length == keys.length - 1;
-     @ requires valuesNew.length == values.length - 1;
-     @ requires index > 0;
-     @ requires index < keys.length;
-     @ requires keys.length > 0;
-     @ requires \typeof(keysNew) == \typeof(keys);
-     @ requires \typeof(valuesNew) == \typeof(values);
-     @ assignable keysNew[0..index - 1], valuesNew[0..index - 1];
-     @ ensures (\forall Object o; !\fresh(o));
-     @ ensures (\forall int i; 0 <= i && i < index;
-     @                  keysNew[i] == keys[i] && valuesNew[i] == values[i]);
-     @*/
-    private void removeCopyLower(/*nullable*/Object[] keysNew,
-            /*nullable*/ Object[] valuesNew,
-            int index) {
-        copyArray(keysNew, keys, index - 1, 0, 0);
-        copyArray(valuesNew, values, index - 1, 0, 0);
+    void removeCopy(MapEntryImplementation[] entryNew, int index) {
+        copyMapEntries(entryNew, 0, 0, index - 1);
+        copyMapEntries(entryNew, index, index + 1, size() - index);
     }
 
-    /*@ public normal_behaviour
-     @ requires keysNew != valuesNew;
-     @ requires valuesNew != null;
-     @ requires keysNew != null;
-     @ requires keysNew.length == keys.length - 1;
-     @ requires valuesNew.length == values.length - 1;
-     @ requires \typeof(keysNew) == \typeof(keys);
-     @ requires \typeof(valuesNew) == \typeof(values);
-     @ assignable keysNew[index..keys.length - 1], valuesNew[index..values.length - 1];
-     @ ensures (\forall Object o; !\fresh(o));
-     @ ensures (\forall int i; index < i && i < keys.length;
-     @                  keysNew[i - 1] == keys[i] && valuesNew[i - 1] == values[i]);
-     @*/
-    private void removeCopyUpper(/*nullable*/Object[] keysNew,
-            /*nullable*/ Object[] valuesNew,
-            int index) {
-        copyArray(keysNew, keys, keys.length - (index + 1), index, index + 1);
-        copyArray(valuesNew, values, keys.length - (index + 1), index, index + 1);
-    }
-
-    void removeCopy(Object[] keysNew,
-            Object[] valuesNew,
-            int index) {
-        removeCopyLower(keysNew, valuesNew, index);
-        removeCopyUpper(keysNew, valuesNew, index);
-    }
-
-    Object removeInDomain(Object key, int index) {
-
-        Object ret = values[index];
-
-        Object keysNew[] = newArray(keys.length - 1);
-        Object valuesNew[] = newArray(keys.length - 1);
-
-        removeCopy(keysNew, valuesNew, index);
-
-        keys = keysNew;
-        values = valuesNew;
-
-        //@ set map = \dl_mapRemove(map, key);
-        //@ set footprint = \set_union(\set_union(\all_fields(keys), \all_fields(values)), \all_fields(this));
+    Object removeInDomain(int index) {
+        Object ret = getValue(index);
+        MapEntryImplementation[] entryNew = getMapEntryArray(size() - 1);
+        removeCopy(entryNew, index);
+        entry = entryNew;
+        //@ set map = \dl_mapRemove(map, getKey(index));
         return ret;
     }
 
     public Object remove(Object key) {
-
         int index = getIndexOfKey(key);
 
         if (index == -1) {
             return null;
         } else {
-            return removeInDomain(key, index);
+            return removeInDomain(index);
         }
     }
 
     public void clear() {
-        keys = new Object[0];
-        values = new Object[0];
+        entry = new MapEntryImplementation[0];
         //@ set map = \dl_mapEmpty();
-        //@ set footprint = \set_union(\set_union(\all_fields(keys), \all_fields(values)), \all_fields(this));
+        //@ set footprint = \all_fields(this);
+    }
+
+    Object getKey(int index) {
+        return entry[index].getKey();
+    }
+
+    Object getValue(int index) {
+        return entry[index].getValue();
     }
 
 }

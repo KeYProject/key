@@ -16,7 +16,7 @@ public interface MapInterface {
     
     /*@ public normal_behaviour
     @ accessible footprint;
-    @ ensures \result == (\dl_inDomain(map, key)?\dl_mapGet(map, key):null);
+    @ ensures \result == (\dl_inDomain(map, key) ? \dl_mapGet(map, key) : null);
     @*/
     public /*@pure nullable@*/ Object get(Object key);
 
@@ -46,12 +46,12 @@ public interface MapInterface {
     
     /*@ public normal_behaviour
      @ assignable footprint;
-     @ ensures map == \dl_mapUpdate(\old(map), key, value) &&
-     @           \result == (\dl_inDomain(\old(map), key)?\dl_mapGet(\old(map), key):null);
+     @ ensures map == \dl_mapUpdate(\old(map), key, value);
+     @ ensures \result == (\dl_inDomain(\old(map), key) ? \dl_mapGet(\old(map), key) : null);
      @*/
     public /*@nullable@*/ Object put(Object key, Object value);
 
-    /* What if keys.length == 1 before remove? 
+    /* What if size() == 1 before remove? 
      * Do I have to set map = mapEmpty in case inDomain(map, key)?
      */
     
