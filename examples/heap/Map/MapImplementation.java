@@ -51,10 +51,10 @@ class MapImplementation extends AbstractMap {
 
     public boolean containsValue(Object value) {
         /*@ loop_invariant 0 <= i && i <= keys.length;
-          @ loop_invariant (\forall int x; x < 0 || x >= i || value != values[x]);
-          @ decreases keys.length - i;
-          @ assignable \strictly_nothing;
-          @*/
+         @ loop_invariant (\forall int x; x < 0 || x >= i || value != values[x]);
+         @ decreases keys.length - i;
+         @ assignable \strictly_nothing;
+         @*/
         for (int i = 0; i < keys.length; i++) {
             if (value == values[i]) {
                 return true;
@@ -62,12 +62,12 @@ class MapImplementation extends AbstractMap {
         }
         return false;
     }
-    
+
     Object[] newArray(int l) {
         // This function is taken from ArrayList.java
         return new Object[l];
     }
-    
+
     int getIndexOfKey(Object key) {
         int index = -1;
         /*@ loop_invariant 0 <= i && i <= keys.length;
@@ -85,12 +85,12 @@ class MapImplementation extends AbstractMap {
         }
         return index;
     }
-    
+
     void copyArray(Object[] target,
-                           Object[] source,
-                           int beginTarget,
-                           int beginSource,
-                           int numberCopies) {
+            Object[] source,
+            int beginTarget,
+            int beginSource,
+            int numberCopies) {
         /*@ loop_invariant 0 <= i && i <= numberCopies;
          @ loop_invariant (\forall int x; 0 <= x && x < i; 
          @          (target[beginTarget + x] == source[beginSource + x]));
@@ -102,19 +102,19 @@ class MapImplementation extends AbstractMap {
             target[beginTarget + i] = source[beginSource + i];
         }
     }
-    
-    Object putInDomain(int index, Object value){
+
+    Object putInDomain(int index, Object value) {
         Object ret = values[index];
         values[index] = value;
         //@ set map = \dl_mapUpdate(map, keys[index], value);
         return ret;
     }
-    
+
     void putCopy(Object[] keysNew, Object[] valuesNew) {
         copyArray(keysNew, keys, 0, 0, keys.length);
         copyArray(valuesNew, values, 0, 0, keys.length);
     }
-    
+
     Object putNotInDomain(Object key, Object value) {
 
         Object[] keysNew = newArray(keys.length + 1);
@@ -143,13 +143,16 @@ class MapImplementation extends AbstractMap {
             return putNotInDomain(key, value);
         }
     }
-    
+
     /*@ public normal_behaviour
      @ requires keysNew != valuesNew;
      @ requires valuesNew != null;
      @ requires keysNew != null;
      @ requires keysNew.length == keys.length - 1;
      @ requires valuesNew.length == values.length - 1;
+     @ requires index > 0;
+     @ requires index < keys.length;
+     @ requires keys.length > 0;
      @ requires \typeof(keysNew) == \typeof(keys);
      @ requires \typeof(valuesNew) == \typeof(values);
      @ assignable keysNew[0..index - 1], valuesNew[0..index - 1];
@@ -157,11 +160,13 @@ class MapImplementation extends AbstractMap {
      @ ensures (\forall int i; 0 <= i && i < index;
      @                  keysNew[i] == keys[i] && valuesNew[i] == values[i]);
      @*/
-    private void removeCopyLower(/*nullable*/Object[] keysNew, /*nullable*/ Object[] valuesNew, int index) {
-        copyArray(keysNew, keys, index, 0, 0);
-        copyArray(valuesNew, values, index, 0, 0);
+    private void removeCopyLower(/*nullable*/Object[] keysNew,
+            /*nullable*/ Object[] valuesNew,
+            int index) {
+        copyArray(keysNew, keys, index - 1, 0, 0);
+        copyArray(valuesNew, values, index - 1, 0, 0);
     }
-    
+
     /*@ public normal_behaviour
      @ requires keysNew != valuesNew;
      @ requires valuesNew != null;
@@ -175,23 +180,27 @@ class MapImplementation extends AbstractMap {
      @ ensures (\forall int i; index < i && i < keys.length;
      @                  keysNew[i - 1] == keys[i] && valuesNew[i - 1] == values[i]);
      @*/
-    private void removeCopyUpper(/*nullable*/Object[] keysNew, /*nullable*/ Object[] valuesNew, int index) {
+    private void removeCopyUpper(/*nullable*/Object[] keysNew,
+            /*nullable*/ Object[] valuesNew,
+            int index) {
         copyArray(keysNew, keys, keys.length - (index + 1), index, index + 1);
-        copyArray(keysNew, keys, keys.length - (index + 1), index, index + 1);
+        copyArray(valuesNew, values, keys.length - (index + 1), index, index + 1);
     }
-    
-    void removeCopy(Object[] keysNew, Object[] valuesNew, int index) {
+
+    void removeCopy(Object[] keysNew,
+            Object[] valuesNew,
+            int index) {
         removeCopyLower(keysNew, valuesNew, index);
         removeCopyUpper(keysNew, valuesNew, index);
     }
-    
+
     Object removeInDomain(Object key, int index) {
 
         Object ret = values[index];
 
         Object keysNew[] = newArray(keys.length - 1);
         Object valuesNew[] = newArray(keys.length - 1);
-        
+
         removeCopy(keysNew, valuesNew, index);
 
         keys = keysNew;
