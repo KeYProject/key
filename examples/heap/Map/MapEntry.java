@@ -1,6 +1,6 @@
 package MapCaseStudy;
 
-final class MapEntry{
+final class MapEntry {
 
     public final Object key;
     public Object value;
@@ -11,11 +11,10 @@ final class MapEntry{
     }
 
     /*@ public normal_behaviour
-     @   ensures \result == ( this.getKey() == mapEntry.getKey()
-     @                     && this.getValue() == mapEntry.getValue() );
+     @   ensures \result == ( key == mapEntry.key && value == mapEntry.value );
      @*/
     public /*strictly_pure*/ boolean equals(MapEntry mapEntry) {
-        return this.key == mapEntry.key && this.value == mapEntry.value;
+        return key == mapEntry.key && value == mapEntry.value;
     }
 
 }

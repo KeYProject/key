@@ -8,7 +8,7 @@ public abstract class AbstractMap implements MapInterface {
      @ public invariant (\forall int i1; 0 <= i1 && i1 < entry.length;
      @                      (\forall int i2; i1 < i2 && i2 < entry.length;
      @                          ( entry[i1].key != entry[i2].key )));
-     @ public invariant \typeof(entry) == \type(MapEntryImplementation[]);
+     @ public invariant \typeof(entry) == \type(MapEntry[]);
      @ public invariant entry.length == \dl_mapSize(map);
      @ public invariant (\forall int i; 0 <= i && i < entry.length;
      @                      \dl_mapGet(map, entry[i].key) == entry[i].value);
@@ -24,7 +24,7 @@ public abstract class AbstractMap implements MapInterface {
 
     /*@ public normal_behavior
      @   requires l >= 0;
-     @   ensures \typeof(\result) == \type(MapEntryImplementation[]);
+     @   ensures \typeof(\result) == \type(MapEntry[]);
      @   ensures \result.length == l;
      @   ensures \fresh(\result);
      @   ensures \result != null;
@@ -36,9 +36,10 @@ public abstract class AbstractMap implements MapInterface {
 
     /*@ public normal_behavior
      @ ensures \dl_inDomain(map, key) ? 
-     @           (\result >= 0 && \result < size() && getKey(\result) == key) : 
-     @                          (\result == -1);
+     @              (\result >= 0 && \result < entry.length && entry[\result].key == key) : 
+     @              (\result == -1);
      @ ensures (\forall Object o; !\fresh(o));
+     @ accessible footprint;
      @*/
     abstract /*@strictly_pure@*/ int getIndexOfKey(Object key);
 

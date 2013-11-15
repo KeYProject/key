@@ -21,6 +21,18 @@ public interface MapInterface {
     public void clear();
     
     /*@ public normal_behaviour
+     @ accessible footprint;
+     @ ensures \result == \dl_inDomain(map, key);
+     @*/
+    public /*@pure@*/ boolean containsKey(Object key);
+
+    /*@ public normal_behaviour
+    @ accessible footprint;
+    @ ensures \result == (\exists Object key; \dl_inDomain(map,key); \dl_mapGet(map,key) == value);
+    @*/
+    public /*@pure@*/ boolean containsValue(Object value);
+    
+    /*@ public normal_behaviour
     @ accessible footprint;
     @ ensures \result == (\dl_inDomain(map, key) ? \dl_mapGet(map, key) : null);
     @*/
@@ -37,18 +49,6 @@ public interface MapInterface {
      @ ensures \result == \dl_mapSize(map);
      @*/
     public /*@pure@*/ int size();
-
-    /*@ public normal_behaviour
-     @ accessible footprint;
-     @ ensures \result == \dl_inDomain(map,key);
-     @*/
-    public /*@pure@*/ boolean containsKey(Object key);
-
-    /*@ public normal_behaviour
-    @ accessible footprint;
-    @ ensures \result == (\exists Object key; \dl_inDomain(map,key); \dl_mapGet(map,key) == value);
-    @*/
-    public /*@pure@*/ boolean containsValue(Object value);
     
     /*@ public normal_behaviour
      @ assignable footprint;

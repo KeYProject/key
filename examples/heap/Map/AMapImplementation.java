@@ -1,18 +1,38 @@
 package MapCaseStudy;
 
-final class MapImplementation extends AbstractMap {
+final class AMapImplementation extends AbstractMap {
 
     /*@ normal_behaviour
      @ ensures map == \dl_mapEmpty();
      @*/
-    public /*@pure@*/ MapImplementation() {
-        clear();
+    public /*@pure@*/ AMapImplementation() {
+        entry = new MapEntry[0];
+        //@ set map = \dl_mapEmpty();
+        //@ set footprint = \set_union(\all_fields(this), \all_fields(entry));
     }
     
     public void clear() {
         entry = new MapEntry[0];
         //@ set map = \dl_mapEmpty();
-        //@ set footprint = \all_fields(this);
+        //@ set footprint = \set_union(\all_fields(this), \all_fields(entry));
+    }
+    
+    public boolean containsKey(Object key) {
+        return getIndexOfKey(key) != -1;
+    }
+
+    public boolean containsValue(Object value) {
+        /*@ loop_invariant 0 <= i && i <= size();
+         @ loop_invariant (\forall int x; 0 <= x && x < i; value != getValue(x));
+         @ decreases size() - i;
+         @ assignable \strictly_nothing;
+         @*/
+        for (int i = 0; i < size(); i++) {
+            if (value == getValue(i)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int size() {
@@ -32,24 +52,6 @@ final class MapImplementation extends AbstractMap {
         return size() == 0;
     }
 
-    public boolean containsKey(Object key) {
-        return getIndexOfKey(key) != -1;
-    }
-
-    public boolean containsValue(Object value) {
-        /*@ loop_invariant 0 <= i && i <= size();
-         @ loop_invariant (\forall int x; 0 <= x && x < i; value != getValue(x));
-         @ decreases size() - i;
-         @ assignable \strictly_nothing;
-         @*/
-        for (int i = 0; i < size(); i++) {
-            if (value == getValue(i)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     MapEntry[] getMapEntryArray(int l) {
         // This function is modeled after ArrayList.newArray()
         return new MapEntry[l];
@@ -57,20 +59,21 @@ final class MapImplementation extends AbstractMap {
 
     int getIndexOfKey(Object key) {
         int index = -1;
-        /*@ loop_invariant 0 <= i && i <= size();
-         @ loop_invariant (index >= -1 && index < size());
-         @ loop_invariant ((index > -1) ==> (getKey(index) == key
+        /*@ loop_invariant 0 <= i && i <= entry.length;
+         @ loop_invariant (index >= -1 && index < entry.length);
+         @ loop_invariant ((index > -1) ==> (entry[index].key == key
          @                                          && \dl_inDomain(map, key) 
-         @                                          && i >= size() ));
-         @ loop_invariant ((index == -1) ==> (\forall int x; x>=0 && x<i; getKey(x) != key));
+         @                                          && i >= entry.length ));
+         @ loop_invariant ((index == -1) ==> (\forall int x; x>=0 && x<i; entry[x].key != key));
          @ loop_invariant (\forall Object o; !\fresh(o));
          @ decreases size() - i;
          @ assignable \strictly_nothing;
+         @ accessible footprint;
          @*/
         for (int i = 0; i < size(); i++) {
             if (key == entry[i].key) {
                 index = i;
-                i = size();
+                i = entry.length;
             }
         }
         return index;
