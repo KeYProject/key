@@ -16,6 +16,9 @@ public abstract class AbstractMap implements MapInterface {
      @          (\exists int i; 0 <= i && i < entry.length; entry[i].key == o) <==> \dl_inDomain(map, o));
      @*/
     
+    /*@ public invariant (\forall int i; 0 <= i && i < entry.length; 
+      @          entry[i] != null && entry[i].key != null && entry[i].value != null); */
+    
     /*@ public invariant footprint == \set_union(\set_union(\set_union(
      @              \infinite_union(int i; 0 <= i && i < entry.length; entry[i].*), 
      @              this.*),
