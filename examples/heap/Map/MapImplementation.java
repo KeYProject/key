@@ -134,8 +134,11 @@ final class MapImplementation implements Map2 {
      @ ensures (\forall Object o; !\fresh(o));
      @ assignable target[beginTarget..beginTarget + numberCopies - 1];
      @*/
-    private void copyArray(Object[] /*@ nullable */ target, Object[] source, int beginTarget, int beginSource,
-            int numberCopies) {
+    private void copyArray(Object[] /*@ nullable */ target,
+                           Object[] source,
+                           int beginTarget,
+                           int beginSource,
+                           int numberCopies) {
         /*@ loop_invariant 0 <= i && i <= numberCopies;
          @ loop_invariant (\forall int x; 0 <= x && x < i; 
          @ (target[beginTarget + x] == source[beginSource + x]));
@@ -163,19 +166,22 @@ final class MapImplementation implements Map2 {
     }
     
     /*@ public normal_behaviour
+    @ requires keysNew != valuesNew;
     @ requires valuesNew != null;
     @ requires keysNew != null;
     @ requires keysNew.length == keys.length + 1;
     @ requires valuesNew.length == values.length + 1;
+    @ requires \typeof(keysNew) == \typeof(keys);
+    @ requires \typeof(valuesNew) == \typeof(values);
     @ assignable keysNew[*], valuesNew[*];
     @ ensures (\forall Object o; !\fresh(o));
     @ ensures (\forall int i; 0<=i && i<keys.length; keysNew[i] == keys[i] &&
     @                                valuesNew[i] == values[i]);
     @*/
-    private void putCopyToNewArray(/*@nullable*/ Object[] keysNew,
-            /*@nullable*/ Object[] valuesNew){
-        copyArray(keysNew, keys, keys.length, 0, 0);
-        copyArray(valuesNew, values, values.length, 0, 0);
+    private void putCopyToNewArray(/*@nullable*/Object[] keysNew,
+            /*@nullable*/ Object[] valuesNew) {
+        copyArray(keysNew, keys, 0, 0, keys.length);
+        copyArray(valuesNew, values, 0, 0, keys.length);
     }
     
     /*@ public normal_behaviour
@@ -187,10 +193,10 @@ final class MapImplementation implements Map2 {
      @ ensures !\dl_inDomain(map, keys);
      @ ensures !\dl_inDomain(map, values);
      @*/
-    private Object putCreateNew(Object key, Object value) {
+    private /*nullable*/Object putCreateNew(Object key, Object value) {
 
-        Object keysNew[] = newArray(keys.length + 1);
-        Object valuesNew[] = newArray(keys.length + 1);
+        Object[] keysNew = newArray(keys.length + 1);
+        Object[] valuesNew = newArray(keys.length + 1);
 //      Object keysNew[] = new Object[keys.length + 1];
 //      Object valuesNew[] = new Object[keys.length + 1];
 
@@ -214,21 +220,6 @@ final class MapImplementation implements Map2 {
         } else {
             return putCreateNew(key, value);
         }
-    }
-    
-    /*@ private normal_behavior
-     @   ensures \typeof(\result) == \type(Object[]);
-     @   ensures \result.length == source.length + 1;
-     @   ensures \fresh(\result);
-     @   ensures (\forall int i; 0 <= i && i < source.length; \result[i] == source[i]);
-     @   ensures \result[source.length] == newValue;
-     @   assignable \nothing;
-     @*/
-    private Object[] enlargeArray(Object[] source, Object newValue) {
-        Object ret[] = newArray(source.length + 1);
-        copyArray(ret, source, source.length, 0, 0);
-        ret[source.length] = newValue;
-        return ret;
     }
 
     public Object remove(Object key) {
