@@ -1,4 +1,4 @@
-package CaseStudyUseMaps;
+package MapCaseStudy;
 
 public interface MapInterface {
     

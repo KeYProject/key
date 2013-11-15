@@ -1,6 +1,6 @@
-package CaseStudyUseMaps;
+package MapCaseStudy;
 
-final class MapImplementation implements MapInterface {
+class MapImplementation implements MapInterface {
 
     private Object keys[];
     private Object values[];
