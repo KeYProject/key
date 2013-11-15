@@ -1,6 +1,6 @@
 package CaseStudyUseMaps;
 
-public interface Map2 {
+public interface MapInterface {
     
     //@ public ghost instance \locset footprint;
     //@ public ghost instance \free map;
