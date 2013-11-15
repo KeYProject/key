@@ -48,7 +48,7 @@ public abstract class AbstractMap implements MapInterface {
      @ requires target != null;
      @ requires 0 <= numberCopies;
      @ requires 0 <= beginTarget && beginTarget + numberCopies <= target.length;
-     @ requires 0 <= beginEntry && beginEntry + numberCopies <= size();
+     @ requires 0 <= beginEntry && beginEntry + numberCopies <= entry.length;
      @ requires \typeof(target) == \typeof(entry);
      @ ensures (\forall int x; 0 <= x && x < numberCopies; 
      @               ( target[beginTarget + x].equals(entry[beginEntry + x] )));
@@ -61,7 +61,7 @@ public abstract class AbstractMap implements MapInterface {
             int numberCopies);
 
     /*@ public normal_behaviour
-     @ requires 0 <= index && index < size();
+     @ requires 0 <= index && index < entry.length;
      @ ensures map == \dl_mapUpdate(\old(map), getKey(index), value);
      @ ensures \result == (\dl_mapGet(\old(map), getKey(index)));
      @ ensures (\forall Object o; !\fresh(o));
@@ -81,12 +81,12 @@ public abstract class AbstractMap implements MapInterface {
 
     /*@ public normal_behaviour
      @ requires entryNew != null;
-     @ requires entryNew.length == size() - 1;
+     @ requires entryNew.length == entry.length - 1;
      @ requires \typeof(entryNew) == \typeof(entry);
      @ assignable entryNew[*];
      @ ensures (\forall Object o; !\fresh(o));
      @ ensures (\forall int i; 0 <= i && i < index; entryNew[i].equals(entry[i] ));
-     @ ensures (\forall int i; index < i && i < size(); entryNew[i - 1].equals(entry[i] ));
+     @ ensures (\forall int i; index < i && i < entry.length; entryNew[i - 1].equals(entry[i] ));
      @*/
     abstract void removeCopy( /*nullable*/ MapEntry[] entryNew, int index);
 
@@ -100,13 +100,13 @@ public abstract class AbstractMap implements MapInterface {
     abstract /*strictly_pure*/ Object removeInDomain(int index);
     
     /*@ public normal_behaviour
-     @ requires 0 <= index && index < size();
+     @ requires 0 <= index && index < entry.length;
      @ ensures \result == entry[index].key;
      @*/
     abstract /*strictly_pure*/ Object getKey(int index);
     
     /*@ public normal_behaviour
-     @ requires 0 <= index && index < size();
+     @ requires 0 <= index && index < entry.length;
      @ ensures \result == entry[index].value;
      @*/
     abstract /*strictly_pure*/ Object getValue(int index);

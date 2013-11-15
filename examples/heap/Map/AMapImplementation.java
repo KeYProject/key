@@ -22,12 +22,12 @@ final class AMapImplementation extends AbstractMap {
     }
 
     public boolean containsValue(Object value) {
-        /*@ loop_invariant 0 <= i && i <= size();
+        /*@ loop_invariant 0 <= i && i <= entry.length;
          @ loop_invariant (\forall int x; 0 <= x && x < i; value != getValue(x));
-         @ decreases size() - i;
+         @ decreases entry.length - i;
          @ assignable \strictly_nothing;
          @*/
-        for (int i = 0; i < size(); i++) {
+        for (int i = 0; i < entry.length; i++) {
             if (value == getValue(i)) {
                 return true;
             }
@@ -49,7 +49,7 @@ final class AMapImplementation extends AbstractMap {
     }
 
     public boolean isEmpty() {
-        return size() == 0;
+        return entry.length == 0;
     }
 
     MapEntry[] getMapEntryArray(int l) {
@@ -58,25 +58,18 @@ final class AMapImplementation extends AbstractMap {
     }
 
     int getIndexOfKey(Object key) {
-        int index = -1;
         /*@ loop_invariant 0 <= i && i <= entry.length;
-         @ loop_invariant (index >= -1 && index < entry.length);
-         @ loop_invariant ((index > -1) ==> (entry[index].key == key
-         @                                          && \dl_inDomain(map, key) 
-         @                                          && i >= entry.length ));
-         @ loop_invariant ((index == -1) ==> (\forall int x; x>=0 && x<i; entry[x].key != key));
+         @ loop_invariant (\forall int x; x>=0 && x<i; entry[x].key != key);
          @ loop_invariant (\forall Object o; !\fresh(o));
-         @ decreases size() - i;
+         @ decreases entry.length - i;
          @ assignable \strictly_nothing;
-         @ accessible footprint;
          @*/
-        for (int i = 0; i < size(); i++) {
+        for (int i = 0; i < entry.length; i++) {
             if (key == entry[i].key) {
-                index = i;
-                i = entry.length;
+                return i;
             }
         }
-        return index;
+        return -1;
     }
 
     void copyMapEntries(Object[] target,
@@ -103,9 +96,9 @@ final class AMapImplementation extends AbstractMap {
     }
 
     Object putNotInDomain(Object key, Object value) {
-        MapEntry[] entryNew = getMapEntryArray(size() + 1);
-        copyMapEntries(entryNew, 0, 0, size());
-        entryNew[size()] = new MapEntry(key, value);
+        MapEntry[] entryNew = getMapEntryArray(entry.length + 1);
+        copyMapEntries(entryNew, 0, 0, entry.length);
+        entryNew[entry.length] = new MapEntry(key, value);
         entry = entryNew;
         //@ set map = \dl_mapUpdate(map, key, value);
         return null;
@@ -123,12 +116,12 @@ final class AMapImplementation extends AbstractMap {
 
     void removeCopy(MapEntry[] entryNew, int index) {
         copyMapEntries(entryNew, 0, 0, index - 1);
-        copyMapEntries(entryNew, index, index + 1, size() - index);
+        copyMapEntries(entryNew, index, index + 1, entry.length - index);
     }
 
     Object removeInDomain(int index) {
         Object ret = getValue(index);
-        MapEntry[] entryNew = getMapEntryArray(size() - 1);
+        MapEntry[] entryNew = getMapEntryArray(entry.length - 1);
         removeCopy(entryNew, index);
         entry = entryNew;
         //@ set map = \dl_mapRemove(map, getKey(index));
