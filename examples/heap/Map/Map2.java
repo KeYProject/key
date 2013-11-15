@@ -57,8 +57,8 @@ public interface Map2 {
     
     /*@ public normal_behaviour
      @ assignable footprint;
-     @ ensures map == \dl_mapRemove(map, key) &&
-     @           \result == (\dl_inDomain(\old(map), key)?\dl_mapGet(\old(map), key):null);
+     @ ensures map == \dl_mapRemove(map, key);
+     @ ensures \result == (\dl_inDomain(\old(map), key) ? \dl_mapGet(\old(map), key) : null);
      @*/
     public /*@nullable@*/ Object remove(Object key);
 
