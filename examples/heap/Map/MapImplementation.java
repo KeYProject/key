@@ -8,6 +8,12 @@ final class MapImplementation extends AbstractMap {
     public /*@pure@*/ MapImplementation() {
         clear();
     }
+    
+    public void clear() {
+        entry = new MapEntry[0];
+        //@ set map = \dl_mapEmpty();
+        //@ set footprint = \all_fields(this);
+    }
 
     public int size() {
         return entry.length;
@@ -44,9 +50,9 @@ final class MapImplementation extends AbstractMap {
         return false;
     }
 
-    MapEntryImplementation[] getMapEntryArray(int l) {
+    MapEntry[] getMapEntryArray(int l) {
         // This function is modeled after ArrayList.newArray()
-        return new MapEntryImplementation[l];
+        return new MapEntry[l];
     }
 
     int getIndexOfKey(Object key) {
@@ -62,7 +68,7 @@ final class MapImplementation extends AbstractMap {
          @ assignable \strictly_nothing;
          @*/
         for (int i = 0; i < size(); i++) {
-            if (key == entry[i].getKey()) {
+            if (key == entry[i].key) {
                 index = i;
                 i = size();
             }
@@ -88,15 +94,15 @@ final class MapImplementation extends AbstractMap {
 
     Object putInDomain(int index, Object value) {
         Object ret = getValue(index);
-        entry[index].setValue(value);
+        entry[index].value = value;
         //@ set map = \dl_mapUpdate(map, getKey(index), value);
         return ret;
     }
 
     Object putNotInDomain(Object key, Object value) {
-        MapEntryImplementation[] entryNew = getMapEntryArray(size() + 1);
+        MapEntry[] entryNew = getMapEntryArray(size() + 1);
         copyMapEntries(entryNew, 0, 0, size());
-        entryNew[size()] = new MapEntryImplementation(key, value);
+        entryNew[size()] = new MapEntry(key, value);
         entry = entryNew;
         //@ set map = \dl_mapUpdate(map, key, value);
         return null;
@@ -112,14 +118,14 @@ final class MapImplementation extends AbstractMap {
         }
     }
 
-    void removeCopy(MapEntryImplementation[] entryNew, int index) {
+    void removeCopy(MapEntry[] entryNew, int index) {
         copyMapEntries(entryNew, 0, 0, index - 1);
         copyMapEntries(entryNew, index, index + 1, size() - index);
     }
 
     Object removeInDomain(int index) {
         Object ret = getValue(index);
-        MapEntryImplementation[] entryNew = getMapEntryArray(size() - 1);
+        MapEntry[] entryNew = getMapEntryArray(size() - 1);
         removeCopy(entryNew, index);
         entry = entryNew;
         //@ set map = \dl_mapRemove(map, getKey(index));
@@ -136,18 +142,12 @@ final class MapImplementation extends AbstractMap {
         }
     }
 
-    public void clear() {
-        entry = new MapEntryImplementation[0];
-        //@ set map = \dl_mapEmpty();
-        //@ set footprint = \all_fields(this);
-    }
-
     Object getKey(int index) {
-        return entry[index].getKey();
+        return entry[index].key;
     }
 
     Object getValue(int index) {
-        return entry[index].getValue();
+        return entry[index].value;
     }
 
 }

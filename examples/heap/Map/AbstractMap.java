@@ -2,23 +2,24 @@ package MapCaseStudy;
 
 public abstract class AbstractMap implements MapInterface {
 
-    public MapEntryImplementation[] entry;
+    public MapEntry[] entry;
 
     /*@
      @ public invariant (\forall int i1; 0 <= i1 && i1 < entry.length;
-     @                   (\forall int i2; i1 < i2 && i2 < entry.length;
-     @                                        ( entry[i1].key != entry[i2].key )));
+     @                      (\forall int i2; i1 < i2 && i2 < entry.length;
+     @                          ( entry[i1].key != entry[i2].key )));
      @ public invariant \typeof(entry) == \type(MapEntryImplementation[]);
      @ public invariant entry.length == \dl_mapSize(map);
      @ public invariant (\forall int i; 0 <= i && i < entry.length;
-     @                         \dl_mapGet(map, entry[i].key) == entry[i].value);
+     @                      \dl_mapGet(map, entry[i].key) == entry[i].value);
      @ public invariant (\forall Object o;
      @          (\exists int i; 0 <= i && i < entry.length; entry[i].key == o) <==> \dl_inDomain(map, o));
      @*/
     
     /*@ public invariant footprint == \set_union(\set_union(\set_union(
-     @           \infinite_union(int i; 0 <= i && i < entry.length; entry[i].*), 
-     @           this.*), entry.*) );
+     @              \infinite_union(int i; 0 <= i && i < entry.length; entry[i].*), 
+     @              this.*),
+     @              entry.*) );
      @*/
 
     /*@ public normal_behavior
@@ -86,7 +87,7 @@ public abstract class AbstractMap implements MapInterface {
      @ ensures (\forall int i; 0 <= i && i < index; entryNew[i].equals(entry[i] ));
      @ ensures (\forall int i; index < i && i < size(); entryNew[i - 1].equals(entry[i] ));
      @*/
-    abstract void removeCopy( /*nullable*/ MapEntryImplementation[] entryNew, int index);
+    abstract void removeCopy( /*nullable*/ MapEntry[] entryNew, int index);
 
     /*@ public normal_behaviour
      @ assignable footprint;
@@ -99,13 +100,13 @@ public abstract class AbstractMap implements MapInterface {
     
     /*@ public normal_behaviour
      @ requires 0 <= index && index < size();
-     @ ensures \result == entry[index].getKey();
+     @ ensures \result == entry[index].key;
      @*/
     abstract /*strictly_pure*/ Object getKey(int index);
     
     /*@ public normal_behaviour
      @ requires 0 <= index && index < size();
-     @ ensures \result == entry[index].getValue();
+     @ ensures \result == entry[index].value;
      @*/
     abstract /*strictly_pure*/ Object getValue(int index);
 
