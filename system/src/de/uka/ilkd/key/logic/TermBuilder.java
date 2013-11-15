@@ -34,6 +34,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.label.ShortcutEvaluationTermLabel;
+import de.uka.ilkd.key.logic.label.UndefinedValueTermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -597,7 +598,8 @@ public class TermBuilder {
         final Term forall = all(xs, imp(body, leq(t, tx, services)));
         final Term minForm = and(qvsInInt, origGuard, forall);
 
-        final Term undef = func(new Function(new Name("undefMin"), intSort));
+        final Term undef = label(func(new Function(new Name("undefMin"), intSort)),
+                                 UndefinedValueTermLabel.INSTANCE);
         return ifEx(qvs, minForm, t, undef);
     }
 
@@ -644,7 +646,8 @@ public class TermBuilder {
         final Term forall = all(xs, imp(body, geq(t, tx, services)));
         final Term maxForm = and(qvsInInt, origGuard, forall);
 
-        final Term undef = func(new Function(new Name("undefMax"), intSort));
+        final Term undef = label(func(new Function(new Name("undefMax"), intSort)),
+                                 UndefinedValueTermLabel.INSTANCE);
         return ifEx(qvs, maxForm, t, undef);
     }
 
