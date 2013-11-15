@@ -59,7 +59,7 @@ public abstract class AbstractMap implements MapInterface {
      @   ensures !\dl_inDomain(map, \result);
      @   assignable \nothing;
      @*/
-    abstract /*@helper*/ /*@nullable*/ Object[] getMapEntryArray(int l);
+    abstract /*@helper nullable*/ MapEntry[] getMapEntryArray(int l);
 
     /*@ public normal_behaviour
      @ requires 0 <= index && index < entry.length;

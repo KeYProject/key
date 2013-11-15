@@ -60,10 +60,6 @@ final class AMapImplementation extends AbstractMap {
             return null;
         }
     }
-
-    public boolean isEmpty() {
-        return entry.length == 0;
-    }
     
     int getIndexOfKey(Object key) {
         /*@ loop_invariant 0 <= i && i <= entry.length;
@@ -79,12 +75,26 @@ final class AMapImplementation extends AbstractMap {
         }
         return -1;
     }
-
+    
     MapEntry[] getMapEntryArray(int l) {
         // This function is modeled after ArrayList.newArray()
         return new MapEntry[l];
     }
 
+    public boolean isEmpty() {
+        return entry.length == 0;
+    }
+
+    public Object put(Object key, Object value) {
+        int index = getIndexOfKey(key);
+        if (index == -1) {
+            return putNotInDomain(key, value);
+
+        } else {
+            return putInDomain(index, value);
+        }
+    }
+    
     Object putInDomain(int index, Object value) {
         Object ret = entry[index].value;
         entry[index].value = value;
@@ -100,14 +110,14 @@ final class AMapImplementation extends AbstractMap {
         //@ set map = \dl_mapUpdate(map, key, value);
         return null;
     }
-
-    public Object put(Object key, Object value) {
+    
+    public Object remove(Object key) {
         int index = getIndexOfKey(key);
-        if (index == -1) {
-            return putNotInDomain(key, value);
 
+        if (index == -1) {
+            return null;
         } else {
-            return putInDomain(index, value);
+            return removeInDomain(index);
         }
     }
 
@@ -123,16 +133,6 @@ final class AMapImplementation extends AbstractMap {
         entry = entryNew;
         //@ set map = \dl_mapRemove(map, entry[index].key);
         return ret;
-    }
-
-    public Object remove(Object key) {
-        int index = getIndexOfKey(key);
-
-        if (index == -1) {
-            return null;
-        } else {
-            return removeInDomain(index);
-        }
     }
     
     public int size() {
