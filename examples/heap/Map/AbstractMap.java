@@ -21,28 +21,7 @@ public abstract class AbstractMap implements MapInterface {
      @              this.*),
      @              entry.*) );
      @*/
-
-    /*@ public normal_behavior
-     @   requires l >= 0;
-     @   ensures \typeof(\result) == \type(MapEntry[]);
-     @   ensures \result.length == l;
-     @   ensures \fresh(\result);
-     @   ensures \result != null;
-     @   ensures (\forall int i; 0 <= i && i < \result.length; \result[i] == null);
-     @   ensures !\dl_inDomain(map, \result);
-     @   assignable \nothing;
-     @*/
-    abstract /*@helper*/ /*@nullable*/ Object[] getMapEntryArray(int l);
-
-    /*@ public normal_behavior
-     @ ensures \dl_inDomain(map, key) ? 
-     @              (\result >= 0 && \result < entry.length && entry[\result].key == key) : 
-     @              (\result == -1);
-     @ ensures (\forall Object o; !\fresh(o));
-     @ accessible footprint;
-     @*/
-    abstract /*@strictly_pure@*/ int getIndexOfKey(Object key);
-
+    
     /*@ public normal_behaviour
      @ requires target != entry;
      @ requires target != null;
@@ -59,11 +38,32 @@ public abstract class AbstractMap implements MapInterface {
             int beginTarget,
             int beginEntry,
             int numberCopies);
+    
+    /*@ public normal_behavior
+     @ ensures \dl_inDomain(map, key) ? 
+     @              (\result >= 0 && \result < entry.length && entry[\result].key == key) : 
+     @              (\result == -1);
+     @ ensures (\forall Object o; !\fresh(o));
+     @ accessible footprint;
+     @*/
+    abstract /*@strictly_pure@*/ int getIndexOfKey(Object key);
+
+    /*@ public normal_behavior
+     @   requires l >= 0;
+     @   ensures \typeof(\result) == \type(MapEntry[]);
+     @   ensures \result.length == l;
+     @   ensures \fresh(\result);
+     @   ensures \result != null;
+     @   ensures (\forall int i; 0 <= i && i < \result.length; \result[i] == null);
+     @   ensures !\dl_inDomain(map, \result);
+     @   assignable \nothing;
+     @*/
+    abstract /*@helper*/ /*@nullable*/ Object[] getMapEntryArray(int l);
 
     /*@ public normal_behaviour
      @ requires 0 <= index && index < entry.length;
-     @ ensures map == \dl_mapUpdate(\old(map), getKey(index), value);
-     @ ensures \result == (\dl_mapGet(\old(map), getKey(index)));
+     @ ensures map == \dl_mapUpdate(\old(map), entry[index].key, value);
+     @ ensures \result == (\dl_mapGet(\old(map), entry[index].key));
      @ ensures (\forall Object o; !\fresh(o));
      @ assignable entry[index].value, map;
      @*/
@@ -92,23 +92,11 @@ public abstract class AbstractMap implements MapInterface {
 
     /*@ public normal_behaviour
      @ assignable footprint;
-     @ ensures map == \dl_mapRemove(\old(map), getKey(index));
-     @ ensures \result == \dl_mapGet(\old(map), getKey(index));
+     @ ensures map == \dl_mapRemove(\old(map), entry[index].key);
+     @ ensures \result == \dl_mapGet(\old(map), entry[index].key);
      @ ensures \fresh(entry);
      @ ensures !\dl_inDomain(map, entry);
      @*/
     abstract /*strictly_pure*/ Object removeInDomain(int index);
-    
-    /*@ public normal_behaviour
-     @ requires 0 <= index && index < entry.length;
-     @ ensures \result == entry[index].key;
-     @*/
-    abstract /*strictly_pure*/ Object getKey(int index);
-    
-    /*@ public normal_behaviour
-     @ requires 0 <= index && index < entry.length;
-     @ ensures \result == entry[index].value;
-     @*/
-    abstract /*strictly_pure*/ Object getValue(int index);
 
 }
