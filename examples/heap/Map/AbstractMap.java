@@ -63,6 +63,24 @@ public abstract class AbstractMap implements MapInterface {
      @   assignable \nothing;
      @*/
     abstract /*@helper nullable*/ MapEntry[] getMapEntryArray(int l);
+    
+    /*@ public normal_behavior
+     @   ensures \fresh(\result);
+     @   ensures \result.key == key;
+     @   ensures \result.value == value;
+     @   ensures !\dl_inDomain(map, \result);
+     @   assignable \nothing;
+     @*/
+    abstract MapEntry putCreateMapEntry(Object key, Object value);
+    
+    /*@ public normal_behaviour
+     @ ensures \result.length == entry.length + 1;
+     @ ensures (\forall int i; 0 <= i && i < entry.length; \result[i] == entry[i]);
+     @ ensures \result[entry.length].key == key;
+     @ ensures \result[entry.length].value == value;
+     @ ensures \fresh(\result, \result[entry.length]);
+     @*/
+    abstract /*pure*/ MapEntry[] putExtendArray(Object key, Object value);
 
     /*@ public normal_behaviour
      @ requires 0 <= index && index < entry.length;
@@ -78,8 +96,9 @@ public abstract class AbstractMap implements MapInterface {
      @ assignable footprint;
      @ ensures map == \dl_mapUpdate(\old(map), key, value);
      @ ensures \result == null;
-     @ ensures \fresh(entry);
+     @ ensures \fresh(entry, entry[entry.length - 1]);
      @ ensures !\dl_inDomain(map, entry);
+     @ ensures !\dl_inDomain(map, entry[entry.length - 1]);
      @*/
     abstract /*nullable*/ Object putNotInDomain(Object key, Object value);
 

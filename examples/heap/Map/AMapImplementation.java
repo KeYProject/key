@@ -93,20 +93,39 @@ final class AMapImplementation extends AbstractMap {
             return putInDomain(index, value);
         }
     }
+    
+   MapEntry putCreateMapEntry(Object key, Object value){
+       return new MapEntry(key, value);
+   }
+   
+   MapEntry[] putExtendArray(Object key, Object value) {
+        MapEntry[] result = getMapEntryArray(entry.length + 1);
+        copyMapEntries(result, 0, 0, entry.length);
+        result[entry.length] = putCreateMapEntry(key, value);
+        return result;
+    }
 
     Object putInDomain(int index, Object value) {
-        Object ret = entry[index].value;
+        Object result = entry[index].value;
         entry[index].value = value;
         //@ set map = \dl_mapUpdate(map, entry[index].key, value);
-        return ret;
+        return result;
     }
 
     Object putNotInDomain(Object key, Object value) {
-        MapEntry[] entryNew = getMapEntryArray(entry.length + 1);
-        copyMapEntries(entryNew, 0, 0, entry.length);
-        entryNew[entry.length] = new MapEntry(key, value);
-        entry = entryNew;
+        
+        MapEntry[] newEntry = putExtendArray(key, value);
+        //@ set footprint = \set_minus(footprint, \singleton(this.entry));
+        entry = newEntry;
+        //@ set footprint = \set_union(footprint, \singleton(this.entry));
+        
+        //@ set footprint = \set_union(footprint, \all_fields(this.entry));
+        //@ set footprint = \set_union(footprint, \all_fields(this.entry[this.entry.length - 1]));
+        
+        //@ set footprint = \set_minus(footprint, \singleton(map));
         //@ set map = \dl_mapUpdate(map, key, value);
+        //@ set footprint = \set_union(footprint, \singleton(map));
+        
         return null;
     }
     
@@ -126,12 +145,14 @@ final class AMapImplementation extends AbstractMap {
     }
 
     Object removeInDomain(int index) {
-        Object ret = entry[index].value;
+        Object result = entry[index].value;
         MapEntry[] entryNew = getMapEntryArray(entry.length - 1);
         removeCopy(entryNew, index);
         entry = entryNew;
         //@ set map = \dl_mapRemove(map, entry[index].key);
-        return ret;
+        //@ set footprint = \set_union(footprint, \all_fields(entry));
+        //@ set footprint = \set_union(footprint, \all_fields(entry[entry.length - 1]));
+        return result;
     }
     
     public int size() {
