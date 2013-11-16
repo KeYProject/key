@@ -264,7 +264,7 @@ public class SymbolicConfigurationExtractor {
       synchronized (this) {
          if (!isAnalysed()) {
             // Get path condition
-            pathCondition = SymbolicExecutionUtil.computePathCondition(node, true);
+            pathCondition = SymbolicExecutionUtil.computePathCondition(node, true, false);
             pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
             // Compute all locations used in path conditions and updates. The values of the locations will be later computed in the state computation (and finally shown in a symbolic configuration).
             Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractLocationParameter>();
@@ -1112,7 +1112,7 @@ public class SymbolicConfigurationExtractor {
             int goalCount = info.getProof().openGoals().size();
             for (Goal goal : info.getProof().openGoals()) {
                Term resultTerm = SymbolicExecutionUtil.extractOperatorTerm(goal, configurationTerm.op());
-               Term condition = goalCount == 1 ? null : SymbolicExecutionUtil.computePathCondition(goal.node(), true);
+               Term condition = goalCount == 1 ? null : SymbolicExecutionUtil.computePathCondition(goal.node(), true, true);
                for (ExtractLocationParameter param : locations) {
                   ExecutionVariableValuePair pair;
                   if (param.isArrayIndex()) {

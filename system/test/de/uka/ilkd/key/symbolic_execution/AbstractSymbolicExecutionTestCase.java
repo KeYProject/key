@@ -1604,4 +1604,24 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          }
       }
    }
+   
+   /**
+    * Makes sure that two {@link Term}s are equal. 
+    * @param expected The expected {@link Term}.
+    * @param actual The actual {@link Term}.
+    */
+   protected void assertTerm(Term expected, Term actual) {
+      if (expected != null) {
+         assertEquals(expected.op(), actual.op());
+         assertEquals(expected.javaBlock(), actual.javaBlock());
+         assertEquals(expected.getLabels(), actual.getLabels());
+         assertEquals(expected.arity(), actual.arity());
+         for (int i = 0; i < expected.arity(); i++) {
+            assertTerm(expected.sub(i), actual.sub(i));
+         }
+      }
+      else {
+         assertNull(actual);
+      }
+   }
 }

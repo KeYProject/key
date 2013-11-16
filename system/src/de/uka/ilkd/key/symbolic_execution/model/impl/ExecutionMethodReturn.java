@@ -220,11 +220,12 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                      for (Entry<Term, List<Node>> entry : valueNodeMap.entrySet()) {
                         List<Term> conditions = new LinkedList<Term>();
                         for (Node node : entry.getValue()) {
-                           Term condition = SymbolicExecutionUtil.computePathCondition(node, false);
+                           Term condition = SymbolicExecutionUtil.computePathCondition(node, false, false);
                            conditions.add(condition);
                         }
                         Term condition = TermBuilder.DF.or(conditions);
                         condition = SymbolicExecutionUtil.simplify(info.getProof(), condition);
+                        condition = SymbolicExecutionUtil.improveReadability(condition, info.getProof().getServices());
                         result[i] = new ExecutionMethodReturnValue(getMediator(), getProofNode(), entry.getKey(), condition);
                         i++;
                      }
