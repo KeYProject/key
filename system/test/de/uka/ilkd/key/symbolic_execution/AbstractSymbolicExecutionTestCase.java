@@ -40,6 +40,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaProgramElement;
@@ -62,6 +63,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
@@ -95,6 +97,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Provides the basic functionality of {@link TestCase}s which tests
@@ -1353,6 +1356,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                 boolean nonExecutionBranchHidingSideProofs,
                                                                                 boolean aliasChecks) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       HashMap<String, String> originalTacletOptions = null;
+      boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
          // Make sure that parameter are valid.
          assertNotNull(javaPathInBaseDir);
@@ -1366,13 +1370,15 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertTrue(maximalNumberOfExecutedSetNodes >= 1);
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, containerTypeName, methodFullName);
+         setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
          SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks);
          internalDoSETTest(oracleFile, env, oraclePathInBaseDirFile, maximalNumberOfExecutedSetNodes, includeVariables, includeCallStack, includeReturnValues);
          return env;
       }
       finally {
-         // Restore taclet options
+         // Restore original options
+         setOneStepSimplificationEnabled(null, originalOneStepSimplification);
          restoreTacletOptions(originalTacletOptions);
       }
    }
@@ -1622,6 +1628,36 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       else {
          assertNull(actual);
+      }
+   }
+   
+   /**
+    * Checks if one step simplification is enabled in the given {@link Proof}.
+    * @param proof The {@link Proof} to read from or {@code null} to return the general settings value.
+    * @return {@code true} one step simplification is enabled, {@code false} if disabled.
+    */
+   public static boolean isOneStepSimplificationEnabled(Proof proof) {
+      if (proof != null && !proof.isDisposed()) {
+         return proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification();
+      }
+      else {
+         return ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+      }
+   }
+   
+   /**
+    * 
+    * @param proof
+    * @param enabled
+    */
+   public static void setOneStepSimplificationEnabled(Proof proof, boolean enabled) {
+      ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(enabled);
+      if (proof != null && !proof.isDisposed()) {
+         proof.getProofIndependentSettings().getGeneralSettings().setOneStepSimplification(true);
+         OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof.env().getInitConfig().getProfile());
+         if (simplifier != null) {
+            simplifier.refresh(proof);
+         }
       }
    }
 }

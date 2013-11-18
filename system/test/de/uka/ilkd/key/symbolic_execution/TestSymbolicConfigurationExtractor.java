@@ -630,6 +630,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
                          boolean onReturnStatementNode) throws Exception {
       HashMap<String, String> originalTacletOptions = null;
       SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = null;
+      boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
          // Define test settings
          final String methodFullName = "compute";
@@ -637,6 +638,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
          originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
          // Create proof environment for symbolic execution
          env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, useOperationContracts, false, false, false);
+         setOneStepSimplificationEnabled(null, true);
          // Resume
          resume(env.getUi(), env.getBuilder(), oraclePathInBaseDir + symbolicExecutionOracleFileName, keyRepDirectory);
          // Find most left method return node
@@ -710,7 +712,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
          }
       }
       finally {
-         // Restore taclet options
+         // Restore original options
+         setOneStepSimplificationEnabled(null, originalOneStepSimplification);
          restoreTacletOptions(originalTacletOptions);
          if (env != null) {
             env.dispose();
