@@ -1,13 +1,12 @@
-// An example of a secure password file.                                      //
-//                                                                            //
-// A straight forward implementation of a password file. This implementation  //
-// can be proven to be secure. It froms the basis for the other implementation//
-// variants.                                                                  //
-
-
+/**
+ * Information flow example.
+ *
+ * The example demonstrates precise declassification: the sum of the entries
+ * of an array are declassified, nothing else.
+ *
+ * @author Christoph Scheben
+ */
 class SumExample {
-
-    //@ model \seq anyUser;
 
     private int[] values;
 
@@ -18,7 +17,7 @@ class SumExample {
 
 
     /*@ normal_behavior
-      @     separates   anyUser, \result
+      @     separates   \result
       @                 \declassifies  (\bsum int i; 0; values.length; values[i]);
       @*/
     public int getSum() {
