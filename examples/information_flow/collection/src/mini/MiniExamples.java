@@ -7,6 +7,9 @@ package mini;
  * "Abstract Interpretation of Symbolic Execution with Explicit State Updates"
  * and "A Theorem Proving Approach to Analysis of Secure Information Flow".
  *
+ * The information flow proof obligations of all secure examples can be proved
+ * fully automatically using the macro "Full Information Flow Auto Pilot".
+ *
  * @author Christoph Scheben
  */
 public class MiniExamples {
