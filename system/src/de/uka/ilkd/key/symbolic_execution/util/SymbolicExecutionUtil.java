@@ -84,6 +84,7 @@ import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -1879,7 +1880,13 @@ public final class SymbolicExecutionUtil {
       Term exceptionDefinition = workingTerm;
       while (exceptionDefinition.op() == Junctor.AND) {
          exceptionDefinitionParent = exceptionDefinition;
-         exceptionDefinition = exceptionDefinition.sub(0);
+         Term firstSub = exceptionDefinition.sub(0);
+         if (firstSub.op() == node.proof().env().getInitialServices().getJavaInfo().getInv()) { // TODO: Replace "node.proof().env().getInitialServices().getJavaInfo().getInv()" with "node.proof().getServices().getJavaInfo().getInv()" when bug item http://i12www.ira.uka.de/~klebanov/mantis/view.php?id=1386 is solved.
+            exceptionDefinition = exceptionDefinition.sub(1);
+         }
+         else {
+            exceptionDefinition = firstSub;
+         }
       }
       // Make sure that exception equality was found
       Term exceptionEquality;
