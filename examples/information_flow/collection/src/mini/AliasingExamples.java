@@ -6,6 +6,9 @@
 package mini;
 
 /**
+ * Information flow examples.
+ *
+ * A collection of mini examples related to aliasing.
  *
  * @author christoph
  */
