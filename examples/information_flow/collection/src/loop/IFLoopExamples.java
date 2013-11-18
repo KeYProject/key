@@ -11,7 +11,36 @@ package loop;
 public class IFLoopExamples {
 	int low;
 
-	/*@
+        //@ normal_behavior
+        //@ separates low;
+        public void hammer(int secret) {
+            int x = 0;
+            int y = 0;
+            //@ loop_invariant 0 <= y && y <= 10;
+            //@ separates low, y, (y < 10 ? x : 0);
+            //@ assignable low;
+            //@ decreases 10 - y;
+            while (y < 10) {
+                print(x);
+                if (y == 5) {
+                    x = secret;
+                    y = 9;
+                }
+                x++;
+                y++;
+            }
+        }
+
+        //@ normal_behavior
+        //@ separates low, x;
+        //@ assignable low;
+        //@ helper
+        public void print(int x) {
+            low = x;
+        }
+
+
+        /*@
 	  @ requires    x >= 0;
 	  @ assignable low;
 	  @ separates    low, x;
@@ -484,42 +513,4 @@ public class IFLoopExamples {
             secure_no_while(x);
         }
 
-//        //@ separates \declassifies l \erases \result;  // separates l, \result;
-//        public int m(int l) {
-//            int l1 = l;
-//
-//            //@ separates l1;
-//            {   l1++;
-//            }
-//
-//            return l1;
-//        }
-
-        //@ normal_behavior
-        //@ separates low;
-        public void m(int secret) {
-            int x = 0;
-            int y = 0;
-            //@ loop_invariant 0 <= y && y <= 10;
-            //@ separates low, y, (y < 10 ? x : 0);
-            //@ assignable low;
-            //@ decreases 10 - y;
-            while (y < 10) {
-                print(x);
-                if (y == 5) {
-                    x = secret;
-                    y = 9;
-                }
-                x++;
-                y++;
-            }
-        }
-        
-        //@ normal_behavior
-        //@ separates low, x;
-        //@ assignable low;
-        //@ helper
-        public void print(int x) {
-            low = x;
-        }
 }
