@@ -256,23 +256,4 @@ public class IFMethodContract {
         }
     }
     
-//-------- Loops
-    
-    
-    /*@ requires    x >= 0;
-      @ separates    low, x;
-      @*/
-    void secure_while(int x) {
-        /*@ loop_invariant 0 <= x;
-          @ separates low, x;
-          @ decreases x;
-          @ assignable low;
-          @*/
-        while (x > 0) {
-            low = low + 1;
-            x = x -1;
-        }
-    }
-    
-    
 }
