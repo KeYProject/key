@@ -361,14 +361,12 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
       KeYEnvironment<?> environment = null;
       Proof proof = null;
       HashMap<String, String> originalTacletOptions = null;
-      boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
          // Make sure that required files exists
          File javaFile = new File(baseDir, javaPathInBaseDir);
          assertTrue(javaFile.exists());
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, containerTypeName, methodFullName);
-         setOneStepSimplificationEnabled(null, true);
          // Load java file
          environment = KeYEnvironment.load(javaFile, null, null);
          // Search method to proof
@@ -384,9 +382,8 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          doProofTest(environment, proof, useContracts, tester);
       }
       finally {
-         // Restore original options
+         // Restore taclet options
          restoreTacletOptions(originalTacletOptions);
-         setOneStepSimplificationEnabled(null, originalOneStepSimplification);
          // Dispose proof and environment
          if (proof != null) {
             proof.dispose();
@@ -409,38 +406,31 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
                               Proof proof,
                               boolean useContracts,
                               IProofTester tester) throws Exception {
-      boolean originalOneStepSimplification = isOneStepSimplificationEnabled(proof);
-      try {
-         // Test parameters
-         assertNotNull(environment);
-         assertNotNull(proof);
-         assertNotNull(tester);
-         // Start auto mode
-         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-         sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_EXPAND);
-         sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_EXPAND);
-         sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, useContracts ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
-         sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_ON);
-         sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
-         sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_OFF);
-         sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF);
-         sp.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_ON);
-         sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_DELAYED);
-         sp.setProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, StrategyProperties.RETREAT_MODE_NONE);
-         sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
-         sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_INSTANTIATE);
-         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
-         proof.getSettings().getStrategySettings().setMaxSteps(1000);
-         setOneStepSimplificationEnabled(proof, true);
-         environment.getUi().startAndWaitForAutoMode(proof);
-         // Do test
-         tester.doTest(environment, proof);
-      }
-      finally {
-         setOneStepSimplificationEnabled(proof, originalOneStepSimplification);
-      }
+      // Test parameters
+      assertNotNull(environment);
+      assertNotNull(proof);
+      assertNotNull(tester);
+      // Start auto mode
+      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+      sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_EXPAND);
+      sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_EXPAND);
+      sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, useContracts ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
+      sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_ON);
+      sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+      sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_OFF);
+      sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF);
+      sp.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_ON);
+      sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_DELAYED);
+      sp.setProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, StrategyProperties.RETREAT_MODE_NONE);
+      sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
+      sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_INSTANTIATE);
+      proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+      proof.getSettings().getStrategySettings().setMaxSteps(1000);
+      environment.getUi().startAndWaitForAutoMode(proof);
+      // Do test
+      tester.doTest(environment, proof);
    }
-
+   
    /**
     * Executes some proof steps with on given {@link Proof}. 
     * @author Martin Hentschel
