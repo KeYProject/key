@@ -8,8 +8,15 @@ package contract;
 
 
 /**
+ * Information flow examples.
  *
- * @author scheben
+ * A collection of several examples showing the usage of information flow
+ * method contracts.
+ *
+ * The information flow proof obligations of all secure examples can be proved
+ * fully automatically using the macro "Full Information Flow Auto Pilot".
+ *
+ * @author Christoph Scheben
  */
 public class IFMethodContract {
     public int low;
