@@ -101,12 +101,12 @@ termination: diamond" pathCondition="!array = null" pathConditionChanged="false"
                      </branchCondition>
                      <branchCondition name="!array.length = 0" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 0" pathConditionChanged="true" branchCondition="!array.length = 0" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <methodReturn name="&lt;return of self.average(array);&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	quotient_0 {!result_0 &lt;= -1}, 
-	quotient_1 * -1 {!result_0 &gt;= 0}
+	quotient_1 {!result_0 &lt;= -1}, 
+	quotient_0 * -1 {!result_0 &gt;= 0}
 as result of self.average(array);&gt;" isReturnValueComputed="true">
-                           <methodReturnValue name="quotient_0 {!result_0 &lt;= -1}" returnValueString="quotient_0" hasCondition="true" conditionString="!result_0 &lt;= -1">
+                           <methodReturnValue name="quotient_1 {!result_0 &lt;= -1}" returnValueString="quotient_1" hasCondition="true" conditionString="!result_0 &lt;= -1">
                            </methodReturnValue>
-                           <methodReturnValue name="quotient_1 * -1 {!result_0 &gt;= 0}" returnValueString="quotient_1 * -1" hasCondition="true" conditionString="!result_0 &gt;= 0">
+                           <methodReturnValue name="quotient_0 * -1 {!result_0 &gt;= 0}" returnValueString="quotient_0 * -1" hasCondition="true" conditionString="!result_0 &gt;= 0">
                            </methodReturnValue>
                            <variable name="self" arrayIndex="-1" isArrayIndex="false">
                               <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
