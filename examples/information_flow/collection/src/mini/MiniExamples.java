@@ -1,13 +1,13 @@
 package mini;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
+ * Information flow examples.
+ * 
+ * A collection of several mini examples including the examples form the papers
+ * "Abstract Interpretation of Symbolic Execution with Explicit State Updates"
+ * and "A Theorem Proving Approach to Analysis of Secure Information Flow".
  *
- * @author christoph
+ * @author Christoph Scheben
  */
 public class MiniExamples {
     public static int l;
