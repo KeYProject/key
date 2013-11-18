@@ -53,7 +53,7 @@ public class IFBlockExamples {
         }
 
         //@ separates \nothing \declassifies l \erases \result;
-        public int m(int l) {
+        public int secure_6(int l) {
             int l1 = l;
             low++;
 
@@ -67,7 +67,7 @@ public class IFBlockExamples {
         }
 
         //@ separates \nothing \declassifies l \erases \result;
-        public int m_1(int l) {
+        public int secure_7(int l) {
             low++;
 
             //@ normal_behavior
@@ -80,7 +80,7 @@ public class IFBlockExamples {
         }
 
         //@ separates low;
-        public int m_2(int l) {
+        public int secure_8(int l) {
             low++;
 
             //@ normal_behavior
