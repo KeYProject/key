@@ -1242,8 +1242,13 @@ public class BlockContractRule implements BuiltInRule {
         {
             if (occursReturnAndIsReturnTypeNotVoid()) {
                 KeYJavaType resultType = variables.result.getKeYJavaType();
-                statements.add(KeYJavaASTFactory.declare(variables.result,
-                                resultType.getDefaultValue(), resultType));
+//                statements.add(KeYJavaASTFactory.declare(variables.result,
+//                                resultType.getDefaultValue(), resultType));
+            // Program variable is already registered, thus it has not to be declared again.
+            // On the other hand the repeated declaration caused trouble, because
+            // a new variable had been constructed even if it already existed.
+                statements.add(KeYJavaASTFactory.assign(variables.result,
+                               resultType.getDefaultValue()));
             }
         }
 
@@ -1254,8 +1259,12 @@ public class BlockContractRule implements BuiltInRule {
 
         private void declareExceptionNull()
         {
-            statements.add(KeYJavaASTFactory.declare(variables.exception, NullLiteral.NULL,
-                                                     variables.exception.getKeYJavaType()));
+//            statements.add(KeYJavaASTFactory.declare(variables.exception, NullLiteral.NULL,
+//                                                     variables.exception.getKeYJavaType()));
+            // Program variable is already registered, thus it has not to be declared again.
+            // On the other hand the repeated declaration caused trouble, because
+            // a new variable had been constructed even if it already existed.
+            statements.add(KeYJavaASTFactory.assign(variables.exception, NullLiteral.NULL));
         }
 
         private void executeBlockSafely()
