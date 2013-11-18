@@ -4,10 +4,9 @@
       <term term="self"/>
       <term term="self.next"/>
    </equivalenceClass>
-   <state name="return InstanceCreationTest.classWrapper.value+this.instanceWrapper.value+this.next.instanceWrapper.value+localWrapper.value;">
+   <state name="{}">
       <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
       <association name="InstanceCreationTest::classWrapper" programVariable="InstanceCreationTest::classWrapper" isArrayIndex="false" arrayIndex="-1" target="o5"/>
-      <association name="localWrapper" programVariable="localWrapper" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </state>
    <object xml:id="o1" name="self" type="InstanceCreationTest">
       <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o1"/>
