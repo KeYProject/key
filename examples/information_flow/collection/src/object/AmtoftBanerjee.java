@@ -20,9 +20,6 @@ public class AmtoftBanerjee {
         return this.q;
     }
 
-    //@ normal_behavior
-    //@ assignable q;
-    //@ separates \nothing \declassifies n \erases q;
     void setQ(int n) {
         this.q = n;
     }
