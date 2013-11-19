@@ -1167,20 +1167,24 @@ public final class LogicPrinter {
                 layouter.print("{"); // ("\u27E6");
             }
 
+            layouter.print("anon(");
+
             markStartSub();
             printTerm(locset);
             markEndSub();
 
-            layouter.print(" <- ");
+            layouter.print(", ");
 
             markStartSub();
             printTerm(otherHeapTerm);
             markEndSub();
 
+            layouter.print(")");
+
             if(closingBrace) {
                 layouter.end();
-                layouter.mark(MARK_END_UPDATE);
                 layouter.print("}"); //("\u27e7");
+                layouter.mark(MARK_END_UPDATE);
             }
 
         } else {
