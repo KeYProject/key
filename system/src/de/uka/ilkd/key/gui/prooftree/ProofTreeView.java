@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
@@ -796,12 +797,7 @@ public class ProofTreeView extends JPanel {
 	private JMenuItem collapseBelow = new JMenuItem("Collapse Below");
 	private JMenuItem prevSibling = new JMenuItem("Previous Sibling");
 	private JMenuItem nextSibling = new JMenuItem("Next Sibling");
-	private JCheckBoxMenuItem hideIntermediate =
-		new JCheckBoxMenuItem("Hide Intermediate Proofsteps");
-	    private JCheckBoxMenuItem hideAutomode =
-	            new JCheckBoxMenuItem("Hide Non-interactive Proofsteps");
-	private JCheckBoxMenuItem hideClosedSubtrees =
-		new JCheckBoxMenuItem("Hide Closed Subtrees");
+	private Map<JCheckBoxMenuItem, ProofTreeViewFilter> filters = new LinkedHashMap<JCheckBoxMenuItem, ProofTreeViewFilter> ();
 	private JMenuItem notes = new JMenuItem("Edit Notes");
 	private JMenuItem search = new JMenuItem("Search");
 	private JMenuItem prune    = new JMenuItem("Prune Proof");
@@ -896,19 +892,15 @@ public class ProofTreeView extends JPanel {
 	    prevSibling.addActionListener(this);
 	    this.add(nextSibling);
 	    nextSibling.addActionListener(this);
-            this.add(new JSeparator());
-	    this.add(hideIntermediate);
-	    hideIntermediate.setSelected(delegateModel
-	        .isHidingIntermediateProofsteps());
-	    hideIntermediate.addItemListener(this);
-        this.add(hideAutomode);
-        hideAutomode.setSelected(delegateModel
-            .isHidingAutomodeProofsteps());
-        hideAutomode.addItemListener(this);
-	    this.add(hideClosedSubtrees);
-	    hideClosedSubtrees.setSelected(delegateModel
-	        .hideClosedSubtrees());
-	    hideClosedSubtrees.addItemListener(this);
+        
+	    this.add(new JSeparator());
+        for (ProofTreeViewFilter filter: ProofTreeViewFilter.ALL) {
+        	final JCheckBoxMenuItem m = new JCheckBoxMenuItem(filter.name());
+        	filters.put(m, filter);
+        	this.add(m);
+        	m.setSelected(filter.isActive());
+        	m.addItemListener(this);
+        }
 	    this.add(search);
 	    search.addActionListener(this);
 	    this.add(new JSeparator());
@@ -1148,83 +1140,71 @@ public class ProofTreeView extends JPanel {
 
 	}
 
-        public void itemStateChanged(ItemEvent e) {
-            final boolean selected = e.getStateChange()
-                == ItemEvent.SELECTED;
-            if (e.getSource() == hideIntermediate) {
-                delegateModel.hideIntermediateProofsteps(selected);
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		final boolean selected = e.getStateChange() == ItemEvent.SELECTED;
+		final Object source = e.getSource();
+		final ProofTreeViewFilter filter = filters.get(source);
+		if (filter==null) return;
+		
+		// TODO: further refactor
+		
+		if (filter == ProofTreeViewFilter.HIDE_INTERMEDIATE || filter == ProofTreeViewFilter.ONLY_INTERACTIVE) {
+			delegateModel.setFilter(filter, selected);
 
-                // implies hide non-interactive steps
-                hideAutomode.setEnabled(!selected);
+			if (branch == path) {
+				if (delegateModel.getRoot() instanceof GUIBranchNode) {
+					TreeNode node = ((GUIAbstractTreeNode)delegateModel
+							.getRoot()).findBranch(invokedNode);
+					if (node instanceof GUIBranchNode) {
+						selectBranchNode((GUIBranchNode)node);
+					}
+				}
+			} else {
+				delegateView.scrollPathToVisible(path);
+				delegateView.setSelectionPath(path);
+			}
+		}
+		if (filter == ProofTreeViewFilter.HIDE_CLOSED_SUBTREES) {
+			delegateModel.setFilter(filter, selected);
+			if (branch == path) {
+				if (e.getStateChange() != ItemEvent.SELECTED) {
+					if (delegateModel.getRoot() instanceof GUIBranchNode) {
+						TreeNode node = ((GUIAbstractTreeNode)delegateModel
+								.getRoot()).findBranch(invokedNode);
+						if (node instanceof GUIBranchNode) {
+							selectBranchNode((GUIBranchNode)node);
+						}
+					}
+				} else {
+					if (invokedNode.parent() == null || delegateModel
+							.getProofTreeNode(invokedNode.parent())
+							.findChild(invokedNode.parent()) == null) {
+						// it's still a branch
+						if (delegateModel.getRoot() instanceof GUIBranchNode) {
+							TreeNode node = ((GUIAbstractTreeNode)delegateModel
+									.getRoot()).findBranch(invokedNode);
+							if (node instanceof GUIBranchNode) {
+								selectBranchNode((GUIBranchNode)node);
+							}
+						}
+					} else {
+						TreePath tp = new TreePath(delegateModel.getProofTreeNode(
+								invokedNode).getPath());
+						delegateView.scrollPathToVisible(tp);
+						delegateView.setSelectionPath(tp);
+					}
+				}
+			} else {
+				TreePath tp = new TreePath(delegateModel.getProofTreeNode(
+						invokedNode).getPath());
+				delegateView.scrollPathToVisible(tp);
+				delegateView.setSelectionPath(tp);
+			}
+		}
+	}
 
-                if (branch == path) {
-                    if (delegateModel.getRoot() instanceof GUIBranchNode) {
-                        TreeNode node = ((GUIAbstractTreeNode)delegateModel
-                            .getRoot()).findBranch(invokedNode);
-                        if (node instanceof GUIBranchNode) {
-                            selectBranchNode((GUIBranchNode)node);
-                        }
-                    }
-                } else {
-                    delegateView.scrollPathToVisible(path);
-                    delegateView.setSelectionPath(path);
-                }
-            }
-            if (e.getSource() == hideAutomode) {
-                delegateModel.setHideAutomodeProofsteps(selected);
-                if (branch == path) {
-                    if (delegateModel.getRoot() instanceof GUIBranchNode) {
-                        TreeNode node = ((GUIAbstractTreeNode)delegateModel
-                            .getRoot()).findBranch(invokedNode);
-                        if (node instanceof GUIBranchNode) {
-                            selectBranchNode((GUIBranchNode)node);
-                        }
-                    }
-                } else {
-                    delegateView.scrollPathToVisible(path);
-                    delegateView.setSelectionPath(path);
-                }
-            }
-            if (e.getSource() == hideClosedSubtrees) {
-                delegateModel.setHideClosedSubtrees(selected);
-                if (branch == path) {
-                    if (e.getStateChange() != ItemEvent.SELECTED) {
-                        if (delegateModel.getRoot() instanceof GUIBranchNode) {
-                            TreeNode node = ((GUIAbstractTreeNode)delegateModel
-                                .getRoot()).findBranch(invokedNode);
-                            if (node instanceof GUIBranchNode) {
-                                selectBranchNode((GUIBranchNode)node);
-                            }
-                        }
-                    } else {
-                        if (invokedNode.parent() == null || delegateModel
-                                .getProofTreeNode(invokedNode.parent())
-                                .findChild(invokedNode.parent()) == null) {
-                            // it's still a branch
-                            if (delegateModel.getRoot() instanceof GUIBranchNode) {
-                                TreeNode node = ((GUIAbstractTreeNode)delegateModel
-                                    .getRoot()).findBranch(invokedNode);
-                                if (node instanceof GUIBranchNode) {
-                                    selectBranchNode((GUIBranchNode)node);
-                                }
-                            }
-                        } else {
-                            TreePath tp = new TreePath(delegateModel.getProofTreeNode(
-                                invokedNode).getPath());
-                            delegateView.scrollPathToVisible(tp);
-                            delegateView.setSelectionPath(tp);
-                        }
-                    }
-                } else {
-                    TreePath tp = new TreePath(delegateModel.getProofTreeNode(
-                        invokedNode).getPath());
-                    delegateView.scrollPathToVisible(tp);
-                    delegateView.setSelectionPath(tp);
-                }
-            }
-        }
-
- 	}
+    }
 
     // to prevent memory leaks
     private static class CacheLessMetalTreeUI extends MetalTreeUI{

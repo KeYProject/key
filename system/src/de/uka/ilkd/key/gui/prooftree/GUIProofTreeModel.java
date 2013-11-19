@@ -186,10 +186,14 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     }
 
 
+    // TODO remove those
+    
+    @Deprecated
     public boolean hideClosedSubtrees () {
     	return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getHideClosedSubtrees();
     }
 
+    @Deprecated
     public void setHideClosedSubtrees (boolean hide) {
         if ( hide != hideClosedSubtrees() ) {
         	ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHideClosedSubtrees(hide);
@@ -197,6 +201,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
         }
     }
 
+    @Deprecated
     public boolean isHidingIntermediateProofsteps() {
     	return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getHideIntermediateProofsteps();
     }
@@ -205,6 +210,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
      * Sets wether intermediate proofsteps should be shown or not and
      * updates the tree.
      */
+    @Deprecated
     public void hideIntermediateProofsteps(boolean hide) {
 	if (hide != isHidingIntermediateProofsteps()) {
 		ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHideIntermediateProofsteps(hide);
@@ -212,15 +218,29 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 	}
     }
 
+    @Deprecated
     public boolean isHidingAutomodeProofsteps() {
         return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getHideAutomodeProofsteps();
     }
 
+    @Deprecated
     public void setHideAutomodeProofsteps (boolean hide) {
         if ( hide != isHidingAutomodeProofsteps() ) {
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHideAutomodeProofsteps(hide);
             updateTree((TreeNode) null);
         }
+    }
+    
+    /**
+     * Set filters active or inactive and update tree if necessary.
+     * @param filter
+     * @param active
+     */
+    public void setFilter (ProofTreeViewFilter filter, boolean active) {
+    	if (active != filter.isActive()) {
+    		filter.setActive(active);
+    		updateTree((TreeNode) null);
+    	}
     }
 
     /**
