@@ -931,139 +931,151 @@ public class ProofTreeView extends JPanel {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	       if (e.getSource() == delayedCut) {
-	           delegateModel.setAttentive(false);
-	           if(mediator().processDelayedCut(invokedNode)){
-	               delegateModel.updateTree ( null );
-	           }
-	           delegateModel.setAttentive(true);
-	           makeNodeVisible(mediator.getSelectedNode());
-	           }else
-	    if (e.getSource() == prune) {
-		delegateModel.setAttentive(false);
-		mediator().setBack(invokedNode);
-		delegateModel.updateTree ( null );
-		delegateModel.setAttentive(true);
-		makeNodeVisible(mediator.getSelectedNode());
-	    } else if (e.getSource() == runStrategy) {
-		runStrategyOnNode();
-	    } else if (e.getSource() == expandAll) {
-		ExpansionState.expandAll(delegateView);
-            } else if (e.getSource() == expandAllBelow) {
-		ExpansionState.expandAll(delegateView, branch);
-            } else if (e.getSource() == expandGoals) {
-                for (final Goal g : proof.openGoals()) {
-                    makeNodeExpanded ( g.node () );
-                }
-		collapseClosedNodes ();
-		// do not show selected node if it is not on the path to an
-		// open goal, but do expand root
-		// makeNodeVisible(mediator.getSelectedNode());
-                delegateView.expandRow(0);
-            } else if (e.getSource() == expandGoalsBelow) {
+		if (e.getSource() == delayedCut) {
+			delegateModel.setAttentive(false);
+			if(mediator().processDelayedCut(invokedNode)){
+				delegateModel.updateTree ( null );
+			}
+			delegateModel.setAttentive(true);
+			makeNodeVisible(mediator.getSelectedNode());
+		}else
+			if (e.getSource() == prune) {
+				delegateModel.setAttentive(false);
+				mediator().setBack(invokedNode);
+				delegateModel.updateTree ( null );
+				delegateModel.setAttentive(true);
+				makeNodeVisible(mediator.getSelectedNode());
+			} else if (e.getSource() == runStrategy) {
+				runStrategyOnNode();
+			} else if (e.getSource() == expandAll) {
+				ExpansionState.expandAll(delegateView);
+			} else if (e.getSource() == expandAllBelow) {
+				ExpansionState.expandAll(delegateView, branch);
+			} else if (e.getSource() == expandGoals) {
+				for (final Goal g : proof.openGoals()) {
+					makeNodeExpanded ( g.node () );
+				}
+				collapseClosedNodes ();
+				// do not show selected node if it is not on the path to an
+				// open goal, but do expand root
+				// makeNodeVisible(mediator.getSelectedNode());
+				delegateView.expandRow(0);
+			} else if (e.getSource() == expandGoalsBelow) {
+				expandGoalsBelow();
+			} else if (e.getSource() == collapseAll) {
+				ExpansionState.collapseAll(delegateView);
+				delegateView.expandRow(0);
+			} else if (e.getSource() == collapseOtherBranches) {
+				collapseOthers(branch);
+			} else if (e.getSource() == collapseBelow) {
+				collapseBelow();
+			} else if (e.getSource() == prevSibling) {
+				Object node = branch.getLastPathComponent();
+				TreeNode parent = ((GUIAbstractTreeNode) node).getParent();
+				if (parent == null) {
+					return;
+				}
+				Object sibling = delegateModel.getChild(parent, delegateModel
+						.getIndexOfChild(parent, node) - 1);
+				if (!(sibling != null && sibling instanceof GUIBranchNode)) {
+					int index = delegateModel
+					.getIndexOfChild(parent, node);
+					for (int i = parent.getChildCount(); i > index; i--) {
+						sibling = delegateModel.getChild(parent, i);
+						if (sibling != null && sibling instanceof
+								GUIBranchNode) {
+							break;
+						}
+					}
+				}
+				if (sibling != null && sibling instanceof GUIBranchNode) {
+					selectBranchNode((GUIBranchNode)sibling);
+				}
+			} else if (e.getSource() == nextSibling) {
+				Object node = branch.getLastPathComponent();
+				TreeNode parent = ((GUIAbstractTreeNode) node).getParent();
+				if (parent == null) {
+					return;
+				}
+				Object sibling = delegateModel.getChild(parent, delegateModel
+						.getIndexOfChild(parent, node) + 1);
+				if (!(sibling != null && sibling instanceof GUIBranchNode)) {
+					int index = delegateModel.getIndexOfChild(parent, node);
+					for (int i = 0; i < index; i++) {
+						sibling = delegateModel.getChild(parent, i);
+						if (sibling != null && sibling instanceof
+								GUIBranchNode) {
+							break;
+						}
+					}
+				}
+				if (sibling != null && sibling instanceof GUIBranchNode) {
+					selectBranchNode((GUIBranchNode)sibling);
+				}
+			} else if (e.getSource() == search) {
+				showSearchPanel();
+			} else if (e.getSource() == notes) {
+				openNotes();
+			}
+	}
+
+	private void openNotes() {
+		// display a dialog to attach text to the node
+		final Icon editIcon = IconFactory.editFile(20);
+		final String origNotes = invokedNode.getNodeInfo().getNotes();
+		final String newNotes = (String)JOptionPane.showInputDialog(
+				this,null,
+				"Annotate this proof node",
+				JOptionPane.PLAIN_MESSAGE,
+				editIcon,
+				null,
+				origNotes);
+		if (newNotes != null) {
+			if (newNotes.length()==0)
+				invokedNode.getNodeInfo().setNotes(null);
+			else invokedNode.getNodeInfo().setNotes(newNotes);
+		}
+	}
+
+	private void collapseBelow() {
+		Object node = branch.getLastPathComponent();
+
+		for (int count = delegateModel.getChildCount(node), i = 0;
+		i < count; i++)
+		{
+			Object child = delegateModel.getChild(node, i);
+
+			if (!delegateModel.isLeaf(child))
+				ExpansionState.collapseAll(delegateView,
+						branch.pathByAddingChild(child));
+		}
+	}
+
+	private void expandGoalsBelow() {
 		Object tmpNode = branch.getLastPathComponent();
 		if (branch == path) {
 			ExpansionState.collapseAll(delegateView, branch);
 		} else {
 			for ( int count = delegateModel.getChildCount(tmpNode),
-				i = 0; i < count; i++ ) {
-			    Object child = delegateModel.getChild(tmpNode, i);
-			    if ( !delegateModel.isLeaf ( child ) )
-				ExpansionState.collapseAll(delegateView, branch
-					.pathByAddingChild(child));
+					i = 0; i < count; i++ ) {
+				Object child = delegateModel.getChild(tmpNode, i);
+				if ( !delegateModel.isLeaf ( child ) )
+					ExpansionState.collapseAll(delegateView, branch
+							.pathByAddingChild(child));
 			}
 		}
 		Iterator<Goal> it = proof.openGoals ().iterator ();
 		Node n;
 		while ( it.hasNext () ) {
-		    n = it.next ().node ();
-		    GUIAbstractTreeNode node = delegateModel.getProofTreeNode(n);
-		    if (node==null) break;
-		    TreeNode[] obs=node.getPath();
-		    TreePath tp = new TreePath(obs);
-		    if (branch.isDescendant(tp)) {
-			delegateView.makeVisible(tp);
-		    }
-		}
-            } else if (e.getSource() == collapseAll) {
-		ExpansionState.collapseAll(delegateView);
-                delegateView.expandRow(0);
-            } else if (e.getSource() == collapseOtherBranches) {
-		collapseOthers(branch);
-            } else if (e.getSource() == collapseBelow) {
-                Object node = branch.getLastPathComponent();
-
-                for (int count = delegateModel.getChildCount(node), i = 0;
-                    i < count; i++)
-                {
-                    Object child = delegateModel.getChild(node, i);
-
-                    if (!delegateModel.isLeaf(child))
-                        ExpansionState.collapseAll(delegateView,
-                            branch.pathByAddingChild(child));
-                }
-            } else if (e.getSource() == prevSibling) {
-		Object node = branch.getLastPathComponent();
-		TreeNode parent = ((GUIAbstractTreeNode) node).getParent();
-		if (parent == null) {
-			return;
-		}
-		Object sibling = delegateModel.getChild(parent, delegateModel
-			.getIndexOfChild(parent, node) - 1);
-		if (!(sibling != null && sibling instanceof GUIBranchNode)) {
-			int index = delegateModel
-				.getIndexOfChild(parent, node);
-			for (int i = parent.getChildCount(); i > index; i--) {
-				sibling = delegateModel.getChild(parent, i);
-				if (sibling != null && sibling instanceof
-					 GUIBranchNode) {
-				    break;
-				}
+			n = it.next ().node ();
+			GUIAbstractTreeNode node = delegateModel.getProofTreeNode(n);
+			if (node==null) break;
+			TreeNode[] obs=node.getPath();
+			TreePath tp = new TreePath(obs);
+			if (branch.isDescendant(tp)) {
+				delegateView.makeVisible(tp);
 			}
 		}
-		if (sibling != null && sibling instanceof GUIBranchNode) {
-			selectBranchNode((GUIBranchNode)sibling);
-		}
-            } else if (e.getSource() == nextSibling) {
-		Object node = branch.getLastPathComponent();
-		TreeNode parent = ((GUIAbstractTreeNode) node).getParent();
-		if (parent == null) {
-			return;
-		}
-		Object sibling = delegateModel.getChild(parent, delegateModel
-			.getIndexOfChild(parent, node) + 1);
-		if (!(sibling != null && sibling instanceof GUIBranchNode)) {
-			int index = delegateModel.getIndexOfChild(parent, node);
-			for (int i = 0; i < index; i++) {
-				sibling = delegateModel.getChild(parent, i);
-				if (sibling != null && sibling instanceof
-					 GUIBranchNode) {
-				    break;
-				}
-			}
-		}
-		if (sibling != null && sibling instanceof GUIBranchNode) {
-			selectBranchNode((GUIBranchNode)sibling);
-		}
-            } else if (e.getSource() == search) {
-		showSearchPanel();
-            } else if (e.getSource() == notes) {
-                // display a dialog to attach text to the node
-                final Icon editIcon = IconFactory.editFile(20);
-                final String origNotes = invokedNode.getNodeInfo().getNotes();
-                final String newNotes = (String)JOptionPane.showInputDialog(
-                                    this,null,
-                                    "Annotate this proof node",
-                                    JOptionPane.PLAIN_MESSAGE,
-                                    editIcon,
-                                    null,
-                                    origNotes);
-                if (newNotes != null) {
-                    if (newNotes.length()==0)
-                        invokedNode.getNodeInfo().setNotes(null);
-                    else invokedNode.getNodeInfo().setNotes(newNotes);
-                }
-            }
 	}
 
 	/**
