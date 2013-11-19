@@ -19,10 +19,10 @@ public abstract class AbstractMap implements MapInterface {
     /*@ public invariant (\forall int i; 0 <= i && i < entry.length; 
       @          entry[i] != null && entry[i].key != null && entry[i].value != null); */
     
-    /*@ public invariant footprint == \set_union(\set_union(\set_union(
-     @              \infinite_union(int i; 0 <= i && i < entry.length; entry[i].*), 
-     @              this.*),
-     @              entry.*) );
+    /*@ public invariant footprint ==
+     @      \set_union(\infinite_union(int i; 0 <= i && i < entry.length; entry[i].*),
+     @                 this.*,
+     @                 entry.*);
      @*/
     
     /*@ public normal_behaviour
@@ -33,8 +33,7 @@ public abstract class AbstractMap implements MapInterface {
      @ requires 0 <= beginEntry && beginEntry + numberCopies <= entry.length;
      @ requires \typeof(target) == \typeof(entry);
      @ ensures (\forall int x; 0 <= x && x < numberCopies; 
-     @               ( target[beginTarget + x].key == entry[beginEntry + x].key ) &&
-     @               ( target[beginTarget + x].value == entry[beginEntry + x].value ) );
+     @               ( target[beginTarget + x] == entry[beginEntry + x]));
      @ ensures (\forall Object o; !\fresh(o));
      @ assignable target[beginTarget..beginTarget + numberCopies - 1];
      @*/
@@ -79,8 +78,9 @@ public abstract class AbstractMap implements MapInterface {
      @ ensures \result[entry.length].key == key;
      @ ensures \result[entry.length].value == value;
      @ ensures \fresh(\result, \result[entry.length]);
+     @ ensures \typeof(\result) == \type(MapEntry[]);
      @*/
-    abstract /*pure*/ MapEntry[] putExtendArray(Object key, Object value);
+    abstract /*@ pure */ MapEntry[] putExtendArray(Object key, Object value);
 
     /*@ public normal_behaviour
      @ requires 0 <= index && index < entry.length;
@@ -100,7 +100,7 @@ public abstract class AbstractMap implements MapInterface {
      @ ensures !\dl_inDomain(map, entry);
      @ ensures !\dl_inDomain(map, entry[entry.length - 1]);
      @*/
-    abstract /*nullable*/ Object putNotInDomain(Object key, Object value);
+    abstract /*@ nullable */ Object putNotInDomain(Object key, Object value);
 
     /*@ public normal_behaviour
      @ requires entryNew != null;

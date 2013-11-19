@@ -112,20 +112,20 @@ final class AMapImplementation extends AbstractMap {
         return result;
     }
 
+
+    /* public invariant footprint ==
+     *   \set_union(\infinite_union(int i; 0 <= i && i < entry.length; entry[i].*),
+     @              this.*,
+     @              entry.*);
+     @*/
+
     Object putNotInDomain(Object key, Object value) {
         
         MapEntry[] newEntry = putExtendArray(key, value);
-        //@ set footprint = \set_minus(footprint, \singleton(this.entry));
         entry = newEntry;
-        //@ set footprint = \set_union(footprint, \singleton(this.entry));
-        
-        //@ set footprint = \set_union(footprint, \all_fields(this.entry));
-        //@ set footprint = \set_union(footprint, \all_fields(this.entry[this.entry.length - 1]));
-        
-        //@ set footprint = \set_minus(footprint, \singleton(map));
+        //@ set footprint = \set_union(\dl_allElementsOfArray(entry, \all_fields(entry[0])), \set_union(\all_fields(this), \all_fields(entry)));
         //@ set map = \dl_mapUpdate(map, key, value);
-        //@ set footprint = \set_union(footprint, \singleton(map));
-        
+
         return null;
     }
     
