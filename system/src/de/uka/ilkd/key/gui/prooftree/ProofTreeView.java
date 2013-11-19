@@ -797,7 +797,8 @@ public class ProofTreeView extends JPanel {
 	private JMenuItem collapseBelow = new JMenuItem("Collapse Below");
 	private JMenuItem prevSibling = new JMenuItem("Previous Sibling");
 	private JMenuItem nextSibling = new JMenuItem("Next Sibling");
-	private Map<JCheckBoxMenuItem, ProofTreeViewFilter> filters = new LinkedHashMap<JCheckBoxMenuItem, ProofTreeViewFilter> ();
+	private Map<JCheckBoxMenuItem, ProofTreeViewFilter> filters = 
+		new LinkedHashMap<JCheckBoxMenuItem, ProofTreeViewFilter> (); // TODO: change to radio button ?
 	private JMenuItem notes = new JMenuItem("Edit Notes");
 	private JMenuItem search = new JMenuItem("Search");
 	private JMenuItem prune    = new JMenuItem("Prune Proof");
@@ -1147,10 +1148,16 @@ public class ProofTreeView extends JPanel {
 		final ProofTreeViewFilter filter = filters.get(source);
 		if (filter==null) return;
 		
-		// TODO: further refactor
-		
-		if (filter == ProofTreeViewFilter.HIDE_INTERMEDIATE || filter == ProofTreeViewFilter.ONLY_INTERACTIVE) {
+		if (!filter.global()) {
 			delegateModel.setFilter(filter, selected);
+			
+			// enable / disable others
+			// TODO: change to radio button and remove this
+			for (JCheckBoxMenuItem item: filters.keySet()) {
+				if (item != source && !filters.get(item).global()) {
+					item.setEnabled(!selected);
+				}
+			}
 
 			if (branch == path) {
 				if (delegateModel.getRoot() instanceof GUIBranchNode) {
@@ -1164,8 +1171,7 @@ public class ProofTreeView extends JPanel {
 				delegateView.scrollPathToVisible(path);
 				delegateView.setSelectionPath(path);
 			}
-		}
-		if (filter == ProofTreeViewFilter.HIDE_CLOSED_SUBTREES) {
+		} else {
 			delegateModel.setFilter(filter, selected);
 			if (branch == path) {
 				if (e.getStateChange() != ItemEvent.SELECTED) {
