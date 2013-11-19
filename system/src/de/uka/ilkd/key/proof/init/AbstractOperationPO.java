@@ -48,6 +48,7 @@ import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -141,14 +142,86 @@ public abstract class AbstractOperationPO extends AbstractPO {
    public void readProblem() throws ProofInputException {
       final IProgramMethod pm = getProgramMethod();
       final boolean[] transactionFlags;
+      final List<Term> termPOs = new ArrayList<Term>();
+
+      if(pm.isModel()) {
+    	  boolean makeNamesUnique = isMakeNamesUnique();
+    	  final ImmutableList<ProgramVariable> paramVars = TB.paramVars(services, pm, makeNamesUnique);
+    	  final ProgramVariable selfVar = TB.selfVar(services, pm, getCalleeKeYJavaType(), makeNamesUnique);
+    	  final IObserverFunction target = (IObserverFunction)javaInfo.getToplevelPM(getCalleeKeYJavaType(), pm);
+    	  final ProgramVariable resultVar = TB.resultVar(services, pm, makeNamesUnique);
+    	  final List<LocationVariable> modHeaps = HeapContext.getModHeaps(services, false);
+    	  final Map<LocationVariable, LocationVariable> atPreVars = HeapContext.getBeforeAtPreVars(modHeaps, services, "AtPre");
+    	  final Map<LocationVariable, Map<Term, Term>> heapToAtPre = new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+    	  
+    	  for (LocationVariable heap : modHeaps) {
+    		  heapToAtPre.put(heap, new LinkedHashMap<Term, Term>());
+    		  heapToAtPre.get(heap).put(TB.var(heap), TB.var(atPreVars.get(heap)));
+    	  }
+    	  register(paramVars);
+    	  register(selfVar);
+    	  register(resultVar);
+    	  for (LocationVariable lv : atPreVars.values()) {
+    		  register(lv);
+    	  }
+    	  ImmutableList<LocationVariable> formalParamVars = ImmutableSLList.<LocationVariable> nil();
+    	  for (ProgramVariable paramVar : paramVars) {
+    		  if (isCopyOfMethodArgumentsUsed()) {
+    			  ProgramElementName pen = new ProgramElementName("_" + paramVar.name());
+    			  LocationVariable formalParamVar = new LocationVariable(pen, paramVar.getKeYJavaType());
+    			  formalParamVars = formalParamVars.append(formalParamVar);
+    			  register(formalParamVar);
+              } else {
+            	  formalParamVars = formalParamVars.append((LocationVariable)paramVar);
+              }
+    	  }
+    	  // build precondition
+    	  final List<LocationVariable> heaps = new ArrayList<LocationVariable>();
+    	  if(target.getStateCount() >= 1) {
+    		  heaps.addAll(modHeaps);
+    		  if(target.getStateCount() == 2) {
+    			  for(LocationVariable heap : modHeaps) {
+    				  heaps.add(atPreVars.get(heap));
+    			  }
+    		  }
+    	  }
+    	  final Term pre =
+    			  TB.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, heaps),
+    					  getPre(modHeaps, selfVar, paramVars, atPreVars, services));
+    	  // build program term
+    	  Term postTerm = getPost(modHeaps, selfVar, paramVars, resultVar, null, atPreVars, services);
+    	  // Add uninterpreted predicate
+    	  if (isAddUninterpretedPredicate()) {
+    		  postTerm = TB.and(postTerm,
+    				  buildUninterpretedPredicate(paramVars, null, getUninterpretedPredicateName()));
+    	  }
+    	  final Term[] updateSubs = new Term[target.arity()];
+    	  int i = 0;
+    	  for (LocationVariable heap : modHeaps) {
+    		  if(target.getStateCount() >= 1) {
+    			  updateSubs[i++] = TB.var(heap);
+    			  if(target.getStateCount() == 2) {
+    				  updateSubs[i++] = TB.var(atPreVars.get(heap));
+    			  }
+    		  }
+    	  }
+    	  if(!target.isStatic()) {
+    		  updateSubs[i++] = TB.var(selfVar);
+    	  }
+    	  for(ProgramVariable paramVar : paramVars) {
+    		  updateSubs[i++] = TB.var(paramVar);
+    	  }
+    	  final Term progPost = TB.apply(TB.elementary(services, TB.var(resultVar), TB.func(target, updateSubs)), postTerm);
+    	  termPOs.add(TB.imp(pre, progPost));    	  
+      }else{
+      // This sould be indented, but for now I want to make diffing a bit easier
       if (isTransactionApplicable()) {
-         transactionFlags = new boolean[] { false, true };
-         poNames = new String[2];
+          transactionFlags = new boolean[] { false, true };
+          poNames = new String[2];
       }
       else {
-         transactionFlags = new boolean[] { false };
+          transactionFlags = new boolean[] { false };
       }
-      final List<Term> termPOs = new ArrayList<Term>();
       int nameIndex = 0;
       for (boolean transactionFlag : transactionFlags) {
          // prepare variables, program method, heapAtPre
@@ -237,6 +310,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
          if (poNames != null) {
             poNames[nameIndex++] = buildPOName(transactionFlag);
          }
+      } // for(boolean transactionFlag : transactionFlags)
       }
       // save in field
       assignPOTerms(termPOs.toArray(new Term[0]));
