@@ -21,10 +21,11 @@ public class FullInformationFlowAutoPilotMacro extends SequentialOnLastGoalProof
 
     /**
      * The number of proof steps that should be run by the {@link TryCloseMacro}
-     * before retracting. This overrides the strategy setting.
+     * before retracting. This overrides the strategy setting if set to a value
+     * greater or equal to 0.
      */
-    private static final int NUMBER_OF_TRY_STEPS =
-            Integer.getInteger("key.autopilot.closesteps", 1000);
+    private static final int NUMBER_OF_TRY_STEPS = -1;
+//            Integer.getInteger("key.autopilot.closesteps", 1000);
 
     @Override
     public String getName() {
