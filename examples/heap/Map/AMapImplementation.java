@@ -41,8 +41,7 @@ final class AMapImplementation extends AbstractMap {
             int numberCopies) {
         /*@ loop_invariant 0 <= i && i <= numberCopies;
          @ loop_invariant (\forall int x; 0 <= x && x < i; 
-         @               ( target[beginTarget + x].key == entry[beginEntry + x].key ) &&
-         @               ( target[beginTarget + x].value == entry[beginEntry + x].value ) );
+         @               ( target[beginTarget + x] == entry[beginEntry + x] ));
          @ loop_invariant (\forall Object o; !\fresh(o));
          @ decreases numberCopies - i;
          @ assignable target[beginTarget..beginTarget + numberCopies - 1];
@@ -112,36 +111,62 @@ final class AMapImplementation extends AbstractMap {
         return result;
     }
 
-
-    /* public invariant footprint ==
-     *   \set_union(\infinite_union(int i; 0 <= i && i < entry.length; entry[i].*),
-     @              this.*,
-     @              entry.*);
-     @*/
-
     Object putNotInDomain(Object key, Object value) {
-        
         MapEntry[] newEntry = putExtendArray(key, value);
         entry = newEntry;
         //@ set footprint = \set_union(\dl_allElementsOfArray(entry, \all_fields(entry[0])), \set_union(\all_fields(this), \all_fields(entry)));
         //@ set map = \dl_mapUpdate(map, key, value);
-
         return null;
     }
     
     public Object remove(Object key) {
         int index = getIndexOfKey(key);
-
         if (index == -1) {
             return null;
         } else {
             return removeInDomain(index);
         }
     }
+    
+    /*@ public normal_behaviour
+     @ requires entryNew != null;
+     @ requires entryNew != entry;
+     @ requires entry.length > 0;
+     @ requires entryNew.length == entry.length - 1;
+     @ requires \typeof(entryNew) == \typeof(entry);
+     @ requires 0 < index && index < entry.length;
+     @ ensures (\forall Object o; !\fresh(o));
+     @ ensures (\forall int i; 0 <= i && i < index;
+     @               entryNew[i] == entry[i]);
+     @ assignable entryNew[0..index - 1];
+     @*/
+    void c1( /*@nullable*/MapEntry[] entryNew, int index) {
+            copyMapEntries(entryNew, 0, 0, index);
+    }
+    
+    /*@ public normal_behaviour
+     @ requires entryNew != null;
+     @ requires entryNew != entry;
+     @ requires entry.length > 0;
+     @ requires entryNew.length == entry.length - 1;
+     @ requires \typeof(entryNew) == \typeof(entry);
+     @ requires 0 <= index && index < entryNew.length;
+     @ ensures (\forall Object o; !\fresh(o));
+     @ ensures (\forall int i;  index <= i && i < entryNew.length;
+     @               entryNew[i] == entry[i + 1]);
+     @ assignable entryNew[index..entryNew.length - 1];
+     @*/
+    void c2( /*@nullable*/MapEntry[] entryNew, int index) {
+            copyMapEntries(entryNew, index, index + 1, entryNew.length - index);
+    }
 
     void removeCopy(MapEntry[] entryNew, int index) {
-        copyMapEntries(entryNew, 0, 0, index - 1);
-        copyMapEntries(entryNew, index, index + 1, entry.length - index);
+        if (index > 0) {
+            c1(entryNew, index);
+        }
+        if (index < entryNew.length) {
+            c2(entryNew, index);
+        }
     }
 
     Object removeInDomain(int index) {
@@ -150,8 +175,7 @@ final class AMapImplementation extends AbstractMap {
         removeCopy(entryNew, index);
         entry = entryNew;
         //@ set map = \dl_mapRemove(map, entry[index].key);
-        //@ set footprint = \set_union(footprint, \all_fields(entry));
-        //@ set footprint = \set_union(footprint, \all_fields(entry[entry.length - 1]));
+        //@ set footprint = \set_union(\dl_allElementsOfArray(entry, \all_fields(entry[0])), \set_union(\all_fields(this), \all_fields(entry)));
         return result;
     }
     
