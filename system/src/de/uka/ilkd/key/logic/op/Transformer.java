@@ -24,80 +24,80 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * Functions with a restricted/special rule set only applicable for the top level
- * of the transformer procedure and not directly for its arguments, prohibiting any rule
+ * of the term transformer and not directly for its arguments, prohibiting any rule
  * applications to sub arguments as well as applications from outside such as update applications.
  * They work similar to the idea of 'Predicate Transformer Semantics' as introduced by Dijkstra in
  * "Guarded commands, nondeterminacy and formal derivation of programs".
  *
  * @author Michael Kirsten
  */
-public class TransformerProcedure extends Function {
+public class Transformer extends Function {
 
     // The template of the well-definedness transformer for terms.
-    private static final TransformerProcedure WD_ANY =
-            new TransformerProcedure(new Name("wd"), Sort.ANY);
+    private static final Transformer WD_ANY =
+            new Transformer(new Name("wd"), Sort.ANY);
 
     // The template of the well-definedness transformer for formulas.
-    private static final TransformerProcedure WD_FORMULA =
-            new TransformerProcedure(new Name("WD"), Sort.FORMULA);
+    private static final Transformer WD_FORMULA =
+            new Transformer(new Name("WD"), Sort.FORMULA);
 
-    public TransformerProcedure(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
+    public Transformer(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
         super(name, sort, argSorts, false);
     }
 
-    public TransformerProcedure(Name name, Sort argSort) {
+    public Transformer(Name name, Sort argSort) {
         this(name, Sort.FORMULA, new ImmutableArray<Sort>(argSort));
     }
 
     /**
-     * Looks up the function namespace for a transformer procedure with the given
+     * Looks up the function namespace for a term transformer with the given
      * attributes, assuming it to be uniquely defined by its name. If none is found,
-     * a new transformer procedure is created.
-     * @param name name of the transformer procedure
-     * @param sort sort of the transformer procedure
-     * @param argSorts array of the procedure's argument sorts
+     * a new term transformer is created.
+     * @param name name of the term transformer
+     * @param sort sort of the term transformer
+     * @param argSorts array of the transformer's argument sorts
      * @param services
-     * @return the transformer procedure of interest
+     * @return the term transformer of interest
      */
-    public static TransformerProcedure getTransformer(Name name,
+    public static Transformer getTransformer(Name name,
                                                       Sort sort,
                                                       ImmutableArray<Sort> argSorts,
                                                       Services services) {
         final Named f = services.getNamespaces().functions().lookup(name);
-        if (f != null && f instanceof TransformerProcedure) {
-            TransformerProcedure t = (TransformerProcedure)f;
+        if (f != null && f instanceof Transformer) {
+            Transformer t = (Transformer)f;
             assert t.sort() == sort;
             assert t.argSorts().size() == argSorts.size();
             return t;
         }
-        return new TransformerProcedure(name, sort, argSorts);
+        return new Transformer(name, sort, argSorts);
     }
 
-    public static TransformerProcedure wdFormula(Services services) {
+    public static Transformer wdFormula(Services services) {
         return getTransformer(WD_FORMULA, services);
     }
 
-    public static TransformerProcedure wdAny(Services services) {
+    public static Transformer wdAny(Services services) {
         return getTransformer(WD_ANY, services);
     }
 
     /**
-     * Takes a template for atransformer procedure and checks in the function
-     * namespace, if an equivalent already exists. In this case, it returns
-     * the found transformer procedure, otherwise it creates a new one.
-     * @param t the template for a transformer procedure
+     * Takes a template for a term transformer and checks in the function
+     * namespace, whether an equivalent already exists. If this is the case,
+     * it returns the found transformer, otherwise it creates a new one.
+     * @param t the template for a term transformer
      * @param services
-     * @return the transformer procedure to be used
+     * @return the term transformer to be used
      */
-    public static TransformerProcedure getTransformer(TransformerProcedure t,
+    public static Transformer getTransformer(Transformer t,
                                                       Services services) {
         return getTransformer(t.name(), t.sort(), t.argSorts(), services);
     }
 
     /**
-     * Examines a position for whether it is inside a transformer procedure.
+     * Examines a position for whether it is inside a term transformer.
      * @param pio A position in an occurrence of a term
-     * @return true if inside a transformer procedure, false otherwise
+     * @return true if inside a term transformer, false otherwise
      */
     public static boolean inTransformer(PosInOccurrence pio) {
         boolean trans = false;
@@ -111,19 +111,19 @@ public class TransformerProcedure extends Function {
             while ( it.next () != -1 && !trans) {
                 final Term t = it.getSubTerm ();
                 op = t.op ();
-                trans = op instanceof TransformerProcedure;
+                trans = op instanceof Transformer;
             }
         }
         return trans;
     }
 
     /**
-     * Examines a position for whether it is inside a transformer procedure.
-     * If this is the case, the found transformer procedure is returned.
+     * Examines a position for whether it is inside a term transformer.
+     * If this is the case, the found term transformer is returned.
      * @param pio A position in an occurrence of a term
-     * @return the transformer procedure the position is in, null otherwise
+     * @return the term transformer the position is in, null otherwise
      */
-    public static TransformerProcedure getTransformer(PosInOccurrence pio) {
+    public static Transformer getTransformer(PosInOccurrence pio) {
         if ( pio.posInTerm () != null ) {
             PIOPathIterator it = pio.iterator ();
             Operator        op;
@@ -131,8 +131,8 @@ public class TransformerProcedure extends Function {
             while ( it.next () != -1) {
                 final Term t = it.getSubTerm ();
                 op = t.op ();
-                if (op instanceof TransformerProcedure)
-                    return (TransformerProcedure)op;
+                if (op instanceof Transformer)
+                    return (Transformer)op;
             }
         }
         return null;

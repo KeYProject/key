@@ -52,7 +52,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SubstOp;
-import de.uka.ilkd.key.logic.op.TransformerProcedure;
+import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
@@ -1514,9 +1514,9 @@ public class TermBuilder {
         if(t.op() == Junctor.FALSE || t.op() == Junctor.TRUE) {
             return tt();
         } else if (t.sort().equals(Sort.FORMULA)) {
-            return func(TransformerProcedure.wdFormula(services), t);
+            return func(Transformer.wdFormula(services), t);
         } else {
-            return func(TransformerProcedure.wdAny(services), t);
+            return func(Transformer.wdAny(services), t);
         }
     }
 

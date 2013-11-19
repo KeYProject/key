@@ -140,7 +140,7 @@ public class BlockContractRule implements BuiltInRule {
             return false;
         }
         // abort if inside of transformer
-        if (TransformerProcedure.inTransformer(occurrence)) {
+        if (Transformer.inTransformer(occurrence)) {
             return false;
         }
         final Instantiation instantiation =

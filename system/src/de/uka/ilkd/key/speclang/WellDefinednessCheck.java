@@ -38,7 +38,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.TransformerProcedure;
+import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -725,8 +725,8 @@ public abstract class WellDefinednessCheck implements Contract {
                                             Term goal1,
                                             Term goal2,
                                             Services services) {
-        assert find1.op().name().equals(TransformerProcedure.wdAny(services).name());
-        assert find2.op().name().equals(TransformerProcedure.wdAny(services).name());
+        assert find1.op().name().equals(Transformer.wdAny(services).name());
+        assert find2.op().name().equals(Transformer.wdAny(services).name());
         assert find1.sub(0).op().name().equals(find2.sub(0).op().name());
         assert find1.sub(0).arity() == find2.sub(0).arity();
 

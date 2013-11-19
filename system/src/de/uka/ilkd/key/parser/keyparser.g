@@ -2082,10 +2082,10 @@ transform_decl
         {
             if (!skip_transformers) {
 
-                TransformerProcedure t =
-                    new TransformerProcedure(new Name(trans_name),
-                                             Sort.FORMULA,
-                                             new ImmutableArray<Sort>(argSorts));
+                Transformer t =
+                    new Transformer(new Name(trans_name),
+                                    Sort.FORMULA,
+                                    new ImmutableArray<Sort>(argSorts));
 
                 if (lookup(t.name()) != null) {
                     if(!isProblemParser()) {

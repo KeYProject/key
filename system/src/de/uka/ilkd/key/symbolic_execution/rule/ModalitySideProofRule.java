@@ -19,7 +19,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.TransformerProcedure;
+import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
@@ -84,7 +84,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
       boolean applicable = false;
       if (pio != null && pio.isTopLevel()) {
           // abort if inside of transformer
-          if (TransformerProcedure.inTransformer(pio)) {
+          if (Transformer.inTransformer(pio)) {
               return false;
           }
           Term term = pio.subTerm();
