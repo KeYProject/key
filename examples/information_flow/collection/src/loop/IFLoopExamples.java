@@ -11,6 +11,9 @@ package loop;
 public class IFLoopExamples {
 	int low;
 
+        // This is a secure example from a tutorial by Christian Hammer
+        // which was designed to show where approximative analysis usually
+        // have to give up.
         //@ normal_behavior
         //@ separates low;
         public void hammer(int secret) {
@@ -180,24 +183,6 @@ public class IFLoopExamples {
 		}
 	}
 
-        /*@
-	  @ requires    x >= 1;
-	  @ assignable low;
-	  @ separates    low, x;
-	  @*/
-	public void secure_while_wrongInv(int x) {
-
-		/*@
-		  @ loop_invariant x >= 1;
-		  @ assignable low;
-		  @ separates low, x;
-		  @ decreases x;
-		  @*/
-		while (x > 0) {
-			low = low + 1;
-			x = x - 1;
-		}
-	}
 
 	/*@
 	  @ requires    x >= 1;
