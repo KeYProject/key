@@ -54,7 +54,9 @@ public final class ObjectOrientation {
         o0 = high_object;
     }
 
-    //@ separates \nothing \new_objects o0, o1, o2;
+    /*@ normal_behavior
+      @ separates \nothing \new_objects o0, o1, o2;
+      @ */
     public void secure_two_object_creation() {
         o0 = new ObjectOrientation(0);
         o1 = new ObjectOrientation(1);
@@ -81,6 +83,7 @@ public final class ObjectOrientation {
 
     //@ separates \nothing \new_objects o0, o1;
     //@ also
+    // the following contract does not hold
     //@ separates \nothing \new_objects o0, o1, o1.next;
     public void if_two_object_creation_next() {
         if(high) {
