@@ -48,6 +48,94 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class IOUtilTest extends TestCase {
    /**
+    * Tests {@link IOUtil#computeMD5(File)}.
+    */
+   @Test
+   public void testComputeMD5_File() throws IOException {
+      // Test null
+      try {
+         IOUtil.computeMD5((File)null);
+         fail("MD5 without File should not be possible.");
+      }
+      catch (IOException e) {
+         assertEquals("Can't compute MD5 without a File.", e.getMessage());
+      }
+      // Test not existing file
+      try {
+         IOUtil.computeMD5(new File("NOT_EXISTING_FILE.txt"));
+         fail("MD5 without existing File should not be possible.");
+      }
+      catch (IOException e) {
+         assertEquals("Can't compute MD5, because \"NOT_EXISTING_FILE.txt\" is not an existing file.", e.getMessage());
+      }
+      // Test content
+      File file = File.createTempFile("HelloWorld", ".txt");
+      IOUtil.writeTo(new FileOutputStream(file), "Hello World");
+      try {
+         assertEquals("b10a8db164e0754105b7a99be72e3fe5", IOUtil.computeMD5(file));
+      }
+      finally {
+         file.delete();
+      }
+   }
+
+   /**
+    * Tests {@link IOUtil#computeMD5(InputStream)}.
+    */
+   @Test
+   public void testComputeMD5_InputStream() throws IOException {
+      // Test null
+      try {
+         IOUtil.computeMD5((InputStream)null);
+         fail("MD5 without InputStream should not be possible.");
+      }
+      catch (IOException e) {
+         assertEquals("Can't compute MD5 without an InputStream.", e.getMessage());
+      }
+      // Test content
+      TextInputStream in = new TextInputStream("Hello World");
+      assertFalse(in.isClosed());
+      assertEquals("b10a8db164e0754105b7a99be72e3fe5", IOUtil.computeMD5(in));
+      assertTrue(in.isClosed());
+   }
+
+   /**
+    * {@link InputStream} with a fixed text.
+    * @author Martin Hentschel
+    */
+   private static class TextInputStream extends ByteArrayInputStream {
+      /**
+       * Is the stream closed?
+       */
+      private boolean closed = false;
+
+      /**
+       * Constructor.
+       * @param text The fixed text.
+       */
+      public TextInputStream(String text) {
+         super(text.getBytes());
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void close() throws IOException {
+         this.closed = true;
+         super.close();
+      }
+
+      /**
+       * Checks if the stream is closed.
+       * @return {@code true} closed, {@code false} open.
+       */
+      public boolean isClosed() {
+         return closed;
+      }
+   }
+
+   /**
     * Tests {@link IOUtil#visit(File, org.key_project.util.java.IOUtil.IFileVisitor)}.
     */
    @Test

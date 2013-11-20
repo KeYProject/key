@@ -21,6 +21,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,6 +50,51 @@ public final class IOUtil {
     * Forbid instances by this private constructor.
     */
    private IOUtil() {
+   }
+
+   /**
+    * Computes the MD5 checksum of the given {@link File}.
+    * @param file The {@link File} to compute its MD5 checksum.
+    * @return The computed MD5 checksum.
+    * @throws IOException Occurred Exception.
+    */
+   public static String computeMD5(File file) throws IOException {
+      if (file == null) {
+         throw new IOException("Can't compute MD5 without a File.");
+      }
+      if (!file.isFile()) {
+         throw new IOException("Can't compute MD5, because \"" + file + "\" is not an existing file.");
+      }
+      return computeMD5(new FileInputStream(file));
+   }
+
+   /**
+    * Computes the MD5 checksum of the given {@link InputStream} and closes it.
+    * @param in The {@link InputStream} which provides the content to compute its MD5 checksum. The {@link InputStream} will be closed.
+    * @return The computed MD5 checksum.
+    * @throws IOException Occurred Exception.
+    */
+   public static String computeMD5(InputStream in) throws IOException {
+      if (in == null) {
+         throw new IOException("Can't compute MD5 without an InputStream.");
+      }
+      try {
+         MessageDigest digest = MessageDigest.getInstance("MD5");
+         byte[] buffer = new byte[8192];
+         int read = 0;
+         while( (read = in.read(buffer)) > 0) {
+            digest.update(buffer, 0, read);
+         }
+         byte[] md5sum = digest.digest();
+         BigInteger bigInt = new BigInteger(1, md5sum);
+         return bigInt.toString(16);
+      }
+      catch (NoSuchAlgorithmException e) {
+         throw new IOException("Algorithm MD5 is not available.");
+      }
+      finally {
+         in.close();
+      }
    }
    
    /**

@@ -3654,23 +3654,24 @@ varexp[TacletBuilder b]
 :
   ( varcond_applyUpdateOnRigid[b]
     | varcond_dropEffectlessElementaries[b]
-    | varcond_dropEffectlessStores[b] 
-    | varcond_enum_const[b] 
-    | varcond_free[b]  
+    | varcond_dropEffectlessStores[b]
+    | varcond_enum_const[b]
+    | varcond_free[b]
     | varcond_hassort[b]
     | varcond_fieldtype[b]
     | varcond_equalUnique[b]
     | varcond_new[b]
-    | varcond_newlabel[b] 
+    | varcond_newlabel[b]
     | varcond_observer[b]
     | varcond_different[b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
+    | varcond_differentFields[b]
   ) 
   | 
   ( (NOT {negated = true;} )? 
-      (   varcond_abstractOrInterface[b, negated]
-	| varcond_array[b, negated]
+    (   varcond_abstractOrInterface[b, negated]
+	    | varcond_array[b, negated]
         | varcond_array_length[b, negated]	
         | varcond_enumtype[b, negated]
         | varcond_freeLabelIn[b,negated]         
@@ -3739,6 +3740,23 @@ varcond_dropEffectlessStores[TacletBuilder b]
                                                                (TermSV)result));
    }
 ;
+
+varcond_differentFields [TacletBuilder b]
+{
+  ParsableVariable x = null;
+  ParsableVariable y = null;
+
+}
+:
+   DIFFERENTFIELDS
+   LPAREN
+     x = varId COMMA y = varId
+   RPAREN
+   {
+            b.addVariableCondition(new DifferentFields((SchemaVariable)x, (SchemaVariable)y));
+   }
+;
+
 
 varcond_simplifyIfThenElseUpdate[TacletBuilder b]
 {

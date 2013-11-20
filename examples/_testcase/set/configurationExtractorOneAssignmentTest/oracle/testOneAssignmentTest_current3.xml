@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <equivalenceClass representativeTerm="null">
-      <term term="x"/>
-      <term term="self.y"/>
-      <term term="null"/>
-   </equivalenceClass>
    <state name="return this.first.value+this.second.value+tempX.value+tempY.value;">
-      <value name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
-      <value name="tempX" programVariable="tempX" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
-      <value name="tempY" programVariable="tempY" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
       <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" target="o3"/>
+      <association name="tempX" programVariable="tempX" isArrayIndex="false" arrayIndex="-1" target="o3"/>
+      <association name="tempY" programVariable="tempY" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </state>
    <object xml:id="o1" name="self" type="OneAssignmentTest">
-      <value name="y" programVariable="y" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
-      <value name="second" programVariable="second" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
-      <value name="first" programVariable="first" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
+      <association name="y" programVariable="y" isArrayIndex="false" arrayIndex="-1" target="o2"/>
+      <association name="second" programVariable="second" isArrayIndex="false" arrayIndex="-1" target="o2"/>
+      <association name="first" programVariable="first" isArrayIndex="false" arrayIndex="-1" target="o3"/>
+   </object>
+   <object xml:id="o2" name="self.y" type="OneAssignmentTestValueWrapper">
+   </object>
+   <object xml:id="o3" name="x" type="OneAssignmentTestValueWrapper">
    </object>
 </model>

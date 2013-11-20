@@ -87,6 +87,7 @@ tokens {
 	DIFFERENT = "\\different";
 	METADISJOINT = "\\metaDisjoint";
 	ISTHISREFERENCE="\\isThisReference";
+	DIFFERENTFIELDS="\\differentFields";
 	ISREFERENCE="\\isReference";
 	ISREFERENCEARRAY="\\isReferenceArray";
 	ISSTATICFIELD = "\\isStaticField";
