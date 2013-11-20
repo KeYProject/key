@@ -128,15 +128,15 @@ final class AMapImplementation extends AbstractMap {
         }
     }
     
-    void removeCopy(MapEntry[] entriesNew, int index) {
-        copyMapEntries(entriesNew, 0, 0, index);
-        copyMapEntries(entriesNew, index, index + 1, entriesNew.length - index);
+    void removeCopyOldEntries(MapEntry[] newEntries, int index) {
+        copyMapEntries(newEntries, 0, 0, index);
+        copyMapEntries(newEntries, index, index + 1, newEntries.length - index);
     }
 
     Object removeInDomain(int index) {
         Object result = entries[index].value;
         MapEntry[] entriesNew = newMapEntryArray(entries.length - 1);
-        removeCopy(entriesNew, index);
+        removeCopyOldEntries(entriesNew, index);
         entries = entriesNew;
         //@ set map = \dl_mapRemove(map, entries[index].key);
         //@ set footprint = \set_union(\dl_allElementsOfArray(entries, \all_fields(entries[0])), \set_union(\all_fields(this), \all_fields(entries)));

@@ -103,18 +103,18 @@ public abstract class AbstractMap implements MapInterface {
     abstract /*@ nullable */ Object putNotInDomain(Object key, Object value);
 
     /*@ public normal_behaviour
-     @ requires entriesNew != null;
-     @ requires entriesNew != entries;
+     @ requires newEntries != null;
+     @ requires newEntries != entries;
      @ requires entries.length > 0;
-     @ requires entriesNew.length == entries.length - 1;
-     @ requires \typeof(entriesNew) == \typeof(entries);
+     @ requires newEntries.length == entries.length - 1;
+     @ requires \typeof(newEntries) == \typeof(entries);
      @ requires 0 <= index && index < entries.length;
      @ ensures (\forall Object o; !\fresh(o));
-     @ ensures (\forall int i; 0 <= i && i < entriesNew.length;
-     @               entriesNew[i] == ((i < index) ? entries[i] : entries[i + 1]));
-     @ assignable entriesNew[*];
+     @ ensures (\forall int i; 0 <= i && i < newEntries.length;
+     @               newEntries[i] == ((i < index) ? entries[i] : entries[i + 1]));
+     @ assignable newEntries[*];
      @*/
-    abstract void removeCopy( /*@nullable*/ MapEntry[] entriesNew, int index);
+    abstract void removeCopyOldEntries( /*@nullable*/ MapEntry[] newEntries, int index);
 
     /*@ public normal_behaviour
      @ requires 0 <= index && index < entries.length;
