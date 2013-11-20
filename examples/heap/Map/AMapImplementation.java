@@ -36,18 +36,18 @@ final class AMapImplementation extends AbstractMap {
     }
     
     void copyMapEntries(MapEntry[] target,
-            int beginTarget,
-            int beginEntry,
+            int targetIndex,
+            int entriesIndex,
             int numberCopies) {
         /*@ loop_invariant 0 <= i && i <= numberCopies;
          @ loop_invariant (\forall int x; 0 <= x && x < i; 
-         @               ( target[beginTarget + x] == entries[beginEntry + x] ));
+         @               ( target[targetIndex + x] == entries[entriesIndex + x] ));
          @ loop_invariant (\forall Object o; !\fresh(o));
          @ decreases numberCopies - i;
-         @ assignable target[beginTarget..beginTarget + numberCopies - 1];
+         @ assignable target[targetIndex..targetIndex + numberCopies - 1];
          @*/
         for (int i = 0; i < numberCopies; i++) {
-            target[beginTarget + i] = entries[beginEntry + i];
+            target[targetIndex + i] = entries[entriesIndex + i];
         }
     }
 

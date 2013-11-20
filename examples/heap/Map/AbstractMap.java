@@ -29,17 +29,17 @@ public abstract class AbstractMap implements MapInterface {
      @ requires target != entries;
      @ requires target != null;
      @ requires 0 <= numberCopies;
-     @ requires 0 <= beginTarget && beginTarget + numberCopies <= target.length;
-     @ requires 0 <= beginEntry && beginEntry + numberCopies <= entries.length;
+     @ requires 0 <= targetIndex && targetIndex + numberCopies <= target.length;
+     @ requires 0 <= entriesIndex && entriesIndex + numberCopies <= entries.length;
      @ requires \typeof(target) == \typeof(entries);
      @ ensures (\forall int x; 0 <= x && x < numberCopies; 
-     @               ( target[beginTarget + x] == entries[beginEntry + x]));
+     @               ( target[targetIndex + x] == entries[entriesIndex + x]));
      @ ensures (\forall Object o; !\fresh(o));
-     @ assignable target[beginTarget..beginTarget + numberCopies - 1];
+     @ assignable target[targetIndex..targetIndex + numberCopies - 1];
      @*/
     abstract void copyMapEntries(MapEntry[] /*@nullable*/ target,
-            int beginTarget,
-            int beginEntry,
+            int targetIndex,
+            int entriesIndex,
             int numberCopies);
     
     /*@ public normal_behavior
