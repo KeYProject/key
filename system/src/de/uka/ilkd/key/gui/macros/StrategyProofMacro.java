@@ -77,7 +77,7 @@ public abstract class StrategyProofMacro implements ProofMacro {
         }
 
         // add a focus manager if there is a focus
-        if(posInOcc != null) {
+        if(posInOcc != null && mediator.getSelectedGoal() != null) {
             Goal goal = mediator.getSelectedGoal();
             AutomatedRuleApplicationManager realManager = goal.getRuleAppManager();
             realManager.clearCache();
