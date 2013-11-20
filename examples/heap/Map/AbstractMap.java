@@ -78,6 +78,8 @@ public abstract class AbstractMap implements MapInterface {
      @ ensures \result[entries.length].key == key;
      @ ensures \result[entries.length].value == value;
      @ ensures \fresh(\result, \result[entries.length]);
+     @ ensures !\dl_inDomain(map, \result);
+     @ ensures !\dl_inDomain(map, \result[entries.length]);
      @ ensures \typeof(\result) == \type(MapEntry[]);
      @*/
     abstract /*@ pure */ MapEntry[] putExtendArray(Object key, Object value);
