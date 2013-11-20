@@ -112,8 +112,8 @@ final class AMapImplementation extends AbstractMap {
     }
 
     Object putNotInDomain(Object key, Object value) {
-        MapEntry[] newEntry = putExtendArray(key, value);
-        entries = newEntry;
+        MapEntry[] newEntries = putExtendArray(key, value);
+        entries = newEntries;
         //@ set footprint = \set_union(\dl_allElementsOfArray(entries, \all_fields(entries[0])), \set_union(\all_fields(this), \all_fields(entries)));
         //@ set map = \dl_mapUpdate(map, key, value);
         return null;
@@ -135,9 +135,9 @@ final class AMapImplementation extends AbstractMap {
 
     Object removeInDomain(int index) {
         Object result = entries[index].value;
-        MapEntry[] entriesNew = newMapEntryArray(entries.length - 1);
-        removeCopyOldEntries(entriesNew, index);
-        entries = entriesNew;
+        MapEntry[] newEntries = newMapEntryArray(entries.length - 1);
+        removeCopyOldEntries(newEntries, index);
+        entries = newEntries;
         //@ set map = \dl_mapRemove(map, entries[index].key);
         //@ set footprint = \set_union(\dl_allElementsOfArray(entries, \all_fields(entries[0])), \set_union(\all_fields(this), \all_fields(entries)));
         return result;
