@@ -37,13 +37,13 @@ final class SimplifiedLinkedList {
 
     /*@ normal_behaviour
       @ requires i > 0 && i < size;
-      @ ensures nodeseq == \old(\seq_concat(nodeseq[0..i-1], nodeseq[i+1..nodeseq.length-1]));
+      @ ensures nodeseq == \old(\seq_concat(nodeseq[0..i], nodeseq[i+1..nodeseq.length]));
       @*/
     public void remove(int i) {
 	Node node = getNext(i-1);
 	Node node2 = getNext(i);
 	node.next = node2.next;
-        //@ set nodeseq = (\seq_concat(\seq_sub(nodeseq,0,i-1), \seq_sub(nodeseq,i+1,\seq_length(nodeseq)-1)));
+        //@ set nodeseq = (\seq_concat(\seq_sub(nodeseq,0,i), \seq_sub(nodeseq,i+1,\seq_length(nodeseq))));
 	size --;
     }
 }
