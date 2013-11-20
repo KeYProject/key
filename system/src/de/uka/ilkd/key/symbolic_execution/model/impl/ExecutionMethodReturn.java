@@ -23,13 +23,12 @@ import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -221,11 +220,12 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                      for (Entry<Term, List<Node>> entry : valueNodeMap.entrySet()) {
                         List<Term> conditions = new LinkedList<Term>();
                         for (Node node : entry.getValue()) {
-                           Term condition = SymbolicExecutionUtil.computePathCondition(node, false);
+                           Term condition = SymbolicExecutionUtil.computePathCondition(node, false, false);
                            conditions.add(condition);
                         }
                         Term condition = TermBuilder.DF.or(conditions);
                         condition = SymbolicExecutionUtil.simplify(info.getProof(), condition);
+                        condition = SymbolicExecutionUtil.improveReadability(condition, info.getProof().getServices());
                         result[i] = new ExecutionMethodReturnValue(getMediator(), getProofNode(), entry.getKey(), condition);
                         i++;
                      }

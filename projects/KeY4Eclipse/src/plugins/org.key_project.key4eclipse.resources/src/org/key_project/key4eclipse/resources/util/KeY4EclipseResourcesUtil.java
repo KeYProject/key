@@ -13,11 +13,6 @@
 
 package org.key_project.key4eclipse.resources.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -42,6 +37,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
+import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -133,25 +129,12 @@ public class KeY4EclipseResourcesUtil {
     * @return the MD5 Sum as {@link String}
     */
    public static String computeContentMD5(IFile iFile){ // TODO: Move to ResourceUtil.computeMD5(IFile)
-      File file = iFile.getLocation().toFile(); // TODO: Never work with File instead of IFile because in general an IFile can be everywhere and not only on hard disk. Ensure that this is never done. Only KeY has to do it because it can not handle IFiles... 
-      String md5 = null;
-         try {
-            MessageDigest digest = MessageDigest.getInstance("MD5");
-            InputStream is = new FileInputStream(file); // TODO: Use iFile iFile.getContents() instead. Here and everwhere in your code!
-            byte[] buffer = new byte[8192];
-            int read = 0;
-            while( (read = is.read(buffer)) > 0) {
-               digest.update(buffer, 0, read);
-            }     
-            byte[] md5sum = digest.digest();
-            BigInteger bigInt = new BigInteger(1, md5sum);
-            md5 = bigInt.toString(16);
-            is.close();
-         }
-         catch(Exception e) {
-            throw new RuntimeException("Unable to process file for MD5", e); // TODO: Bad idea, it is legal that exceptions are thrown, treat it by the caller of this method!
-         }
-      return md5;
+      try {
+         return IOUtil.computeMD5(iFile.getContents());
+      }
+      catch(Exception e) {
+         throw new RuntimeException("Unable to process file for MD5", e); // TODO: Bad idea, it is legal that exceptions are thrown, treat it by the caller of this method!
+      }
    }
    
    

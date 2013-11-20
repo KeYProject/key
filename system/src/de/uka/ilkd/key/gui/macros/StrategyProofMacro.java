@@ -127,5 +127,10 @@ public abstract class StrategyProofMacro implements ProofMacro {
         }
 
     }
+    
+    @Override
+    public javax.swing.KeyStroke getKeyStroke () {
+    	return null; // default implementation
+    }
 
 }

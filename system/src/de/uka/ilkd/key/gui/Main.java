@@ -175,6 +175,9 @@ public final class Main {
             evaluateOptions(cl);
             UserInterface userInterface = createUserInterface();
             loadCommandLineFile(userInterface);
+        } catch (ExceptionInInitializerError e) {
+        	System.err.println("D'oh! It seems that KeY was not built properly!");
+        	System.exit(777);
         } catch (CommandLineException e) {
             printHeader(); // exception before verbosity option could be read
             if (Debug.ENABLE_DEBUG) {
@@ -402,6 +405,8 @@ public final class Main {
                     System.exit(-1);
                 }
             });
+            if (fileNameOnStartUp == null)
+                printUsageAndExit(true, "Error: No file to load from.", -4);
             BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
 
             ui = new ConsoleUserInterface(batch, true, verbosity);

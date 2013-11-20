@@ -12,9 +12,7 @@ invariant: i &gt;= 0
 variant: javaSubInt(array.length, i)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
-               <branchCondition name="!(    i_0 &gt;= 1
-    &amp; array.length &gt;= 0
-    &amp; array.length &lt;= -1 + i_0
+               <branchCondition name="!(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
   | i_0 &lt;= -1
   &amp; array.length &gt;= 0
   &amp; array.length &gt;= i_0
@@ -24,11 +22,9 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
       -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0))" pathCondition="!(  array.length &gt;= 0
   &amp; (    !i_0 = 0
        &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
+       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
      | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))" pathConditionChanged="true" branchCondition="!(    i_0 &gt;= 1
-    &amp; array.length &gt;= 0
-    &amp; array.length &lt;= -1 + i_0
+         -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))" pathConditionChanged="true" branchCondition="!(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
   | i_0 &lt;= -1
   &amp; array.length &gt;= 0
   &amp; array.length &gt;= i_0
@@ -40,7 +36,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                   <branchCondition name="!array = null" pathCondition="   array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt;   bsum{int j;}(0, i_0, array[j])
               = result_1_0))
@@ -48,7 +44,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                      <statement name="result_1+=array[i];" pathCondition="   array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt;   bsum{int j;}(0, i_0, array[j])
               = result_1_0))
@@ -57,7 +53,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                         <branchStatement name="if (i&gt;=0) { {     cont_1=true;break inner_label;   } }" pathCondition="   array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt;   bsum{int j;}(0, i_0, array[j])
               = result_1_0))
@@ -66,7 +62,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                            <statement name="break inner_label;" pathCondition="   array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt;   bsum{int j;}(0, i_0, array[j])
               = result_1_0))
@@ -75,7 +71,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                               <termination name="&lt;loop body end&gt;" pathCondition="   array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt;   bsum{int j;}(0, i_0, array[j])
               = result_1_0))
@@ -88,7 +84,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                   <branchCondition name="array = null" pathCondition="   array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt;   bsum{int j;}(0, i_0, array[j])
               = result_1_0))
@@ -96,7 +92,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                      <termination name="&lt;loop body end&gt;" pathCondition="   array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt;   bsum{int j;}(0, i_0, array[j])
               = result_1_0))
@@ -104,9 +100,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                      </termination>
                   </branchCondition>
                </branchCondition>
-               <branchCondition name="!(    i_0 &gt;= 1
-    &amp; array.length &gt;= 0
-    &amp; array.length &lt;= -1 + i_0
+               <branchCondition name="!(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
   | i_0 &lt;= -1
   &amp; array.length &gt;= 0
   &amp; array.length &gt;= i_0
@@ -116,11 +110,9 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
       -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0))" pathCondition="!(  array.length &gt;= 0
   &amp; (    !i_0 = 0
        &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
+       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
      | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))" pathConditionChanged="true" branchCondition="!(    i_0 &gt;= 1
-    &amp; array.length &gt;= 0
-    &amp; array.length &lt;= -1 + i_0
+         -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))" pathConditionChanged="true" branchCondition="!(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
   | i_0 &lt;= -1
   &amp; array.length &gt;= 0
   &amp; array.length &gt;= i_0
@@ -132,21 +124,21 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                   <statement name="return result_1;" pathCondition="!(  array.length &gt;= 0
   &amp; (    !i_0 = 0
        &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
+       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
      | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
          -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
                      <methodReturn name="&lt;return of ArraySumWhileWithContinue.sum(array);&gt;" pathCondition="!(  array.length &gt;= 0
   &amp; (    !i_0 = 0
        &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
+       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
      | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
          -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))" pathConditionChanged="false" isReturnValueComputed="false">
                         <callStackEntry path="/0"/>
                         <termination name="&lt;end&gt;" pathCondition="!(  array.length &gt;= 0
   &amp; (    !i_0 = 0
        &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
+       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
      | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
          -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>

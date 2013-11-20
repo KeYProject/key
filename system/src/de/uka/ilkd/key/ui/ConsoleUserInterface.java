@@ -72,7 +72,12 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
     public void taskFinished(TaskFinishedInfo info) {
         progressMax = 0; // reset progress bar marker
-        final int openGoals = info.getProof().openGoals().size();
+        final Proof proof = info.getProof();
+        if (proof==null) {
+            if (verbosity > SILENT) System.out.println("Proof loading failed");
+            return;
+        }
+        final int openGoals = proof.openGoals().size();
         final Object result2 = info.getResult();
         if (info.getSource() instanceof ApplyStrategy) {
             if (verbosity >= HIGH) {

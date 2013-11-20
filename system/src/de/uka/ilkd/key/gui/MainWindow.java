@@ -91,6 +91,7 @@ import de.uka.ilkd.key.gui.actions.PruneProofAction;
 import de.uka.ilkd.key.gui.actions.QuickLoadAction;
 import de.uka.ilkd.key.gui.actions.QuickSaveAction;
 import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
+import de.uka.ilkd.key.gui.actions.ToggleConfirmExitAction;
 import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
 import de.uka.ilkd.key.gui.actions.SaveFileAction;
 import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
@@ -809,6 +810,8 @@ public final class MainWindow extends JFrame  {
         proof.setMnemonic(KeyEvent.VK_P);
 
         proof.add(autoModeAction);
+        final JMenuItem macros = new de.uka.ilkd.key.gui.macros.ProofMacroMenu(mediator, null);
+        proof.add(macros);
         proof.add(new UndoLastStepAction(this, true));
         proof.add(new AbandonTaskAction(this));
         proof.addSeparator();
@@ -832,6 +835,7 @@ public final class MainWindow extends JFrame  {
 	options.add(new SMTOptionsAction(this));
 //	options.add(setupSpeclangMenu()); // legacy since only JML supported
 	options.addSeparator();
+        options.add(new JCheckBoxMenuItem(new ToggleConfirmExitAction(this)));
 	options.add(new JCheckBoxMenuItem(new AutoSave(this)));
 	options.add(new JCheckBoxMenuItem(new DefaultProofFolder(this)));
         options.add(new JCheckBoxMenuItem(new MinimizeInteraction(this)));

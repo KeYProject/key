@@ -414,28 +414,27 @@ public class ContractFactory {
                 axioms.put(h, axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom));
               }
 
-            }
-
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-               if(!hasMod.get(h) && !other.hasModifiesClause(h)) {
-             	   continue;
-               }
-               hasMod.put(h, true);
-               Term m1 = mods.get(h);
-               Term m2 = other.getMod(h,t.originalSelfVar,
-                                      t.originalParamVars,
-                                      services);
-                Term nm = null;
-                if(m1 == null && m2 == null)
-                  continue;
-                if(m1 == null){
-                   nm = m2;
-                }else if(m2 == null) {
-                   nm = m1;
-                }else{
-                   nm = tb.union(services, m1, m2);
+                if (hasMod.get(h) || other.hasModifiesClause(h)) {
+                    hasMod.put(h, true);
+                    Term m1 = mods.get(h);
+                    Term m2 = other.getMod(h, t.originalSelfVar,
+                                           t.originalParamVars,
+                                           services);
+                    if (m1 != null || m2 != null) {
+                        Term nm;
+                        if (m1 == null) {
+                            nm = m2;
+                        } else if (m2 == null) {
+                            nm = m1;
+                        } else {
+                            Term ownPre = pres.get(h) == null ? pres.get(h) : tb.tt();
+                            nm = tb.intersect(services,
+                                              tb.ife(ownPre, m1, tb.allLocs(services)),
+                                              tb.ife(otherPre, m2, tb.allLocs(services)));
+                        }
+                        mods.put(h, nm);
+                    }
                 }
-                mods.put(h, nm);
 
             }
         }

@@ -307,7 +307,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             }
             ProofUserManager.getInstance().addUser(currentProof, environment, this);
             this.environment.getMediator().setProof(currentProof);
-            this.environment.getMediator().setStupidMode(true);
+            this.environment.getMediator().setMinimizeInteraction(true);
             if (this.getEnvironment().getMediator().getSelectedNode() == null) {
                this.getEnvironment().getMediator().getSelectionModel().setSelectedNode(currentProof.root());
             }
@@ -517,7 +517,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    public void setCurrentNode(Node currentNode) {
       this.currentNode = currentNode;
-      getMediator().setStupidMode(true);
+      getMediator().setMinimizeInteraction(true);
       viewerDecorator.showNode(currentNode, getMediator());
    }
    

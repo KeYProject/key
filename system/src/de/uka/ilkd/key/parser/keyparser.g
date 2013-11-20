@@ -3604,11 +3604,12 @@ varexp[TacletBuilder b]
     | varcond_different[b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
+    | varcond_differentFields[b]        
   ) 
   | 
   ( (NOT {negated = true;} )? 
-      (   varcond_abstractOrInterface[b, negated]
-	| varcond_array[b, negated]
+    (   varcond_abstractOrInterface[b, negated]
+	    | varcond_array[b, negated]
         | varcond_array_length[b, negated]	
         | varcond_enumtype[b, negated]
         | varcond_freeLabelIn[b,negated]         
@@ -3673,6 +3674,23 @@ varcond_dropEffectlessStores[TacletBuilder b]
                                                                (TermSV)result));
    }
 ;
+
+varcond_differentFields [TacletBuilder b]
+{
+  ParsableVariable x = null;
+  ParsableVariable y = null;
+
+}
+:
+   DIFFERENTFIELDS
+   LPAREN      
+     x = varId COMMA y = varId                    
+   RPAREN 
+   { 
+            b.addVariableCondition(new DifferentFields((SchemaVariable)x, (SchemaVariable)y)); 
+   }
+; 
+
 
 varcond_simplifyIfThenElseUpdate[TacletBuilder b]
 {
@@ -4095,6 +4113,9 @@ varcond_induction_variable [TacletBuilder b, boolean negated]
        (SchemaVariable)x, negated ));
    }
 ;
+
+
+
 
 goalspecs[TacletBuilder b, boolean ruleWithFind] :
         CLOSEGOAL

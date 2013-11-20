@@ -13,10 +13,14 @@
 
 package de.uka.ilkd.key.gui.macros;
 
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
@@ -191,6 +195,11 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
             delegate.instantiateApp(app, pio, goal, collector);
         }
 
+    }
+    
+    @Override
+    public KeyStroke getKeyStroke () {
+    	return KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.SHIFT_DOWN_MASK);
     }
 
     @Override

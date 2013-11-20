@@ -126,7 +126,7 @@ final class JMLTranslator {
         NOT_MOD ("\\not_modified"),
         VALUES ("\\values"),
         INDEX ("\\index"),
-        INDEX_OF ("\\indexOf"),
+        INDEX_OF ("\\seq_indexOf"),
         SEQ_CONST ("\\seq"),
         SEQ_GET ("\\seq_get"),
         SEQ_CONCAT ("\\seq_concat"),
