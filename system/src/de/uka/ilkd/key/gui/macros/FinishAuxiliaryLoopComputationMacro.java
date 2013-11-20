@@ -35,8 +35,15 @@ public class FinishAuxiliaryLoopComputationMacro extends
     @Override
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
         final Proof proof = mediator.getSelectedProof();
+        if (proof == null) {
+            return false;
+        }
+        final Services services = proof.getServices();
+        if (services == null) {
+            return false;
+        }
         final ContractPO poForProof =
-                proof.getServices().getSpecificationRepository().getPOForProof(proof);
+                services.getSpecificationRepository().getPOForProof(proof);
         return poForProof instanceof LoopInvExecutionPO;
     }
 
@@ -45,6 +52,9 @@ public class FinishAuxiliaryLoopComputationMacro extends
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) {
         final Proof proof = mediator.getSelectedProof();
+        if (proof == null) {
+            return;
+        }
         final ContractPO poForProof =
                 proof.getServices().getSpecificationRepository().getPOForProof(proof);
         if (!(poForProof instanceof LoopInvExecutionPO)) {

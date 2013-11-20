@@ -36,7 +36,13 @@ public class FinishAuxiliaryComputationMacro
     public boolean canApplyTo(KeYMediator mediator,
                               PosInOccurrence posInOcc) {
         final Proof proof = mediator.getSelectedProof();
+        if (proof == null) {
+            return false;
+        }
         final Services services = proof.getServices();
+        if (services == null) {
+            return false;
+        }
         final ContractPO poForProof =
                 services.getSpecificationRepository().getPOForProof(proof);
         return poForProof instanceof SymbolicExecutionPO;
@@ -48,6 +54,9 @@ public class FinishAuxiliaryComputationMacro
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) {
         final Proof proof = mediator.getSelectedProof();
+        if (proof == null) {
+            return;
+        }
         final ContractPO poForProof =
                 proof.getServices().getSpecificationRepository().getPOForProof(proof);
         if (!(poForProof instanceof SymbolicExecutionPO)) {
