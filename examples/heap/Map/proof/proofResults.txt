@@ -1,0 +1,48 @@
+Results for MapImplementation.java proofs.
+Unless otherwise mentioned, contracts were automatically proven.
+
+GIT repository commit hash: b9b1cccca4f611ed6fff8f91afef716b85ac7bb6
+Checkout this commit hash to verify the proofs.
+The automatic proofs were done with default settings.
+
+constructor(): automatic, 938 nodes
+
+clear(): automatic, 946 nodes
+
+containsKey() accessible clause: automatic, 14187 nodes
+containsKey() normal behaviour: automatic, 2868 nodes
+
+containsValue() accessible clause: automatic, 4573 nodes
+containsValue() normal behaviour: automatic, 2605 nodes
+
+copyMapEntries(): 2 interactions, 2851 nodes
+
+get() accessible clause: automatic, 21909 nodes
+get() normal behaviour: automatic, 2874 nodes
+
+getIndexOfKey() accessible clause: automatic, 5968 nodes
+getIndexOfKey() normal behaviour: automatic, 2543 nodes
+
+isEmpty() accessible clause: automatic, 361 nodes
+isEmpty() normal behaviour: automatic, 1039 nodes
+
+newMapEntry(): automatic, 1823 nodes
+
+newMapEntryArray(): automatic, 483 nodes
+
+put(): 20 interactions, 18759 nodes
+
+putExtendArray(): automatic, 15717 nodes
+
+putInDomain(): automatic, 2523 nodes
+
+putNotInDomain(): 1 interacion, 8980 nodes
+
+remove(): 39 interactions, 38111 nodes
+
+*removeCopyOldEntries(): 27 interactions, 9542 nodes
+
+removeInDomain(): 
+
+size() accessible clause: automatic, 357 nodes
+size() normal behaviour: automatic, 992 nodes

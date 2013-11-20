@@ -120,8 +120,8 @@ public abstract class AbstractMap implements MapInterface {
 
     /*@ public normal_behaviour
      @ requires 0 <= index && index < entries.length;
-     @ ensures map == \dl_mapRemove(\old(map), entries[index].key);
-     @ ensures \result == \dl_mapGet(\old(map), entries[index].key);
+     @ ensures map == \dl_mapRemove(\old(map), \old(entries[index].key));
+     @ ensures \result == \dl_mapGet(\old(map), \old(entries[index].key));
      @ ensures \fresh(entries);
      @ ensures !\dl_inDomain(map, entries);
      @ assignable footprint;
