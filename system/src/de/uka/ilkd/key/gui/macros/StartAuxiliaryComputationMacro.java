@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
+import javax.swing.KeyStroke;
 
 
 /**
@@ -104,5 +105,11 @@ public class StartAuxiliaryComputationMacro implements ProofMacro {
         } catch (ProofInputException exc) {
             ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
         }
+    }
+
+
+    @Override
+    public KeyStroke getKeyStroke() {
+        return null; // default implementation
     }
 }

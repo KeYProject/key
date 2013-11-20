@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
+import javax.swing.KeyStroke;
 
 
 /**
@@ -121,5 +122,11 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
         } catch (ProofInputException exc) {
             ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
         }
+    }
+
+
+    @Override
+    public KeyStroke getKeyStroke() {
+        return null; // default implementation
     }
 }

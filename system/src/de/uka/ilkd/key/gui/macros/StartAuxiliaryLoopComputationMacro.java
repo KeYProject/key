@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import javax.swing.KeyStroke;
 
 public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
 
@@ -110,5 +111,11 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
         } catch (ProofInputException exc) {
             ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
         }
+    }
+
+
+    @Override
+    public KeyStroke getKeyStroke() {
+        return null; // default implementation
     }
 }

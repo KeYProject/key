@@ -25,6 +25,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.MiscTools;
+import javax.swing.KeyStroke;
 
 public class FinishAuxiliaryLoopComputationMacro extends
         AbstractFinishAuxiliaryComputationMacro {
@@ -123,5 +124,11 @@ public class FinishAuxiliaryLoopComputationMacro extends
         tacletBuilder.setSurviveSmbExec(true);
 
         return tacletBuilder.getTaclet();
+    }
+
+
+    @Override
+    public KeyStroke getKeyStroke() {
+        return null; // default implementation
     }
 }
