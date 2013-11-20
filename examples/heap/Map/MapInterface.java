@@ -7,11 +7,10 @@ public interface MapInterface {
     
     //@ public instance invariant \subset(\singleton(this.map), footprint);
     //@ public instance invariant \subset(\singleton(this.footprint), footprint);
-    
     //@ public instance invariant \dl_isFinite(map);
     
     // -----
-    // Method signatures + specs
+    // Method signatures and specifications
     // -----
     
     /*@ public normal_behaviour
@@ -50,10 +49,6 @@ public interface MapInterface {
      @ ensures \result == (\dl_inDomain(\old(map), key) ? \dl_mapGet(\old(map), key) : null);
      @*/
     public /*@nullable@*/ Object put(Object key, Object value);
-
-    /* What if size() == 1 before remove? 
-     * Do I have to set map = mapEmpty in case inDomain(map, key)?
-     */
     
     /*@ public normal_behaviour
      @ assignable footprint;

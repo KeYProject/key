@@ -2,38 +2,38 @@ package MapCaseStudy;
 
 public abstract class AbstractMap implements MapInterface {
 
-    public MapEntry[] entry;
+    public MapEntry[] entries;
 
     /*@
-     @ public invariant (\forall int i1; 0 <= i1 && i1 < entry.length;
-     @                      (\forall int i2; i1 < i2 && i2 < entry.length;
-     @                          ( entry[i1].key != entry[i2].key )));
-     @ public invariant \typeof(entry) == \type(MapEntry[]);
-     @ public invariant entry.length == \dl_mapSize(map);
-     @ public invariant (\forall int i; 0 <= i && i < entry.length;
-     @                      \dl_mapGet(map, entry[i].key) == entry[i].value);
+     @ public invariant (\forall int i1; 0 <= i1 && i1 < entries.length;
+     @                      (\forall int i2; i1 < i2 && i2 < entries.length;
+     @                          ( entries[i1].key != entries[i2].key )));
+     @ public invariant \typeof(entries) == \type(MapEntry[]);
+     @ public invariant entries.length == \dl_mapSize(map);
+     @ public invariant (\forall int i; 0 <= i && i < entries.length;
+     @                      \dl_mapGet(map, entries[i].key) == entries[i].value);
      @ public invariant (\forall Object o;
-     @          (\exists int i; 0 <= i && i < entry.length; entry[i].key == o) <==> \dl_inDomain(map, o));
+     @          (\exists int i; 0 <= i && i < entries.length; entries[i].key == o) <==> \dl_inDomain(map, o));
      @*/
     
-    /*@ public invariant (\forall int i; 0 <= i && i < entry.length; 
-      @          entry[i] != null && entry[i].key != null && entry[i].value != null); */
+    /*@ public invariant (\forall int i; 0 <= i && i < entries.length; 
+      @          entries[i] != null && entries[i].key != null && entries[i].value != null); */
     
     /*@ public invariant footprint ==
-     @      \set_union(\infinite_union(int i; 0 <= i && i < entry.length; entry[i].*),
+     @      \set_union(\infinite_union(int i; 0 <= i && i < entries.length; entries[i].*),
      @                 this.*,
-     @                 entry.*);
+     @                 entries.*);
      @*/
     
     /*@ public normal_behaviour
-     @ requires target != entry;
+     @ requires target != entries;
      @ requires target != null;
      @ requires 0 <= numberCopies;
      @ requires 0 <= beginTarget && beginTarget + numberCopies <= target.length;
-     @ requires 0 <= beginEntry && beginEntry + numberCopies <= entry.length;
-     @ requires \typeof(target) == \typeof(entry);
+     @ requires 0 <= beginEntry && beginEntry + numberCopies <= entries.length;
+     @ requires \typeof(target) == \typeof(entries);
      @ ensures (\forall int x; 0 <= x && x < numberCopies; 
-     @               ( target[beginTarget + x] == entry[beginEntry + x]));
+     @               ( target[beginTarget + x] == entries[beginEntry + x]));
      @ ensures (\forall Object o; !\fresh(o));
      @ assignable target[beginTarget..beginTarget + numberCopies - 1];
      @*/
@@ -44,12 +44,21 @@ public abstract class AbstractMap implements MapInterface {
     
     /*@ public normal_behavior
      @ ensures \dl_inDomain(map, key) ? 
-     @              (\result >= 0 && \result < entry.length && entry[\result].key == key) : 
+     @              (\result >= 0 && \result < entries.length && entries[\result].key == key) : 
      @              (\result == -1);
      @ ensures (\forall Object o; !\fresh(o));
      @ accessible footprint;
      @*/
     abstract /*@strictly_pure@*/ int getIndexOfKey(Object key);
+    
+    /*@ public normal_behavior
+     @   ensures \fresh(\result);
+     @   ensures \result.key == key;
+     @   ensures \result.value == value;
+     @   ensures !\dl_inDomain(map, \result);
+     @   assignable \nothing;
+     @*/
+    abstract MapEntry newMapEntry(Object key, Object value);
 
     /*@ public normal_behavior
      @   requires l >= 0;
@@ -61,33 +70,24 @@ public abstract class AbstractMap implements MapInterface {
      @   ensures !\dl_inDomain(map, \result);
      @   assignable \nothing;
      @*/
-    abstract /*@helper nullable*/ MapEntry[] getMapEntryArray(int l);
-    
-    /*@ public normal_behavior
-     @   ensures \fresh(\result);
-     @   ensures \result.key == key;
-     @   ensures \result.value == value;
-     @   ensures !\dl_inDomain(map, \result);
-     @   assignable \nothing;
-     @*/
-    abstract MapEntry putCreateMapEntry(Object key, Object value);
+    abstract /*@helper nullable*/ MapEntry[] newMapEntryArray(int l);
     
     /*@ public normal_behaviour
-     @ ensures \result.length == entry.length + 1;
-     @ ensures (\forall int i; 0 <= i && i < entry.length; \result[i] == entry[i]);
-     @ ensures \result[entry.length].key == key;
-     @ ensures \result[entry.length].value == value;
-     @ ensures \fresh(\result, \result[entry.length]);
+     @ ensures \result.length == entries.length + 1;
+     @ ensures (\forall int i; 0 <= i && i < entries.length; \result[i] == entries[i]);
+     @ ensures \result[entries.length].key == key;
+     @ ensures \result[entries.length].value == value;
+     @ ensures \fresh(\result, \result[entries.length]);
      @ ensures \typeof(\result) == \type(MapEntry[]);
      @*/
     abstract /*@ pure */ MapEntry[] putExtendArray(Object key, Object value);
 
     /*@ public normal_behaviour
-     @ requires 0 <= index && index < entry.length;
-     @ ensures map == \dl_mapUpdate(\old(map), entry[index].key, value);
-     @ ensures \result == (\dl_mapGet(\old(map), entry[index].key));
+     @ requires 0 <= index && index < entries.length;
+     @ ensures map == \dl_mapUpdate(\old(map), entries[index].key, value);
+     @ ensures \result == (\dl_mapGet(\old(map), entries[index].key));
      @ ensures (\forall Object o; !\fresh(o));
-     @ assignable entry[index].value, map;
+     @ assignable entries[index].value, map;
      @*/
     abstract Object putInDomain(int index, Object value);
 
@@ -96,32 +96,32 @@ public abstract class AbstractMap implements MapInterface {
      @ assignable footprint;
      @ ensures map == \dl_mapUpdate(\old(map), key, value);
      @ ensures \result == null;
-     @ ensures \fresh(entry, entry[entry.length - 1]);
-     @ ensures !\dl_inDomain(map, entry);
-     @ ensures !\dl_inDomain(map, entry[entry.length - 1]);
+     @ ensures \fresh(entries, entries[entries.length - 1]);
+     @ ensures !\dl_inDomain(map, entries);
+     @ ensures !\dl_inDomain(map, entries[entries.length - 1]);
      @*/
     abstract /*@ nullable */ Object putNotInDomain(Object key, Object value);
 
     /*@ public normal_behaviour
-     @ requires entryNew != null;
-     @ requires entryNew != entry;
-     @ requires entry.length > 0;
-     @ requires entryNew.length == entry.length - 1;
-     @ requires \typeof(entryNew) == \typeof(entry);
-     @ requires 0 <= index && index < entry.length;
+     @ requires entriesNew != null;
+     @ requires entriesNew != entries;
+     @ requires entries.length > 0;
+     @ requires entriesNew.length == entries.length - 1;
+     @ requires \typeof(entriesNew) == \typeof(entries);
+     @ requires 0 <= index && index < entries.length;
      @ ensures (\forall Object o; !\fresh(o));
-     @ ensures (\forall int i; 0 <= i && i < entryNew.length;
-     @               entryNew[i] == ((i < index) ? entry[i] : entry[i + 1]));
-     @ assignable entryNew[*];
+     @ ensures (\forall int i; 0 <= i && i < entriesNew.length;
+     @               entriesNew[i] == ((i < index) ? entries[i] : entries[i + 1]));
+     @ assignable entriesNew[*];
      @*/
-    abstract void removeCopy( /*@nullable*/ MapEntry[] entryNew, int index);
+    abstract void removeCopy( /*@nullable*/ MapEntry[] entriesNew, int index);
 
     /*@ public normal_behaviour
-     @ requires 0 <= index && index < entry.length;
-     @ ensures map == \dl_mapRemove(\old(map), entry[index].key);
-     @ ensures \result == \dl_mapGet(\old(map), entry[index].key);
-     @ ensures \fresh(entry);
-     @ ensures !\dl_inDomain(map, entry);
+     @ requires 0 <= index && index < entries.length;
+     @ ensures map == \dl_mapRemove(\old(map), entries[index].key);
+     @ ensures \result == \dl_mapGet(\old(map), entries[index].key);
+     @ ensures \fresh(entries);
+     @ ensures !\dl_inDomain(map, entries);
      @ assignable footprint;
      @*/
     abstract Object removeInDomain(int index);
