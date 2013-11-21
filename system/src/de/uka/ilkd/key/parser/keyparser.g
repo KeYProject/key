@@ -1524,6 +1524,7 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
 {
     boolean isAbstractSort = false;
     boolean isGenericSort = false;
+    boolean isProxySort = false;
     Sort[] sortExt=new Sort [0];
     Sort[] sortOneOf=new Sort [0];
     String firstSort;
@@ -1532,6 +1533,8 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
         ( 
          GENERIC {isGenericSort=true;} sortIds = simple_ident_comma_list
             ( ONEOF sortOneOf = oneof_sorts )? 
+            ( EXTENDS sortExt = extends_sorts )?
+        | PROXY {isProxySort=true;} sortIds = simple_ident_comma_list
             ( EXTENDS sortExt = extends_sorts )?
         | (ABSTRACT {isAbstractSort = true;})?
           firstSort = simple_ident_dots { sortIds = sortIds.prepend(firstSort); }
@@ -1573,7 +1576,11 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
                                     ext = ext.add ( sortExt[i] );
                                 }
 
+                                if(isProxySort) {
+                                    s = new ProxySort(sort_name, ext);
+                                } else {
                                 s = new SortImpl(sort_name, ext, isAbstractSort);
+                                }
                             }
                             assert s != null;
                             sorts().add ( s ); 
