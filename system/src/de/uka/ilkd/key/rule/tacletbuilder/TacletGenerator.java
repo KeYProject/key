@@ -243,6 +243,7 @@ public class TacletGenerator {
 
     public ImmutableSet<Taclet> generateFunctionalRepresentsTaclets(
             Name name,
+            Term originalPreTerm,
             Term originalRepresentsTerm,
             KeYJavaType kjt,
             IObserverFunction target,
@@ -310,6 +311,50 @@ public class TacletGenerator {
             ifSeq = Sequent.createAnteSequent(ifSemiSeq);
         }
 
+        Term addForumlaTerm = originalPreTerm;
+        final Sequent addedSeq;
+        // The presence of the precondition term means we are dealing with a model method definition 
+        // taclet, an \add section to check preconditions has to be added
+        // FIXME does this also affect the satisfiability branches?
+        if(addForumlaTerm != null) {
+            Term wfFormula = null;
+            Term createdFormula = null;
+        	for(SchemaVariable heapSV : heapSVs) {
+        		final Term wf = TB.wellFormed(TB.var(heapSV), services);
+        		if(wfFormula == null) {
+        			wfFormula = wf;
+        		}else{
+        			wfFormula = TB.and(wfFormula, wf);
+        		}
+        		if(!target.isStatic()) {
+        			final Term crf = TB.created(services, TB.var(heapSV), TB.var(selfSV));
+        			if(createdFormula == null) {
+        				createdFormula = crf;
+        			}else{
+        				createdFormula = TB.and(createdFormula, crf);
+        			}
+        		}
+        	}
+        	final Term selfNull = target.isStatic() ? null : TB.equals(TB.var(selfSV), TB.NULL(services));
+        	if(wfFormula != null) {
+        		addForumlaTerm = TB.and(addForumlaTerm, wfFormula);
+        	}
+        	if(createdFormula != null) {
+        		addForumlaTerm = TB.and(addForumlaTerm, createdFormula);
+        	}
+        	if(selfNull != null) {
+        		addForumlaTerm = TB.and(addForumlaTerm, TB.not(selfNull));
+        	}
+            final TermAndBoundVarPair schemaAdd = createSchemaTerm(addForumlaTerm, pvs, svs);
+
+            final Term addedFormula = schemaAdd.term;
+            final SequentFormula addedCf = new SequentFormula(addedFormula);
+            final Semisequent addedSemiSeq = Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
+            addedSeq = Sequent.createAnteSequent(addedSemiSeq);
+        }else{
+        	addedSeq = null;
+        }
+
         //create taclet
         final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
         tacletBuilder.setFind(schemaLhs);
@@ -317,6 +362,9 @@ public class TacletGenerator {
                 new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
                                               ImmutableSLList.<Taclet>nil(),
                                               limitedRhs));
+        if(addedSeq != null) {
+            tacletBuilder.addTacletGoalTemplate (new TacletGoalTemplate(addedSeq, ImmutableSLList.<Taclet>nil()));
+        }
         if (ifSeq != null) {
             tacletBuilder.setIfSequent(ifSeq);
         }
@@ -553,7 +601,7 @@ public class TacletGenerator {
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
         tacletBuilder.addTacletGoalTemplate (new TacletGoalTemplate(addedSeq, ImmutableSLList.<Taclet>nil()));
         tacletBuilder.setName(name);
-        tacletBuilder.addRuleSet(new RuleSet(new Name("query_axiom"))); // TODO classAxiom
+        tacletBuilder.addRuleSet(new RuleSet(new Name("query_axiom"))); // TODO classAxiom ???
 
         return DefaultImmutableSet.<Taclet>nil().add(tacletBuilder.getTaclet());
 

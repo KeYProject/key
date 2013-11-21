@@ -836,6 +836,7 @@ public final class SpecificationRepository {
                       invSymbol,
                       kjt,
                       new Private(),
+                      null,
                       invDef,
                       selfVar,
                       ImmutableSLList.<ProgramVariable>nil(), null);
@@ -899,6 +900,8 @@ public final class SpecificationRepository {
                     }
                     for(FunctionalOperationContract fop : lookupContracts) {
                         Term representsFromContract = fop.getRepresentsAxiom(heaps.get(0), selfVar, paramVars, TB.resultVar(services, pm, false), atPreVars, services);
+                        Term preContract = fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
+                        if(preContract == null) preContract = TB.tt();
                         if(representsFromContract != null) {
                             // TODO Wojtek: I do not understand the visibility issues of model fields/methods.
                             // VisibilityModifier visibility = pm.isPrivate() ? new Private() :
@@ -906,7 +909,7 @@ public final class SpecificationRepository {
 
                             final ClassAxiom modelMethodRepresentsAxiom
                                 = new RepresentsAxiom("Definition axiom for " + pm.getName() + " in " + kjt.getFullName(),
-                                       pm, kjt, new Private(), representsFromContract, selfVar, paramVars, atPreVars);
+                                       pm, kjt, new Private(), preContract, representsFromContract, selfVar, paramVars, atPreVars);
                             result = result.add(modelMethodRepresentsAxiom);
                             definitionFound = true;
                             break;
