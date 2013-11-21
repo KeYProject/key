@@ -52,7 +52,11 @@ public class SequentSearchBar extends SearchBar {
         this.sequentView = sequentView;
         search();
     }
-    
+
+    public SequentView getSequentView() {
+        return this.sequentView;
+    }
+
     @Override
     public void createUI(){
         super.createUI();
