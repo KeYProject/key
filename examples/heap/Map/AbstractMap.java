@@ -127,5 +127,14 @@ public abstract class AbstractMap implements MapInterface {
      @ assignable footprint;
      @*/
     abstract Object removeInDomain(int index);
+    
+    /*@ public normal_behaviour
+     @ requires 0 <= index && index < entries.length;
+     @ ensures map == \dl_mapRemove(\old(map), \old(entries[index].key));
+     @ ensures \fresh(entries);
+     @ ensures !\dl_inDomain(map, entries);
+     @ assignable footprint;
+     @*/
+    abstract void removeInDomainWithoutResult(int index);
 
 }

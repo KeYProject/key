@@ -146,7 +146,7 @@ final class AMapImplementation extends AbstractMap {
     /*@ public normal_behaviour
      @ requires 0 <= index && index < entries.length;
      @ ensures \result.length == entries.length - 1;
-     @   ensures \typeof(\result) == \type(MapEntry[]);
+     @ ensures \typeof(\result) == \type(MapEntry[]);
      @ ensures (\forall int i; 0 <= i && i < \result.length;
      @               \result[i] == ((i < index) ? entries[i] : entries[i + 1]));
      @ ensures \fresh(\result);
@@ -160,10 +160,16 @@ final class AMapImplementation extends AbstractMap {
 
     Object removeInDomain(int index) {
         Object ret = entries[index].value;
-        setEnries(removeGetNewArray(index));
-        //@ set map = \dl_mapRemove(map, ret);
-        //@ set footprint = \set_union(\dl_allElementsOfArray(entries, \all_fields(entries[0])), \set_union(\all_fields(this), \all_fields(entries)));
+        removeInDomainWithoutResult(index);
         return ret;
+    }
+    
+    //@ ghost Object key;
+    void removeInDomainWithoutResult(int index) {
+        //@ set key = entries[index].key;
+        setEnries(removeGetNewArray(index));
+        //@ set map = \dl_mapRemove(map, key);
+        //@ set footprint = \set_union(\dl_allElementsOfArray(entries, \all_fields(entries[0])), \set_union(\all_fields(this), \all_fields(entries)));
     }
     
     public int size() {
