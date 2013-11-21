@@ -350,7 +350,7 @@ public class TacletGenerator {
             final Term addedFormula = schemaAdd.term;
             final SequentFormula addedCf = new SequentFormula(addedFormula);
             final Semisequent addedSemiSeq = Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
-            addedSeq = Sequent.createAnteSequent(addedSemiSeq);
+            addedSeq = Sequent.createSuccSequent(addedSemiSeq);
         }else{
         	addedSeq = null;
         }
@@ -362,9 +362,14 @@ public class TacletGenerator {
                 new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
                                               ImmutableSLList.<Taclet>nil(),
                                               limitedRhs));
+
+        // FIXME - there is a chance this will have to go along with all the other associated changes
         if(addedSeq != null) {
-            tacletBuilder.addTacletGoalTemplate (new TacletGoalTemplate(addedSeq, ImmutableSLList.<Taclet>nil()));
+        	TacletGoalTemplate tgc = new TacletGoalTemplate(addedSeq, ImmutableSLList.<Taclet>nil());
+        	tgc.setName("Precondition of "+target.name());
+            tacletBuilder.addTacletGoalTemplate (tgc);
         }
+
         if (ifSeq != null) {
             tacletBuilder.setIfSequent(ifSeq);
         }
