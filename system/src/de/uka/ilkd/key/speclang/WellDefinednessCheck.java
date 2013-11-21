@@ -1092,6 +1092,7 @@ public abstract class WellDefinednessCheck implements Contract {
                                  ProgramVariable heapAtPre,
                                  Term anonHeap, Services services) {
         assert mod != null;
+        assert anonHeap != null || TB.strictlyNothing().equals(mod);
         final Term havocUpd = TB.strictlyNothing().equals(mod) ?
                 TB.skip()
                 : TB.elementary(services, heap, TB.anon(services, TB.var(heap), mod, anonHeap));
