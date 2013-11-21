@@ -2,12 +2,12 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="LoopSplittingCondition.main(x);" pathCondition="true" pathConditionChanged="false">
       <statement name="int i = x&gt;=0 ?x :-x;" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="!x &lt;= -1" pathCondition="!x &lt;= -1" pathConditionChanged="true" branchCondition="!x &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
+         <branchCondition name="x &gt;  -1" pathCondition="x &gt;  -1" pathConditionChanged="true" branchCondition="x &gt;  -1" mergedBranchCondition="false" isBranchConditionComputed="true">
             <loopInvariant name="
 invariant: i &gt;= 0;
 variant: i
-mod: false" pathCondition="!x &lt;= -1" pathConditionChanged="false" initiallyValid="true">
-               <branchCondition name="!i_1 &lt;= -1" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="true" branchCondition="!i_1 &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+mod: false" pathCondition="x &gt;  -1" pathConditionChanged="false" initiallyValid="true">
+               <branchCondition name="i_1 &gt;  -1" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="true" branchCondition="i_1 &gt;  -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <methodCall name="LoopSplittingCondition.goOn(x_17);" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false">
                      <branchStatement name="if (x_17&gt;0) {return true; }else  {return false; }" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false">
                         <statement name="return true;" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false">
@@ -27,7 +27,7 @@ mod: false" pathCondition="!x &lt;= -1" pathConditionChanged="false" initiallyVa
                      </branchStatement>
                   </methodCall>
                </branchCondition>
-               <branchCondition name="!i_1 &lt;= -1" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="true" branchCondition="!i_1 &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+               <branchCondition name="i_1 &gt;  -1" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="true" branchCondition="i_1 &gt;  -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                   <statement name="return i;" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false">
                      <methodReturn name="&lt;return of LoopSplittingCondition.main(x);&gt;" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return i_1 as result of LoopSplittingCondition.main(x);&gt;" isReturnValueComputed="true">
                         <methodReturnValue name="i_1" returnValueString="i_1" hasCondition="false">
@@ -39,11 +39,11 @@ mod: false" pathCondition="!x &lt;= -1" pathConditionChanged="false" initiallyVa
                </branchCondition>
             </loopInvariant>
          </branchCondition>
-         <branchCondition name="!x &gt;= 0" pathCondition="!x &gt;= 0" pathConditionChanged="true" branchCondition="!x &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+         <branchCondition name="x &lt; 0" pathCondition="x &lt; 0" pathConditionChanged="true" branchCondition="x &lt; 0" mergedBranchCondition="false" isBranchConditionComputed="true">
             <loopInvariant name="
 invariant: i &gt;= 0;
 variant: i
-mod: false" pathCondition="!x &gt;= 0" pathConditionChanged="false" initiallyValid="true">
+mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid="true">
                <branchCondition name="false" pathCondition="false" pathConditionChanged="true" branchCondition="false" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <methodCall name="LoopSplittingCondition.goOn(x_7);" pathCondition="false" pathConditionChanged="false">
                      <branchStatement name="if (x_7&gt;0) {return true; }else  {return false; }" pathCondition="false" pathConditionChanged="false">
@@ -64,7 +64,7 @@ mod: false" pathCondition="!x &gt;= 0" pathConditionChanged="false" initiallyVal
                      </branchStatement>
                   </methodCall>
                </branchCondition>
-               <branchCondition name="!i_0 &lt;= -1" pathCondition="i_0 &gt;= 0 &amp; x &lt;= -1" pathConditionChanged="true" branchCondition="!i_0 &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+               <branchCondition name="i_0 &gt;  -1" pathCondition="i_0 &gt;= 0 &amp; x &lt;= -1" pathConditionChanged="true" branchCondition="i_0 &gt;  -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                   <statement name="return i;" pathCondition="i_0 &gt;= 0 &amp; x &lt;= -1" pathConditionChanged="false">
                      <methodReturn name="&lt;return of LoopSplittingCondition.main(x);&gt;" pathCondition="i_0 &gt;= 0 &amp; x &lt;= -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return i_0 as result of LoopSplittingCondition.main(x);&gt;" isReturnValueComputed="true">
                         <methodReturnValue name="i_0" returnValueString="i_0" hasCondition="false">

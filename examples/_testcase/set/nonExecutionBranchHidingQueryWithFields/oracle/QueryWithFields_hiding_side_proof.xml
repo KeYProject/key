@@ -13,8 +13,8 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
 | result_0 = 42
 &amp; x &gt;= 0
 &amp; !self.instanceField = 11}, 
-	421166 {!result_0 = 42 &amp; x &gt;= 0 &amp; self.instanceField = 11}, 
-	-4711 {!x &gt;= 0}
+	421166 {!result_0 = 42 &amp; x &gt;= 0}, 
+	-4711 {x &lt; 0}
 as result of self.main(x);&gt;" isReturnValueComputed="true">
                   <methodReturnValue name="42 {  result_0 = 42 &amp; x &gt;= 0 &amp; self.instanceField = 11
 | result_0 = 42
@@ -24,9 +24,9 @@ as result of self.main(x);&gt;" isReturnValueComputed="true">
 &amp; x &gt;= 0
 &amp; !self.instanceField = 11">
                   </methodReturnValue>
-                  <methodReturnValue name="421166 {!result_0 = 42 &amp; x &gt;= 0 &amp; self.instanceField = 11}" returnValueString="421166" hasCondition="true" conditionString="!result_0 = 42 &amp; x &gt;= 0 &amp; self.instanceField = 11">
+                  <methodReturnValue name="421166 {!result_0 = 42 &amp; x &gt;= 0}" returnValueString="421166" hasCondition="true" conditionString="!result_0 = 42 &amp; x &gt;= 0">
                   </methodReturnValue>
-                  <methodReturnValue name="-4711 {!x &gt;= 0}" returnValueString="-4711" hasCondition="true" conditionString="!x &gt;= 0">
+                  <methodReturnValue name="-4711 {x &lt; 0}" returnValueString="-4711" hasCondition="true" conditionString="x &lt; 0">
                   </methodReturnValue>
                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
