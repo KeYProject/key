@@ -336,14 +336,20 @@ public final class ProblemInitializer {
 		readIncludes(envInput, initConfig);
 	    }
 	    
-	    // read envInput itself
+	    //sanity check
+	    assert initConfig.varNS().allElements().size() == 0;
+	    for(Named n : initConfig.sortNS().allElements()) {
+		assert n instanceof Sort && !(n instanceof GenericSort);
+	    }	    
+	    
+	    //read envInput itself
 	    reportStatus("Reading "+envInput.name(), 
 		    	 envInput.getNumberOfChars());
 	    envInput.setInitConfig(initConfig);	    
 	    envInput.read();	
 	    
-	    // reset the variables namespace
-	    initConfig.namespaces().setVariables(new Namespace());
+	    //clean namespaces
+	    cleanupNamespaces(initConfig);	    	    
 	}
     }
 
