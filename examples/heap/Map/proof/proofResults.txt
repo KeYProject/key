@@ -44,5 +44,7 @@ removeCopyOldEntries(): 26 interactions, 7807 nodes
 
 removeInDomain(): 
 
+removeGetNewArray(): automatic, 7743 nodes
+
 size() accessible clause: automatic, 357 nodes
 size() normal behaviour: automatic, 992 nodes
