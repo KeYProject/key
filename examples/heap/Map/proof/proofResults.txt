@@ -1,7 +1,7 @@
 Results for MapImplementation.java proofs.
 Unless otherwise mentioned, contracts were automatically proven.
 
-GIT repository commit hash: b9b1cccca4f611ed6fff8f91afef716b85ac7bb6
+GIT repository commit hash: 803fdd2edad16477cecf11ac0251fee705930f3a
 Checkout this commit hash to verify the proofs.
 The automatic proofs were done with default settings.
 
@@ -38,9 +38,9 @@ putInDomain(): automatic, 2523 nodes
 
 putNotInDomain(): 1 interacion, 8980 nodes
 
-remove(): 39 interactions, 38111 nodes
+remove(): 5 interactions, 277469 nodes
 
-*removeCopyOldEntries(): 27 interactions, 9542 nodes
+removeCopyOldEntries(): 26 interactions, 7807 nodes
 
 removeInDomain(): 
 

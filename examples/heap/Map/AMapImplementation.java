@@ -132,13 +132,23 @@ final class AMapImplementation extends AbstractMap {
         copyMapEntries(newEntries, 0, 0, index);
         copyMapEntries(newEntries, index, index + 1, newEntries.length - index);
     }
+    
+    /*@ public normal_behaviour
+     @ requires \typeof(newEntries) == \type(entries);
+     @ ensures (\forall Object o; !\fresh(o));
+     @ ensures entries == newEntries;
+     @ assignable entries;
+     @*/
+    private /*@helper*/ void setEnries(MapEntry[] newEntries){
+        entries = newEntries;
+    }
 
     Object removeInDomain(int index) {
         Object result = entries[index].value;
         MapEntry[] newEntries = newMapEntryArray(entries.length - 1);
         removeCopyOldEntries(newEntries, index);
-        entries = newEntries;
         //@ set map = \dl_mapRemove(map, entries[index].key);
+        setEnries(newEntries);
         //@ set footprint = \set_union(\dl_allElementsOfArray(entries, \all_fields(entries[0])), \set_union(\all_fields(this), \all_fields(entries)));
         return result;
     }
