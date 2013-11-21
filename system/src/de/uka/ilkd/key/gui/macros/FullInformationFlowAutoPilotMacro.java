@@ -40,7 +40,7 @@ public class FullInformationFlowAutoPilotMacro extends SequentialOnLastGoalProof
     @Override
     protected ProofMacro[] createProofMacroArray() {
         // The StateExpansionAndInfFlowContractApplicationMacro and the
-        // TryCloseMacro shell be started at the same node. Therefore they are
+        // TryCloseMacro shall be started at the same node. Therefore they are
         // encapsulated in an own (anonymous) SequentialProofMacro.
         SequentialProofMacro fullmainCompMacro =
                 new SequentialProofMacro() {

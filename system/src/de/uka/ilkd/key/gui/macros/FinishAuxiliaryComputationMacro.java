@@ -17,7 +17,7 @@ import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.tacletbuilder.MethodInfFlowUnfouldTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.MethodInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.GuiUtilities;
 import javax.swing.KeyStroke;
@@ -29,8 +29,6 @@ import javax.swing.KeyStroke;
  */
 public class FinishAuxiliaryComputationMacro
         extends AbstractFinishAuxiliaryComputationMacro {
-
-    private static int i = 0;
 
     @Override
     public boolean canApplyTo(KeYMediator mediator,
@@ -73,8 +71,8 @@ public class FinishAuxiliaryComputationMacro
 
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
-        final MethodInfFlowUnfouldTacletBuilder tacletBuilder =
-                new MethodInfFlowUnfouldTacletBuilder(services);
+        final MethodInfFlowUnfoldTacletBuilder tacletBuilder =
+                new MethodInfFlowUnfoldTacletBuilder(services);
         tacletBuilder.setContract(ifContract);
         tacletBuilder.setInfFlowVars(ifVars);
         tacletBuilder.setReplacewith(result);

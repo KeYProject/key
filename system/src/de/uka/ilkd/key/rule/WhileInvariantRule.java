@@ -15,7 +15,6 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.rule.tacletbuilder.InfFlowLoopInvariantTacletBuilder;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,7 +30,6 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -526,11 +524,6 @@ public final class WhileInvariantRule implements BuiltInRule {
             throws RuleAbortException {
    final Sequent applicationSequent = goal.sequent();
         final KeYJavaType booleanKJT = services.getTypeConverter().getBooleanType();
-        final KeYJavaType intKJT =
-                services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
-
-        final KeYJavaType anyKJT 
-                = services.getJavaInfo().getKeYJavaType(Sort.ANY);
 
         //get instantiation
         final Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);
@@ -954,10 +947,6 @@ public final class WhileInvariantRule implements BuiltInRule {
             assert updates != null;
             assert applPredTerm != null;
             assert infFlowApp != null;
-        }
-
-        public InfFlowData() {
-            this(null, null, null, null, null, null, null, null, null, null, null);
         }
     }
 }

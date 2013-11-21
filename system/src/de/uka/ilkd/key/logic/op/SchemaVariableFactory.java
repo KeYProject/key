@@ -14,7 +14,6 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.strategy.termfeature.IsSelectSkolemConstantTermFeature;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;

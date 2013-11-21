@@ -3,7 +3,6 @@ package de.uka.ilkd.key.gui.macros;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -11,26 +10,17 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.LoopInvExecutionPO;
-import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
-import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.tacletbuilder.LoopInfFlowUnfouldTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.LoopInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.GuiUtilities;
-import de.uka.ilkd.key.util.MiscTools;
 import javax.swing.KeyStroke;
 
 public class FinishAuxiliaryLoopComputationMacro extends
         AbstractFinishAuxiliaryComputationMacro {
-
-    private static int i = 0;
 
     @Override
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
@@ -79,8 +69,8 @@ public class FinishAuxiliaryLoopComputationMacro extends
 
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
-        final LoopInfFlowUnfouldTacletBuilder tacletBuilder =
-                new LoopInfFlowUnfouldTacletBuilder(services);
+        final LoopInfFlowUnfoldTacletBuilder tacletBuilder =
+                new LoopInfFlowUnfoldTacletBuilder(services);
         tacletBuilder.setLoopInv(loopInv);
         tacletBuilder.setInfFlowVars(ifVars);
         tacletBuilder.setReplacewith(result);
@@ -104,38 +94,6 @@ public class FinishAuxiliaryLoopComputationMacro extends
             }
         });
     }
-
-    private Taclet generateRewriteTaclet(Term replacewith,
-                                         LoopInvariant loopInv,
-                                         IFProofObligationVars ifVars,
-                                         Services services) {
-        final Name tacletName =
-                MiscTools.toValidTacletName("unfold computed formula " + i + " of " +
-                                            loopInv.getUniqueName());
-        i++;
-
-        // create find term
-        InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(loopInv,
-                                                   ifVars.c1, ifVars.c2,
-                                                   services);
-        final Term find =
-                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
-
-        //create taclet
-        final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
-        tacletBuilder.setName(tacletName);
-        tacletBuilder.setFind(find);
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
-        final RewriteTacletGoalTemplate goal =
-                new RewriteTacletGoalTemplate(replacewith);
-        tacletBuilder.addTacletGoalTemplate(goal);
-        tacletBuilder.addRuleSet(new RuleSet(new Name("concrete")));
-        tacletBuilder.setSurviveSmbExec(true);
-
-        return tacletBuilder.getTaclet();
-    }
-
 
     @Override
     public KeyStroke getKeyStroke() {
