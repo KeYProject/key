@@ -134,13 +134,20 @@ final class AMapImplementation extends AbstractMap {
     }
     
     /*@ public normal_behaviour
+     @ requires 0 <= index && index < entries.length;
+     @ requires (\forall int i; 0 <= i && i < newEntries.length;
+     @               newEntries[i] == ((i < index) ? entries[i] : entries[i + 1]));
      @ requires \typeof(newEntries) == \type(entries);
+     @ requires newEntries.length == entries.length - 1;
+     @ ensures map == \dl_mapRemove(\old(map), \old(entries[index].key));
      @ ensures (\forall Object o; !\fresh(o));
      @ ensures entries == newEntries;
-     @ assignable entries;
+     @ assignable footprint;
      @*/
-    private /*@helper*/ void setEnries(MapEntry[] newEntries){
+    private void setEnries(MapEntry[] newEntries, int index){
+        //@ set map = \dl_mapRemove(map, entries[index].key);
         entries = newEntries;
+        //@ set footprint = \set_union(\dl_allElementsOfArray(entries, \all_fields(entries[0])), \set_union(\all_fields(this), \all_fields(entries)));
     }
     
     /*@ public normal_behaviour
@@ -164,12 +171,8 @@ final class AMapImplementation extends AbstractMap {
         return ret;
     }
     
-    //@ ghost Object key;
     void removeInDomainWithoutResult(int index) {
-        //@ set key = entries[index].key;
-        setEnries(removeGetNewArray(index));
-        //@ set map = \dl_mapRemove(map, key);
-        //@ set footprint = \set_union(\dl_allElementsOfArray(entries, \all_fields(entries[0])), \set_union(\all_fields(this), \all_fields(entries)));
+        setEnries(removeGetNewArray(index), index);
     }
     
     public int size() {
