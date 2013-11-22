@@ -397,11 +397,18 @@ public final class WhileInvariantRule implements BuiltInRule {
             beforeAssumptions = TB.and(beforeAssumptions, TB.equals(outsAtPre.next(), locOut));
         }
 
+        Term selfAtPostAssumption =
+                // if the method is not static and if it is no constructor
+                (symbExecVars.pre.self != null && symbExecVars.post.self != null) ?
+                // then the self-variable does not change
+                TB.equals(symbExecVars.post.self, symbExecVars.pre.self) :
+                // else there is nothing to say about self
+                TB.tt();
         Term afterAssumptions = TB.and(heapAtPostEq,
                                        TB.box(infData.guardJb,
                                               TB.equals(infData.guardAtPost,
                                                         infData.guardTerm)),
-                                       TB.equals(symbExecVars.post.self, symbExecVars.pre.self));
+                                       selfAtPostAssumption);
         final Iterator<Term> outsAtPost = infData.localOutsAtPost.iterator();
         for (final Term locOut: infData.localOuts) {
             afterAssumptions = TB.and(afterAssumptions, TB.equals(outsAtPost.next(), locOut));
