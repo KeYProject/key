@@ -111,7 +111,7 @@ public class ExceptionDialog extends JDialog {
 	    ParseException pexc = (ParseException)exc;
 	    Token token = pexc.currentToken;
 	    // TODO find out filename here
-	    location = new Location("", token.next.beginLine, token.next.beginColumn);
+	    location = token==null? null: new Location("", token.next.beginLine, token.next.beginColumn);
         } else if (exc instanceof SLTranslationException) {
             SLTranslationException ste = (SLTranslationException) exc;
             location = new Location(ste.getFileName(), 
