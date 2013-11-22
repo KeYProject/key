@@ -324,7 +324,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             RewriteTaclet rwTaclet = (RewriteTaclet) taclet;
             MatchConditions check = 
                     rwTaclet.checkPrefix(pio, MatchConditions.EMPTY_MATCHCONDITIONS, services);
-            assert check != null : "A taclet with illegal prefix is chosen: " + taclet.name();
+            if (check == null) return null;
         }
         
         return app;
