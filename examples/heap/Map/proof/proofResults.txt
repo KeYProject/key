@@ -42,9 +42,9 @@ remove(): 5 interactions, 277469 nodes
 
 removeCopyOldEntries(): 26 interactions, 7807 nodes
 
-*removeInDomain(): 17 interactions, 10543 nodes
+removeInDomain(): 13 interactions, 12706 nodes
 
-removeInDomainWithoutResult(): 
+removeInDomainWithoutResult(): 23 interactions, 47947 nodes
 
 setEnries(): 80 interactions, 34553 nodes
 
