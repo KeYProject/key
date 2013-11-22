@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <equivalenceClass representativeTerm="null">
-      <term term="\if (current.right.left = current)
-    \then (current.right.left)
-    \else (current.parent)"/>
       <term term="current.parent"/>
       <term term="null"/>
    </equivalenceClass>

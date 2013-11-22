@@ -18,31 +18,31 @@
    &amp; array.length = 1
    &amp; !array[0] = null
    &amp; array[0].length = 1" pathConditionChanged="false">
-                              <branchCondition name="array[0][0] = 42" pathCondition="   array.length &gt;= 0 &amp; array[0].length &gt;= 0
+                              <branchCondition name="array[0][0] = 42" pathCondition="   array[0].length &gt;= 0 &amp; array.length &gt;= 0
 -&gt;   !array = null
    &amp; array.length = 1
    &amp; !array[0] = null
    &amp; array[0].length = 1
    &amp; array[0][0] = 42" pathConditionChanged="true" branchCondition="array[0][0] = 42" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                 <statement name="array[0][0]=5;" pathCondition="   array.length &gt;= 0 &amp; array[0].length &gt;= 0
+                                 <statement name="array[0][0]=5;" pathCondition="   array[0].length &gt;= 0 &amp; array.length &gt;= 0
 -&gt;   !array = null
    &amp; array.length = 1
    &amp; !array[0] = null
    &amp; array[0].length = 1
    &amp; array[0][0] = 42" pathConditionChanged="false">
-                                    <statement name="return array[0][0];" pathCondition="   array.length &gt;= 0 &amp; array[0].length &gt;= 0
+                                    <statement name="return array[0][0];" pathCondition="   array[0].length &gt;= 0 &amp; array.length &gt;= 0
 -&gt;   !array = null
    &amp; array.length = 1
    &amp; !array[0] = null
    &amp; array[0].length = 1
    &amp; array[0][0] = 42" pathConditionChanged="false">
-                                       <methodReturn name="&lt;return of MultiArrayIndexReadWriteAccess.compute(array);&gt;" pathCondition="   array.length &gt;= 0 &amp; array[0].length &gt;= 0
+                                       <methodReturn name="&lt;return of MultiArrayIndexReadWriteAccess.compute(array);&gt;" pathCondition="   array[0].length &gt;= 0 &amp; array.length &gt;= 0
 -&gt;   !array = null
    &amp; array.length = 1
    &amp; !array[0] = null
    &amp; array[0].length = 1
    &amp; array[0][0] = 42" pathConditionChanged="false" isReturnValueComputed="false">
-                                          <termination name="&lt;end&gt;" pathCondition="   array.length &gt;= 0 &amp; array[0].length &gt;= 0
+                                          <termination name="&lt;end&gt;" pathCondition="   array[0].length &gt;= 0 &amp; array.length &gt;= 0
 -&gt;   !array = null
    &amp; array.length = 1
    &amp; !array[0] = null

@@ -89,7 +89,7 @@ public class ContainsTermFeature implements Feature {
 
         @Override
         public void visit(Term visited) {
-            found = visited.equalsModRenaming(term);
+            found = found || visited.equalsModRenaming(term);
         }
 
         @Override
