@@ -322,31 +322,13 @@ public final class JavaInfo {
     /**
      * looks up a KeYJavaType with given name. If the name is a fully
      * qualifying name with package prefix an element with this full name is
-     * taken. If the name does not contain a full package prefix some
-     * KeYJavaType with this short name is taken.
-     * @param className the fully qualified class name 
+     * taken. In case of an unqualified name to which no type is found in the default package,
+     * the type is looked for in package <code>cjava.lang</code>
+     * @param className the fully qualified class name (or an unqualified name from package java.lang)
      * @return a class matching the name
      */
     public KeYJavaType getTypeByClassName(String className) {
-	
-        
-    KeYJavaType result = getTypeByName(className);
-	className = translateArrayType(className);
-
-	if(result != null){
-	    Debug.out("javaInfo: type found (className, type):", className, result);
-	} else {
-	    // maybe a not yet known array type
-	    if (className.endsWith("]")) {
-	        readJavaBlock("{" + className + " k;}");
-	        result = getKeYJavaType(className);
-	        if (result != null) {
-	            return result;
-	        }
-	    }
-	    Debug.out("javaInfo: type not found. Looked for:", className);
-	}
-	return result;
+    	return getTypeByClassName(className, null);
     }
 
     /**
@@ -417,7 +399,7 @@ public final class JavaInfo {
     public KeYJavaType getKeYJavaType(String fullName) {
         KeYJavaType result = getPrimitiveKeYJavaType(fullName);
         return (result == null ?
-            (KeYJavaType)getTypeByClassName(fullName) :
+            getTypeByClassName(fullName) :
             result);
     }
 
@@ -1383,21 +1365,30 @@ public final class JavaInfo {
         public abstract boolean isSatisfiedBy(ProgramElement pe);
     }
 
-    public KeYJavaType getTypeByClassName(String name, KeYJavaType specInClass) {
-        KeYJavaType result = getTypeByClassName(name);
+    /**
+     * retrieves the KeYJavaType of the given type name. If the type is not fully qualified,
+     * it is looked for in the context of the <code>containerType</code> first and 
+     * then in the <code>java.lang</code>
+     * package.  
+     * @param name the name of the type (if possible fully qualified)
+     * @param containerType the KeYJavaType of the context in which the type should be resolved
+     * @return the KeYJavaType of the given type or <code>null</code> if type name is unknown
+     */
+    public KeYJavaType getTypeByClassName(String name, KeYJavaType containerType) {
+        KeYJavaType result = getTypeByName(name);
         if (result == null) {
-            final int lastSep = (specInClass == null ? 
-                    -1 : specInClass.getFullName().lastIndexOf('.')); 
+            final int lastSep = (containerType == null ? 
+                    -1 : containerType.getFullName().lastIndexOf('.')); 
                         
             // try if class is in same package
             if (lastSep >= 0) {
                 result = getTypeByClassName(
-                        specInClass.getFullName().substring(0, lastSep) +
+                        containerType.getFullName().substring(0, lastSep) +
                         "." + name);
             }                       
             
             if (result == null) {
-                return getTypeByClassName("java.lang." + name);                
+                return getTypeByName("java.lang." + name);                
             }
         }         
         return result;        
