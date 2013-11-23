@@ -109,7 +109,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
     */
    public void testAssociationSourceIsNotRepresentativeTermOfEquivalenceClass() throws Exception {
       doTest("examples/_testcase/set/configurationExtractorAssociationSourceIsNotRepresentativeTermOfEquivalenceClass/test/AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.java",
-             "AssociationSourceIsNotRepresentativeTermOfEquivalenceClass",
+             "algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass",
              "examples/_testcase/set/configurationExtractorAssociationSourceIsNotRepresentativeTermOfEquivalenceClass/oracle/",
              "AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.xml",
              "testAssociationSourceIsNotRepresentativeTermOfEquivalenceClass_initial",

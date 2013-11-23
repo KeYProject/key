@@ -890,7 +890,7 @@ options {
     throws KeYSemanticException {
         KeYJavaType kjt = null;              
         try {
-	    kjt=getJavaInfo().getKeYJavaTypeByClassName(s);
+	    kjt=getJavaInfo().getTypeByClassName(s);
         } catch(RuntimeException e){
             return null;
         }
