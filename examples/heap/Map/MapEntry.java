@@ -1,6 +1,6 @@
 package MapCaseStudy;
 
-final class MapEntry {
+public final class MapEntry {
 
     public final Object key;
     public Object value;

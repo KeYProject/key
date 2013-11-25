@@ -132,34 +132,8 @@ final class AMapImplementation extends AbstractMap {
         copyMapEntries(newEntries, 0, 0, index);
         copyMapEntries(newEntries, index, index + 1, newEntries.length - index);
     }
-    
-    /*@ public normal_behaviour
-     @ requires 0 <= index && index < entries.length;
-     @ requires (\forall int i; 0 <= i && i < newEntries.length;
-     @               newEntries[i] == ((i < index) ? entries[i] : entries[i + 1]));
-     @ requires \typeof(newEntries) == \type(entries);
-     @ requires newEntries.length == entries.length - 1;
-     @ ensures map == \dl_mapRemove(\old(map), \old(entries[index].key));
-     @ ensures (\forall Object o; !\fresh(o));
-     @ ensures entries == newEntries;
-     @ assignable footprint;
-     @*/
-    private void setEnries(MapEntry[] newEntries, int index){
-        //@ set map = \dl_mapRemove(map, entries[index].key);
-        entries = newEntries;
-        //@ set footprint = \set_union(\dl_allElementsOfArray(entries, \all_fields(entries[0])), \set_union(\all_fields(this), \all_fields(entries)));
-    }
-    
-    /*@ public normal_behaviour
-     @ requires 0 <= index && index < entries.length;
-     @ ensures \result.length == entries.length - 1;
-     @ ensures \typeof(\result) == \type(MapEntry[]);
-     @ ensures (\forall int i; 0 <= i && i < \result.length;
-     @               \result[i] == ((i < index) ? entries[i] : entries[i + 1]));
-     @ ensures \fresh(\result);
-     @ ensures !\dl_inDomain(map, \result);
-     @*/
-    private /*@pure*/ MapEntry[] removeGetNewArray(int index) {
+
+    public MapEntry[] removeGetNewArray(int index) {
         MapEntry[] newEntries = newMapEntryArray(entries.length - 1);
         removeCopyOldEntries(newEntries, index);
         return newEntries;
@@ -172,7 +146,13 @@ final class AMapImplementation extends AbstractMap {
     }
     
     void removeInDomainWithoutResult(int index) {
-        setEnries(removeGetNewArray(index), index);
+        removeSetEnries(removeGetNewArray(index), index);
+    }
+    
+    public void removeSetEnries(MapEntry[] newEntries, int index){
+        //@ set map = \dl_mapRemove(map, entries[index].key);
+        entries = newEntries;
+        //@ set footprint = \set_union(\dl_allElementsOfArray(entries, \all_fields(entries[0])), \set_union(\all_fields(this), \all_fields(entries)));
     }
     
     public int size() {

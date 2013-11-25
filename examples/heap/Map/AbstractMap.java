@@ -117,6 +117,17 @@ public abstract class AbstractMap implements MapInterface {
      @ assignable newEntries[*];
      @*/
     abstract void removeCopyOldEntries( /*@nullable*/ MapEntry[] newEntries, int index);
+    
+    /*@ public normal_behaviour
+     @ requires 0 <= index && index < entries.length;
+     @ ensures \result.length == entries.length - 1;
+     @ ensures \typeof(\result) == \type(MapEntry[]);
+     @ ensures (\forall int i; 0 <= i && i < \result.length;
+     @               \result[i] == ((i < index) ? entries[i] : entries[i + 1]));
+     @ ensures \fresh(\result);
+     @ ensures !\dl_inDomain(map, \result);
+     @*/
+    abstract public /*@pure*/ MapEntry[] removeGetNewArray(int index);
 
     /*@ public normal_behaviour
      @ requires 0 <= index && index < entries.length;
@@ -136,5 +147,18 @@ public abstract class AbstractMap implements MapInterface {
      @ assignable footprint;
      @*/
     abstract void removeInDomainWithoutResult(int index);
+    
+    /*@ public normal_behaviour
+     @ requires 0 <= index && index < entries.length;
+     @ requires (\forall int i; 0 <= i && i < newEntries.length;
+     @               newEntries[i] == ((i < index) ? entries[i] : entries[i + 1]));
+     @ requires \typeof(newEntries) == \type(entries);
+     @ requires newEntries.length == entries.length - 1;
+     @ ensures map == \dl_mapRemove(\old(map), \old(entries[index].key));
+     @ ensures (\forall Object o; !\fresh(o));
+     @ ensures entries == newEntries;
+     @ assignable footprint;
+     @*/
+    abstract public void removeSetEnries(MapEntry[] newEntries, int index);
 
 }
