@@ -37,7 +37,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
     */
    public void testComplicatedInnerMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
-             "TheInnerClass",
+             "my.packageName.TheClass.TheInnerClass",
              "complicatedInnerMethod",
              "examples/_testcase/set/fullqualifiedTypeNamesTest/oracle/TheInnerClass_complicatedInnerMethod.xml",
              null,
@@ -49,7 +49,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
     */
    public void testComplicatedMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
-             "TheClass",
+             "my.packageName.TheClass",
              "complicatedMethod",
              "examples/_testcase/set/fullqualifiedTypeNamesTest/oracle/TheClass_complicatedMethod.xml",
              "a == 2 && b && x != null && \"Hello\" == x",
@@ -61,7 +61,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
     */
    public void testComplicatedMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
-             "TheClass",
+             "my.packageName.TheClass",
              "complicatedMethod",
              "examples/_testcase/set/fullqualifiedTypeNamesTest/oracle/TheClass_complicatedMethod.xml",
              null,
