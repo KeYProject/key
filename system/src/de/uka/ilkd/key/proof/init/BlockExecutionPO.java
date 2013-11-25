@@ -45,6 +45,20 @@ public class BlockExecutionPO extends AbstractOperationPO
      */
     private InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
 
+    /** To be used only for auxiliary proofs where the services object of
+     * the actual proof has to be used instead of the initial services form
+     * the InitConfig.
+     */
+    public BlockExecutionPO(InitConfig initConfig,
+                            BlockContract contract,
+                            ProofObligationVars symbExecVars,
+                            Goal initiatingGoal,
+                            ExecutionContext context,
+                            Services services) {
+        this(initConfig, contract, symbExecVars, initiatingGoal, context);
+        this.services = services;
+    }
+
     public BlockExecutionPO(InitConfig initConfig,
                             BlockContract contract,
                             ProofObligationVars symbExecVars,

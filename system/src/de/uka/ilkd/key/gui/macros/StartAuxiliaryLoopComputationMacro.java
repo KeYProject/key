@@ -94,8 +94,10 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
 
 
         LoopInvExecutionPO loopInvExecPO =
-                new LoopInvExecutionPO(initConfig, loopInv, ifVars.symbExecVars,
-                                       goal, loopInv.getExecutionContext());
+                new LoopInvExecutionPO(initConfig, loopInv,
+                                       ifVars.symbExecVars.labelHeapAtPreAsAnonHeapFunc(),
+                                       goal, loopInv.getExecutionContext(),
+                                       proof.getServices());
         ProblemInitializer pi =
                 new ProblemInitializer(mediator.getUI(),
                                        mediator.getServices(), true,

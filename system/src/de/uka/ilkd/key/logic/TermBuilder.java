@@ -1612,6 +1612,15 @@ public class TermBuilder {
                                               term.javaBlock());
     }
 
+    public Term unlabelRecursive(Term term) {
+        Term[] subs = new Term[term.subs().size()];
+        for (int i = 0; i < subs.length; i++) {
+            subs[i] = unlabelRecursive(term.sub(i));
+        }
+        return TermFactory.DEFAULT.createTerm(term.op(), subs, term.boundVars(),
+                                              term.javaBlock());
+    }
+
     public Term dotArr(Services services, Term ref, Term idx) {
         if(ref == null || idx == null) {
             throw new TermCreationException("Tried to build an array access "+

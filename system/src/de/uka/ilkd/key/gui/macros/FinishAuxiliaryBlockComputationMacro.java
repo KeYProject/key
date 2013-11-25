@@ -77,7 +77,8 @@ public class FinishAuxiliaryBlockComputationMacro
         final BlockContractBuiltInRuleApp blockRuleApp =
                 (BlockContractBuiltInRuleApp)app;
         final BlockContract contract = blockRuleApp.getContract();
-        final IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
+        IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
+        ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();
         
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);

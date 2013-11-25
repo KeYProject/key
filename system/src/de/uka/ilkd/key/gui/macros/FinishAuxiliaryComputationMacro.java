@@ -68,7 +68,7 @@ public class FinishAuxiliaryComputationMacro
         final InfFlowContractPO ifPO =
                 (InfFlowContractPO) services.getSpecificationRepository()
                                          .getPOForProof(initiatingProof);
-        final IFProofObligationVars ifVars = ifPO.getIFVars();
+        final IFProofObligationVars ifVars = ifPO.getIFVars().labelHeapAtPreAsAnonHeapFunc();
         final InformationFlowContract ifContract = ifPO.getContract();
 
         // create and register resulting taclets

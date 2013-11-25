@@ -61,7 +61,7 @@ public abstract class AbstractPO implements IPersistablePO {
     protected static final TermFactory TF = TermFactory.DEFAULT;
     protected static final TermBuilder TB = TermBuilder.DF;
     protected final InitConfig initConfig;
-    protected final Services services;
+    protected Services services;
     protected final JavaInfo javaInfo;
     protected final HeapLDT heapLDT;
     protected final SpecificationRepository specRepos;
@@ -285,7 +285,14 @@ public abstract class AbstractPO implements IPersistablePO {
                                 header,
                                 initConfig.createTacletIndex(),
                                 initConfig.createBuiltInRuleIndex(),
-                                initConfig.getServices(),
+                                // Normally services and initConfig.getServices()
+                                // point to the same object. Only in case an
+                                // auxiliray proof is started, then services
+                                // is a "newer" object which was cloned
+                                // from initConfig.getServices() and updated
+                                // later on. We have to use the updated
+                                // services object in this case.
+                                services,
                                 initConfig.getSettings() != null
                                 ? initConfig.getSettings()
                                 : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));

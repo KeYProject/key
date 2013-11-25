@@ -39,6 +39,20 @@ public class SymbolicExecutionPO extends AbstractOperationPO
      */
     private InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
 
+    /** To be used only for auxiliary proofs where the services object of
+     * the actual proof has to be used instead of the initial services form
+     * the InitConfig.
+     */
+    public SymbolicExecutionPO(InitConfig initConfig,
+                               InformationFlowContract contract,
+                               ProofObligationVars symbExecVars,
+                               Goal initiatingGoal,
+                               Services services) {
+        this(initConfig, contract, symbExecVars, initiatingGoal);
+        this.services = services;
+    }
+
+
     public SymbolicExecutionPO(InitConfig initConfig,
                                InformationFlowContract contract,
                                ProofObligationVars symbExecVars,

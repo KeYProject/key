@@ -49,7 +49,7 @@ abstract class AbstractInfFlowUnfouldTacletBuilder extends AbstractInfFlowTaclet
 
 
     public void setInfFlowVars(IFProofObligationVars ifVars) {
-        this.ifVars = ifVars;
+        this.ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();
     }
 
 
