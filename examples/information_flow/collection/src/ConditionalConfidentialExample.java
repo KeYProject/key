@@ -14,10 +14,11 @@ public class ConditionalConfidentialExample {
     private int confidentialData;
 
     /*@ normal_behavior
-      @ separates u, u.data,
-      @           (\exists int i; 0 <= i && i < trustworthyUsers.length;
-      @                                             trustworthyUsers[i] == u),
-      @           (hasAccessRight(u) ? confidentialData : 0);
+      @ determines u, u.data,
+      @            (\exists int i; 0 <= i && i < trustworthyUsers.length;
+      @                                              trustworthyUsers[i] == u),
+      @            (hasAccessRight(u) ? confidentialData : 0)
+      @        \by \itself;
       @*/
     public void getConfidentialData(User u) {
         if (hasAccessRight(u)) {
