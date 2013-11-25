@@ -17,7 +17,7 @@ class SumExample {
 
 
     /*@ normal_behavior
-      @     separates   \result
+      @     determines  \result \by \nothing
       @                 \declassifies  (\bsum int i; 0; values.length; values[i]);
       @*/
     public int getSum() {

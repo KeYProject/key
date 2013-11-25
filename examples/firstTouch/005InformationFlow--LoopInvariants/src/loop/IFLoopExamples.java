@@ -1,10 +1,13 @@
-Information flow example.
+package loop;
 
-A collection of several examples showing the usage of information flow loop invariants.
-
-
---- source code ---
-
+/**
+ * Information flow examples.
+ *
+ * A collection of several examples showing the usage of information flow
+ * loop invariants.
+ *
+ * @author Christoph Scheben
+ */
 public class IFLoopExamples {
 	int low;
 

@@ -4,11 +4,11 @@ A collection of several examples showing the usage of information flow block con
 
 
 --- source code ---
- 
+
 public class IFBlockExamples {
         int low;
 
-        //@ separates low \declassifies l \erases \result;
+        //@ determines low, \result \by low, l;
         public int secure_1(int l) {
             int l1 = l;
             low++;
@@ -18,7 +18,7 @@ public class IFBlockExamples {
 
             //@ normal_behavior
             //@ assignable \nothing;
-            //@ separates l1;
+            //@ determines l1 \by \itself;
             {   l1++;
                 if(l2 == 8) {}
             }
@@ -26,7 +26,7 @@ public class IFBlockExamples {
             return l1;
         }
 
-        //@ separates low \declassifies l \erases \result;
+        //@ determines low, \result \by low, l;
         public int secure_4(int l) {
             int l1 = l;
             low++;
@@ -36,61 +36,61 @@ public class IFBlockExamples {
 
             //@ normal_behavior
             //@ assignable \nothing;
-            //@ separates l1, l2;
+            //@ determines l1, l2 \by \itself;
             {   l1 += l2;
             }
 
             return l1;
         }
 
-        //@ separates low \erases \result;
+        //@ determines low, \result \by low;
         public int insecure_1(int l) {
             int l1 = l;
             low++;
 
             //@ normal_behavior
             //@ assignable \nothing;
-            //@ separates l1;
+            //@ determines l1 \by \itself;
             {   l1++;
             }
 
             return l1;
         }
 
-        //@ separates \nothing \declassifies l \erases \result;
+        //@ determines \result \by l;
         public int secure_6(int l) {
             int l1 = l;
             low++;
 
             //@ normal_behavior
             //@ assignable \nothing;
-            //@ separates l1;
+            //@ determines l1 \by \itself;
             {   l1++;
             }
 
             return l1;
         }
 
-        //@ separates \nothing \declassifies l \erases \result;
+        //@ determines \result \by l;
         public int secure_7(int l) {
             low++;
 
             //@ normal_behavior
             //@ assignable \nothing;
-            //@ separates l;
+            //@ determines l \by \itself;
             {   l++;
             }
 
             return l;
         }
 
-        //@ separates low;
+        //@ determines low \by \itself;
         public int secure_8(int l) {
             low++;
 
             //@ normal_behavior
             //@ assignable low;
-            //@ separates low;
+            //@ determines low \by \itself;
             {   low++;
             }
 
@@ -98,22 +98,22 @@ public class IFBlockExamples {
         }
 
 
-        //@ separates low \declassifies l \erases \result;
+        //@ determines low, \result \by low, l;
         public int secure_2(int l) {
             int l1 = l;
             low++;
 
             //@ normal_behavior
             //@ assignable \nothing;
-            //@ separates l1;
+            //@ determines l1 \by \itself;
             {   l1++;
                 //@ normal_behavior
                 //@ assignable \nothing;
-                //@ separates l1;
+                //@ determines l1 \by \itself;
                 {   l1++;
                     //@ normal_behavior
                     //@ assignable \nothing;
-                    //@ separates l1;
+                    //@ determines l1 \by \itself;
                     {   l1++;
                     }
                 }
@@ -123,23 +123,23 @@ public class IFBlockExamples {
         }
 
 
-        //@ separates low \declassifies l \erases \result;
+        //@ determines low, \result \by low, l;
         public int secure_3(int l) {
             int l1 = l;
             low++;
 
             //@ normal_behavior
             //@ assignable \nothing;
-            //@ separates l1;
+            //@ determines l1 \by \itself;
             {   l1++;
                 //@ normal_behavior
                 //@ assignable \nothing;
-                //@ separates l1;
+                //@ determines l1 \by \itself;
                 {   l1++;
                 }
                 //@ normal_behavior
                 //@ assignable \nothing;
-                //@ separates l1;
+                //@ determines l1 \by \itself;
                 {   l1++;
                 }
             }
@@ -147,23 +147,23 @@ public class IFBlockExamples {
             return l1;
         }
 
-        //@ separates low \declassifies l \erases \result;
+        //@ determines low, \result \by low, l;
         public int insecure_3(int l) {
             int l1 = l;
             low++;
 
             //@ normal_behavior
             //@ assignable \nothing;
-            //@ separates l1;
+            //@ determines l1 \by \itself;
             {   l1++;
                 //@ normal_behavior
                 //@ assignable \nothing;
-                //@ separates low;
+                //@ determines low \by \itself;
                 {   l1++;
                 }
                 //@ normal_behavior
                 //@ assignable \nothing;
-                //@ separates l1;
+                //@ determines l1 \by \itself;
                 {   l1++;
                 }
             }
@@ -171,23 +171,23 @@ public class IFBlockExamples {
             return l1;
         }
 
-        //@ separates low \erases \result;
+        //@ determines low, \result \by low;
         public int insecure_4(int l) {
             int l1 = l;
             low++;
 
             //@ normal_behavior
             //@ assignable \nothing;
-            //@ separates l1;
+            //@ determines l1 \by \itself;
             {   l1++;
                 //@ normal_behavior
                 //@ assignable \nothing;
-                //@ separates l1;
+                //@ determines l1 \by \itself;
                 {   l1++;
                 }
                 //@ normal_behavior
                 //@ assignable \nothing;
-                //@ separates l1;
+                //@ determines l1 \by \itself;
                 {   l1++;
                 }
             }
@@ -196,19 +196,19 @@ public class IFBlockExamples {
         }
 
         //@ requires l > 0;
-        //@ separates low \declassifies l;
+        //@ determines low \by low, l;
         public void block_while_secure(int l) {
             int l1 = low;
             //@ normal_behavior
             //@ assignable \nothing;
-            //@ separates l1;
+            //@ determines l1 \by \itself;
             { l1++;
             }
 
            /*@
              @ loop_invariant l >= 0;
              @ assignable \nothing;
-             @ separates l1, l;
+             @ determines l1, l \by \itself;
              @ decreases l;
              @*/
             while (l > 0) {
@@ -221,13 +221,13 @@ public class IFBlockExamples {
 
 
         //@ requires l > 0;
-        //@ separates low \declassifies l;
+        //@ determines low \by low, l;
         public void while_block_secure(int l) {
             int l1 = low;
            /*@
              @ loop_invariant l >= 0;
              @ assignable \nothing;
-             @ separates l1, l;
+             @ determines l1, l \by \itself;
              @ decreases l;
              @*/
             while (l > 0) {
@@ -237,7 +237,7 @@ public class IFBlockExamples {
 
             //@ normal_behavior
             //@ assignable \nothing;
-            //@ separates l1;
+            //@ determines l1 \by \itself;
             { l1++;
             }
 
@@ -245,13 +245,13 @@ public class IFBlockExamples {
         }
 
         //@ requires l > 0;
-        //@ separates low \declassifies l;
+        //@ determines low \by low, l;
         public void while_block_insecure(int l) {
             int l1 = low;
            /*@
              @ loop_invariant l >= 0;
              @ assignable \nothing;
-             @ separates l;
+             @ determines l \by \itself;
              @ decreases l;
              @*/
             while (l > 0) {
@@ -261,7 +261,7 @@ public class IFBlockExamples {
 
             //@ normal_behavior
             //@ assignable \nothing;
-            //@ separates l1;
+            //@ determines l1 \by \itself;
             { l1++;
             }
 
@@ -269,24 +269,24 @@ public class IFBlockExamples {
         }
 
                 //@ requires l > 0;
-        //@ separates low \declassifies l;
+        //@ determines low \by low, l;
         public void block_no_return_secure(int l) {
             int l1 = low;
 
             //@ normal_behavior
             //@ assignable \nothing;
-            //@ separates l1;
+            //@ determines l1 \by \itself;
             { l1++;
             }
 
             low = l1;
         }
 
-        //@ separates low;
+        //@ determines low \by \itself;
         public void secure_5() {
             //@ normal_behavior
             //@ assignable low;
-            //@ separates low;
+            //@ determines low \by \itself;
             {   low++;
             }
         }
