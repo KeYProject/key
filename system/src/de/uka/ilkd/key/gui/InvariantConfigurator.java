@@ -60,7 +60,9 @@ public class InvariantConfigurator {
     private static final int INV_IDX = 0;
     private static final int MOD_IDX = 1;
     private static final int VAR_IDX = 2;
-    private static final int RSP_IDX = 3;
+    private static final int IF_PRE_IDX = 3;
+    private static final int IF_POST_IDX = 4;
+    private static final int IF_OO_IDX = 5;
     private static final String DEFAULT = "Default";
 
     private static InvariantConfigurator configurator = null;
@@ -136,7 +138,9 @@ public class InvariantConfigurator {
             private static final String INVARIANTTITLE = "Invariant%s: ";
             private static final String VARIANTTITLE = "Variant%s: ";
             private static final String MODIFIESTITLE = "Modifies%s: ";
-            private static final String INFFLOWSPECTITLE = "InfFlowSpec%s: ";
+            private static final String IF_PRE_TITLE = "InfFlowPreExpressions%s: ";
+            private static final String IF_POST_TITLE = "InfFlowPostExpressions%s: ";
+            private static final String IF_OO_TITLE = "InfFlowNewObjects%s: ";
 
 
             /**
@@ -256,7 +260,7 @@ public class InvariantConfigurator {
             private void initInvariants() {
 
                 @SuppressWarnings("unchecked")
-                Map<String,String>[] loopInvTexts = new Map[RSP_IDX+1];
+                Map<String,String>[] loopInvTexts = new Map[IF_OO_IDX+1];
 
                 loopInvTexts[INV_IDX] = new LinkedHashMap<String,String>();
                 final Map<LocationVariable,Term> atPres = loopInv.getInternalAtPres();
@@ -286,30 +290,63 @@ public class InvariantConfigurator {
                     }
                 }
 
-                loopInvTexts[RSP_IDX] = new LinkedHashMap<String,String>();
-
-                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                  final ImmutableList<InfFlowSpec>
-                          infFlowSpecs = loopInv.getInfFlowSpecs(heap, loopInv.getInternalSelfTerm(), atPres, services);
-
-                  if (infFlowSpecs == null) {
-                    loopInvTexts[RSP_IDX].put(heap.toString(), "noInfFlowSpec");
-                  } else {
-                      // XXX why only for separates? (CS)
-                      for (InfFlowSpec infFlowSpec : infFlowSpecs) {
-                          for (Term t : infFlowSpec.separates) {
-                              loopInvTexts[RSP_IDX].put(heap.toString(), printTerm(t, false));
-                          }
-                      }                                        
-                  }
-                }
-
                 loopInvTexts[VAR_IDX] = new LinkedHashMap<String,String>();
                 final Term variant = loopInv.getVariant(loopInv.getInternalSelfTerm(), atPres, services);
                 if (variant == null) {
                     loopInvTexts[VAR_IDX].put(DEFAULT,"");
                 } else {                    
                     loopInvTexts[VAR_IDX].put(DEFAULT,printTerm(variant, true));
+                }
+
+                loopInvTexts[IF_PRE_IDX] = new LinkedHashMap<String,String>();
+
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                  final ImmutableList<InfFlowSpec>
+                          infFlowSpecs = loopInv.getInfFlowSpecs(heap, loopInv.getInternalSelfTerm(), atPres, services);
+
+                  if (infFlowSpecs == null) {
+                    loopInvTexts[IF_PRE_IDX].put(heap.toString(), "true");
+                  } else {
+                      for (InfFlowSpec infFlowSpec : infFlowSpecs) {
+                          for (Term t : infFlowSpec.preExpressions) {
+                              loopInvTexts[IF_PRE_IDX].put(heap.toString(), printTerm(t, false));
+                          }
+                      }
+                  }
+                }
+
+                loopInvTexts[IF_POST_IDX] = new LinkedHashMap<String,String>();
+
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                  final ImmutableList<InfFlowSpec>
+                          infFlowSpecs = loopInv.getInfFlowSpecs(heap, loopInv.getInternalSelfTerm(), atPres, services);
+
+                  if (infFlowSpecs == null) {
+                    loopInvTexts[IF_POST_IDX].put(heap.toString(), "true");
+                  } else {
+                      for (InfFlowSpec infFlowSpec : infFlowSpecs) {
+                          for (Term t : infFlowSpec.postExpressions) {
+                              loopInvTexts[IF_POST_IDX].put(heap.toString(), printTerm(t, false));
+                          }
+                      }
+                  }
+                }
+
+                loopInvTexts[IF_OO_IDX] = new LinkedHashMap<String,String>();
+
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                  final ImmutableList<InfFlowSpec>
+                          infFlowSpecs = loopInv.getInfFlowSpecs(heap, loopInv.getInternalSelfTerm(), atPres, services);
+
+                  if (infFlowSpecs == null) {
+                    loopInvTexts[IF_OO_IDX].put(heap.toString(), "true");
+                  } else {
+                      for (InfFlowSpec infFlowSpec : infFlowSpecs) {
+                          for (Term t : infFlowSpec.newObjects) {
+                              loopInvTexts[IF_OO_IDX].put(heap.toString(), printTerm(t, false));
+                          }
+                      }
+                  }
                 }
 
                 if (!mapLoopsToInvariants.containsKey(loopInv.getLoop())) {
@@ -367,12 +404,30 @@ public class InvariantConfigurator {
                 }
                 
                 JTabbedPane respPane = new JTabbedPane(JTabbedPane.BOTTOM);
-                Map<String,String> resps = invariants.get(i)[RSP_IDX];
+                Map<String,String> resps = invariants.get(i)[IF_PRE_IDX];
                 for(String k : resps.keySet()) {
-                   String title = String.format(INFFLOWSPECTITLE, k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
+                   String title = String.format(IF_PRE_TITLE, k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
                    JTextArea textArea = createInputTextArea(title, resps.get(k), i);
-                   setInfFlowSpecListener(textArea, k, i);
+                   setInfFlowPreExpsListener(textArea, k, i);
                    respPane.add(k, textArea);
+                }
+
+                JTabbedPane ifPostPane = new JTabbedPane(JTabbedPane.BOTTOM);
+                Map<String,String> postExps = invariants.get(i)[IF_POST_IDX];
+                for(String k : postExps.keySet()) {
+                   String title = String.format(IF_POST_TITLE, k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
+                   JTextArea textArea = createInputTextArea(title, postExps.get(k), i);
+                   setInfFlowPostExpsListener(textArea, k, i);
+                   ifPostPane.add(k, textArea);
+                }
+
+                JTabbedPane ifNewObjectsPane = new JTabbedPane(JTabbedPane.BOTTOM);
+                Map<String,String> ifNewObjects = invariants.get(i)[IF_OO_IDX];
+                for(String k : ifNewObjects.keySet()) {
+                   String title = String.format(IF_OO_TITLE, k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
+                   JTextArea textArea = createInputTextArea(title, ifNewObjects.get(k), i);
+                   setInfFlowNewObsListener(textArea, k, i);
+                   ifNewObjectsPane.add(k, textArea);
                 }
 
                 JTextArea vararea = createInputTextArea(String.format(VARIANTTITLE,""),
@@ -382,6 +437,9 @@ public class InvariantConfigurator {
                 panel.add(invPane);
                 panel.add(modPane);
                 panel.add(vararea);
+                panel.add(respPane);
+                panel.add(ifPostPane);
+                panel.add(ifNewObjectsPane);
                 heapPanes.add(invPane);
                 heapPanes.add(modPane);
 
@@ -464,20 +522,56 @@ public class InvariantConfigurator {
                 });
             }
             
-            private void setInfFlowSpecListener(JTextArea ta, final String key, int i) {
+            private void setInfFlowPreExpsListener(JTextArea ta, final String key, int i) {
                 index = i;
                 ta.getDocument().addDocumentListener(new DocumentListener() {
 
                     public void removeUpdate(DocumentEvent e) {
-                        respUdatePerformed(e, key);
+                        ifPreExpsUdatePerformed(e, key);
                     }
 
                     public void insertUpdate(DocumentEvent e) {
-                        respUdatePerformed(e, key);
+                        ifPreExpsUdatePerformed(e, key);
                     }
 
                     public void changedUpdate(DocumentEvent e) {
-                        respUdatePerformed(e, key);
+                        ifPreExpsUdatePerformed(e, key);
+                    }
+                });
+            }
+
+            private void setInfFlowPostExpsListener(JTextArea ta, final String key, int i) {
+                index = i;
+                ta.getDocument().addDocumentListener(new DocumentListener() {
+
+                    public void removeUpdate(DocumentEvent e) {
+                        ifPostExpsUdatePerformed(e, key);
+                    }
+
+                    public void insertUpdate(DocumentEvent e) {
+                        ifPostExpsUdatePerformed(e, key);
+                    }
+
+                    public void changedUpdate(DocumentEvent e) {
+                        ifPostExpsUdatePerformed(e, key);
+                    }
+                });
+            }
+
+            private void setInfFlowNewObsListener(JTextArea ta, final String key, int i) {
+                index = i;
+                ta.getDocument().addDocumentListener(new DocumentListener() {
+
+                    public void removeUpdate(DocumentEvent e) {
+                        ifNewObjectsUdatePerformed(e, key);
+                    }
+
+                    public void insertUpdate(DocumentEvent e) {
+                        ifNewObjectsUdatePerformed(e, key);
+                    }
+
+                    public void changedUpdate(DocumentEvent e) {
+                        ifNewObjectsUdatePerformed(e, key);
                     }
                 });
             }
@@ -663,13 +757,39 @@ public class InvariantConfigurator {
                 }
             }
             
-            public void respUdatePerformed(DocumentEvent d, String key) {
+            public void ifPreExpsUdatePerformed(DocumentEvent d, String key) {
                 Document doc = d.getDocument();
                 index = inputPane.getSelectedIndex();
 
                 Map<String,String>[] inv = invariants.get(index);
                 try {
-                    inv[RSP_IDX].put(key, doc.getText(0, doc.getLength()));
+                    inv[IF_PRE_IDX].put(key, doc.getText(0, doc.getLength()));
+                } catch (Exception e) {
+                } finally {
+                    parse();
+                }
+            }
+
+            public void ifPostExpsUdatePerformed(DocumentEvent d, String key) {
+                Document doc = d.getDocument();
+                index = inputPane.getSelectedIndex();
+
+                Map<String,String>[] inv = invariants.get(index);
+                try {
+                    inv[IF_POST_IDX].put(key, doc.getText(0, doc.getLength()));
+                } catch (Exception e) {
+                } finally {
+                    parse();
+                }
+            }
+
+            public void ifNewObjectsUdatePerformed(DocumentEvent d, String key) {
+                Document doc = d.getDocument();
+                index = inputPane.getSelectedIndex();
+
+                Map<String,String>[] inv = invariants.get(index);
+                try {
+                    inv[IF_OO_IDX].put(key, doc.getText(0, doc.getLength()));
                 } catch (Exception e) {
                 } finally {
                     parse();
@@ -746,6 +866,7 @@ public class InvariantConfigurator {
                     }
                 }
                 LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+                // TODO: add post expressions and new objects
                 try {
                     infFlowSpecs.put(baseHeap, parseInfFlowSpec(baseHeap));
                     setOK(respErrors,respCols,baseHeap.toString());
@@ -868,22 +989,34 @@ public class InvariantConfigurator {
             }
             
             protected ImmutableList<InfFlowSpec> parseInfFlowSpec(LocationVariable heap) throws Exception {
-                Term res = null;
+                Term preExps = null;
+                Term postExps = null;
+                Term newObjects = null;
                 //ImmutableList<ImmutableList<Term>> result = null;
                 index = inputPane.getSelectedIndex();
                 // might throw parserException or some obscure
-                // antlr                
-                final String respAsString = invariants.get(index)[RSP_IDX].get(heap.toString());
-                res = parser.parse(
-                      new StringReader(respAsString), Sort.ANY,
+                // antlr
+                final String preExpsAsString = invariants.get(index)[IF_PRE_IDX].get(heap.toString());
+                final String postExpsAsString = invariants.get(index)[IF_POST_IDX].get(heap.toString());
+                final String newObjectsAsString = invariants.get(index)[IF_OO_IDX].get(heap.toString());
+                // TODO: allow more than one term
+                preExps = parser.parse(
+                      new StringReader(preExpsAsString), Sort.ANY,
+                      services, services.getNamespaces(), getAbbrevMap());
+                // TODO: allow more than one term
+                postExps = parser.parse(
+                      new StringReader(postExpsAsString), Sort.ANY,
+                      services, services.getNamespaces(), getAbbrevMap());
+                // TODO: allow more than one term
+                newObjects = parser.parse(
+                      new StringReader(newObjectsAsString), Sort.ANY,
                       services, services.getNamespaces(), getAbbrevMap());
                 ImmutableList<InfFlowSpec> result =
                     ImmutableSLList.<InfFlowSpec>nil()
                                    .append(new InfFlowSpec
-                                                     (ImmutableSLList.<Term>nil().append(res),
-                                                      ImmutableSLList.<Term>nil(),
-                                                      ImmutableSLList.<Term>nil(),
-                                                      ImmutableSLList.<Term>nil()));
+                                                     (ImmutableSLList.<Term>nil().append(preExps),
+                                                      ImmutableSLList.<Term>nil().append(postExps),
+                                                      ImmutableSLList.<Term>nil().append(newObjects)));
                 return result;
             }
 

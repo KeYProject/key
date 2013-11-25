@@ -109,19 +109,16 @@ public class ProgramVariableCollector extends JavaASTVisitor {
            }
         }
 
-      //respect (TODO: does this really belong here?)
+       //information flow (TODO: does this really belong here?)
         for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             ImmutableList<InfFlowSpec> infFlowSpecs =
                    x.getInfFlowSpecs(heap, selfTerm, atPres, services);
             if (infFlowSpecs != null) {
                 for (InfFlowSpec infFlowSpec : infFlowSpecs) {
-                    for (Term t: infFlowSpec.separates) {
+                    for (Term t: infFlowSpec.preExpressions) {
                         t.execPostOrder(tpvc);
                     }
-                    for (Term t: infFlowSpec.declassifies) {
-                        t.execPostOrder(tpvc);
-                    }
-                    for (Term t: infFlowSpec.erases) {
+                    for (Term t: infFlowSpec.postExpressions) {
                         t.execPostOrder(tpvc);
                     }
                     for (Term t: infFlowSpec.newObjects) {
@@ -164,13 +161,10 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         }
         ImmutableList<InfFlowSpec> infFlowSpecs = x.getInfFlowSpecs();
         for (InfFlowSpec ts : infFlowSpecs) {
-            for (Term t : ts.separates) {
+            for (Term t : ts.preExpressions) {
                 t.execPostOrder(collector);
             }
-            for (Term t : ts.declassifies) {
-                t.execPostOrder(collector);
-            }
-            for (Term t : ts.erases) {
+            for (Term t : ts.postExpressions) {
                 t.execPostOrder(collector);
             }
             for (Term t : ts.newObjects) {

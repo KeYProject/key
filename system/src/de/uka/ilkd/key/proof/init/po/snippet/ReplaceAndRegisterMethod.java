@@ -81,24 +81,19 @@ abstract class ReplaceAndRegisterMethod {
     final InfFlowSpec replace(InfFlowSpec terms,
                               StateVars origVars,
                               StateVars poVars) {
-        ImmutableList<Term> resultSeparates = ImmutableSLList.<Term>nil();
-        for (Term t : terms.separates) {
-            resultSeparates = resultSeparates.append(replace(t, origVars, poVars));
+        ImmutableList<Term> resultPreExps = ImmutableSLList.<Term>nil();
+        for (Term t : terms.preExpressions) {
+            resultPreExps = resultPreExps.append(replace(t, origVars, poVars));
         }
-        ImmutableList<Term> resultDeclassifies = ImmutableSLList.<Term>nil();
-        for (Term t : terms.declassifies) {
-            resultDeclassifies = resultDeclassifies.append(replace(t, origVars, poVars));
-        }
-        ImmutableList<Term> resultErases = ImmutableSLList.<Term>nil();
-        for (Term t : terms.erases) {
-            resultErases = resultErases.append(replace(t, origVars, poVars));
+        ImmutableList<Term> resultPostExps = ImmutableSLList.<Term>nil();
+        for (Term t : terms.postExpressions) {
+            resultPostExps = resultPostExps.append(replace(t, origVars, poVars));
         }
         ImmutableList<Term> resultNewObjecs = ImmutableSLList.<Term>nil();
         for (Term t : terms.newObjects) {
             resultNewObjecs = resultNewObjecs.append(replace(t, origVars, poVars));
         }
-        return new InfFlowSpec(resultSeparates, resultDeclassifies,
-                               resultErases, resultNewObjecs);
+        return new InfFlowSpec(resultPreExps, resultPostExps, resultNewObjecs);
     }
 
 

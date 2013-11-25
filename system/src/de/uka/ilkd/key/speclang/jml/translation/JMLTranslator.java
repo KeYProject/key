@@ -146,7 +146,7 @@ final class JMLTranslator {
         RETURNS ("returns"),
 
         // information flow
-        SEPARATES ("separates");
+        INF_FLOW_SPEC_LIST ("infflowspeclist");
 
         private final String jmlName;
         JMLKeyWord(String name) {
@@ -1635,7 +1635,7 @@ final class JMLTranslator {
 				return new SLExpression(TB.values((Services)params[0]),t);
 			}});
         
-        translationMethods.put(JMLKeyWord.SEPARATES, new JMLTranslationMethod() {
+        translationMethods.put(JMLKeyWord.INF_FLOW_SPEC_LIST, new JMLTranslationMethod() {
 
             @Override
             public ImmutableList<?> translate(

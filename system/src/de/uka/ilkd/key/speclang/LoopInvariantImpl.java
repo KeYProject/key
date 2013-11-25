@@ -439,33 +439,43 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
     @Override
     public LoopInvariant setGuard(final Term guardTerm, Services services) {
-        Map<LocationVariable, ImmutableList<InfFlowSpec>> newIFSpecs =
+        Map<LocationVariable, ImmutableList<InfFlowSpec>> newIFSpecMap =
                 new LinkedHashMap<LocationVariable, ImmutableList<InfFlowSpec>>(originalInfFlowSpecs);
         ImmutableList<InfFlowSpec> infFlowSpecs = getInfFlowSpecs(services);
+        ImmutableList<InfFlowSpec> newInfFlowSpecs =
+                ImmutableSLList.<InfFlowSpec>nil();
+
+        if (infFlowSpecs.isEmpty()) {
+            infFlowSpecs = infFlowSpecs.append(InfFlowSpec.EMPTY_INF_FLOW_SPEC);
+        }
+
+        for(InfFlowSpec infFlowSpec : infFlowSpecs) {
+            final ImmutableList<Term> newPreExpressions;
+            final ImmutableList<Term> newPostExpressions;
+            if (guard != null) {
+                // XXX CS: why is this neccessary?
+                newPreExpressions = infFlowSpec.preExpressions.removeFirst(guard).append(guardTerm);
+                newPostExpressions = infFlowSpec.postExpressions.removeFirst(guard).append(guardTerm);
+            } else {
+                newPreExpressions = infFlowSpec.preExpressions.append(guardTerm);
+                newPostExpressions = infFlowSpec.postExpressions.append(guardTerm);
+            }
+            newInfFlowSpecs = newInfFlowSpecs.append(
+                new InfFlowSpec(newPreExpressions,
+                                newPostExpressions,
+                                infFlowSpec.newObjects));
+        }
+
         final LocationVariable baseHeap =
                 services.getTypeConverter().getHeapLDT().getHeap();
-        final InfFlowSpec baseInfFlowSpec =
-                !infFlowSpecs.isEmpty() ? infFlowSpecs.head() : InfFlowSpec.EMPTY_INF_FLOW_SPEC;
-
-        final ImmutableList<Term> newSeparates;
-        if (guard != null) {
-            newSeparates = baseInfFlowSpec.separates.removeFirst(guard);
-        } else {
-            newSeparates = baseInfFlowSpec.separates;
-        }
-        infFlowSpecs = infFlowSpecs.tail().prepend(
-                new InfFlowSpec(newSeparates.append(guardTerm),
-                                baseInfFlowSpec.declassifies,
-                                baseInfFlowSpec.erases,
-                                baseInfFlowSpec.newObjects));
-        newIFSpecs.put(baseHeap, infFlowSpecs);
+        newIFSpecMap.put(baseHeap, newInfFlowSpecs);
 
         return new LoopInvariantImpl(loop,
                                      pm,
                                      innermostExecCont,
                                      originalInvariants,
                                      originalModifies,
-                                     newIFSpecs,
+                                     newIFSpecMap,
                                      originalVariant,
                                      originalSelfTerm,
                                      guardTerm,

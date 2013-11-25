@@ -321,7 +321,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                + (hasRealModifiesClause ? "" : "<b>, creates no new objects</b>")
                + getHTMLFor(origMby, "measured-by", services)
                + "<br><b>termination</b> " + modality
-               + getHTMLFor(origInfFlowSpecs, "separates", services)
+               + getHTMLFor(origInfFlowSpecs, "determines", services)
                + "</html>";
     }
 
@@ -400,13 +400,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         if (hasInfFlowSpec()) {
             infFlowSpecString = "<br><b>" + htmlName + "</b> ";
             for (InfFlowSpec infFlowSpec : originalInfFlowSpecs) {
-                infFlowSpecString += "(" + getHTMLFor(infFlowSpec.separates, services) + ")";
-                if (!infFlowSpec.declassifies.isEmpty()) {
-                    infFlowSpecString += ", declassifies (" + getHTMLFor(infFlowSpec.declassifies, services) + ")";
-                }
-                if (!infFlowSpec.erases.isEmpty()) {
-                    infFlowSpecString += ", erases (" + getHTMLFor(infFlowSpec.erases, services) + ")";
-                }
+                infFlowSpecString += "(" + getHTMLFor(infFlowSpec.preExpressions, services) + ")";
+                infFlowSpecString += " by (" + getHTMLFor(infFlowSpec.postExpressions, services) + ")";
                 if (!infFlowSpec.newObjects.isEmpty()) {
                     infFlowSpecString += ", new objects (" + getHTMLFor(infFlowSpec.newObjects, services) + ")";
                 }

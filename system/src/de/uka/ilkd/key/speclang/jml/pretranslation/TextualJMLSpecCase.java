@@ -424,7 +424,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         }
         it = infFlowSpecs.iterator();
         while (it.hasNext()) {
-            sb.append("separates: ").append(it.next()).append("\n");
+            sb.append("determines: ").append(it.next()).append("\n");
         }
         return sb.toString();
     }

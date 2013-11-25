@@ -152,11 +152,10 @@ public class OpReplacer {
         }
         
         for(final InfFlowSpec infFlowSpec : terms) {
-            final ImmutableList<Term> separates = replace(infFlowSpec.separates);
-            final ImmutableList<Term> declassifies = replace(infFlowSpec.declassifies);
-            final ImmutableList<Term> erases = replace(infFlowSpec.erases);
+            final ImmutableList<Term> preExpressions = replace(infFlowSpec.preExpressions);
+            final ImmutableList<Term> postExpressions = replace(infFlowSpec.postExpressions);
             final ImmutableList<Term> newObjects = replace(infFlowSpec.newObjects);
-            result = result.append(new InfFlowSpec(separates, declassifies, erases, newObjects));
+            result = result.append(new InfFlowSpec(preExpressions, postExpressions, newObjects));
         }
         return result;
     }
