@@ -195,7 +195,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
 //            mbyAtPreDef = TB.equals(mbyAtPre, mby);
             mbyAtPreDef = TB.measuredBy(mby, services);
         } else {
-            mbyAtPreDef = TB.tt();
+//            mbyAtPreDef = TB.tt();
+            mbyAtPreDef = TB.measuredByEmpty(services);
         }
         return mbyAtPreDef;
     }
