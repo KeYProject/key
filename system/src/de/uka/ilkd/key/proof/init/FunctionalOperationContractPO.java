@@ -35,13 +35,14 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
 import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
@@ -184,7 +185,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         if (contract.hasMby()) {
             final Function mbyAtPreFunc =
                     new Function(new Name(TB.newName(services, "mbyAtPre")),
-                                 services.getTypeConverter().getIntegerLDT().targetSort());
+                            Sort.ANY);
+//                                 services.getTypeConverter().getIntegerLDT().targetSort());
             register(mbyAtPreFunc);
             mbyAtPre = TB.func(mbyAtPreFunc);
             final Term mby = contract.getMby(selfVar, paramVars, services);

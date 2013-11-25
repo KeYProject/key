@@ -62,7 +62,8 @@ public final class Main {
     private static final String EXAMPLES = "--examples";
     public static final String JKEY_PREFIX = "--jr-";
     public static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
-    public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
+//    deprecated
+//    public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
     public static final String JPATH_OF_RESULT = JKEY_PREFIX + "pathOfResult";
     public static final String JTIMEOUT = JKEY_PREFIX + "timeout";
     public static final String JPRINT = JKEY_PREFIX + "print";
@@ -174,6 +175,9 @@ public final class Main {
             evaluateOptions(cl);
             UserInterface userInterface = createUserInterface();
             loadCommandLineFile(userInterface);
+        } catch (ExceptionInInitializerError e) {
+        	System.err.println("D'oh! It seems that KeY was not built properly!");
+        	System.exit(777);
         } catch (CommandLineException e) {
             printHeader(); // exception before verbosity option could be read
             if (Debug.ENABLE_DEBUG) {
@@ -393,17 +397,19 @@ public final class Main {
                 @Override
                 public void uncaughtException(Thread t, Throwable e) {
                     if (verbosity > Verbosity.SILENT) {
-                        System.out.println("Auto mode was terminated by an exception:");
-                        if (Debug.ENABLE_DEBUG) e.printStackTrace();
+                        System.out.println("Auto mode was terminated by an exception:"+e.getClass().toString().substring(5));
+                        if (verbosity >= Verbosity.DEBUG) e.printStackTrace();
                         final String msg = e.getMessage();
                         if (msg!=null) System.out.println(msg);
                     }
                     System.exit(-1);
                 }
             });
+            if (fileNameOnStartUp == null)
+                printUsageAndExit(true, "Error: No file to load from.", -4);
             BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
 
-            ui = new ConsoleUserInterface(batch, verbosity);
+            ui = new ConsoleUserInterface(batch, true, verbosity);
         } else {
             updateSplashScreen();
             MainWindow mainWindow = MainWindow.getInstance();

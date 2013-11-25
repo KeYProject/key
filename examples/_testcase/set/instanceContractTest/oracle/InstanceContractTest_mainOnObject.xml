@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.mainOnObject(x);" pathCondition="true" pathConditionChanged="false">
+      <statement name="return x.getValue();" pathCondition="true" pathConditionChanged="false">
+         <operationContract name="result_0 = x.getValue() catch(exc_0)
+pre: x.&lt;inv&gt;
+post: result_0 = x.value &amp; x.&lt;inv&gt; &amp; exc_0 = null
+mod: allLocs
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
+            <branchCondition name="!x = null" pathCondition="!x = null" pathConditionChanged="true" branchCondition="!x = null" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (getValue)">
+               <methodReturn name="&lt;return of self.mainOnObject(x);&gt;" pathCondition="!x = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return result_0 as result of self.mainOnObject(x);&gt;" isReturnValueComputed="true">
+                  <methodReturnValue name="result_0" returnValueString="result_0" hasCondition="false">
+                  </methodReturnValue>
+                  <termination name="&lt;end&gt;" pathCondition="!x = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  </termination>
+               </methodReturn>
+            </branchCondition>
+         </operationContract>
+      </statement>
+   </methodCall>
+</start>

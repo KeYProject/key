@@ -80,9 +80,9 @@ public final class DependencyContractImpl implements DependencyContract {
         assert deps != null : "cannot create contract "+baseName+" for "+target+" when no specification is given";
         assert (selfVar == null) == target.isStatic();
         assert paramVars != null;
-        assert paramVars.size() == target.arity() - (target.isStatic() ? 1 : 2);
+        // This cannot be done properly for multiple heaps without access to services:
+        //assert paramVars.size() == target.arity() - (target.isStatic() ? 1 : 2);
         assert target.getStateCount() > 0;
-        // FIXME small hack, -1 is the savedHeap, this is because there is no access to services
         this.baseName = baseName;
         this.name = name != null
                 ? name
@@ -535,5 +535,10 @@ public final class DependencyContractImpl implements DependencyContract {
     public String getTypeName() {
         return ContractFactory.generateContractTypeName(baseName, kjt, target,
                 specifiedIn);
+    }
+
+    @Override
+    public boolean hasSelfVar() {
+        return originalSelfVar != null;
     }
 }

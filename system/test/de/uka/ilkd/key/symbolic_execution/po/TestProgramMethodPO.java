@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.symbolic_execution.po;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -24,7 +25,6 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
@@ -37,7 +37,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
     */
    public void testComplicatedInnerMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
-             "TheInnerClass",
+             "my.packageName.TheClass.TheInnerClass",
              "complicatedInnerMethod",
              "examples/_testcase/set/fullqualifiedTypeNamesTest/oracle/TheInnerClass_complicatedInnerMethod.xml",
              null,
@@ -49,7 +49,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
     */
    public void testComplicatedMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
-             "TheClass",
+             "my.packageName.TheClass",
              "complicatedMethod",
              "examples/_testcase/set/fullqualifiedTypeNamesTest/oracle/TheClass_complicatedMethod.xml",
              "a == 2 && b && x != null && \"Hello\" == x",
@@ -61,7 +61,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
     */
    public void testComplicatedMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
-             "TheClass",
+             "my.packageName.TheClass",
              "complicatedMethod",
              "examples/_testcase/set/fullqualifiedTypeNamesTest/oracle/TheClass_complicatedMethod.xml",
              null,
@@ -125,17 +125,13 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
                          String oraclePathInBaseDirFile,
                          String precondition,
                          String expectedTryContent) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      String originalRuntimeExceptions = null;
+      HashMap<String, String> originalTacletOptions = null;
       SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = null;
+      boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
-         // Store original settings of KeY which requires that at least one proof was instantiated.
-         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, false, false, false, false);
-            env.dispose();
-         }
-         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
-         assertNotNull(originalRuntimeExceptions);
-         SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
+         // Make sure that the correct taclet options are defined.
+         originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
+         setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
          env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, false, false, false, false);
          // Extract and test try content
@@ -147,10 +143,9 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
          assertSaveAndReload(keyRepDirectory, javaPathInkeyRepDirectory, oraclePathInBaseDirFile, env);
       }
       finally {
-         // Restore runtime option
-         if (originalRuntimeExceptions != null) {
-            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
-         }
+         // Restore original options
+         setOneStepSimplificationEnabled(null, originalOneStepSimplification);
+         restoreTacletOptions(originalTacletOptions);
          if (env != null) {
             env.dispose();
          }

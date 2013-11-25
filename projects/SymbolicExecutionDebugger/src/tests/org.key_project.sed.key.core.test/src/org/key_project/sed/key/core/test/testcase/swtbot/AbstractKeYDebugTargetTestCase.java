@@ -20,8 +20,6 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
@@ -39,7 +37,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Before;
-import org.key_project.key4eclipse.starter.core.test.util.TestStarterCoreUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.serialization.SEDXMLWriter;
 import org.key_project.sed.core.test.util.DebugTargetResumeSuspendListener;
@@ -52,17 +49,17 @@ import org.key_project.sed.ui.visualization.view.ExecutionTreeView;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 import org.xml.sax.SAXException;
 
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Provides the functionality to test {@link KeYDebugTarget}s.
  * @author Martin Hentschel
  */
-public class AbstractKeYDebugTargetTestCase extends TestCase {
+public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
    /**
     * <p>
     * If this constant is {@code true} a temporary directory is created with
@@ -599,7 +596,6 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
       IPerspectiveDescriptor defaultPerspective = TestUtilsUtil.getActivePerspective();
       SWTBotTree debugTree = null;
       long originalTimeout = SWTBotPreferences.TIMEOUT;
-      String originalRuntimeExceptions = null;
       boolean restoreExecutionTreeView = false;
       boolean restoreThumbinalExecutionTreeView = false;
       boolean restorePropertiesView = false;
@@ -626,13 +622,6 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          String targetName = TestSEDKeyCoreUtil.computeTargetName(method);
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * timeoutFactor;
-         // Store original settings of KeY which requires that at least one proof was instantiated.
-         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            Proof proof = TestStarterCoreUtil.instantiateProofWithGeneratedContract(method, false, false);
-            proof.dispose();
-         }
-         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
-         assertNotNull(originalRuntimeExceptions);
          // Set choice settings in KeY.
          SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          assertEquals(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
@@ -649,10 +638,6 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
       finally {
          // Restore timeout
          SWTBotPreferences.TIMEOUT = originalTimeout;
-         // Restore runtime option
-         if (originalRuntimeExceptions != null) {
-            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
-         }
          // Terminate and remove all launches
          TestSedCoreUtil.terminateAndRemoveAll(debugTree);
          // Make sure that all jobs are done because otherwise older jobs may influence the next test execution

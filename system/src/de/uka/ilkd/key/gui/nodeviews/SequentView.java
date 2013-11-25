@@ -22,6 +22,8 @@ import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_CO
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
@@ -71,7 +73,7 @@ public abstract class SequentView extends JTextArea
     
     private ConfigChangeListener configChangeListener;
     SequentPrintFilter filter;
-    LogicPrinter printer;
+    private LogicPrinter printer;
     public boolean refreshHighlightning = true;
     private boolean showTermInfo = false;
     
@@ -231,6 +233,20 @@ public abstract class SequentView extends JTextArea
         }
     }
 
+    /** Return used LogicPrinter.
+     * @return The LogicPrinter that is used.
+     */
+    public LogicPrinter getLogicPrinter() {
+        return printer;
+    }
+
+    /** Set the LogicPrinter to be used.
+     * @param p The LogicPrinter to be used
+     */
+    protected void setLogicPrinter(LogicPrinter p) {
+        printer = p;
+    }
+
     public String getHighlightedText(PosInSequent pos) {
         String s = "";
         try {
@@ -240,6 +256,10 @@ public abstract class SequentView extends JTextArea
             e.printStackTrace();
         }
         return s;
+    }
+
+    public String getHighlightedText() {
+       return getHighlightedText(getPosInSequent(getMousePosition()));
     }
 
     private void showTermInfo(Point p) {
@@ -261,6 +281,9 @@ public abstract class SequentView extends JTextArea
                             tOpClassString.lastIndexOf('.') + 1);
                     // What is the purpose of displaying the java hashcode here?
                     info = operator + ", Sort: " + t.sort() + ", Hash:" + t.hashCode();
+
+                    Sequent seq = mainWindow.getMediator().getSelectedNode().sequent();
+                    info += ProofSaver.posInOccurrence2Proof(seq, posInOcc);
                 }
             }
 
@@ -276,10 +299,10 @@ public abstract class SequentView extends JTextArea
 
     /**
      * Return the character index for a certain coordinate. The usual
-     * viewToModel is focussed on inter-character spaces, not characters, so it
+     * viewToModel is focused on inter-character spaces, not characters, so it
      * returns the correct index in the left half of the glyph but one too many
      * in the right half. Therefore, we get width of character before the one
-     * given by viewToModel, substract it from the given x value, and get the
+     * given by viewToModel, subtract it from the given x value, and get the
      * character at the new position. That is the correct one.
      */
     public int correctedViewToModel(Point p) {

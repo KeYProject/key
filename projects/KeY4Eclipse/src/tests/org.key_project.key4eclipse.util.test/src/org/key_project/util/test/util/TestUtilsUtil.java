@@ -98,6 +98,7 @@ import org.key_project.swtbot.swing.bot.SwingBotJTree;
 import org.key_project.swtbot.swing.bot.finder.waits.Conditions;
 import org.key_project.util.eclipse.Logger;
 import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.eclipse.setup.SetupStartup;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
@@ -108,6 +109,7 @@ import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.internal.ContextMenuHelper;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -1034,20 +1036,6 @@ public class TestUtilsUtil {
    }
 
    /**
-    * Waits until the given {@link Thread}s have terminated.
-    * @param threads The {@link Thread}s to wait for.
-    */
-   public static void waitForThreads(Thread[] threads) {
-      if (threads != null) {
-         for (Thread thread : threads) {
-            while (thread.isAlive()) {
-               sleep(100);
-            }
-         }
-      }
-   }
-
-   /**
     * Returns the active perspective of the active {@link IWorkbenchPage}.
     * @return The active perspective.
     */
@@ -1454,13 +1442,49 @@ public class TestUtilsUtil {
    }
 
    /**
-    * Blocks the current thread until a auto mode is started.
+    * Blocks the current thread until the auto mode has started.
     * @param ui The {@link UserInterface} to wait for its auto mode.
     */
-   public static void waitUntilAutoMode(UserInterface ui) {
-      while (!ui.getMediator().autoMode()) {
-         sleep(10);
-      }
+   public static void waitUntilAutoMode(SWTBot bot, UserInterface ui) {
+      final KeYMediator mediator = ui.getMediator(); 
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return mediator.autoMode();
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "Mediator \"" + mediator + "\" is not in automode.";
+         }
+      });
+   }
+
+   /**
+    * Blocks the current thread while the auto mode is running.
+    * @param ui The {@link UserInterface} to wait for its auto mode.
+    */
+   public static void waitWhileAutoMode(SWTBot bot, UserInterface ui) {
+      final KeYMediator mediator = ui.getMediator(); 
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return !mediator.autoMode();
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "Mediator \"" + mediator + "\" is still in automode.";
+         }
+      });
    }
 
    /**
@@ -1491,5 +1515,15 @@ public class TestUtilsUtil {
       };
       Display.getDefault().syncExec(run);
       return run.getResult();
+   }
+
+   /**
+    * Blocks the current thread until the workspace is initialized
+    * by the {@link SetupStartup}.
+    */
+   public static void waitUntilWorkspaceInitialized() {
+      while (!SetupStartup.isSetupDone()) {
+         sleep(500);
+      }
    }
 }

@@ -66,7 +66,7 @@ import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.ISEDLoopInvariant;
-import org.key_project.sed.core.model.ISEDOperationContract;
+import org.key_project.sed.core.model.ISEDMethodContract;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionLayoutFeature;
@@ -118,10 +118,10 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.LoopInvariant
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopInvariantCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopInvariantLayoutFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopInvariantUpdateFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.OperationContractAddFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.OperationContractCreateFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.OperationContractLayoutFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.OperationContractUpdateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.MethodContractAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.MethodContractCreateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.MethodContractLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.MethodContractUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDIndependenceSolver;
 
 /**
@@ -169,7 +169,7 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
                                       new TerminationCreateFeature(this),
                                       new ThreadCreateFeature(this),
                                       new LoopInvariantCreateFeature(this),
-                                      new OperationContractCreateFeature(this)};
+                                      new MethodContractCreateFeature(this)};
       }
       else {
          return new ICreateFeature[0];
@@ -214,8 +214,8 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else if (context.getNewObject() instanceof ISEDThread) {
          return new ThreadAddFeature(this);
       }
-      else if (context.getNewObject() instanceof ISEDOperationContract) {
-         return new OperationContractAddFeature(this);
+      else if (context.getNewObject() instanceof ISEDMethodContract) {
+         return new MethodContractAddFeature(this);
       }
       else if (context.getNewObject() instanceof ISEDLoopInvariant) {
          return new LoopInvariantAddFeature(this);
@@ -267,8 +267,8 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else if (bo instanceof ISEDThread) {
          return new ThreadUpdateFeature(this);
       }
-      else if (bo instanceof ISEDOperationContract) {
-         return new OperationContractUpdateFeature(this);
+      else if (bo instanceof ISEDMethodContract) {
+         return new MethodContractUpdateFeature(this);
       }
       else if (bo instanceof ISEDLoopInvariant) {
          return new LoopInvariantUpdateFeature(this);
@@ -318,8 +318,8 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else if (bo instanceof ISEDThread) {
          return new ThreadLayoutFeature(this);
       }
-      else if (bo instanceof ISEDOperationContract) {
-         return new OperationContractLayoutFeature(this);
+      else if (bo instanceof ISEDMethodContract) {
+         return new MethodContractLayoutFeature(this);
       }
       else if (bo instanceof ISEDLoopInvariant) {
          return new LoopInvariantLayoutFeature(this);

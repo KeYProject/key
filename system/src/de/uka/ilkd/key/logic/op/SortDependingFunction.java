@@ -104,8 +104,9 @@ public final class SortDependingFunction extends Function {
 	    			              Sort s2, 
 	    			              MatchConditions mc,
 	    			              Services services) {
-        assert !(s2 instanceof GenericSort)
-               : "Sort s2 is not allowed to be of type generic.";
+// This restriction has been dropped for free generic sorts to prove taclets correct
+//        assert !(s2 instanceof GenericSort)
+//               : "Sort s2 is not allowed to be of type generic.";
         if (!(s1 instanceof GenericSort)) {
             if (s1 == s2) {
                 return mc;

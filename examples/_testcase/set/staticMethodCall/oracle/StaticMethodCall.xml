@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="StaticMethodCall.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="doSomething();" pathCondition="true" pathConditionChanged="false">
          <methodCall name="StaticMethodCall.doSomething();" pathCondition="true" pathConditionChanged="false">
@@ -19,7 +19,7 @@
                                                    <methodReturn name="&lt;return of StaticMethodCall.sub();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                                       <statement name="return x;" pathCondition="true" pathConditionChanged="false">
                                                          <methodReturn name="&lt;return of StaticMethodCall.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                                                            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                             </termination>
                                                          </methodReturn>
                                                       </statement>
@@ -40,4 +40,4 @@
          </methodCall>
       </statement>
    </methodCall>
-</startNode>
+</start>

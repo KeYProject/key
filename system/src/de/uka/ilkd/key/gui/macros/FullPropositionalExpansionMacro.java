@@ -13,7 +13,11 @@
 
 package de.uka.ilkd.key.gui.macros;
 
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.util.Set;
+
+import javax.swing.KeyStroke;
 
 /**
  * The macro FullPropositionalExpansionMacro apply rules to decompose
@@ -38,7 +42,10 @@ public class FullPropositionalExpansionMacro extends AbstractPropositionalExpans
 
     private static final String[] ADMITTED_RULES = {
         "andLeft", "orRight", "impRight", "notLeft", "notRight", "close",
-        "andRight", "orLeft", "impLeft"
+        "andRight", "orLeft", "impLeft",
+        "closeTrue", "closeFalse", "true_left", "false_right",
+//        "ifthenelse_split", "ifthenelse_split_for",
+        "equivLeft", "equivRight"
     };
 
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
@@ -48,4 +55,9 @@ public class FullPropositionalExpansionMacro extends AbstractPropositionalExpans
         return ADMITTED_RULES_SET;
     }
 
+
+    @Override
+    public KeyStroke getKeyStroke () {
+    	return KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_DOWN_MASK);
+    }
 }

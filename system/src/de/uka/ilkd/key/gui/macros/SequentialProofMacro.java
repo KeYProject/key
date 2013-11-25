@@ -107,4 +107,9 @@ public abstract class SequentialProofMacro implements ProofMacro {
         }
         return Collections.unmodifiableList(Arrays.asList(proofMacros));
     }
+    
+    @Override
+    public javax.swing.KeyStroke getKeyStroke() {
+    	return null; // default implementation
+    }
 }

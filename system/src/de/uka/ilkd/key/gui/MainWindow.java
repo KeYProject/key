@@ -89,6 +89,7 @@ import de.uka.ilkd.key.gui.actions.PruneProofAction;
 import de.uka.ilkd.key.gui.actions.QuickLoadAction;
 import de.uka.ilkd.key.gui.actions.QuickSaveAction;
 import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
+import de.uka.ilkd.key.gui.actions.ToggleConfirmExitAction;
 import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
 import de.uka.ilkd.key.gui.actions.SaveFileAction;
 import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
@@ -282,7 +283,7 @@ public final class MainWindow extends JFrame  {
         proofListener = new MainProofListener(this);
         guiListener = new MainGUIListener();
         userInterface = new WindowUserInterface(this);
-        setMediator(new KeYMediator(userInterface));
+        setMediator(new KeYMediator(userInterface, true));
         initNotification();
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);
@@ -303,6 +304,20 @@ public final class MainWindow extends JFrame  {
             instance = new MainWindow();
         }
         return instance;
+    }
+    
+    /**
+     * <p>
+     * Checks if an instance of the main window is already created or not.
+     * </p>
+     * <p>
+     * <b>This method is required, because the Eclipse integration of KeY has
+     * to do some cleanup only if a {@link MainWindow} instance exists.</b>
+     * </p>
+     * @return {@code true} {@link MainWindow} exists and is available via {@link #getInstance()}, {@code false} {@link MainWindow} is not instantiated and will be instantiated via {@link #getInstance()}.
+     */
+    public static boolean hasInstance() {
+       return instance != null;
     }
 
     /**
@@ -388,7 +403,7 @@ public final class MainWindow extends JFrame  {
         final boolean stupidMode =
         		  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
 //            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().tacletFilter();
-        mediator.setStupidMode(stupidMode);
+        mediator.setMinimizeInteraction(stupidMode);
 
         // set up actions
         autoModeAction            = new AutoModeAction(this);
@@ -786,6 +801,8 @@ public final class MainWindow extends JFrame  {
         proof.setMnemonic(KeyEvent.VK_P);
 
         proof.add(autoModeAction);
+        final JMenuItem macros = new de.uka.ilkd.key.gui.macros.ProofMacroMenu(mediator, null);
+        proof.add(macros);
         proof.add(new UndoLastStepAction(this, true));
         proof.add(new AbandonTaskAction(this));
         proof.addSeparator();
@@ -809,6 +826,7 @@ public final class MainWindow extends JFrame  {
 	options.add(new SMTOptionsAction(this));
 //	options.add(setupSpeclangMenu()); // legacy since only JML supported
 	options.addSeparator();
+        options.add(new JCheckBoxMenuItem(new ToggleConfirmExitAction(this)));
         options.add(new JCheckBoxMenuItem(new MinimizeInteraction(this)));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
         options.add(new JCheckBoxMenuItem(oneStepSimplAction));

@@ -31,7 +31,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * A class to provide the correct labels for the KeY-Outline.
@@ -40,7 +39,7 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  */
 public class ProofTreeLabelProvider extends LabelProvider {
    private Viewer viewer;
-   private KeYEnvironment<CustomConsoleUserInterface> environment;
+   private KeYEnvironment<?> environment;
    private Proof proof;
    private Map<Node, BranchFolder> nodeToBranchMapping = new HashMap<Node, BranchFolder>();  
    
@@ -69,6 +68,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
       super();
       this.viewer = viewer;
       this.proof = proof;
+      this.environment = environment;
       if (environment != null) {
          environment.getMediator().addAutoModeListener(autoModeListener);
       }
@@ -122,19 +122,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
    public String getText(Object element){
       if(element instanceof Node) {
          Node node = (Node)element;
-         // Return text to show
-         if(node.childrenCount() == 1) {
-            Node child = node.child(0);
-            if (child.getNodeInfo().getBranchLabel() != null) {
-               return node.serialNr() + ":" + node.name() + ": " + child.getNodeInfo().getBranchLabel();
-            }
-            else {
-               return node.serialNr() + ":" + node.name();
-            }
-         }
-         else {
-            return node.serialNr() + ":" + node.name();
-         }
+         return getNodeText(node);
       }
       else if(element instanceof BranchFolder){
          BranchFolder folder = (BranchFolder)element;
@@ -143,6 +131,21 @@ public class ProofTreeLabelProvider extends LabelProvider {
       }
       else {
          return ObjectUtil.toString(element);
+      }
+   }
+   
+   public static String getNodeText(Node node) {
+      if(node.childrenCount() == 1) {
+         Node child = node.child(0);
+         if (child.getNodeInfo().getBranchLabel() != null) {
+            return node.serialNr() + ":" + node.name() + ": " + child.getNodeInfo().getBranchLabel();
+         }
+         else {
+            return node.serialNr() + ":" + node.name();
+         }
+      }
+      else {
+         return node.serialNr() + ":" + node.name();
       }
    }
    

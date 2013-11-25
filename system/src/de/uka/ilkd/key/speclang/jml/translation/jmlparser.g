@@ -348,6 +348,7 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = representsclause
     |   result = axiomsclause
     |   result = requiresclause
+    |   result = decreasesclause
     |   result = respectsclause
     |   result = returnsclause
     |   result = signalsclause
@@ -407,6 +408,14 @@ dependsclause returns [Triple<ObserverFunction,Term,Term> result=null] throws SL
                 dep.getText(), Triple.class, lhs, rhs, mby, services); }
     ;
 
+decreasesclause returns [Term result = null] throws SLTranslationException
+{ 
+    Term t;
+}
+:
+    dec:DECREASES result=termexpression
+        (COMMA t=termexpression { result = TB.pair(result, t, services); } )*
+    ;
 
 requiresclause returns [Term result = null] throws SLTranslationException
 :
@@ -976,8 +985,12 @@ relationalexpr returns [SLExpression result=null] throws SLTranslationException
 		if (result.getTerm() == null) {
 		    addIgnoreWarning("subtype expression <: only supported for" +
 			" \\typeof() arguments on the left side.", st);
-			final int x = (new java.util.Random()).nextInt(1000);
-			final Function z = new Function(new Name("subtype"+x),Sort.FORMULA);
+			final Namespace fns = services.getNamespaces().functions();
+			int x = -1; Name name = null;
+			do name = new Name("subtype_"+ ++x);
+			while (fns.lookup(name)!= null);
+			final Function z = new Function(name,Sort.FORMULA);
+			fns.add(z);
 			result = new SLExpression(TB.func(z));
 		} else {
 
@@ -1571,31 +1584,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 
     |   FRESH LPAREN list=expressionlist RPAREN
 	{
-	    if(atPres == null || atPres.get(getBaseHeap()) == null) {
-	        raiseError("\\fresh not allowed in this context");
-	    }
-	    t = TB.tt();
-	    final Sort objectSort = services.getJavaInfo().objectSort();
-	    for(SLExpression expr: list) {
-	        if(!expr.isTerm()) {
-	            raiseError("Expected a term, but found: " + expr);
-	        } else if(expr.getTerm().sort().extendsTrans(objectSort)) {
-	            t = TB.and(t,
-	                       TB.equals(TB.select(services,
-	                                           booleanLDT.targetSort(),
-	                                           atPres.get(getBaseHeap()),
-	                                           expr.getTerm(),
-	                                           TB.func(heapLDT.getCreated())),
-	                                 TB.FALSE(services)));
-	        } else if(expr.getTerm().sort().extendsTrans(locSetLDT.targetSort())) {
-	            t = TB.and(t, TB.subset(services,
-	                                    expr.getTerm(),
-	                                    TB.freshLocs(services, atPres.get(getBaseHeap()))));
-	        } else {
-	            raiseError("Wrong type: " + expr);
-	        }
-	    }
-	    result = new SLExpression(t);
+        result = translator.translate("\\fresh", SLExpression.class, list, atPres, services);
 	}
 
     |   REACH LPAREN t=storeref COMMA e1=expression COMMA e2=expression (COMMA e3=expression)? RPAREN

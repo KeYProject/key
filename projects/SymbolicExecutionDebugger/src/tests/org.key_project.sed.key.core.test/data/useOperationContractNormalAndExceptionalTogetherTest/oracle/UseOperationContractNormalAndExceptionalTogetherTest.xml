@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_4c5c3388-2374-41c4-9cba-b567a7cf2e4c" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_d1031cc9-6978-4816-8b21-c4fb78e932d9" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_a214e085-5e08-4cab-a05b-12eb56136ac9" name="UseOperationContractNormalAndExceptionalTogetherTest.main();" pathCondition="true" lineNumber="-1" charStart="160" charEnd="164">
-            <sedStatement xml:id="_dfce5874-eee6-468c-8bb6-021097931241" name="int magicNumber = magic(123);" pathCondition="true" lineNumber="-1" charStart="182" charEnd="211">
-               <sedUseOperationContract xml:id="_2f249717-93f9-4e20-8868-2de7bb5328c0" name="result = magic(x) catch(exc)
-pre: x &lt; 0 | x &gt;= 0
-post: (   x &lt; 0
-   -&gt;   !exc = null
-      &amp; (    java.lang.RuntimeException::instance(exc)
+   <sedTarget xml:id="_977a269f-b0c7-49ef-be70-2c1f0797e1de" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_c3a98989-b2b1-4c6f-81ab-64e53eff87b1" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_64792c6c-c7c8-418c-a4be-43c8ce9afd8d" name="UseOperationContractNormalAndExceptionalTogetherTest.main();" pathCondition="true" lineNumber="-1" charStart="160" charEnd="164">
+            <sedStatement xml:id="_edcb61a9-21b0-4c6e-be9f-ef7d0a890f94" name="int magicNumber = magic(123);" pathCondition="true" lineNumber="-1" charStart="182" charEnd="211">
+               <sedMethodContract xml:id="_093fa4dd-3485-4365-b116-034f95af12c2" name="result_0 = magic(123) catch(exc_0)
+pre: 123 &lt; 0 | 123 &gt;= 0
+post: (   123 &lt; 0
+   -&gt;   !exc_0 = null
+      &amp; (    java.lang.RuntimeException::instance(exc_0)
            = TRUE
-         | java.lang.Exception::instance(exc) = TRUE))
-&amp; (x &gt;= 0 -&gt; result = 42 &amp; exc = null)
-mod: allLocs \cup allLocs
+         | java.lang.Exception::instance(exc_0) = TRUE))
+&amp; (123 &gt;= 0 -&gt; result_0 = 42 &amp; exc_0 = null)
+mod: \if (true)  \then (allLocs)  \else (allLocs)
+\cap \if (123 &gt;= 0)  \then (allLocs)  \else (allLocs)
 termination: diamond" pathCondition="true" lineNumber="-1" charStart="576" charEnd="581" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-                  <sedStatement xml:id="_0136e9d9-36f3-40e6-9056-013126cf90a6" name="int magicNumberCopy = magicNumber;" pathCondition="true" lineNumber="-1" charStart="216" charEnd="250">
-                     <sedStatement xml:id="_c98ec5de-01fd-42c0-bb41-8380cdf4f30c" name="return magicNumber+magicNumberCopy;" pathCondition="true" lineNumber="-1" charStart="255" charEnd="292">
-                        <sedMethodReturn xml:id="_18ea12e1-922b-4099-af24-453bcfc8bad7" name="&lt;return of UseOperationContractNormalAndExceptionalTogetherTest.main();&gt;" pathCondition="true" lineNumber="-1" charStart="160" charEnd="164">
-                           <sedTermination xml:id="_d4a914c9-4308-4182-a410-8f87d4ad27c7" name="&lt;end&gt;" pathCondition="true">
+                  <sedStatement xml:id="_b143f45c-50bc-4644-8e3b-aec6d71d0e43" name="int magicNumberCopy = magicNumber;" pathCondition="true" lineNumber="-1" charStart="216" charEnd="250">
+                     <sedStatement xml:id="_01ad28fe-d12a-45f0-8346-9ef5e8de4114" name="return magicNumber+magicNumberCopy;" pathCondition="true" lineNumber="-1" charStart="255" charEnd="292">
+                        <sedMethodReturn xml:id="_21d0adf2-37d7-45b3-abd8-7c965d93b90f" name="&lt;return of UseOperationContractNormalAndExceptionalTogetherTest.main();&gt;" pathCondition="true" lineNumber="-1" charStart="160" charEnd="164">
+                           <sedTermination xml:id="_11a8850b-dcaa-4fc5-a785-c9bc4ae4db65" name="&lt;end&gt;" pathCondition="true" verified="true">
                            </sedTermination>
                         </sedMethodReturn>
                      </sedStatement>
                   </sedStatement>
-               </sedUseOperationContract>
+               </sedMethodContract>
             </sedStatement>
          </sedMethodCall>
       </sedThread>

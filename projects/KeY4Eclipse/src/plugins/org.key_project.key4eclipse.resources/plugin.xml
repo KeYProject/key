@@ -62,6 +62,17 @@
       </persistent>
    </extension>
    <extension
+         id="org.key_project.key4eclipse.resources.ui.marker.cycleDetectedMarker"
+         name="Cycle detected"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+   <extension
          point="org.eclipse.ui.ide.markerResolution">
       <markerResolutionGenerator
             class="org.key_project.key4eclipse.resources.marker.ProofMarkerResolutionGenerator"

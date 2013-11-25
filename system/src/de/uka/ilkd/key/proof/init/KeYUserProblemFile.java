@@ -128,8 +128,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             final ParserConfig schemaConfig 
                 = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
             
-            KeYParserF problemParser 
-                    = new KeYParserF(ParserMode.PROBLEM, 
+            KeYParserF problemParser
+                    = new KeYParserF(ParserMode.PROBLEM,
                                     lexer, 
                                     file.toString(), 
                                     schemaConfig, 
@@ -159,6 +159,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
                 problemHeader = problemHeader.substring(
                     0, problemHeader.lastIndexOf(searchS));
             }
+                        
             initConfig.setTaclets(problemParser.getTaclets());
             lastParser = problemParser;
         } catch (antlr.ANTLRException e) {

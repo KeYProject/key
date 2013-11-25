@@ -19,10 +19,12 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
@@ -34,8 +36,12 @@ import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Position;
@@ -46,6 +52,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -56,22 +63,23 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
@@ -89,6 +97,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Provides the basic functionality of {@link TestCase}s which tests
@@ -401,6 +410,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       else if (expected instanceof IExecutionTermination) {
          assertTrue("Expected IExecutionTermination but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionTermination);
          assertEquals(((IExecutionTermination)expected).getTerminationKind(), ((IExecutionTermination)current).getTerminationKind());
+         assertEquals(((IExecutionTermination)expected).isBranchVerified(), ((IExecutionTermination)current).isBranchVerified());
       }
       else if (expected instanceof IExecutionBranchStatement) {
          assertTrue("Expected IExecutionBranchStatement but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBranchStatement);
@@ -907,7 +917,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ProofOblInput input = new FunctionalOperationContractPO(environment.getInitConfig(), (FunctionalOperationContract)contract, true, true);
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
-      SymbolicExecutionUtil.configureProof(proof);
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
@@ -956,7 +965,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ProofOblInput input = new ProgramMethodPO(environment.getInitConfig(), pm.getFullName(), pm, precondition, true, true);
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
-      SymbolicExecutionUtil.configureProof(proof);
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
@@ -1045,7 +1053,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ProofOblInput input = new ProgramMethodSubsetPO(environment.getInitConfig(), methodFullName, pm, precondition, startPosition, endPosition, true, true);
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
-      SymbolicExecutionUtil.configureProof(proof);
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
@@ -1348,7 +1355,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                 boolean useLoopInvariants,
                                                                                 boolean nonExecutionBranchHidingSideProofs,
                                                                                 boolean aliasChecks) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      String originalRuntimeExceptions = null;
+      HashMap<String, String> originalTacletOptions = null;
+      boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
          // Make sure that parameter are valid.
          assertNotNull(javaPathInBaseDir);
@@ -1360,49 +1368,296 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             assertTrue("Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.", oracleFile.exists());
          }
          assertTrue(maximalNumberOfExecutedSetNodes >= 1);
-         // Store original settings of KeY which requires that at least one proof was instantiated.
-         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks);
-            env.dispose();
-         }
-         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
-         assertNotNull(originalRuntimeExceptions);
-         SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
+         // Make sure that the correct taclet options are defined.
+         originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, containerTypeName, methodFullName);
+         setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
          SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks);
-         // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
-         ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes);
-         env.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
-         int nodeCount;
-         // Execute auto mode until no more symbolic execution tree nodes are found or no new rules are applied.
-         do {
-            // Store the number of nodes before start of the auto mode 
-            nodeCount = env.getProof().countNodes();
-            // Run proof
-            env.getUi().startAndWaitForAutoMode(env.getProof());
-            // Update symbolic execution tree 
-            env.getBuilder().analyse();
-            // Make sure that not to many set nodes are executed
-            Map<Goal, Integer> executedSetNodesPerGoal = stopCondition.getExectuedSetNodesPerGoal();
-            for (Integer value : executedSetNodesPerGoal.values()) {
-               assertNotNull(value);
-               assertTrue(value.intValue() + " is not less equal to " + maximalNumberOfExecutedSetNodes, value.intValue() <= maximalNumberOfExecutedSetNodes);
-            }
-         } while(stopCondition.wasSetNodeExecuted() && nodeCount != env.getProof().countNodes());
-         // Create new oracle file if required in a temporary directory
-         createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile, includeVariables, includeCallStack, includeReturnValues);
-         // Read oracle file
-         ExecutionNodeReader reader = new ExecutionNodeReader();
-         IExecutionNode oracleRoot = reader.read(oracleFile);
-         assertNotNull(oracleRoot);
-         // Make sure that the created symbolic execution tree matches the expected one.
-         assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables, includeCallStack, false, includeReturnValues);
+         internalDoSETTest(oracleFile, env, oraclePathInBaseDirFile, maximalNumberOfExecutedSetNodes, includeVariables, includeCallStack, includeReturnValues);
          return env;
       }
       finally {
-         // Restore runtime option
-         if (originalRuntimeExceptions != null) {
-            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
+         // Restore original options
+         setOneStepSimplificationEnabled(null, originalOneStepSimplification);
+         restoreTacletOptions(originalTacletOptions);
+      }
+   }
+   /**
+    * Executes a test with the following steps:
+    * <ol>
+    *    <li>Load java file</li>
+    *    <li>Instantiate proof for method in container type</li>
+    *    <li>Try to close proof in auto mode</li>
+    *    <li>Create symbolic execution tree</li>
+    *    <li>Create new oracle file in temporary directory {@link #tempNewOracleDirectory} if it is defined</li>
+    *    <li>Load oracle file</li>
+    *    <li>Compare created symbolic execution tree with oracle model</li>
+    * </ol>
+    * @param baseDir The base directory which contains test and oracle file.
+    * @param javaPathInBaseDir The path to the java file inside the base directory.
+    * @param baseContractName The name of the contract.
+    * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
+    * @param includeVariables Include variables?
+    * @param includeCallStack Include call stack?
+    * @param includeReturnValues Include method return values?
+    * @param maximalNumberOfExecutedSetNodes The number of executed set nodes per auto mode run.
+    * @param mergeBranchConditions Merge branch conditions?
+    * @param useOperationContracts Use operation contracts?
+    * @param useLoopInvariants Use loop invariants?
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
+    * @param aliasChecks Do alias checks?
+    * @return The tested {@link SymbolicExecutionEnvironment}.
+    * @throws ProofInputException Occurred Exception
+    * @throws IOException Occurred Exception
+    * @throws ParserConfigurationException Occurred Exception
+    * @throws SAXException Occurred Exception
+    * @throws ProblemLoaderException Occurred Exception
+    */
+   protected SymbolicExecutionEnvironment<CustomConsoleUserInterface> doSETTest(File baseDir,
+                                                                                String javaPathInBaseDir,
+                                                                                String baseContractName,
+                                                                                String oraclePathInBaseDirFile,
+                                                                                boolean includeVariables,
+                                                                                boolean includeCallStack,
+                                                                                boolean includeReturnValues,
+                                                                                int maximalNumberOfExecutedSetNodes,
+                                                                                boolean mergeBranchConditions,
+                                                                                boolean useOperationContracts,
+                                                                                boolean useLoopInvariants,
+                                                                                boolean nonExecutionBranchHidingSideProofs,
+                                                                                boolean aliasChecks) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+      HashMap<String, String> originalTacletOptions = null;
+      try {
+         // Make sure that parameter are valid.
+         assertNotNull(javaPathInBaseDir);
+         assertNotNull(baseContractName);
+         assertNotNull(oraclePathInBaseDirFile);
+         File oracleFile = new File(baseDir, oraclePathInBaseDirFile);
+         if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
+            assertTrue("Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.", oracleFile.exists());
+         }
+         assertTrue(maximalNumberOfExecutedSetNodes >= 1);
+         // Make sure that the correct taclet options are defined.
+         originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, baseContractName);
+         // Create proof environment for symbolic execution
+         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, baseContractName, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks);
+         internalDoSETTest(oracleFile, env, oraclePathInBaseDirFile, maximalNumberOfExecutedSetNodes, includeVariables, includeCallStack, includeReturnValues);
+         return env;
+      }
+      finally {
+         // Restore taclet options
+         restoreTacletOptions(originalTacletOptions);
+      }
+   }
+   
+   /**
+    * Internal test method called by
+    * {@link #doSETTest(File, String, String, String, boolean, boolean, boolean, int, boolean, boolean, boolean, boolean, boolean)} and
+    * {@link #doSETTest(File, String, String, String, String, String, boolean, boolean, boolean, int, boolean, boolean, boolean, boolean, boolean)}.
+    */
+   private void internalDoSETTest(File oracleFile, SymbolicExecutionEnvironment<CustomConsoleUserInterface> env, String oraclePathInBaseDirFile, int maximalNumberOfExecutedSetNodes, boolean includeVariables, boolean includeCallStack, boolean includeReturnValues) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+      // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
+      ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes);
+      env.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
+      int nodeCount;
+      // Execute auto mode until no more symbolic execution tree nodes are found or no new rules are applied.
+      do {
+         // Store the number of nodes before start of the auto mode 
+         nodeCount = env.getProof().countNodes();
+         // Run proof
+         env.getUi().startAndWaitForAutoMode(env.getProof());
+         // Update symbolic execution tree 
+         env.getBuilder().analyse();
+         // Make sure that not to many set nodes are executed
+         Map<Goal, Integer> executedSetNodesPerGoal = stopCondition.getExectuedSetNodesPerGoal();
+         for (Integer value : executedSetNodesPerGoal.values()) {
+            assertNotNull(value);
+            assertTrue(value.intValue() + " is not less equal to " + maximalNumberOfExecutedSetNodes, value.intValue() <= maximalNumberOfExecutedSetNodes);
+         }
+      } while(stopCondition.wasSetNodeExecuted() && nodeCount != env.getProof().countNodes());
+      // Create new oracle file if required in a temporary directory
+      createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile, includeVariables, includeCallStack, includeReturnValues);
+      // Read oracle file
+      ExecutionNodeReader reader = new ExecutionNodeReader();
+      IExecutionNode oracleRoot = reader.read(oracleFile);
+      assertNotNull(oracleRoot);
+      // Make sure that the created symbolic execution tree matches the expected one.
+      assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables, includeCallStack, false, includeReturnValues);
+   }
+   
+   /**
+    * Ensures that the default taclet options are defined.
+    * @param baseDir The base directory which contains the java file.
+    * @param javaPathInBaseDir The path in the base directory to the java file.
+    * @param baseContractName The name of the contract to prove.
+    * @return The original settings which are overwritten.
+    * @throws ProblemLoaderException Occurred Exception.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public static HashMap<String, String> setDefaultTacletOptions(File baseDir, 
+                                                                 String javaPathInBaseDir,
+                                                                 String baseContractName) throws ProblemLoaderException, ProofInputException {
+      if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
+         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInBaseDir, baseContractName, false, false, false, false, false);
+         env.dispose();
+      }
+      return setDefaultTacletOptions();
+   }
+
+   /**
+    * Ensures that the default taclet options are defined.
+    * @param baseDir The base directory which contains the java file.
+    * @param javaPathInBaseDir The path in the base directory to the java file.
+    * @param containerTypeName The type nach which provides the method.
+    * @param methodFullName The method to prove.
+    * @return The original settings which are overwritten.
+    * @throws ProblemLoaderException Occurred Exception.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public static HashMap<String, String> setDefaultTacletOptions(File baseDir, 
+                                                                 String javaPathInBaseDir,
+                                                                 String containerTypeName,
+                                                                 String methodFullName) throws ProblemLoaderException, ProofInputException {
+      if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
+         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, null, false, false, false, false, false);
+         env.dispose();
+      }
+      return setDefaultTacletOptions();
+   }
+   
+   /**
+    * Ensures that the default taclet options are defined.
+    * @param javaFile The java file to load.
+    * @param containerTypeName The type name which provides the target.
+    * @param targetName The target to proof.
+    * @return The original settings which are overwritten.
+    * @throws ProblemLoaderException Occurred Exception.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public static HashMap<String, String> setDefaultTacletOptionsForTarget(File javaFile,
+                                                                          String containerTypeName,
+                                                                          final String targetName) throws ProblemLoaderException, ProofInputException {
+      if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
+         KeYEnvironment<?> environment = null;
+         Proof proof = null;
+         try {
+            // Load java file
+            environment = KeYEnvironment.load(javaFile, null, null);
+            // Search type
+            KeYJavaType containerKJT = environment.getJavaInfo().
+                    getTypeByClassName(containerTypeName);
+            assertNotNull(containerKJT);
+            // Search observer function
+            ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(containerKJT);
+            IObserverFunction target = JavaUtil.search(targets, new IFilter<IObserverFunction>() {
+               @Override
+               public boolean select(IObserverFunction element) {
+                  return targetName.equals(element.toString());
+               }
+            });
+            assertNotNull(target);
+            // Find first contract.
+            ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(containerKJT, target);
+            assertFalse(contracts.isEmpty());
+            Contract contract = contracts.iterator().next();
+            // Start proof
+            proof = environment.createProof(contract.createProofObl(environment.getInitConfig(), contract));
+            assertNotNull(proof);
+         }
+         catch (Exception e) {
+            if (proof != null) {
+               proof.dispose();
+            }
+            if (environment != null) {
+               environment.dispose();
+            }
+         }
+      }
+      return setDefaultTacletOptions();
+   }
+   
+   /**
+    * Ensures that the default taclet options are defined.
+    * @return The original settings which are overwritten.
+    */
+   public static HashMap<String, String> setDefaultTacletOptions() {
+      assertTrue(SymbolicExecutionUtil.isChoiceSettingInitialised());
+      // Set default taclet options
+      ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+      HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
+      HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
+      newSettings.putAll(SymbolicExecutionUtil.getDefaultTacletOptions());
+      choiceSettings.setDefaultChoices(newSettings);
+      // Make sure that default taclet options are set
+      HashMap<String, String> updatedChoiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+      for (Entry<String, String> entry : newSettings.entrySet()) {
+         assertEquals(entry.getValue(), updatedChoiceSettings.get(entry.getKey()));
+      }
+      return oldSettings;
+   }
+
+   /**
+    * Restores the given taclet options.
+    * @param options The taclet options to restore.
+    */
+   public static void restoreTacletOptions(HashMap<String, String> options) {
+      if (options != null) {
+         assertTrue(SymbolicExecutionUtil.isChoiceSettingInitialised());
+         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(options);
+         // Make sure that taclet options are restored
+         HashMap<String, String> updatedChoiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+         for (Entry<String, String> entry : options.entrySet()) {
+            assertEquals(entry.getValue(), updatedChoiceSettings.get(entry.getKey()));
+         }
+      }
+   }
+   
+   /**
+    * Makes sure that two {@link Term}s are equal. 
+    * @param expected The expected {@link Term}.
+    * @param actual The actual {@link Term}.
+    */
+   protected void assertTerm(Term expected, Term actual) {
+      if (expected != null) {
+         assertEquals(expected.op(), actual.op());
+         assertEquals(expected.javaBlock(), actual.javaBlock());
+         assertEquals(expected.getLabels(), actual.getLabels());
+         assertEquals(expected.arity(), actual.arity());
+         for (int i = 0; i < expected.arity(); i++) {
+            assertTerm(expected.sub(i), actual.sub(i));
+         }
+      }
+      else {
+         assertNull(actual);
+      }
+   }
+   
+   /**
+    * Checks if one step simplification is enabled in the given {@link Proof}.
+    * @param proof The {@link Proof} to read from or {@code null} to return the general settings value.
+    * @return {@code true} one step simplification is enabled, {@code false} if disabled.
+    */
+   public static boolean isOneStepSimplificationEnabled(Proof proof) {
+      if (proof != null && !proof.isDisposed()) {
+         return proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification();
+      }
+      else {
+         return ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+      }
+   }
+   
+   /**
+    * 
+    * @param proof
+    * @param enabled
+    */
+   public static void setOneStepSimplificationEnabled(Proof proof, boolean enabled) {
+      ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(enabled);
+      if (proof != null && !proof.isDisposed()) {
+         proof.getProofIndependentSettings().getGeneralSettings().setOneStepSimplification(true);
+         OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof.env().getInitConfig().getProfile());
+         if (simplifier != null) {
+            simplifier.refresh(proof);
          }
       }
    }

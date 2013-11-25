@@ -711,6 +711,36 @@ public class TestMatchTaclet extends TestCase {
 	
     }
 
+    public void testInsequentStateRestriction() {
+	FindTaclet restrictedTaclet =
+                (FindTaclet) TacletForTests.getTaclet("testInsequentState").taclet();
+	FindTaclet unrestrictedTaclet =
+                (FindTaclet) TacletForTests.getTaclet("testInsequentState_2").taclet();
+
+        Term match = TacletForTests.parseTerm("{ i := 0 } (i = 0)");
+	MatchConditions mc=(restrictedTaclet.matchFind(match,
+                                                       MatchConditions.EMPTY_MATCHCONDITIONS,
+                                                       services));
+ 	assertNull("Test inSequentState failed: matched on term with update prefix", mc);
+
+        mc=(unrestrictedTaclet.matchFind(match,
+                                         MatchConditions.EMPTY_MATCHCONDITIONS,
+                                         services));
+ 	assertNotNull("Test inSequentState failed: did not match on term with update prefix", mc);
+
+        
+        match = TacletForTests.parseTerm("i = 0");
+	mc=(restrictedTaclet.matchFind(match,
+                                       MatchConditions.EMPTY_MATCHCONDITIONS,
+                                       services));
+ 	assertNotNull("Test inSequentState failed: did not match on term with without update prefix", mc);
+
+        mc=(unrestrictedTaclet.matchFind(match,
+                                         MatchConditions.EMPTY_MATCHCONDITIONS,
+                                         services));
+ 	assertNotNull("Test inSequentState failed: did not match on term with without update prefix", mc);
+    }
+
     public static void main(String args[]) {
 	TestMatchTaclet t=new TestMatchTaclet("XXX", true);
 	t.setUp();

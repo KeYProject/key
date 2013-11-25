@@ -15,8 +15,6 @@ package de.hentschel.visualdbc.datasource.key.test.testCase.swtbot.example;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
@@ -26,6 +24,7 @@ import org.key_project.swtbot.swing.bot.SwingBotJDialog;
 import org.key_project.swtbot.swing.bot.SwingBotJFrame;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.hentschel.visualdbc.datasource.key.test.Activator;
@@ -43,7 +42,7 @@ import de.hentschel.visualdbc.datasource.model.exception.DSException;
  * an opened proof automatically in KeY.
  * @author Martin Hentschel
  */
-public class SWTBotExampeForSwingBot extends TestCase {
+public class SWTBotExampeForSwingBot extends AbstractSetupTestCase {
    /**
     * Opens the proof obligation "PreservesOwnInv" of method
     * paycard.PayCard#isValid() and closes it automatically.

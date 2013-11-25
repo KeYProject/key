@@ -21,13 +21,22 @@ provable: ./heap/comprehensions/sum1.key
 provable: ./heap/comprehensions/sum2.key
 provable: ./heap/comprehensions/sum3.key
 provable: ./heap/comprehensions/segsum.key
+provable: ./heap/comprehensions/bsum_negative.key
+provable: ./heap/comprehensions/bsum_neg2.key
 provable: ./heap/comprehensions/bsumSplit.key
 provable: ./heap/comprehensions/bprodSplit.key
 notprovable: ./heap/comprehensions/bsumSplitInvalid.key
 
 # Performance tests
-provable: ./performance-test/disjoint-test-1.key
-provable: ./performance-test/disjoint-test-2.key
+provable: ./performance-test/key-files/Disjoint(Disjoint__disjoint_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/Disjoint(Disjoint__disjoint2_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/AccessChain1(AccessChain1__foo_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/AccessChain4(AccessChain4__foo_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/Disjoint(Disjoint__xZero_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/Dynamic(Dynamic__foo_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/DynamicGhost(DynamicGhost__dynamicGhost_08()).JML_normal_behavior_operation_contract.0.key
+provable: ./performance-test/key-files/GhostFrame(GhostFrame__foo_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/Modelfield(Modelfield__foo_08()).JML_operation_contract.0.key
 
 # Tests for rule application restrictions
 provable: ./heap/polarity_tests/wellformed1.key
@@ -109,6 +118,7 @@ provable: ./heap/list_ghost/ArrayList_size.key
 provable: ./heap/list_recursiveSpec/ListOperationsNonNull_getNextNN_normal_behavior.key
 provable: ./heap/list_recursiveSpec/ListOperationsNonNull_setValueAt_normal_behavior.key
 provable: ./heap/list_recursiveSpec/ListOperationsNonNull_remove_normal_behavior.key
+provable: ./heap/list_seq/SimplifiedLinkedList.remove.key
 provable: ./heap/observer/ExampleObserver_ExampleObserver.key
 provable: ./heap/observer/ExampleObserver_inv.key
 provable: ./heap/observer/ExampleObserver_subject.key
@@ -201,6 +211,7 @@ provable: ./heap/vstte10_05_Queue/LinkedList_tail.key
 provable: ./heap/WeideEtAl_01_AddAndMultiply/AddAndMultiply_add.key
 provable: ./heap/WeideEtAl_01_AddAndMultiply/AddAndMultiply_mul.key
 provable: ./heap/WeideEtAl_02_BinarySearch/BinarySearch_search.key
+provable: ./heap/Wellfounded/ackermann.key
 provable: ./heap/strictly_pure/strictlyPureMethod.key
 provable: ./heap/strictly_pure/useStrictlyPureMethod.key
 provable: ./standard_key/arith/binomial1.key

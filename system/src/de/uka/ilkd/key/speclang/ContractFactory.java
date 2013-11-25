@@ -187,6 +187,7 @@ public class ContractFactory {
     }
 
     public DependencyContract dep(KeYJavaType kjt,
+    							  LocationVariable targetHeap,
                                   Triple<IObserverFunction, Term, Term> dep,
                                   ProgramVariable selfVar) {
         final ImmutableList<ProgramVariable> paramVars =
@@ -196,7 +197,13 @@ public class ContractFactory {
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
                  selfVar == null ? tb.tt() : tb.inv(services, tb.var(selfVar)));
         Map<ProgramVariable,Term> accessibles = new LinkedHashMap<ProgramVariable, Term>();
-        accessibles.put(services.getTypeConverter().getHeapLDT().getHeap(), dep.second);
+        for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+        	if(heap == targetHeap) {
+              accessibles.put(heap, dep.second);
+        	}else{
+              accessibles.put(heap, TermBuilder.DF.allLocs(services));        		
+        	}
+        }
         // TODO: insert static invariant??
         return dep(kjt, dep.first, dep.first.getContainerType(), pres, dep.third, accessibles, selfVar, paramVars, null, null);
     }
@@ -304,7 +311,7 @@ public class ContractFactory {
         for(LocationVariable h : t.originalPres.keySet()) {
            pres.put(h, t.originalPres.get(h));
         }
-        Term mby = t.originalMby;
+        Term mby = t.originalMby; // TODO: what about the others?
         Map<LocationVariable,Boolean> hasMod = new LinkedHashMap<LocationVariable,Boolean>();
         Map<LocationVariable,Term> posts = new LinkedHashMap<LocationVariable,Term>(t.originalPosts.size());
         for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
@@ -318,7 +325,7 @@ public class ContractFactory {
         }
 
         Map<LocationVariable,Term> axioms = new LinkedHashMap<LocationVariable,Term>();
-        if(t.originalAxioms != null) {
+        if(t.originalAxioms != null) { // TODO: what about the others?
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 Term oriAxiom = t.originalAxioms.get(h);
                 if(oriAxiom != null) {
@@ -327,7 +334,7 @@ public class ContractFactory {
             }
         }
         Map<LocationVariable,Term> mods = t.originalMods;
-        Modality moda = t.modality;
+        Modality moda = t.modality; // TODO: what about the others?
         for(FunctionalOperationContract other : others) {
             Term otherMby = other.hasMby()
                         ? other.getMby(t.originalSelfVar,
@@ -373,28 +380,27 @@ public class ContractFactory {
                 axioms.put(h, axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom));
               }
 
-            }
-
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-               if(!hasMod.get(h) && !other.hasModifiesClause(h)) {
-             	   continue;
-               }
-               hasMod.put(h, true);
-               Term m1 = mods.get(h);
-               Term m2 = other.getMod(h,t.originalSelfVar,
-                                      t.originalParamVars,
-                                      services);
-                Term nm = null;
-                if(m1 == null && m2 == null)
-                  continue;
-                if(m1 == null){
-                   nm = m2;
-                }else if(m2 == null) {
-                   nm = m1;
-                }else{
-                   nm = tb.union(services, m1, m2);
+                if (hasMod.get(h) || other.hasModifiesClause(h)) {
+                    hasMod.put(h, true);
+                    Term m1 = mods.get(h);
+                    Term m2 = other.getMod(h, t.originalSelfVar,
+                                           t.originalParamVars,
+                                           services);
+                    if (m1 != null || m2 != null) {
+                        Term nm;
+                        if (m1 == null) {
+                            nm = m2;
+                        } else if (m2 == null) {
+                            nm = m1;
+                        } else {
+                            Term ownPre = pres.get(h) == null ? pres.get(h) : tb.tt();
+                            nm = tb.intersect(services,
+                                              tb.ife(ownPre, m1, tb.allLocs(services)),
+                                              tb.ife(otherPre, m2, tb.allLocs(services)));
+                        }
+                        mods.put(h, nm);
+                    }
                 }
-                mods.put(h, nm);
 
             }
         }

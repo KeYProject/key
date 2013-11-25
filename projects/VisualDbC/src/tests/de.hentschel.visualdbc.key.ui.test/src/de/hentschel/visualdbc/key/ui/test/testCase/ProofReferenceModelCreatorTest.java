@@ -34,7 +34,6 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Tests {@link ProofReferenceModelCreator}.
@@ -175,21 +174,12 @@ public class ProofReferenceModelCreatorTest extends AbstractProofReferenceModelC
                          String finalOracleFileInBundle) throws Exception {
       KeYEnvironment<?> environment = null;
       Proof proof = null;
-      String originalRuntimeExceptions = null;
       try {
          // Create test project
          IProject project = TestUtilsUtil.createProject(projectName);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathInBundle, project);
          IFile javaFile = project.getFile(new Path(javaFileInProject));
          assertTrue(javaFile.exists());
-         // Store original settings of KeY which requires that at least one proof was instantiated.
-         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            environment = KeYEnvironment.load(ResourceUtil.getLocation(javaFile), null, null);
-            environment.dispose();
-         }
-         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
-         assertNotNull(originalRuntimeExceptions);
-         SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          // Create Proof
          environment = KeYEnvironment.load(ResourceUtil.getLocation(javaFile), null, null);
          // Search type
@@ -236,10 +226,6 @@ public class ProofReferenceModelCreatorTest extends AbstractProofReferenceModelC
          compareWithOracle(oracleDirectory, creator.getModel(), finalOracleFileInBundle);
       }
       finally {
-         // Restore runtime option
-         if (originalRuntimeExceptions != null) {
-            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
-         }
          // Dispose proof and environment
          if (proof != null) {
             proof.dispose();

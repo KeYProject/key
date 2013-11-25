@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="ComplexConstructorTest.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="DefaultConstructor dc = new DefaultConstructor ();" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
@@ -152,7 +152,7 @@
                                                                                                                                                       <methodReturnValue name="191" returnValueString="191" hasCondition="false">
                                                                                                                                                       </methodReturnValue>
                                                                                                                                                       <callStackEntry path="/0"/>
-                                                                                                                                                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                                                                                                                                                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                                                                                                       </termination>
                                                                                                                                                    </methodReturn>
                                                                                                                                                 </statement>
@@ -203,4 +203,4 @@
          </methodCall>
       </statement>
    </methodCall>
-</startNode>
+</start>

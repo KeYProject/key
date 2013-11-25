@@ -29,8 +29,9 @@ import javax.swing.border.TitledBorder;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
+import de.uka.ilkd.key.pp.PosInSequent;
 
-public class GuiUtilities {
+public final class GuiUtilities {
 
     private static TextArea clipBoardTextArea;
     
@@ -98,8 +99,8 @@ public class GuiUtilities {
     }
 
     // is this still needed?
-    public static void copyHighlightToClipboard(CurrentGoalView view) {
-        String s = view.getHighlightedText();
+    public static void copyHighlightToClipboard(CurrentGoalView view, PosInSequent pos) {
+        String s = view.getHighlightedText(pos);
         // now CLIPBOARD
         java.awt.datatransfer.StringSelection ss = 
             new java.awt.datatransfer.StringSelection(s);

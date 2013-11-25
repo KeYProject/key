@@ -13,8 +13,6 @@
 
 package org.key_project.sed.key.ui.test.testcase;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -26,13 +24,14 @@ import org.eclipse.jdt.core.search.SearchEngine;
 import org.key_project.sed.key.ui.jdt.AllTypesSearchEngine;
 import org.key_project.sed.key.ui.test.Activator;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests for {@link AllTypesSearchEngine}
  * @author Martin Hentschel
  */
-public class AllTypesSearchEngineTest extends TestCase {
+public class AllTypesSearchEngineTest extends AbstractSetupTestCase {
     /**
      * Executes a search in that inner and anonymous types are filtered.
      */

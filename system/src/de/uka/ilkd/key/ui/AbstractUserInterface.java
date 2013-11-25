@@ -44,9 +44,7 @@ public abstract class AbstractUserInterface implements UserInterface {
 
     @Override
 	public  IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
-		if (app instanceof IBuiltInRuleApp) {
-			app = ((IBuiltInRuleApp)app).tryToInstantiate(goal);
-		}
+    	app = forced? app.forceInstantiate(goal): app.tryToInstantiate(goal);
 		// cannot complete that app
 		return app.complete() ? app : null;
 	}
@@ -56,11 +54,18 @@ public abstract class AbstractUserInterface implements UserInterface {
      */
     @Override
     public DefaultProblemLoader load(Profile profile, File file, List<File> classPath, File bootClassPath) throws ProblemLoaderException {
+       DefaultProblemLoader loader = null;
        try {
           getMediator().stopInterface(true);
-          DefaultProblemLoader loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile, getMediator());
+          loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile, getMediator());
           loader.load(isRegisterProofs());
           return loader;
+       }
+       catch (ProblemLoaderException e) {
+          if (loader != null && loader.getProof() != null) {
+             loader.getProof().dispose();
+          }
+          throw e;
        }
        finally {
           getMediator().startInterface(true);

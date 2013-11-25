@@ -104,14 +104,11 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
              // Make sure that the location is contained in a Java project
              IProject project = method.getResource().getProject();
              Assert.isTrue(JDTUtil.isJavaProject(project), " The project \"" + project + "\" is no Java project.");
-             // Get source paths from class path
-             List<File> sourcePaths = JDTUtil.getSourceLocations(project);
-             Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
              // Get KeY project settings
              bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
              classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
              // Get local file for the eclipse resource
-             location = sourcePaths.get(0);
+             location = KeYUtil.getSourceLocation(project);
              Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
           }
           else {
@@ -234,7 +231,6 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           // Create proof
           proof = ui.createProof(initConfig, input);
        }
-       SymbolicExecutionUtil.configureProof(proof);
        // Create symbolic execution tree builder
        SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, settings.isMergeBranchConditions());
        builder.analyse();

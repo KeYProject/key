@@ -744,7 +744,7 @@ measured_by_clause
 @init { result = r; }
 @after { r = result; }
 :
-    measured_by_keyword result=expression
+    measured_by_keyword result=expression { result = result.prepend("decreases "); }
 ;
 
 
@@ -1079,7 +1079,7 @@ depends_clause[ImmutableList<String> mods]
     accessible_keyword ps=expression
     {
     	TextualJMLDepends d
-    		= new TextualJMLDepends(mods, ps.prepend("depends "));
+    		= new TextualJMLDepends(mods, flipHeaps("depends", ps, false));
 	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(d);
     }
 ;
@@ -1258,7 +1258,7 @@ variant_function returns [PositionedString r = null]
 @init { result = r; }
 @after { r = result; }
 :
-    decreasing_keyword result=expression
+    decreasing_keyword result=expression { result = result.prepend("decreases "); }
 ;
 
 

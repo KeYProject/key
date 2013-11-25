@@ -726,7 +726,7 @@ measured_by_clause
 	returns [PositionedString result = null]
 	throws SLTranslationException
 :
-    measured_by_keyword result=expression
+    measured_by_keyword result=expression { result = result.prepend("decreases "); }
 ;
 
 
@@ -1029,7 +1029,7 @@ depends_clause[ImmutableList<String> mods]
     accessible_keyword ps=expression
     {
     	TextualJMLDepends d
-    		= new TextualJMLDepends(mods, ps.prepend("depends "));
+    		= new TextualJMLDepends(mods, flipHeaps("depends", ps, false));
 	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(d);
     }
 ;
@@ -1229,7 +1229,7 @@ maintaining_keyword
 
 variant_function returns [PositionedString result = null]
 :
-    decreasing_keyword result=expression
+    decreasing_keyword result=expression { result = result.prepend("decreases "); }
 ;
 
 

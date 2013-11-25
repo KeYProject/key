@@ -37,7 +37,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.java.visitor.UndeclaredProgramVariableCollector;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;

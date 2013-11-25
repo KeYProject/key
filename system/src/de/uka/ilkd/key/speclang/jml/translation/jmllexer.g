@@ -54,6 +54,7 @@ tokens {
     SECURE_FOR      = "secure_for";
     SIGNALS         = "signals";
     SIGNALS_ONLY    = "signals_only";
+    DECREASES       = "decreases";
 
     NULLABLE        = "nullable";
     NON_NULL        = "non_null";
@@ -174,7 +175,7 @@ SEQCONCAT : "\\seq_concat";
 SEQSUB : "\\seq_sub";
 SEQREVERSE : "\\seq_reverse";
 SEQREPLACE : "\\seq_put";
-INDEXOF : "\\indexOf";
+INDEXOF : "\\seq_indexOf";
 SEQDEF : "\\seq_def";
 
 

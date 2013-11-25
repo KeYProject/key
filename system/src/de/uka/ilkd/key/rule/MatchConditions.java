@@ -29,13 +29,18 @@ public class MatchConditions {
 	new MatchConditions ( SVInstantiations.EMPTY_SVINSTANTIATIONS,
 			      RenameTable.EMPTY_TABLE);
 
-    private SVInstantiations   instantiations   = SVInstantiations.EMPTY_SVINSTANTIATIONS;
- 
-    private RenameTable renameTable = RenameTable.EMPTY_TABLE;
+    private final SVInstantiations instantiations;
+    private final RenameTable renameTable;
 
+    public MatchConditions() {
+        this.instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+        this.renameTable = RenameTable.EMPTY_TABLE;
+    }
     
     public MatchConditions ( SVInstantiations   p_instantiations,
 			     RenameTable        p_renameTable) {
+        assert p_instantiations != null;
+        assert p_renameTable != null;
 	instantiations   = p_instantiations;	
         renameTable      = p_renameTable; 
     }

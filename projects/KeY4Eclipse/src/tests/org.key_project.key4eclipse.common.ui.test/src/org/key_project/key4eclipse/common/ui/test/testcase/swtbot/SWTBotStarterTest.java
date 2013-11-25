@@ -13,8 +13,6 @@
 
 package org.key_project.key4eclipse.common.ui.test.testcase.swtbot;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -61,6 +59,7 @@ import org.key_project.key4eclipse.common.ui.wizard.StarterWizard;
 import org.key_project.key4eclipse.common.ui.wizard.page.StarterWizardPage;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -71,7 +70,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
  * {@link StarterPreferencePage} and the UI integration.
  * @author Martin Hentschel
  */
-public class SWTBotStarterTest extends TestCase {
+public class SWTBotStarterTest extends AbstractSetupTestCase {
    /**
     * Tests {@link StarterUtil#openProjectStarter(org.eclipse.swt.widgets.Shell, IProject)}
     * starter via context menu in the navigator.
@@ -158,8 +157,8 @@ public class SWTBotStarterTest extends TestCase {
             }
          };
          ImmutableList<StarterDescription<IProjectStarter>> starters = StarterUtil.getProjectStarters();
-         StarterDescription<IProjectStarter> firstSD = StarterUtil.searchGlobalStarter(starters, FirstLoggingProjectStarter.ID);
-         StarterDescription<IProjectStarter> secondSD = StarterUtil.searchGlobalStarter(starters, SecondLoggingProjectStarter.ID);
+         StarterDescription<IProjectStarter> firstSD = StarterUtil.searchStarter(starters, FirstLoggingProjectStarter.ID);
+         StarterDescription<IProjectStarter> secondSD = StarterUtil.searchStarter(starters, SecondLoggingProjectStarter.ID);
          assertTrue(firstSD.getInstance() instanceof FirstLoggingProjectStarter);
          assertTrue(secondSD.getInstance() instanceof SecondLoggingProjectStarter);
          doStarterTest(helper, 
@@ -266,8 +265,8 @@ public class SWTBotStarterTest extends TestCase {
             }
          };
          ImmutableList<StarterDescription<IFileStarter>> starters = StarterUtil.getFileStarters();
-         StarterDescription<IFileStarter> firstSD = StarterUtil.searchGlobalStarter(starters, FirstLoggingFileStarter.ID);
-         StarterDescription<IFileStarter> secondSD = StarterUtil.searchGlobalStarter(starters, SecondLoggingFileStarter.ID);
+         StarterDescription<IFileStarter> firstSD = StarterUtil.searchStarter(starters, FirstLoggingFileStarter.ID);
+         StarterDescription<IFileStarter> secondSD = StarterUtil.searchStarter(starters, SecondLoggingFileStarter.ID);
          assertTrue(firstSD.getInstance() instanceof FirstLoggingFileStarter);
          assertTrue(secondSD.getInstance() instanceof SecondLoggingFileStarter);
          doStarterTest(helper, 
@@ -469,8 +468,8 @@ public class SWTBotStarterTest extends TestCase {
     */
    protected void doMethodStarterTest(ITestHelper<FirstLoggingMethodStarter, SecondLoggingMethodStarter> helper) throws Exception {
       ImmutableList<StarterDescription<IMethodStarter>> starters = StarterUtil.getMethodStarters();
-      StarterDescription<IMethodStarter> firstSD = StarterUtil.searchGlobalStarter(starters, FirstLoggingMethodStarter.ID);
-      StarterDescription<IMethodStarter> secondSD = StarterUtil.searchGlobalStarter(starters, SecondLoggingMethodStarter.ID);
+      StarterDescription<IMethodStarter> firstSD = StarterUtil.searchStarter(starters, FirstLoggingMethodStarter.ID);
+      StarterDescription<IMethodStarter> secondSD = StarterUtil.searchStarter(starters, SecondLoggingMethodStarter.ID);
       assertTrue(firstSD.getInstance() instanceof FirstLoggingMethodStarter);
       assertTrue(secondSD.getInstance() instanceof SecondLoggingMethodStarter);
       doStarterTest(helper, 
@@ -517,8 +516,8 @@ public class SWTBotStarterTest extends TestCase {
     */
    protected void doGlobalStarterTest(ITestHelper<FirstLoggingGlobalStarter, SecondLoggingGlobalStarter> helper) throws Exception {
       ImmutableList<StarterDescription<IGlobalStarter>> starters = StarterUtil.getGlobalStarters();
-      StarterDescription<IGlobalStarter> firstSD = StarterUtil.searchGlobalStarter(starters, FirstLoggingGlobalStarter.ID);
-      StarterDescription<IGlobalStarter> secondSD = StarterUtil.searchGlobalStarter(starters, SecondLoggingGlobalStarter.ID);
+      StarterDescription<IGlobalStarter> firstSD = StarterUtil.searchStarter(starters, FirstLoggingGlobalStarter.ID);
+      StarterDescription<IGlobalStarter> secondSD = StarterUtil.searchStarter(starters, SecondLoggingGlobalStarter.ID);
       assertTrue(firstSD.getInstance() instanceof FirstLoggingGlobalStarter);
       assertTrue(secondSD.getInstance() instanceof SecondLoggingGlobalStarter);
       doStarterTest(helper, 

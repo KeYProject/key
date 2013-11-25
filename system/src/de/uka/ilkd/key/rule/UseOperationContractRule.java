@@ -14,6 +14,7 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -313,12 +315,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 	final Name anonHeapName = new Name(TB.newName(services, "anon_" + heap + "_" + pm.getName()));
 	final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-	final Term anonHeap = TB.func(anonHeapFunc);
+	final Term anonHeap = TB.label(TB.func(anonHeapFunc), AnonHeapTermLabel.INSTANCE);
 	final Term assumption = TB.equals(TB.anon(services,
-				          TB.var(heap),
-				          mod,
-				          anonHeap),
-		               TB.func(methodHeapFunc));
+                                                  TB.var(heap),
+                                                  mod,
+                                                  anonHeap),
+                                          TB.func(methodHeapFunc));
 	final Term anonUpdate = TB.elementary(services, heap, TB.func(methodHeapFunc));
 
 	return new Triple<Term,Term,Term>(assumption, anonUpdate, anonHeap);
@@ -508,7 +510,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 	        staticType,
 	        mr,
 	        pm,
-	        actualParams);
+	        actualParams,
+	        mod == Modality.DIA_TRANSACTION || mod == Modality.BOX_TRANSACTION);
 	return result;
     }
 
@@ -564,13 +567,11 @@ public final class UseOperationContractRule implements BuiltInRule {
                 .getInstantiation();
         assert contract.getTarget().equals(inst.pm);
 
-        Modality md = (Modality)TermBuilder.DF.goBelowUpdates(ruleApp.posInOccurrence().subTerm()).op();
-        boolean transaction = (md == Modality.DIA_TRANSACTION || md == Modality.BOX_TRANSACTION);
-        final List<LocationVariable> heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
+        final List<LocationVariable> heapContext = HeapContext.getModHeaps(goal.proof().getServices(), inst.transaction);
 
 	//prepare heapBefore_method
 
-        Map<LocationVariable,LocationVariable> atPreVars = HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
+        Map<LocationVariable,LocationVariable> atPreVars = computeAtPreVars(heapContext, services, inst);
         for(LocationVariable v : atPreVars.values()) {
      	  goal.addProgramVariable(v);
         }
@@ -579,10 +580,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         Map<LocationVariable,Term> atPres = HeapContext.getAtPres(atPreVars, services);
 
         //create variables for result and exception
-        final ProgramVariable resultVar
-        	= inst.pm.isConstructor()
-        	  ? TB.selfVar(services, inst.staticType, true)
-                  : TB.resultVar(services, inst.pm, true);
+        final ProgramVariable resultVar = computeResultVar(inst, services); 
         if(resultVar != null) {
             goal.addProgramVariable(resultVar);
         }
@@ -595,20 +593,12 @@ public final class UseOperationContractRule implements BuiltInRule {
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         //translate the contract
         final Term baseHeapTerm = TB.getBaseHeap(services);
-        final Term contractSelf
-        	= OpReplacer.replace(baseHeapTerm,
-        		             atPres.get(baseHeap),
-        		             inst.pm.isConstructor()
-        		               ? TB.var(resultVar)
-        		               : inst.actualSelf);
-        final ImmutableList<Term> contractParams
-        	= OpReplacer.replace(baseHeapTerm,
-        			    atPres.get(baseHeap),
-        			    inst.actualParams);
+        final ImmutableList<Term> contractParams = computeParams(baseHeapTerm, atPres, baseHeap, inst);
         final Term contractResult
         	= inst.pm.isConstructor() || resultVar == null
         	  ? null
                   : TB.var(resultVar);
+        final Term contractSelf = computeSelf(baseHeapTerm, atPres, baseHeap, inst, contractResult == null && resultVar != null ? TB.var(resultVar) : contractResult);
         Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable h : heapContext) {
            heapTerms.put(h, TB.var(h));
@@ -754,8 +744,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 		          .getPOForProof(goal.proof());
 	final Term mbyOk;
 	if(po != null && po.getMbyAtPre() != null && mby != null ) {
-    	mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
-    			       TB.lt(mby, po.getMbyAtPre(), services));
+//    	mbyOk = TB.and(TB.leq(TB.zero(services), mby, services), 
+//    			       TB.lt(mby, po.getMbyAtPre(), services));
+	    mbyOk = TB.prec(mby, po.getMbyAtPre(), services);
 	} else {
 	    mbyOk = TB.tt();
 	}
@@ -824,6 +815,10 @@ public final class UseOperationContractRule implements BuiltInRule {
             nullGoal.changeFormula(new SequentFormula(TB.apply(inst.u, actualSelfNotNull, null)),
         	                   ruleApp.posInOccurrence());
         }
+        if (TermLabelWorkerManagement.hasInstantiators(services)) {
+           TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, nullGoal);
+        }
+
 
         //create justification
         final RuleJustificationBySpec just
@@ -836,7 +831,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
 
-    @Override
+   @Override
     public Name name() {
         return NAME;
     }
@@ -869,6 +864,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	public final MethodOrConstructorReference mr;
 	public final IProgramMethod pm;
 	public final ImmutableList<Term> actualParams;
+	public final boolean transaction;
 
 	public Instantiation(Term u,
 			     Term progPost,
@@ -878,7 +874,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 			     KeYJavaType staticType,
 			     MethodOrConstructorReference mr,
 			     IProgramMethod pm,
-			     ImmutableList<Term> actualParams) {
+			     ImmutableList<Term> actualParams,
+			     boolean transaction) {
 	    assert u != null;
 	    assert u.sort() == Sort.UPDATE;
 	    assert progPost != null;
@@ -896,6 +893,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    this.mr = mr;
 	    this.pm = pm;
 	    this.actualParams = actualParams;
+	    this.transaction = transaction;
 	}
     }
 
@@ -906,6 +904,32 @@ public final class UseOperationContractRule implements BuiltInRule {
 		return new ContractRuleApp(this, pos);
     }
 
+   public static Map<LocationVariable, LocationVariable> computeAtPreVars(List<LocationVariable> heapContext, 
+                                                                          Services services, 
+                                                                          Instantiation inst) {
+      return HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
+   }
 
+   public static Term computeSelf(Term baseHeapTerm, 
+                                  Map<LocationVariable,Term> atPres, 
+                                  LocationVariable baseHeap, 
+                                  Instantiation inst, 
+                                  Term resultTerm) {
+      return OpReplacer.replace(baseHeapTerm,
+                                atPres.get(baseHeap),
+                                inst.pm.isConstructor() ? resultTerm : inst.actualSelf);
+   }
 
+   public static ImmutableList<Term> computeParams(Term baseHeapTerm, 
+                                                   Map<LocationVariable,Term> atPres, 
+                                                   LocationVariable baseHeap, 
+                                                   Instantiation inst) {
+      return OpReplacer.replace(baseHeapTerm, atPres.get(baseHeap), inst.actualParams);
+   }
+
+   public static ProgramVariable computeResultVar(Instantiation inst, Services services) {
+      return inst.pm.isConstructor() ? 
+             TB.selfVar(services, inst.staticType, true) : 
+             TB.resultVar(services, inst.pm, true);
+   }
 }

@@ -39,6 +39,666 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: examples/_testcase/set/useLoopInvariantAndOperationContractStrictlyPure
+    */
+   public void testLoopInvariantAndOperationContractStrictlyPure() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantAndOperationContractStrictlyPure/test/IndexOf.java", 
+                "IndexOf", 
+                "indexOf", 
+                null,
+                "examples/_testcase/set/useLoopInvariantAndOperationContractStrictlyPure/oracle/IndexOf.xml",
+                false,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainVoidMethod() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainVoidMethod", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainVoidMethod.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainNoArgs() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainNoArgs", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainNoArgs.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainResult() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainResult", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainResult.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainResultNotSpecified() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainResultNotSpecified", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainResultNotSpecified.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainExceptinalVoid() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainExceptinalVoid", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainExceptinalVoid.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainExceptinalUnused() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainExceptinalUnused", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainExceptinalUnused.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainExceptinal() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainExceptinal", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainExceptinal.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainBooleanResultUnused() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainBooleanResultUnused", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainBooleanResultUnused.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainBooleanResultUnspecifiedUnused() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainBooleanResultUnspecifiedUnused", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainBooleanResultUnspecifiedUnused.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainExceptionalConstructor() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainExceptionalConstructor", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainExceptionalConstructor.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainConstructor() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainConstructor", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainConstructor.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainOnObject() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainOnObject", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainOnObject.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainVoidMethod() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainVoidMethod", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainVoidMethod.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainNoArgs() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainNoArgs", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainNoArgs.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainResult() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainResult", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainResult.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainResultNotSpecified() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainResultNotSpecified", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainResultNotSpecified.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainExceptinalVoid() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainExceptinalVoid", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainExceptinalVoid.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainExceptinalUnused() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainExceptinalUnused", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainExceptinalUnused.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainExceptinal() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainExceptinal", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainExceptinal.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainBooleanResultUnused() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainBooleanResultUnused", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainBooleanResultUnused.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainBooleanResultUnspecifiedUnused() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainBooleanResultUnspecifiedUnused", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainBooleanResultUnspecifiedUnused.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainExceptionalConstructor() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainExceptionalConstructor", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainExceptionalConstructor.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainConstructor() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainConstructor", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainConstructor.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainOnObject() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainOnObject", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainOnObject.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/verifiedTest
+    */
+   public void testVerifiedTest_notLoop() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/verifiedTest/test/VerifiedTest.java", 
+                "VerifiedTest[VerifiedTest::notLoop(int)].JML operation contract.0", 
+                "examples/_testcase/set/verifiedTest/oracle/VerifiedTest_notLoop.xml",
+                false,
+                false,
+                false,
+                ALL_IN_ONE_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+
+   /**
+    * Tests example: examples/_testcase/set/verifiedTest
+    */
+   public void testVerifiedTest_loop() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/verifiedTest/test/VerifiedTest.java", 
+                "VerifiedTest[VerifiedTest::loop(int)].JML operation contract.0", 
+                "examples/_testcase/set/verifiedTest/oracle/VerifiedTest_loop.xml",
+                false,
+                false,
+                false,
+                ALL_IN_ONE_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+
+   /**
+    * Tests example: examples/_testcase/set/verifiedTest
+    */
+   public void testVerifiedTest_notMagic() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/verifiedTest/test/VerifiedTest.java", 
+                "VerifiedTest[VerifiedTest::notMagic()].JML operation contract.0", 
+                "examples/_testcase/set/verifiedTest/oracle/VerifiedTest_notMagic.xml",
+                false,
+                false,
+                false,
+                ALL_IN_ONE_RUN,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+
+   /**
+    * Tests example: examples/_testcase/set/verifiedTest
+    */
+   public void testVerifiedTest_magic() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/verifiedTest/test/VerifiedTest.java", 
+                "VerifiedTest[VerifiedTest::magic()].JML operation contract.0", 
+                "examples/_testcase/set/verifiedTest/oracle/VerifiedTest_magic.xml",
+                false,
+                false,
+                false,
+                ALL_IN_ONE_RUN,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/verifiedTest
+    */
+   public void testVerifiedTest_notMagicException() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/verifiedTest/test/VerifiedTest.java", 
+                "VerifiedTest[VerifiedTest::notMagicException()].JML exceptional_behavior operation contract.0", 
+                "examples/_testcase/set/verifiedTest/oracle/VerifiedTest_notMagicException.xml",
+                false,
+                false,
+                false,
+                ALL_IN_ONE_RUN,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/verifiedTest
+    */
+   public void testVerifiedTest_magicException() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/verifiedTest/test/VerifiedTest.java", 
+                "VerifiedTest[VerifiedTest::magicException()].JML exceptional_behavior operation contract.0", 
+                "examples/_testcase/set/verifiedTest/oracle/VerifiedTest_magicException.xml",
+                false,
+                false,
+                false,
+                ALL_IN_ONE_RUN,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/methodCallReturnTests
+    */
+   public void testMethodCallReturnTests() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/methodCallReturnTests/test/MethodCallReturnTests.java", 
+                "MethodCallReturnTests", 
+                "main", 
+                null,
+                "examples/_testcase/set/methodCallReturnTests/oracle/MethodCallReturnTests.xml",
+                true,
+                true,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/useLoopInvariantArrayAverage
     */
    public void testUseLoopInvariantArrayAverage() throws Exception {
@@ -433,6 +1093,58 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "size", 
                 null,
                 "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/oracle/WhileWithMethodCallAsCondition_NoPreMethodContract.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantWhileWithLoopInvariantInCondition
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testWhileWithLoopInvariantInCondition() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantWhileWithLoopInvariantInCondition/test/WhileWithLoopInvariantInCondition.java", 
+                "WhileWithLoopInvariantInCondition", 
+                "size", 
+                null,
+                "examples/_testcase/set/useLoopInvariantWhileWithLoopInvariantInCondition/oracle/WhileWithLoopInvariantInCondition.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsConditionOnObject
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testWhileWithMethodCallAsConditionOnObject() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsConditionOnObject/test/WhileWithMethodCallAsConditionOnObject.java", 
+                "WhileWithMethodCallAsConditionOnObject", 
+                "size", 
+                null,
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsConditionOnObject/oracle/WhileWithMethodCallAsConditionOnObject.xml",
                 false,
                 true,
                 false,
@@ -1043,7 +1755,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    public void testVariablesUnknownTest() throws Exception {
       doSETTestAndDispose(keyRepDirectory, 
                           "examples/_testcase/set/variablesUnknownTest/test/UnknownTest.java", 
-                          "UnknownTest", 
+                          "endless.UnknownTest", 
                           "main", 
                           null,
                           "examples/_testcase/set/variablesUnknownTest/oracle/UnknownTest.xml",

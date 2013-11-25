@@ -97,11 +97,15 @@ public abstract class AbstractFeatureStrategy implements Strategy {
     }
 
     protected Feature add (Feature a, Feature b) {
-        return BinarySumFeature.createSum ( a, b );
+        return SumFeature.createSum ( a, b );
     }
 
     protected Feature add (Feature a, Feature b, Feature c) {
-        return TernarySumFeature.createSum ( a, b, c );
+        return SumFeature.createSum ( a, b, c );
+    }
+
+    protected Feature add (Feature... features) {
+        return SumFeature.createSum ( features );
     }
 
     protected TermFeature add (TermFeature a, TermFeature b) {
@@ -129,6 +133,14 @@ public abstract class AbstractFeatureStrategy implements Strategy {
         return or ( a, or ( b, c ) );
     }
     
+    protected Feature or(Feature... features) {
+        Feature orFeature = inftyConst();
+        for (Feature f : features) {
+            orFeature = or( orFeature, f);
+        }
+        return orFeature;
+    }
+
     protected Feature ifZero (Feature cond, Feature thenFeature) {
         return ShannonFeature.createConditionalBinary ( cond, thenFeature );
     }

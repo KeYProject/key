@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="WhileWithLoopInvariantInCondition.size(array);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
+         <callStackEntry path="/0"/>
+         <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
+            <callStackEntry path="/0"/>
+            <loopInvariant name="
+invariant: i &gt;= 0 &amp; (i &lt;= array.length &amp; result_1 = i);
+variant: javaSubInt(array.length, i)
+mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
+               <callStackEntry path="/0"/>
+               <branchCondition name="!(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
+  | i_0 &lt;= -1
+  &amp; array.length &gt;= 0
+  &amp; array.length &gt;= i_0
+  | !(     i_0 &gt;= 0
+         &amp; array.length &gt;= 0
+         &amp; array.length &gt;= i_0
+      -&gt; result_1_0 = i_0)
+  | !(     result_1_0 = i_0
+         &amp; i_0 &gt;= 0
+         &amp; array.length &gt;= 0
+         &amp; array.length &gt;= i_0
+      -&gt; wellFormed(heap) &amp; i = -1))" pathCondition="!(  array.length &gt;= 0
+  &amp; (    !i_0 = 0
+       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+         -&gt; result_1_0 = i_0)
+     | !(     i_0 &gt;= 0
+            &amp; result_1_0 = i_0
+            &amp; array.length &gt;= i_0
+         -&gt; wellFormed(heap) &amp; i = -1)))" pathConditionChanged="true" branchCondition="!(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
+  | i_0 &lt;= -1
+  &amp; array.length &gt;= 0
+  &amp; array.length &gt;= i_0
+  | !(     i_0 &gt;= 0
+         &amp; array.length &gt;= 0
+         &amp; array.length &gt;= i_0
+      -&gt; result_1_0 = i_0)
+  | !(     result_1_0 = i_0
+         &amp; i_0 &gt;= 0
+         &amp; array.length &gt;= 0
+         &amp; array.length &gt;= i_0
+      -&gt; wellFormed(heap) &amp; i = -1))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                  <callStackEntry path="/0"/>
+                  <branchCondition name="i_2 &lt;= -1 &amp; i_2_0 = -1" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0)
+       | !(     i_0 &gt;= 0
+              &amp; result_1_0 = i_0
+              &amp; array.length &gt;= i_0
+           -&gt; wellFormed(heap) &amp; i = -1))
+   &amp; (i_2 &lt;= -1 &amp; i_2_0 = -1)" pathConditionChanged="true" branchCondition="i_2 &lt;= -1 &amp; i_2_0 = -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                     <methodCall name="WhileWithLoopInvariantInCondition.goOnNice(array_3,i_3);" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0)
+       | !(     i_0 &gt;= 0
+              &amp; result_1_0 = i_0
+              &amp; array.length &gt;= i_0
+           -&gt; wellFormed(heap) &amp; i = -1))
+   &amp; (i_2 &lt;= -1 &amp; i_2_0 = -1)" pathConditionChanged="false">
+                        <callStackEntry path="/0"/>
+                        <loopInvariant name="
+invariant: i_3 = javaUnaryMinusInt(1);
+variant: i_3
+mod: false" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0)
+       | !(     i_0 &gt;= 0
+              &amp; result_1_0 = i_0
+              &amp; array.length &gt;= i_0
+           -&gt; wellFormed(heap) &amp; i = -1))
+   &amp; (i_2 &lt;= -1 &amp; i_2_0 = -1)" pathConditionChanged="false" initiallyValid="false">
+                           <callStackEntry path="/0"/>
+                           <callStackEntry path="/0/0/0/0/0/0/0"/>
+                           <branchCondition name="i_3 &lt;= -1 &amp; i_3_0 = -1" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0)
+       | !(     i_0 &gt;= 0
+              &amp; result_1_0 = i_0
+              &amp; array.length &gt;= i_0
+           -&gt; wellFormed(heap) &amp; i = -1))
+   &amp; (i_2 &lt;= -1 &amp; i_2_0 = -1)
+   &amp; (i_3 &lt;= -1 &amp; i_3_0 = -1)" pathConditionChanged="true" branchCondition="i_3 &lt;= -1 &amp; i_3_0 = -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                              <callStackEntry path="/0"/>
+                              <callStackEntry path="/0/0/0/0/0/0/0"/>
+                              <statement name="return true;" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0)
+       | !(     i_0 &gt;= 0
+              &amp; result_1_0 = i_0
+              &amp; array.length &gt;= i_0
+           -&gt; wellFormed(heap) &amp; i = -1))
+   &amp; (i_2 &lt;= -1 &amp; i_2_0 = -1)
+   &amp; (i_3 &lt;= -1 &amp; i_3_0 = -1)" pathConditionChanged="false">
+                                 <callStackEntry path="/0"/>
+                                 <callStackEntry path="/0/0/0/0/0/0/0"/>
+                                 <methodReturn name="&lt;return of WhileWithLoopInvariantInCondition.goOnNice(array_3,i_3);&gt;" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0)
+       | !(     i_0 &gt;= 0
+              &amp; result_1_0 = i_0
+              &amp; array.length &gt;= i_0
+           -&gt; wellFormed(heap) &amp; i = -1))
+   &amp; (i_2 &lt;= -1 &amp; i_2_0 = -1)
+   &amp; (i_3 &lt;= -1 &amp; i_3_0 = -1)" pathConditionChanged="false" isReturnValueComputed="false">
+                                    <callStackEntry path="/0"/>
+                                    <callStackEntry path="/0/0/0/0/0/0/0"/>
+                                    <statement name="result_1++;" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0)
+       | !(     i_0 &gt;= 0
+              &amp; result_1_0 = i_0
+              &amp; array.length &gt;= i_0
+           -&gt; wellFormed(heap) &amp; i = -1))
+   &amp; (i_2 &lt;= -1 &amp; i_2_0 = -1)
+   &amp; (i_3 &lt;= -1 &amp; i_3_0 = -1)" pathConditionChanged="false">
+                                       <callStackEntry path="/0"/>
+                                       <statement name="i++;" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0)
+       | !(     i_0 &gt;= 0
+              &amp; result_1_0 = i_0
+              &amp; array.length &gt;= i_0
+           -&gt; wellFormed(heap) &amp; i = -1))
+   &amp; (i_2 &lt;= -1 &amp; i_2_0 = -1)
+   &amp; (i_3 &lt;= -1 &amp; i_3_0 = -1)" pathConditionChanged="false">
+                                          <callStackEntry path="/0"/>
+                                          <termination name="&lt;loop body end&gt;" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0)
+       | !(     i_0 &gt;= 0
+              &amp; result_1_0 = i_0
+              &amp; array.length &gt;= i_0
+           -&gt; wellFormed(heap) &amp; i = -1))
+   &amp; (i_2 &lt;= -1 &amp; i_2_0 = -1)
+   &amp; (i_3 &lt;= -1 &amp; i_3_0 = -1)" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+                                          </termination>
+                                       </statement>
+                                    </statement>
+                                 </methodReturn>
+                              </statement>
+                           </branchCondition>
+                        </loopInvariant>
+                     </methodCall>
+                  </branchCondition>
+               </branchCondition>
+               <branchCondition name="!(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
+  | i_0 &lt;= -1
+  &amp; array.length &gt;= 0
+  &amp; array.length &gt;= i_0
+  | !(     i_0 &gt;= 0
+         &amp; array.length &gt;= 0
+         &amp; array.length &gt;= i_0
+      -&gt; result_1_0 = i_0)
+  | result_1_0 = i_0
+  &amp; i_0 &gt;= 0
+  &amp; array.length &gt;= 0
+  &amp; array.length &gt;= i_0
+  &amp; wellFormed(anon_heap_loop_4&lt;&lt;anonHeapFunction&gt;&gt;)
+  &amp; i_5 = -1
+  | !(     result_1_0 = i_0
+         &amp; i_0 &gt;= 0
+         &amp; array.length &gt;= 0
+         &amp; array.length &gt;= i_0
+      -&gt; wellFormed(heap) &amp; i = -1))" pathCondition="!(  array.length &gt;= 0
+  &amp; (    !i_0 = 0
+       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+         -&gt; result_1_0 = i_0)
+     | wellFormed(anon_heap_loop_4&lt;&lt;anonHeapFunction&gt;&gt;)
+     &amp; i_0 &gt;= 0
+     &amp; i_5 = -1
+     &amp; result_1_0 = i_0
+     &amp; array.length &gt;= i_0
+     | !(     i_0 &gt;= 0
+            &amp; result_1_0 = i_0
+            &amp; array.length &gt;= i_0
+         -&gt; wellFormed(heap) &amp; i = -1)))" pathConditionChanged="true" branchCondition="!(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
+  | i_0 &lt;= -1
+  &amp; array.length &gt;= 0
+  &amp; array.length &gt;= i_0
+  | !(     i_0 &gt;= 0
+         &amp; array.length &gt;= 0
+         &amp; array.length &gt;= i_0
+      -&gt; result_1_0 = i_0)
+  | result_1_0 = i_0
+  &amp; i_0 &gt;= 0
+  &amp; array.length &gt;= 0
+  &amp; array.length &gt;= i_0
+  &amp; wellFormed(anon_heap_loop_4&lt;&lt;anonHeapFunction&gt;&gt;)
+  &amp; i_5 = -1
+  | !(     result_1_0 = i_0
+         &amp; i_0 &gt;= 0
+         &amp; array.length &gt;= 0
+         &amp; array.length &gt;= i_0
+      -&gt; wellFormed(heap) &amp; i = -1))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                  <callStackEntry path="/0"/>
+                  <statement name="return result_1;" pathCondition="!(  array.length &gt;= 0
+  &amp; (    !i_0 = 0
+       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+         -&gt; result_1_0 = i_0)
+     | wellFormed(anon_heap_loop_4&lt;&lt;anonHeapFunction&gt;&gt;)
+     &amp; i_0 &gt;= 0
+     &amp; i_5 = -1
+     &amp; result_1_0 = i_0
+     &amp; array.length &gt;= i_0
+     | !(     i_0 &gt;= 0
+            &amp; result_1_0 = i_0
+            &amp; array.length &gt;= i_0
+         -&gt; wellFormed(heap) &amp; i = -1)))" pathConditionChanged="false">
+                     <callStackEntry path="/0"/>
+                  </statement>
+               </branchCondition>
+            </loopInvariant>
+         </statement>
+      </statement>
+   </methodCall>
+</start>

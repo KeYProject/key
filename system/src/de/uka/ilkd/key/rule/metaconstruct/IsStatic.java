@@ -15,9 +15,9 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -45,10 +45,10 @@ public class IsStatic extends ProgramTransformer{
 					    SVInstantiations svInst) {
 	if(pe instanceof VariableReference){
 	    if(((VariableReference) pe).getProgramVariable().isStatic()){
-		return BooleanLiteral.TRUE;
+		return KeYJavaASTFactory.trueLiteral();
 	    }
 	}
-	return BooleanLiteral.FALSE;
+	return KeYJavaASTFactory.falseLiteral();
     }
 }
 

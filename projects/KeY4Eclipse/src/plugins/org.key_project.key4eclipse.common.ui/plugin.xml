@@ -5,6 +5,7 @@
    <extension-point id="org.key_project.key4eclipse.common.ui.methodStarter" name="Method Starter" schema="schema/org.key_project.key4eclipse.common.ui.methodStarter.exsd"/>
    <extension-point id="org.key_project.key4eclipse.common.ui.fileStarter" name="File Starter" schema="schema/org.key_project.key4eclipse.common.ui.fileStarter.exsd"/>
    <extension-point id="org.key_project.key4eclipse.common.ui.projectStarter" name="Project Starter" schema="schema/org.key_project.key4eclipse.common.ui.projectStarter.exsd"/>
+   <extension-point id="org.key_project.key4eclipse.common.ui.proofStarter" name="Proof Starter" schema="schema/org.key_project.key4eclipse.common.ui.proofStarter.exsd"/>
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
@@ -572,6 +573,13 @@
             properties="projectStarterAvailable"
             type="java.lang.Object">
       </propertyTester>
+      <propertyTester
+            class="org.key_project.key4eclipse.common.ui.expression.ProofStarterAvailablePropertyTester"
+            id="org.key_project.key4eclipse.common.ui.expression.ProofStarterAvailablePropertyTester"
+            namespace="org.key_project.key4eclipse.common.ui"
+            properties="proofStarterAvailable"
+            type="java.lang.Object">
+      </propertyTester>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
@@ -584,6 +592,12 @@
             id="org.key_project.key4eclipse.common.ui.keyTextEditor"
             name="KeY Text Editor">
       </editor>
+   </extension>
+   <extension
+         point="org.key_project.util.setupParticipants">
+      <participant
+            class="org.key_project.key4eclipse.common.ui.setup.TacletOptionsSetupParticipant">
+      </participant>
    </extension>
 
 </plugin>

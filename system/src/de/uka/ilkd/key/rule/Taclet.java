@@ -23,8 +23,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.configuration.LabelSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
@@ -51,9 +49,9 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.Debug;
@@ -845,35 +843,12 @@ public abstract class Taclet implements Rule, Named {
 	final SyntacticalReplaceVisitor srVisitor = 
 	    new SyntacticalReplaceVisitor(services,
                                      mc.getInstantiations(),
-                                     new TermLabelWorkerManagement(applicationPosInOccurrence, this, getLabelInstantiators(services)));
+                                     new TermLabelWorkerManagement(applicationPosInOccurrence, this, TermLabelWorkerManagement.getLabelInstantiators(services)));
 	term.execPostOrder(srVisitor);
 
 	return srVisitor.getTerm();
     }
     
-    /**
-     * Returns the {@link ITermLabelWorker} to use.
-     * @param services The {@link Services} to extract {@link ITermLabelWorker} from.
-     * @return The {@link ITermLabelWorker} to use or {@code null} if no {@link ITermLabelWorker} are available.
-     */
-    protected ImmutableList<ITermLabelWorker> getLabelInstantiators(Services services) {
-       ImmutableList<ITermLabelWorker> result = null;
-       if (services != null) {
-          Proof proof = services.getProof();
-          if (proof != null) {
-             ProofSettings settings = proof.getSettings();
-             if (settings != null) {
-                LabelSettings labelSettings = settings.getLabelSettings();
-                if (labelSettings != null) {
-                   result = labelSettings.getLabelInstantiators();
-                }
-             }
-          }
-       }
-       return result;
-    }
-    
-
     /**
      * adds SequentFormula to antecedent or succedent depending on
      * position information or the boolean antec 
@@ -1294,11 +1269,12 @@ public abstract class Taclet implements Rule, Named {
      * in this taclet (that is, these schema variables occur as
      * arguments of a substitution operator)
      */
-    public SchemaVariable getNameCorrespondent ( SchemaVariable p ) {
+    public SchemaVariable getNameCorrespondent ( SchemaVariable p,
+                                                 Services services) {
 	// should be synchronized
 	if ( svNameCorrespondences == null ) {
 	    final SVNameCorrespondenceCollector c =
-		new SVNameCorrespondenceCollector ();
+		new SVNameCorrespondenceCollector (services.getTypeConverter().getHeapLDT());
 	    c.visit ( this, true );
 	    svNameCorrespondences = c.getCorrespondences ();
 	}

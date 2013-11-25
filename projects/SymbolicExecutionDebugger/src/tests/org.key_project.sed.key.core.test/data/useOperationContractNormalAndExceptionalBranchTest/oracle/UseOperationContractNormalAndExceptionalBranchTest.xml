@@ -1,48 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_91fd6161-5a03-4508-96cc-aceca98bdaa4" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_863ce224-201b-4b0f-b5a4-7fcf37230b49" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_5471389e-bb27-4c71-ad76-c6dd4ab150a1" name="UseOperationContractNormalAndExceptionalBranchTest.main(value);" pathCondition="true" lineNumber="-1" charStart="88" charEnd="92">
-            <sedStatement xml:id="_05bdce59-2d47-4c0e-8a5f-a890b5d9185e" name="int magicNumber = magic(value);" pathCondition="true" lineNumber="-1" charStart="119" charEnd="150">
-               <sedUseOperationContract xml:id="_d3958b14-edda-4b55-a88b-6faa9a731f3d" name="result = magic(x) catch(exc)
-pre: x &lt; 0 &amp; x &gt;= javaUnaryMinusInt(10)
-| x &lt; javaUnaryMinusInt(10)
-| x &gt;= 0
-&amp; x &lt; 10
-| x &gt;= 10
-post: (   x &lt; 0 &amp; x &gt;= javaUnaryMinusInt(10)
-   -&gt;   !exc = null
-      &amp; (    java.lang.RuntimeException::instance(exc)
+   <sedTarget xml:id="_15cd657b-d00d-46bf-994b-341d6bb8ed55" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_d26c69b9-035c-4e5d-b244-4d636d52df8e" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_6c6afd02-d9f4-4a61-b192-affd7520a8f3" name="UseOperationContractNormalAndExceptionalBranchTest.main(value);" pathCondition="true" lineNumber="-1" charStart="88" charEnd="92">
+            <sedStatement xml:id="_08d853c4-1b00-42ec-94bf-33b80ce4a95a" name="int magicNumber = magic(value);" pathCondition="true" lineNumber="-1" charStart="119" charEnd="150">
+               <sedMethodContract xml:id="_e43fb862-8f3f-49c5-80ab-f227c707db6c" name="result_0 = magic(value) catch(exc_0)
+pre: value &lt; 0 &amp; value &gt;= javaUnaryMinusInt(10)
+| value &lt; javaUnaryMinusInt(10)
+| value &gt;= 0
+&amp; value &lt; 10
+| value &gt;= 10
+post: (   value &lt; 0 &amp; value &gt;= javaUnaryMinusInt(10)
+   -&gt;   !exc_0 = null
+      &amp; (    java.lang.RuntimeException::instance(exc_0)
            = TRUE
-         | java.lang.Exception::instance(exc) = TRUE))
-&amp; (   x &lt; javaUnaryMinusInt(10)
-   -&gt;   !exc = null
-      &amp; (    java.lang.RuntimeException::instance(exc)
+         | java.lang.Exception::instance(exc_0) = TRUE))
+&amp; (   value &lt; javaUnaryMinusInt(10)
+   -&gt;   !exc_0 = null
+      &amp; (    java.lang.RuntimeException::instance(exc_0)
            = TRUE
-         | java.lang.Exception::instance(exc) = TRUE))
-&amp; (x &gt;= 0 &amp; x &lt; 10 -&gt; result = 42 &amp; exc = null)
-&amp; (x &gt;= 10 -&gt; result = 84 &amp; exc = null)
-mod: allLocs \cup allLocs \cup allLocs \cup allLocs
+         | java.lang.Exception::instance(exc_0) = TRUE))
+&amp; (   value &gt;= 0 &amp; value &lt; 10
+   -&gt; result_0 = 42 &amp; exc_0 = null)
+&amp; (value &gt;= 10 -&gt; result_0 = 84 &amp; exc_0 = null)
+mod: \if (true)
+         \then (     \if (true)
+                         \then (     \if (true)
+                                         \then (allLocs)
+                                         \else (allLocs)
+                                \cap \if (  value
+                                          &lt; javaUnaryMinusInt(10))
+                                         \then (allLocs)
+                                         \else (allLocs))
+                         \else (allLocs)
+                \cap \if (value &gt;= 0 &amp; value &lt; 10)
+                         \then (allLocs)
+                         \else (allLocs))
+         \else (allLocs)
+\cap \if (value &gt;= 10)
+         \then (allLocs)
+         \else (allLocs)
 termination: diamond" pathCondition="true" lineNumber="-1" charStart="755" charEnd="760" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-                  <sedBranchCondition xml:id="_f8907dd1-8637-46dd-a7d3-a14d87e7ee34" name="Post (magic): !value &lt;= -1" pathCondition="!value &lt;= -1">
-                     <sedStatement xml:id="_edf61ccc-abae-4d3b-99b0-2c118afe4460" name="int magicNumberCopy = magicNumber;" pathCondition="!value &lt;= -1" lineNumber="-1" charStart="155" charEnd="189">
-                        <sedStatement xml:id="_3a414e6a-4082-4a1b-b417-d49dde654ef5" name="return magicNumber+magicNumberCopy;" pathCondition="!value &lt;= -1" lineNumber="-1" charStart="194" charEnd="231">
-                           <sedMethodReturn xml:id="_1acf3729-7a04-4801-a1fc-9135afb99232" name="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" pathCondition="!value &lt;= -1" lineNumber="-1" charStart="88" charEnd="92">
-                              <sedTermination xml:id="_0870db73-eb03-4a5a-bbe2-48a8cc156674" name="&lt;end&gt;" pathCondition="!value &lt;= -1">
+                  <sedBranchCondition xml:id="_b7c13465-2c28-4e13-b028-a4fa1341a869" name="Post (magic): value &gt;  -1" pathCondition="value &gt;  -1">
+                     <sedStatement xml:id="_c26e085c-85e3-4afe-a16a-61f87372bbd8" name="int magicNumberCopy = magicNumber;" pathCondition="value &gt;  -1" lineNumber="-1" charStart="155" charEnd="189">
+                        <sedStatement xml:id="_dd115a9a-bc30-4d9a-9683-2c8402789713" name="return magicNumber+magicNumberCopy;" pathCondition="value &gt;  -1" lineNumber="-1" charStart="194" charEnd="231">
+                           <sedMethodReturn xml:id="_8a78bf3f-43f1-496a-b980-71fcfbe72a60" name="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" pathCondition="value &gt;  -1" lineNumber="-1" charStart="88" charEnd="92">
+                              <sedTermination xml:id="_d413f433-d513-4296-85ba-274a8e681514" name="&lt;end&gt;" pathCondition="value &gt;  -1" verified="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_9432d8ce-decc-4bca-b140-a7f9e3101b2f" name="Exceptional Post (magic): !value &gt;= 0" pathCondition="!value &gt;= 0">
-                     <sedStatement xml:id="_6238adad-584c-483b-b271-b9f7b1288002" name="return -1;" pathCondition="!value &gt;= 0" lineNumber="-1" charStart="266" charEnd="276">
-                        <sedMethodReturn xml:id="_d20eeab5-98a1-4b48-a0ee-54c1a297785a" name="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" pathCondition="!value &gt;= 0" lineNumber="-1" charStart="88" charEnd="92">
-                           <sedTermination xml:id="_49c2873b-3fe5-4eb8-8943-8844abf5aac9" name="&lt;end&gt;" pathCondition="!value &gt;= 0">
+                  <sedBranchCondition xml:id="_3f8dac49-aef5-4b79-a821-6223087ba505" name="Exceptional Post (magic): value &lt; 0" pathCondition="value &lt; 0">
+                     <sedStatement xml:id="_1290fbff-0d60-4dd3-9e68-c56e3bb3945e" name="return -1;" pathCondition="value &lt; 0" lineNumber="-1" charStart="266" charEnd="276">
+                        <sedMethodReturn xml:id="_85c8a40a-8b6f-4110-9c73-d60c7e8fbd2b" name="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" pathCondition="value &lt; 0" lineNumber="-1" charStart="88" charEnd="92">
+                           <sedTermination xml:id="_3874d2cc-665e-4775-8137-76a14c0cae29" name="&lt;end&gt;" pathCondition="value &lt; 0" verified="true">
                            </sedTermination>
                         </sedMethodReturn>
                      </sedStatement>
                   </sedBranchCondition>
-               </sedUseOperationContract>
+               </sedMethodContract>
             </sedStatement>
          </sedMethodCall>
       </sedThread>

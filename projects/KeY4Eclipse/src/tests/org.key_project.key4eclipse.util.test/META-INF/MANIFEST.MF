@@ -30,5 +30,6 @@ Export-Package: org.key_project.util.test.editor,
  org.key_project.util.test.perspective,
  org.key_project.util.test.suite,
  org.key_project.util.test.suite.swtbot,
+ org.key_project.util.test.testcase,
  org.key_project.util.test.util,
  org.key_project.util.test.view

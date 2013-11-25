@@ -1,48 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="QueryInPrecondition.main(x,y);" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicValue = magic(x,y);" pathCondition="true" pathConditionChanged="false">
-         <useOperationContract name="result = magic(x, y) catch(exc)
+         <operationContract name="result_0 = magic(x, y) catch(exc_0)
 pre: xPre(x) = TRUE &amp; y &lt; 0 | !(xPre(x) = TRUE &amp; y &lt; 0)
-post: (   heapAtPre[xPre(x)] = TRUE &amp; y &lt; 0
-   -&gt; result = subFirst(x, y) &amp; exc = null)
-&amp; (   !(heapAtPre[xPre(x)] = TRUE &amp; y &lt; 0)
-   -&gt; result = subSecond(x, y) &amp; exc = null)
-mod: {}
+post: (   heapBefore_magic_0[xPre(x)] = TRUE &amp; y &lt; 0
+   -&gt; result_0 = subFirst(x, y) &amp; exc_0 = null)
+&amp; (   !(heapBefore_magic_0[xPre(x)] = TRUE &amp; y &lt; 0)
+   -&gt; result_0 = subSecond(x, y) &amp; exc_0 = null)
+mod: \if (true)  \then ({})  \else (allLocs)
+\cap \if (!(xPre(x) = TRUE &amp; y &lt; 0))
+         \then ({})
+         \else (allLocs)
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-            <branchCondition name="!x &lt;= -1" pathCondition="!x &lt;= -1" pathConditionChanged="true" branchCondition="!x &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <branchCondition name="!y &gt;= 0" pathCondition="x &gt;= 0 &amp; y &lt;= -1" pathConditionChanged="true" branchCondition="!y &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchCondition name="x &gt;  -1" pathCondition="x &gt;  -1" pathConditionChanged="true" branchCondition="x &gt;  -1" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <branchCondition name="y &lt; 0" pathCondition="x &gt;= 0 &amp; y &lt;= -1" pathConditionChanged="true" branchCondition="y &lt; 0" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return magicValue;" pathCondition="x &gt;= 0 &amp; y &lt;= -1" pathConditionChanged="false">
                      <methodReturn name="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="x &gt;= 0 &amp; y &lt;= -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
                         <methodReturnValue name="42" returnValueString="42" hasCondition="false">
                         </methodReturnValue>
-                        <termination name="&lt;end&gt;" pathCondition="x &gt;= 0 &amp; y &lt;= -1" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="x &gt;= 0 &amp; y &lt;= -1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
                </branchCondition>
-               <branchCondition name="!y &lt;= -1" pathCondition="x &gt;= 0 &amp; y &gt;= 0" pathConditionChanged="true" branchCondition="!y &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <branchCondition name="y &gt;  -1" pathCondition="x &gt;= 0 &amp; y &gt;= 0" pathConditionChanged="true" branchCondition="y &gt;  -1" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return magicValue;" pathCondition="x &gt;= 0 &amp; y &gt;= 0" pathConditionChanged="false">
                      <methodReturn name="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="x &gt;= 0 &amp; y &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -4711 as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
                         <methodReturnValue name="-4711" returnValueString="-4711" hasCondition="false">
                         </methodReturnValue>
-                        <termination name="&lt;end&gt;" pathCondition="x &gt;= 0 &amp; y &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="x &gt;= 0 &amp; y &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
                </branchCondition>
             </branchCondition>
-            <branchCondition name="!x &gt;= 0" pathCondition="!x &gt;= 0" pathConditionChanged="true" branchCondition="!x &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <statement name="return magicValue;" pathCondition="!x &gt;= 0" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="!x &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -4711 as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
+            <branchCondition name="x &lt; 0" pathCondition="x &lt; 0" pathConditionChanged="true" branchCondition="x &lt; 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="return magicValue;" pathCondition="x &lt; 0" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="x &lt; 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -4711 as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
                      <methodReturnValue name="-4711" returnValueString="-4711" hasCondition="false">
                      </methodReturnValue>
-                     <termination name="&lt;end&gt;" pathCondition="!x &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL">
+                     <termination name="&lt;end&gt;" pathCondition="x &lt; 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>
             </branchCondition>
-         </useOperationContract>
+         </operationContract>
       </statement>
    </methodCall>
-</startNode>
+</start>

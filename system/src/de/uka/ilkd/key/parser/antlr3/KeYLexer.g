@@ -282,6 +282,7 @@ lexer grammar KeYLexer;
 	DIFFERENT : '\\different';		
 	METADISJOINT : '\\metaDisjoint';
 	ISTHISREFERENCE:'\\isThisReference';	        
+	DIFFERENTFIELDS:'\\differentFields';	        
 	ISREFERENCE:'\\isReference';	        
 	ISREFERENCEARRAY:'\\isReferenceArray';
 	ISSUBTYPE : '\\sub';	

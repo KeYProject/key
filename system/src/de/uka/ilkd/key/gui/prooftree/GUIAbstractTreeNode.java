@@ -71,10 +71,8 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
     public TreeNode[] getPath() {
 	LinkedList<TreeNode> path = new LinkedList<TreeNode>();
 	TreeNode n = this;
-	//	System.out.println("1: "+n);
 	path.addFirst(n);
 	while ( ( n = n.getParent() ) != null ) {
-	    //	    System.out.println("2: "+n+ "    "+path);
 	    path.addFirst(n);
 	}
 	return path.toArray(new TreeNode[path.size()]);

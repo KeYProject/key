@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.rule.label.ITermLabelWorker;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -60,6 +61,11 @@ public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabe
       return instantiatedLabels;
    }
    
+   /**
+    * Checks if the {@link Operator} is supported.
+    * @param newTermOp The {@link Operator} to check.
+    * @return {@code true} is supported; add labels if required, {@code false} is not supported; add no labels
+    */
    protected boolean checkOperator(Operator newTermOp) {
       return newTermOp instanceof Modality;
    }
@@ -68,33 +74,28 @@ public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabe
     * {@inheritDoc}
     */
    @Override
-   public List<ITermLabel> updateLabels(Term tacletTerm, 
-                                        PosInOccurrence applicationPosInOccurrence, 
-                                        Term termToUpdate, 
-                                        Rule rule,
-                                        Goal goal) {
+   public void updateLabels(Term tacletTerm, 
+                            PosInOccurrence applicationPosInOccurrence, 
+                            Term termToUpdate, 
+                            Rule rule,
+                            Goal goal,
+                            List<ITermLabel> newLabels) {
+      // Remove label from the pre branch of the UseOperationContractRule
       if (rule instanceof UseOperationContractRule &&
-          goal.node().getNodeInfo().getBranchLabel().startsWith("Pre")) {
-         return null; // Throw symbolic execution labels away in pre branch of use operation contract rule
+          (goal.node().getNodeInfo().getBranchLabel().startsWith("Pre") || 
+           goal.node().getNodeInfo().getBranchLabel().startsWith("Null reference"))) {
+         ITermLabel termLabel = getTermLabel(termToUpdate);
+         if (termLabel != null) {
+            newLabels.remove(termLabel);
+         }
       }
-      else {
-         return keepLabels(termToUpdate);
+      if (rule instanceof WhileInvariantRule &&
+          goal.node().getNodeInfo().getBranchLabel().startsWith("Invariant Initially Valid")) {
+         ITermLabel termLabel = getTermLabel(termToUpdate);
+         if (termLabel != null) {
+            newLabels.remove(termLabel);
+         }
       }
-   }
-   
-   /**
-    * Keeps the managed {@link ITermLabel} available via {@link #getTermLabel(Term)}
-    * if available.
-    * @param termToUpdate The {@link Term} to update.
-    * @return The {@link ITermLabel}s to keep.
-    */
-   protected List<ITermLabel> keepLabels(Term termToUpdate) {
-      List<ITermLabel> updatedLabels = new LinkedList<ITermLabel>();
-      ITermLabel termLabel = getTermLabel(termToUpdate);
-      if (termLabel != null && termToUpdate.containsLabel(termLabel)) {
-          updatedLabels.add(termLabel);
-      }
-      return updatedLabels;
    }
 
    /**

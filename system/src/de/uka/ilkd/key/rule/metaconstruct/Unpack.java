@@ -14,10 +14,10 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
@@ -51,11 +51,9 @@ public class Unpack extends ProgramTransformer {
 		astFor.getInitializers().get(i);
 	}
 
-	loopInitStatementList
-	[loopInitStatementList.length - 1] = new For(null,
-		astFor.getGuard(), 
-		astFor.getIForUpdates(), 
-		astFor.getBody());
-	return new StatementBlock(loopInitStatementList);
+	loopInitStatementList[loopInitStatementList.length - 1] = KeYJavaASTFactory
+		.forLoop(astFor.getGuard(), astFor.getIForUpdates(),
+			astFor.getBody());
+	return KeYJavaASTFactory.block(loopInitStatementList);
     }
 }

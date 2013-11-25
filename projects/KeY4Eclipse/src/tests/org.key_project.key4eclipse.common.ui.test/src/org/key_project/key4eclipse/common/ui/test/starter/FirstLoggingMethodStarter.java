@@ -14,14 +14,13 @@
 package org.key_project.key4eclipse.common.ui.test.starter;
 
 import org.eclipse.jdt.core.IMethod;
-import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
 import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 
 /**
- * {@link IGlobalStarter} which logs the calls of {@link #open(IMethod)}.
+ * {@link IMethodStarter} which logs the calls of {@link #open(IMethod)}.
  * @author Martin Hentschel
  */
 public class FirstLoggingMethodStarter implements IMethodStarter, ITestedStarter {

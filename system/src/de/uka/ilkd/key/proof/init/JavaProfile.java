@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
@@ -28,6 +29,8 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.label.ITermLabelWorker;
+import de.uka.ilkd.key.rule.label.SelectSkolemConstantTermLabelInstantiator;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
@@ -53,6 +56,8 @@ public class JavaProfile extends AbstractProfile {
     private final static StrategyFactory DEFAULT =
         new JavaCardDLStrategy.Factory();
 
+    private OneStepSimplifier oneStepSimpilifier;
+    
     protected JavaProfile(String standardRules, ImmutableSet<GoalChooserBuilder> gcb) {
         super(standardRules, gcb);
      }
@@ -78,7 +83,7 @@ public class JavaProfile extends AbstractProfile {
         builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE)
                                    .prepend(BlockContractRule.INSTANCE)
                                    .prepend(UseDependencyContractRule.INSTANCE)
-                                   .prepend(getInitialOneStepSimpilifier())
+                                   .prepend(getOneStepSimpilifier())
         			   //.prepend(PullOutConditionalsRule.INSTANCE)  // rule at the moment unsound
         			   .prepend(QueryExpand.INSTANCE);
   
@@ -101,8 +106,13 @@ public class JavaProfile extends AbstractProfile {
      * </p> 
      * @return The {@link OneStepSimplifier} instance to use.
      */
-    protected OneStepSimplifier getInitialOneStepSimpilifier() {
-       return OneStepSimplifier.INSTANCE;
+    public OneStepSimplifier getOneStepSimpilifier() {
+       synchronized (this) {
+          if (oneStepSimpilifier == null) {
+             oneStepSimpilifier = new OneStepSimplifier();
+          }
+          return oneStepSimpilifier;
+       }
     }
 
     /**
@@ -132,6 +142,16 @@ public class JavaProfile extends AbstractProfile {
      */
     public StrategyFactory getDefaultStrategyFactory() {
         return DEFAULT;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ImmutableList<ITermLabelWorker> computeLabelInstantiators() {
+       ImmutableList<ITermLabelWorker> result = ImmutableSLList.nil();
+       result = result.prepend(SelectSkolemConstantTermLabelInstantiator.INSTANCE);
+       return result;
     }
 
     /**

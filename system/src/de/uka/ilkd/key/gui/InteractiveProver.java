@@ -32,7 +32,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -91,7 +90,9 @@ public class InteractiveProver implements InterruptListener {
         applyStrategy = new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
         applyStrategy.addProverTaskObserver(mediator().getUI());
 
-        applyStrategy.addProverTaskObserver(AutoSaver.getInstance());
+        if (mediator.getAutoSaver() != null) {
+           applyStrategy.addProverTaskObserver(mediator.getAutoSaver());
+        }
     }
 
     /** returns the KeYMediator */
@@ -104,8 +105,8 @@ public class InteractiveProver implements InterruptListener {
      */
     public void setProof(Proof p) {
         proof = p;
-        if (p != null) { // Will be null if last proof is removed from user interface
-           AutoSaver.getInstance().setProof(p);
+        if (mediator.getAutoSaver() != null) {
+           mediator.getAutoSaver().setProof(p);
         }
     }
 
@@ -486,7 +487,7 @@ public class InteractiveProver implements InterruptListener {
         java.util.HashSet<Taclet> applicableRules = new java.util.HashSet<Taclet>();
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
         for (NoPosTacletApp app : tacletInstances) {
-            if (mediator().stupidMode()) {
+            if (mediator().minimizeInteraction()) {
                 ImmutableList<TacletApp> ifCandidates =
                         app.findIfFormulaInstantiations(
                                 mediator().getSelectedGoal().sequent(),

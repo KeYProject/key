@@ -44,12 +44,12 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -65,6 +65,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import de.uka.ilkd.key.util.MiscTools;
 
 
 public class KeYMediator {
@@ -93,36 +94,45 @@ public class KeYMediator {
 
     private KeYExceptionHandler defaultExceptionHandler;
 
-    private boolean stupidMode; // minimize user interaction
+    private boolean minimizeInteraction; // minimize user interaction
 
     private TacletFilter filterForInteractiveProving;
+    
+    /**
+     * The currently used {@link OneStepSimplifier} which has to be changed
+     * when the current {@link Proof} lives in a different {@link Profile}
+     * than the {@link Proof} before.
+     */
+    private OneStepSimplifier currentOneStepSimplifier;
+
+    /**
+     * An optional used {@link AutoSaver}.
+     */
+    private AutoSaver autoSaver;
 
 
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
-    */
-    public KeYMediator(UserInterface ui) {
-	this.ui             = ui;
+     */
+    public KeYMediator(UserInterface ui, boolean useAutoSaver) {
+    	this.ui             = ui;
+    	if (useAutoSaver) {
+    		autoSaver = new AutoSaver();
+    	}
 
-	notationInfo        = new NotationInfo();
-	proofListener       = new KeYMediatorProofListener();
-	proofTreeListener   = new KeYMediatorProofTreeListener();
-	keySelectionModel   = new KeYSelectionModel();
-	interactiveProver   = new InteractiveProver(this);
+    	notationInfo        = new NotationInfo();
+    	proofListener       = new KeYMediatorProofListener();
+    	proofTreeListener   = new KeYMediatorProofTreeListener();
+    	keySelectionModel   = new KeYSelectionModel();
+    	interactiveProver   = new InteractiveProver(this);
 
-	addRuleAppListener(proofListener);
-	addAutoModeListener(proofListener);
+    	addAutoModeListener(proofListener);
 
-	defaultExceptionHandler = new KeYRecoderExcHandler();
+    	defaultExceptionHandler = new KeYRecoderExcHandler();
 
-	// There may be other interruption listeners, but the interaction
-	// engine listens by default.
-	addInterruptedListener(interactiveProver);
-
-	// moved from layout main here; but does not actually belong here at all;
-	// we should get that rule to behave like a normal built-in rule
-	addKeYSelectionListener(OneStepSimplifier.INSTANCE);
-
+    	// There may be other interruption listeners, but the interaction
+    	// engine listens by default.
+    	addInterruptedListener(interactiveProver);
     }
 
 
@@ -208,12 +218,12 @@ public class KeYMediator {
     }
 
     /** simplified user interface? */
-    public boolean stupidMode() {
-       return stupidMode;
+    public boolean minimizeInteraction() {
+       return minimizeInteraction;
     }
 
-    public void setStupidMode(boolean b) {
-       stupidMode = b;
+    public void setMinimizeInteraction(boolean b) {
+       minimizeInteraction = b;
     }
 
     public boolean ensureProofLoaded() {
@@ -279,7 +289,9 @@ public class KeYMediator {
                                                         (proof.openGoals().size()+" open goals remain."));
                                 }
                         });
-        TermTacletAppIndexCacheSet.clearCache();
+        if (!proof.isDisposed()) {
+           proof.getServices().getCaches().getTermTacletAppIndexCache().clear();
+        }
         AbstractBetaFeature.clearCache();
         IfThenElseMalusFeature.clearCache();
     }
@@ -301,17 +313,34 @@ public class KeYMediator {
     }
 
 
-    private void setProofHelper(Proof p) {
-	if (getSelectedProof() != null) {
-	    getSelectedProof().removeProofTreeListener(proofTreeListener);
-	}
-	if (p!=null) notationInfo.setAbbrevMap(p.abbreviations());
-	Proof proof = p;
-	if (proof != null) {
-	    proof.addProofTreeListener(proofTreeListener);
-	    proof.mgt().setMediator(this);
-	}
-        keySelectionModel.setSelectedProof(proof);
+    private void setProofHelper(Proof newProof) {
+      Proof oldProof = getSelectedProof();
+      if (oldProof != null) {
+         oldProof.removeProofTreeListener(proofTreeListener);
+         oldProof.removeRuleAppListener(proofListener);
+      }
+      if (newProof != null) {
+         notationInfo.setAbbrevMap(newProof.abbreviations());
+      }
+      if (newProof != null) {
+         newProof.addProofTreeListener(proofTreeListener);
+         newProof.addRuleAppListener(proofListener);
+      }
+      
+      // moved from layout main here; but does not actually belong here at all;
+      // we should get that rule to behave like a normal built-in rule
+      OneStepSimplifier newSimplifier = MiscTools.findOneStepSimplifier(newProof);
+      if (currentOneStepSimplifier != newSimplifier) {
+         if (currentOneStepSimplifier != null) {
+            removeKeYSelectionListener(currentOneStepSimplifier);
+         }
+         currentOneStepSimplifier = newSimplifier;
+         if (currentOneStepSimplifier != null) {
+            addKeYSelectionListener(currentOneStepSimplifier);
+         }
+      }
+      
+      keySelectionModel.setSelectedProof(newProof);
     }
 
 
@@ -401,7 +430,7 @@ public class KeYMediator {
 	    TacletApp firstApp = it.next();
             boolean ifSeqInteraction =
                !firstApp.taclet().ifSequent().isEmpty() ;
-            if (stupidMode && !firstApp.complete()) {
+            if (minimizeInteraction && !firstApp.complete()) {
                 ImmutableList<TacletApp> ifSeqCandidates =
                     firstApp.findIfFormulaInstantiations(goal.sequent(),
 		        getServices());
@@ -556,14 +585,6 @@ public class KeYMediator {
      */
     public void removeGUIListener(GUIListener listener) {
 	listenerList.remove(GUIListener.class, listener);
-    }
-
-    public void addRuleAppListener(RuleAppListener listener) {
-	Goal.addRuleAppListener(listener);
-    }
-
-    public void removeRuleAppListener(RuleAppListener listener) {
-	Goal.removeRuleAppListener(listener);
     }
 
     public void addAutoModeListener(AutoModeListener listener) {
@@ -1022,4 +1043,12 @@ public class KeYMediator {
         return true;
 
     }
+
+   /**
+    * Returns the {@link AutoSaver} to use.
+    * @return The {@link AutoSaver} to use or {@code null} if no {@link AutoSaver} should be used.
+    */
+   public AutoSaver getAutoSaver() {
+      return autoSaver;
+   }
 }

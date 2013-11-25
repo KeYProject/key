@@ -34,7 +34,7 @@ public class FunctionalOperationContractCompletion implements InteractiveRuleApp
         Services services = goal.proof().getServices();
 
         if (forced) {
-            app = app.tryToInstantiate(goal);
+            app = app.forceInstantiate(goal);
             if (app.complete()) {
                 return app;
             }

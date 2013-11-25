@@ -31,6 +31,7 @@ import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.debug.core.model.IDisconnect;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
@@ -76,14 +77,14 @@ import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
 import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
+import org.key_project.sed.core.model.ISEDLoopInvariant;
 import org.key_project.sed.core.model.ISEDLoopStatement;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
+import org.key_project.sed.core.model.ISEDMethodContract;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.ISEDLoopInvariant;
-import org.key_project.sed.core.model.ISEDOperationContract;
 import org.key_project.sed.core.model.ISEDValue;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.LaunchUtil;
@@ -631,6 +632,31 @@ public final class TestSedCoreUtil {
          }
       });
    }
+   
+   /**
+    * Waits until the given {@link IDisconnect} is terminated.
+    * @param bot The {@link SWTBot} to use.
+    * @param disconnect The {@link IDisconnect} to wait for.
+    */
+   public static void waitUntilLaunchIsDisconnected(SWTBot bot, final IDisconnect disconnect) {
+      TestCase.assertNotNull(bot);
+      TestCase.assertNotNull(disconnect);
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return disconnect.isDisconnected();
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "ILaunch \"" + disconnect + "\" is not terminated.";
+         }
+      });
+   }
 
    /**
     * Waits until the {@link IDebugTarget} can suspend.
@@ -836,9 +862,9 @@ public final class TestSedCoreUtil {
             TestCase.assertTrue("Expected ISEDThread on " + ((ISEDThread)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDThread);
             compareThread((ISEDThread)expectedNext, (ISEDThread)currentNext, true, compareId);
          }
-         else if (expectedNext instanceof ISEDOperationContract) {
-            TestCase.assertTrue("Expected ISEDOperationContract on " + ((ISEDOperationContract)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDOperationContract);
-            compareOperationContract((ISEDOperationContract)expectedNext, (ISEDOperationContract)currentNext, true, compareId, compareVariables, compareCallStack);
+         else if (expectedNext instanceof ISEDMethodContract) {
+            TestCase.assertTrue("Expected ISEDMethodContract on " + ((ISEDMethodContract)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDMethodContract);
+            compareMethodContract((ISEDMethodContract)expectedNext, (ISEDMethodContract)currentNext, true, compareId, compareVariables, compareCallStack);
          }
          else if (expectedNext instanceof ISEDLoopInvariant) {
             TestCase.assertTrue("Expected ISEDLoopInvariant on " + ((ISEDLoopInvariant)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDLoopInvariant);
@@ -945,7 +971,7 @@ public final class TestSedCoreUtil {
                   compareLoopCondition((ISEDLoopCondition)expectedChildren[i], (ISEDLoopCondition)currentChildren[i], false, compareId, compareVariables, compareCallStack);
                }
                else if (expectedChildren[i] instanceof ISEDLoopStatement) {
-                  TestCase.assertTrue("Expected ISEDLoopNode on " + ((ISEDLoopStatement)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDLoopStatement);
+                  TestCase.assertTrue("Expected ISEDLoopStatement on " + ((ISEDLoopStatement)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDLoopStatement);
                   compareLoopStatement((ISEDLoopStatement)expectedChildren[i], (ISEDLoopStatement)currentChildren[i], false, compareId, compareVariables, compareCallStack);
                }
                else if (expectedChildren[i] instanceof ISEDMethodCall) {
@@ -968,9 +994,9 @@ public final class TestSedCoreUtil {
                   TestCase.assertTrue("Expected ISEDThread on " + ((ISEDThread)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDThread);
                   compareThread((ISEDThread)expectedChildren[i], (ISEDThread)currentChildren[i], true, compareVariables);
                }
-               else if (expectedChildren[i] instanceof ISEDOperationContract) {
-                  TestCase.assertTrue("Expected ISEDOperationContract on " + ((ISEDOperationContract)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDOperationContract);
-                  compareOperationContract((ISEDOperationContract)expectedChildren[i], (ISEDOperationContract)currentChildren[i], false, compareId, compareVariables, compareCallStack);
+               else if (expectedChildren[i] instanceof ISEDMethodContract) {
+                  TestCase.assertTrue("Expected ISEDMethodContract on " + ((ISEDMethodContract)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDMethodContract);
+                  compareMethodContract((ISEDMethodContract)expectedChildren[i], (ISEDMethodContract)currentChildren[i], false, compareId, compareVariables, compareCallStack);
                }
                else if (expectedChildren[i] instanceof ISEDLoopInvariant) {
                   TestCase.assertTrue("Expected ISEDLoopInvariant on " + ((ISEDLoopInvariant)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDLoopInvariant);
@@ -1399,17 +1425,17 @@ public final class TestSedCoreUtil {
    }
 
    /**
-    * Compares the given {@link ISEDOperationContract}s with each other.
-    * @param expected The expected {@link ISEDOperationContract}.
-    * @param current The current {@link ISEDOperationContract}.
+    * Compares the given {@link ISEDMethodContract}s with each other.
+    * @param expected The expected {@link ISEDMethodContract}.
+    * @param current The current {@link ISEDMethodContract}.
     * @param compareReferences Compare also the containment hierarchy?
     * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
     * @param compareVariables Compare variables?
     * @param compareCallStack Compare call stack?
     * @throws DebugException Occurred Exception.
     */
-   protected static void compareOperationContract(ISEDOperationContract expected, 
-                                                  ISEDOperationContract current, 
+   protected static void compareMethodContract(ISEDMethodContract expected, 
+                                                  ISEDMethodContract current, 
                                                   boolean compareReferences, 
                                                   boolean compareId, 
                                                   boolean compareVariables,
@@ -1459,6 +1485,7 @@ public final class TestSedCoreUtil {
                                             boolean compareVariables,
                                             boolean compareCallStack) throws DebugException {
       compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack);
+      assertEquals(expected.isVerified(), current.isVerified());
    }
    
    /**

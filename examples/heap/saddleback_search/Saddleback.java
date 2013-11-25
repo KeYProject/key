@@ -38,7 +38,7 @@ class Saddleback {
 	  @                     0<=j && j < array[0].length ;
 	  @      (i < x || j > y) ==> array[i][j] != value);
 	  @
-	  @ decreases array.length - x + y + 2;
+	  @ decreases array.length - x + y;
 	  @ modifies \nothing;
 	  @*/
 	while(x < array.length && y >= 0) {

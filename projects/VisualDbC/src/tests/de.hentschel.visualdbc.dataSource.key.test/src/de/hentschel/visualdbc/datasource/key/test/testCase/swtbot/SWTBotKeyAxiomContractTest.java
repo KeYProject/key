@@ -17,6 +17,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
@@ -34,7 +35,7 @@ import de.hentschel.visualdbc.datasource.model.exception.DSException;
  * Tests for {@link KeyOperationContract}
  * @author Martin Hentschel
  */
-public class SWTBotKeyAxiomContractTest extends TestCase {
+public class SWTBotKeyAxiomContractTest extends AbstractSetupTestCase {
    /**
     * Tests {@link IDSProvable#openInteractiveProof(String)}
     */

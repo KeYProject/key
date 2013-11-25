@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="VerifiedTest.loop(_x);" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (_x&lt;0) {   _x=-_x; }" pathCondition="true" pathConditionChanged="false">
+         <branchCondition name="x &lt; 0" pathCondition="x &lt; 0" pathConditionChanged="true" branchCondition="x &lt; 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="_x=-_x;" pathCondition="x &lt; 0" pathConditionChanged="false">
+               <loopInvariant name="
+invariant: _x &gt;= 0;
+variant: _x
+mod: allLocs
+mod[savedHeap]: allLocs" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid="true">
+                  <branchCondition name="_x &gt;= 1 &amp; _x_1 &gt;= 0" pathCondition="_x &gt;= 1 &amp; _x_1 &gt;= 0 &amp; x &lt;= -1" pathConditionChanged="true" branchCondition="_x &gt;= 1 &amp; _x_1 &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                     <statement name="_x--;" pathCondition="_x &gt;= 1 &amp; _x_1 &gt;= 0 &amp; x &lt;= -1" pathConditionChanged="false">
+                        <termination name="&lt;loop body end&gt;" pathCondition="_x &gt;= 1 &amp; _x_1 &gt;= 0 &amp; x &lt;= -1" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
+                        </termination>
+                     </statement>
+                  </branchCondition>
+                  <branchCondition name="_x &lt;= 0 &amp; _x_1 &gt;= 0" pathCondition="_x &lt;= 0 &amp; _x_1 &gt;= 0 &amp; x &lt;= -1" pathConditionChanged="true" branchCondition="_x &lt;= 0 &amp; _x_1 &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                     <statement name="return _x;" pathCondition="_x &lt;= 0 &amp; _x_1 &gt;= 0 &amp; x &lt;= -1" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of VerifiedTest.loop(_x);&gt;" pathCondition="_x &lt;= 0 &amp; _x_1 &gt;= 0 &amp; x &lt;= -1" pathConditionChanged="false" isReturnValueComputed="false">
+                           <termination name="&lt;end&gt;" pathCondition="_x &lt;= 0 &amp; _x_1 &gt;= 0 &amp; x &lt;= -1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           </termination>
+                        </methodReturn>
+                     </statement>
+                  </branchCondition>
+               </loopInvariant>
+            </statement>
+         </branchCondition>
+         <branchCondition name="x &gt;  -1" pathCondition="x &gt;  -1" pathConditionChanged="true" branchCondition="x &gt;  -1" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <loopInvariant name="
+invariant: _x &gt;= 0;
+variant: _x
+mod: allLocs
+mod[savedHeap]: allLocs" pathCondition="x &gt;  -1" pathConditionChanged="false" initiallyValid="true">
+               <branchCondition name="_x &gt;= 1 &amp; _x_0 &gt;= 0" pathCondition="_x &gt;= 1 &amp; _x_0 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="true" branchCondition="_x &gt;= 1 &amp; _x_0 &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                  <statement name="_x--;" pathCondition="_x &gt;= 1 &amp; _x_0 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false">
+                     <termination name="&lt;loop body end&gt;" pathCondition="_x &gt;= 1 &amp; _x_0 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
+                     </termination>
+                  </statement>
+               </branchCondition>
+               <branchCondition name="_x &lt;= 0 &amp; _x_0 &gt;= 0" pathCondition="_x &lt;= 0 &amp; _x_0 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="true" branchCondition="_x &lt;= 0 &amp; _x_0 &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                  <statement name="return _x;" pathCondition="_x &lt;= 0 &amp; _x_0 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of VerifiedTest.loop(_x);&gt;" pathCondition="_x &lt;= 0 &amp; _x_0 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="_x &lt;= 0 &amp; _x_0 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </branchCondition>
+            </loopInvariant>
+         </branchCondition>
+      </branchStatement>
+   </methodCall>
+</start>
