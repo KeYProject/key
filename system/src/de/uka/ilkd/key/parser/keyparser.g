@@ -890,7 +890,7 @@ options {
     throws KeYSemanticException {
         KeYJavaType kjt = null;              
         try {
-	    kjt=getJavaInfo().getKeYJavaTypeByClassName(s);
+	    kjt=getJavaInfo().getTypeByClassName(s, null);
         } catch(RuntimeException e){
             return null;
         }
@@ -1119,7 +1119,7 @@ options {
 	    		 LT(n+2).getText().charAt(1)<='z' && LT(n+2).getText().charAt(1)>='a'))){  	   
                 if (LA(n+1) != DOT && LA(n+1) != EMPTYBRACKETS) return false;
                 // maybe still an attribute starting with an uppercase letter followed by a lowercase letter
-                if(getTypeByClassName(className.toString())!=null){
+                if(getTypeByClassName(className.toString()) != null){
                     ProgramVariable maybeAttr = 
                     javaInfo.getAttribute(LT(n+2).getText(), getTypeByClassName(className.toString()));
                     if(maybeAttr!=null){
@@ -4349,8 +4349,12 @@ problem returns [ Term a = null ]
     String pref = null;
 }
     :
+       { if (capturer != null) capturer.mark(); }
+    
         profile     
-	{ if (capturer != null) capturer.mark(); }
+   	
+   	{ if (profileName != null && capturer != null) capturer.mark(); }
+    
         (pref = preferences)
         { if ((pref!=null) && (capturer != null)) capturer.mark(); }
         

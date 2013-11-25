@@ -1755,7 +1755,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    public void testVariablesUnknownTest() throws Exception {
       doSETTestAndDispose(keyRepDirectory, 
                           "examples/_testcase/set/variablesUnknownTest/test/UnknownTest.java", 
-                          "UnknownTest", 
+                          "endless.UnknownTest", 
                           "main", 
                           null,
                           "examples/_testcase/set/variablesUnknownTest/oracle/UnknownTest.xml",
