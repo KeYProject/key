@@ -183,14 +183,17 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                                        ImmutableList<ProgramVariable> paramVars) {
         final Term mbyAtPreDef;
         if (contract.hasMby()) {
+/*
             final Function mbyAtPreFunc =
                     new Function(new Name(TB.newName(services, "mbyAtPre")),
                             Sort.ANY);
 //                                 services.getTypeConverter().getIntegerLDT().targetSort());
             register(mbyAtPreFunc);
             mbyAtPre = TB.func(mbyAtPreFunc);
+*/
             final Term mby = contract.getMby(selfVar, paramVars, services);
-            mbyAtPreDef = TB.equals(mbyAtPre, mby);
+//            mbyAtPreDef = TB.equals(mbyAtPre, mby);
+            mbyAtPreDef = TB.measuredBy(mby, services);
         } else {
             mbyAtPreDef = TB.tt();
         }

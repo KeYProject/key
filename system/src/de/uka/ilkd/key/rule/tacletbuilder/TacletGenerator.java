@@ -364,12 +364,13 @@ public class TacletGenerator {
                                               limitedRhs));
 
         // FIXME - there is a chance this will have to go along with all the other associated changes
+/*
         if(addedSeq != null) {
         	TacletGoalTemplate tgc = new TacletGoalTemplate(addedSeq, ImmutableSLList.<Taclet>nil());
         	tgc.setName("Precondition of "+target.name());
             tacletBuilder.addTacletGoalTemplate (tgc);
         }
-
+*/
         if (ifSeq != null) {
             tacletBuilder.setIfSequent(ifSeq);
         }
@@ -495,6 +496,7 @@ public class TacletGenerator {
             Name name,
             Term originalPre,
             Term originalPost,
+            Term originalMby,
             KeYJavaType kjt,
             IObserverFunction target,
             List<? extends ProgramVariable> heaps,
@@ -552,7 +554,8 @@ public class TacletGenerator {
             }
         }
         final Term selfNull = target.isStatic() ? null : TB.equals(TB.var(selfSV), TB.NULL(services));
-
+        final Term mbyOK = originalMby != null ? TB.measuredByCheck(originalMby, services): null;
+        
         // create find
         final Term[] subs = new Term[target.arity()];
         int i = 0;
@@ -577,6 +580,9 @@ public class TacletGenerator {
         }
         if(selfNull != null) {
             addForumlaTerm = TB.and(addForumlaTerm, TB.not(selfNull));
+        }
+        if(mbyOK != null) {
+            addForumlaTerm = TB.and(addForumlaTerm, mbyOK);        	
         }
 
         pvs = pvs.append(originalSelfVar).append(originalParamVars); // .append(originalResultVar)
@@ -606,7 +612,7 @@ public class TacletGenerator {
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
         tacletBuilder.addTacletGoalTemplate (new TacletGoalTemplate(addedSeq, ImmutableSLList.<Taclet>nil()));
         tacletBuilder.setName(name);
-        tacletBuilder.addRuleSet(new RuleSet(new Name("query_axiom"))); // TODO classAxiom ???
+        tacletBuilder.addRuleSet(new RuleSet(new Name("classAxiom")));
 
         return DefaultImmutableSet.<Taclet>nil().add(tacletBuilder.getTaclet());
 

@@ -42,6 +42,7 @@ public final class ContractAxiom extends ClassAxiom {
     private final VisibilityModifier visibility;
     private final Term originalPre;
     private final Term originalPost;
+    private final Term originalMby;
     private final ProgramVariable originalSelfVar;
     private final ProgramVariable originalResultVar;
     private final ImmutableList<ProgramVariable> originalParamVars;
@@ -53,11 +54,12 @@ public final class ContractAxiom extends ClassAxiom {
                          VisibilityModifier visibility,
                          Term pre,
                          Term post,
+                         Term mby,
                          Map<LocationVariable,ProgramVariable> atPreVars,
                          ProgramVariable selfVar,
                          ProgramVariable resultVar,
                          ImmutableList<ProgramVariable> paramVars) {
-        this(name,null,target,kjt,visibility,pre,post,atPreVars,selfVar,resultVar,paramVars);
+        this(name,null,target,kjt,visibility,pre,post,mby,atPreVars,selfVar,resultVar,paramVars);
     }
 
     public ContractAxiom(String name,
@@ -67,6 +69,7 @@ public final class ContractAxiom extends ClassAxiom {
                 VisibilityModifier visibility,
                 Term originalPre,
                 Term originalPost,
+                Term originalMby,
                 Map<LocationVariable,ProgramVariable> atPreVars,
                 ProgramVariable selfVar, ProgramVariable resultVar, ImmutableList<ProgramVariable> paramVars) {
 
@@ -82,6 +85,7 @@ public final class ContractAxiom extends ClassAxiom {
         this.visibility = visibility;
         this.originalPre = originalPre;
         this.originalPost = originalPost;
+        this.originalMby = originalMby;
         this.originalSelfVar = selfVar;
         this.originalResultVar = resultVar;
         this.originalParamVars = paramVars;
@@ -101,6 +105,7 @@ public final class ContractAxiom extends ClassAxiom {
         return TG.generateContractAxiomTaclets(tacletName,
                                                originalPre,
                                                originalPost,
+                                               originalMby,
                                                kjt,
                                                target,
                                                heaps,

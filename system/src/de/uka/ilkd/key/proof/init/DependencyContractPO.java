@@ -126,15 +126,18 @@ public final class DependencyContractPO extends AbstractPO
         //initial value of measured_by clause
         final Term mbyAtPreDef;
         if(contract.hasMby()) {
-            final Function mbyAtPreFunc
+/*
+        	final Function mbyAtPreFunc
             	= new Function(new Name(TB.newName(services, "mbyAtPre")), 
         		       services.getTypeConverter()
         		               .getIntegerLDT()
         		               .targetSort());
             register(mbyAtPreFunc);
             mbyAtPre = TB.func(mbyAtPreFunc);
+*/
             final Term mby = contract.getMby(selfVar, paramVars, services);
-            mbyAtPreDef = TB.equals(mbyAtPre, mby);
+//            mbyAtPreDef = TB.equals(mbyAtPre, mby);
+            mbyAtPreDef = TB.measuredBy(mby, services);
         } else {
             mbyAtPreDef = TB.tt();
         }        
