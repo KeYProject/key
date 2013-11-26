@@ -16,29 +16,24 @@ import de.uka.ilkd.key.logic.Term;
 public class InfFlowSpec {
     public static final InfFlowSpec EMPTY_INF_FLOW_SPEC = new InfFlowSpec();
 
-    public final ImmutableList<Term> separates;
+    public final ImmutableList<Term> preExpressions;
 
-    public final ImmutableList<Term> declassifies;
-
-    public final ImmutableList<Term> erases;
+    public final ImmutableList<Term> postExpressions;
 
     public final ImmutableList<Term> newObjects;
 
 
-    public InfFlowSpec(final ImmutableList<Term> separates,
-                       final ImmutableList<Term> declassifies,
-                       final ImmutableList<Term> erases,
+    public InfFlowSpec(final ImmutableList<Term> preExpressions,
+                       final ImmutableList<Term> postExpressions,
                        final ImmutableList<Term> newObjects) {
-        this.separates = separates;
-        this.declassifies = declassifies;
-        this.erases = erases;
+        this.preExpressions = preExpressions;
+        this.postExpressions = postExpressions;
         this.newObjects = newObjects;
     }
 
     private InfFlowSpec() {
-        this.separates = ImmutableSLList.<Term>nil();
-        this.declassifies = ImmutableSLList.<Term>nil();
-        this.erases = ImmutableSLList.<Term>nil();
+        this.preExpressions = ImmutableSLList.<Term>nil();
+        this.postExpressions = ImmutableSLList.<Term>nil();
         this.newObjects = ImmutableSLList.<Term>nil();
     }
 }

@@ -49,6 +49,14 @@ public class IFProofObligationVars {
     }
 
 
+    public IFProofObligationVars labelHeapAtPreAsAnonHeapFunc() {
+        ProofObligationVars newC1 = c1.labelHeapAtPreAsAnonHeapFunc();
+        ProofObligationVars newC2 = c2.labelHeapAtPreAsAnonHeapFunc();
+        ProofObligationVars sev = symbExecVars.labelHeapAtPreAsAnonHeapFunc();
+        return new IFProofObligationVars(newC1, newC2, sev);
+    }
+
+
     private void linkSymbExecVarsToCopies() {
         for (ProofObligationVars ifVars : infFlowToSymbExecVarsMaps.keySet()) {
             linkStateVarsToCopies(ifVars.pre, symbExecVars.pre, getMapFor(ifVars));

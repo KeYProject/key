@@ -102,8 +102,14 @@ public final class WhileInvariantRule implements BuiltInRule {
         services.getSpecificationRepository().addLoopInvariant(inv);
         ((LoopInvariantBuiltInRuleApp) ruleApp).setLoopInvariant(inv);
         instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);
-        final Term heapAtPre = TB.var(TB.heapAtPreVar(services, baseHeap + "_Before_LOOP",
-                                                      baseHeap.sort(), false));
+
+        // create heap_Before_LOOP
+        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        Name heapAtPreName = new Name(TB.newName(services, baseHeap + "_Before_LOOP"));
+        final Function heapAtPreFunc = new Function(heapAtPreName, heapLDT.targetSort(), true);
+	services.getNamespaces().functions().addSafely(heapAtPreFunc);
+        final Term heapAtPre = TB.func(heapAtPreFunc);
+
         final Term heapAtPost = anonUpdateData.loopHeap;
         final Term guardAtPre = buildBeforeVar(guardTerm, services);
         final Term guardAtPost = buildAfterVar(guardTerm, services);

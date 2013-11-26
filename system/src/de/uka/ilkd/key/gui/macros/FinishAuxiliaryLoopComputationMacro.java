@@ -65,7 +65,8 @@ public class FinishAuxiliaryLoopComputationMacro extends
                 (LoopInvariantBuiltInRuleApp)app;
         LoopInvariant loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
         loopInv = loopInv != null ? loopInv : loopInvRuleApp.getInvariant();
-        final IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
+        IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
+        ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();
 
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);

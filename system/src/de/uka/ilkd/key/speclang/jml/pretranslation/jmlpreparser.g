@@ -659,6 +659,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=continues_clause      { sc.addContinues(ps); }
 	|   ps=returns_clause        { sc.addReturns(ps); }
         |   ps=separates_clause      { sc.addInfFlowSpecs(ps); }
+        |   ps=determines_clause      { sc.addInfFlowSpecs(ps); }
     )
     {
     	if(b == Behavior.EXCEPTIONAL_BEHAVIOR
@@ -690,11 +691,20 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 //-----------------------------------------------------------------------------
 
 
+// old information flow annotations
 separates_clause
 	returns [PositionedString result = null]
 	throws SLTranslationException
 :
     (RESPECTS | SEPARATES) result=expression { result = result.prepend("separates "); }
+;
+
+
+determines_clause
+	returns [PositionedString result = null]
+	throws SLTranslationException
+:
+    (DETERMINES) result=expression { result = result.prepend("determines "); }
 ;
 
 
@@ -1218,6 +1228,7 @@ loop_specification[ImmutableList<String> mods]
     	:
             ps=loop_invariant       { ls.addInvariant(ps); }
         |   ps=separates_clause      { ls.addInfFlowSpecs(ps); }
+        |   ps=determines_clause      { ls.addInfFlowSpecs(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
         |   ps=variant_function     { ls.setVariant(ps); }
     )*

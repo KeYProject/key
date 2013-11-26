@@ -15,7 +15,7 @@ public class AmtoftBanerjee {
 
     //@ normal_behavior
     //@ assignable \nothing;
-    //@ separates \nothing \declassifies q \erases \result;
+    //@ determines \result \by q;
     int getQ() {
         return this.q;
     }
@@ -28,11 +28,11 @@ public class AmtoftBanerjee {
     static int secret, z;
 
     //@ normal_behavior
-    //@ separates \nothing \declassifies secret \erases z;
+    //@ determines z \by secret;
     //@ also
     // the following contract is not satisfied
     //@ normal_behavior
-    //@ separates \nothing \erases z;
+    //@ determines z \by \nothing;
     static void m_1() {
         AmtoftBanerjee x1;
         AmtoftBanerjee x2 = new AmtoftBanerjee();
@@ -42,7 +42,7 @@ public class AmtoftBanerjee {
     }
 
     //@ normal_behavior
-    //@ separates \nothing \erases z;
+    //@ determines z \by \nothing;
     static void m_2() {
         AmtoftBanerjee x1 = new AmtoftBanerjee();
         AmtoftBanerjee x2 = new AmtoftBanerjee();

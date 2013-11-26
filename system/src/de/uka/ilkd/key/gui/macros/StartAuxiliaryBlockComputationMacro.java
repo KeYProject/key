@@ -105,8 +105,10 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
         IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
 
         BlockExecutionPO blockExecPO =
-                new BlockExecutionPO(initConfig, contract, ifVars.symbExecVars,
-                                     goal, blockRuleApp.getExecutionContext());
+                new BlockExecutionPO(initConfig, contract,
+                                     ifVars.symbExecVars.labelHeapAtPreAsAnonHeapFunc(),
+                                     goal, blockRuleApp.getExecutionContext(),
+                                     proof.getServices());
         ProblemInitializer pi =
                 new ProblemInitializer(mediator.getUI(),
                                        mediator.getServices(), true,

@@ -45,6 +45,21 @@ public class LoopInvExecutionPO extends AbstractOperationPO
      */
     private InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
 
+    /** To be used only for auxiliary proofs where the services object of
+     * the actual proof has to be used instead of the initial services form
+     * the InitConfig.
+     */
+    public LoopInvExecutionPO(InitConfig initConfig,
+                              LoopInvariant loopInv,
+                              ProofObligationVars symbExecVars,
+                              Goal initiatingGoal,
+                              ExecutionContext context,
+                              Services services) {
+        this(initConfig, loopInv, symbExecVars, initiatingGoal, context);
+        this.services = services;
+    }
+
+
     public LoopInvExecutionPO(InitConfig initConfig,
                               LoopInvariant loopInv,
                               ProofObligationVars symbExecVars,

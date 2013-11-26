@@ -86,44 +86,22 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                                     ProofObligationVars vs2,
                                     InfFlowSpec infFlowSpec1,
                                     InfFlowSpec infFlowSpec2) {
-        //      BasicPOSnippetFactory f1 = POSnippetFactory.getBasicFactory(d, vs1);
-        //      BasicPOSnippetFactory f2 = POSnippetFactory.getBasicFactory(d, vs2);
-        //      Term framingLocs1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
-        //      Term framingLocs2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
-        Term[] eqAtLocs =
-                new Term[infFlowSpec1.separates.size() +
-                         infFlowSpec1.declassifies.size()];
+        Term[] eqAtLocs = new Term[infFlowSpec1.preExpressions.size()];
 
-        Iterator<Term> separates1It = infFlowSpec1.separates.iterator();
-        Iterator<Term> separates2It = infFlowSpec2.separates.iterator();
-        for (int i = 0; i < infFlowSpec1.separates.size(); i++) {
-            Term separates1Term = separates1It.next();
-            Term separates2Term = separates2It.next();
+        Iterator<Term> preExp1It = infFlowSpec1.preExpressions.iterator();
+        Iterator<Term> preExp2It = infFlowSpec2.preExpressions.iterator();
+        for (int i = 0; i < infFlowSpec1.preExpressions.size(); i++) {
+            Term preExp1Term = preExp1It.next();
+            Term preExp2Term = preExp2It.next();
             SearchVisitor search = new SearchVisitor(vs1.pre.result, vs1.post.result);
-            separates1Term.execPreOrder(search);
+            preExp1Term.execPreOrder(search);
             if (!search.termFound) {
-                eqAtLocs[i] = d.tb.equals(separates1Term, separates2Term);
+                eqAtLocs[i] =
+                        d.tb.equals(preExp1Term, preExp2Term);
             } else {
                 // terms which contain \result are not included in
                 // the precondition
                 eqAtLocs[i] = d.tb.tt();
-            }
-        }
-
-        Iterator<Term> declassifies1It = infFlowSpec1.declassifies.iterator();
-        Iterator<Term> declassifies2It = infFlowSpec2.declassifies.iterator();
-        for (int i = 0; i < infFlowSpec1.declassifies.size(); i++) {
-            Term declassifies1Term = declassifies1It.next();
-            Term declassifies2Term = declassifies2It.next();
-            SearchVisitor search = new SearchVisitor(vs1.pre.result, vs1.post.result);
-            declassifies1Term.execPreOrder(search);
-            if (!search.termFound) {
-                eqAtLocs[i + infFlowSpec1.separates.size()] =
-                        d.tb.equals(declassifies1Term, declassifies2Term);
-            } else {
-                // terms which contain \result are not included in
-                // the precondition
-                eqAtLocs[i + infFlowSpec1.separates.size()] = d.tb.tt();
             }
         }
 
@@ -135,28 +113,15 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                                      ProofObligationVars vs2,
                                      InfFlowSpec infFlowSpec1,
                                      InfFlowSpec infFlowSpec2) {
-        //        BasicPOSnippetFactory f1 = POSnippetFactory.getBasicFactory(d, vs1);
-        //        BasicPOSnippetFactory f2 = POSnippetFactory.getBasicFactory(d, vs2);
-        //        Term framingLocs1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_MOD);
-        //        Term framingLocs2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_MOD);
-
-        // build equalities for seperates terms
+        // build equalities for post expressions
         ImmutableList<Term> eqAtLocs = ImmutableSLList.<Term>nil();
-        Iterator<Term> separates1It = infFlowSpec1.separates.iterator();
-        Iterator<Term> separates2It = infFlowSpec2.separates.iterator();
-        for (int i = 0; i < infFlowSpec1.separates.size(); i++) {
-            Term separates1Term = separates1It.next();
-            Term separates2Term = separates2It.next();
-            eqAtLocs = eqAtLocs.append(d.tb.equals(separates1Term, separates2Term));
-        }
 
-        // build equalities for erases terms
-        Iterator<Term> erases1It = infFlowSpec1.erases.iterator();
-        Iterator<Term> erases2It = infFlowSpec2.erases.iterator();
-        for (int i = 0; i < infFlowSpec1.erases.size(); i++) {
-            Term erases1Term = erases1It.next();
-            Term erases2Term = erases2It.next();
-            eqAtLocs = eqAtLocs.append(d.tb.equals(erases1Term, erases2Term));
+        Iterator<Term> postExp1It = infFlowSpec1.postExpressions.iterator();
+        Iterator<Term> postExp2It = infFlowSpec2.postExpressions.iterator();
+        for (int i = 0; i < infFlowSpec1.postExpressions.size(); i++) {
+            Term postExp1Term = postExp1It.next();
+            Term postExp2Term = postExp2It.next();
+            eqAtLocs = eqAtLocs.append(d.tb.equals(postExp1Term, postExp2Term));
         }
         final Term eqAtLocsTerm = d.tb.and(eqAtLocs);
 

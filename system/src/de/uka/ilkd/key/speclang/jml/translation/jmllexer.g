@@ -50,6 +50,7 @@ tokens {
     REPRESENTS      = "represents";
     REQUIRES        = "requires";
     RESPECTS        = "respects";
+    DETERMINES      = "determines";
     SEPARATES       = "separates";
     SECURE_FOR      = "secure_for";
     SIGNALS         = "signals";
@@ -182,6 +183,8 @@ SEQDEF : "\\seq_def";
 DECLASSIFIES : "\\declassifies";
 ERASES : "\\erases";
 NEW_OBJECTS: "\\new_objects";
+BY : "\\by";
+ITSELF : "\\itself";
 
 
 DL_ESCAPE : "\\dl_"  LETTER  ( LETTERORDIGIT )*  ;

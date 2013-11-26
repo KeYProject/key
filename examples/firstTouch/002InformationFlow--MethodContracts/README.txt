@@ -15,26 +15,26 @@ public class IFMethodContract {
 //--------
 
     
-    //@ separates low;
+    //@ determines low \by \itself;
     void secure_sequential_n1_n2() {
         n1();
         n2();
     }
     
     //@ normal_behavior
-    //@ separates low;
+    //@ determines low \by \itself;
     void n1() {
         low = 27;
     }
     
     //@ normal_behavior
-    //@ separates low;
+    //@ determines low \by \itself;
     void n2() {
         low = low + 13;
     }
     
     
-    //@ separates low;
+    //@ determines low \by \itself;
     void secure_assignments_n2() {
         low = 45;
         high = high * high;
@@ -42,7 +42,7 @@ public class IFMethodContract {
     }
     
     
-    //@ separates low;
+    //@ determines low \by \itself;
     void insecure_assignment_n2() {
         low = high;
         n2();
@@ -52,7 +52,7 @@ public class IFMethodContract {
 //--------
 
     
-    //@ separates low;
+    //@ determines low \by \itself;
     void secure_sequential_n3_precond_n4() {
         n3();
         n4();
@@ -60,7 +60,7 @@ public class IFMethodContract {
     
     /*@ normal_behavior
       @ ensures high > 0;
-      @ separates low;
+      @ determines low \by \itself;
       @*/
     void n3() {
         high = 8;
@@ -68,7 +68,7 @@ public class IFMethodContract {
     
     /*@ normal_behavior
       @ requires high > 0;
-      @ separates low;
+      @ determines low \by \itself;
       @*/
     void n4() {
         if (high > 0) {
@@ -82,7 +82,7 @@ public class IFMethodContract {
 //--------
 
     
-    //@ separates low;
+    //@ determines low \by \itself;
     void secure_n5() {
         low = n5(high);
     }
@@ -91,7 +91,7 @@ public class IFMethodContract {
 //--------
 
     
-    //@ separates low;
+    //@ determines low \by \itself;
     void secure_if_high_n1() {
         if (high > 0) {
             high = 2 * high;
@@ -102,7 +102,7 @@ public class IFMethodContract {
     }
     
     
-    //@ separates low;
+    //@ determines low \by \itself;
     void secure_if_high_n5_n1() {
         if (high > 0) {
             low = n5(high);
@@ -114,14 +114,14 @@ public class IFMethodContract {
     }
     
     //@ normal_behavior
-    //@ separates low, \result;
+    //@ determines low, \result \by low;
     int n5(int x) {
         high = 2 * x;
         return 15;
     }
     
     
-    //@ separates low;
+    //@ determines low \by \itself;
     void insecure_if_high_n5_n1() {
         if (high > 0) {
             low = n5(high);
@@ -135,7 +135,7 @@ public class IFMethodContract {
 //--------
     
     
-    //@ separates low;
+    //@ determines low \by \itself;
     void secure_assignment_0_n9() {
         high = 0;
         n9();
@@ -176,7 +176,7 @@ public class IFMethodContract {
 
     
     /*@ requires high != 0;
-      @ separates low;
+      @ determines low \by \itself;
       @*/
     void secure_n6() {
         n6();
@@ -184,7 +184,7 @@ public class IFMethodContract {
  
     /*@ normal_behavior
       @ requires high != 0;
-      @ separates low;
+      @ determines low \by \itself;
       @*/
     void n6() {
         high = low / high;
@@ -194,7 +194,7 @@ public class IFMethodContract {
 //--------
 
     
-    //@ separates low;
+    //@ determines low \by \itself;
     void secure_catch_exception() {
         try {
             n7();

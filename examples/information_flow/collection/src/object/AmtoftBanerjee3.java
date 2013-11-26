@@ -13,7 +13,7 @@ public class AmtoftBanerjee3 {
     int x, a, b;
 
     //@ requires (a % 4) == 3;
-    //@ separates \nothing \declassifies x \erases b;
+    //@ determines b \by x;
     void m() {
         b = x + (a % 4);
     }

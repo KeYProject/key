@@ -349,7 +349,8 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = axiomsclause
     |   result = requiresclause
     |   result = decreasesclause
-    |   result = separatesclause
+    |   result = separatesclause  // old information flow syntax
+    |   result = determinesclause // new information flow syntax
     |   result = returnsclause
     |   result = signalsclause
     |   result = signalsonlyclause
@@ -480,22 +481,45 @@ separatesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] 
     ImmutableList<Term> tmp;
 }
 :
-    (RESPECTS | SEPARATES) (NOTHING | sep = separateslist)
-    (   (DECLASSIFIES (NOTHING | tmp = separateslist {decl = decl.append(tmp);})) |
-        (ERASES (NOTHING | tmp = separateslist {erases = erases.append(tmp);})) |
-        (NEW_OBJECTS (NOTHING | tmp = separateslist {newObs = newObs.append(tmp);}))
+    (RESPECTS | SEPARATES) (NOTHING | sep = infflowspeclist)
+    (   (DECLASSIFIES (NOTHING | tmp = infflowspeclist {decl = decl.append(tmp);})) |
+        (ERASES (NOTHING | tmp = infflowspeclist {erases = erases.append(tmp);})) |
+        (NEW_OBJECTS (NOTHING | tmp = infflowspeclist {newObs = newObs.append(tmp);}))
     )*
-    {result = new InfFlowSpec(sep, decl, erases, newObs);}
+    {decl = sep.append(decl);
+     erases = sep.append(erases);
+     result = new InfFlowSpec(decl, erases, newObs);}
     ;
 
 
-separateslist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
+determinesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException {
+    ImmutableList<Term> det = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> by = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> decl = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> erases = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> tmp;
+}
+:
+    DETERMINES (NOTHING | det = infflowspeclist)
+    BY (NOTHING | (ITSELF {by = det;}) | by = infflowspeclist)
+    (   (DECLASSIFIES (NOTHING | tmp = infflowspeclist {decl = decl.append(tmp);})) |
+        (ERASES (NOTHING | tmp = infflowspeclist {erases = erases.append(tmp);})) |
+        (NEW_OBJECTS (NOTHING | tmp = infflowspeclist {newObs = newObs.append(tmp);}))
+    )*
+    {det = det.append(erases);
+     by = by.append(decl);
+     result = new InfFlowSpec(by, det, newObs);}
+    ;
+
+
+infflowspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
     Term term = null;
 }
 :
     term = termexpression { result = result.append(term); }
     (COMMA term = termexpression { result = result.append(term); })*
-        { result = translator.translate("separates", ImmutableList.class, result, services); }
+        { result = translator.translate("infflowspeclist", ImmutableList.class, result, services); }
     ;
 
 

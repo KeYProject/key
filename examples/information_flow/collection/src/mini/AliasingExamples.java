@@ -16,14 +16,14 @@ public class AliasingExamples {
     int x;
     
     /*@ requires a != b;
-      @ separates \result, b.x;
+      @ determines \result, b.x \by \itself;
       @*/
     int secure_1(AliasingExamples a, AliasingExamples b, int h) {
         a.x = h;
         return b.x;
     }
     
-    /*@ separates \result, b.x;
+    /*@ determines \result, b.x \by \itself;
       @*/
     int insecure_1(AliasingExamples a, AliasingExamples b, int h) {
         a.x = h;

@@ -215,17 +215,16 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         ImmutableList<InfFlowSpec>
                     res = ImmutableSLList.<InfFlowSpec>nil();
         for (final InfFlowSpec innerTerms : terms) {
-            final ImmutableList<Term> renamedSeparates =
-                    replaceVariablesInTerms(innerTerms.separates);
-            final ImmutableList<Term> renamedDeclassifies =
-                    replaceVariablesInTerms(innerTerms.declassifies);
-            final ImmutableList<Term> renamedErases =
-                    replaceVariablesInTerms(innerTerms.erases);
+            final ImmutableList<Term> renamedPreExpressions =
+                    replaceVariablesInTerms(innerTerms.preExpressions);
+            final ImmutableList<Term> renamedPostExpressions =
+                    replaceVariablesInTerms(innerTerms.postExpressions);
             final ImmutableList<Term> renamedNewObjects =
                     replaceVariablesInTerms(innerTerms.newObjects);
             res = res.append(
-                    new InfFlowSpec(renamedSeparates, renamedDeclassifies,
-                                    renamedErases, renamedNewObjects));
+                    new InfFlowSpec(renamedPreExpressions,
+                                    renamedPostExpressions,
+                                    renamedNewObjects));
         }
         return res;
     }

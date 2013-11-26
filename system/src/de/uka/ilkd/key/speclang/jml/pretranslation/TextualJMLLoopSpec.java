@@ -126,7 +126,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         for(Name heap : HeapLDT.VALID_HEAP_NAMES) {
             it = infFlowSpecs.iterator();
             while(it.hasNext()) {
-              sb.append("separates<"+heap+">: " + it.next() + "\n");
+              sb.append("determines<"+heap+">: " + it.next() + "\n");
             }
           }
         if(variant != null) {

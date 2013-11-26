@@ -13,26 +13,26 @@ public class IFEfficiencyExamples {
     private int h;
     public int l;
 
-    //@ separates l;
+    //@ determines l \by \itself;
     void mWithBlockContract() {
         // fix l value
-        //@ normal_behavior separates l;
+        //@ normal_behavior determines l \by \itself;
         { if (l < 0) { l = 0;} }
-        //@ normal_behavior separates l;
+        //@ normal_behavior determines l \by \itself;
         { if (l > 8) { l = 8; } }
 
         // fix h value
-        //@ normal_behavior separates l;
+        //@ normal_behavior determines l \by \itself;
         { if (h < 0) { h = 0; } }
-        //@ normal_behavior separates l;
+        //@ normal_behavior determines l \by \itself;
         { if (h > 8) { h = 8; } }
 
         // calculate h result
-        //@ normal_behavior separates l;
+        //@ normal_behavior determines l \by \itself;
         { h = h * l; }
     }
 
-    //@ separates l;
+    //@ determines l \by \itself;
     void mWithoutBlockContract() {
         // fix l value
         if (l < 0) { l = 0; }
