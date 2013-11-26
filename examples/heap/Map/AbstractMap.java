@@ -14,12 +14,12 @@ public abstract class AbstractMap implements MapInterface {
      @                      \dl_mapGet(map, entries[i].key) == entries[i].value);
      @ public invariant (\forall Object o;
      @          (\exists int i; 0 <= i && i < entries.length; entries[i].key == o) <==> \dl_inDomain(map, o));
-     @*/
-    
-    /*@ public invariant (\forall int i; 0 <= i && i < entries.length; 
-      @          entries[i] != null && entries[i].key != null && entries[i].value != null); */
-    
-    /*@ public invariant footprint ==
+     @
+     @
+     @ public invariant (\forall int i; 0 <= i && i < entries.length; 
+     @          entries[i] != null && entries[i].key != null && entries[i].value != null);
+     @
+     @ public invariant footprint ==
      @      \set_union(\infinite_union(int i; 0 <= i && i < entries.length; entries[i].*),
      @                 this.*,
      @                 entries.*);
@@ -55,10 +55,8 @@ public abstract class AbstractMap implements MapInterface {
      @   ensures \fresh(\result);
      @   ensures \result.key == key;
      @   ensures \result.value == value;
-     @   ensures !\dl_inDomain(map, \result);
-     @   assignable \nothing;
      @*/
-    abstract MapEntry newMapEntry(Object key, Object value);
+    abstract /*@pure*/ MapEntry newMapEntry(Object key, Object value);
 
     /*@ public normal_behavior
      @   requires l >= 0;
@@ -67,10 +65,8 @@ public abstract class AbstractMap implements MapInterface {
      @   ensures \fresh(\result);
      @   ensures \result != null;
      @   ensures (\forall int i; 0 <= i && i < \result.length; \result[i] == null);
-     @   ensures !\dl_inDomain(map, \result);
-     @   assignable \nothing;
      @*/
-    abstract /*@helper nullable*/ MapEntry[] newMapEntryArray(int l);
+    abstract /*@pure nullable*/ MapEntry[] newMapEntryArray(int l);
     
     /*@ public normal_behaviour
      @ ensures \result.length == entries.length + 1;
@@ -82,7 +78,7 @@ public abstract class AbstractMap implements MapInterface {
      @ ensures !\dl_inDomain(map, \result[entries.length]);
      @ ensures \typeof(\result) == \type(MapEntry[]);
      @*/
-    abstract /*@ pure */ MapEntry[] putExtendArray(Object key, Object value);
+    abstract /*@pure*/ MapEntry[] putExtendArray(Object key, Object value);
 
     /*@ public normal_behaviour
      @ requires 0 <= index && index < entries.length;

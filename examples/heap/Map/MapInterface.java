@@ -9,9 +9,9 @@ public interface MapInterface {
     //@ public instance invariant \subset(\singleton(this.footprint), footprint);
     //@ public instance invariant \dl_isFinite(map);
     
-    // -----
+    // --------
     // Method signatures and specifications
-    // -----
+    // --------
     
     /*@ public normal_behaviour
      @ assignable footprint;
