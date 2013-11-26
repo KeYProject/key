@@ -60,7 +60,7 @@ final class Tree {
           measured_by height;
           helper model \locset footprintUntilLeft(Tree t) {
              return (
-               this == t ? \empty : \set_union(
+               t == this ? this.height : \set_union(
                  this.*,
                  \set_union(
                     (left==null) ? \empty : left.footprintUntilLeft(t),
@@ -72,7 +72,7 @@ final class Tree {
 
 
     /*@ model_behavior 
-          requires true;
+          requires t.treeInv();
           ensures true;
           accessible footprintUntilLeft(t);
           measured_by height;
@@ -85,7 +85,7 @@ final class Tree {
                        && height > right.height && right.treeInv()))
                      && (left==null ||
                           (\disjoint(this.*, left.footprintUntilLeft(t))
-                          && height > left.height && left.treeInvUntilLeft(t)))  
+                         && height > left.height && left.treeInvUntilLeft(t)))  
                      && (left==null || right==null ||
                           \disjoint(left.footprintUntilLeft(t), right.footprint()))
                       )
@@ -100,7 +100,7 @@ final class Tree {
           measured_by height;
           helper model \seq treeRepUntilLeft(Tree t) {
             return (
-                (this == t) ? \seq_empty : 
+                (t == this) ? \seq_empty : 
                 \seq_concat(
                   (left == null) ? \seq_empty : left.treeRepUntilLeft(t), 
                   \seq_concat(
