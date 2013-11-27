@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <equivalenceClass representativeTerm="obj">
-      <term term="IsInstanceTest.A"/>
       <term term="obj"/>
+      <term term="IsInstanceTest.A"/>
    </equivalenceClass>
    <state name="return 1;">
       <association name="IsInstanceTest::A" programVariable="IsInstanceTest::A" isArrayIndex="false" arrayIndex="-1" target="o1"/>

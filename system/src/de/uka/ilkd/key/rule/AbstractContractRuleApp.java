@@ -46,6 +46,7 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
 		
     @Override
     public abstract AbstractContractRuleApp tryToInstantiate(Goal goal);
+    
 
     public abstract AbstractContractRuleApp setContract(Contract contract);
 

@@ -79,7 +79,7 @@ public abstract class SequentView extends JTextArea
     
     private ConfigChangeListener configChangeListener;
     SequentPrintFilter filter;
-    LogicPrinter printer;
+    private LogicPrinter printer;
     public boolean refreshHighlightning = true;
     private boolean showTermInfo = false;
     
@@ -239,6 +239,20 @@ public abstract class SequentView extends JTextArea
         }
     }
 
+    /** Return used LogicPrinter.
+     * @return The LogicPrinter that is used.
+     */
+    public LogicPrinter getLogicPrinter() {
+        return printer;
+    }
+
+    /** Set the LogicPrinter to be used.
+     * @param p The LogicPrinter to be used
+     */
+    protected void setLogicPrinter(LogicPrinter p) {
+        printer = p;
+    }
+
     public String getHighlightedText(PosInSequent pos) {
         String s = "";
         try {
@@ -248,6 +262,10 @@ public abstract class SequentView extends JTextArea
             e.printStackTrace();
         }
         return s;
+    }
+
+    public String getHighlightedText() {
+       return getHighlightedText(getPosInSequent(getMousePosition()));
     }
 
     private void showTermInfo(Point p) {
