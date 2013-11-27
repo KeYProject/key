@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.gui.macros;
 
@@ -46,28 +46,24 @@ public class FullInformationFlowAutoPilotMacro extends SequentialOnLastGoalProof
                 new SequentialProofMacro() {
             @Override
             protected ProofMacro[] createProofMacroArray() {
-                return new ProofMacro[]{
-                    new StateExpansionAndInfFlowContractApplicationMacro(),
-                    new TryCloseMacro(NUMBER_OF_TRY_STEPS)
-                };
-            }
-
-
+                return new ProofMacro[]{new StateExpansionAndInfFlowContractApplicationMacro(),
+                                        new TryCloseMacro(NUMBER_OF_TRY_STEPS)};}
             @Override
-            public String getName() {
-                return "Anonymous Macro";
-            }
-
-
+            public String getName() { return "Anonymous Macro"; }
             @Override
-            public String getDescription() {
-                return "Anonymous Macro";
-            }
+            public String getDescription() { return "Anonymous Macro"; }
         };
-        return new ProofMacro[]{
-            new AuxiliaryComputationAutoPilotMacro(),
-            new FinishAuxiliaryComputationMacro(),
-            fullmainCompMacro
+        ExhaustiveProofMacro exhaustiveAuxCompAutoPilotMacro =
+                new ExhaustiveProofMacro() {
+                    @Override
+                    public String getName() { return "Anonymous Macro"; }
+                    @Override
+                    public String getDescription() { return "Anonymous Macro"; }
+                    @Override
+                    ProofMacro getProofMacro() { return new AuxiliaryComputationAutoPilotMacro(); }
         };
+        return new ProofMacro[]{ new AuxiliaryComputationAutoPilotMacro(),//exhaustiveAuxCompAutoPilotMacro,
+                                 new FinishAuxiliaryComputationMacro(),
+                                 fullmainCompMacro};
     }
 }
