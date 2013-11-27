@@ -31,16 +31,6 @@ class BasicParamsOkSnippet implements FactoryMethod {
             ProgramVariable pv = (ProgramVariable) param.op();
             paramsOK = d.tb.and(paramsOK, d.tb.reachableValue(poVars.pre.heap, param, pv.getKeYJavaType()));
         }
-        // neccessary??
-        for (Term param : poVars.post.localVars) {
-            if (!(param.op() instanceof ProgramVariable)) {
-                throw new UnsupportedOperationException("Tried to produce "
-                        + "PARAMS_OK for a term "
-                        + "which is no ProgramVariable.");
-            }
-            ProgramVariable pv = (ProgramVariable) param.op();
-            paramsOK = d.tb.and(paramsOK, d.tb.reachableValue(poVars.pre.heap, param, pv.getKeYJavaType()));
-        }
         if (poVars.pre.guard != null) {
             if (!(poVars.pre.guard.op() instanceof ProgramVariable)) {
                 throw new UnsupportedOperationException("Tried to produce "
