@@ -60,7 +60,7 @@ final class Tree {
           measured_by height;
           helper model \locset footprintUntilLeft(Tree t) {
              return (
-               t == this ? this.height : \set_union(
+               t == this ? \empty : \set_union(
                  this.*,
                  \set_union(
                     (left==null) ? \empty : left.footprintUntilLeft(t),
@@ -74,7 +74,7 @@ final class Tree {
     /*@ model_behavior 
           requires t.treeInv();
           ensures true;
-          accessible footprintUntilLeft(t);
+          accessible \set_union(footprintUntilLeft(t), t == this ? \singleton(this.height) : \empty);
           measured_by height;
           helper model boolean treeInvUntilLeft(Tree t) {
              return (t == this || 
