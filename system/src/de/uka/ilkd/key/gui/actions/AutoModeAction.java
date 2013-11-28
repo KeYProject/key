@@ -14,10 +14,12 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.AutoModeListener;
@@ -34,7 +36,9 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 
 public final class AutoModeAction extends MainWindowAction {
 
-    /**
+    private static final KeyStroke START_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK);
+	private static final KeyStroke STOP_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+	/**
      * 
      */
     private static final long serialVersionUID = -7702898691162947994L;
@@ -77,7 +81,7 @@ public final class AutoModeAction extends MainWindowAction {
         setName(getStartCommand());
         setTooltip(MainWindow.AUTO_MODE_TEXT);
         setIcon(startLogo);
-        setAcceleratorLetter(KeyEvent.VK_A);
+        setAcceleratorKey(START_KEY);
     
         enable();
     
@@ -120,6 +124,7 @@ public final class AutoModeAction extends MainWindowAction {
         	}
         	putValue(Action.NAME, "Stop");
         	putValue(Action.SMALL_ICON, stopLogo);
+        	putValue(Action.ACCELERATOR_KEY, STOP_KEY);
             }
     
             /**
@@ -132,6 +137,7 @@ public final class AutoModeAction extends MainWindowAction {
         	}
         	putValue(Action.NAME, getStartCommand());
         	putValue(Action.SMALL_ICON, startLogo);
+        	putValue(Action.ACCELERATOR_KEY, START_KEY);
             }
     
         });

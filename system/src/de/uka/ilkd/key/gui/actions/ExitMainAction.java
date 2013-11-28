@@ -56,13 +56,10 @@ public class ExitMainAction extends MainWindowAction {
    protected void exitMain() {
        final ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
        if (vs.confirmExit()) {
-           final JCheckBox checkbox = new JCheckBox("Don't ask me again");
-           final Object[] message = new Object[]{"Really Quit?\n\n",checkbox};
            final int option = JOptionPane.showConfirmDialog
-                   (mainWindow, message, "Exit",
+                   (mainWindow, "Really Quit?\n", "Exit",
                            JOptionPane.YES_NO_OPTION);
            if (option == JOptionPane.YES_OPTION) {
-               vs.setConfirmExit(!checkbox.isSelected());
                exitMainWithoutInteraction();
            }
        } else {

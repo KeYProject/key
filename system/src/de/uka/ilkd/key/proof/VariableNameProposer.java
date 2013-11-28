@@ -114,7 +114,7 @@ public class VariableNameProposer implements InstantiationProposer {
 						        Node undoAnchor,
                                                         ImmutableList<String> previousProposals) {
 	return getNameProposalForSkolemTermVariable
-	    ( createBaseNameProposalBasedOnCorrespondence ( p_app, p_var ),
+	    ( createBaseNameProposalBasedOnCorrespondence ( p_app, p_var, services ),
 	      services,
 	      undoAnchor,
               previousProposals);
@@ -126,9 +126,10 @@ public class VariableNameProposer implements InstantiationProposer {
      * of <code>Taclet.getNameCorrespondent</code>
      */
     protected static String createBaseNameProposalBasedOnCorrespondence (TacletApp p_app,
-                                                                         SchemaVariable p_var) {
+                                                                         SchemaVariable p_var,
+                                                                         Services services) {
         final String result;
-        final SchemaVariable v = p_app.taclet ().getNameCorrespondent ( p_var );
+        final SchemaVariable v = p_app.taclet ().getNameCorrespondent ( p_var, services );
         if ( v != null && p_app.instantiations ().isInstantiated ( v ) ) {
             
             final Object inst = p_app.instantiations ().getInstantiation ( v );

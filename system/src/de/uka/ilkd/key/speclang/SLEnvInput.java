@@ -201,11 +201,9 @@ public final class SLEnvInput extends AbstractEnvInput {
                 RuleSource rs = null;
                 
                 //external or internal path?
-                if(filePath.startsWith("/")) {
-                    File file = new File(filePath);
-                    if(file.exists()) {
+                File file = new File(filePath);
+                if(file.isFile()) {
                 	rs = RuleSource.initRuleFile(file);
-                    }
                 } else {
                     URL url = KeYResourceManager.getManager().getResourceFile(
                 				Recoder2KeY.class, 

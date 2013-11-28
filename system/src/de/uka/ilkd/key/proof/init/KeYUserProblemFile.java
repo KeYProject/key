@@ -159,6 +159,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
                 problemHeader = problemHeader.substring(
                     0, problemHeader.lastIndexOf(searchS));
             }
+                        
             initConfig.setTaclets(problemParser.getTaclets());
             lastParser = problemParser;
         } catch (antlr.ANTLRException e) {

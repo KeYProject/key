@@ -19,12 +19,12 @@ mod: {}
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue+this.instanceField+classField;" pathCondition="true" pathConditionChanged="false">
                <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	120 {!x &lt;= -1}, 
-	-4787 {!x &gt;= 0}
+	120 {x &gt;  -1}, 
+	-4787 {x &lt; 0}
 as result of self.main(x);&gt;" isReturnValueComputed="true">
-                  <methodReturnValue name="120 {!x &lt;= -1}" returnValueString="120" hasCondition="true" conditionString="!x &lt;= -1">
+                  <methodReturnValue name="120 {x &gt;  -1}" returnValueString="120" hasCondition="true" conditionString="x &gt;  -1">
                   </methodReturnValue>
-                  <methodReturnValue name="-4787 {!x &gt;= 0}" returnValueString="-4787" hasCondition="true" conditionString="!x &gt;= 0">
+                  <methodReturnValue name="-4787 {x &lt; 0}" returnValueString="-4787" hasCondition="true" conditionString="x &lt; 0">
                   </methodReturnValue>
                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
