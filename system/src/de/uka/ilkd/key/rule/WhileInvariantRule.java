@@ -116,23 +116,36 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term guardAtPre = buildBeforeVar(guardTerm, services);
         final Term guardAtPost = buildAfterVar(guardTerm, services);
         final Term selfAtPost = buildAtPostVar(selfTerm, "LOOP", services);
+        // The set of local variables which are read in the loop body.
         final ImmutableList<Term> localInTerms = MiscTools.toTermList(localIns);
+        // The set of local vairables which are written in the loop body.
         final ImmutableList<Term> localOutTerms = MiscTools.toTermList(localOuts);
+        // For every local variable which is written we need a pre and a post varible.
         final ImmutableList<Term> localOutsAtPre = buildLocalOutsAtPre(localOutTerms, services);
         final ImmutableList<Term> localOutsAtPost = buildLocalOutsAtPost(localOutTerms, services);
+        // For every local variable which is read only, we need only a pre
+        // variable (because the value of those variables does not change).
         // localIns contains the local variables which might be read in the
         // loop body, localOuts contains the local variables which might be
-        // assigned. Both sets might overlap. Hence we have to filter out
-        // those local variables from localIns which also appear in
-        // localOuts (not the other way around because we have to generate
-        // atPost variables for all local variables which might be assigned
-        // to).
+        // assigned. Both sets might overlap. Because we already generated
+        // pre and post variables for all variables which might be assigned to,
+        // additional pre variables need to be generated only for those variables
+        // which are contained in localInTerms but not in localOutTerms.
+        // Hence we have to filter out those local variables from localIns which
+        // also appear in localOuts.
         final ImmutableList<Term> localInsWithoutOutDuplicates =
                 MiscTools.filterOutDuplicates(localInTerms, localOutTerms);
+        // The set of local pre variables is the union of the pre variables
+        // generated for the variables which are assigned to and the pre
+        // variables for the variables which are read only.
         final ImmutableList<Term> localVarsAtPre =
                 localInsWithoutOutDuplicates.append(localOutsAtPre);
+        // The set of local post variables is the union of the post variables
+        // generated for the variables which are assigned to and the pre
+        // variables for the variables which are read only.
         final ImmutableList<Term> localVarsAtPost =
                 localInsWithoutOutDuplicates.append(localOutsAtPost);
+
         final Pair<Term, Term> updates = new Pair<Term, Term> (inst.u, anonUpdate);
         final InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
                 new InfFlowLoopInvariantTacletBuilder(services);
@@ -146,12 +159,14 @@ public final class WhileInvariantRule implements BuiltInRule {
         ifInvariantBuilder.setSelfAtPost(selfAtPost);
         ifInvariantBuilder.setLocalVarsAtPre(localVarsAtPre);
         ifInvariantBuilder.setLocalVarsAtPost(localVarsAtPost);
+
         // generate information flow invariant application predicate
         // and associated taclet
         final Term loopInvApplPredTerm =
                 ifInvariantBuilder.buildContractApplPredTerm();
         final Taclet informationFlowInvariantApp =
                 ifInvariantBuilder.buildTaclet();
+
         // generate proof obligation variables
         final StateVars instantiationPreVars =
                 new StateVars(selfTerm, guardAtPre, localVarsAtPre, heapAtPre);
