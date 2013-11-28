@@ -351,6 +351,8 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = decreasesclause
     |   result = separatesclause  // old information flow syntax
     |   result = determinesclause // new information flow syntax
+    |   result = loopseparatesclause  // old information flow syntax
+    |   result = loopdeterminesclause // new information flow syntax
     |   result = returnsclause
     |   result = signalsclause
     |   result = signalsonlyclause
@@ -481,7 +483,7 @@ separatesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] 
     ImmutableList<Term> tmp;
 }
 :
-    (RESPECTS | SEPARATES) (NOTHING | sep = infflowspeclist)
+    SEPARATES (NOTHING | sep = infflowspeclist)
     (   (DECLASSIFIES (NOTHING | tmp = infflowspeclist {decl = decl.append(tmp);})) |
         (ERASES (NOTHING | tmp = infflowspeclist {erases = erases.append(tmp);})) |
         (NEW_OBJECTS (NOTHING | tmp = infflowspeclist {newObs = newObs.append(tmp);}))
@@ -489,6 +491,19 @@ separatesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] 
     {decl = sep.append(decl);
      erases = sep.append(erases);
      result = new InfFlowSpec(decl, erases, newObs);}
+    ;
+
+
+loopseparatesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException {
+    ImmutableList<Term> sep = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> tmp;
+}
+:
+    LOOP_SEPARATES (NOTHING | sep = infflowspeclist)
+    (   (NEW_OBJECTS (NOTHING | tmp = infflowspeclist {newObs = newObs.append(tmp);}))
+    )*
+    {result = new InfFlowSpec(sep, sep, newObs);}
     ;
 
 
@@ -510,6 +525,20 @@ determinesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC]
     {det = det.append(erases);
      by = by.append(decl);
      result = new InfFlowSpec(by, det, newObs);}
+    ;
+
+
+loopdeterminesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException {
+    ImmutableList<Term> det = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> tmp;
+}
+:
+    LOOP_DETERMINES (NOTHING | det = infflowspeclist)
+    BY ITSELF
+    (   (NEW_OBJECTS (NOTHING | tmp = infflowspeclist {newObs = newObs.append(tmp);}))
+    )*
+    {result = new InfFlowSpec(det, det, newObs);}
     ;
 
 
