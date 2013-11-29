@@ -2867,11 +2867,12 @@ elementary_heap_update [Term heap] returns [Term result=heap]
     String id;
 }
     : // TODO find the right kind of super non-terminal for "o.f" and "a[i]"
+      // and do not resign to parsing an arbitrary term
     ( (equivalence_term ASSIGN) => target=equivalence_term ASSIGN val=equivalence_term 
         {
            Term objectTerm = target.sub(1);
            Term fieldTerm  = target.sub(2);
-           result = TermBuilder.DF.store(services, heap, objectTerm, fieldTerm, val);
+           result = TermBuilder.DF.store(getServices(), heap, objectTerm, fieldTerm, val);
         }
     | id=simple_ident args=argument_list
         {
@@ -2883,7 +2884,7 @@ elementary_heap_update [Term heap] returns [Term result=heap]
            System.arraycopy(args, 0, augmentedArgs, 1, args.length);
            augmentedArgs[0] = heap;
            result = tf.createTerm(f, augmentedArgs);
-           if(result.sort().name().toString().equals("Heap")) {
+           if(!result.sort().name().toString().equals("Heap")) {
               semanticError(id + " is not a heap constructor ");
            }
         }
