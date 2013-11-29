@@ -84,7 +84,6 @@ import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -3005,7 +3004,7 @@ public final class SymbolicExecutionUtil {
       HashMap<String, String> result = new HashMap<String, String>();
       result.put("Strings", "Strings:on");
       result.put("reach", "reach:on");
-      result.put("JavaCard", "JavaCard:on");
+      result.put("JavaCard", "JavaCard:off");
       result.put("assertions", "assertions:on");
       result.put("bigint", "bigint:on");
       result.put("intRules", "intRules:arithmeticSemanticsIgnoringOF");
