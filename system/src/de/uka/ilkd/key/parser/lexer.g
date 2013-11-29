@@ -40,6 +40,7 @@ tokens {
         // Keywords used in sort declarations
 	SORTS="\\sorts";
 	GENERIC = "\\generic";
+	PROXY = "\\proxy";
         EXTENDS = "\\extends";
         ONEOF = "\\oneof";
 	ABSTRACT = "\\abstract";        
@@ -84,6 +85,7 @@ tokens {
 	DIFFERENT = "\\different";		
 	METADISJOINT = "\\metaDisjoint";
 	ISTHISREFERENCE="\\isThisReference";	        
+	DIFFERENTFIELDS="\\differentFields";	        
 	ISREFERENCE="\\isReference";	        
 	ISREFERENCEARRAY="\\isReferenceArray";
 	ISSUBTYPE = "\\sub";	

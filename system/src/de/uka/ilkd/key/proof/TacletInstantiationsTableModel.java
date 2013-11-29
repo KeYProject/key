@@ -556,12 +556,4 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
         return -1;
     }
 
-
-    public static String getBaseNameProposalForMetavariable(Goal goal,
-                                                        TacletApp      p_app,
-                                                        SchemaVariable p_var) {
-        String s = VariableNameProposer.
-            createBaseNameProposalBasedOnCorrespondence(p_app, p_var ).toUpperCase();
-        return s;
-    }
 }

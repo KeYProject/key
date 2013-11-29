@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.ClassAxiom;
@@ -306,7 +307,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          // Load java file
          environment = KeYEnvironment.load(javaFile, null, null);
          // Search type
-         KeYJavaType containerKJT = environment.getJavaInfo().getTypeByClassName(containerTypeName);
+         KeYJavaType containerKJT = environment.getJavaInfo().getTypeByClassName(containerTypeName, null);
          assertNotNull(containerKJT);
          // Search observer function
          ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(containerKJT);

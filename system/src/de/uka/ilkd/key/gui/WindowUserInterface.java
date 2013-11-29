@@ -236,7 +236,6 @@ public class WindowUserInterface extends AbstractUserInterface {
 	    if (mainWindow.getMediator().autoMode()) {
 	        return super.completeBuiltInRuleApp(app, goal, forced);
 	    }
-
 	    IBuiltInRuleApp result = app;
 	    for (InteractiveRuleApplicationCompletion compl : completions ) {
 	        if (compl.canComplete(app)) {

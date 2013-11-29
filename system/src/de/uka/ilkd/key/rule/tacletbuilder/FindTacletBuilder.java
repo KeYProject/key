@@ -27,15 +27,15 @@ public abstract class FindTacletBuilder extends TacletBuilder {
     /**
      * checks that a SchemaVariable that is used to match pure variables
      * (this means bound variables) occurs at most once in a quantifier of the
-     * ifs and finds and throws an exception otherwise
+     * assumes and finds and throws an exception otherwise
      */
     protected void checkBoundInIfAndFind() {
 	final BoundUniquenessChecker ch = 
                 new BoundUniquenessChecker(getFind(), ifSequent());
 	if (!ch.correct()) {
 	    throw new TacletBuilderException(this, 
-                    "A bound SchemaVariable variables occurs twice "
-	            +"in if and find.");
+                    "A bound SchemaVariable variables occurs both "
+	            +"in assumes and find clauses.");
 	}
     }
 
