@@ -78,7 +78,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.strategy.AbstractBreakpointStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.BreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
@@ -780,9 +780,9 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    }
 
    /**
-    * Returns the {@link CompoundStopCondition} containing all {@link AbstractBreakpointStopCondition}s of this target.
+    * Returns the {@link CompoundStopCondition} containing all {@link BreakpointStopCondition}s of this target.
     * 
-    * @return  the {@link CompoundStopCondition} containing all {@link AbstractBreakpointStopCondition}s of this target
+    * @return  the {@link CompoundStopCondition} containing all {@link BreakpointStopCondition}s of this target
     */
    public CompoundStopCondition getBreakpointStopConditions() {
       return breakpointManager.getBreakpointStopConditions();

@@ -9,9 +9,9 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.symbolic_execution.strategy.AbstractBreakpointStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.BreakpointStopCondition;
 
-public class AbstractNonSymbolicBreakpointStopCondition extends AbstractBreakpointStopCondition {
+public abstract class AbstractNonSymbolicBreakpointStopCondition extends BreakpointStopCondition {
 
    public AbstractNonSymbolicBreakpointStopCondition(Proof proof, boolean enabled) {
       super(proof, enabled);
@@ -34,14 +34,9 @@ public class AbstractNonSymbolicBreakpointStopCondition extends AbstractBreakpoi
             Node node = goal.node();
             RuleApp ruleApp = singleRuleApplicationInfo.getAppliedRuleApp();
             SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
-            if (activeStatement != null && activeStatement.getStartPosition().getLine() != -1) {
-               String path = activeStatement.getPositionInfo().getParentClass();
-               int startLine = activeStatement.getStartPosition().getLine();
-               int endLine = activeStatement.getEndPosition().getLine();
-               if(breakpointHit(startLine, endLine, path, ruleApp, proof, node)){
+               if(isBreakpointHit(activeStatement, ruleApp, proof, node)){
                   return true;
                }
-            }
          }
       }catch(ProofInputException e){
          //TODO

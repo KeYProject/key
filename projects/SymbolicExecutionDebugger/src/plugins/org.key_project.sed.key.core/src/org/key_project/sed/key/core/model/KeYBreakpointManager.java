@@ -25,7 +25,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExceptionBreakpointStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.JavaWatchpointStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.FieldWatchpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.KeYWatchpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.LineBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.MethodBreakpointStopCondition;
@@ -128,7 +128,7 @@ public class KeYBreakpointManager {
          containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
          KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
          if(containerKJT!=null){
-            JavaWatchpointStopCondition stopCondition = new JavaWatchpointStopCondition(javaWatchpoint.isEnabled(),javaWatchpoint.getHitCount(),
+            FieldWatchpointStopCondition stopCondition = new FieldWatchpointStopCondition(javaWatchpoint.isEnabled(),javaWatchpoint.getHitCount(),
                   javaWatchpoint.getFieldName(), javaWatchpoint.isAccess(), javaWatchpoint.isModification(), containerKJT,
                   environment.getBuilder().getProof());
             breakpointStopConditions.addChildren(stopCondition);
@@ -278,7 +278,7 @@ public class KeYBreakpointManager {
     * @throws ProofInputException
     */
    public void javaWatchpointChanged(JavaWatchpoint javaWatchpoint) throws CoreException {
-      JavaWatchpointStopCondition stopCondition = (JavaWatchpointStopCondition) breakpointMap.get(javaWatchpoint);
+      FieldWatchpointStopCondition stopCondition = (FieldWatchpointStopCondition) breakpointMap.get(javaWatchpoint);
       stopCondition.setHitCount(javaWatchpoint.getHitCount());
       stopCondition.setEnabled(javaWatchpoint.isEnabled());
       stopCondition.setAccess(javaWatchpoint.isAccess());

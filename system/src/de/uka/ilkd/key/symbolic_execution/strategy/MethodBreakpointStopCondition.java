@@ -3,19 +3,23 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.rule.ContractRuleApp;
+import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-public class MethodBreakpointStopCondition extends AbstractLineBreakpointStopCondition {
+public class MethodBreakpointStopCondition extends ConditionalBreakpointStopCondition {
 
    /**
     * flag to tell whether to stop on method entry
@@ -26,9 +30,24 @@ public class MethodBreakpointStopCondition extends AbstractLineBreakpointStopCon
     * flag to tell whether to stop on method exit
     */
    private boolean isExit;
+   
+   /**
+    * The start of the method containing the associated Breakpoint
+    */
+   protected int methodStart;
+  
+   /**
+    * The end of the method containing the associated Breakpoint
+    */
+   protected int methodEnd;
 
    /**
-    * Creates a new {@link AbstractLineBreakpointStopCondition}.
+    * The path of the class this {@link LineBreakpointStopCondition} is associated with.
+    */
+   private String classPath;
+
+   /**
+    * Creates a new {@link LineBreakpointStopCondition}.
     * 
     * @param classPath the path of the class the associated Breakpoint lies within
     * @param lineNumber the line where the associated Breakpoint is located in the class
@@ -50,16 +69,19 @@ public class MethodBreakpointStopCondition extends AbstractLineBreakpointStopCon
          Proof proof, String condition,
          boolean enabled, boolean conditionEnabled, int methodStart,
          int methodEnd, boolean isEntry, boolean isExit) throws SLTranslationException {
-      super(classPath, lineNumber, hitCount, pm, proof,
-               condition, enabled, conditionEnabled, methodStart, methodEnd, pm.getContainerType());
+      super(hitCount, pm, proof, enabled, conditionEnabled, methodStart, methodEnd, pm.getContainerType());
       this.isEntry = isEntry;
       this.isExit = isExit;
+      this.setClassPath(classPath);
+      this.methodEnd=methodEnd;
+      this.methodStart=methodStart;
+      this.setCondition(condition);
    }
    
    @Override
-   protected boolean breakpointHit(int startLine, int endLine, String path, RuleApp ruleApp,
+   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp,
          Proof proof, Node node) throws ProofInputException {
-      return ((isMethodCallNode(node, ruleApp)&&isEntry)||(isMethodReturnNode(node, ruleApp)&&isExit))&&super.breakpointHit(startLine, endLine, path, ruleApp, proof, node);
+      return ((isMethodCallNode(node, ruleApp)&&isEntry)||(isMethodReturnNode(node, ruleApp)&&isExit))&&(!isConditionEnabled()||conditionMet(ruleApp, proof, node))&&isEnabled()&&hitcountExceeded(node);
    }
 
    /**
@@ -74,8 +96,17 @@ public class MethodBreakpointStopCondition extends AbstractLineBreakpointStopCon
          MethodBodyStatement mbs = (MethodBodyStatement)statement;
          currentPm = mbs.getProgramMethod(getProof().getServices()); 
       }
-      if(SymbolicExecutionUtil.isMethodCallNode(node, ruleApp, NodeInfo.computeActiveStatement(ruleApp))&&currentPm != null&&currentPm.equals(getPm())){
+      if(currentPm != null&&currentPm.equals(getPm())&&SymbolicExecutionUtil.isMethodCallNode(node, ruleApp, statement)){
             return true;
+      }else if(ruleApp instanceof ContractRuleApp){
+         ContractRuleApp methodRuleApp = (ContractRuleApp) ruleApp;
+         Contract contract = methodRuleApp.getInstantiation();
+         if(contract instanceof FunctionalOperationContract){
+            FunctionalOperationContract methodContract = (FunctionalOperationContract)contract;
+            if(methodContract.getTarget().equals(getPm())){
+               return true;
+            }
+         }
       }
       return false;
       
@@ -90,55 +121,18 @@ public class MethodBreakpointStopCondition extends AbstractLineBreakpointStopCon
       if(SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp)
             &&isCorrectMethodReturn(node, ruleApp)){
             return true;
+      }else if(ruleApp instanceof ContractRuleApp){
+         ContractRuleApp methodRuleApp = (ContractRuleApp) ruleApp;
+         Contract contract = methodRuleApp.getInstantiation();
+         if(contract instanceof FunctionalOperationContract){
+            FunctionalOperationContract methodContract = (FunctionalOperationContract)contract;
+            if(methodContract.getTarget().equals(getPm())){
+               return true;
+            }
+         }
       }
       return false;
       
-   }
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) { 
-         if(goal!=null){
-            Node node = goal.node();
-            RuleApp ruleApp = goal.getRuleAppManager().peekNext();
-            if(getVarsForCondition()!=null&&ruleApp!=null&&node!=null){
-               refreshVarMaps(ruleApp, node);
-            }
-               if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {
-                  // Check if the result for the current node was already computed.
-                  Boolean value = getGoalAllowedResultPerSetNode().get(node);
-                  if (value == null) {
-                     // Get the number of executed set nodes on the current goal
-                     Integer executedNumberOfSetNodes = getExecutedNumberOfSetNodesPerGoal().get(goal);
-                     if (executedNumberOfSetNodes == null) {
-                        executedNumberOfSetNodes = Integer.valueOf(0);
-                     }
-                     // Check if limit of set nodes of the current goal is exceeded
-                     if (!(executedNumberOfSetNodes.intValue() + 1 > getMaximalNumberOfSetNodesToExecutePerGoal())) {
-                           try {
-                              if(((isMethodCallNode(node, ruleApp)&&isEntry)||(isMethodReturnNode(node, ruleApp)&&isExit))&&isEnabled()&&(!isConditionEnabled()||conditionMet(ruleApp, proof, node))){
-                                 // Increase number of set nodes on this goal and allow rule application
-                                 if(hitcountExceeded(node)){
-                                    executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
-                                    getExecutedNumberOfSetNodesPerGoal().put(goal, executedNumberOfSetNodes);
-                                    getGoalAllowedResultPerSetNode().put(node, Boolean.TRUE);
-                                 }
-                                 }
-                           }
-                           catch (ProofInputException e) {
-                              // TODO Auto-generated catch block
-                              e.printStackTrace();
-                           }
-                        
-                        return true; 
-                     }
-                  }
-               }
-            
-         }
-      return true;
    }
    
    private boolean isCorrectMethodReturn(Node node, RuleApp ruleApp){
@@ -191,4 +185,50 @@ public class MethodBreakpointStopCondition extends AbstractLineBreakpointStopCon
    public void setExit(boolean isExit) {
       this.isExit = isExit;
    }
+   @Override
+   protected boolean isInScope(Node node) {
+      Node checkNode = node;
+      while (checkNode != null) {
+         SourceElement activeStatement = NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
+         if (activeStatement != null && activeStatement.getStartPosition().getLine() != -1) {
+            if (activeStatement.getStartPosition().getLine() >= methodStart && activeStatement.getEndPosition().getLine() <= methodEnd) {
+               return true;
+            }
+            break;
+         }
+         checkNode = checkNode.parent();
+      }
+      return false;
+   }
+   
+   @Override
+   protected boolean isInScopeForCondition(Node node) {
+      Node checkNode = node;
+      while (checkNode != null) {
+         SourceElement activeStatement = NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
+         if (activeStatement != null && activeStatement.getStartPosition().getLine() != -1) {
+            if (activeStatement.getStartPosition().getLine() >= methodStart && activeStatement.getEndPosition().getLine() <= methodEnd && activeStatement instanceof LocalVariableDeclaration) {
+               return true;
+            }
+            break;
+         }
+         checkNode = checkNode.parent();
+      }
+      return false;
+   }
+
+   /**
+    * @return the classPath
+    */
+   public String getClassPath() {
+      return classPath;
+   }
+
+   /**
+    * @param classPath the classPath to set
+    */
+   public void setClassPath(String classPath) {
+      this.classPath = classPath;
+   }
+
 }

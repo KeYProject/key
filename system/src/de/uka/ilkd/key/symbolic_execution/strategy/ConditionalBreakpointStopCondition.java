@@ -24,6 +24,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.abstraction.Field;
@@ -57,8 +58,8 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-public abstract class AbstractConditionalBreakpointStopCondition extends
-      AbstractHitCountBreakpointStopCondition {
+public abstract class ConditionalBreakpointStopCondition extends
+      HitCountBreakpointStopCondition {
    
    /**
     * The condition  for this Breakpoint (set by user).
@@ -111,7 +112,7 @@ public abstract class AbstractConditionalBreakpointStopCondition extends
    private IProgramMethod pm;
 
    /**
-    * Creates a new {@link AbstractConditionalBreakpointStopCondition}. Call setCondition immediately after calling the constructor!
+    * Creates a new {@link ConditionalBreakpointStopCondition}. Call setCondition immediately after calling the constructor!
     * 
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
@@ -122,7 +123,7 @@ public abstract class AbstractConditionalBreakpointStopCondition extends
     * @param methodEnd the line the containing method of this breakpoint ends at
     * @param containerType the type of the element containing the breakpoint
     */
-   public AbstractConditionalBreakpointStopCondition(int hitCount, IProgramMethod pm, Proof proof, 
+   public ConditionalBreakpointStopCondition(int hitCount, IProgramMethod pm, Proof proof, 
          boolean enabled, boolean conditionEnabled,
          int methodStart, int methodEnd, KeYJavaType containerType){
       super(hitCount, proof,enabled);
@@ -202,7 +203,7 @@ public abstract class AbstractConditionalBreakpointStopCondition extends
     * @param inScope the flag to determine if the current statement is in the scope of the breakpoint
     * @param oldMap the oldMap variableNamings
     */
-   private void putValuesFromRenamings(ProgramVariable varForCondition, Node node, boolean inScope, Map<SVSubstitute, SVSubstitute> oldMap) {
+   private void putValuesFromRenamings(ProgramVariable varForCondition, Node node, boolean inScope, Map<SVSubstitute, SVSubstitute> oldMap, RuleApp ruleApp) {
       // look for renamings KeY did
       boolean found = false;
       //get current renaming tables
@@ -268,7 +269,7 @@ public abstract class AbstractConditionalBreakpointStopCondition extends
          putValuesFromGlobalVars(varForCondition, node, inScope);
          // put renamings into map and tokeep remove no longer need vars from
          // tokeep
-         putValuesFromRenamings(varForCondition, node, inScope, oldMap);
+         putValuesFromRenamings(varForCondition, node, isInScopeForCondition(node), oldMap, ruleApp);
       }
       freeVariablesAfterReturn(node, ruleApp, inScope);
    }
@@ -359,12 +360,13 @@ public abstract class AbstractConditionalBreakpointStopCondition extends
       Term toProof = TermBuilder.DF.equals(TermBuilder.DF.tt(), termForSideProof);
       Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
       ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
+      proof.getServices().getNameRecorder();
       return info.getProof().closed();
    }
    @Override
-   protected boolean breakpointHit(int startLine, int endLine, String path, RuleApp ruleApp,
+   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp,
          Proof proof, Node node) throws ProofInputException {
-      return (!conditionEnabled||conditionMet(ruleApp, proof, node))&&super.breakpointHit(startLine, endLine, path, ruleApp, proof, node);
+      return (!conditionEnabled||conditionMet(ruleApp, proof, node))&&super.isBreakpointHit(activeStatement, ruleApp, proof, node);
    }
 
    /**
@@ -382,6 +384,16 @@ public abstract class AbstractConditionalBreakpointStopCondition extends
     * @return true if the node represents a statement in the scope of this breakpoint.
     */
    protected abstract boolean isInScope(Node node);
+
+   /**
+    * Checks if the statement of a given {@link Node} is in the scope of this breakpoint.
+    * 
+    * @param node the {@link Node} to be checked
+    * @return true if the node represents a statement in the scope of this breakpoint.
+    */
+   protected abstract boolean isInScopeForCondition(Node node);
+   
+   
 
 
    private ImmutableList<ProgramVariable> saveAddVariable(LocationVariable x,

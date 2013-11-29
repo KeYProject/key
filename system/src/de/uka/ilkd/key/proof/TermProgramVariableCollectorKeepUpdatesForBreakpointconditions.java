@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.symbolic_execution.strategy.AbstractConditionalBreakpointStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.ConditionalBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 
 public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions extends TermProgramVariableCollector {
@@ -42,8 +42,8 @@ public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions exte
    
    private void addVarsToKeep() {
       for(IStopCondition stopCondition : parentCondition.getChildren()){
-         if(stopCondition instanceof AbstractConditionalBreakpointStopCondition){
-            AbstractConditionalBreakpointStopCondition lineBreakpoint = (AbstractConditionalBreakpointStopCondition) stopCondition;
+         if(stopCondition instanceof ConditionalBreakpointStopCondition){
+            ConditionalBreakpointStopCondition lineBreakpoint = (ConditionalBreakpointStopCondition) stopCondition;
             if(lineBreakpoint.getToKeep()!=null){
                for(SVSubstitute sub : lineBreakpoint.getToKeep()){
                   if(sub instanceof LocationVariable){

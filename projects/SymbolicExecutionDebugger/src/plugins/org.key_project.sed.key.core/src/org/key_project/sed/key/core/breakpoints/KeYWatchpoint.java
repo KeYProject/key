@@ -61,21 +61,18 @@ public class KeYWatchpoint extends JavaBreakpoint {
 
    @Override
    protected void addInstanceFilter(EventRequest request, ObjectReference object) {
-      // TODO Auto-generated method stub
       
    }
 
    @Override
    protected EventRequest[] newRequests(JDIDebugTarget target,
          ReferenceType type) throws CoreException {
-      // TODO Auto-generated method stub
       return null;
    }
 
    @Override
    protected void setRequestThreadFilter(EventRequest request,
          ThreadReference thread) {
-      // TODO Auto-generated method stub
       
    }
 

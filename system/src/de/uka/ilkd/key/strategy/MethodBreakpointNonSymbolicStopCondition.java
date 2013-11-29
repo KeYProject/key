@@ -14,7 +14,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.symbolic_execution.strategy.AbstractLineBreakpointStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.LineBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 public class MethodBreakpointNonSymbolicStopCondition extends AbstractNonSymbolicLineBreakpointStopCondition {
@@ -30,7 +30,7 @@ public class MethodBreakpointNonSymbolicStopCondition extends AbstractNonSymboli
    private boolean isExit;
 
    /**
-    * Creates a new {@link AbstractLineBreakpointStopCondition}.
+    * Creates a new {@link LineBreakpointStopCondition}.
     * 
     * @param classPath the path of the class the associated Breakpoint lies within
     * @param lineNumber the line where the associated Breakpoint is located in the class
@@ -59,9 +59,9 @@ public class MethodBreakpointNonSymbolicStopCondition extends AbstractNonSymboli
    }
    
    @Override
-   protected boolean breakpointHit(int startLine, int endLine, String path, RuleApp ruleApp,
+   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp,
          Proof proof, Node node) throws ProofInputException {
-      return ((isMethodCallNode(node, ruleApp)&&isEntry)||(isMethodReturnNode(node, ruleApp)&&isExit))&&super.breakpointHit(startLine, endLine, path, ruleApp, proof, node);
+      return ((isMethodCallNode(node, ruleApp)&&isEntry)||(isMethodReturnNode(node, ruleApp)&&isExit))&&super.isBreakpointHit(activeStatement, ruleApp, proof, node);
    } 
    
    @Override

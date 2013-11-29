@@ -39,9 +39,9 @@ public class TestJavaWatchpointStopConditionWithHitCount extends
             }
          }
          
-         JavaWatchpointStopCondition firstBreakpoint = new JavaWatchpointStopCondition(true, 2, "access", true,false, containerType, env.getBuilder().getProof());
-         JavaWatchpointStopCondition secondBreakpoint = new JavaWatchpointStopCondition(true, -1, "modification", false,true, containerType, env.getBuilder().getProof());
-         JavaWatchpointStopCondition thirdBreakpoint = new JavaWatchpointStopCondition(true, 2, "accessAndModification", true,true, containerType, env.getBuilder().getProof());
+         FieldWatchpointStopCondition firstBreakpoint = new FieldWatchpointStopCondition(true, 2, "access", true,false, containerType, env.getBuilder().getProof());
+         FieldWatchpointStopCondition secondBreakpoint = new FieldWatchpointStopCondition(true, -1, "modification", false,true, containerType, env.getBuilder().getProof());
+         FieldWatchpointStopCondition thirdBreakpoint = new FieldWatchpointStopCondition(true, 2, "accessAndModification", true,true, containerType, env.getBuilder().getProof());
          allBreakpoints.addChildren(firstBreakpoint,secondBreakpoint,thirdBreakpoint);
          env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(allBreakpoints));
          // Do steps

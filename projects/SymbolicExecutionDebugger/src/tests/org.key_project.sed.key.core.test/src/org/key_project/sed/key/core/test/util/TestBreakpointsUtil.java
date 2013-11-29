@@ -28,7 +28,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
 import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExceptionBreakpointStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.JavaWatchpointStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.FieldWatchpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.LineBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.MethodBreakpointStopCondition;
 
@@ -134,7 +134,7 @@ public final class TestBreakpointsUtil {
          }
       }else if(stopCondition instanceof LineBreakpointStopCondition
             ||stopCondition instanceof MethodBreakpointStopCondition
-            ||stopCondition instanceof JavaWatchpointStopCondition
+            ||stopCondition instanceof FieldWatchpointStopCondition
             ||stopCondition instanceof ExceptionBreakpointStopCondition){
          lineBreakpoints.add(stopCondition);
       }
@@ -165,7 +165,7 @@ public final class TestBreakpointsUtil {
          if(breakpoint instanceof MethodBreakpointStopCondition){
             localNumberOfMethods++;
          } 
-         else if(breakpoint instanceof JavaWatchpointStopCondition){
+         else if(breakpoint instanceof FieldWatchpointStopCondition){
             localNumberOfWatchpoints++;
          } 
          else if(breakpoint instanceof ExceptionBreakpointStopCondition){
@@ -203,8 +203,8 @@ public final class TestBreakpointsUtil {
                return false;
             }
          } 
-         else if(breakpoint instanceof JavaWatchpointStopCondition){
-            if(!(((JavaWatchpointStopCondition)breakpoint).getHitCount()==hitCount)){
+         else if(breakpoint instanceof FieldWatchpointStopCondition){
+            if(!(((FieldWatchpointStopCondition)breakpoint).getHitCount()==hitCount)){
                return false;
             }
          } 
@@ -263,8 +263,8 @@ public final class TestBreakpointsUtil {
                return false;
             }
          } 
-         else if(breakpoint instanceof JavaWatchpointStopCondition){
-            if(!(((JavaWatchpointStopCondition)breakpoint).isEnabled()==enabled)){
+         else if(breakpoint instanceof FieldWatchpointStopCondition){
+            if(!(((FieldWatchpointStopCondition)breakpoint).isEnabled()==enabled)){
                return false;
             }
          } 
@@ -416,8 +416,8 @@ public final class TestBreakpointsUtil {
       int localNumberOfAccesses = 0;
       int localNumberOfModifications = 0;
       for(IStopCondition breakpoint : list){
-         if(breakpoint instanceof JavaWatchpointStopCondition){
-            JavaWatchpointStopCondition watchpoint = (JavaWatchpointStopCondition)breakpoint;
+         if(breakpoint instanceof FieldWatchpointStopCondition){
+            FieldWatchpointStopCondition watchpoint = (FieldWatchpointStopCondition)breakpoint;
             if(watchpoint.isAccess()){
                localNumberOfAccesses++;
             }

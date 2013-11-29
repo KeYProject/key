@@ -15,13 +15,14 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 
-public abstract class AbstractHitCountBreakpointStopCondition extends
-      AbstractBreakpointStopCondition {
+public abstract class HitCountBreakpointStopCondition extends
+      BreakpointStopCondition {
    
 
    
@@ -42,13 +43,13 @@ public abstract class AbstractHitCountBreakpointStopCondition extends
 
 
    /**
-    * Creates a new {@link AbstractHitCountBreakpointStopCondition}.
+    * Creates a new {@link HitCountBreakpointStopCondition}.
     * 
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param proof the {@link Proof} that will be executed and should stop
     * @param enabled flag if the Breakpoint is enabled
     */
-   public AbstractHitCountBreakpointStopCondition(int hitCount, Proof proof, boolean enabled){
+   public HitCountBreakpointStopCondition(int hitCount, Proof proof, boolean enabled){
       super(proof, enabled);
       hittedNodes = new HashMap<Integer, Boolean>();
       this.hitCount = hitCount;
@@ -84,8 +85,8 @@ public abstract class AbstractHitCountBreakpointStopCondition extends
    }
    
    @Override
-   protected boolean breakpointHit(int startLine, int endLine, String path, RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
-      return super.breakpointHit(startLine, endLine, path, ruleApp, proof, node)&&hitcountExceeded(node);
+   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
+      return hitcountExceeded(node);
    }
 
    /**

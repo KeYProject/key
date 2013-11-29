@@ -25,6 +25,7 @@ import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.abstraction.Field;
@@ -362,9 +363,9 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
       return info.getProof().closed();
    }
    @Override
-   protected boolean breakpointHit(int startLine, int endLine, String path, RuleApp ruleApp,
+   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp,
          Proof proof, Node node) throws ProofInputException {
-      return (!conditionEnabled||conditionMet(ruleApp, proof, node))&&super.breakpointHit(startLine, endLine, path, ruleApp, proof, node);
+      return (!conditionEnabled||conditionMet(ruleApp, proof, node))&&super.isBreakpointHit(activeStatement, ruleApp, proof, node);
    }
 
    /**

@@ -15,6 +15,7 @@ package de.uka.ilkd.key.strategy;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -84,8 +85,8 @@ public abstract class AbstractNonSymbolicHitCountBreakpointStopCondition extends
    }
    
    @Override
-   protected boolean breakpointHit(int startLine, int endLine, String path, RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
-      return super.breakpointHit(startLine, endLine, path, ruleApp, proof, node)&&hitcountExceeded(node);
+   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
+      return hitcountExceeded(node);
    }
 
    /**

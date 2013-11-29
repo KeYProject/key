@@ -2,6 +2,7 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -27,7 +28,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * 
  * @author Marco Drebing
  */
-public class KeYWatchpointStopCondition extends AbstractConditionalBreakpointStopCondition{
+public class KeYWatchpointStopCondition extends ConditionalBreakpointStopCondition{
    
    /**
     * a flag to tell whether the condition should evaluate to true or just be satisfiable
@@ -36,7 +37,7 @@ public class KeYWatchpointStopCondition extends AbstractConditionalBreakpointSto
 
 
    /**
-    * Creates a new {@link AbstractConditionalBreakpointStopCondition}. Call setCondition immediately after calling the constructor!
+    * Creates a new {@link ConditionalBreakpointStopCondition}. Call setCondition immediately after calling the constructor!
     * 
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
@@ -64,6 +65,11 @@ public class KeYWatchpointStopCondition extends AbstractConditionalBreakpointSto
    
    @Override
    protected boolean isInScope(Node node) {
+      return true;
+   }
+   
+   @Override
+   protected boolean isInScopeForCondition(Node node) {
       return true;
    }
    
@@ -100,5 +106,14 @@ public class KeYWatchpointStopCondition extends AbstractConditionalBreakpointSto
    
    public void setSuspendOnTrue(boolean suspendOnTrue) {
       this.suspendOnTrue = suspendOnTrue;
+   }
+   
+   @Override
+   protected boolean isBreakpointHit(SourceElement activeStatement,
+         RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
+      if(activeStatement != null && activeStatement.getStartPosition().getLine() != -1){
+         return super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+      }
+      return false;
    }
 }

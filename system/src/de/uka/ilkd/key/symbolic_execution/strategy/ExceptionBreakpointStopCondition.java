@@ -25,7 +25,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * @author Marco Drebing
  */
 public class ExceptionBreakpointStopCondition extends
-      AbstractHitCountBreakpointStopCondition {
+      HitCountBreakpointStopCondition {
    
    /**
     * The exception to watch for
@@ -58,7 +58,7 @@ public class ExceptionBreakpointStopCondition extends
    private boolean uncaught;
 
    /**
-    * Creates a new {@link AbstractHitCountBreakpointStopCondition}.
+    * Creates a new {@link HitCountBreakpointStopCondition}.
     * 
     * @param proof the {@link Proof} that will be executed and should stop
     * @param exceptionName the name of the exception to watch for

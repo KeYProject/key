@@ -127,10 +127,16 @@ public class AbstractNonSymbolicLineBreakpointStopCondition extends
    }
    
    @Override
-   protected boolean breakpointHit(int startLine, int endLine, String path, RuleApp ruleApp,
+   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp,
          Proof proof, Node node) throws ProofInputException {
+      if (activeStatement != null && activeStatement.getStartPosition().getLine() != -1) {
+         String path = activeStatement.getPositionInfo().getParentClass();
+         int startLine = activeStatement.getStartPosition().getLine();
+         int endLine = activeStatement.getEndPosition().getLine();
       boolean stopInLine = endLine>startLine+1 ? shouldStopInLine(startLine, path) : shouldStopInLine(endLine, path);
-      return stopInLine&&super.breakpointHit(startLine, endLine, path, ruleApp, proof, node);
+      return stopInLine&&super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+      }
+      return false;
    }
    
    /**

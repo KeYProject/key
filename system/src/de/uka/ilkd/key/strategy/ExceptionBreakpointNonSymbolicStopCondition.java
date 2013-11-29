@@ -16,7 +16,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.symbolic_execution.strategy.AbstractHitCountBreakpointStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.HitCountBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -59,7 +59,7 @@ public class ExceptionBreakpointNonSymbolicStopCondition extends
    private boolean uncaught;
 
    /**
-    * Creates a new {@link AbstractHitCountBreakpointStopCondition}.
+    * Creates a new {@link HitCountBreakpointStopCondition}.
     * 
     * @param proof the {@link Proof} that will be executed and should stop
     * @param exceptionName the name of the exception to watch for
