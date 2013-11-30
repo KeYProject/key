@@ -586,7 +586,7 @@ public final class LogicPrinter {
     }
 
     protected void printHeuristics(Taclet taclet) throws IOException{
-        if (taclet.getRuleSets().size() == 0) {
+        if (taclet.getRuleSets().isEmpty()) {
                 return;
         }
                 layouter.brk().beginC(2).print("\\heuristics (");
@@ -946,9 +946,8 @@ public final class LogicPrinter {
 
         List<ITermLabel> termLabelList = new LinkedList();
         for (ITermLabel l : t.getLabels()) {
-            if (!termLabelPreferences.hiddenTermLabels.contains(l.getClass())) {
+            if (!termLabelPreferences.hiddenTermLabels.contains(l.name())) {
                 termLabelList.add(l);
-            } else {
             }
         }
 

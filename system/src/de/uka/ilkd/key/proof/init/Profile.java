@@ -148,5 +148,10 @@ public interface Profile {
      * @see ITermLabel
      */
     ImmutableList<ITermLabelWorker> getLabelInstantiators();
+    
+    /*
+     Get names of supported ITermLabels.
+     */
+    ImmutableList<Name> getSupportedLabelNames();
 
 }

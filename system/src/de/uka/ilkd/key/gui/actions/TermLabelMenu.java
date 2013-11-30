@@ -4,8 +4,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.ITermLabel;
-import de.uka.ilkd.key.logic.label.LabelFactory;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.pp.TermLabelPreferences;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -32,13 +31,11 @@ public class TermLabelMenu extends JMenu {
 
         if (mediator.getSelectedProof() != null) {
             addSeparator();
-            for (ITermLabel label : LabelFactory.getCreatedLabels()) {
-                Class<ITermLabel> labelClass = (Class<ITermLabel>)label.getClass();
-                TermLabelCheckBox checkBox = new TermLabelCheckBox(
-                        labelClass, label.name().toString()) {
+            for (Name labelName : mediator.getProfile().getSupportedLabelNames()) {
+                TermLabelCheckBox checkBox = new TermLabelCheckBox(labelName) {
                 };
                 
-                checkBox.setSelected(!termLabelPreferences.hiddenTermLabels.contains(labelClass));
+                checkBox.setSelected(!termLabelPreferences.hiddenTermLabels.contains(labelName));
                 checkBox.setEnabled(!hideAllTermLabels.isSelected());
                 checkBoxList.add(checkBox);
             }
@@ -99,19 +96,19 @@ public class TermLabelMenu extends JMenu {
 
     private class TermLabelCheckBox extends KeYMenuCheckBox implements Comparable<TermLabelCheckBox> {
 
-        Class<ITermLabel> c;
+        Name labelName;
 
-        TermLabelCheckBox(Class<ITermLabel> c, String label) {
-            super(mainWindow, label);
-            this.c = c;
+        TermLabelCheckBox(Name labelName) {
+            super(mainWindow, labelName.toString());
+            this.labelName = labelName;
         }
 
         @Override
         public void handleClickEvent() {
             if (isSelected()) {
-                termLabelPreferences.hiddenTermLabels.remove(c);
+                termLabelPreferences.hiddenTermLabels.remove(labelName);
             } else {
-                termLabelPreferences.hiddenTermLabels.add(c);
+                termLabelPreferences.hiddenTermLabels.add(labelName);
             }
             mainWindow.makePrettyView();
         }
