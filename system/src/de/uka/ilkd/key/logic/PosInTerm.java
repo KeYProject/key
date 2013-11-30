@@ -79,7 +79,7 @@ public class PosInTerm {
 
   
     /** descending downwards choosing the n'th subterm, subformula 
-     * @param n int describs the chosen subterm 
+     * @param n int describes the chosen subterm
      * @return Position like old Position but with a deeper
      * subterm.
      */

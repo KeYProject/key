@@ -47,7 +47,7 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
         Services services = proof.getServices();
 
         Goal goal = mediator.getSelectedGoal();
-        if (goal.node().parent() == null) {
+        if (goal == null || goal.node() == null || goal.node().parent() == null) {
             return false;
         }
         RuleApp app = goal.node().parent().getAppliedRuleApp();

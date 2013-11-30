@@ -51,15 +51,13 @@ public abstract class AlternativeProofMacro implements ProofMacro {
      */
     @Override
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        boolean result = false;
         List<ProofMacro> macros = getProofMacros();
         for (int i = 0; i < macros.size(); i++) {
-            result = result || macros.get(i).canApplyTo(mediator, posInOcc);
-            if (result) {
+            if (macros.get(i).canApplyTo(mediator, posInOcc)) {
                 return true;
             }
         }
-        return result;
+        return false;
     }
 
     /**

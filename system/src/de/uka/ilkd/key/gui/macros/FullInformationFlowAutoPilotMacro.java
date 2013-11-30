@@ -46,23 +46,25 @@ public class FullInformationFlowAutoPilotMacro extends SequentialOnLastGoalProof
                 new SequentialProofMacro() {
             @Override
             protected ProofMacro[] createProofMacroArray() {
-                return new ProofMacro[]{new StateExpansionAndInfFlowContractApplicationMacro(),
-                                        new TryCloseMacro(NUMBER_OF_TRY_STEPS)};}
+                return new ProofMacro[] {new StateExpansionAndInfFlowContractApplicationMacro(),
+                                         new TryCloseMacro(NUMBER_OF_TRY_STEPS)};}
             @Override
             public String getName() { return "Anonymous Macro"; }
             @Override
             public String getDescription() { return "Anonymous Macro"; }
         };
-        ExhaustiveProofMacro exhaustiveAuxCompAutoPilotMacro =
-                new ExhaustiveProofMacro() {
+        AlternativeProofMacro exhaustiveOrFinishCompMacro =
+                new AlternativeProofMacro() {
                     @Override
                     public String getName() { return "Anonymous Macro"; }
                     @Override
                     public String getDescription() { return "Anonymous Macro"; }
                     @Override
-                    ProofMacro getProofMacro() { return new AuxiliaryComputationAutoPilotMacro(); }
+                    protected ProofMacro[] createProofMacroArray() {
+                        return new ProofMacro[] {new ExhaustiveOrFinishAuxiliaryComputationAutoPilotMacro(),
+                                                 new FinishAuxiliaryComputationMacro()};}
         };
-        return new ProofMacro[]{ new AuxiliaryComputationAutoPilotMacro(),//exhaustiveAuxCompAutoPilotMacro,
+        return new ProofMacro[] {exhaustiveOrFinishCompMacro,
                                  new FinishAuxiliaryComputationMacro(),
                                  fullmainCompMacro};
     }
