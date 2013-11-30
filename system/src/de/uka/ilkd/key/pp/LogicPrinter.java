@@ -84,7 +84,7 @@ import java.util.List;
 /**
  * The front end for the Sequent pretty-printer.  It prints a sequent
  * and its parts and computes the PositionTable, which is needed for
- * highliting.
+ * highlighting.
  *
  * <P>The actual layouting/formatting is done using the {@link
  * de.uka.ilkd.key.util.pp.Layouter} class.  The concrete syntax for
@@ -345,7 +345,6 @@ public final class LogicPrinter {
 
     /** Reprints the sequent.  This can be useful if settings like
      * PresentationFeatures or abbreviations have changed.
-     * @param seq The Sequent to be reprinted
      * @param filter The SequentPrintFilter for seq
      * @param lineWidth the max. number of character to put on one line
      *   (the actual taken linewidth is the max of
@@ -587,7 +586,7 @@ public final class LogicPrinter {
     }
 
     protected void printHeuristics(Taclet taclet) throws IOException{
-        if (taclet.getRuleSets().size() == 0) {
+        if (taclet.getRuleSets().isEmpty()) {
                 return;
         }
                 layouter.brk().beginC(2).print("\\heuristics (");
@@ -845,7 +844,6 @@ public final class LogicPrinter {
      * formula, the sequent arrow is on a line of its own, and formulae
      * are indented w.r.t. the arrow.
      * A line-break is printed after the Sequent.
-     * @param seq The Sequent to be pretty-printed
      * @param filter The SequentPrintFilter for seq
      */
     public void printSequent(SequentPrintFilter filter) {
@@ -948,9 +946,8 @@ public final class LogicPrinter {
 
         List<ITermLabel> termLabelList = new LinkedList();
         for (ITermLabel l : t.getLabels()) {
-            if (!termLabelPreferences.hiddenTermLabels.contains(l.getClass())) {
+            if (!termLabelPreferences.hiddenTermLabels.contains(l.name())) {
                 termLabelList.add(l);
-            } else {
             }
         }
 
@@ -1829,6 +1826,7 @@ public final class LogicPrinter {
      *
      * @return the pretty-printed sequent.
      */
+    @Override
     public String toString() {
         try {
             layouter.flush();

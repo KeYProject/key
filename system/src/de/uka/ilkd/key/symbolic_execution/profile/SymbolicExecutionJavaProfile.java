@@ -121,4 +121,13 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
       return defaultInstance;
    }
    
+    @Override
+    public ImmutableList<Name> getSupportedLabelNames() {
+        ImmutableList<Name> ret = super.getSupportedLabelNames();
+        ret = ret.prepend(LoopBodyTermLabel.NAME);
+        ret = ret.prepend(LoopInvariantNormalBehaviorTermLabel.NAME);
+        ret = ret.prepend(SymbolicExecutionTermLabel.NAME);
+        return ret;
+    }
+   
 }

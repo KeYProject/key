@@ -120,6 +120,7 @@ public class TermBuilder {
      *            the services to be used for parsing
      * @param namespaces
      *            the namespaces used for name lookup.
+     * @throws de.uka.ilkd.key.parser.ParserException
      */
     public Term parseTerm(String s, Services services, NamespaceSet namespaces)
         throws ParserException
@@ -800,6 +801,29 @@ public class TermBuilder {
               TRUE(services));
     }
 
+    // Functions for wellfoundedness
+    //------------------------------
+
+    public Term pair(Term first, Term second, Services services) {
+        final Namespace funcNS = services.getNamespaces().functions();
+        final Function f = (Function)funcNS.lookup(new Name("pair"));
+        if (f == null)
+            throw new RuntimeException("LDT: Function pair not found.\n" +
+                    "It seems that there are definitions missing from the .key files.");
+
+        return func(f, first, second);
+
+    }
+
+    public Term prec(Term mby, Term mbyAtPre, Services services) {
+        final Namespace funcNS = services.getNamespaces().functions();
+        final Function f = (Function)funcNS.lookup(new Name("prec"));
+        if (f == null)
+                throw new RuntimeException("LDT: Function prec not found.\n" +
+                                "It seems that there are definitions missing from the .key files.");
+        
+        return func(f, mby, mbyAtPre);
+    }
 
     /**
      * If a is a boolean literal, the method returns the literal as a Formula.

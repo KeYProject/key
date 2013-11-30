@@ -39,6 +39,27 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: examples/_testcase/set/useLoopInvariantAndOperationContractStrictlyPure
+    */
+   public void testLoopInvariantAndOperationContractStrictlyPure() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantAndOperationContractStrictlyPure/test/IndexOf.java", 
+                "IndexOf", 
+                "indexOf", 
+                null,
+                "examples/_testcase/set/useLoopInvariantAndOperationContractStrictlyPure/oracle/IndexOf.xml",
+                false,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                true,
+                false,
+                false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/instanceContractTest
     */
    public void testInstanceContractTest_mainVoidMethod() throws Exception {
@@ -1734,7 +1755,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    public void testVariablesUnknownTest() throws Exception {
       doSETTestAndDispose(keyRepDirectory, 
                           "examples/_testcase/set/variablesUnknownTest/test/UnknownTest.java", 
-                          "UnknownTest", 
+                          "endless.UnknownTest", 
                           "main", 
                           null,
                           "examples/_testcase/set/variablesUnknownTest/oracle/UnknownTest.xml",

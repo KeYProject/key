@@ -67,10 +67,10 @@ public class InnerNodeView extends SequentView {
         super(mainWindow);
         this.node = node;
         filter = new IdentitySequentPrintFilter(node.sequent());
-        printer = new LogicPrinter(new ProgramPrinter(),
+        setLogicPrinter(new LogicPrinter(new ProgramPrinter(),
                 mediator.getNotationInfo(),
                 mediator.getServices(),
-                getTermLabelPreferences());
+                getTermLabelPreferences()));
         setSelectionColor(new Color(10,180,50));
 
         tacletInfo = new JTextArea(getTacletDescription(mediator, node, filter));
@@ -117,7 +117,7 @@ public class InnerNodeView extends SequentView {
                 out.append(op.name());
                 sep = ", ";
             }
-            out.append(" } " + modalOpSV.name());
+            out.append(" } ").append(modalOpSV.name());
         } else if (schemaVar instanceof TermSV) {
             out.append("\\term");
         } else if (schemaVar instanceof FormulaSV) {
@@ -135,9 +135,9 @@ public class InnerNodeView extends SequentView {
         }
         writeSVModifiers(out, schemaVar);
         if (!(schemaVar instanceof FormulaSV || schemaVar instanceof UpdateSV)) {
-            out.append(" " + schemaVar.sort().declarationString());
+            out.append(" ").append(schemaVar.sort().declarationString());
         }
-        out.append(" " + schemaVar.name());
+        out.append(" ").append(schemaVar.name());
     }
 
     public static void writeTacletSchemaVariablesHelper(StringBuffer out,
@@ -181,7 +181,6 @@ public class InnerNodeView extends SequentView {
      * @param mediator The {@link KeYMediator} to use.
      * @param node The {@link Node} to use.
      * @param filter The {@link SequentPrintFilter} to use.
-     * @param printer The {@link LogicPrinter} to use.
      * @return The text to show.
      */
     public static String getTacletDescription(KeYMediator mediator,
@@ -309,16 +308,18 @@ public class InnerNodeView extends SequentView {
         return r;
     }
 
+    @Override
     public String getTitle() {
         return "Inner Node";
     }
 
-    public synchronized void printSequent() {
+    @Override
+    public final synchronized void printSequent() {
 
         setLineWidth(computeLineWidth());
-        printer.update(filter, getLineWidth());
-        setText(printer.toString());
-        posTable = printer.getInitialPositionTable();
+        getLogicPrinter().update(filter, getLineWidth());
+        setText(getLogicPrinter().toString());
+        posTable = getLogicPrinter().getInitialPositionTable();
 
         RuleApp app = node.getAppliedRuleApp();
         if (app != null) {

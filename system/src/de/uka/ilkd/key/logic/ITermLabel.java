@@ -15,8 +15,6 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.label.LabelFactory;
 import de.uka.ilkd.key.proof.init.Profile;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <p>
@@ -55,7 +53,7 @@ import java.util.Map;
  * </ol>
  * </p>
  */
-public abstract class ITermLabel implements Named {
+public interface ITermLabel extends Named {
     /**
      * A term label may have structure, i.e., parameterized
      * @param i the i-th parameter (from 0 to max nr of parameters)
@@ -70,18 +68,4 @@ public abstract class ITermLabel implements Named {
      */
     public abstract int getChildCount();
     
-    /*
-     * Store the runtime classes of all ITermLabel objects in this map.
-     * Also, a class is mapped to the name of its instance created last.
-     * That name is then displayed in the TermLabelMenu for each class.
-     */
-    private static final Map<Class<ITermLabel>, Name> registeredTermLabels = new HashMap();
-
-    public static Map<Class<ITermLabel>, Name> getRegisteredTermLabels() {
-        return registeredTermLabels;
-    }
-    
-    public ITermLabel(){
-        registeredTermLabels.put((Class<ITermLabel>) this.getClass(), this.name());
-    }
 }

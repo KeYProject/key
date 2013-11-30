@@ -19,7 +19,6 @@ import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 
 import antlr.Token;
@@ -126,7 +125,7 @@ final class JMLTranslator {
         NOT_MOD ("\\not_modified"),
         VALUES ("\\values"),
         INDEX ("\\index"),
-        INDEX_OF ("\\indexOf"),
+        INDEX_OF ("\\seq_indexOf"),
         SEQ_GET ("\\seq_get"),
         SEQ_CONCAT ("\\seq_concat"),
         REACH ("reach"),
@@ -527,8 +526,13 @@ final class JMLTranslator {
             protected Term createSkolemTerm ()  {
                 addUnderspecifiedWarning("\\sum over non-interval domain");
                 final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-                final int x = (new Random()).nextInt(999);
-                final Function sk = new Function(new Name("sum"+x),intSort);
+                final Namespace fns = services.getNamespaces().functions();
+                int x = -1;
+                Name name = null;
+                do name = new Name("sum_"+ ++x);
+                while (fns.lookup(name)!= null);
+                final Function sk = new Function(name,intSort);
+                fns.addSafely(sk);
                 final Term res = TB.func(sk);
                 return res;
             }
@@ -551,8 +555,13 @@ final class JMLTranslator {
             protected Term createSkolemTerm ()  {
                 addUnderspecifiedWarning("\\prod over non-interval domain");
                 final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-                final int x = (new Random()).nextInt(999);
-                final Function sk = new Function(new Name("prod"+x),intSort);
+                final Namespace fns = services.getNamespaces().functions();
+                int x = -1;
+                Name name = null;
+                do name = new Name("prod_"+ ++x);
+                while (fns.lookup(name)!= null);
+                final Function sk = new Function(name,intSort);
+                fns.addSafely(sk);
                 final Term res = TB.func(sk);
                 return res;
             }
@@ -670,8 +679,13 @@ final class JMLTranslator {
                 final TypeConverter typeConverter = services.getTypeConverter();
                 final IntegerLDT integerLDT = typeConverter.getIntegerLDT();
                 final Sort intSort = integerLDT.targetSort();
-                final int x = (new Random()).nextInt(999);
-                final Function sk = new Function(new Name("numOf"+x),intSort);
+                final Namespace fns = services.getNamespaces().functions();
+                int x = -1;
+                Name name = null;
+                do name = new Name("numOf_"+ ++x);
+                while (fns.lookup(name)!= null);
+                final Function sk = new Function(name,intSort);
+                fns.addSafely(sk);
                 final Term res = TB.func(sk);
                 return res;
             }
@@ -1251,7 +1265,7 @@ final class JMLTranslator {
                 Named symbol = funcs.lookup(new Name(functName));
 
                 if (symbol != null) {
-                    // Function symbol found
+                    // Function or predicate symbol found
 
                     assert symbol instanceof Function : "Expecting a function symbol in this namespace";
                     Function function = (Function) symbol;
@@ -1305,6 +1319,8 @@ final class JMLTranslator {
                 symbol = progVars.lookup(new Name(functName));
 
                 if (symbol == null) {
+                    
+                    System.out.println(funcs.toString());
                     throw excManager.createException("Unknown escaped symbol "
                                                      + functName, escape);
                 }
@@ -1655,9 +1671,9 @@ final class JMLTranslator {
                     "Unknown JML-keyword or unknown translation for "
                     + "JML-keyword \"" + jmlKeyWordName
                     + "\". The keyword seems "
-                    + "not to be supported yet.");
+                    + "not to be supported yet.", e);
         } catch (TermCreationException e) {
-            throw excManager.createException(e.getMessage());
+            throw excManager.createException(e.getMessage(), e);
         }
     }
 
@@ -1712,9 +1728,14 @@ final class JMLTranslator {
      */
     SLExpression createSkolemExprBool(Token jmlKeyWord) {
         addUnderspecifiedWarning(jmlKeyWord);
+        final Namespace fns = services.getNamespaces().functions();
         final String shortName = jmlKeyWord.getText().replace("\\", "");
-        final int x = (new Random()).nextInt(1000); // function is unique anyway
-        final Function sk = new Function(new Name(shortName+x),Sort.FORMULA);
+        int x = -1;
+        Name name = null;
+        do name = new Name(shortName+"_"+ ++x);
+        while (fns.lookup(name)!=null);
+        final Function sk = new Function(name,Sort.FORMULA);
+        fns.add(sk);
         final Term t = TB.func(sk);
         return new SLExpression(t);
     }
@@ -1790,10 +1811,15 @@ final class JMLTranslator {
     private SLExpression skolemExprHelper(Token jmlKeyWord, KeYJavaType type, Services services) {
         addUnderspecifiedWarning(jmlKeyWord);
         assert services != null;
+        final Namespace fns = services.getNamespaces().functions();
         final Sort sort = type.getSort();
         final String shortName = jmlKeyWord.getText().replace("\\", "");
-        final int x = (new Random()).nextInt(1000); // function is unique anyway
-        final Function sk = new Function(new Name(shortName+x),sort);
+        int x = -1;
+        Name name = null;
+        do name = new Name(shortName+"_"+ ++x);
+        while (fns.lookup(name)!= null);
+        final Function sk = new Function(name,sort);
+        fns.add(sk);
         final Term t = TB.func(sk);
         return new SLExpression(t,type);
     }
@@ -2273,3 +2299,9 @@ final class JMLTranslator {
         protected abstract SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression left, SLExpression right) throws SLTranslationException;
     }
 }
+
+//if(symbol == null) {
+//  // no function -> look for predicates
+//  Namespace preds = services.getNamespaces().functions();
+//  Named symbol = funcs.lookup(new Name(functName));
+//}

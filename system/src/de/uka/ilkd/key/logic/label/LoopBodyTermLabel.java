@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.Name;
  * Label attached to the modality which executes a loop body 
  * in branch "Body Preserves Invariant" of applied "Loop Invariant" rules. 
  */
-public class LoopBodyTermLabel extends ITermLabel {
+public class LoopBodyTermLabel implements ITermLabel {
    /**
     * The unique name of this label.
     */

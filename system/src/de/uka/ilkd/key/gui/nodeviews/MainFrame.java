@@ -64,6 +64,7 @@ public final class MainFrame extends JScrollPane {
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
                 "copy");
         getActionMap().put("copy", new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 // FIXME: Can this ever be reached ?!?! (MU 2013)
                 PosInSequent pos = mainWindow.leafNodeView.getMousePosInSequent();

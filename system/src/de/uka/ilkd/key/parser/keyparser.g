@@ -890,7 +890,7 @@ options {
     throws KeYSemanticException {
         KeYJavaType kjt = null;              
         try {
-	    kjt=getJavaInfo().getKeYJavaTypeByClassName(s);
+	    kjt=getJavaInfo().getTypeByClassName(s, null);
         } catch(RuntimeException e){
             return null;
         }
@@ -1119,7 +1119,7 @@ options {
 	    		 LT(n+2).getText().charAt(1)<='z' && LT(n+2).getText().charAt(1)>='a'))){  	   
                 if (LA(n+1) != DOT && LA(n+1) != EMPTYBRACKETS) return false;
                 // maybe still an attribute starting with an uppercase letter followed by a lowercase letter
-                if(getTypeByClassName(className.toString())!=null){
+                if(getTypeByClassName(className.toString()) != null){
                     ProgramVariable maybeAttr = 
                     javaInfo.getAttribute(LT(n+2).getText(), getTypeByClassName(className.toString()));
                     if(maybeAttr!=null){
@@ -1524,6 +1524,7 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
 {
     boolean isAbstractSort = false;
     boolean isGenericSort = false;
+    boolean isProxySort = false;
     Sort[] sortExt=new Sort [0];
     Sort[] sortOneOf=new Sort [0];
     String firstSort;
@@ -1532,6 +1533,8 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
         ( 
          GENERIC {isGenericSort=true;} sortIds = simple_ident_comma_list
             ( ONEOF sortOneOf = oneof_sorts )? 
+            ( EXTENDS sortExt = extends_sorts )?
+        | PROXY {isProxySort=true;} sortIds = simple_ident_comma_list
             ( EXTENDS sortExt = extends_sorts )?
         | (ABSTRACT {isAbstractSort = true;})?
           firstSort = simple_ident_dots { sortIds = sortIds.prepend(firstSort); }
@@ -1573,7 +1576,11 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
                                     ext = ext.add ( sortExt[i] );
                                 }
 
+                                if(isProxySort) {
+                                    s = new ProxySort(sort_name, ext);
+                                } else {
                                 s = new SortImpl(sort_name, ext, isAbstractSort);
+                                }
                             }
                             assert s != null;
                             sorts().add ( s ); 
@@ -3589,11 +3596,12 @@ varexp[TacletBuilder b]
     | varcond_different[b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
+    | varcond_differentFields[b]        
   ) 
   | 
   ( (NOT {negated = true;} )? 
-      (   varcond_abstractOrInterface[b, negated]
-	| varcond_array[b, negated]
+    (   varcond_abstractOrInterface[b, negated]
+	    | varcond_array[b, negated]
         | varcond_array_length[b, negated]	
         | varcond_enumtype[b, negated]
         | varcond_freeLabelIn[b,negated]         
@@ -3658,6 +3666,23 @@ varcond_dropEffectlessStores[TacletBuilder b]
                                                                (TermSV)result));
    }
 ;
+
+varcond_differentFields [TacletBuilder b]
+{
+  ParsableVariable x = null;
+  ParsableVariable y = null;
+
+}
+:
+   DIFFERENTFIELDS
+   LPAREN      
+     x = varId COMMA y = varId                    
+   RPAREN 
+   { 
+            b.addVariableCondition(new DifferentFields((SchemaVariable)x, (SchemaVariable)y)); 
+   }
+; 
+
 
 varcond_simplifyIfThenElseUpdate[TacletBuilder b]
 {
@@ -4080,6 +4105,9 @@ varcond_induction_variable [TacletBuilder b, boolean negated]
    }
 ;
 
+
+
+
 goalspecs[TacletBuilder b, boolean ruleWithFind] :
         CLOSEGOAL
     | goalspecwithoption[b, ruleWithFind] ( SEMI goalspecwithoption[b, ruleWithFind] )* ;
@@ -4328,8 +4356,12 @@ problem returns [ Term a = null ]
     String pref = null;
 }
     :
+       { if (capturer != null) capturer.mark(); }
+    
         profile     
-	{ if (capturer != null) capturer.mark(); }
+   	
+   	{ if (profileName != null && capturer != null) capturer.mark(); }
+    
         (pref = preferences)
         { if ((pref!=null) && (capturer != null)) capturer.mark(); }
         

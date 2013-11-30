@@ -348,6 +348,7 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = representsclause
     |   result = axiomsclause
     |   result = requiresclause
+    |   result = decreasesclause
     |   result = respectsclause
     |   result = returnsclause
     |   result = signalsclause
@@ -407,6 +408,14 @@ dependsclause returns [Triple<ObserverFunction,Term,Term> result=null] throws SL
                 dep.getText(), Triple.class, lhs, rhs, mby, services); }
     ;
 
+decreasesclause returns [Term result = null] throws SLTranslationException
+{ 
+    Term t;
+}
+:
+    dec:DECREASES result=termexpression
+        (COMMA t=termexpression { result = TB.pair(result, t, services); } )*
+    ;
 
 requiresclause returns [Term result = null] throws SLTranslationException
 :
@@ -976,8 +985,12 @@ relationalexpr returns [SLExpression result=null] throws SLTranslationException
 		if (result.getTerm() == null) {
 		    addIgnoreWarning("subtype expression <: only supported for" +
 			" \\typeof() arguments on the left side.", st);
-			final int x = (new java.util.Random()).nextInt(1000);
-			final Function z = new Function(new Name("subtype"+x),Sort.FORMULA);
+			final Namespace fns = services.getNamespaces().functions();
+			int x = -1; Name name = null;
+			do name = new Name("subtype_"+ ++x);
+			while (fns.lookup(name)!= null);
+			final Function z = new Function(name,Sort.FORMULA);
+			fns.add(z);
 			result = new SLExpression(TB.func(z));
 		} else {
 

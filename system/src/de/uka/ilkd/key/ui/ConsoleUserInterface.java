@@ -57,14 +57,14 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 	private int progressMax = 0;
 
     public boolean isAutoMode() {
-      return autoMode;
-   }
+        return autoMode;
+    }
 
    public ConsoleUserInterface(BatchMode batchMode, boolean useAutoSaver, byte verbosity) {
     	this.batchMode = batchMode;
     	this.verbosity = verbosity;
         this.mediator  = new KeYMediator(this, useAutoSaver);
-    }
+   }
 
    public ConsoleUserInterface(BatchMode batchMode, boolean useAutoSaver, boolean verbose) {
        this(batchMode, useAutoSaver, verbose? DEBUG: NORMAL);
@@ -72,7 +72,12 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
     public void taskFinished(TaskFinishedInfo info) {
         progressMax = 0; // reset progress bar marker
-        final int openGoals = info.getProof().openGoals().size();
+        final Proof proof = info.getProof();
+        if (proof==null) {
+            if (verbosity > SILENT) System.out.println("Proof loading failed");
+            return;
+        }
+        final int openGoals = proof.openGoals().size();
         final Object result2 = info.getResult();
         if (info.getSource() instanceof ApplyStrategy) {
             if (verbosity >= HIGH) {
@@ -85,7 +90,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                     final Proof.Statistics stat = info.getProof().statistics();
                     System.out.println("Proof steps: "+stat.nodes);
                     System.out.println("Branches: "+stat.branches);
-                    System.out.println("Time: "+stat.autoModeTime+"ms");
+                    System.out.println("Automode Time: "+stat.autoModeTime+"ms");
                 }
                 System.out.println("Number of goals remaining open: " +
                         openGoals);

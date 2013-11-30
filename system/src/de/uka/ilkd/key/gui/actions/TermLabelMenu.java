@@ -4,14 +4,11 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.pp.TermLabelPreferences;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 
@@ -34,11 +31,11 @@ public class TermLabelMenu extends JMenu {
 
         if (mediator.getSelectedProof() != null) {
             addSeparator();
-            Map<Class<ITermLabel>, Name> termLabels = ITermLabel.getRegisteredTermLabels();
-            for (Entry<Class<ITermLabel>, Name> e : termLabels.entrySet()) {
-                TermLabelCheckBox checkBox = new TermLabelCheckBox(e.getKey(), e.getValue().toString()) {
+            for (Name labelName : mediator.getProfile().getSupportedLabelNames()) {
+                TermLabelCheckBox checkBox = new TermLabelCheckBox(labelName) {
                 };
-                checkBox.setSelected(!termLabelPreferences.hiddenTermLabels.contains(e.getKey()));
+                
+                checkBox.setSelected(!termLabelPreferences.hiddenTermLabels.contains(labelName));
                 checkBox.setEnabled(!hideAllTermLabels.isSelected());
                 checkBoxList.add(checkBox);
             }
@@ -69,6 +66,7 @@ public class TermLabelMenu extends JMenu {
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
+                rebuildMenu();
             }
 
             @Override
@@ -98,19 +96,19 @@ public class TermLabelMenu extends JMenu {
 
     private class TermLabelCheckBox extends KeYMenuCheckBox implements Comparable<TermLabelCheckBox> {
 
-        Class<ITermLabel> c;
+        Name labelName;
 
-        TermLabelCheckBox(Class<ITermLabel> c, String label) {
-            super(mainWindow, label);
-            this.c = c;
+        TermLabelCheckBox(Name labelName) {
+            super(mainWindow, labelName.toString());
+            this.labelName = labelName;
         }
 
         @Override
         public void handleClickEvent() {
             if (isSelected()) {
-                termLabelPreferences.hiddenTermLabels.remove(c);
+                termLabelPreferences.hiddenTermLabels.remove(labelName);
             } else {
-                termLabelPreferences.hiddenTermLabels.add(c);
+                termLabelPreferences.hiddenTermLabels.add(labelName);
             }
             mainWindow.makePrettyView();
         }

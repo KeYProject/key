@@ -77,9 +77,9 @@ public abstract class SequentView extends JTextArea
         return MainWindow.getInstance().termLabelMenu.termLabelPreferences;
     }
     
-    private ConfigChangeListener configChangeListener;
+    private final ConfigChangeListener configChangeListener;
     SequentPrintFilter filter;
-    LogicPrinter printer;
+    private LogicPrinter printer;
     public boolean refreshHighlightning = true;
     private boolean showTermInfo = false;
     
@@ -98,7 +98,7 @@ public abstract class SequentView extends JTextArea
     /*
      * Store highlights in a HashMap in order to prevent duplicate highlights.
      */
-    private HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight =
+    private final HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight =
             new LinkedHashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
 
     SequentView(MainWindow mainWindow) {
@@ -127,7 +127,7 @@ public abstract class SequentView extends JTextArea
         addHierarchyBoundsListener(changeListener);
     }
     
-    public void setFont() {
+    public final void setFont() {
         Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
         if (myFont != null) {
             setFont(myFont);
@@ -205,7 +205,7 @@ public abstract class SequentView extends JTextArea
      * @param color the Color used to highlight regions of the sequent
      * @return the highlight for the specified color
      */
-    public Object getColorHighlight(Color color) {
+    public final Object getColorHighlight(Color color) {
         Object highlight = null;
         if (!color2Highlight.containsKey(color)) {
             color2Highlight.put(color,
@@ -239,15 +239,34 @@ public abstract class SequentView extends JTextArea
         }
     }
 
+    /** Return used LogicPrinter.
+     * @return The LogicPrinter that is used.
+     */
+    public LogicPrinter getLogicPrinter() {
+        return printer;
+    }
+
+    /** Set the LogicPrinter to be used.
+     * @param p The LogicPrinter to be used
+     */
+    protected void setLogicPrinter(LogicPrinter p) {
+        printer = p;
+    }
+
     public String getHighlightedText(PosInSequent pos) {
+        if(pos == null) return "";
         String s = "";
         try {
             s = getText(pos.getBounds().start(),
                     pos.getBounds().length());
-        } catch (Exception e) {
+        } catch (BadLocationException e) {
             e.printStackTrace();
         }
         return s;
+    }
+
+    public String getHighlightedText() {
+       return getHighlightedText(getPosInSequent(getMousePosition()));
     }
 
     private void showTermInfo(Point p) {
@@ -267,7 +286,8 @@ public abstract class SequentView extends JTextArea
                     String tOpClassString = t.op().getClass().toString();
                     String operator = tOpClassString.substring(
                             tOpClassString.lastIndexOf('.') + 1);
-                    // What is the purpose of displaying the java hashcode here?
+                    // The hash code is displayed here since sometimes terms with
+                    // equal string representation are still different.
                     info = operator + ", Sort: " + t.sort() + ", Hash:" + t.hashCode();
 
                     Sequent seq = mainWindow.getMediator().getSelectedNode().sequent();
@@ -389,18 +409,22 @@ public abstract class SequentView extends JTextArea
         paintHighlights(p);
     }
 
+    @Override
     public void mouseClicked(MouseEvent e) {
         // Necessary for MouseListener Interface
     }
 
+    @Override
     public void mousePressed(MouseEvent e) {
         // Necessary for MouseListener Interface
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
         // Necessary for MouseListener Interface
     }
 
+    @Override
     public void mouseEntered(MouseEvent e) {
         // Requesting focus here is necessary for the
         // ALT KeyListener, which works in combination with
@@ -408,10 +432,12 @@ public abstract class SequentView extends JTextArea
         requestFocusInWindow();
     }
 
+    @Override
     public void mouseDragged(MouseEvent me) {
         // Necessary for MouseMotionListener Interface
     }
 
+    @Override
     public void mouseMoved(MouseEvent me) {
         showTermInfo(me.getPoint());
         if (refreshHighlightning) {
@@ -419,12 +445,14 @@ public abstract class SequentView extends JTextArea
         }
     }
     
+    @Override
     public void mouseExited(MouseEvent e) {
         if (refreshHighlightning) {
             disableHighlights();
         }
     }
 
+    @Override
     public void keyTyped(KeyEvent e) {
         // Necessary for KeyListener Interface
     }
@@ -432,6 +460,7 @@ public abstract class SequentView extends JTextArea
     /* (non-Javadoc)
      * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
      */
+    @Override
     public void keyPressed(KeyEvent e) {
         if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) {
             showTermInfo = true;
@@ -442,6 +471,7 @@ public abstract class SequentView extends JTextArea
     /* (non-Javadoc)
      * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
      */
+    @Override
     public void keyReleased(KeyEvent e) {
         if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) == 0 && showTermInfo) {
             showTermInfo = false;
