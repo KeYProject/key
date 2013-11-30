@@ -575,6 +575,7 @@ public final class MainWindow extends JFrame  {
 
 	smtComponent.addListener(new ChangeListener() {
 
+            @Override
 	    public void stateChanged(ChangeEvent e) {
 		ComplexButton but = (ComplexButton) e.getSource();
 		if(but.getSelectedItem() instanceof SMTInvokeAction){
@@ -616,6 +617,7 @@ public final class MainWindow extends JFrame  {
      */
     public void setStandardStatusLine() {
         GuiUtilities.invokeOnEventQueue(new Runnable() {
+            @Override
 	    public void run() {
 		setStandardStatusLineImmediately();
 	    }
@@ -936,6 +938,7 @@ public final class MainWindow extends JFrame  {
         group.add(jmlButton);
         jmlButton.setIcon(IconFactory.jmlLogo(15));
         jmlButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 GeneralSettings gs
                 =ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
@@ -950,6 +953,7 @@ public final class MainWindow extends JFrame  {
         result.add(noneButton);
         group.add(noneButton);
         noneButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
         	GeneralSettings gs
         	=ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
@@ -996,6 +1000,7 @@ public final class MainWindow extends JFrame  {
 
     public void addProblem(final de.uka.ilkd.key.proof.ProofAggregate plist) {
         Runnable guiUpdater = new Runnable() {
+            @Override
             public void run() {
                 disableCurrentGoalView = true;
                 addToProofList(plist);
@@ -1070,6 +1075,7 @@ public final class MainWindow extends JFrame  {
             doNotReenable = null;
         }
 
+        @Override
         public void modalDialogOpened(GUIEvent e) {
 
             if (e.getSource() instanceof ApplyTacletDialog) {
@@ -1088,6 +1094,7 @@ public final class MainWindow extends JFrame  {
         }
 
         /** invoked if a frame that wants modal access is closed */
+        @Override
         public void modalDialogClosed(GUIEvent e) {
             if (e.getSource() instanceof ApplyTacletDialog) {
                 // enable all previously diabled elements ...
@@ -1104,6 +1111,7 @@ public final class MainWindow extends JFrame  {
             }
         }
 
+        @Override
         public void shutDown(GUIEvent e) {
             MainWindow.this.notify(new ExitKeYEvent());
             MainWindow.this.setVisible(false);
@@ -1171,6 +1179,7 @@ public final class MainWindow extends JFrame  {
         private final MainWindow mainWindow;
 
         /** focused node has changed */
+        @Override
         public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
             if (getMediator().autoMode()) return;
             updateSequentView();
@@ -1179,6 +1188,7 @@ public final class MainWindow extends JFrame  {
         /**
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
+        @Override
         public synchronized void selectedProofChanged(KeYSelectionEvent e) {
             Debug.out("Main: initialize with new proof");
 
@@ -1201,6 +1211,7 @@ public final class MainWindow extends JFrame  {
         /**
          * invoked if automatic execution has started
          */
+        @Override
         public synchronized void autoModeStarted(ProofEvent e) {
             Debug.log4jWarn("Automode started", MainWindow.class.getName());
             disableCurrentGoalView = true;
@@ -1211,6 +1222,7 @@ public final class MainWindow extends JFrame  {
         /**
          * invoked if automatic execution has stopped
          */
+        @Override
         public synchronized void autoModeStopped(ProofEvent e) {
             if (Debug.ENABLE_DEBUG) {
 		Debug.log4jWarn("Automode stopped", MainWindow.class.getName());
@@ -1224,32 +1236,13 @@ public final class MainWindow extends JFrame  {
         }
 
         /** invoked when the strategy of a proof has been changed */
+        @Override
         public synchronized void settingsChanged ( GUIEvent e ) {
             if ( proof.getSettings().getStrategySettings() == (StrategySettings) e.getSource() ) {
                 // updateAutoModeConfigButton();
             }
         }
     }
-
-//    /** displays some status information */
-// MU: I moved this to DefaultTaskFinishedInfo.toString()
-//    void displayResults ( long time, int appliedRules, int closedGoals, int openGoals ) {
-//        String message;
-//        String timeString = "" + (time/1000)+"."+((time%1000)/100);
-//
-//        // display message in the status bar
-//
-//        if ( appliedRules != 0 ) {
-//            message = "Strategy: Applied " + appliedRules + " rule";
-//            if ( appliedRules != 1 ) message += "s";
-//            message += " (" + timeString + " sec), ";
-//            message += " closed " + closedGoals + " goal";
-//            if ( closedGoals != 1 ) message += "s";
-//            message += ", " + openGoals;
-//            message += " remaining";
-//            setStatusLine ( message );
-//        }
-//    }
 
     void displayResults(String message){
             setStatusLine(message);
@@ -1391,6 +1384,7 @@ public final class MainWindow extends JFrame  {
 	    smtComponent.setEnabled(b);
 	}
 
+        @Override
         public void selectedProofChanged(KeYSelectionEvent e) {
 
 	    if(e.getSource().getSelectedProof() != null){
@@ -1430,6 +1424,7 @@ public final class MainWindow extends JFrame  {
 	    return b;
 	}
 
+        @Override
 	public void actionPerformed(ActionEvent e) {
 	    if (!mediator.ensureProofLoaded() || solverUnion ==SolverTypeCollection.EMPTY_COLLECTION){
             MainWindow.this.popupWarning("No proof loaded or no solvers selected.", "Oops...");

@@ -120,6 +120,7 @@ public class TermBuilder {
      *            the services to be used for parsing
      * @param namespaces
      *            the namespaces used for name lookup.
+     * @throws de.uka.ilkd.key.parser.ParserException
      */
     public Term parseTerm(String s, Services services, NamespaceSet namespaces)
         throws ParserException

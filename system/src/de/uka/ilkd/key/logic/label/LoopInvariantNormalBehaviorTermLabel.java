@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.Name;
  * in branch "Body Preserves Invariant" of applied "Loop Invariant" rules
  * to show the loop invariant. 
  */
-public class LoopInvariantNormalBehaviorTermLabel extends ITermLabel {
+public class LoopInvariantNormalBehaviorTermLabel implements ITermLabel {
    /**
     * The unique name of this label.
     */
