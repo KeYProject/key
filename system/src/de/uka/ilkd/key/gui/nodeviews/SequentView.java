@@ -254,6 +254,7 @@ public abstract class SequentView extends JTextArea
     }
 
     public String getHighlightedText(PosInSequent pos) {
+        if(pos == null) return "";
         String s = "";
         try {
             s = getText(pos.getBounds().start(),

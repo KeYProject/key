@@ -86,7 +86,7 @@ public class SequentSearchBar extends SearchBar {
     public void searchPrevious() {
         if (!searchResults.isEmpty()) {
             resetExtraHighlight();
-            resultIteratorPos++;
+            resultIteratorPos--;
             resultIteratorPos %= searchResults.size();
             setExtraHighlight(resultIteratorPos);
         }
