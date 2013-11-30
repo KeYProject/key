@@ -66,7 +66,6 @@ public class TermLabelMenu extends JMenu {
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
-                rebuildMenu();
             }
 
             @Override
