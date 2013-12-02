@@ -949,7 +949,7 @@ public abstract class Taclet implements Rule, Named {
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is rewritten
      * @return the instanted formulas of the semisquent as list
      */
-    private ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi, Services services,
+    protected ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi, Services services,
             MatchConditions matchCond, PosInOccurrence applicationPosInOccurrence) {       
         
         ImmutableList<SequentFormula> replacements = ImmutableSLList.<SequentFormula>nil();
