@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Text;
 import org.key_project.key4eclipse.common.ui.property.AbstractProjectPropertyPage;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
-import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
+import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 
 public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    
@@ -292,7 +292,7 @@ private SelectionListener enableMultiThreadingButtonSelectionListener = new Sele
          KeYProjectProperties.setNumberOfThreads(project, String.valueOf(setNumberOfThreadsSpinner.getSelection()));
          KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection());
          KeYProjectProperties.setHideMetaFiles(project, hideMefaFiles.getSelection());
-         KeY4EclipseResourcesUtil.hideMetaFiles(project);
+         KeYResourcesUtil.hideMetaFiles(project);
          return super.performOk();
       }
       catch (CoreException e) {

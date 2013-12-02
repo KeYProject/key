@@ -355,11 +355,11 @@ public class MarkerTests extends AbstractResourceTest {
       assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile) == 2);
       
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
-      if(testMarker(markerList.get(0), MarkerManager.CYCLEDETECTEDMARKER_ID, 301, 302)){
-         assertTrue(testMarker(markerList.get(1), MarkerManager.CYCLEDETECTEDMARKER_ID, 461, 462));
+      if(testMarker(markerList.get(0), MarkerManager.RECURSIONMARKER_ID, 301, 302)){
+         assertTrue(testMarker(markerList.get(1), MarkerManager.RECURSIONMARKER_ID, 461, 462));
       }
-      else if(testMarker(markerList.get(0), MarkerManager.CYCLEDETECTEDMARKER_ID, 461, 462)){
-         assertTrue(testMarker(markerList.get(1), MarkerManager.CYCLEDETECTEDMARKER_ID, 301, 302));
+      else if(testMarker(markerList.get(0), MarkerManager.RECURSIONMARKER_ID, 461, 462)){
+         assertTrue(testMarker(markerList.get(1), MarkerManager.RECURSIONMARKER_ID, 301, 302));
       }
       else{
          fail();

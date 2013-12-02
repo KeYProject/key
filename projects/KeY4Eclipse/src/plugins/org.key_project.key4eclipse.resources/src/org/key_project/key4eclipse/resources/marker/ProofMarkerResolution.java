@@ -77,7 +77,7 @@ public class ProofMarkerResolution implements IMarkerResolution2{
          }
       }
       catch (Exception e) {
-         LogUtil.getLogger().createErrorStatus(e); // TODO: You do nothing with the created status. I guess you mean LogUtil.getLogger().logError(e); which writes the exception into the eclipse log
+         LogUtil.getLogger().logError(e);
       }
    }
 
