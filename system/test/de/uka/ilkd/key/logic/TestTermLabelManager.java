@@ -724,7 +724,6 @@ public class TestTermLabelManager extends TestCase {
 
       public LoggingTermLabel(Name name, List<String> arguments) {
          assert name != null;
-         assert arguments != null;
          this.name = name;
          this.arguments = arguments;
       }
