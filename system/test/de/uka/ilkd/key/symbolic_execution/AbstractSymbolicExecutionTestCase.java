@@ -150,7 +150,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    /**
     * The directory which contains the KeY repository.
     */
-   protected static final File keyRepDirectory;
+   public static final File keyRepDirectory;
    
    /**
     * Creates the temporary oracle directory if required.
@@ -1544,7 +1544,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             // Load java file
             environment = KeYEnvironment.load(javaFile, null, null);
             // Search type
-            KeYJavaType containerKJT = environment.getJavaInfo().getTypeByClassName(containerTypeName);
+            KeYJavaType containerKJT = environment.getJavaInfo().
+                    getTypeByClassName(containerTypeName);
             assertNotNull(containerKJT);
             // Search observer function
             ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(containerKJT);
