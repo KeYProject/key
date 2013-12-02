@@ -525,6 +525,9 @@ public final class ProblemInitializer {
 
         //read envInput
         readEnvInput(envInput, initConfig);
+        
+        //remove generic sorts defined in KeY file
+        cleanupNamespaces(initConfig);
 
         //done
         if(listener !=null){

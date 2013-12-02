@@ -67,9 +67,9 @@ public class InnerNodeView extends SequentView {
         super(mainWindow);
         this.node = node;
         filter = new IdentitySequentPrintFilter(node.sequent());
-        printer = new LogicPrinter(new ProgramPrinter(),
-                mediator.getNotationInfo(),
-                mediator.getServices());
+        setLogicPrinter(new LogicPrinter(new ProgramPrinter(),
+                        mediator.getNotationInfo(),
+                        mediator.getServices()));
         setSelectionColor(new Color(10,180,50));
 
         tacletInfo = new JTextArea(getTacletDescription(mediator, node, filter));
@@ -314,9 +314,9 @@ public class InnerNodeView extends SequentView {
     public synchronized void printSequent() {
 
         setLineWidth(computeLineWidth());
-        printer.update(filter, getLineWidth());
-        setText(printer.toString());
-        posTable = printer.getInitialPositionTable();
+        getLogicPrinter().update(filter, getLineWidth());
+        setText(getLogicPrinter().toString());
+        posTable = getLogicPrinter().getInitialPositionTable();
 
         RuleApp app = node.getAppliedRuleApp();
         if (app != null) {

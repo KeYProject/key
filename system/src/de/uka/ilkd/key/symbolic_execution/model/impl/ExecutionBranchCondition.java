@@ -136,9 +136,10 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
          branchCondition = TermBuilder.DF.and(getMergedBranchCondtions());
          // Simplify merged branch conditions
          branchCondition = SymbolicExecutionUtil.simplify(getProof(), branchCondition);
+         branchCondition = SymbolicExecutionUtil.improveReadability(branchCondition, getServices());
       }
       else {
-         branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true);
+         branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true, true);
       }
       // Format branch condition
       StringBuffer sb = ProofSaver.printTerm(branchCondition, getServices(), true);
@@ -193,6 +194,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
       pathCondition = TermBuilder.DF.and(parentPath, getBranchCondition());
       // Simplify path condition
       pathCondition = SymbolicExecutionUtil.simplify(getProof(), pathCondition);
+      pathCondition = SymbolicExecutionUtil.improveReadability(pathCondition, getServices());
       // Format path condition
       StringBuffer sb = ProofSaver.printTerm(pathCondition, getServices(), true);
       formatedPathCondition = sb.toString();
@@ -239,7 +241,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
          Term[] result = new Term[mergedProofNodes.size()];
          Iterator<Node> iter = mergedProofNodes.iterator();
          for (int i = 0; i < result.length; i++) {
-            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), true);
+            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), true, true);
          }
          return result;
       }

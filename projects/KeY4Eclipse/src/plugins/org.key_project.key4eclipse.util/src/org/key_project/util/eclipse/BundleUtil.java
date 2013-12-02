@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.key_project.util.Activator;
+import org.key_project.util.java.IOUtil;
 import org.osgi.framework.Bundle;
 
 /**
@@ -252,5 +253,16 @@ public final class BundleUtil {
        else {
            throw new IOException("No plug-in defined.");
        }
+   }
+
+   /**
+    * Computes the MD5 checksum of the specified file in {@link Bundle}.
+    * @param bundleId The ID of the plug-in that contains the resource.
+    * @param pathInBundle The path to the file.
+    * @return The computed MD5 checksum.
+    * @throws IOException Occurred Exception.
+    */
+   public static String computeMD5(String bundleId, String pathInBundle) throws IOException {
+      return IOUtil.computeMD5(openInputStream(bundleId, pathInBundle));
    }
 }
