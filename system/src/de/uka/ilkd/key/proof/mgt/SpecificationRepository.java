@@ -915,15 +915,16 @@ public final class SpecificationRepository {
                             break;
                         }
                     }
-                    FunctionalOperationContract fop = combineOperationContracts(getOperationContracts(kjt,pm));
-                    Term preFromContract = fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
-                    Term postFromContract = fop.getPost(heaps, selfVar, paramVars, resultVar, null, atPreVars, services);
-                    if(preFromContract != null && postFromContract != null && postFromContract != TB.tt()) {
-                    	 Term mbyFromContract = fop.hasMby() ? fop.getMby(selfVar, paramVars, services) : null;
-                         final ClassAxiom modelMethodContractAxiom
-                             = new ContractAxiom("Contract axiom for " + pm.getName() + " in " + kjt.getName().toString(),
-                                 pm, kjt, new Private(), preFromContract, postFromContract, mbyFromContract, atPreVars, selfVar, resultVar, paramVars);
-                         result = result.add(modelMethodContractAxiom);
+                    for(FunctionalOperationContract fop : getOperationContracts(kjt,pm)) {
+                    	Term preFromContract = fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
+                    	Term postFromContract = fop.getPost(heaps, selfVar, paramVars, resultVar, null, atPreVars, services);
+                    	if(preFromContract != null && postFromContract != null && postFromContract != TB.tt()) {
+                    		Term mbyFromContract = fop.hasMby() ? fop.getMby(selfVar, paramVars, services) : null;
+                    		final ClassAxiom modelMethodContractAxiom
+                    		= new ContractAxiom("Contract axiom for " + pm.getName() + " in " + kjt.getName().toString(),
+                    				pm, kjt, new Private(), preFromContract, postFromContract, mbyFromContract, atPreVars, selfVar, resultVar, paramVars);
+                    		result = result.add(modelMethodContractAxiom);
+                    	}
                     }
                 }
             }

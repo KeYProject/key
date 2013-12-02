@@ -336,27 +336,26 @@ public class ContractFactory {
         Map<LocationVariable,Term> mods = t.originalMods;
         Modality moda = t.modality; // TODO: what about the others?
         for(FunctionalOperationContract other : others) {
-            FunctionalOperationContractImpl ot = ((FunctionalOperationContractImpl)other);	
             Term otherMby = other.hasMby()
-                        ? other.getMby(ot.originalSelfVar,
-                                   ot.originalParamVars,
+                        ? other.getMby(t.originalSelfVar,
+                                   t.originalParamVars,
                                    services)
                             : null;
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-              Term otherPre = other.getPre(h, ot.originalSelfVar,
-                               ot.originalParamVars,
-                               ot.originalAtPreVars,
+              Term otherPre = other.getPre(h, t.originalSelfVar,
+                               t.originalParamVars,
+                               t.originalAtPreVars,
                                services);
-              Term otherPost = other.getPost(h, ot.originalSelfVar,
-                                 ot.originalParamVars,
-                                 ot.originalResultVar,
-                                 ot.originalExcVar,
-                                 ot.originalAtPreVars,
+              Term otherPost = other.getPost(h, t.originalSelfVar,
+                                 t.originalParamVars,
+                                 t.originalResultVar,
+                                 t.originalExcVar,
+                                 t.originalAtPreVars,
                                  services);
-              Term otherAxiom = other.getRepresentsAxiom(h, ot.originalSelfVar,
-            	                                 ot.originalParamVars,
-            		                             ot.originalResultVar,
-            		                             ot.originalAtPreVars,
+              Term otherAxiom = other.getRepresentsAxiom(h, t.originalSelfVar,
+            	                                 t.originalParamVars,
+            		                             t.originalResultVar,
+            		                             t.originalAtPreVars,
             		                             services);
 
               if(h == services.getTypeConverter().getHeapLDT().getHeap()) {
@@ -373,19 +372,19 @@ public class ContractFactory {
                 pres.put(h,pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
               }
               if(otherPost != null) {
-                final Term oPost = tb.imp(atPreify(otherPre, ot.originalAtPreVars), otherPost);
+                final Term oPost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
                 posts.put(h, posts.get(h) == null ? oPost : tb.and(posts.get(h), oPost));
               }
               if(otherAxiom != null) {
-                final Term oAxiom = tb.imp(atPreify(otherPre, ot.originalAtPreVars), otherAxiom);
+                final Term oAxiom = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherAxiom);
                 axioms.put(h, axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom));
               }
 
                 if (hasMod.get(h) || other.hasModifiesClause(h)) {
                     hasMod.put(h, true);
                     Term m1 = mods.get(h);
-                    Term m2 = other.getMod(h, ot.originalSelfVar,
-                                           ot.originalParamVars,
+                    Term m2 = other.getMod(h, t.originalSelfVar,
+                                           t.originalParamVars,
                                            services);
                     if (m1 != null || m2 != null) {
                         Term nm;
