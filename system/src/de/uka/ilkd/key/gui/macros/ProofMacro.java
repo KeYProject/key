@@ -125,4 +125,9 @@ public interface ProofMacro {
      */
     public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc, 
             ProverTaskListener listener) throws InterruptedException;
+
+    /**
+     * Assigns a key shortcut to the macro (optional).
+     */
+	public javax.swing.KeyStroke getKeyStroke();
 }

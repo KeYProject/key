@@ -724,7 +724,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
    public void testAssignment() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/assignment/Assignment.java", 
-                            "Assignment", 
+                            "assignment.Assignment", 
                             "caller", 
                             false,
                             new ProgramVariableReferencesAnalyst(),
@@ -738,7 +738,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
    public void testAssignment_array2() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/assignment_array2/Assignment_array2.java", 
-                            "Assignment_array2", 
+                            "assignment_array2.Assignment_array2", 
                             "caller", 
                             false,
                             new ProgramVariableReferencesAnalyst(),
@@ -753,7 +753,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
    public void testAssignment_read_attribute() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/assignment_read_attribute/Assignment_read_attribute.java", 
-                            "Assignment_read_attribute", 
+                            "assignment_read_attribute.Assignment_read_attribute", 
                             "caller", 
                             false,
                             new ProgramVariableReferencesAnalyst(),
@@ -767,7 +767,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
    public void testAssignment_read_length() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/assignment_read_length/Assignment_read_length.java", 
-                            "Assignment_read_length", 
+                            "assignment_read_length.Assignment_read_length", 
                             "caller", 
                             false,
                             new ProgramVariableReferencesAnalyst(),
@@ -780,7 +780,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
    public void testAssignment_to_primitive_array_component() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/assignment_to_primitive_array_component/Assignment_to_primitive_array_component.java", 
-                            "Assignment_to_primitive_array_component", 
+                            "assignment_to_primitive_array_component.Assignment_to_primitive_array_component", 
                             "caller", 
                             false,
                             new ProgramVariableReferencesAnalyst(),
@@ -794,7 +794,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
    public void testAssignment_to_reference_array_component() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/assignment_to_reference_array_component/Assignment_to_reference_array_component.java", 
-                            "Assignment_to_reference_array_component", 
+                            "assignment_to_reference_array_component.Assignment_to_reference_array_component", 
                             "caller", 
                             false,
                             new ProgramVariableReferencesAnalyst(),
@@ -807,7 +807,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
    public void testAssignment_write_attribute() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/assignment_write_attribute/Assignment_write_attribute.java", 
-                            "Assignment_write_attribute", 
+                            "assignment_write_attribute.Assignment_write_attribute", 
                             "caller", 
                             false,
                             new ProgramVariableReferencesAnalyst(),
@@ -820,7 +820,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
    public void testAssignment_write_static_attribute() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/assignment_write_static_attribute/Assignment_write_static_attribute.java", 
-                            "Assignment_write_static_attribute", 
+                            "assignment_write_static_attribute.Assignment_write_static_attribute", 
                             "caller", 
                             false,
                             new ProgramVariableReferencesAnalyst(),
@@ -833,7 +833,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
    public void testActiveUseStaticFieldReadAccess2() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/activeUseStaticFieldReadAccess2/ActiveUseStaticFieldReadAccess2.java", 
-                            "ActiveUseStaticFieldReadAccess2", 
+                            "activeUseStaticFieldReadAccess2.ActiveUseStaticFieldReadAccess2", 
                             "caller", 
                             false,
                             new ProgramVariableReferencesAnalyst(),
@@ -846,7 +846,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
    public void testActiveUseStaticFieldWriteAccess2() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/activeUseStaticFieldWriteAccess2/ActiveUseStaticFieldWriteAccess2.java", 
-                            "ActiveUseStaticFieldWriteAccess2", 
+                            "activeUseStaticFieldWriteAccess2.ActiveUseStaticFieldWriteAccess2", 
                             "caller", 
                             false,
                             new ProgramVariableReferencesAnalyst(),
@@ -859,7 +859,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
    public void testEval_order_access4() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/eval_order_access4/Eval_order_access4.java", 
-                            "Eval_order_access4", 
+                            "eval_order_access4.Eval_order_access4", 
                             "caller", 
                             false,
                             new ProgramVariableReferencesAnalyst(),
@@ -872,7 +872,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
    public void testEval_order_array_access5() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/eval_order_array_access5/Eval_order_array_access5.java", 
-                            "Eval_order_array_access5", 
+                            "eval_order_array_access5.Eval_order_array_access5", 
                             "caller", 
                             false,
                             new ProgramVariableReferencesAnalyst(),
@@ -885,7 +885,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
    public void testVariableDeclarationAssign() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/variableDeclarationAssign/VariableDeclarationAssign.java", 
-                            "VariableDeclarationAssign", 
+                            "variableDeclarationAssign.VariableDeclarationAssign", 
                             "caller", 
                             false,
                             new ProgramVariableReferencesAnalyst(),

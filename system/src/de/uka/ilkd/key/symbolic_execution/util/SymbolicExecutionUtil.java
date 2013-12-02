@@ -62,8 +62,8 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -76,13 +76,14 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.label.LoopBodyTermLabel;
-import de.uka.ilkd.key.logic.label.LoopInvariantNormalBehaviorTermLabel;
-import de.uka.ilkd.key.logic.label.SelectSkolemConstantTermLabel;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -100,6 +101,7 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
@@ -118,10 +120,6 @@ import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.label.ITermLabelWorker;
-import de.uka.ilkd.key.rule.label.LoopBodyTermLabelInstantiator;
-import de.uka.ilkd.key.rule.label.LoopInvariantNormalBehaviorTermLabelInstantiator;
-import de.uka.ilkd.key.rule.label.SymbolicExecutionTermLabelInstantiator;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
@@ -130,6 +128,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -195,6 +194,168 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
+    * Improves the {@link Term} to increase its readability.
+    * The following changes will be performed:
+    * <ul>
+    *    <li>{@code a < 1 + b} => {@code a <= b}</li>
+    *    <li>{@code a < b + 1} => {@code a <= b}</li>
+    *    
+    *    <li>{@code a >= 1 + b} => {@code a > b}</li>
+    *    <li>{@code a >= b + 1} => {@code a > b}</li>
+    *    
+    *    <li>{@code a <= -1 + b} => {@code a < b}</li>
+    *    <li>{@code a <= b + -1} => {@code a < b}</li>
+    *    <li>{@code a <= b - 1} => {@code a < b}</li>
+    *    
+    *    <li>{@code a > -1 + b} => {@code a >= b}</li>
+    *    <li>{@code a > b + -1} => {@code a >= b}</li>
+    *    <li>{@code a > b - 1} => {@code a >= b}</li>
+    *    
+    *    <li>{@code a >= 1 + b} => {@code a > b}</li>
+    *    <li>{@code a >= b + 1} => {@code a > b}</li>
+    *    <li>{@code !a >= b} => {@code a < b}</li>
+    *    <li>{@code !a > b} => {@code a <= b}</li>
+    *    <li>{@code !a <= b} => {@code a > b}</li>
+    *    <li>{@code !a < b} => {@code a >= b}</li>
+    * </ul>
+    * @param term The {@link Term} to improve.
+    * @param services The {@link Services} to use.
+    * @return The improved {@link Term} or the {@link Term} itself if no improvements are possible.
+    */
+   public static Term improveReadability(Term term, Services services) {
+      if (term != null && services != null) {
+         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+         term = improveReadabilityRecursive(term, services, integerLDT);
+      }
+      return term;
+   }
+   
+   /**
+    * Helper method of {@link #improveReadability(Term, Services)}.
+    * @param term The {@link Term} to improve.
+    * @param services The {@link Services} to use.
+    * @param integerLDT The {@link IntegerLDT} to use.
+    * @return The improved {@link Term} or the {@link Term} itself if no improvements are possible.
+    */
+   private static Term improveReadabilityRecursive(Term term, 
+                                                   Services services, 
+                                                   IntegerLDT integerLDT) {
+      // Improve children
+      boolean subChanged = false;
+      List<Term> newSubs = new LinkedList<Term>();
+      for (Term sub : term.subs()) {
+         Term newSub = improveReadabilityRecursive(sub, services, integerLDT);
+         if (newSub != sub) {
+            newSubs.add(newSub);
+            subChanged = true;
+         }
+         else {
+            newSubs.add(sub);
+         }
+      }
+      if (subChanged) {
+         term = TermFactory.DEFAULT.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), term.getLabels());
+      }
+      // Improve readability: a < 1 + b, a < b + 1
+      if (term.op() == integerLDT.getLessThan()) {
+         Term subOne = term.sub(1); 
+         if (subOne.op() == integerLDT.getAdd()) {
+            if (subOne.sub(0) == integerLDT.one()) {
+               term = TermBuilder.DF.leq(term.sub(0), subOne.sub(1), services);
+            }
+            else if (subOne.sub(1) == integerLDT.one()) {
+               term = TermBuilder.DF.leq(term.sub(0), subOne.sub(0), services);
+            }
+         }
+      }
+      // Improve readability: a >= 1 + b, a >= b + 1
+      else if (term.op() == integerLDT.getGreaterOrEquals()) {
+         Term subOne = term.sub(1); 
+         if (subOne.op() == integerLDT.getAdd()) {
+            if (subOne.sub(0) == integerLDT.one()) {
+               term = TermBuilder.DF.gt(term.sub(0), subOne.sub(1), services);
+            }
+            else if (subOne.sub(1) == integerLDT.one()) {
+               term = TermBuilder.DF.gt(term.sub(0), subOne.sub(0), services);
+            }
+         }
+      }
+      // Improve readability: a <= -1 + b, a <= 1 + -b, a <= 1 - b
+      else if (term.op() == integerLDT.getLessOrEquals()) {
+         Term subOne = term.sub(1); 
+         if (subOne.op() == integerLDT.getAdd()) {
+            if (isMinusOne(subOne.sub(0), integerLDT)) {
+               term = TermBuilder.DF.lt(term.sub(0), subOne.sub(1), services);
+            }
+            else if (isMinusOne(subOne.sub(1), integerLDT)) {
+               term = TermBuilder.DF.lt(term.sub(0), subOne.sub(0), services);
+            }
+         }
+         else if (subOne.op() == integerLDT.getSub()) {
+            if (subOne.sub(1) == integerLDT.one()) {
+               term = TermBuilder.DF.lt(term.sub(0), subOne.sub(0), services);
+            }
+         }
+      }
+      // Improve readability: a > -1 + b, a > 1 + -b, a > 1 - b
+      else if (term.op() == integerLDT.getGreaterThan()) {
+         Term subOne = term.sub(1); 
+         if (subOne.op() == integerLDT.getAdd()) {
+            if (isMinusOne(subOne.sub(0), integerLDT)) {
+               term = TermBuilder.DF.geq(term.sub(0), subOne.sub(1), services);
+            }
+            else if (isMinusOne(subOne.sub(1), integerLDT)) {
+               term = TermBuilder.DF.geq(term.sub(0), subOne.sub(0), services);
+            }
+         }
+         else if (subOne.op() == integerLDT.getSub()) {
+            if (subOne.sub(1) == integerLDT.one()) {
+               term = TermBuilder.DF.geq(term.sub(0), subOne.sub(0), services);
+            }
+         }
+      }
+      // Improve readability: !a >= b, !a > b, !a <= b, !a < b
+      else if (term.op() == Junctor.NOT) {
+         Term sub = term.sub(0);
+         if (sub.op() == integerLDT.getLessOrEquals()) {
+            term = TermBuilder.DF.gt(sub.sub(0), sub.sub(1), services);
+         }
+         else if (sub.op() == integerLDT.getLessThan()) {
+            term = TermBuilder.DF.geq(sub.sub(0), sub.sub(1), services);
+         }
+         else if (sub.op() == integerLDT.getGreaterOrEquals()) {
+            term = TermBuilder.DF.lt(sub.sub(0), sub.sub(1), services);
+         }
+         else if (sub.op() == integerLDT.getGreaterThan()) {
+            term = TermBuilder.DF.leq(sub.sub(0), sub.sub(1), services);
+         }
+      }
+      return term;
+   }
+   
+   /**
+    * Checks if the given {@link Term} represents the integer constant {@code -1}.
+    * @param term The {@link Term} to check.
+    * @param integerLDT The {@link IntegerLDT} to use.
+    * @return {@code true} {@link Term} represents {@code -1}, {@code false} {@link Term} is something else.
+    */
+   private static boolean isMinusOne(Term term, IntegerLDT integerLDT) {
+      if (term.op() == integerLDT.getNumberSymbol()) {
+         term = term.sub(0);
+         if (term.op() == integerLDT.getNegativeNumberSign()) {
+            term = term.sub(0);
+            if (term.op() == integerLDT.getNumberLiteralFor(1)) {
+               term = term.sub(0);
+               if (term.op() == integerLDT.getNumberTerminator()) {
+                  return true;
+               }
+            }
+         }
+      }
+      return false;
+   }
+
+   /**
     * Converts the given {@link Sequent} into an implication.
     * @param sequent The {@link Sequent} to convert.
     * @return The created implication.
@@ -238,12 +399,26 @@ public final class SymbolicExecutionUtil {
     */
    public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(Proof source) {
       assert source != null;
+      assert !source.isDisposed();
       // Get required source instances
-      ProofEnvironment sourceEnv = source.env();
+      final ProofEnvironment sourceEnv = source.env();
       InitConfig sourceInitConfig = sourceEnv.getInitConfig();
       RuleJustificationInfo sourceJustiInfo = sourceEnv.getJustifInfo();
       // Create new profile which has separate OneStepSimplifier instance
-      JavaProfile profile = new JavaProfile();
+      JavaProfile profile = new JavaProfile() {
+         @Override
+         protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
+            Profile sourceProfile = sourceEnv.getInitConfig().getProfile();
+            if (sourceProfile instanceof SymbolicExecutionJavaProfile) {
+               ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
+               result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations()); // Make sure that the term labels of symbolic execution are also supported by the new environment.
+               return result;
+            }
+            else {
+               return super.computeTermLabelConfiguration();
+            }
+         }
+      };
       // Create new InitConfig and initialize it with value from initial one.
       InitConfig initConfig = new InitConfig(source.getServices().copy(profile, true));
       initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
@@ -481,9 +656,6 @@ public final class SymbolicExecutionUtil {
       // Configure ProofStarter
       ProofEnvironment env = SymbolicExecutionUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(proof); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
       starter.init(sequentToProve, env);
-      if (!proof.isDisposed()) {
-         starter.getProof().getSettings().getLabelSettings().setLabelInstantiators(proof.getSettings().getLabelSettings().getLabelInstantiators()); // Use label instantiators of original proof also in side proof.
-      }
       return starter;
    }
    
@@ -1043,7 +1215,7 @@ public final class SymbolicExecutionUtil {
          Term term = ruleApp.posInOccurrence().subTerm();
          if (term != null) {
             term = TermBuilder.DF.goBelowUpdates(term);
-            return term.containsLabel(LoopBodyTermLabel.INSTANCE);
+            return term.containsLabel(ParameterlessTermLabel.LOOP_BODY_LABEL);
          }
          else {
             return false;
@@ -1062,7 +1234,7 @@ public final class SymbolicExecutionUtil {
    public static boolean hasLoopBodyTerminationLabel(RuleApp ruleApp) {
       if (ruleApp != null && ruleApp.posInOccurrence() != null) {
          Term term = ruleApp.posInOccurrence().subTerm();
-         return term.containsLabel(LoopInvariantNormalBehaviorTermLabel.INSTANCE);
+         return term.containsLabel(ParameterlessTermLabel.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL);
       }
       else {
          return false;
@@ -1109,9 +1281,9 @@ public final class SymbolicExecutionUtil {
    public static SymbolicExecutionTermLabel getSymbolicExecutionLabel(Term term) {
       if (term != null) {
          term = TermBuilder.DF.goBelowUpdates(term);
-         return (SymbolicExecutionTermLabel)JavaUtil.search(term.getLabels(), new IFilter<ITermLabel>() {
+         return (SymbolicExecutionTermLabel)JavaUtil.search(term.getLabels(), new IFilter<TermLabel>() {
             @Override
-            public boolean select(ITermLabel element) {
+            public boolean select(TermLabel element) {
                return element instanceof SymbolicExecutionTermLabel;
             }
          });
@@ -1549,20 +1721,23 @@ public final class SymbolicExecutionUtil {
     * Computes the branch condition of the given {@link Node}.
     * @param node The {@link Node} to compute its branch condition.
     * @param simplify {@code true} simplify result, {@code false} keep computed non simplified result.
+    * @param improveReadability {@code true} improve readability, {@code false} do not improve readability.
     * @return The computed branch condition.
     * @throws ProofInputException Occurred Exception.
     */
-   public static Term computeBranchCondition(Node node, boolean simplify) throws ProofInputException {
+   public static Term computeBranchCondition(Node node, 
+                                             boolean simplify,
+                                             boolean improveReadability) throws ProofInputException {
       // Get applied taclet on parent proof node
       Node parent = node.parent();
       if (parent.getAppliedRuleApp() instanceof TacletApp) {
-         return computeTacletAppBranchCondition(parent, node, simplify);
+         return computeTacletAppBranchCondition(parent, node, simplify, improveReadability);
       }
       else if (parent.getAppliedRuleApp() instanceof ContractRuleApp) {
-        return computeContractRuleAppBranchCondition(parent, node, simplify);
+        return computeContractRuleAppBranchCondition(parent, node, simplify, improveReadability);
       }
       else if (parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
-         return computeLoopInvariantBuiltInRuleAppBranchCondition(parent, node, simplify);
+         return computeLoopInvariantBuiltInRuleAppBranchCondition(parent, node, simplify, improveReadability);
       }
       else {
          throw new ProofInputException("Unsupported RuleApp in branch computation \"" + parent.getAppliedRuleApp() + "\"."); 
@@ -1596,10 +1771,14 @@ public final class SymbolicExecutionUtil {
     * @param parent The parent {@link Node} of the given one.
     * @param node The {@link Node} to compute its branch condition.
     * @param simplify {@code true} simplify result, {@code false} keep computed non simplified result.
+    * @param improveReadability {@code true} improve readability, {@code false} do not improve readability.
     * @return The computed branch condition.
     * @throws ProofInputException Occurred Exception.
     */
-   private static Term computeContractRuleAppBranchCondition(Node parent, Node node, boolean simplify) throws ProofInputException {
+   private static Term computeContractRuleAppBranchCondition(Node parent, 
+                                                             Node node, 
+                                                             boolean simplify,
+                                                             boolean improveReadability) throws ProofInputException {
       // Make sure that a computation is possible
       if (!(parent.getAppliedRuleApp() instanceof ContractRuleApp)) {
          throw new ProofInputException("Only ContractRuleApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found."); 
@@ -1666,6 +1845,9 @@ public final class SymbolicExecutionUtil {
          if (simplify) {
             result = simplify(node.proof(), result);
          }
+         if (improveReadability) {
+            result = improveReadability(result, node.proof().getServices());
+         }
          return result;
       }
    }
@@ -1696,7 +1878,13 @@ public final class SymbolicExecutionUtil {
       Term exceptionDefinition = workingTerm;
       while (exceptionDefinition.op() == Junctor.AND) {
          exceptionDefinitionParent = exceptionDefinition;
-         exceptionDefinition = exceptionDefinition.sub(0);
+         Term firstSub = exceptionDefinition.sub(0);
+         if (firstSub.op() == node.proof().env().getInitialServices().getJavaInfo().getInv()) { // TODO: Replace "node.proof().env().getInitialServices().getJavaInfo().getInv()" with "node.proof().getServices().getJavaInfo().getInv()" when bug item http://i12www.ira.uka.de/~klebanov/mantis/view.php?id=1386 is solved.
+            exceptionDefinition = exceptionDefinition.sub(1);
+         }
+         else {
+            exceptionDefinition = firstSub;
+         }
       }
       // Make sure that exception equality was found
       Term exceptionEquality;
@@ -1824,12 +2012,14 @@ public final class SymbolicExecutionUtil {
     * @param parent The parent {@link Node} of the given one.
     * @param node The {@link Node} to compute its branch condition.
     * @param simplify {@code true} simplify result, {@code false} keep computed non simplified result.
+    * @param improveReadability {@code true} improve readability, {@code false} do not improve readability.
     * @return The computed branch condition.
     * @throws ProofInputException Occurred Exception.
     */
    private static Term computeLoopInvariantBuiltInRuleAppBranchCondition(Node parent, 
                                                                          Node node, 
-                                                                         boolean simplify) throws ProofInputException {
+                                                                         boolean simplify,
+                                                                         boolean improveReadability) throws ProofInputException {
       // Make sure that a computation is possible
       if (!(parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp)) {
          throw new ProofInputException("Only LoopInvariantBuiltInRuleApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found."); 
@@ -1881,6 +2071,9 @@ public final class SymbolicExecutionUtil {
          // Simplify result if requested
          if (simplify) {
             branchCondition = simplify(node.proof(), branchCondition);
+         }
+         if (improveReadability) {
+            branchCondition = improveReadability(branchCondition, services);
          }
          return branchCondition;
       }
@@ -1989,10 +2182,14 @@ public final class SymbolicExecutionUtil {
     * @param parent The parent {@link Node} of the given one.
     * @param node The {@link Node} to compute its branch condition.
     * @param simplify {@code true} simplify result, {@code false} keep computed non simplified result.
+    * @param improveReadability {@code true} improve readability, {@code false} do not improve readability.
     * @return The computed branch condition.
     * @throws ProofInputException Occurred Exception.
     */
-   private static Term computeTacletAppBranchCondition(Node parent, Node node, boolean simplify) throws ProofInputException {
+   private static Term computeTacletAppBranchCondition(Node parent, 
+                                                       Node node, 
+                                                       boolean simplify,
+                                                       boolean improveReadability) throws ProofInputException {
       if (!(parent.getAppliedRuleApp() instanceof TacletApp)) {
          throw new ProofInputException("Only TacletApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found."); 
       }
@@ -2059,7 +2256,10 @@ public final class SymbolicExecutionUtil {
       }
       // Execute simplification if requested
       if (simplify) {
-         result = SymbolicExecutionUtil.simplify(node.proof(), result);
+         result = simplify(node.proof(), result);
+      }
+      if (improveReadability) {
+         result = improveReadability(result, services);
       }
       // Make sure that no skolem constant is contained in the result.
       result = replaceSkolemConstants(node.sequent(), result);
@@ -2078,7 +2278,7 @@ public final class SymbolicExecutionUtil {
                                                            Semisequent semisequent) {
       ImmutableList<Term> terms = ImmutableSLList.nil();
       for (SequentFormula sf : semisequent) {
-         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, svInst, null);
+         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, svInst, null, null);
          sf.formula().execPostOrder(visitor);
          terms = terms.append(visitor.getTerm());
       }
@@ -2338,7 +2538,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} is skolem {@link Term}, {@code false} is not a skolem {@link Term}.
     */
    public static boolean isSkolemConstant(Term term) {
-      return term.containsLabel(SelectSkolemConstantTermLabel.INSTANCE);
+      return term.containsLabel(ParameterlessTermLabel.SELECT_SKOLEM_LABEL);
    }
    
    /**
@@ -2504,16 +2704,19 @@ public final class SymbolicExecutionUtil {
     * Computes the path condition of the given {@link Node}.
     * @param node The {@link Node} to compute its path condition.
     * @param simplify {@code true} simplify result, {@code false} keep computed non simplified result.
+    * @param improveReadability {@code true} improve readability, {@code false} do not improve readability.
     * @return The computed path condition.
     * @throws ProofInputException Occurred Exception.
     */
-   public static Term computePathCondition(Node node, boolean simplify) throws ProofInputException {
+   public static Term computePathCondition(Node node, 
+                                           boolean simplify,
+                                           boolean improveReadability) throws ProofInputException {
       if (node != null) {
          Term pathCondition = TermBuilder.DF.tt();
          while (node != null) {
             Node parent = node.parent();
             if (parent != null && parent.childrenCount() >= 2) {
-               Term branchCondition = computeBranchCondition(node, simplify);
+               Term branchCondition = computeBranchCondition(node, simplify, improveReadability);
                pathCondition = TermBuilder.DF.and(branchCondition, pathCondition);
             }
             node = parent;
@@ -2707,26 +2910,6 @@ public final class SymbolicExecutionUtil {
          assert sp != null;
          ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
-      }
-   }
-
-   /**
-    * Configures the proof for symbolic execution.
-    * @param proof The proof to configure.
-    */
-   public static void configureProof(Proof proof) {
-      if (proof != null) {
-         ImmutableList<ITermLabelWorker> labelInstantiators = proof.getSettings().getLabelSettings().getLabelInstantiators();
-         if (!labelInstantiators.contains(SymbolicExecutionTermLabelInstantiator.INSTANCE)) {
-            labelInstantiators = labelInstantiators.append(SymbolicExecutionTermLabelInstantiator.INSTANCE);
-         }
-         if (!labelInstantiators.contains(LoopBodyTermLabelInstantiator.INSTANCE)) {
-            labelInstantiators = labelInstantiators.append(LoopBodyTermLabelInstantiator.INSTANCE);
-         }
-         if (!labelInstantiators.contains(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE)) {
-            labelInstantiators = labelInstantiators.append(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
-         }
-         proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
       }
    }
    

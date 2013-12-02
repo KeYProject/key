@@ -21,6 +21,8 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
@@ -48,6 +50,21 @@ public abstract class AbstractProfile implements Profile {
 
     private GoalChooserBuilder prototype;
 
+    private TermLabelManager termLabelManager;
+    
+    private static
+        ImmutableSet<String> extractNames(ImmutableSet<GoalChooserBuilder> supportedGCB) {
+    
+        ImmutableSet<String> result = DefaultImmutableSet.<String>nil();
+    
+        final Iterator<GoalChooserBuilder> it = supportedGCB.iterator();
+        while (it.hasNext()) {
+            result  = result.add(it.next().name());
+        }
+    
+        return result;
+    }
+
     protected AbstractProfile(String standardRuleFilename,
             ImmutableSet<GoalChooserBuilder> supportedGCB) {
         standardRules = new RuleCollection(RuleSource
@@ -58,20 +75,7 @@ public abstract class AbstractProfile implements Profile {
         this.supportedGC = extractNames(supportedGCB);
         this.prototype = getDefaultGoalChooserBuilder();
         assert( this.prototype!=null );
-
-    }
-
-    private static
-        ImmutableSet<String> extractNames(ImmutableSet<GoalChooserBuilder> supportedGCB) {
-
-        ImmutableSet<String> result = DefaultImmutableSet.<String>nil();
-
-        final Iterator<GoalChooserBuilder> it = supportedGCB.iterator();
-        while (it.hasNext()) {
-            result  = result.add(it.next().name());
-        }
-
-        return result;
+        this.termLabelManager = new TermLabelManager(computeTermLabelConfiguration());
     }
 
     public AbstractProfile(String standardRuleFilename) {
@@ -82,6 +86,12 @@ public abstract class AbstractProfile implements Profile {
                 add(new SymbolicExecutionGoalChooserBuilder()));
     }
 
+    /**
+     * Computes the {@link TermLabelConfiguration} to use in this {@link Profile}.
+     * @return The {@link TermLabelConfiguration} to use in this {@link Profile}.
+     */
+    protected abstract ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration();
+    
     public RuleCollection getStandardRules() {
         return standardRules;
     }
@@ -246,4 +256,10 @@ public abstract class AbstractProfile implements Profile {
       assert defaultProfile != null;
       AbstractProfile.defaultProfile = defaultProfile;
    }
+   
+   @Override 
+   public TermLabelManager getTermLabelManager() {
+       return termLabelManager;
+   }
+
 }

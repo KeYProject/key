@@ -24,9 +24,9 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -214,7 +214,7 @@ public final class DependencyContractPO extends AbstractPO
      	final Name anonHeapName = new Name(TB.newName(services, "anon_"+h.toString()));
 	    final Function anonHeapFunc = new Function(anonHeapName, heapLDT.targetSort());
         register(anonHeapFunc);	
-	    final Term anonHeap = TB.label(TB.func(anonHeapFunc), AnonHeapTermLabel.INSTANCE);
+	    final Term anonHeap = TB.label(TB.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
 	    final Term wellFormedAnonHeap = TB.wellFormed(anonHeap, services);
 	    if(wellFormedHeaps == null) {
 	        wellFormedHeaps = wellFormedAnonHeap;

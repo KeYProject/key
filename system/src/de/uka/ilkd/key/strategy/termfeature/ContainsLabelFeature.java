@@ -13,18 +13,18 @@
 
 package de.uka.ilkd.key.strategy.termfeature;
 
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 
 public class ContainsLabelFeature extends BinaryFeature {
 
-   private final ITermLabel label;
+   private final TermLabel label;
 
 
-   public ContainsLabelFeature(ITermLabel label) {
+   public ContainsLabelFeature(TermLabel label) {
       this.label = label;
    }
    

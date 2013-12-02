@@ -13,30 +13,61 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.NotEquals;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.Branch;
+import de.uka.ilkd.key.java.statement.Catch;
+import de.uka.ilkd.key.java.statement.CatchAllStatement;
+import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.statement.TransactionStatement;
+import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
-
-import java.util.*;
 
 public class BlockContractRule implements BuiltInRule {
 
@@ -472,7 +503,7 @@ public class BlockContractRule implements BuiltInRule {
                 Term anonymisationUpdate = skip();
                 final Term modifiesClause = modifiesClauses.get(anonymisationHeap.getKey());
                 if (!modifiesClause.equals(strictlyNothing())) {
-                    anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause, TB.label(TB.func(anonymisationHeap.getValue()), AnonHeapTermLabel.INSTANCE));
+                    anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause, TB.label(TB.func(anonymisationHeap.getValue()), ParameterlessTermLabel.ANON_HEAP_LABEL));
                 }
                 result = parallel(result, anonymisationUpdate);
             }
@@ -620,7 +651,7 @@ public class BlockContractRule implements BuiltInRule {
         {
             Term result = tt();
             for (Function anonymisationFunction : anonymisationHeaps.values()) {
-                result = and(result, wellFormed(TB.label(TB.func(anonymisationFunction), AnonHeapTermLabel.INSTANCE)));
+                result = and(result, wellFormed(TB.label(TB.func(anonymisationFunction), ParameterlessTermLabel.ANON_HEAP_LABEL)));
             }
             return result;
         }

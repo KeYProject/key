@@ -148,14 +148,14 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      * then gets a new list of updates to highlight
      */
     public void updateUpdateHighlights() {
-        if (printer == null) return;
+        if (getLogicPrinter() == null) return;
         
         for (Object updateHighlight : updateHighlights) {
             removeHighlight(updateHighlight);
         }
 
         updateHighlights.clear();
-        Range[] ranges = printer.getPositionTable().getUpdateRanges();
+        Range[] ranges = getLogicPrinter().getPositionTable().getUpdateRanges();
 
         if (ranges != null) {
             for (Range range : ranges) {
@@ -191,13 +191,13 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         
         setLineWidth(computeLineWidth());
         
-        if (printer != null) {
-            printer.update(filter, getLineWidth());
+        if (getLogicPrinter() != null) {
+            getLogicPrinter().update(filter, getLineWidth());
 	    boolean errorocc;
 	    do {
 	        errorocc = false;
 	        try {
-		    setText(printer.toString());
+		    setText(getLogicPrinter().toString());
 			MainWindow.getInstance().sequentSearchBar.search();
 	        } catch (Error e) {
 		    System.err.println("Error occurred while printing Sequent!");
@@ -235,7 +235,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      * @param sp the LogicPrinter that is used
      */
     public void setPrinterNoProof() {
-    	printer = new LogicPrinter(new ProgramPrinter(null), null, null);
+    	setLogicPrinter(new LogicPrinter(new ProgramPrinter(null), null, null));
     }
     
     /** sets the LogicPrinter to use
@@ -244,20 +244,13 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      */
     public void setPrinter(Goal goal) {
         filter = new IdentitySequentPrintFilter(goal.sequent());
-        printer = new LogicPrinter(new ProgramPrinter(null),
-                getMediator().getNotationInfo(),
-                mediator.getServices());
+        setLogicPrinter(new LogicPrinter(new ProgramPrinter(null),
+                        getMediator().getNotationInfo(),
+                        mediator.getServices()));
     }
 
     protected SequentPrintFilter getSequentPrintFilter() {
     	return filter;
-    }
-
-    /** return used LogicPrinter
-     * @return the LogicPrinter that is used
-     */
-    public LogicPrinter getPrinter() {
-    	return printer;
     }
 
     /** sets the mediator
@@ -302,10 +295,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 	return listener.modalDragNDropEnabled();
     }
 
-    public String getHighlightedText() {
-       return getHighlightedText(getPosInSequent(getMousePosition()));
-    }
-	
     public PosInSequent getMousePosInSequent() {
        return getPosInSequent(getMousePosition());
     }

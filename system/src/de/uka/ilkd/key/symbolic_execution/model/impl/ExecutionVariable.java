@@ -284,11 +284,12 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          List<Term> pathConditions = new LinkedList<Term>();
          Proof proof = null;
          for (Goal valueGoal : valueGoals) {
-            pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(), false));
+            pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(), false, false));
             proof = valueGoal.node().proof();
          }
          Term comboundPathCondition = TermBuilder.DF.or(pathConditions);
          comboundPathCondition = SymbolicExecutionUtil.simplify(proof, comboundPathCondition);
+         comboundPathCondition = SymbolicExecutionUtil.improveReadability(comboundPathCondition, proof.getServices());
          return comboundPathCondition;
       }
       else {

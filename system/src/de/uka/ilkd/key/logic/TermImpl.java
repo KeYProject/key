@@ -17,6 +17,7 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -33,7 +34,7 @@ class TermImpl implements Term {
     private static final ImmutableArray<QuantifiableVariable> EMPTY_VAR_LIST
     	= new ImmutableArray<QuantifiableVariable>();
 	
-    private static final ImmutableArray<ITermLabel> EMPTY_LABEL_LIST = new ImmutableArray<ITermLabel>();
+    private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST = new ImmutableArray<TermLabel>();
     
 	private static int serialNumberCounter =0;
 
@@ -545,12 +546,12 @@ class TermImpl implements Term {
 	}
 
 	@Override
-	public boolean containsLabel(ITermLabel label) {
+	public boolean containsLabel(TermLabel label) {
 		return false;
 	}
 
 	@Override
-	public ImmutableArray<ITermLabel> getLabels() {
+	public ImmutableArray<TermLabel> getLabels() {
 		return EMPTY_LABEL_LIST;
 	}
     

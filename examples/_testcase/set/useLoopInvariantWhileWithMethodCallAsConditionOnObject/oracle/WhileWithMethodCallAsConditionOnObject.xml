@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.size(x,array);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
+         <callStackEntry path="/0"/>
+         <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
+            <callStackEntry path="/0"/>
+            <loopInvariant name="
+invariant: i &gt;= 0 &amp; (i &lt;= array.length &amp; result_1 = i);
+variant: javaSubInt(array.length, i)
+mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
+               <callStackEntry path="/0"/>
+               <branchCondition name="!(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
+  | i_0 &lt;= -1
+  &amp; array.length &gt;= 0
+  &amp; array.length &gt;= i_0
+  | !(     i_0 &gt;= 0
+         &amp; array.length &gt;= 0
+         &amp; array.length &gt;= i_0
+      -&gt; result_1_0 = i_0))" pathCondition="!(  array.length &gt;= 0
+  &amp; (    !i_0 = 0
+       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+         -&gt; result_1_0 = i_0)))" pathConditionChanged="true" branchCondition="!(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
+  | i_0 &lt;= -1
+  &amp; array.length &gt;= 0
+  &amp; array.length &gt;= i_0
+  | !(     i_0 &gt;= 0
+         &amp; array.length &gt;= 0
+         &amp; array.length &gt;= i_0
+      -&gt; result_1_0 = i_0))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                  <callStackEntry path="/0"/>
+                  <branchCondition name="x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)" pathConditionChanged="true" branchCondition="x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (goOnNice)">
+                     <operationContract name="result_5 = x.goOnNice(array, i) catch(exc_8)
+pre: i &lt; 0 &amp; x.&lt;inv&gt; | !array = null &amp; i &gt;= 0 &amp; x.&lt;inv&gt;
+post: (   i &lt; 0 &amp; heapBefore_goOnNice_5[x.&lt;inv&gt;]
+   -&gt;   !exc_8 = null
+      &amp; (  (     java.lang.Exception::instance(exc_8)
+               = TRUE
+            -&gt; x.&lt;inv&gt;)
+         &amp; (    java.lang.RuntimeException::instance(exc_8)
+              = TRUE
+            |   java.lang.RuntimeException::instance(exc_8)
+              = TRUE)))
+&amp; (     !array = null
+      &amp; i &gt;= 0
+      &amp; heapBefore_goOnNice_5[x.&lt;inv&gt;]
+   -&gt;     result_5
+        = \if (i &lt; array.length)
+              \then (TRUE)
+              \else (FALSE)
+      &amp; x.&lt;inv&gt;
+      &amp; exc_8 = null)
+mod: \if (true)
+         \then (     \if (true)
+                         \then (     \if (true)
+                                         \then (     \if (true)
+                                                         \then (     \if (true)
+                                                                         \then (     \if (true)
+                                                                                         \then (allLocs)
+                                                                                         \else (allLocs)
+                                                                                \cap \if (  !  array
+                                                                                             = null
+                                                                                          &amp;    i
+                                                                                            &gt;= 0
+                                                                                          &amp; x.&lt;inv&gt;)
+                                                                                         \then (allLocs)
+                                                                                         \else (allLocs))
+                                                                         \else (allLocs)
+                                                                \cap \if (  !  array
+                                                                             = null
+                                                                          &amp;    i
+                                                                            &gt;= 0
+                                                                          &amp; x.&lt;inv&gt;)
+                                                                         \then (allLocs)
+                                                                         \else (allLocs))
+                                                         \else (allLocs)
+                                                \cap \if (  !  array
+                                                             = null
+                                                          &amp;    i
+                                                            &gt;= 0
+                                                          &amp; x.&lt;inv&gt;)
+                                                         \then (allLocs)
+                                                         \else (allLocs))
+                                         \else (allLocs)
+                                \cap \if (  !  array
+                                             = null
+                                          &amp; i &gt;= 0
+                                          &amp; x.&lt;inv&gt;)
+                                         \then (allLocs)
+                                         \else (allLocs))
+                         \else (allLocs)
+                \cap \if (  !array = null
+                          &amp; i &gt;= 0
+                          &amp; x.&lt;inv&gt;)
+                         \then (allLocs)
+                         \else (allLocs))
+         \else (allLocs)
+\cap \if (!array = null &amp; i &gt;= 0 &amp; x.&lt;inv&gt;)
+         \then (allLocs)
+         \else (allLocs)
+termination: diamond" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
+                        <callStackEntry path="/0"/>
+                        <branchCondition name="x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)" pathConditionChanged="true" branchCondition="x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (goOnNice)">
+                           <callStackEntry path="/0"/>
+                           <branchCondition name="result_5 = TRUE" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)
+   &amp; result_5 = TRUE" pathConditionChanged="true" branchCondition="result_5 = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
+                              <callStackEntry path="/0"/>
+                              <statement name="result_1++;" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)
+   &amp; result_5 = TRUE" pathConditionChanged="false">
+                                 <callStackEntry path="/0"/>
+                                 <statement name="i++;" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)
+   &amp; result_5 = TRUE" pathConditionChanged="false">
+                                    <callStackEntry path="/0"/>
+                                    <termination name="&lt;loop body end&gt;" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)
+   &amp; result_5 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+                                    </termination>
+                                 </statement>
+                              </statement>
+                           </branchCondition>
+                           <branchCondition name="!result_5 = TRUE" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)
+   &amp; !result_5 = TRUE" pathConditionChanged="true" branchCondition="!result_5 = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
+                              <callStackEntry path="/0"/>
+                              <termination name="&lt;loop body end&gt;" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)
+   &amp; !result_5 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+                              </termination>
+                           </branchCondition>
+                        </branchCondition>
+                        <branchCondition name="x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)
+   &amp; (x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null)" pathConditionChanged="true" branchCondition="x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (goOnNice)">
+                           <callStackEntry path="/0"/>
+                           <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)
+   &amp; (x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                           </termination>
+                        </branchCondition>
+                     </operationContract>
+                  </branchCondition>
+                  <branchCondition name="x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null)" pathConditionChanged="true" branchCondition="x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (goOnNice)">
+                     <operationContract name="result_6 = x.goOnNice(array, i) catch(exc_9)
+pre: i &lt; 0 &amp; x.&lt;inv&gt; | !array = null &amp; i &gt;= 0 &amp; x.&lt;inv&gt;
+post: (   i &lt; 0 &amp; heapBefore_goOnNice_5[x.&lt;inv&gt;]
+   -&gt;   !exc_9 = null
+      &amp; (  (     java.lang.Exception::instance(exc_9)
+               = TRUE
+            -&gt; x.&lt;inv&gt;)
+         &amp; (    java.lang.RuntimeException::instance(exc_9)
+              = TRUE
+            |   java.lang.RuntimeException::instance(exc_9)
+              = TRUE)))
+&amp; (     !array = null
+      &amp; i &gt;= 0
+      &amp; heapBefore_goOnNice_5[x.&lt;inv&gt;]
+   -&gt;     result_6
+        = \if (i &lt; array.length)
+              \then (TRUE)
+              \else (FALSE)
+      &amp; x.&lt;inv&gt;
+      &amp; exc_9 = null)
+mod: \if (true)
+         \then (     \if (true)
+                         \then (     \if (true)
+                                         \then (     \if (true)
+                                                         \then (     \if (true)
+                                                                         \then (     \if (true)
+                                                                                         \then (allLocs)
+                                                                                         \else (allLocs)
+                                                                                \cap \if (  !  array
+                                                                                             = null
+                                                                                          &amp;    i
+                                                                                            &gt;= 0
+                                                                                          &amp; x.&lt;inv&gt;)
+                                                                                         \then (allLocs)
+                                                                                         \else (allLocs))
+                                                                         \else (allLocs)
+                                                                \cap \if (  !  array
+                                                                             = null
+                                                                          &amp;    i
+                                                                            &gt;= 0
+                                                                          &amp; x.&lt;inv&gt;)
+                                                                         \then (allLocs)
+                                                                         \else (allLocs))
+                                                         \else (allLocs)
+                                                \cap \if (  !  array
+                                                             = null
+                                                          &amp;    i
+                                                            &gt;= 0
+                                                          &amp; x.&lt;inv&gt;)
+                                                         \then (allLocs)
+                                                         \else (allLocs))
+                                         \else (allLocs)
+                                \cap \if (  !  array
+                                             = null
+                                          &amp; i &gt;= 0
+                                          &amp; x.&lt;inv&gt;)
+                                         \then (allLocs)
+                                         \else (allLocs))
+                         \else (allLocs)
+                \cap \if (  !array = null
+                          &amp; i &gt;= 0
+                          &amp; x.&lt;inv&gt;)
+                         \then (allLocs)
+                         \else (allLocs))
+         \else (allLocs)
+\cap \if (!array = null &amp; i &gt;= 0 &amp; x.&lt;inv&gt;)
+         \then (allLocs)
+         \else (allLocs)
+termination: diamond" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null)" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
+                        <callStackEntry path="/0"/>
+                        <branchCondition name="x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null)
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)" pathConditionChanged="true" branchCondition="x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (goOnNice)">
+                           <callStackEntry path="/0"/>
+                           <branchCondition name="result_6 = TRUE" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null)
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)
+   &amp; result_6 = TRUE" pathConditionChanged="true" branchCondition="result_6 = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
+                              <callStackEntry path="/0"/>
+                              <statement name="result_1++;" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null)
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)
+   &amp; result_6 = TRUE" pathConditionChanged="false">
+                                 <callStackEntry path="/0"/>
+                                 <statement name="i++;" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null)
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)
+   &amp; result_6 = TRUE" pathConditionChanged="false">
+                                    <callStackEntry path="/0"/>
+                                    <termination name="&lt;loop body end&gt;" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null)
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)
+   &amp; result_6 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+                                    </termination>
+                                 </statement>
+                              </statement>
+                           </branchCondition>
+                           <branchCondition name="!result_6 = TRUE" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null)
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)
+   &amp; !result_6 = TRUE" pathConditionChanged="true" branchCondition="!result_6 = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
+                              <callStackEntry path="/0"/>
+                              <termination name="&lt;loop body end&gt;" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null)
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)
+   &amp; !result_6 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+                              </termination>
+                           </branchCondition>
+                        </branchCondition>
+                        <branchCondition name="x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null)" pathConditionChanged="true" branchCondition="x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (goOnNice)">
+                           <callStackEntry path="/0"/>
+                           <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &lt;= -1 &amp; !x = null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                           </termination>
+                        </branchCondition>
+                     </operationContract>
+                  </branchCondition>
+               </branchCondition>
+               <branchCondition name="!(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
+  | i_0 &lt;= -1
+  &amp; array.length &gt;= 0
+  &amp; array.length &gt;= i_0
+  | !(     i_0 &gt;= 0
+         &amp; array.length &gt;= 0
+         &amp; array.length &gt;= i_0
+      -&gt; result_1_0 = i_0))" pathCondition="!(  array.length &gt;= 0
+  &amp; (    !i_0 = 0
+       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+         -&gt; result_1_0 = i_0)))" pathConditionChanged="true" branchCondition="!(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
+  | i_0 &lt;= -1
+  &amp; array.length &gt;= 0
+  &amp; array.length &gt;= i_0
+  | !(     i_0 &gt;= 0
+         &amp; array.length &gt;= 0
+         &amp; array.length &gt;= i_0
+      -&gt; result_1_0 = i_0))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                  <callStackEntry path="/0"/>
+                  <statement name="return result_1;" pathCondition="!(  array.length &gt;= 0
+  &amp; (    !i_0 = 0
+       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+         -&gt; result_1_0 = i_0)))" pathConditionChanged="false">
+                     <callStackEntry path="/0"/>
+                     <branchCondition name="x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)" pathConditionChanged="true" branchCondition="x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (goOnNice)">
+                        <methodReturn name="&lt;return of self.size(x,array);&gt;" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)" pathConditionChanged="false" isReturnValueComputed="false">
+                           <callStackEntry path="/0"/>
+                           <termination name="&lt;end&gt;" pathCondition="   array.length &gt;= 0
+-&gt;   !(    !i_0 = 0
+         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
+         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
+       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
+           -&gt; result_1_0 = i_0))
+   &amp; (x.&lt;inv&gt; &amp; i_0 &gt;= 0 &amp; !array = null &amp; !x = null)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           </termination>
+                        </methodReturn>
+                     </branchCondition>
+                  </statement>
+               </branchCondition>
+            </loopInvariant>
+         </statement>
+      </statement>
+   </methodCall>
+</start>

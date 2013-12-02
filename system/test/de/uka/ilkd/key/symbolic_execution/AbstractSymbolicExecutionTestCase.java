@@ -40,6 +40,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaProgramElement;
@@ -65,6 +66,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
@@ -98,6 +100,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Provides the basic functionality of {@link TestCase}s which tests
@@ -150,7 +153,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    /**
     * The directory which contains the KeY repository.
     */
-   protected static final File keyRepDirectory;
+   public static final File keyRepDirectory;
    
    /**
     * Creates the temporary oracle directory if required.
@@ -954,7 +957,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ProofOblInput input = new FunctionalOperationContractPO(environment.getInitConfig(), (FunctionalOperationContract)contract, true, true);
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
-      SymbolicExecutionUtil.configureProof(proof);
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
@@ -1003,7 +1005,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ProofOblInput input = new ProgramMethodPO(environment.getInitConfig(), pm.getFullName(), pm, precondition, true, true);
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
-      SymbolicExecutionUtil.configureProof(proof);
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
@@ -1092,7 +1093,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ProofOblInput input = new ProgramMethodSubsetPO(environment.getInitConfig(), methodFullName, pm, precondition, startPosition, endPosition, true, true);
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
-      SymbolicExecutionUtil.configureProof(proof);
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
@@ -1396,6 +1396,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                 boolean nonExecutionBranchHidingSideProofs,
                                                                                 boolean aliasChecks) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       HashMap<String, String> originalTacletOptions = null;
+      boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
          // Make sure that parameter are valid.
          assertNotNull(javaPathInBaseDir);
@@ -1409,13 +1410,15 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertTrue(maximalNumberOfExecutedSetNodes >= 1);
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, containerTypeName, methodFullName);
+         setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
          SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks);
          internalDoSETTest(oracleFile, env, oraclePathInBaseDirFile, maximalNumberOfExecutedSetNodes, includeVariables, includeCallStack, includeReturnValues);
          return env;
       }
       finally {
-         // Restore taclet options
+         // Restore original options
+         setOneStepSimplificationEnabled(null, originalOneStepSimplification);
          restoreTacletOptions(originalTacletOptions);
       }
    }
@@ -1581,7 +1584,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             // Load java file
             environment = KeYEnvironment.load(javaFile, null, null);
             // Search type
-            KeYJavaType containerKJT = environment.getJavaInfo().getTypeByClassName(containerTypeName);
+            KeYJavaType containerKJT = environment.getJavaInfo().
+                    getTypeByClassName(containerTypeName);
             assertNotNull(containerKJT);
             // Search observer function
             ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(containerKJT);
@@ -1648,6 +1652,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
    }
    
+<<<<<<< HEAD
 
 
 
@@ -1665,5 +1670,55 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          }
       };
       return programVariableCollectorFactory;
+=======
+   /**
+    * Makes sure that two {@link Term}s are equal. 
+    * @param expected The expected {@link Term}.
+    * @param actual The actual {@link Term}.
+    */
+   protected void assertTerm(Term expected, Term actual) {
+      if (expected != null) {
+         assertEquals(expected.op(), actual.op());
+         assertEquals(expected.javaBlock(), actual.javaBlock());
+         assertEquals(expected.getLabels(), actual.getLabels());
+         assertEquals(expected.arity(), actual.arity());
+         for (int i = 0; i < expected.arity(); i++) {
+            assertTerm(expected.sub(i), actual.sub(i));
+         }
+      }
+      else {
+         assertNull(actual);
+      }
+   }
+   
+   /**
+    * Checks if one step simplification is enabled in the given {@link Proof}.
+    * @param proof The {@link Proof} to read from or {@code null} to return the general settings value.
+    * @return {@code true} one step simplification is enabled, {@code false} if disabled.
+    */
+   public static boolean isOneStepSimplificationEnabled(Proof proof) {
+      if (proof != null && !proof.isDisposed()) {
+         return proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification();
+      }
+      else {
+         return ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+      }
+   }
+   
+   /**
+    * 
+    * @param proof
+    * @param enabled
+    */
+   public static void setOneStepSimplificationEnabled(Proof proof, boolean enabled) {
+      ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(enabled);
+      if (proof != null && !proof.isDisposed()) {
+         proof.getProofIndependentSettings().getGeneralSettings().setOneStepSimplification(true);
+         OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof.env().getInitConfig().getProfile());
+         if (simplifier != null) {
+            simplifier.refresh(proof);
+         }
+      }
+>>>>>>> 482ba17d1dcfe304dd0d3b15ff15758639e3d50b
    }
 }

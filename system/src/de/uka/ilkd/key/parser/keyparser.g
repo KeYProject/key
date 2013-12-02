@@ -890,7 +890,7 @@ options {
     throws KeYSemanticException {
         KeYJavaType kjt = null;              
         try {
-	    kjt=getJavaInfo().getKeYJavaTypeByClassName(s);
+	    kjt=getJavaInfo().getTypeByClassName(s, null);
         } catch(RuntimeException e){
             return null;
         }
@@ -1119,7 +1119,7 @@ options {
 	    		 LT(n+2).getText().charAt(1)<='z' && LT(n+2).getText().charAt(1)>='a'))){  	   
                 if (LA(n+1) != DOT && LA(n+1) != EMPTYBRACKETS) return false;
                 // maybe still an attribute starting with an uppercase letter followed by a lowercase letter
-                if(getTypeByClassName(className.toString())!=null){
+                if(getTypeByClassName(className.toString()) != null){
                     ProgramVariable maybeAttr = 
                     javaInfo.getAttribute(LT(n+2).getText(), getTypeByClassName(className.toString()));
                     if(maybeAttr!=null){
@@ -1524,6 +1524,7 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
 {
     boolean isAbstractSort = false;
     boolean isGenericSort = false;
+    boolean isProxySort = false;
     Sort[] sortExt=new Sort [0];
     Sort[] sortOneOf=new Sort [0];
     String firstSort;
@@ -1532,6 +1533,8 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
         ( 
          GENERIC {isGenericSort=true;} sortIds = simple_ident_comma_list
             ( ONEOF sortOneOf = oneof_sorts )? 
+            ( EXTENDS sortExt = extends_sorts )?
+        | PROXY {isProxySort=true;} sortIds = simple_ident_comma_list
             ( EXTENDS sortExt = extends_sorts )?
         | (ABSTRACT {isAbstractSort = true;})?
           firstSort = simple_ident_dots { sortIds = sortIds.prepend(firstSort); }
@@ -1573,7 +1576,11 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
                                     ext = ext.add ( sortExt[i] );
                                 }
 
+                                if(isProxySort) {
+                                    s = new ProxySort(sort_name, ext);
+                                } else {
                                 s = new SortImpl(sort_name, ext, isAbstractSort);
+                                }
                             }
                             assert s != null;
                             sorts().add ( s ); 
@@ -2833,22 +2840,66 @@ accessterm returns [Term result = null]
                     ". Casts between primitive and reference types are not allowed. ");
          }
          result = tf.createTerm(s.getCastSymbol(getServices()), result);
-	  } |
+	}
+      |
       ( {isStaticQuery()}? // look for package1.package2.Class.query(
         result = static_query
-      | 
+      |
         {isStaticAttribute()}?            // look for package1.package2.Class.attr
         result = static_attribute_suffix
-      | 	
+      |
         result = atom
-      )   
-         ( result = array_access_suffix[result] | result = attribute_or_query_suffix[result] )*
+      )
+         ( result = array_access_suffix[result] 
+         | result = attribute_or_query_suffix[result] 
+         | result = heap_update_suffix[result]
+         )*
  ; exception
         catch [TermCreationException ex] {
               semanticError(ex.getMessage());
         }
 
+heap_update_suffix [Term heap] returns [Term result=heap]
+    :
+    LBRACE
+    result=elementary_heap_update[result]
+    ( PARALLEL result=elementary_heap_update[result] )*
+    RBRACE
+    ; 
 
+elementary_heap_update [Term heap] returns [Term result=heap]
+{
+    Term target, val;
+    Term[] args;
+    String id;
+}
+    : // TODO find the right kind of super non-terminal for "o.f" and "a[i]"
+      // and do not resign to parsing an arbitrary term
+    ( (equivalence_term ASSIGN) => target=equivalence_term ASSIGN val=equivalence_term 
+        {
+           Term objectTerm = target.sub(1);
+           Term fieldTerm  = target.sub(2);
+           result = TermBuilder.DF.store(getServices(), heap, objectTerm, fieldTerm, val);
+        }
+    | id=simple_ident args=argument_list
+        {
+           Function f = (Function)functions().lookup(new Name(id));
+           if(f == null) {
+             semanticError("Unknown heap constructor " + id);
+           }
+           Term[] augmentedArgs = new Term[args.length+1];
+           System.arraycopy(args, 0, augmentedArgs, 1, args.length);
+           augmentedArgs[0] = heap;
+           result = tf.createTerm(f, augmentedArgs);
+           if(!result.sort().name().toString().equals("Heap")) {
+              semanticError(id + " is not a heap constructor ");
+           }
+        }
+    )
+    ; exception
+        catch [TermCreationException ex] {
+              semanticError(ex.getMessage());
+        }
 
 array_access_suffix [Term arrayReference] returns [Term result = arrayReference] 
 {
@@ -2901,7 +2952,7 @@ accesstermlist returns [HashSet accessTerms = new LinkedHashSet()] {Term t = nul
 
 atom returns [Term a = null]
 {
-  ImmutableArray<ITermLabel> labels;
+  ImmutableArray<TermLabel> labels;
 }
     :
 (        {isTermTransformer()}? a = specialTerm
@@ -2923,37 +2974,40 @@ atom returns [Term a = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-label returns [ImmutableArray<ITermLabel> labels = new ImmutableArray<ITermLabel>()] 
+label returns [ImmutableArray<TermLabel> labels = new ImmutableArray<TermLabel>()] 
 {
-  ArrayList<ITermLabel> labelList = new ArrayList<ITermLabel>();
-  ITermLabel label;
+  ArrayList<TermLabel> labelList = new ArrayList<TermLabel>();
+  TermLabel label;
 }
 :
    label=single_label {labelList.add(label);} (COMMA label=single_label {labelList.add(label);})*
    {
-   	labels = new ImmutableArray<ITermLabel>((ITermLabel[])labelList.toArray(new ITermLabel[labelList.size()]));
+   	labels = new ImmutableArray<TermLabel>((TermLabel[])labelList.toArray(new TermLabel[labelList.size()]));
    }
 ;
 
-single_label returns [ITermLabel label=null]
+single_label returns [TermLabel label=null]
 {
   String labelName = "";
-  ITermLabel left = null;
-  ITermLabel right = null;
+  TermLabel left = null;
+  TermLabel right = null;
   List<String> parameters = new LinkedList<String>();
 }
 :
   (name:IDENT {labelName=name.getText();} | star:STAR {labelName=star.getText();} ) (LPAREN param1:STRING_LITERAL {parameters.add(param1.getText().substring(1,param1.getText().length()-1));} (COMMA param2:STRING_LITERAL {parameters.add(param2.getText().substring(1,param2.getText().length()-1));})* RPAREN)? 
   {
-  	label = LabelFactory.createLabel(labelName, parameters);
+      try {
+          label = getServices().getProfile().
+                   getTermLabelManager().parseLabel(labelName, parameters);
+      } catch(TermLabelException ex) {
+          Exception semEx = new KeYSemanticException(ex.getMessage(), getFilename(), getLine(), getColumn());
+          semEx.initCause(ex);
+          keh.reportException(semEx);
+      }
   }
- 
-;  exception
-        catch [UnknownLabelException ex] {
-              keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getFilename(), getLine(), getColumn()));
-        }
+  ; 
+
+       
 
 
 abbreviation returns [Term a=null]
@@ -3294,14 +3348,13 @@ funcpredvarterm returns [Term a = null]
         { a = toZNotation(neg+number.getText(), functions());}    
     | AT a = abbreviation
     | varfuncid = funcpred_name (LIMITED {limited = true;})?
-        (
-            (
+        ( (~LBRACE | LBRACE bound_variables) =>
+            ( 
                LBRACE 
                boundVars = bound_variables 
                RBRACE 
-               args = argument_list
-            )
-            |
+            )?
+
             args = argument_list
         )? 
         
@@ -3589,11 +3642,12 @@ varexp[TacletBuilder b]
     | varcond_different[b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
+    | varcond_differentFields[b]        
   ) 
   | 
   ( (NOT {negated = true;} )? 
-      (   varcond_abstractOrInterface[b, negated]
-	| varcond_array[b, negated]
+    (   varcond_abstractOrInterface[b, negated]
+	    | varcond_array[b, negated]
         | varcond_array_length[b, negated]	
         | varcond_enumtype[b, negated]
         | varcond_freeLabelIn[b,negated]         
@@ -3658,6 +3712,23 @@ varcond_dropEffectlessStores[TacletBuilder b]
                                                                (TermSV)result));
    }
 ;
+
+varcond_differentFields [TacletBuilder b]
+{
+  ParsableVariable x = null;
+  ParsableVariable y = null;
+
+}
+:
+   DIFFERENTFIELDS
+   LPAREN      
+     x = varId COMMA y = varId                    
+   RPAREN 
+   { 
+            b.addVariableCondition(new DifferentFields((SchemaVariable)x, (SchemaVariable)y)); 
+   }
+; 
+
 
 varcond_simplifyIfThenElseUpdate[TacletBuilder b]
 {
@@ -4080,6 +4151,9 @@ varcond_induction_variable [TacletBuilder b, boolean negated]
    }
 ;
 
+
+
+
 goalspecs[TacletBuilder b, boolean ruleWithFind] :
         CLOSEGOAL
     | goalspecwithoption[b, ruleWithFind] ( SEMI goalspecwithoption[b, ruleWithFind] )* ;
@@ -4328,8 +4402,12 @@ problem returns [ Term a = null ]
     String pref = null;
 }
     :
+       { if (capturer != null) capturer.mark(); }
+    
         profile     
-	{ if (capturer != null) capturer.mark(); }
+   	
+   	{ if (profileName != null && capturer != null) capturer.mark(); }
+    
         (pref = preferences)
         { if ((pref!=null) && (capturer != null)) capturer.mark(); }
         

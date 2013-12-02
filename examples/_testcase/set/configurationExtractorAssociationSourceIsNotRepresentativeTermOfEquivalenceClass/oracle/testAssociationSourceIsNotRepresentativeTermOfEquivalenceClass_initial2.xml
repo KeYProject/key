@@ -5,9 +5,6 @@
       <term term="current.right"/>
    </equivalenceClass>
    <equivalenceClass representativeTerm="null">
-      <term term="\if (current.right.left = current)
-    \then (current.right.left)
-    \else (current.parent)"/>
       <term term="current.parent"/>
       <term term="null"/>
    </equivalenceClass>

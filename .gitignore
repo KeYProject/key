@@ -6,6 +6,7 @@
 system/genSrc
 system/binary
 system/lib
+system/doc
 *#*
 system/key.jar
 system/setup.jar
