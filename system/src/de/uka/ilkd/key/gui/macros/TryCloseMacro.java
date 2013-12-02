@@ -13,6 +13,11 @@
 
 package de.uka.ilkd.key.gui.macros;
 
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+
+import javax.swing.KeyStroke;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
@@ -158,6 +163,11 @@ public class TryCloseMacro implements ProofMacro {
             fireStop(listener, proof, time, appliedRules, goalsClosed);
         }
 
+    }
+    
+    @Override
+    public KeyStroke getKeyStroke () {
+    	return KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK);
     }
 
     private void fireStop(ProverTaskListener listener, Proof proof, long time, 

@@ -526,7 +526,7 @@ public final class SupportedTaclets {
                                 Category.REACH_AXIOMS);
                 addTaclet(node24, "accDefinition", "reachDefinition");
 
-                TreeItem node25 = newNode(node19, "Lemmata",
+                TreeItem node25 = newNode(node19, "Lemmas",
                                 Category.REACH_LEMATA);
                 addTaclet(node25, "reachZero", "reachOne", "reachNull",
                                 "reachNull2", "reachAddOne", "reachAddOne2",

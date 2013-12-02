@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <equivalenceClass representativeTerm="self">
-      <term term="self.next"/>
       <term term="self"/>
+      <term term="self.next"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return InstanceCreationTest.classWrapper.value+this.instanceWrapper.value+this.next.instanceWrapper.value+localWrapper.value;">
       <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
