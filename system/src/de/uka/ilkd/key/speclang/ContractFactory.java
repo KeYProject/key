@@ -336,13 +336,13 @@ public class ContractFactory {
         Map<LocationVariable,Term> mods = t.originalMods;
         Modality moda = t.modality; // TODO: what about the others?
         for(FunctionalOperationContract other : others) {
+            FunctionalOperationContractImpl ot = ((FunctionalOperationContractImpl)other);	
             Term otherMby = other.hasMby()
-                        ? other.getMby(t.originalSelfVar,
-                                   t.originalParamVars,
+                        ? other.getMby(ot.originalSelfVar,
+                                   ot.originalParamVars,
                                    services)
                             : null;
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-              FunctionalOperationContractImpl ot = ((FunctionalOperationContractImpl)other);	
               Term otherPre = other.getPre(h, ot.originalSelfVar,
                                ot.originalParamVars,
                                ot.originalAtPreVars,
