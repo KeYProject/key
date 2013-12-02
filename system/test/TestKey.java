@@ -69,7 +69,8 @@ public class TestKey extends TestSuite {
 	de.uka.ilkd.key.proof.TestProofTree.class,
 	de.uka.ilkd.key.proof.TestGoal.class,
 	de.uka.ilkd.key.proof.TestTermTacletAppIndex.class,
-	de.uka.ilkd.key.taclettranslation.TestTacletTranslator.class
+	de.uka.ilkd.key.taclettranslation.TestTacletTranslator.class,
+	de.uka.ilkd.key.taclettranslation.lemma.TestGenericRemovingLemmaGenerator.class
     };
 
 
