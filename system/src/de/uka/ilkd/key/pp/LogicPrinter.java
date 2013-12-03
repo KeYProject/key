@@ -16,7 +16,6 @@ package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -46,7 +45,6 @@ import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -75,12 +73,13 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -945,9 +944,9 @@ public final class LogicPrinter {
             return;
         }
 
-        List<ITermLabel> termLabelList = new LinkedList();
-        for (ITermLabel l : t.getLabels()) {
-            if (!termLabelPreferences.hiddenTermLabels.contains(l.name())) {
+        List<TermLabel> termLabelList = new LinkedList();
+        for (TermLabel l : t.getLabels()) {
+            if (!termLabelPreferences.isVisible(l.name())) {
                 termLabelList.add(l);
             }
         }
@@ -957,7 +956,7 @@ public final class LogicPrinter {
         }
         layouter.beginC().print("\u00ab"); //  ("<<");
         boolean afterFirst = false;
-        for (ITermLabel l : termLabelList) {
+        for (TermLabel l : termLabelList) {
             if (afterFirst) {
                layouter.print(",").brk(1, 0);
             }
@@ -1532,7 +1531,7 @@ public final class LogicPrinter {
     public void printSingleton(Term t) throws IOException {
 	assert t.arity() == 2;
 	startTerm(2);	 
-	layouter.print("{(").beginC(0);;
+	layouter.print("{(").beginC(0);
 
 	markStartSub();	 
 	printTerm(t.sub(0));
@@ -2306,7 +2305,7 @@ public final class LogicPrinter {
      * @return the text with special characters replaced
      */
     public static String escapeHTML(String text, boolean escapeWhitespace) {
-         StringBuffer sb = new StringBuffer();
+         StringBuilder sb = new StringBuilder();
         
          for (int i = 0, sz = text.length(); i < sz; i++) {
              char c = text.charAt(i); 
