@@ -259,7 +259,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 Term[] args = computeArgs(owner, prefix, services);
                 Name name = createUniqueName(services, "f_"+sv.name().toString());
 
-                Function function = new Function(name, sv.sort(), argSorts);
+                Function function = new Function(name, replaceSort(sv.sort(), services), argSorts);
                 return TermBuilder.DF.func(function, args);
         }
 
