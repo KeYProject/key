@@ -49,9 +49,10 @@ tokens {
     MODEL_METHOD_AXIOM    = "model_method_axiom";
     REPRESENTS      = "represents";
     REQUIRES        = "requires";
-    RESPECTS        = "respects";
     DETERMINES      = "determines";
+    LOOP_DETERMINES = "loop_determines";
     SEPARATES       = "separates";
+    LOOP_SEPARATES  = "loop_separates";
     SECURE_FOR      = "secure_for";
     SIGNALS         = "signals";
     SIGNALS_ONLY    = "signals_only";

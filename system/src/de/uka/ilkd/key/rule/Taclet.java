@@ -28,8 +28,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.OpCollector;
@@ -38,6 +36,7 @@ import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -91,7 +90,7 @@ import java.util.Set;
  * <code>B</code>. For a complete description of the syntax and semantics of
  * taclets consult the KeY-Manual.  The objects of this class serve different
  * purposes: First they represent the syntactical structure of a taclet, but 
- * they also include the taclet interpreter itself. The taclet interpreter
+ * they also include the taclet interpreter isself. The taclet interpreter
  * knows two modes: the match and the execution mode. The match mode tries to
  * find a a mapping from schemavariables to a given term or formula. In the
  * execution mode, a given goal is manipulated in the manner as described by the
@@ -578,18 +577,6 @@ public abstract class Taclet implements Rule, Named {
 	final Operator sourceOp   = term.op ();
     final Operator templateOp = template.op ();
                 
-    if (template.hasLabels()) {
-        final ImmutableArray<ITermLabel> labels = template.getLabels();
-        if (labels.size() > 1 || !(labels.get(0) instanceof SchemaVariable)) {
-            Debug.out("FAILED 3x.");
-            return null; ///FAILED
-        } else {
-            final MatchConditions cond = ((SchemaVariable)labels.get(0)).match(term, matchCond, services);
-            if (cond == null) {
-                return null;
-            }
-        }
-    }
     
 	if(templateOp instanceof SchemaVariable && templateOp.arity() == 0) {
 	    return templateOp.match(term, matchCond, services);
@@ -959,6 +946,7 @@ public abstract class Taclet implements Rule, Named {
      * @param services the Services
      * @param matchCond the MatchConditions including the mapping 
      * Schemavariables to concrete logic elements
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is rewritten
      * @return the instanted formulas of the semisquent as list
      */
     protected ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi, Services services,

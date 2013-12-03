@@ -25,6 +25,7 @@ import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InformationFlowContractImpl;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.util.InfFlowSpec;
 
 public class LoopInvExecutionPO extends AbstractOperationPO
         implements ContractPO, InfFlowRelatedPO {
@@ -77,6 +78,21 @@ public class LoopInvExecutionPO extends AbstractOperationPO
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;
         this.context = context;
+
+        // consistensy check
+        assert preAndPostExpressionsEqual() :
+                "Information flow loop invariant malformed. Pre expressions" +
+                "do not match post expressions.";
+    }
+
+
+    private boolean preAndPostExpressionsEqual() {
+        for (InfFlowSpec infFlowSpec: loopInvariant.getInfFlowSpecs(services)) {
+            if(infFlowSpec.preExpressions == infFlowSpec.postExpressions) {
+                return false;
+            }
+        }
+        return true;
     }
 
 

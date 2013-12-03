@@ -1227,8 +1227,8 @@ loop_specification[ImmutableList<String> mods]
     	options { greedy = true; }
     	:
             ps=loop_invariant       { ls.addInvariant(ps); }
-        |   ps=separates_clause      { ls.addInfFlowSpecs(ps); }
-        |   ps=determines_clause      { ls.addInfFlowSpecs(ps); }
+        |   ps=loop_separates_clause      { ls.addInfFlowSpecs(ps); }
+        |   ps=loop_determines_clause      { ls.addInfFlowSpecs(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
         |   ps=variant_function     { ls.setVariant(ps); }
     )*
@@ -1262,6 +1262,24 @@ decreasing_keyword
     |   DECREASES
     |   DECREASES_REDUNDANTLY
 ;
+
+
+// old information flow annotations
+loop_separates_clause
+	returns [PositionedString result = null]
+	throws SLTranslationException
+:
+    (RESPECTS | SEPARATES) result=expression { result = result.prepend("loop_separates "); }
+;
+
+
+loop_determines_clause
+	returns [PositionedString result = null]
+	throws SLTranslationException
+:
+    (DETERMINES) result=expression { result = result.prepend("loop_determines "); }
+;
+
 
 
 
