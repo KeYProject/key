@@ -40,7 +40,9 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
     @Override
     public boolean canApplyTo(KeYMediator mediator,
                               PosInOccurrence posInOcc) {
-        if (posInOcc == null || posInOcc.subTerm() == null) {
+        if (posInOcc == null
+                || posInOcc.depth() >= posInOcc.constrainedFormula().formula().arity()
+                || posInOcc.subTerm() == null) {
             return false;
         }
         Proof proof = mediator.getSelectedProof();

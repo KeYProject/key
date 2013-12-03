@@ -55,8 +55,10 @@ public class DoWhileElseMacro implements ProofMacro {
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
         int steps = getMaxSteps(mediator);
-        while (steps > 0 && getCondition()) {
+        while (steps > 0 && getCondition() && canApplyTo(mediator, posInOcc)) {
             getProofMacro().applyTo(mediator, posInOcc, listener);
+            posInOcc = null;
+            steps--;
         }
         if (steps > 0) {
             getAltProofMacro().applyTo(mediator, posInOcc, listener);

@@ -53,19 +53,7 @@ public class FullInformationFlowAutoPilotMacro extends SequentialOnLastGoalProof
             @Override
             public String getDescription() { return "Anonymous Macro"; }
         };
-        AlternativeProofMacro exhaustiveOrFinishCompMacro =
-                new AlternativeProofMacro() {
-                    @Override
-                    public String getName() { return "Anonymous Macro"; }
-                    @Override
-                    public String getDescription() { return "Anonymous Macro"; }
-                    @Override
-                    protected ProofMacro[] createProofMacroArray() {
-                        return new ProofMacro[] {new ExhaustiveOrFinishAuxiliaryComputationAutoPilotMacro(),
-                                                 new FinishAuxiliaryComputationMacro()};}
-        };
-        return new ProofMacro[] {exhaustiveOrFinishCompMacro,
-                                 new FinishAuxiliaryComputationMacro(),
+        return new ProofMacro[] {new ExhaustiveOrFinishAuxiliaryComputationAutoPilotMacro(),
                                  fullmainCompMacro};
     }
 }

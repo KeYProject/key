@@ -58,6 +58,6 @@ public class ExhaustiveOrFinishAuxiliaryComputationAutoPilotMacro extends
                         return new ProofMacro[] {exhaustiveAutoPilotMacro,
                                                  fullmainCompMacro};}
         };
-        return exhaustiveCompMacro;
+        return new DoWhileElseMacro(exhaustiveCompMacro, fullmainCompMacro, NUMBER_OF_TRY_STEPS, true);
     }
 }
