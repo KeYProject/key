@@ -135,6 +135,5 @@ public interface Profile {
      */
     String getInternalClasslistFilename();
     
-
     TermLabelManager getTermLabelManager();
 }

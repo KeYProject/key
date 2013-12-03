@@ -5,16 +5,33 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  * This class is used by LogicPrinter to determine which TermLabels are printed
  * and which are not. If not otherwise set, LogicPrinter will use the return
  * value of function TermLabelPreferences.getDefaults().
+ *
+ * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public abstract class TermLabelPreferences {
 
-    public final Set<Name> hiddenTermLabels = new HashSet();
+    private final Set<Name> hiddenTermLabels;
 
     public abstract boolean hideAllTermLabels();
+
+    public TermLabelPreferences() {
+        hiddenTermLabels = new HashSet();
+    }
+
+    public boolean isVisible(Name name) {
+        return !hideAllTermLabels() && !hiddenTermLabels.contains(name);
+    }
+
+    public void hide(Name name) {
+        hiddenTermLabels.add(name);
+    }
+
+    public void unhide(Name name) {
+        hiddenTermLabels.add(name);
+    }
 
     public static TermLabelPreferences getDefaults() {
         return new TermLabelPreferences() {

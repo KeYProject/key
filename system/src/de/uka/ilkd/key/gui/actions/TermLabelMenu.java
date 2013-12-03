@@ -13,7 +13,8 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 
 /**
- *
+ * This menu can be used to toggle TermLabel visibility for the SequentView.
+ * 
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class TermLabelMenu extends JMenu {
@@ -31,11 +32,12 @@ public class TermLabelMenu extends JMenu {
 
         if (mediator.getSelectedProof() != null) {
             addSeparator();
-            for (Name labelName : mediator.getProfile().getSupportedLabelNames()) {
+            for (Name labelName
+                    : mediator.getProfile().getTermLabelManager().getSupportedTermLabelNames()) {
                 TermLabelCheckBox checkBox = new TermLabelCheckBox(labelName) {
                 };
-                
-                checkBox.setSelected(!termLabelPreferences.hiddenTermLabels.contains(labelName));
+
+                checkBox.setSelected(termLabelPreferences.isVisible(labelName));
                 checkBox.setEnabled(!hideAllTermLabels.isSelected());
                 checkBoxList.add(checkBox);
             }
@@ -105,9 +107,9 @@ public class TermLabelMenu extends JMenu {
         @Override
         public void handleClickEvent() {
             if (isSelected()) {
-                termLabelPreferences.hiddenTermLabels.remove(labelName);
+                termLabelPreferences.unhide(labelName);
             } else {
-                termLabelPreferences.hiddenTermLabels.add(labelName);
+                termLabelPreferences.hide(labelName);
             }
             mainWindow.makePrettyView();
         }
