@@ -21,15 +21,15 @@ public abstract class TermLabelPreferences {
         hiddenTermLabels = new HashSet();
     }
 
-    public boolean isVisible(Name name) {
+    public boolean isTermLabelHidden(Name name) {
         return !hideAllTermLabels() && !hiddenTermLabels.contains(name);
     }
 
-    public void hide(Name name) {
+    public void hideTermLabel(Name name) {
         hiddenTermLabels.add(name);
     }
 
-    public void unhide(Name name) {
+    public void unhideTermLabel(Name name) {
         hiddenTermLabels.add(name);
     }
 

@@ -37,7 +37,7 @@ public class TermLabelMenu extends JMenu {
                 TermLabelCheckBox checkBox = new TermLabelCheckBox(labelName) {
                 };
 
-                checkBox.setSelected(termLabelPreferences.isVisible(labelName));
+                checkBox.setSelected(termLabelPreferences.isTermLabelHidden(labelName));
                 checkBox.setEnabled(!hideAllTermLabels.isSelected());
                 checkBoxList.add(checkBox);
             }
@@ -63,7 +63,7 @@ public class TermLabelMenu extends JMenu {
         };
 
         hideAllTermLabels = new TermLabelToggleAction(mainWindow);
-        hideAllTermLabels.setName("toggleTerms");
+        hideAllTermLabels.setName("hideAllTermLabels");
 
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
@@ -107,9 +107,9 @@ public class TermLabelMenu extends JMenu {
         @Override
         public void handleClickEvent() {
             if (isSelected()) {
-                termLabelPreferences.unhide(labelName);
+                termLabelPreferences.unhideTermLabel(labelName);
             } else {
-                termLabelPreferences.hide(labelName);
+                termLabelPreferences.hideTermLabel(labelName);
             }
             mainWindow.makePrettyView();
         }

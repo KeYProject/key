@@ -531,7 +531,7 @@ public class SVInstantiations {
     }
 
     /** adds an update to the update context 
-    * @param updateApplicationlabels the ITermLabels attached to the application operator term 
+    * @param updateApplicationlabels the TermLabels attached to the application operator term 
     */
     public SVInstantiations addUpdate(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
 	assert update.sort() == Sort.UPDATE;

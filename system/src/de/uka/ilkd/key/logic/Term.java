@@ -146,7 +146,7 @@ public interface Term extends SVSubstitute, Sorted {
     
     /**
      * checks if the given label is attached to the term
-     * @param label the ITermLabel for which to look (must not be null)
+     * @param label the TermLabel for which to look (must not be null)
      */
     public boolean containsLabel(TermLabel label);
     
