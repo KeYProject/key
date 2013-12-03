@@ -15,8 +15,7 @@ public class ConditionalConfidentialExample {
 
     /*@ normal_behavior
       @ determines u, u.data,
-      @            (\exists int i; 0 <= i && i < trustworthyUsers.length;
-      @                                              trustworthyUsers[i] == u),
+      @            hasAccessRight(u),
       @            (hasAccessRight(u) ? confidentialData : 0)
       @        \by \itself;
       @*/
