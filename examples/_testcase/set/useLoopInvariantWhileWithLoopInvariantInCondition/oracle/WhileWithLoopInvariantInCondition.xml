@@ -186,7 +186,7 @@ mod: false" pathCondition="   array.length &gt;= 0
   &amp; i_0 &gt;= 0
   &amp; array.length &gt;= 0
   &amp; array.length &gt;= i_0
-  &amp; wellFormed(anon_heap_loop_4&lt;&lt;anonHeapFunction&gt;&gt;)
+  &amp; wellFormed(anon_heap_loop_4«anonHeapFunction»)
   &amp; i_5 = -1
   | !(     result_1_0 = i_0
          &amp; i_0 &gt;= 0
@@ -198,7 +198,7 @@ mod: false" pathCondition="   array.length &gt;= 0
        &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
      | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
          -&gt; result_1_0 = i_0)
-     | wellFormed(anon_heap_loop_4&lt;&lt;anonHeapFunction&gt;&gt;)
+     | wellFormed(anon_heap_loop_4«anonHeapFunction»)
      &amp; i_0 &gt;= 0
      &amp; i_5 = -1
      &amp; result_1_0 = i_0
@@ -218,7 +218,7 @@ mod: false" pathCondition="   array.length &gt;= 0
   &amp; i_0 &gt;= 0
   &amp; array.length &gt;= 0
   &amp; array.length &gt;= i_0
-  &amp; wellFormed(anon_heap_loop_4&lt;&lt;anonHeapFunction&gt;&gt;)
+  &amp; wellFormed(anon_heap_loop_4«anonHeapFunction»)
   &amp; i_5 = -1
   | !(     result_1_0 = i_0
          &amp; i_0 &gt;= 0
@@ -232,7 +232,7 @@ mod: false" pathCondition="   array.length &gt;= 0
        &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
      | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
          -&gt; result_1_0 = i_0)
-     | wellFormed(anon_heap_loop_4&lt;&lt;anonHeapFunction&gt;&gt;)
+     | wellFormed(anon_heap_loop_4«anonHeapFunction»)
      &amp; i_0 &gt;= 0
      &amp; i_5 = -1
      &amp; result_1_0 = i_0
