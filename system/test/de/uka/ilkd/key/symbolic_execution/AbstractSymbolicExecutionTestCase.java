@@ -150,7 +150,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    /**
     * The directory which contains the KeY repository.
     */
-   protected static final File keyRepDirectory;
+   public static final File keyRepDirectory;
    
    /**
     * Creates the temporary oracle directory if required.

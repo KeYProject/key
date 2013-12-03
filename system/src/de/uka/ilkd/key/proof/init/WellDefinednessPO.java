@@ -28,7 +28,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -367,7 +367,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                           final LocationVariable heap,
                           final Function anonHeap) {
             this(self, result, exception, atPres, params, heap,
-                 TB.label(TB.func(anonHeap), AnonHeapTermLabel.INSTANCE));
+                 TB.label(TB.func(anonHeap), ParameterlessTermLabel.ANON_HEAP_LABEL));
         }
     }
 }

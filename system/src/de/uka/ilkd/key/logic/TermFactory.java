@@ -18,6 +18,7 @@ package de.uka.ilkd.key.logic;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.LRUCache;
 
@@ -67,7 +68,7 @@ public final class TermFactory {
 	    		   ImmutableArray<Term> subs, 
 	    		   ImmutableArray<QuantifiableVariable> boundVars,
 	    		   JavaBlock javaBlock,
-	    		   ImmutableArray<ITermLabel> labels) {
+			   ImmutableArray<TermLabel> labels) {
 	if(op == null) {
 	    throw new TermCreationException("null-Operator at TermFactory");
 	}
@@ -106,9 +107,9 @@ public final class TermFactory {
                            Term[] subs,
                            ImmutableArray<QuantifiableVariable> boundVars,
                            JavaBlock javaBlock,
-                           ITermLabel label) {
+                           TermLabel label) {
         return createTerm(op, new ImmutableArray<Term>(subs), boundVars,
-                          javaBlock, new ImmutableArray<ITermLabel>(label));
+                          javaBlock, new ImmutableArray<TermLabel>(label));
     }
 
 
@@ -120,7 +121,7 @@ public final class TermFactory {
     }
 
 
-    public Term createTerm(Operator op, Term[] subs, ITermLabel label) {
+    public Term createTerm(Operator op, Term[] subs, TermLabel label) {
         return createTerm(op, subs, null, null, label);
     }
     
@@ -149,27 +150,27 @@ public final class TermFactory {
                            Term[] subs,
                            ImmutableArray<QuantifiableVariable> boundVars,
                            JavaBlock javaBlock,
-                           ImmutableArray<ITermLabel> labels) {
+                           ImmutableArray<TermLabel> labels) {
     	return createTerm(op, new ImmutableArray<Term>(subs), boundVars, javaBlock, labels);
     }
 
 
-    public Term createTerm(Operator op, Term[] subs, ImmutableArray<ITermLabel> labels) {
+    public Term createTerm(Operator op, Term[] subs, ImmutableArray<TermLabel> labels) {
     	return createTerm(op, subs, null, null, labels);
     }
 
 
-    public Term createTerm(Operator op, Term sub, ImmutableArray<ITermLabel> labels) {
+    public Term createTerm(Operator op, Term sub, ImmutableArray<TermLabel> labels) {
     	return createTerm(op, new ImmutableArray<Term>(sub), null, null, labels);
     }    
 
 
-    public Term createTerm(Operator op, Term sub1, Term sub2, ImmutableArray<ITermLabel> labels) {
+    public Term createTerm(Operator op, Term sub1, Term sub2, ImmutableArray<TermLabel> labels) {
     	return createTerm(op, new Term[]{sub1, sub2}, null, null, labels);
     }    
 
 
-    public Term createTerm(Operator op, ImmutableArray<ITermLabel> labels) {
+    public Term createTerm(Operator op, ImmutableArray<TermLabel> labels) {
     	return createTerm(op, NO_SUBTERMS, null, null, labels);
     }
 

@@ -251,6 +251,9 @@ public abstract class SequentView extends JTextArea
     public String getHighlightedText(PosInSequent pos) {
         String s = "";
         try {
+            if (pos == null) {
+                pos = PosInSequent.createSequentPos();
+            }
             assert pos != null;
             s = getText(pos.getBounds().start(),
                     pos.getBounds().length());
@@ -281,7 +284,8 @@ public abstract class SequentView extends JTextArea
                     String tOpClassString = t.op().getClass().toString();
                     String operator = tOpClassString.substring(
                             tOpClassString.lastIndexOf('.') + 1);
-                    // What is the purpose of displaying the java hashcode here?
+                    // The hash code is displayed here since sometimes terms with
+                    // equal string representation are still different.
                     info = operator + ", Sort: " + t.sort() + ", Hash:" + t.hashCode();
 
                     Sequent seq = mainWindow.getMediator().getSelectedNode().sequent();

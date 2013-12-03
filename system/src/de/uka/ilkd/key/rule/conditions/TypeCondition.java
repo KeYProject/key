@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -65,18 +66,41 @@ public final class TypeCondition extends VariableConditionAdapter {
 			 SVSubstitute candidate, 
 			 SVInstantiations svInst,
 			 Services services) {
-        
+
         if (!resolver.isComplete(p_var, candidate, svInst, services)) {
             // instantiation not yet complete
             return true;
         }
         final Sort s = resolver.resolveSort(p_var, candidate, svInst, services);
-        
-        if (isReference) {        
-            return (s.extendsTrans(services.getJavaInfo().objectSort()) 
-        	    && !(nonNull && s instanceof NullSort));
+
+        Sort objectSort = services.getJavaInfo().objectSort();
+
+        boolean isProxySort = s instanceof ProxySort;
+        if(!isProxySort) {
+            // for normal sorts this is ...
+            if (isReference) {
+                return (s.extendsTrans(objectSort)
+                        && !(nonNull && s instanceof NullSort));
+            } else {
+                return !(s.extendsTrans(objectSort));
+            }
         } else {
-            return !(s.extendsTrans(services.getJavaInfo().objectSort()));
+            // for proxy sorts this is ...
+            if(isReference && nonNull) {
+                // non-null cannot be guaranteed since there is no lower bound to type var
+                return false;
+            }
+            if(isReference) {
+                // one extended sort must have the property and we are fine
+                for (Sort extSort : s.extendsSorts()) {
+                    // same as:
+                    // extends && isReference  ||  !extends && !isReference
+                    if(extSort.extendsTrans(objectSort) == isReference) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 

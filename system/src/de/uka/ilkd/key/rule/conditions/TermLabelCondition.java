@@ -15,8 +15,8 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
@@ -59,8 +59,8 @@ public class TermLabelCondition extends VariableConditionAdapter {
     static boolean hasLabel(ImmutableArray<?> labels, Name name) {
         boolean found = false;
         for (Object o: labels) {
-            assert o instanceof ITermLabel;
-            ITermLabel label = (ITermLabel)o;
+            assert o instanceof TermLabel;
+            TermLabel label = (TermLabel)o;
             found = found || (label.name().compareTo(name) == 0);
         }
         return found;

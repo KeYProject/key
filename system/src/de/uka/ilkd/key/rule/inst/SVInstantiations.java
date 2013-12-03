@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -139,36 +140,36 @@ public class SVInstantiations {
     public SVInstantiations add(SchemaVariable sv, 
 	    			Term subst, 
 	    			Services services) {
-        return add(sv, new TermInstantiation(sv, subst), services);    
+        return add(sv, new TermInstantiation(sv, subst), services);
     }
 
-    
-    public SVInstantiations add(ModalOperatorSV sv, 
+
+    public SVInstantiations add(ModalOperatorSV sv,
             			Operator op,
             			Services services) {
         return add(sv, new OperatorInstantiation(sv, op), services);
     }
-    
 
-    public SVInstantiations addInteresting(SchemaVariable sv, 
+
+    public SVInstantiations addInteresting(SchemaVariable sv,
 	    				   Term subst,
 	    				   Services services) {
-        return addInteresting(sv, 
+        return addInteresting(sv,
         		      new TermInstantiation(sv, subst),
         		      services);
     }
 
 
-    public SVInstantiations add(SchemaVariable sv, 
-	    		        ProgramList pes, 
+    public SVInstantiations add(SchemaVariable sv,
+			        ProgramList pes,
 	    		        Services services) {
-        return add(sv, 
-        	   new ProgramListInstantiation(sv, pes.getList()), 
-        	   services);
+        return add(sv,
+                   new ProgramListInstantiation(sv, pes.getList()),
+                   services);
     }
 
     public SVInstantiations add(SchemaVariable sv, 
-            ImmutableArray<ITermLabel> labels, 
+            ImmutableArray<TermLabel> labels,
             Services services) {
         return add(sv, 
                 new TermLabelInstantiationEntry(sv, labels), 
@@ -176,18 +177,18 @@ public class SVInstantiations {
     }
 
 
-    public SVInstantiations addList(SchemaVariable sv,  
+    public SVInstantiations addList(SchemaVariable sv,
 	    		            Object[] list,
 	    		            Services services) {
-        return add(sv, 
+        return add(sv,
         	   new ListInstantiation(
-        		   sv, 
+                           sv,
         		   ImmutableSLList.<Object>nil().prepend(list)),
                    services);
     }
 
-    
-    
+
+
     /** adds the given pair to the instantiations. If the given
      * SchemaVariable has been instantiated already, the new pair is
      * taken without a warning.
@@ -196,24 +197,24 @@ public class SVInstantiations {
      * @return SVInstantiations the new SVInstantiations containing
      * the given pair
      */
-    public SVInstantiations add(SchemaVariable sv, 
+    public SVInstantiations add(SchemaVariable sv,
 	    			ProgramElement pe,
 	    			Services services) {
 	return add(sv, new ProgramInstantiation(sv, pe), services);
-    }    
+    }
 
 
-    public SVInstantiations addInteresting(SchemaVariable sv, 
+    public SVInstantiations addInteresting(SchemaVariable sv,
 	    				   ProgramElement pe,
 	    				   Services services) {
 	return addInteresting(sv, new ProgramInstantiation(sv, pe), services);
-    }    
-    
-    public SVInstantiations addInterestingList(SchemaVariable sv, 
-	    				       Object[] list, 
+    }
+
+    public SVInstantiations addInterestingList(SchemaVariable sv,
+					       Object[] list,
 	    				       Services services) {
         return addInteresting(
-        	sv, 
+                sv,
                 new ListInstantiation(sv, ImmutableSLList.<Object>nil().prepend(list)),
                 services);
     }
@@ -223,7 +224,7 @@ public class SVInstantiations {
     /**
      * adds the given pair to the instantiations for the context.If the context
      * has been instantiated already, the new pair is taken without a warning.
-     * 
+     *
      * @param prefix
      *            the PosInProgram describing the prefix
      * @param postfix
@@ -235,17 +236,17 @@ public class SVInstantiations {
      * @return SVInstantiations the new SVInstantiations containing the given
      *         pair
      */
-    public SVInstantiations add(PosInProgram prefix, 
+    public SVInstantiations add(PosInProgram prefix,
 	    			PosInProgram postfix,
-	    			ExecutionContext activeStatementContext, 
+				ExecutionContext activeStatementContext,
 	    			ProgramElement pe,
 	    			Services services) {
-        return add(CONTEXTSV, 
-        	   new ContextInstantiationEntry(CONTEXTSV, 
-        		   		         prefix, 
-        		   		         postfix, 
-        		   		         activeStatementContext, 
-        		   		         pe),
+        return add(CONTEXTSV,
+                   new ContextInstantiationEntry(CONTEXTSV,
+                                                 prefix,
+                                                 postfix,
+                                                 activeStatementContext,
+                                                 pe),
                    services);
     }
 
@@ -532,7 +533,7 @@ public class SVInstantiations {
     /** adds an update to the update context 
     * @param updateApplicationlabels the ITermLabels attached to the application operator term 
     */
-    public SVInstantiations addUpdate(Term update, ImmutableArray<ITermLabel> updateApplicationlabels) {
+    public SVInstantiations addUpdate(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
 	assert update.sort() == Sort.UPDATE;
         return new SVInstantiations(map, interesting(), updateContext
                 .append(new UpdateLabelPair(update, updateApplicationlabels)),
@@ -542,9 +543,9 @@ public class SVInstantiations {
     public static class UpdateLabelPair {
        private Term update;
        
-       private ImmutableArray<ITermLabel> updateApplicationlabels;
+       private ImmutableArray<TermLabel> updateApplicationlabels;
 
-      public UpdateLabelPair(Term update, ImmutableArray<ITermLabel> updateApplicationlabels) {
+      public UpdateLabelPair(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
          this.update = update;
          this.updateApplicationlabels = updateApplicationlabels;
       }
@@ -553,7 +554,7 @@ public class SVInstantiations {
          return update;
       }
 
-      public ImmutableArray<ITermLabel> getUpdateApplicationlabels() {
+      public ImmutableArray<TermLabel> getUpdateApplicationlabels() {
          return updateApplicationlabels;
       }
 

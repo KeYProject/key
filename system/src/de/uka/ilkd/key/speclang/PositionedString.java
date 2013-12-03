@@ -17,7 +17,7 @@ package de.uka.ilkd.key.speclang;
 import antlr.Token;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 
 /**
  * A string with associated position information (file and line number). The
@@ -29,8 +29,8 @@ public class PositionedString {
     public final String fileName;
     public final Position pos;
 
-    private static final ImmutableArray<ITermLabel> EMPTY_LABEL_LIST =
-            new ImmutableArray<ITermLabel>();
+    private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST =
+            new ImmutableArray<TermLabel>();
 
     public PositionedString(String text, String fileName, Position pos) {
         assert text != null;
@@ -96,7 +96,7 @@ public class PositionedString {
      * checks if the given label is attached to the positioned string
      * @param label the ITermLabel for which to look (must not be null)
      */
-    public boolean containsLabel(ITermLabel label) {
+    public boolean containsLabel(TermLabel label) {
         return false;
     }
 
@@ -104,15 +104,15 @@ public class PositionedString {
      * returns list of labels attached to this positioned string
      * @return list of labels (maybe be empty but never <code>null</code>
      */
-    public ImmutableArray<ITermLabel> getLabels() {
+    public ImmutableArray<TermLabel> getLabels() {
         return EMPTY_LABEL_LIST;
     }
 
-    public PositionedLabeledString label(ImmutableArray<ITermLabel> labels) {
+    public PositionedLabeledString label(ImmutableArray<TermLabel> labels) {
         return new PositionedLabeledString(text, fileName, pos, labels);
     }
 
-    public PositionedLabeledString label(ITermLabel label) {
+    public PositionedLabeledString label(TermLabel label) {
         return new PositionedLabeledString(text, fileName, pos, label);
     }
 }

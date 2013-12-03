@@ -64,7 +64,6 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -77,10 +76,10 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.label.LoopBodyTermLabel;
-import de.uka.ilkd.key.logic.label.LoopInvariantNormalBehaviorTermLabel;
-import de.uka.ilkd.key.logic.label.SelectSkolemConstantTermLabel;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -120,7 +119,6 @@ import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.label.ITermLabelWorker;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
@@ -410,15 +408,15 @@ public final class SymbolicExecutionUtil {
       // Create new profile which has separate OneStepSimplifier instance
       JavaProfile profile = new JavaProfile() {
          @Override
-         protected ImmutableList<ITermLabelWorker> computeLabelInstantiators() {
+         protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
             Profile sourceProfile = sourceEnv.getInitConfig().getProfile();
             if (sourceProfile instanceof SymbolicExecutionJavaProfile) {
-               ImmutableList<ITermLabelWorker> result = super.computeLabelInstantiators();
-               result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionLabelInstantiators()); // Make sure that the term label worker of symbolic execution are also used in the new proof environment.
+               ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
+               result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations()); // Make sure that the term labels of symbolic execution are also supported by the new environment.
                return result;
             }
             else {
-               return super.computeLabelInstantiators();
+               return super.computeTermLabelConfiguration();
             }
          }
       };
@@ -1253,7 +1251,7 @@ public final class SymbolicExecutionUtil {
          Term term = ruleApp.posInOccurrence().subTerm();
          if (term != null) {
             term = TermBuilder.DF.goBelowUpdates(term);
-            return term.containsLabel(LoopBodyTermLabel.INSTANCE);
+            return term.containsLabel(ParameterlessTermLabel.LOOP_BODY_LABEL);
          }
          else {
             return false;
@@ -1272,7 +1270,7 @@ public final class SymbolicExecutionUtil {
    public static boolean hasLoopBodyTerminationLabel(RuleApp ruleApp) {
       if (ruleApp != null && ruleApp.posInOccurrence() != null) {
          Term term = ruleApp.posInOccurrence().subTerm();
-         return term.containsLabel(LoopInvariantNormalBehaviorTermLabel.INSTANCE);
+         return term.containsLabel(ParameterlessTermLabel.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL);
       }
       else {
          return false;
@@ -1320,9 +1318,9 @@ public final class SymbolicExecutionUtil {
       if (term != null) {
          term = TermBuilder.DF.goBelowUpdates(term);
          return (SymbolicExecutionTermLabel)JavaUtil.search(term.getLabels(),
-                                                            new IFilter<ITermLabel>() {
+                                                            new IFilter<TermLabel>() {
             @Override
-            public boolean select(ITermLabel element) {
+            public boolean select(TermLabel element) {
                return element instanceof SymbolicExecutionTermLabel;
             }
          });
@@ -2387,7 +2385,7 @@ public final class SymbolicExecutionUtil {
                                                            Semisequent semisequent) {
       ImmutableList<Term> terms = ImmutableSLList.nil();
       for (SequentFormula sf : semisequent) {
-         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, svInst, null);
+         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, svInst, null, null);
          sf.formula().execPostOrder(visitor);
          terms = terms.append(visitor.getTerm());
       }
@@ -2615,7 +2613,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} is skolem {@link Term}, {@code false} is not a skolem {@link Term}.
     */
    public static boolean isSkolemConstant(Term term) {
-      return term.containsLabel(SelectSkolemConstantTermLabel.INSTANCE);
+      return term.containsLabel(ParameterlessTermLabel.SELECT_SKOLEM_LABEL);
    }
 
    /**

@@ -33,8 +33,8 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.label.ShortcutEvaluationTermLabel;
-import de.uka.ilkd.key.logic.label.UndefinedValueTermLabel;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -426,7 +426,7 @@ public class TermBuilder {
     }
 
 
-    public Term prog(Modality mod, JavaBlock jb, Term t, ImmutableArray<ITermLabel> labels) {
+    public Term prog(Modality mod, JavaBlock jb, Term t, ImmutableArray<TermLabel> labels) {
     return tf.createTerm(mod, new Term[]{t}, null, jb, labels);
     }
 
@@ -599,7 +599,7 @@ public class TermBuilder {
         final Term minForm = and(qvsInInt, origGuard, forall);
 
         final Term undef = label(func(new Function(new Name("undefMin"), intSort)),
-                                 UndefinedValueTermLabel.INSTANCE);
+                                 ParameterlessTermLabel.UNDEFINED_VALUE_LABEL);
         return ifEx(qvs, minForm, t, undef);
     }
 
@@ -647,7 +647,7 @@ public class TermBuilder {
         final Term maxForm = and(qvsInInt, origGuard, forall);
 
         final Term undef = label(func(new Function(new Name("undefMax"), intSort)),
-                                 UndefinedValueTermLabel.INSTANCE);
+                                 ParameterlessTermLabel.UNDEFINED_VALUE_LABEL);
         return ifEx(qvs, maxForm, t, undef);
     }
 
@@ -792,7 +792,7 @@ public class TermBuilder {
     }
 
 
-    public Term imp(Term t1, Term t2, ImmutableArray<ITermLabel> labels) {
+    public Term imp(Term t1, Term t2, ImmutableArray<TermLabel> labels) {
         if(t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
             return tt();
         } else if(t1.op() == Junctor.TRUE) {
@@ -1071,7 +1071,7 @@ public class TermBuilder {
         return apply(update,target,null);
     }
 
-    public Term apply(Term update, Term target, ImmutableArray<ITermLabel> labels) {
+    public Term apply(Term update, Term target, ImmutableArray<TermLabel> labels) {
     if(update.sort() != Sort.UPDATE) {
         throw new TermCreationException("Not an update: " + update);
     } else if(update.op() == UpdateJunctor.SKIP) {
@@ -1632,7 +1632,7 @@ public class TermBuilder {
     return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
     }
 
-    public Term relabel(Term term, ImmutableArray<ITermLabel> labels) {
+    public Term relabel(Term term, ImmutableArray<TermLabel> labels) {
         if ((labels == null || labels.isEmpty())
                 && !term.hasLabels()) {
             return term;
@@ -1642,55 +1642,55 @@ public class TermBuilder {
         }
     }
 
-    public Term relabel(Term term, ITermLabel label) {
+    public Term relabel(Term term, TermLabel label) {
         if (label == null && !term.hasLabels()) {
             return term;
         } else {
-            return label(term, new ImmutableArray<ITermLabel>(label));
+            return label(term, new ImmutableArray<TermLabel>(label));
         }
     }
 
-    public Term label(Term term, ImmutableArray<ITermLabel> labels) {
+    public Term label(Term term, ImmutableArray<TermLabel> labels) {
         if ((labels == null || labels.isEmpty())) {
             return term;
         } else if (!term.hasLabels()) {
             return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(),
                                                   term.javaBlock(), labels);
         } else {
-            ImmutableList<ITermLabel> newLabelList = ImmutableSLList.<ITermLabel>nil();
-            for (ITermLabel l: labels) {
+            ImmutableList<TermLabel> newLabelList = ImmutableSLList.<TermLabel>nil();
+            for (TermLabel l: labels) {
                 if (!term.getLabels().contains(l)) {
                     newLabelList = newLabelList.append(l);
                 }
             }
-            ITermLabel[] newLabelArr = new ITermLabel[newLabelList.size()];
-            Iterator<ITermLabel> it = newLabelList.iterator();
+            TermLabel[] newLabelArr = new TermLabel[newLabelList.size()];
+            Iterator<TermLabel> it = newLabelList.iterator();
             for (int i = 0; i < newLabelArr.length; i++) {
                 assert it.hasNext();
                 newLabelArr[i] = it.next();
             }
-            ITermLabel[] newLabels = new ITermLabel[labels.size() + newLabelArr.length];
+            TermLabel[] newLabels = new TermLabel[labels.size() + newLabelArr.length];
             labels.arraycopy(0, newLabels, 0, labels.size());
-            new ImmutableArray<ITermLabel>(newLabelArr).arraycopy(0, newLabels, labels.size(),
+            new ImmutableArray<TermLabel>(newLabelArr).arraycopy(0, newLabels, labels.size(),
                                                                   newLabelArr.length);
             return TermFactory.DEFAULT.createTerm(term.op(), term.subs(),
                                                   term.boundVars(), term.javaBlock(),
-                                                  new ImmutableArray<ITermLabel>(newLabels));
+                                                  new ImmutableArray<TermLabel>(newLabels));
         }
     }
 
-    public Term label(Term term, ITermLabel label) {
+    public Term label(Term term, TermLabel label) {
         if (label == null) {
             return term;
         } else {
-            return label(term, new ImmutableArray<ITermLabel>(label));
+            return label(term, new ImmutableArray<TermLabel>(label));
         }
     }
 
     public Term shortcut(Term term) {
         if (term.op().equals(Junctor.AND)
                         || term.op().equals(Junctor.OR)) {
-            return label(term, ShortcutEvaluationTermLabel.INSTANCE);
+            return label(term, ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL);
         } else {
             return term;
         }

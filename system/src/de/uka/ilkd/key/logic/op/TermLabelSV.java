@@ -2,9 +2,9 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -13,7 +13,7 @@ import de.uka.ilkd.key.rule.inst.TermLabelInstantiationEntry;
 /**
  * A schema variable which matches term labels
  */
-public final class TermLabelSV extends AbstractSV implements SchemaVariable, ITermLabel {
+public final class TermLabelSV extends AbstractSV implements SchemaVariable, TermLabel {
 
     protected TermLabelSV(Name name) {
         super(name, Sort.TERMLABEL, true, false);
@@ -47,8 +47,8 @@ public final class TermLabelSV extends AbstractSV implements SchemaVariable, ITe
             boolean matched = false;
             assert inst.getInstantiation() instanceof ImmutableArray<?>;
             for (Object o: (ImmutableArray<?>)inst.getInstantiation()) {
-                assert o instanceof ITermLabel;
-                if (t.containsLabel((ITermLabel)o)) {
+                assert o instanceof TermLabel;
+                if (t.containsLabel((TermLabel)o)) {
                     matched = true;
                 } else {
                     matched = false;

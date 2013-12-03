@@ -12,8 +12,8 @@
 //
 package de.uka.ilkd.key.strategy.termfeature;
 
-import de.uka.ilkd.key.logic.label.SelectSkolemConstantTermLabel;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 
 
@@ -34,7 +34,7 @@ public final class IsSelectSkolemConstantTermFeature extends BinaryTermFeature {
     @Override
     protected boolean filter(Term t) {
         return t.hasLabels() &&
-               t.containsLabel(SelectSkolemConstantTermLabel.INSTANCE) &&
+               t.containsLabel(ParameterlessTermLabel.SELECT_SKOLEM_LABEL) &&
                t.op().arity() == 0 &&
                t.op() instanceof Function;
     }

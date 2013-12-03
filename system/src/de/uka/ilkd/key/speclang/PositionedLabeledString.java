@@ -15,7 +15,7 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 
 /**
  * A positionedString with labels, which can then be passed over to the translated term.
@@ -28,10 +28,10 @@ import de.uka.ilkd.key.logic.ITermLabel;
  */
 public class PositionedLabeledString extends PositionedString {
 
-    public final ImmutableArray<ITermLabel> labels;
+    public final ImmutableArray<TermLabel> labels;
 
     public PositionedLabeledString(String text, String fileName, Position pos,
-                                   ImmutableArray<ITermLabel> labels) {
+                                   ImmutableArray<TermLabel> labels) {
         super(text, fileName, pos);        
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
@@ -39,24 +39,24 @@ public class PositionedLabeledString extends PositionedString {
         
     }
 
-    public PositionedLabeledString(String text, String fileName, Position pos, ITermLabel label) {
-        this(text, fileName, pos, new ImmutableArray<ITermLabel>(label));
+    public PositionedLabeledString(String text, String fileName, Position pos, TermLabel label) {
+        this(text, fileName, pos, new ImmutableArray<TermLabel>(label));
     }
 
-    public PositionedLabeledString(String text, String fileName, ImmutableArray<ITermLabel> labels) {
+    public PositionedLabeledString(String text, String fileName, ImmutableArray<TermLabel> labels) {
         this(text, fileName, null, labels);
     }
 
-    public PositionedLabeledString(String text, String fileName, ITermLabel label) {
-        this(text, fileName, new ImmutableArray<ITermLabel>(label));
+    public PositionedLabeledString(String text, String fileName, TermLabel label) {
+        this(text, fileName, new ImmutableArray<TermLabel>(label));
     }
 
-    public PositionedLabeledString(String text, ImmutableArray<ITermLabel> labels) {
+    public PositionedLabeledString(String text, ImmutableArray<TermLabel> labels) {
         this(text, (String)null, labels);
     }
 
-    public PositionedLabeledString(String text, ITermLabel label) {
-        this(text, new ImmutableArray<ITermLabel>(label));
+    public PositionedLabeledString(String text, TermLabel label) {
+        this(text, new ImmutableArray<TermLabel>(label));
     }
 
     /**
@@ -70,7 +70,7 @@ public class PositionedLabeledString extends PositionedString {
      * returns the labels attached to this positioned string
      */
     @Override
-    public ImmutableArray<ITermLabel> getLabels() {
+    public ImmutableArray<TermLabel> getLabels() {
             return labels;
     }
 
@@ -80,9 +80,9 @@ public class PositionedLabeledString extends PositionedString {
      * @return true iff. the label is attached to this positioned string
      */
     @Override
-    public boolean containsLabel(ITermLabel label) {
+    public boolean containsLabel(TermLabel label) {
             assert label != null : "Label must not be null";
-            for (ITermLabel l : labels) {
+            for (TermLabel l : labels) {
                     if (label.equals(l)) {
                             return true;
                     }
@@ -102,7 +102,7 @@ public class PositionedLabeledString extends PositionedString {
                     if (!super.equals(o)) {
                             return false;
                     }
-                    for (ITermLabel l : labels) { // this is not optimal, but as long as number of labels limited ok
+                    for (TermLabel l : labels) { // this is not optimal, but as long as number of labels limited ok
                             if (!cmp.labels.contains(l)) {
                                     return false;
                             }

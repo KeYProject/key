@@ -28,8 +28,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.label.ImplicitSpecTermLabel;
-import de.uka.ilkd.key.logic.label.ShortcutEvaluationTermLabel;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -132,11 +131,13 @@ public abstract class WellDefinednessCheck implements Contract {
         if (spec.arity() > 0
                 && spec.op().equals(Junctor.AND)) { // Conjunctions
             assert spec.arity() == 2;
-            if (spec.hasLabels() && spec.containsLabel(ShortcutEvaluationTermLabel.INSTANCE)) {
+            if (spec.hasLabels()
+                    && spec.containsLabel(ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL)) {
                 // Specification conjuncted with short-circuit operator
                 for (Term sub: spec.subs()) {
                     if(sub.hasLabels() // Found implicit subterms
-                            && sub.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
+                            && sub.containsLabel(
+                                    ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)) {
                         final Pair<ImmutableList<Term>, ImmutableList<Term>> p = sort(sub);
                         implicit = implicit.append(p.first).append(p.second);
                     } else { // Subterm not labeled as implicit
@@ -151,13 +152,15 @@ public abstract class WellDefinednessCheck implements Contract {
                 final Term a1 = TB.andSC(c1.implicit, c1.explicit);
                 final Term a2 = TB.andSC(c2.implicit, c2.explicit);
                 final Term a;
-                if (a2.hasLabels() && a2.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
+                if (a2.hasLabels()
+                        && a2.containsLabel(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)) {
                     // Implicit term first
                     a = TB.and(a2, a1);
                 } else {
                     a = TB.and(a1, a2);
                 }
-                if (spec.hasLabels() && spec.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
+                if (spec.hasLabels()
+                        && spec.containsLabel(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)) {
                     // Handled specification is already implicit
                     implicit = implicit.append(a);
                 } else {
@@ -171,14 +174,16 @@ public abstract class WellDefinednessCheck implements Contract {
             final Condition c2 = split(spec.sub(1));
             final Term i1 = TB.andSC(c1.implicit, c1.explicit);
             final Term i2 = TB.andSC(c2.implicit, c2.explicit);
-            if (spec.hasLabels() && spec.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
+            if (spec.hasLabels()
+                    && spec.containsLabel(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)) {
                 // Handled specification is already implicit
                 implicit = implicit.append(TB.imp(i1, i2));
             } else {
                 explicit = explicit.append(TB.imp(i1, i2));
             }
         } else { // Other operator
-            if (spec.hasLabels() && spec.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
+            if (spec.hasLabels()
+                    && spec.containsLabel(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)) {
                 // Handled specification is already implicit
                 implicit = implicit.append(spec);
             } else {

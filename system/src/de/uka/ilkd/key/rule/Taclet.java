@@ -28,7 +28,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -41,6 +40,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -52,7 +52,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.Debug;
@@ -542,12 +541,12 @@ public abstract class Taclet implements Rule, Named {
 	final Operator templateOp = template.op ();
                 
 	if (template.hasLabels()) {
-	    final ImmutableArray<ITermLabel> labels = template.getLabels();
+	    final ImmutableArray<TermLabel> labels = template.getLabels();
 	    if (!(labels.get(0) instanceof SchemaVariable)) {
 	        Debug.out("FAILED 3x.");
 	        return null; ///FAILED
 	    } else {
-	        for (ITermLabel l: labels) {
+	        for (TermLabel l: labels) {
 	            final MatchConditions cond =
 	                    ((SchemaVariable)l).match(term, matchCond, services);
 	            if (cond == null) {
@@ -853,18 +852,16 @@ public abstract class Taclet implements Rule, Named {
 				      Services services,
 				      MatchConditions mc,
 				      PosInOccurrence applicationPosInOccurrence) {
-	final SyntacticalReplaceVisitor srVisitor = 
+	final SyntacticalReplaceVisitor srVisitor =
 	    new SyntacticalReplaceVisitor(services,
-	                                  mc.getInstantiations(),
-	                                  new TermLabelWorkerManagement(
-	                                          applicationPosInOccurrence, this,
-	                                          TermLabelWorkerManagement
-	                                          .getLabelInstantiators(services)));
+                                          mc.getInstantiations(),
+                                          applicationPosInOccurrence,
+                                          this);
 	term.execPostOrder(srVisitor);
 
 	return srVisitor.getTerm();
     }
-    
+
     /**
      * adds SequentFormula to antecedent or succedent depending on
      * position information or the boolean antec 

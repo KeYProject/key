@@ -39,6 +39,7 @@ tokens {
         // Keywords used in sort declarations
 	SORTS="\\sorts";
 	GENERIC = "\\generic";
+	PROXY = "\\proxy";
         EXTENDS = "\\extends";
         ONEOF = "\\oneof";
 	ABSTRACT = "\\abstract";        

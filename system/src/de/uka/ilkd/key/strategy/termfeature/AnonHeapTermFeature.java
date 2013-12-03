@@ -12,8 +12,8 @@
 //
 package de.uka.ilkd.key.strategy.termfeature;
 
-import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 
 
@@ -29,7 +29,7 @@ public final class AnonHeapTermFeature extends BinaryTermFeature {
         return  // the heap term is an anon heap symbol
                 // (for instance an anonHeap function)
                 t.hasLabels() &&
-                t.containsLabel(AnonHeapTermLabel.INSTANCE) &&
+                t.containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL) &&
                 t.op().arity() == 0 &&
                 t.op() instanceof Function;
     }

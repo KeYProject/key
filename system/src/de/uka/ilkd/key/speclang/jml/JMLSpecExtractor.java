@@ -37,7 +37,7 @@ import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.label.ImplicitSpecTermLabel;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -195,12 +195,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 = new PositionedString("(\\forall int i; 0 <= i && i < " + varName + ".length;"
                                               + varName + "[i]" + " != null)",
                                               fileName,
-                                              pos).label(ImplicitSpecTermLabel.INSTANCE);
+                                              pos).label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
                 result = result.add(arrayElementsNonNull);
             }
             PositionedString ps
             = new PositionedString(varName + " != null", fileName, pos)
-                                .label(ImplicitSpecTermLabel.INSTANCE);
+                                .label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
             result = result.add(ps);
         }
         return result;
@@ -260,7 +260,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                             result = result.add(
                                     jsf.createJMLClassInvariant(
                                             kjt, visibility, isStatic,
-                                            classInv.label(ImplicitSpecTermLabel.INSTANCE)));
+                                            classInv.label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)));
                 	}
                     }
                 }
@@ -435,19 +435,19 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 final String invString = pm.isStatic()? "\\inv": "<inv>";
                 if(!pm.isConstructor()) {
                     specCase.addRequires(new PositionedString(invString)
-                                 .label(ImplicitSpecTermLabel.INSTANCE));
+                                 .label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 } else if (addInvariant) {
                     // add static invariant to constructor's precondition
                     specCase.addRequires(new PositionedString(""+pm.getName()+".\\inv")
-                                                .label(ImplicitSpecTermLabel.INSTANCE));
+                                                .label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
                 if(specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                     specCase.addEnsures(new PositionedString("ensures "+invString)
-                                           .label(ImplicitSpecTermLabel.INSTANCE));
+                                           .label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
                 if(specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR && !pm.isModel()) {
                     specCase.addSignals(new PositionedString("signals (Exception e) "+invString)
-                                                         .label(ImplicitSpecTermLabel.INSTANCE));
+                                                         .label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
             }
 
@@ -462,7 +462,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                                 paramDecl.getProgramVariable().getKeYJavaType(),
                                 false, fileName, pm.getStartPosition(), services);
                     for (PositionedString nonNull : nonNullParams) {
-                        specCase.addRequires(nonNull.label(ImplicitSpecTermLabel.INSTANCE));
+                        specCase.addRequires(nonNull.label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                     }
                 }
             }
@@ -478,7 +478,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                             false, fileName, pm.getStartPosition(), services);
                 for (PositionedString nonNull : resultNonNull) {
                     specCase.addEnsures(
-                            nonNull.prepend("ensures ").label(ImplicitSpecTermLabel.INSTANCE));
+                            nonNull.prepend("ensures ").label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
             }
 

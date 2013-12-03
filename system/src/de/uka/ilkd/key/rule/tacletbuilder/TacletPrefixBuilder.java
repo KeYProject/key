@@ -18,10 +18,10 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.NotFreeIn;
 import de.uka.ilkd.key.rule.Taclet;
@@ -101,7 +101,7 @@ public class TacletPrefixBuilder {
 	    currentlyBoundVars=oldBounds;
 	}
 	if (t.hasLabels()) {
-	    for (ITermLabel l: t.getLabels()) {
+	    for (TermLabel l: t.getLabels()) {
 	        if (l instanceof SchemaVariable) {
 	            SchemaVariable sv = (SchemaVariable)l;
 	            ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);

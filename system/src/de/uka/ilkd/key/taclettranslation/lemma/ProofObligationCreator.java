@@ -13,13 +13,17 @@
 
 package de.uka.ilkd.key.taclettranslation.lemma;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -28,8 +32,8 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
-import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 
 
 /**
@@ -66,7 +70,7 @@ public class ProofObligationCreator {
           
                 }
                 UserDefinedSymbols symbolsForAxioms = analyzeTaclets(axioms,initConfig.namespaces());
-                
+
                 symbolsForAxioms.addSymbolsToNamespaces(initConfig.namespaces());
                 
                 for (Taclet taclet : taclets) {
@@ -141,21 +145,23 @@ public class ProofObligationCreator {
 
         private ProofAggregate create(Taclet taclet,
                         InitConfig initConfig, UserDefinedSymbols symbolsForAxioms) {
-                LemmaGenerator generator = new DefaultLemmaGenerator();
-                TacletFormula formula = generator.translate(taclet,
+                LemmaGenerator generator = new GenericRemovingLemmaGenerator();
+                TacletFormula tacletFormula = generator.translate(taclet,
                                 initConfig.getServices());
+                Term formula = tacletFormula.getFormula();
                 String name = "Taclet: " + taclet.name().toString();
                 
                 UserDefinedSymbols userDefinedSymbols = new UserDefinedSymbols(symbolsForAxioms);
                 
-                collectUserDefinedSymbols(formula.getFormula(), userDefinedSymbols);
-   
+                collectUserDefinedSymbols(formula, userDefinedSymbols);
+                userDefinedSymbols.replaceGenericByProxySorts();
+
                 // In the new saving scheme, no header needs to stored
                 // this is encoded in the properties of the TacletProofObligationInput.
                 // (MU 2013-08)
                 // String header = userDefinedSymbols.createHeader(initConfig.getServices());
           
-                Proof proof = new Proof(name, formula.getFormula(), "" /*header*/,
+                Proof proof = new Proof(name, formula, "" /*header*/,
                                 initConfig.createTacletIndex(),
                                 initConfig.createBuiltInRuleIndex(),
                                 initConfig.getServices());
@@ -166,8 +172,5 @@ public class ProofObligationCreator {
                 return ProofAggregate.createProofAggregate(proof, name);
         }
         
-
-        
-
 
 }

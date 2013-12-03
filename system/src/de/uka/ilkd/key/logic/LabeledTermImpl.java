@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
@@ -30,7 +31,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
  */
 class LabeledTermImpl extends TermImpl {
 
-	private final ImmutableArray<ITermLabel> labels;
+	private final ImmutableArray<TermLabel> labels;
 
 	/**
 	 * creates an instance of a labeled term.
@@ -43,7 +44,7 @@ class LabeledTermImpl extends TermImpl {
 	public LabeledTermImpl(Operator op, ImmutableArray<Term> subs,
 			ImmutableArray<QuantifiableVariable> boundVars, 
 			JavaBlock javaBlock,
-			ImmutableArray<ITermLabel> labels) {
+			ImmutableArray<TermLabel> labels) {
 		super(op, subs, boundVars, javaBlock);
 		assert labels != null : "Term labels must not be null";
 		assert !labels.isEmpty() : "There must be at least one term label";
@@ -61,7 +62,7 @@ class LabeledTermImpl extends TermImpl {
 	 * returns the labels attached to this term
 	 */
 	@Override
-	public ImmutableArray<ITermLabel> getLabels() {
+	public ImmutableArray<TermLabel> getLabels() {
 		return labels;
 	}
 
@@ -71,9 +72,9 @@ class LabeledTermImpl extends TermImpl {
 	 * @return true iff. the label is attached to this term
 	 */
 	@Override
-	public boolean containsLabel(ITermLabel label) {
+	public boolean containsLabel(TermLabel label) {
 		assert label != null : "Label must not be null";
-		for (ITermLabel l : labels) {
+		for (TermLabel l : labels) {
 			if (label.equals(l)) {
 				return true;
 			}
@@ -93,7 +94,7 @@ class LabeledTermImpl extends TermImpl {
 			if (!super.equals(o)) {
 				return false;
 			}
-			for (ITermLabel l : labels) { // this is not optimal, but as long as number of labels limited ok
+			for (TermLabel l : labels) { // this is not optimal, but as long as number of labels limited ok
 				if (!cmp.labels.contains(l)) {
 					return false;
 				}

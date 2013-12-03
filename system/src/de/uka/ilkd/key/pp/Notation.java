@@ -336,6 +336,81 @@ public abstract class Notation {
 	}
     }
     
+    public static abstract class HeapNotation extends Notation {
+        protected HeapNotation(int priority) {
+            super(priority);
+        }
+
+        public abstract void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException;
+    }
+
+    /**
+     * The standard concrete syntax for store.
+     */
+    public static final class StoreNotation extends HeapNotation {
+        public StoreNotation() {
+            super(140);
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printStore(t, true);
+        }
+
+        public void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException {
+            sp.printStore(t, false);
+        }
+    }
+
+    /**
+     * The standard concrete syntax for anon.
+     */
+    public static final class AnonNotation extends HeapNotation {
+        public AnonNotation() {
+            super(140);
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printAnon(t, true);
+        }
+
+        public void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException {
+            sp.printAnon(t, false);
+        }
+    }
+
+    /**
+     * The standard concrete syntax for Create.
+     */
+    public static final class CreateNotation extends HeapNotation {
+        public CreateNotation() {
+            super(140);
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printCreate(t, true);
+        }
+
+        public void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException {
+            sp.printCreate(t, false);
+        }
+    }
+
+    /**
+     * The standard concrete syntax for memset.
+     */
+    public static final class MemsetNotation extends HeapNotation {
+        public MemsetNotation() {
+            super(140);
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printMemset(t, true);
+        }
+
+        public void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException {
+            sp.printMemset(t, false);
+        }
+    }
     
     /**
      * The standard concrete syntax for length.

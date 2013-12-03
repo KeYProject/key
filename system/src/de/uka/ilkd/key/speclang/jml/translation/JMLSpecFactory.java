@@ -34,7 +34,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.ImplicitSpecTermLabel;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -675,7 +675,7 @@ public class JMLSpecFactory {
           for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             if(clauses.ensures.get(heap) != null) {
               Term excNull = TB.label(TB.equals(TB.var(progVars.excVar), TB.NULL(services)),
-                                      ImplicitSpecTermLabel.INSTANCE);
+                                      ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
               Term post1 = (originalBehavior == Behavior.NORMAL_BEHAVIOR
                         ? TB.convertToFormula(clauses.ensures.get(heap),services)
                         : TB.imp(excNull, TB.convertToFormula(clauses.ensures.get(heap),services)));
