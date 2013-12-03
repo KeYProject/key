@@ -17,10 +17,6 @@ public class HiddenTermLabels {
     private final JCheckBoxMenuItem hideAllCheckBox;
     private final Set<Name> hiddenTermLabels;
 
-    public boolean allHidden() {
-        return hideAllCheckBox.isSelected();
-    }
-
     public HiddenTermLabels(JCheckBoxMenuItem hideAllCheckBox) {
         this.hideAllCheckBox = hideAllCheckBox;
         this.hiddenTermLabels = new HashSet();
@@ -31,7 +27,7 @@ public class HiddenTermLabels {
     }
 
     public boolean contains(Name name) {
-        return allHidden() || hiddenTermLabels.contains(name);
+        return hideAllCheckBox.isSelected() || hiddenTermLabels.contains(name);
     }
 
     public void add(Name name) {
