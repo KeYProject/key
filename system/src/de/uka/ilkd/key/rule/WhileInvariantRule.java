@@ -14,7 +14,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,8 +34,6 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -45,6 +42,9 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -167,7 +167,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Function anonHeapFunc = new Function(anonHeapName,
                 heapLDT.targetSort());
         services.getNamespaces().functions().addSafely(anonHeapFunc);
-        final Term anonHeapTerm = TB.label(TB.func(anonHeapFunc), AnonHeapTermLabel.INSTANCE);
+        final Term anonHeapTerm = TB.label(TB.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
 
         // check for strictly pure loops
         final Term anonUpdate;
@@ -263,7 +263,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             Instantiation inst, Goal useGoal, final JavaBlock guardJb,
             final Term guardFalseTerm) {
         JavaBlock useJavaBlock = JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
-        final ImmutableArray<ITermLabel> instantiateLabels = TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, useGoal, null, inst.progPost.op(), new ImmutableArray<Term>(inst.progPost.sub(0)), null, useJavaBlock);
+        final ImmutableArray<TermLabel> instantiateLabels = TermLabelManager.instantiateLabels(services, ruleApp.posInOccurrence(), this, useGoal, "UseModality", null, inst.progPost.op(), new ImmutableArray<Term>(inst.progPost.sub(0)), null, useJavaBlock);
         Term restPsi = TB.prog((Modality)inst.progPost.op(), useJavaBlock, inst.progPost.sub(0), instantiateLabels);
         Term guardFalseRestPsi = TB.box(guardJb, 
                 TB.imp(guardFalseTerm, restPsi));
@@ -301,9 +301,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         initGoal.setBranchLabel("Invariant Initially Valid");
         initGoal.changeFormula(initFormula(inst, invTerm, reachableState),
                         ruleApp.posInOccurrence());
-        if (TermLabelWorkerManagement.hasInstantiators(services)) {
-            TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, initGoal);
-        }
+        TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, initGoal, null);
     }
 
 

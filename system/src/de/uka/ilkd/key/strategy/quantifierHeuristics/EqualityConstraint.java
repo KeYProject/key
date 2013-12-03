@@ -195,6 +195,7 @@ public class EqualityConstraint implements Constraint {
 	SyntacticalReplaceVisitor srVisitor =
 	    new SyntacticalReplaceVisitor(new Services(new JavaProfile()), // Any services can be used because it is only used for allquantor instantiation. TODO: Rewrite quantifier heuristics and strategies 
 	                                  this, 
+	                                  null,
 	                                  null);
 	p.execPostOrder ( srVisitor );
 	return srVisitor.getTerm ();

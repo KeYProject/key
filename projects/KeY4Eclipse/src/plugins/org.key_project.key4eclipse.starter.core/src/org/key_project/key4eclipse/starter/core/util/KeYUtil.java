@@ -509,7 +509,7 @@ public final class KeYUtil {
                                               "! This is probably a syntax problem, " + 
                                               " check your import statements.");
             }
-            KeYJavaType kjt = javaInfo.getKeYJavaTypeByClassName(javaTypeName);
+            KeYJavaType kjt = javaInfo.getKeYJavaType(javaTypeName);
             result = result.append(kjt);
         }
         return result;
