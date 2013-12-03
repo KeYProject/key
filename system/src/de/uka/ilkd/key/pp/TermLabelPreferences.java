@@ -6,9 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * This class is used by LogicPrinter to determine which TermLabels are printed
- * and which are not. If not otherwise set, LogicPrinter will use the return
- * value of function TermLabelPreferences.getDefaults().
+ * This class is used by SequentViewLogicPrinter to determine which TermLabels are printed
+ * and which are not.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
