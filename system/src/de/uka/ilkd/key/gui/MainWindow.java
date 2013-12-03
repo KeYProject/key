@@ -137,7 +137,7 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.key.gui.nodeviews.SequentSearchBar;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
-import de.uka.ilkd.key.pp.TermLabelPreferences;
+import de.uka.ilkd.key.pp.HiddenTermLabels;
 
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
@@ -277,8 +277,8 @@ public final class MainWindow extends JFrame  {
     
     private TermLabelMenu termLabelMenu;
     
-    public TermLabelPreferences getTermLabelPreferences(){
-        return termLabelMenu.getTermLabelPreferences();
+    public HiddenTermLabels getHiddenTermLabels(){
+        return termLabelMenu.getHiddenTermLabels();
     }
 
     /*

@@ -5,7 +5,7 @@ import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.pp.TermLabelPreferences;
+import de.uka.ilkd.key.pp.HiddenTermLabels;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,11 +19,11 @@ import javax.swing.JMenu;
  */
 public class TermLabelMenu extends JMenu {
 
-    private final JCheckBoxMenuItem hideAllTermLabels;
+    private final JCheckBoxMenuItem hideAllCheckBox;
     private final List<TermLabelCheckBox> checkBoxList;
     private final KeYMediator mediator;
     private final MainWindow mainWindow;
-    private final TermLabelPreferences termLabelPreferences;
+    private final HiddenTermLabels hiddenTermLabels;
 
     public TermLabelMenu(final KeYMediator mediator, final MainWindow mainWindow) {
 
@@ -32,19 +32,15 @@ public class TermLabelMenu extends JMenu {
         this.mainWindow = mainWindow;
         this.mediator = mediator;
 
-        this.termLabelPreferences = new TermLabelPreferences() {
-            @Override
-            public boolean hideAllTermLabels() {
-                return hideAllTermLabels.isSelected();
-            }
-        };
+        hideAllCheckBox = new TermLabelToggleAction(mainWindow);
+        hideAllCheckBox.setName("hideAllCheckBox");
 
-        hideAllTermLabels = new TermLabelToggleAction(mainWindow);
-        hideAllTermLabels.setName("hideAllTermLabels");
+        hiddenTermLabels = new HiddenTermLabels(hideAllCheckBox);
 
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
+                rebuildMenu();
             }
 
             @Override
@@ -59,7 +55,7 @@ public class TermLabelMenu extends JMenu {
     private void rebuildMenu() {
         removeAll();
         checkBoxList.clear();
-        add(hideAllTermLabels);
+        add(hideAllCheckBox);
 
         if (mediator.getSelectedProof() != null) {
             addSeparator();
@@ -68,8 +64,8 @@ public class TermLabelMenu extends JMenu {
                 TermLabelCheckBox checkBox = new TermLabelCheckBox(labelName) {
                 };
 
-                checkBox.setSelected(termLabelPreferences.isVisible(labelName));
-                checkBox.setEnabled(!hideAllTermLabels.isSelected());
+                checkBox.setSelected(!hiddenTermLabels.contains(labelName));
+                checkBox.setEnabled(!hideAllCheckBox.isSelected());
                 checkBoxList.add(checkBox);
             }
             Collections.sort(checkBoxList);
@@ -78,9 +74,9 @@ public class TermLabelMenu extends JMenu {
             }
         }
     }
-    
-    public TermLabelPreferences getTermLabelPreferences(){
-        return termLabelPreferences;
+
+    public HiddenTermLabels getHiddenTermLabels() {
+        return hiddenTermLabels;
     }
 
     private class TermLabelToggleAction extends KeYMenuCheckBox {
@@ -111,9 +107,9 @@ public class TermLabelMenu extends JMenu {
         @Override
         public void handleClickEvent() {
             if (isSelected()) {
-                termLabelPreferences.unhideTermLabel(labelName);
+                hiddenTermLabels.remove(labelName);
             } else {
-                termLabelPreferences.hideTermLabel(labelName);
+                hiddenTermLabels.add(labelName);
             }
             mainWindow.makePrettyView();
         }

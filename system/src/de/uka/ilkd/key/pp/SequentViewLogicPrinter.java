@@ -10,37 +10,37 @@ import java.util.List;
 
 /**
  * This class optionally hides specific TermLabels. Visibility property of a
- * TermLabel can be retrieved from parameter termLabelPreferences.
+ * TermLabel can be retrieved from parameter hiddenTermLabels.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class SequentViewLogicPrinter extends LogicPrinter {
 
     /* 
-     * Preferences for TermLabel visibility.
+     * Set containing hidden TermLabels.
      */
-    private final TermLabelPreferences termLabelPreferences;
+    private final HiddenTermLabels hiddenTermLabels;
 
-    public SequentViewLogicPrinter(TermLabelPreferences termLabelPreferences) {
+    public SequentViewLogicPrinter(HiddenTermLabels hiddenTermLabels) {
         super();
-        this.termLabelPreferences = termLabelPreferences;
+        this.hiddenTermLabels = hiddenTermLabels;
     }
 
     public SequentViewLogicPrinter(ProgramPrinter prgPrinter,
             NotationInfo notationInfo,
             Services services,
-            TermLabelPreferences termLabelPreferences) {
+            HiddenTermLabels hiddenTermLabels) {
         super(prgPrinter, notationInfo, services);
-        this.termLabelPreferences = termLabelPreferences;
+        this.hiddenTermLabels = hiddenTermLabels;
     }
 
     public SequentViewLogicPrinter(ProgramPrinter prgPrinter,
             NotationInfo notationInfo,
             Services services,
             boolean purePrint,
-            TermLabelPreferences termLabelPreferences) {
+            HiddenTermLabels hiddenTermLabels) {
         super(prgPrinter, notationInfo, services, purePrint);
-        this.termLabelPreferences = termLabelPreferences;
+        this.hiddenTermLabels = hiddenTermLabels;
     }
 
     public SequentViewLogicPrinter(ProgramPrinter prgPrinter,
@@ -48,21 +48,21 @@ public class SequentViewLogicPrinter extends LogicPrinter {
             Backend backend,
             Services services,
             boolean purePrint,
-            TermLabelPreferences termLabelPreferences) {
+            HiddenTermLabels hiddenTermLabels) {
         super(prgPrinter, notationInfo, backend, services, purePrint);
-        this.termLabelPreferences = termLabelPreferences;
+        this.hiddenTermLabels = hiddenTermLabels;
     }
 
     @Override
     protected ImmutableArray<TermLabel> getLabelsForTerm(Term t) {
 
-        if (termLabelPreferences.hideAllTermLabels()) {
+        if (hiddenTermLabels.allHidden()) {
             return new ImmutableArray<TermLabel>();
         }
 
         List<TermLabel> termLabelList = new LinkedList();
         for (TermLabel label : t.getLabels()) {
-            if (termLabelPreferences.isVisible(label)) {
+            if (!hiddenTermLabels.contains(label)) {
                 termLabelList.add(label);
             }
         }

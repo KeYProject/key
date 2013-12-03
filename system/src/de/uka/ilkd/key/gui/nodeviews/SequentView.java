@@ -30,7 +30,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
-import de.uka.ilkd.key.pp.TermLabelPreferences;
+import de.uka.ilkd.key.pp.HiddenTermLabels;
 import de.uka.ilkd.key.util.Debug;
 import java.awt.Color;
 import java.awt.Font;
@@ -74,8 +74,8 @@ public abstract class SequentView extends JTextArea
         return lineWidth;
     }
     
-    public TermLabelPreferences getTermLabelPreferences(){
-        return mainWindow.getTermLabelPreferences();
+    public HiddenTermLabels getHiddenTermLabels(){
+        return mainWindow.getHiddenTermLabels();
     }
     
     private final ConfigChangeListener configChangeListener;

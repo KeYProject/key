@@ -130,7 +130,7 @@ public abstract class ApplyTacletDialog extends JDialog {
         
         SequentViewLogicPrinter tp = new SequentViewLogicPrinter(new ProgramPrinter(w), 
                 new NotationInfo(), backend, mediator.getServices(), true,
-                MainWindow.getInstance().getTermLabelPreferences());
+                MainWindow.getInstance().getHiddenTermLabels());
         
 //        tp.printTaclet(taclet, model[0].tacletApp().instantiations(),
         tp.printTaclet(taclet, 

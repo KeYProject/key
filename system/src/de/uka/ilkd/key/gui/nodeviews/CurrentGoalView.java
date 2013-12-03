@@ -239,7 +239,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     /** sets the LogicPrinter to use in case there is no proof available.
      */
     public void setPrinterNoProof() {
-    	setLogicPrinter(new SequentViewLogicPrinter(getTermLabelPreferences()));
+    	setLogicPrinter(new SequentViewLogicPrinter(getHiddenTermLabels()));
     }
     
     /** 
@@ -250,7 +250,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(null),
                 getMediator().getNotationInfo(),
                 mediator.getServices(),
-                getTermLabelPreferences()));
+                getHiddenTermLabels()));
     }
 
     protected SequentPrintFilter getSequentPrintFilter() {
