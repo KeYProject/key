@@ -35,10 +35,10 @@ import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
@@ -67,7 +67,7 @@ public class InnerNodeView extends SequentView {
         super(mainWindow);
         this.node = node;
         filter = new IdentitySequentPrintFilter(node.sequent());
-        setLogicPrinter(new LogicPrinter(new ProgramPrinter(),
+        setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(),
                 mediator.getNotationInfo(),
                 mediator.getServices(),
                 getTermLabelPreferences()));
@@ -193,7 +193,7 @@ public class InnerNodeView extends SequentView {
         if (app != null) {
             s += "The following rule was applied on this node: \n\n";
             if (app.rule() instanceof Taclet) {
-                LogicPrinter tacPrinter = new LogicPrinter(new ProgramPrinter(null),
+                SequentViewLogicPrinter tacPrinter = new SequentViewLogicPrinter(new ProgramPrinter(null),
                         mediator.getNotationInfo(),
                         mediator.getServices(),
                         true,

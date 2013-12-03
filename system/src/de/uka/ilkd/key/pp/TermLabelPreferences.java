@@ -37,13 +37,4 @@ public abstract class TermLabelPreferences {
     public void unhideTermLabel(Name name) {
         hiddenTermLabels.add(name);
     }
-
-    public static TermLabelPreferences getDefaults() {
-        return new TermLabelPreferences() {
-            @Override
-            public boolean hideAllTermLabels() {
-                return false;
-            }
-        };
-    }
 }

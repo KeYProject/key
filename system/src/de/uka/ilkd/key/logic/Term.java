@@ -99,6 +99,7 @@ public interface Term extends SVSubstitute, Sorted {
     /**
      * The sort of the term.
      */
+    @Override
     public Sort sort();    
     
     /**

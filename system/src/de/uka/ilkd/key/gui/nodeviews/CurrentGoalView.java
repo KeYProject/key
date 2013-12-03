@@ -26,11 +26,11 @@ import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
@@ -56,7 +56,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     private KeYMediator mediator;
 
     // the mouse/mouseMotion listener
-    protected SequentViewListener listener;
+    private SequentViewListener listener;
     
     // an object that detects opening and closing of an Taclet instantiation dialog
     private final GUIListener guiListener;
@@ -239,7 +239,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     /** sets the LogicPrinter to use in case there is no proof available.
      */
     public void setPrinterNoProof() {
-    	setLogicPrinter(new LogicPrinter(getTermLabelPreferences()));
+    	setLogicPrinter(new SequentViewLogicPrinter(getTermLabelPreferences()));
     }
     
     /** 
@@ -247,7 +247,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      */
     public void setPrinter(Goal goal) {
         filter = new IdentitySequentPrintFilter(goal.sequent());
-        setLogicPrinter(new LogicPrinter(new ProgramPrinter(null),
+        setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(null),
                 getMediator().getNotationInfo(),
                 mediator.getServices(),
                 getTermLabelPreferences()));
@@ -269,7 +269,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     /** returns the mediator of this view
      * @return the KeYMediator
      */
-    public KeYMediator getMediator() {
+    public final KeYMediator getMediator() {
 	return mediator;
     }
 

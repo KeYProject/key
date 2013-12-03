@@ -29,6 +29,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.TermLabelPreferences;
 import de.uka.ilkd.key.util.Debug;
 import java.awt.Color;
@@ -249,7 +250,7 @@ public abstract class SequentView extends JTextArea
     /** Set the LogicPrinter to be used.
      * @param p The LogicPrinter to be used
      */
-    protected void setLogicPrinter(LogicPrinter p) {
+    protected void setLogicPrinter(SequentViewLogicPrinter p) {
         printer = p;
     }
 

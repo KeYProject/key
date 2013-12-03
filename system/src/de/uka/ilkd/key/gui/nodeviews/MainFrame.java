@@ -67,9 +67,9 @@ public final class MainFrame extends JScrollPane {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // FIXME: Can this ever be reached ?!?! (MU 2013)
-                PosInSequent pos = mainWindow.leafNodeView.getMousePosInSequent();
+                PosInSequent pos = mainWindow.currentGoalView.getMousePosInSequent();
                 if(pos != null) {
-                    GuiUtilities.copyHighlightToClipboard(mainWindow.leafNodeView, pos);
+                    GuiUtilities.copyHighlightToClipboard(mainWindow.currentGoalView, pos);
                 }
             }
         });

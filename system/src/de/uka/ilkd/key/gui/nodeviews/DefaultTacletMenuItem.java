@@ -20,9 +20,9 @@ import java.io.StringWriter;
 import javax.swing.JMenuItem;
 
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.pp.WriterBackend;
 
@@ -51,7 +51,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         StringWriter w = new StringWriter();
         
         WriterBackend backend = new WriterBackend(w, 68);
-        LogicPrinter tp = new LogicPrinter(new ProgramPrinter(w,
+        SequentViewLogicPrinter tp = new SequentViewLogicPrinter(new ProgramPrinter(w,
                 connectedTo.instantiations()),
                 notationInfo, backend, null,
                 true,
@@ -99,7 +99,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
      * @param sb The StringBuffer with forbidden HTML characters
      * @return A new StringBuffer with the masked characters.
      */
-    protected StringBuffer ascii2html(StringBuffer sb) {
+    protected final StringBuffer ascii2html(StringBuffer sb) {
         StringBuffer nsb = new StringBuffer();
         StringBuffer asb = removeEmptyLines(sb);
         int sbl = asb.length();
@@ -144,6 +144,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.gui.TacletMenuItem#connectedTo()
      */
+    @Override
     public TacletApp connectedTo() {
         return connectedTo;
     }

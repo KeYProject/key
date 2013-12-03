@@ -78,8 +78,6 @@ import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
-import java.util.LinkedList;
-import java.util.List;
 
 
 /**
@@ -100,7 +98,7 @@ import java.util.List;
  *
  *
  */
-public final class LogicPrinter {
+public class LogicPrinter {
 
     /**
      * The default and minimal value o fthe
@@ -138,15 +136,6 @@ public final class LogicPrinter {
     private enum QuantifiableVariablePrintMode {NORMAL, WITH_OUT_DECLARATION}
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
             QuantifiableVariablePrintMode.NORMAL;
-    
-    /* 
-     * Preferences for TermLabel visibility.
-     */
-    private final TermLabelPreferences termLabelPreferences;
-
-    public TermLabelPreferences getTermLabelPreferences() {
-        return termLabelPreferences;
-    }
     
     public static String quickPrintTerm(Term t, Services services) {
         final NotationInfo ni = new NotationInfo();
@@ -205,32 +194,21 @@ public final class LogicPrinter {
      * @param backend      the Backend for the output
      * @param purePrint    if true the PositionTable will not be calculated
                     (simulates the behaviour of the former PureSequentPrinter)
-     * @param termLabelPreferences Preferences for TermLabel visibility.
      */
     public LogicPrinter(ProgramPrinter prgPrinter,
             NotationInfo notationInfo,
             Backend backend,
             Services services,
-            boolean purePrint,
-            TermLabelPreferences termLabelPreferences) {
+            boolean purePrint) {
         this.backend = backend;
         this.layouter = new Layouter(backend, 2);
         this.prgPrinter = prgPrinter;
         this.notationInfo = notationInfo;
         this.services = services;
         this.pure = purePrint;
-        this.termLabelPreferences = termLabelPreferences;
         if (services != null) {
             notationInfo.refresh(services);
         }
-    }
-    
-    public LogicPrinter(ProgramPrinter prgPrinter,
-            NotationInfo notationInfo,
-            Backend backend,
-            Services services,
-            boolean purePrint) {
-        this(prgPrinter,notationInfo,backend,services,purePrint,TermLabelPreferences.getDefaults());
     }
 
     /**
@@ -249,29 +227,15 @@ public final class LogicPrinter {
              notationInfo, 
              new PosTableStringBackend(DEFAULT_LINE_WIDTH), 
              services, 
-             false,
-             TermLabelPreferences.getDefaults());
+             false);
     }
     
-    public LogicPrinter(ProgramPrinter prgPrinter,
-                        NotationInfo notationInfo,
-                        Services services,
-                        TermLabelPreferences termLabelPreferences) {
-	this(prgPrinter, 
-             notationInfo, 
-             new PosTableStringBackend(DEFAULT_LINE_WIDTH), 
-             services, 
-             false,
-             termLabelPreferences);
-    }
-    
-    public LogicPrinter(TermLabelPreferences termLabelPreferences) {
+    public LogicPrinter() {
 	this(new ProgramPrinter(null), 
              null, 
              new PosTableStringBackend(DEFAULT_LINE_WIDTH), 
              null, 
-             false, 
-             termLabelPreferences);
+             false);
     }
 
     /**
@@ -293,21 +257,7 @@ public final class LogicPrinter {
                 notationInfo,
                 new PosTableStringBackend(DEFAULT_LINE_WIDTH),
                 services,
-                purePrint,
-                TermLabelPreferences.getDefaults());
-    }
-
-    public LogicPrinter(ProgramPrinter prgPrinter,
-            NotationInfo notationInfo,
-            Services services,
-            boolean purePrint,
-            TermLabelPreferences termLabelPreferences) {
-        this(prgPrinter,
-                notationInfo,
-                new PosTableStringBackend(DEFAULT_LINE_WIDTH),
-                services,
-                purePrint,
-                termLabelPreferences);
+                purePrint);
     }
 
 
@@ -938,22 +888,18 @@ public final class LogicPrinter {
             printLabels(t);
         }
     }
+    
+    protected ImmutableArray<TermLabel> getLabelsForTerm(Term t){
+        return t.getLabels();
+    }
 
     public void printLabels(Term t) throws IOException {
-        if (termLabelPreferences.hideAllTermLabels()) {
-            return;
-        }
-
-        List<TermLabel> termLabelList = new LinkedList();
-        for (TermLabel label : t.getLabels()) {
-            if (termLabelPreferences.isVisible(label)) {
-                termLabelList.add(label);
-            }
-        }
-
+        ImmutableArray<TermLabel> termLabelList = getLabelsForTerm(t);
+        
         if (termLabelList.isEmpty()) {
             return;
         }
+        
         layouter.beginC().print("\u00ab"); //  ("<<");
         boolean afterFirst = false;
         for (TermLabel l : termLabelList) {
@@ -1786,7 +1732,7 @@ public final class LogicPrinter {
     }
     
 
-    protected void printVariables (ImmutableArray<QuantifiableVariable> vars,
+    private void printVariables (ImmutableArray<QuantifiableVariable> vars,
                                    QuantifiableVariablePrintMode mode)
                                             throws IOException {
         int size = vars.size ();

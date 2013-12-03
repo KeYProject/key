@@ -184,7 +184,7 @@ public final class MainWindow extends JFrame  {
     private JScrollPane openGoalsView;
 
     /** the view of a sequent */
-    public CurrentGoalView leafNodeView;
+    public CurrentGoalView currentGoalView;
 
     /** the rule view */
     private RuleView ruleView = null;
@@ -401,6 +401,7 @@ public final class MainWindow extends JFrame  {
 
         // FIXME FIXME
         recentFiles = new RecentFileMenu(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 mediator.getUI().loadProblem(new File(recentFiles.getAbsolutePath((JMenuItem) e.getSource())));
             }
@@ -466,7 +467,7 @@ public final class MainWindow extends JFrame  {
         leftPane.setName("leftPane");
         leftPane.setOneTouchExpandable(true);
 
-        this.sequentSearchBar = new SequentSearchBar(leafNodeView);
+        this.sequentSearchBar = new SequentSearchBar(currentGoalView);
         JPanel rightPane = new JPanel();
         rightPane.setLayout(new BorderLayout());
 	rightPane.add(goalView, BorderLayout.CENTER);
@@ -569,7 +570,7 @@ public final class MainWindow extends JFrame  {
 	}
 
         Config.DEFAULT.setDefaultFonts();
-        leafNodeView = new CurrentGoalView(mediator, this);
+        currentGoalView = new CurrentGoalView(mediator, this);
     }
 
     private ComplexButton createSMTComponent() {
@@ -611,7 +612,7 @@ public final class MainWindow extends JFrame  {
     /**
      * @return the status line object
      */
-    public MainStatusLine getStatusLine () {
+    protected MainStatusLine getStatusLine () {
 	return statusLine;
     }
 
@@ -650,6 +651,7 @@ public final class MainWindow extends JFrame  {
      */
     public void setStatusLine(final String str, final int max) {
         GuiUtilities.invokeOnEventQueue(new Runnable() {
+            @Override
 	    public void run() {
 		setStatusLineImmediately(str, max);
 	    }
@@ -1143,16 +1145,16 @@ public final class MainWindow extends JFrame  {
         if (getMediator() == null
                 || getMediator().getSelectedProof() == null) {
             //There is no proof. Either not loaded yet or it is abandoned
-            leafNodeView.setPrinterNoProof();
+            currentGoalView.setPrinterNoProof();
             return;
         }
 
         Goal goal = getMediator().getSelectedGoal();
         final SequentView sequentViewLocal;
         if (goal != null && !goal.node().isClosed()) {
-            leafNodeView.setPrinter(goal);
-            leafNodeView.printSequent();
-            sequentViewLocal = leafNodeView;
+            currentGoalView.setPrinter(goal);
+            currentGoalView.printSequent();
+            sequentViewLocal = currentGoalView;
         } else {
             InnerNodeView innerNodeView =
                     new InnerNodeView(getMediator().getSelectedNode(),
@@ -1164,6 +1166,7 @@ public final class MainWindow extends JFrame  {
             goalView.setSequentView(sequentViewLocal);
         } else {
             Runnable sequentUpdater = new Runnable() {
+                @Override
                 public void run() {
                     goalView.setSequentView(sequentViewLocal);
                 }
@@ -1402,6 +1405,7 @@ public final class MainWindow extends JFrame  {
 
         }
 
+        @Override
         public void selectedNodeChanged(KeYSelectionEvent e) {
             selectedProofChanged(e);
 
@@ -1508,18 +1512,19 @@ public final class MainWindow extends JFrame  {
      */
     public void popupInformationMessage(Object message, String title, boolean modal) {
         if (modal) {
-        popupInformationMessage(message, title);
-    } else {
-        if (!(message instanceof Component))
-        throw new InternalError("only messages of type " + Component.class + " supported, yet");
-        // JFrame dlg = new JDialog(mainFrame(),title, modal);
-        JFrame dlg = new JFrame(title);
-        dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        dlg.getContentPane().add((Component)message);
-        dlg.pack();
-        GuiUtilities.setCenter(dlg, this);
-        dlg.setVisible(true);
-    }
+            popupInformationMessage(message, title);
+        } else {
+            if (!(message instanceof Component)) {
+                throw new InternalError("only messages of type " + Component.class + " supported, yet");
+            }
+            // JFrame dlg = new JDialog(mainFrame(),title, modal);
+            JFrame dlg = new JFrame(title);
+            dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            dlg.getContentPane().add((Component) message);
+            dlg.pack();
+            GuiUtilities.setCenter(dlg, this);
+            dlg.setVisible(true);
+        }
     }
 
 
