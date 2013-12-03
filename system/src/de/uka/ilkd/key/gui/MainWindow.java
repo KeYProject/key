@@ -137,6 +137,7 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.key.gui.nodeviews.SequentSearchBar;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
+import de.uka.ilkd.key.pp.TermLabelPreferences;
 
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
@@ -144,9 +145,11 @@ public final class MainWindow extends JFrame  {
     private static MainWindow instance = null;
 
     private ProofManagementDialog proofManagementDialog = null;
+
     public ProofManagementDialog getProofManagementDialog() {
         return proofManagementDialog;
     }
+
     public void setProofManagementDialog(ProofManagementDialog proofManagementDialog) {
         this.proofManagementDialog = proofManagementDialog;
     }
@@ -272,7 +275,11 @@ public final class MainWindow extends JFrame  {
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
     
-    public TermLabelMenu termLabelMenu;
+    private TermLabelMenu termLabelMenu;
+    
+    public TermLabelPreferences getTermLabelPreferences(){
+        return termLabelMenu.getTermLabelPreferences();
+    }
 
     /*
      * This class should only be instantiated once!

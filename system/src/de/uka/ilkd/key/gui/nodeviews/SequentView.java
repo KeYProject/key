@@ -73,8 +73,8 @@ public abstract class SequentView extends JTextArea
         return lineWidth;
     }
     
-    public static TermLabelPreferences getTermLabelPreferences(){
-        return MainWindow.getInstance().termLabelMenu.termLabelPreferences;
+    public TermLabelPreferences getTermLabelPreferences(){
+        return mainWindow.getTermLabelPreferences();
     }
     
     private final ConfigChangeListener configChangeListener;

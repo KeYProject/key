@@ -945,9 +945,9 @@ public final class LogicPrinter {
         }
 
         List<TermLabel> termLabelList = new LinkedList();
-        for (TermLabel l : t.getLabels()) {
-            if (!termLabelPreferences.isVisible(l.name())) {
-                termLabelList.add(l);
+        for (TermLabel label : t.getLabels()) {
+            if (termLabelPreferences.isVisible(label)) {
+                termLabelList.add(label);
             }
         }
 

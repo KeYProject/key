@@ -183,7 +183,7 @@ public class InnerNodeView extends SequentView {
      * @param filter The {@link SequentPrintFilter} to use.
      * @return The text to show.
      */
-    public static String getTacletDescription(KeYMediator mediator,
+    public String getTacletDescription(KeYMediator mediator,
             Node node,
             SequentPrintFilter filter) {
 

@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,8 +21,12 @@ public abstract class TermLabelPreferences {
     public TermLabelPreferences() {
         hiddenTermLabels = new HashSet();
     }
+    
+    public boolean isVisible(TermLabel label) {
+        return isVisible(label.name());
+    }
 
-    public boolean isTermLabelHidden(Name name) {
+    public boolean isVisible(Name name) {
         return !hideAllTermLabels() && !hiddenTermLabels.contains(name);
     }
 

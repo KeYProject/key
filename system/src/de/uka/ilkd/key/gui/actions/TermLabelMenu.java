@@ -14,7 +14,7 @@ import javax.swing.JMenu;
 
 /**
  * This menu can be used to toggle TermLabel visibility for the SequentView.
- * 
+ *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class TermLabelMenu extends JMenu {
@@ -23,30 +23,7 @@ public class TermLabelMenu extends JMenu {
     private final List<TermLabelCheckBox> checkBoxList;
     private final KeYMediator mediator;
     private final MainWindow mainWindow;
-    public final TermLabelPreferences termLabelPreferences;
-
-    private void rebuildMenu() {
-        removeAll();
-        checkBoxList.clear();
-        add(hideAllTermLabels);
-
-        if (mediator.getSelectedProof() != null) {
-            addSeparator();
-            for (Name labelName
-                    : mediator.getProfile().getTermLabelManager().getSupportedTermLabelNames()) {
-                TermLabelCheckBox checkBox = new TermLabelCheckBox(labelName) {
-                };
-
-                checkBox.setSelected(termLabelPreferences.isTermLabelHidden(labelName));
-                checkBox.setEnabled(!hideAllTermLabels.isSelected());
-                checkBoxList.add(checkBox);
-            }
-            Collections.sort(checkBoxList);
-            for (TermLabelCheckBox c : checkBoxList) {
-                add(c);
-            }
-        }
-    }
+    private final TermLabelPreferences termLabelPreferences;
 
     public TermLabelMenu(final KeYMediator mediator, final MainWindow mainWindow) {
 
@@ -77,6 +54,33 @@ public class TermLabelMenu extends JMenu {
         });
 
         rebuildMenu();
+    }
+
+    private void rebuildMenu() {
+        removeAll();
+        checkBoxList.clear();
+        add(hideAllTermLabels);
+
+        if (mediator.getSelectedProof() != null) {
+            addSeparator();
+            for (Name labelName
+                    : mediator.getProfile().getTermLabelManager().getSupportedTermLabelNames()) {
+                TermLabelCheckBox checkBox = new TermLabelCheckBox(labelName) {
+                };
+
+                checkBox.setSelected(termLabelPreferences.isVisible(labelName));
+                checkBox.setEnabled(!hideAllTermLabels.isSelected());
+                checkBoxList.add(checkBox);
+            }
+            Collections.sort(checkBoxList);
+            for (TermLabelCheckBox c : checkBoxList) {
+                add(c);
+            }
+        }
+    }
+    
+    public TermLabelPreferences getTermLabelPreferences(){
+        return termLabelPreferences;
     }
 
     private class TermLabelToggleAction extends KeYMenuCheckBox {
@@ -118,6 +122,5 @@ public class TermLabelMenu extends JMenu {
         public int compareTo(TermLabelCheckBox t) {
             return this.mainWindowAction.getName().toLowerCase().compareTo(t.mainWindowAction.getName().toLowerCase());
         }
-
     }
 }

@@ -14,18 +14,16 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
+import de.uka.ilkd.key.gui.MainWindow;
 import java.io.StringWriter;
-import java.io.Writer;
 
 import javax.swing.JMenuItem;
 
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.pp.WriterBackend;
 
 /** 
@@ -49,7 +47,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
             TacletApp connectedTo, NotationInfo notationInfo) {
         super(connectedTo.taclet().displayName());
         this.connectedTo = connectedTo;	    	    
-        StringBuffer taclet_sb = new StringBuffer();
+        StringBuilder taclet_sb = new StringBuilder();
         StringWriter w = new StringWriter();
         
         WriterBackend backend = new WriterBackend(w, 68);
@@ -57,7 +55,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
                 connectedTo.instantiations()),
                 notationInfo, backend, null,
                 true,
-                SequentView.getTermLabelPreferences());
+                MainWindow.getInstance().getTermLabelPreferences());
         tp.printTaclet(connectedTo.taclet(), 
         	       connectedTo.instantiations(),
         	       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
