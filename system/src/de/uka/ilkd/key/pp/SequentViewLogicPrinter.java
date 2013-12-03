@@ -54,7 +54,7 @@ public class SequentViewLogicPrinter extends LogicPrinter {
     }
 
     @Override
-    protected ImmutableArray<TermLabel> getLabelsForTerm(Term t) {
+    protected ImmutableArray<TermLabel> getVisibleLabels(Term t) {
 
         if (hiddenTermLabels.allHidden()) {
             return new ImmutableArray<TermLabel>();
