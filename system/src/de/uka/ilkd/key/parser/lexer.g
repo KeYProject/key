@@ -80,7 +80,7 @@ tokens {
 	HASSUBFORMULAS="\\hasSubFormulas";
 	ISARRAY="\\isArray";
 	ISARRAYLENGTH="\\isArrayLength";
-	ISATOMIC="\\isAtomic";
+	ISCONSTANT="\\isConstant";
         ISENUMTYPE="\\isEnumType";
 	ISINDUCTVAR="\\isInductVar";
 	ISLOCALVARIABLE = "\\isLocalVariable";

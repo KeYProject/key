@@ -168,11 +168,7 @@ class ContractSelectionPanel extends JPanel {
             public int compare(Contract c1, Contract c2) {
                 int res = c1.id() - c2.id();
                 if (res == 0) {
-                    if (c1 instanceof WellDefinednessCheck) {
-                        return 1;
-                    } else if (c2 instanceof WellDefinednessCheck) {
-                        return -1;
-                    }
+                    return c2.getName().compareTo(c1.getName());
                 }
                 return res;
             }

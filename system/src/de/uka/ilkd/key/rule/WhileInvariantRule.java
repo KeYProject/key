@@ -559,9 +559,6 @@ public final class WhileInvariantRule implements BuiltInRule {
 	Goal initGoal = result.tail().tail().head();
         Goal bodyGoal = result.tail().head();
         Goal useGoal = result.head();
-        initGoal.setBranchLabel("Invariant Initially Valid");
-        bodyGoal.setBranchLabel("Body Preserves Invariant");
-        useGoal.setBranchLabel("Use Case");
 
         //prepare guard
         final Triple<JavaBlock,Term,Term> guardStuff = prepareGuard(inst, booleanKJT, services);

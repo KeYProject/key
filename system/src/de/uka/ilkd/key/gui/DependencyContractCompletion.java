@@ -68,6 +68,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
     		List<LocationVariable> heapContext,
             List<PosInOccurrence> steps, boolean forced, Services services) {
 
+        // 2nd condition is a quickfix to avoid ClassCastExceptions (Michael Kirsten)
         if (steps.size() == 0
                 || !(steps.get(0).subTerm().op() instanceof IObserverFunction)) {
             return null;

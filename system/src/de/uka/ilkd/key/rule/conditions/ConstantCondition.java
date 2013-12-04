@@ -24,17 +24,17 @@ import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * This variable condition checks if an instantiation is an atomic formula or term,
+ * This variable condition checks if an instantiation is a constant formula or term,
  * i.e. its arity is equal to zero.
  *
  * @author Michael Kirsten
  */
-public class AtomicCondition extends VariableConditionAdapter {
+public class ConstantCondition extends VariableConditionAdapter {
 
     private final AbstractSortedOperator t;
     private final boolean negated;
 
-    public AtomicCondition(AbstractSortedOperator t, boolean negated) {
+    public ConstantCondition(AbstractSortedOperator t, boolean negated) {
         this.t = t;
         this.negated = negated;
     }
@@ -65,6 +65,6 @@ public class AtomicCondition extends VariableConditionAdapter {
 
     @Override
     public String toString() {
-        return (negated ? "\\not":"") + "\\isAtomic (" + t + ")";
+        return (negated ? "\\not":"") + "\\isConstant (" + t + ")";
     }
 }
