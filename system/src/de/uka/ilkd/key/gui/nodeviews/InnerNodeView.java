@@ -58,26 +58,25 @@ import javax.swing.text.DefaultHighlighter;
 
 public class InnerNodeView extends SequentView {
 
-    private static final long serialVersionUID = 7273583340974979640L;
     private InitialPositionTable posTable;
     public final JTextArea tacletInfo;
     Node node;
 
-    public InnerNodeView(Node node, KeYMediator mediator, MainWindow mainWindow) {
+    public InnerNodeView(Node node, MainWindow mainWindow) {
         super(mainWindow);
         this.node = node;
         filter = new IdentitySequentPrintFilter(node.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(),
-                mediator.getNotationInfo(),
-                mediator.getServices(),
+                mainWindow.getMediator().getNotationInfo(),
+                mainWindow.getMediator().getServices(),
                 getVisibleTermLabels()));
-        setSelectionColor(new Color(10,180,50));
+        setSelectionColor(new Color(10, 180, 50));
 
-        tacletInfo = new JTextArea(getTacletDescription(mediator, node, filter));
+        tacletInfo = new JTextArea(getTacletDescription(mainWindow.getMediator(), node, filter));
         tacletInfo.setBackground(getBackground());
         tacletInfo.setBorder(new CompoundBorder(
-                new MatteBorder(3,0,0,0,Color.black),
-                new EmptyBorder(new Insets(4,0,0,0))));
+                new MatteBorder(3, 0, 0, 0, Color.black),
+                new EmptyBorder(new Insets(4, 0, 0, 0))));
 
         updateUI();
         printSequent();
@@ -140,7 +139,7 @@ public class InnerNodeView extends SequentView {
         out.append(" ").append(schemaVar.name());
     }
 
-    public static void writeTacletSchemaVariablesHelper(StringBuffer out,
+    private static void writeTacletSchemaVariablesHelper(StringBuffer out,
             final Taclet t) {
         ImmutableSet<SchemaVariable> schemaVars = t.getIfFindVariables();
         ImmutableList<NewVarcond> lnew = t.varsNew();
@@ -183,7 +182,7 @@ public class InnerNodeView extends SequentView {
      * @param filter The {@link SequentPrintFilter} to use.
      * @return The text to show.
      */
-    public String getTacletDescription(KeYMediator mediator,
+    public final String getTacletDescription(KeYMediator mediator,
             Node node,
             SequentPrintFilter filter) {
 
@@ -228,10 +227,10 @@ public class InnerNodeView extends SequentView {
         return s;
     }
 
-    static final HighlightPainter RULEAPP_HIGHLIGHTER =
-            new DefaultHighlighter.DefaultHighlightPainter(new Color(0.5f, 1.0f, 0.5f, 0.4f));
-    static final HighlightPainter IF_FORMULA_HIGHLIGHTER =
-            new DefaultHighlighter.DefaultHighlightPainter(new Color(0.8f, 1.0f, 0.8f, 0.5f));
+    static final HighlightPainter RULEAPP_HIGHLIGHTER
+            = new DefaultHighlighter.DefaultHighlightPainter(new Color(0.5f, 1.0f, 0.5f, 0.4f));
+    static final HighlightPainter IF_FORMULA_HIGHLIGHTER
+            = new DefaultHighlighter.DefaultHighlightPainter(new Color(0.8f, 1.0f, 0.8f, 0.5f));
 
     private void highlightRuleAppPosition(RuleApp app) {
         try {
@@ -277,8 +276,8 @@ public class InnerNodeView extends SequentView {
                 continue;
             }
             final IfFormulaInstSeq inst = (IfFormulaInstSeq) inst2;
-            final PosInOccurrence pos =
-                    new PosInOccurrence(inst.getConstrainedFormula(),
+            final PosInOccurrence pos
+                    = new PosInOccurrence(inst.getConstrainedFormula(),
                     PosInTerm.TOP_LEVEL,
                     inst.inAntec());
             final Range r = highlightPos(pos, IF_FORMULA_HIGHLIGHTER);

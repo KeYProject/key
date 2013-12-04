@@ -285,7 +285,6 @@ public final class MainWindow extends JFrame  {
      * This class should only be instantiated once!
      */
     private MainWindow() {
-
         setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
         setLaF();
         setIconImage(IconFactory.keyLogo());
@@ -683,7 +682,6 @@ public final class MainWindow extends JFrame  {
             frozen = false;
         }
     }
-
 
     public void makePrettyView() {
         if (getMediator().ensureProofLoaded()) {
@@ -1150,10 +1148,7 @@ public final class MainWindow extends JFrame  {
             currentGoalView.printSequent();
             sequentViewLocal = currentGoalView;
         } else {
-            InnerNodeView innerNodeView =
-                    new InnerNodeView(getMediator().getSelectedNode(),
-                    getMediator(), this);
-            sequentViewLocal = innerNodeView;
+            sequentViewLocal = new InnerNodeView(getMediator().getSelectedNode(), this);
         }
 
         if (SwingUtilities.isEventDispatchThread()) {
@@ -1169,7 +1164,6 @@ public final class MainWindow extends JFrame  {
         }
 
         sequentViewSearchBar.setSequentView(sequentViewLocal);
-
     }
 
     class MainProofListener implements AutoModeListener, KeYSelectionListener,
@@ -1208,7 +1202,6 @@ public final class MainWindow extends JFrame  {
             mainFrame.setContent(new EmptySequent(mainWindow));
 
             updateSequentView();
-
             makePrettyView();
         }
 
