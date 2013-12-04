@@ -22,7 +22,7 @@ public class TermLabelMenu extends JMenu {
     private final MainWindow mainWindow;
     private final VisibleTermLabels visibleTermLabels;
 
-    public TermLabelMenu(final KeYMediator mediator, final MainWindow mainWindow) {
+    public TermLabelMenu(final MainWindow mainWindow, final KeYMediator mediator) {
 
         setText("Term Labels");
         checkBoxMap = new TreeMap<Name, TermLabelCheckBox>();

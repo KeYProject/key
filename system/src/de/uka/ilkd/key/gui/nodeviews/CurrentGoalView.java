@@ -34,7 +34,7 @@ import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
-import java.util.Vector;
+import java.util.LinkedList;
 
 /** 
  * This sequent view displays the sequent of an open goal and allows selection of
@@ -64,8 +64,8 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     // enables this component to be a Drag Source
     DragSource dragSource = null;
 
-    private static final Insets autoScrollSensitiveRegion = new Insets(20,20,20,20);
-    private final Vector<Object> updateHighlights;
+    private static final Insets autoScrollSensitiveRegion = new Insets(20, 20, 20, 20);
+    private final LinkedList<Object> updateHighlights;
     
         
     /** 
@@ -142,7 +142,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 	// add listener to KeY GUI events
         getMediator().addGUIListener(guiListener);
         
-        updateHighlights = new Vector<Object>();
+        updateHighlights = new LinkedList<Object>();
 
     }
     
@@ -163,7 +163,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         if (ranges != null) {
             for (Range range : ranges) {
                 Object tag = getColorHighlight(UPDATE_HIGHLIGHT_COLOR);
-                updateHighlights.addElement(tag);
+                updateHighlights.add(tag);
                 paintHighlight(range, tag);
             }
         }
@@ -198,17 +198,17 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         
         if (getLogicPrinter() != null) {
             getLogicPrinter().update(filter, getLineWidth());
-	    boolean errorocc;
-	    do {
-	        errorocc = false;
-	        try {
-		    setText(getLogicPrinter().toString());
-			MainWindow.getInstance().sequentViewSearchBar.search();
-	        } catch (Error e) {
-		    System.err.println("Error occurred while printing Sequent!");
-		    errorocc = true;
-	        }
-	    } while (errorocc);
+            boolean errorocc;
+            do {
+                errorocc = false;
+                try {
+                    setText(getLogicPrinter().toString());
+                    MainWindow.getInstance().sequentViewSearchBar.search();
+                } catch (Error e) {
+                    System.err.println("Error occurred while printing Sequent!");
+                    errorocc = true;
+                }
+            } while (errorocc);
         }
         
         updateUpdateHighlights();
@@ -243,7 +243,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     }
     
     /** 
-     * sets the GUILogicPrinter to use
+     * sets the LogicPrinter to use
      */
     public void setPrinter(Goal goal) {
         filter = new IdentitySequentPrintFilter(goal.sequent());

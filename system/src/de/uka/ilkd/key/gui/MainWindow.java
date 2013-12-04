@@ -175,8 +175,8 @@ public final class MainWindow extends JFrame  {
     private JToolBar fileOpToolBar;
 
     /** JScrollPane for displaying SequentViews*/
-    public MainFrame mainFrame;
-
+    private final MainFrame mainFrame;
+    
     /** the current proof tree*/
     private ProofTreeView proofTreeView;
 
@@ -294,7 +294,8 @@ public final class MainWindow extends JFrame  {
         guiListener = new MainGUIListener();
         userInterface = new WindowUserInterface(this);
         mediator = getMediator(userInterface);
-        termLabelMenu = new TermLabelMenu(mediator, this);
+        termLabelMenu = new TermLabelMenu(this, mediator);
+        mainFrame = new MainFrame(this, mediator);
         initNotification();
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);
@@ -543,7 +544,6 @@ public final class MainWindow extends JFrame  {
     }
 
     private void createViews() {
-	mainFrame = new MainFrame(this);
 
 	openGoalsView = new JScrollPane();
 	GuiUtilities.paintEmptyViewComponent(openGoalsView, "Open Goals");

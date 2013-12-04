@@ -12,6 +12,7 @@
 //
 package de.uka.ilkd.key.gui.nodeviews;
 
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -60,7 +61,7 @@ public final class MainFrame extends JScrollPane {
         return oldContent;
     }
 
-    public MainFrame(final MainWindow mainWindow) {
+    public MainFrame(final MainWindow mainWindow, final KeYMediator mediator) {
         this.mainWindow = mainWindow;
         setBorder(new EmptyBorder(0, 0, 0, 0));
         getVerticalScrollBar().setUnitIncrement(30);
