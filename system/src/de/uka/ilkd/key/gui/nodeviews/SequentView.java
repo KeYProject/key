@@ -122,7 +122,7 @@ public abstract class SequentView extends JTextArea
 	currentHighlight = defaultHighlight;
 
         // add a SeqViewChangeListener to this component
-        SeqViewChangeListener changeListener = new SeqViewChangeListener(this);
+        SequentViewChangeListener changeListener = new SequentViewChangeListener(this);
         addComponentListener(changeListener);
         addPropertyChangeListener("font", changeListener);
         addHierarchyBoundsListener(changeListener);
