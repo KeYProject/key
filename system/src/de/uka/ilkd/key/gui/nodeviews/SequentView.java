@@ -20,12 +20,8 @@ import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.ADDITIONAL_HIGHLIGHT_COLOR;
 import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
@@ -35,12 +31,6 @@ import de.uka.ilkd.key.util.Debug;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Point;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -53,10 +43,13 @@ import javax.swing.text.Highlighter;
 /*
  * Parent class of CurrentGoalView and InnerNodeView.
  */
-public abstract class SequentView extends JTextArea
-        implements KeyListener, MouseMotionListener, MouseListener {
+public abstract class SequentView extends JTextArea {
 
     private final MainWindow mainWindow;
+    
+    public MainWindow getMainWindow(){
+        return mainWindow;
+    }
     
     /* 
      * The current line width. Static declaration for this prevents constructors from
@@ -82,7 +75,6 @@ public abstract class SequentView extends JTextArea
     SequentPrintFilter filter;
     private LogicPrinter printer;
     public boolean refreshHighlightning = true;
-    private boolean showTermInfo = false;
     
     // the default tag of the highlight
     private final Object defaultHighlight;
@@ -110,9 +102,11 @@ public abstract class SequentView extends JTextArea
         setEditable(false);
         setBackground(new Color(249, 249, 249));
         setFont();
-        addKeyListener(this);
-        addMouseMotionListener(this);
-        addMouseListener(this);
+        
+        SequentViewInputListener sequentViewInputListener = new SequentViewInputListener(this);
+        addKeyListener(sequentViewInputListener);
+        addMouseMotionListener(sequentViewInputListener);
+        addMouseListener(sequentViewInputListener);
         
 	// sets the painter for the highlightning
 	setHighlighter(new DefaultHighlighter());
@@ -270,42 +264,6 @@ public abstract class SequentView extends JTextArea
        return getHighlightedText(getPosInSequent(getMousePosition()));
     }
 
-    private void showTermInfo(Point p) {
-
-        if (showTermInfo) {
-
-            PosInSequent mousePos = getPosInSequent(p);
-            String info = null;
-
-            if ((mousePos != null)
-                    && !("".equals(getHighlightedText(mousePos)))) {
-
-                Term t;
-                final PosInOccurrence posInOcc = mousePos.getPosInOccurrence();
-                if (posInOcc != null) {
-                    t = posInOcc.subTerm();
-                    String tOpClassString = t.op().getClass().toString();
-                    String operator = tOpClassString.substring(
-                            tOpClassString.lastIndexOf('.') + 1);
-                    // The hash code is displayed here since sometimes terms with
-                    // equal string representation are still different.
-                    info = operator + ", Sort: " + t.sort() + ", Hash:" + t.hashCode();
-
-                    Sequent seq = mainWindow.getMediator().getSelectedNode().sequent();
-                    info += ProofSaver.posInOccurrence2Proof(seq, posInOcc);
-                }
-            }
-
-            if (info == null) {
-                mainWindow.setStandardStatusLine();
-            } else {
-                mainWindow.setStatusLine(info);
-            }
-
-        }
-
-    }
-
     /**
      * Return the character index for a certain coordinate. The usual
      * viewToModel is focused on inter-character spaces, not characters, so it
@@ -408,76 +366,6 @@ public abstract class SequentView extends JTextArea
     public void highlight(Point p) {
         setCurrentHighlight(defaultHighlight);
         paintHighlights(p);
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        // Necessary for MouseListener Interface
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        // Necessary for MouseListener Interface
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        // Necessary for MouseListener Interface
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        // Requesting focus here is necessary for the
-        // ALT KeyListener, which works in combination with
-        // mouseMoved Events.
-        requestFocusInWindow();
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent me) {
-        // Necessary for MouseMotionListener Interface
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent me) {
-        showTermInfo(me.getPoint());
-        if (refreshHighlightning) {
-            highlight(me.getPoint());
-        }
-    }
-    
-    @Override
-    public void mouseExited(MouseEvent e) {
-        if (refreshHighlightning) {
-            disableHighlights();
-        }
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-        // Necessary for KeyListener Interface
-    }
-
-    /* (non-Javadoc)
-     * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
-     */
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) {
-            showTermInfo = true;
-            showTermInfo(getMousePosition());
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
-     */
-    @Override
-    public void keyReleased(KeyEvent e) {
-        if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) == 0 && showTermInfo) {
-            showTermInfo = false;
-            mainWindow.setStandardStatusLine();
-        }
     }
     
     @Override

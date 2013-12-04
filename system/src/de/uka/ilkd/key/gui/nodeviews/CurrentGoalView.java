@@ -56,7 +56,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     private KeYMediator mediator;
 
     // the mouse/mouseMotion listener
-    private CurrentGoalViewListener listener;
+    private final CurrentGoalViewListener listener;
     
     // an object that detects opening and closing of an Taclet instantiation dialog
     private final GUIListener guiListener;
@@ -122,8 +122,8 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 	// and here comes the drag'n'drop stuff that allows the user to copy
 	// the currently highlighted subterm/formula by mere drag'n'dop actions
 	
-	dragSource = new DragSource();
-	       dragSource.createDefaultDragGestureRecognizer(this,
+        dragSource = new DragSource();
+        dragSource.createDefaultDragGestureRecognizer(this,
                 DnDConstants.ACTION_COPY,
                 listener);
 
