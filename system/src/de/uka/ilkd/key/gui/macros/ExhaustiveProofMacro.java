@@ -20,46 +20,26 @@ import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 
 public abstract class ExhaustiveProofMacro implements ProofMacro {
 
-    private static boolean isApplicableRecursive(KeYMediator mediator,
-                                                 PosInOccurrence posInOcc,
-                                                 ProofMacro macro) {
+    private static PosInOccurrence getApplicablePosInOcc(KeYMediator mediator,
+                                                         PosInOccurrence posInOcc,
+                                                         ProofMacro macro) {
         if (posInOcc == null
-                || posInOcc.depth() >= posInOcc.constrainedFormula().formula().arity()
                 || posInOcc.subTerm() == null) {
-            return false;
+            return null;
         } else if (macro.canApplyTo(mediator, posInOcc)) {
-            return true;
+            return posInOcc;
         }
-        for (int i = 0; i < posInOcc.constrainedFormula().formula().arity(); i++) {
-            if (posInOcc.subTerm().depth() > 0
-                    && isApplicableRecursive(mediator, posInOcc.down(i), macro)) {
-                return true;
-            }
+        Term subTerm = posInOcc.subTerm();
+        for (int i = 0; i < subTerm.arity(); i++) {
+            return getApplicablePosInOcc(mediator, posInOcc.down(i), macro);
         }
-        return false;
-    }
-
-    private static void applyRecursive(KeYMediator mediator,
-                                       PosInOccurrence posInOcc,
-                                       ProofMacro macro,
-                                       ProverTaskListener listener) throws InterruptedException {
-        if (macro.canApplyTo(mediator, posInOcc)) {
-            macro.applyTo(mediator, posInOcc, listener);
-        } else if (posInOcc == null
-                || posInOcc.depth() >= posInOcc.constrainedFormula().formula().arity()
-                || posInOcc.subTerm() == null) {
-            return;
-        }
-        for (int i = 0; i < posInOcc.constrainedFormula().formula().arity(); i++) {
-            if (posInOcc.subTerm().depth() > 0
-                    && isApplicableRecursive(mediator, posInOcc.down(i), macro)) {
-                applyRecursive(mediator, posInOcc.down(i), macro, listener);
-                return;
-            }
-        }
+        return null;
     }
 
     @Override
@@ -68,16 +48,28 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
         assert macro != null;
         assert mediator != null;
         assert mediator.getSelectionModel() != null;
-        if (mediator.getSelectedNode() == null) {
-            return macro.canApplyTo(mediator, posInOcc);
+        final Proof proof = mediator.getSelectedProof();
+        if (proof == null) {
+            // can happen during initialisation
+            return false;
         }
-        final Sequent seq = mediator.getSelectedNode().sequent();
-        for (int i = 1; i <= seq.size(); i++) {
-            if (isApplicableRecursive(mediator,
-                                      PosInOccurrence.findInSequent(seq, i, PosInTerm.TOP_LEVEL),
-                                      macro)) {
-                return true;
+        Goal savedSelectedGoal  = mediator.getSelectedGoal();
+        for (Goal goal : proof.openGoals()) {
+            mediator.getSelectionModel().setSelectedGoal(goal);
+            final Sequent seq = goal.sequent();
+            for (int i = 1; i <= seq.size(); i++) {
+                if (getApplicablePosInOcc(mediator,
+                                          PosInOccurrence.findInSequent(seq, i, PosInTerm.TOP_LEVEL),
+                                          macro) != null) {
+                    if (savedSelectedGoal != null) {
+                        mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
+                    }
+                    return true;
+                }
             }
+        }
+        if (savedSelectedGoal != null) {
+            mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
         }
         return false;
     }
@@ -86,15 +78,27 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
     public void applyTo(KeYMediator mediator,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
-        final Sequent seq = mediator.getSelectedNode().sequent();
-        final ProofMacro macro = getProofMacro();
-        PosInOccurrence searchPos = posInOcc;
-        for (int i = 1; i <= seq.size(); i++) {
-            searchPos = PosInOccurrence.findInSequent(seq, i, PosInTerm.TOP_LEVEL);
-            if (isApplicableRecursive(mediator, searchPos, macro)) {
-                applyRecursive(mediator, searchPos, macro, listener);
-                return;
+        final Proof proof = mediator.getSelectedProof();
+        Goal savedSelectedGoal  = mediator.getSelectedGoal();
+        for (Goal goal : proof.openGoals()) {
+            mediator.getSelectionModel().setSelectedGoal(goal);
+            final Sequent seq = goal.sequent();
+            final ProofMacro macro = getProofMacro();
+            PosInOccurrence searchPos;
+            for (int i = 1; i <= seq.size(); i++) {
+                searchPos = PosInOccurrence.findInSequent(seq, i, PosInTerm.TOP_LEVEL);
+                PosInOccurrence pos = getApplicablePosInOcc(mediator, searchPos, macro);
+                if (pos != null) {
+                    macro.applyTo(mediator, pos, listener);
+                    if (savedSelectedGoal != null) {
+                        mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
+                    }
+                    return;
+                }
             }
+        }
+        if (savedSelectedGoal != null) {
+            mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
         }
     }
 

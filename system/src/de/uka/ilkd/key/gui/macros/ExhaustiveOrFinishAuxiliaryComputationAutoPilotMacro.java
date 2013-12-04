@@ -26,18 +26,6 @@ public class ExhaustiveOrFinishAuxiliaryComputationAutoPilotMacro extends
 
     @Override
     ProofMacro getProofMacro() {
-        final SequentialProofMacro fullmainCompMacro =
-                new SequentialProofMacro() {
-            @Override
-            protected ProofMacro[] createProofMacroArray() {
-                return new ProofMacro[] {new FinishAuxiliaryComputationMacro(),
-                                         new StateExpansionAndInfFlowContractApplicationMacro(),
-                                         new TryCloseMacro(NUMBER_OF_TRY_STEPS)};}
-            @Override
-            public String getName() { return "Anonymous Macro"; }
-            @Override
-            public String getDescription() { return "Anonymous Macro"; }
-        };
         final ExhaustiveProofMacro exhaustiveAutoPilotMacro =
                 new ExhaustiveProofMacro() {
                     @Override
@@ -46,6 +34,28 @@ public class ExhaustiveOrFinishAuxiliaryComputationAutoPilotMacro extends
                     public String getDescription() { return "Anonymous Macro"; }
                     @Override
                     ProofMacro getProofMacro() { return new AuxiliaryComputationAutoPilotMacro(); }
+        };
+        final SequentialProofMacro m1 = new SequentialProofMacro() {
+            @Override
+            protected ProofMacro[] createProofMacroArray() {
+                return new ProofMacro[] {new StateExpansionAndInfFlowContractApplicationMacro(),
+                                         new TryCloseMacro(NUMBER_OF_TRY_STEPS)};
+            }
+            @Override
+            public String getName() { return "Anonymous Macro"; }
+            @Override
+            public String getDescription() { return "Anonymous Macro"; }
+        };
+        final SequentialProofMacro fullmainCompMacro =
+                new SequentialOnLastGoalProofMacro() {
+            @Override
+            protected ProofMacro[] createProofMacroArray() {
+                return new ProofMacro[] {new FinishAuxiliaryComputationMacro(),
+                                         m1};}
+            @Override
+            public String getName() { return "Anonymous Macro"; }
+            @Override
+            public String getDescription() { return "Anonymous Macro"; }
         };
         AlternativeProofMacro exhaustiveCompMacro =
                 new AlternativeProofMacro() {
@@ -58,6 +68,6 @@ public class ExhaustiveOrFinishAuxiliaryComputationAutoPilotMacro extends
                         return new ProofMacro[] {exhaustiveAutoPilotMacro,
                                                  fullmainCompMacro};}
         };
-        return new DoWhileElseMacro(exhaustiveCompMacro, fullmainCompMacro, NUMBER_OF_TRY_STEPS, true);
+        return new DoWhileElseMacro(exhaustiveCompMacro, NUMBER_OF_TRY_STEPS);
     }
 }

@@ -14,6 +14,10 @@ public class DoWhileElseMacro implements ProofMacro {
     boolean condition;
     int steps;
 
+    public DoWhileElseMacro(ProofMacro macro, int steps) {
+        this(macro, new DummyProofMacro(), steps, true);
+    }
+
     public DoWhileElseMacro(ProofMacro macro, ProofMacro elseMacro,
                             int steps, boolean condition) {
         this.macro = macro;
@@ -60,7 +64,7 @@ public class DoWhileElseMacro implements ProofMacro {
             posInOcc = null;
             steps--;
         }
-        if (steps > 0) {
+        if (steps > 0 && getAltProofMacro().canApplyTo(mediator, posInOcc)) {
             getAltProofMacro().applyTo(mediator, posInOcc, listener);
         }
 

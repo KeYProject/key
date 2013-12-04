@@ -100,6 +100,7 @@ public class FinishAuxiliaryBlockComputationMacro
                 // make everyone listen to the proof remove
                 mediator.startInterface(true);
                 mediator.getUI().removeProof(proof);
+                mediator.getSelectionModel().setSelectedGoal(initiatingGoal);
                 // go into automode again
                 mediator.stopInterface(true);
             }
