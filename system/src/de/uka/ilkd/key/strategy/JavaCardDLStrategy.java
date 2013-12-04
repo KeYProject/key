@@ -302,13 +302,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private Feature oneStepSimplificationFeature(Feature cost) {
 	SetRuleFilter filter = new SetRuleFilter();
-	
 	filter.addRuleToSet(MiscTools.findOneStepSimplifier(getProof()));
-
-        return ConditionalFeature.createConditional(filter, cost);        
+	return ConditionalFeature.createConditional(filter, cost);
     }
-    
-   
+
+
     //private Feature smtFeature(Feature cost) {
 	//ClassRuleFilter filter = new ClassRuleFilter(SMTRule.class);
         //return ConditionalFeature.createConditional(filter, cost);        
