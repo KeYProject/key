@@ -135,7 +135,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
-import de.uka.ilkd.key.gui.nodeviews.SequentSearchBar;
+import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.pp.HiddenTermLabels;
 
@@ -155,7 +155,7 @@ public final class MainWindow extends JFrame  {
     }
 
     // Search bar for Sequent Views.
-    public SequentSearchBar sequentSearchBar;
+    public SequentViewSearchBar sequentViewSearchBar;
 
     /**
      * The maximum number of recent files displayed.
@@ -174,8 +174,8 @@ public final class MainWindow extends JFrame  {
     /** the second toolbar */
     private JToolBar fileOpToolBar;
 
-    /** the current goal view */
-    public MainFrame goalView;
+    /** JScrollPane for displaying SequentViews*/
+    public MainFrame mainFrame;
 
     /** the current proof tree*/
     private ProofTreeView proofTreeView;
@@ -183,7 +183,7 @@ public final class MainWindow extends JFrame  {
     /** the list of current open goals*/
     private JScrollPane openGoalsView;
 
-    /** the view of a sequent */
+    /** SequentView for the current goal */
     public CurrentGoalView currentGoalView;
 
     /** the rule view */
@@ -201,19 +201,19 @@ public final class MainWindow extends JFrame  {
     private GoalList goalList;
 
     /** the mediator is stored here */
-    private KeYMediator mediator;
+    private final KeYMediator mediator;
 
     /** the user interface which direct all notifications to this window */
-    private UserInterface userInterface;
+    private final UserInterface userInterface;
 
     /** the status line */
     private MainStatusLine statusLine;
 
     /** listener to global proof events */
-    private MainProofListener proofListener;
+    private final MainProofListener proofListener;
 
     /** listener to gui events */
-    private MainGUIListener guiListener;
+    private final MainGUIListener guiListener;
     private RecentFileMenu recentFiles;
 
     public boolean frozen = false;
@@ -275,7 +275,7 @@ public final class MainWindow extends JFrame  {
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
     
-    private TermLabelMenu termLabelMenu;
+    private final TermLabelMenu termLabelMenu;
     
     public HiddenTermLabels getHiddenTermLabels(){
         return termLabelMenu.getHiddenTermLabels();
@@ -293,8 +293,8 @@ public final class MainWindow extends JFrame  {
         proofListener = new MainProofListener(this);
         guiListener = new MainGUIListener();
         userInterface = new WindowUserInterface(this);
-        setMediator(new KeYMediator(userInterface, true));
-        termLabelMenu = new TermLabelMenu(getMediator(), this);
+        mediator = getMediator(userInterface);
+        termLabelMenu = new TermLabelMenu(mediator, this);
         initNotification();
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);
@@ -356,25 +356,16 @@ public final class MainWindow extends JFrame  {
     }
 
     /**
-     * sets the mediator to corresspond with other gui elements
+     * Returns the MainWindow KeyMediator.
      *
-     * @param m
-     *            the KeYMediator
+     * @param userInterface The UserInterface.
      */
-    private void setMediator(KeYMediator m) {
-        assert mediator == null;
-	// This was an incomplete replacement method. It would call first
-	// "unregisterMediatorListeners();"
-        mediator = m;
-
-        registerMediatorListeners();
-    }
-
-    /** register several listeners */
-    private void registerMediatorListeners() {
-        mediator.addKeYSelectionListener(proofListener);
-        mediator.addAutoModeListener(proofListener);
-        mediator.addGUIListener(guiListener);
+    private KeYMediator getMediator(UserInterface userInterface) {
+        KeYMediator result = new KeYMediator(userInterface, true);
+        result.addKeYSelectionListener(proofListener);
+        result.addAutoModeListener(proofListener);
+        result.addGUIListener(guiListener);
+        return result;
     }
 
     /**
@@ -467,11 +458,11 @@ public final class MainWindow extends JFrame  {
         leftPane.setName("leftPane");
         leftPane.setOneTouchExpandable(true);
 
-        this.sequentSearchBar = new SequentSearchBar(currentGoalView);
+        this.sequentViewSearchBar = new SequentViewSearchBar(currentGoalView);
         JPanel rightPane = new JPanel();
         rightPane.setLayout(new BorderLayout());
-	rightPane.add(goalView, BorderLayout.CENTER);
-	rightPane.add(sequentSearchBar,
+	rightPane.add(mainFrame, BorderLayout.CENTER);
+	rightPane.add(sequentViewSearchBar,
                 BorderLayout.SOUTH);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, rightPane);
@@ -552,7 +543,7 @@ public final class MainWindow extends JFrame  {
     }
 
     private void createViews() {
-	goalView = new MainFrame(this);
+	mainFrame = new MainFrame(this);
 
 	openGoalsView = new JScrollPane();
 	GuiUtilities.paintEmptyViewComponent(openGoalsView, "Open Goals");
@@ -1090,7 +1081,7 @@ public final class MainWindow extends JFrame  {
             if (e.getSource() instanceof ApplyTacletDialog) {
                 // disable all elements except the sequent window (drag'n'drop !) ...
                 enableMenuBar(MainWindow.this.getJMenuBar(), false);
-                MainWindow.this.goalView.setEnabled(false);
+                MainWindow.this.mainFrame.setEnabled(false);
                 MainWindow.this.proofTreeView.setEnabled(false);
                 MainWindow.this.openGoalsView.setEnabled(false);
                 MainWindow.this.strategySelectionView.setEnabled(false);
@@ -1108,7 +1099,7 @@ public final class MainWindow extends JFrame  {
             if (e.getSource() instanceof ApplyTacletDialog) {
                 // enable all previously diabled elements ...
                 enableMenuBar(MainWindow.this.getJMenuBar(), true);
-                MainWindow.this.goalView.setEnabled(true);
+                MainWindow.this.mainFrame.setEnabled(true);
                 MainWindow.this.proofTreeView.setEnabled(true);
                 MainWindow.this.openGoalsView.setEnabled(true);
                 MainWindow.this.strategySelectionView.setEnabled(true);
@@ -1163,18 +1154,18 @@ public final class MainWindow extends JFrame  {
         }
 
         if (SwingUtilities.isEventDispatchThread()) {
-            goalView.setSequentView(sequentViewLocal);
+            mainFrame.setSequentView(sequentViewLocal);
         } else {
             Runnable sequentUpdater = new Runnable() {
                 @Override
                 public void run() {
-                    goalView.setSequentView(sequentViewLocal);
+                    mainFrame.setSequentView(sequentViewLocal);
                 }
             };
             SwingUtilities.invokeLater(sequentUpdater);
         }
 
-        sequentSearchBar.setSequentView(sequentViewLocal);
+        sequentViewSearchBar.setSequentView(sequentViewLocal);
 
     }
 
@@ -1211,7 +1202,7 @@ public final class MainWindow extends JFrame  {
             }
 
             disableCurrentGoalView = false;
-            goalView.setSequentView(new EmptySequent(mainWindow));
+            mainFrame.setSequentView(new EmptySequent(mainWindow));
 
             updateSequentView();
 

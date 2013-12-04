@@ -30,7 +30,7 @@ import javax.swing.JCheckBox;
  * Search bar implementing search function for SequentView.
  */
 
-public class SequentSearchBar extends SearchBar {
+public class SequentViewSearchBar extends SearchBar {
 
     public static final Color SEARCH_HIGHLIGHT_COLOR_1 =
             new Color(255, 140, 0, 178);
@@ -42,7 +42,7 @@ public class SequentSearchBar extends SearchBar {
     private SequentView sequentView;
     JCheckBox regExpCheckBox;
 
-    public SequentSearchBar(SequentView sequentView) {
+    public SequentViewSearchBar(SequentView sequentView) {
         this.sequentView = sequentView;
         searchResults = new ArrayList<Pair<Integer,Object>>();
     }
