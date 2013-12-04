@@ -56,7 +56,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     private KeYMediator mediator;
 
     // the mouse/mouseMotion listener
-    private SequentViewListener listener;
+    private CurrentGoalViewListener listener;
     
     // an object that detects opening and closing of an Taclet instantiation dialog
     private final GUIListener guiListener;
@@ -79,7 +79,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         setBackground(Color.white);
 	// disables selection
 	setSelectionColor(getBackground());
-	listener = new SequentViewListener(this, getMediator());
+	listener = new CurrentGoalViewListener(this, getMediator());
 	
 	guiListener = new GUIListener(){
 		/** invoked if a frame that wants modal access is opened */
@@ -117,16 +117,15 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 		}	
 	    };
 		 
-	addMouseListener(listener);
-	addMouseMotionListener(listener);	
+	addMouseListener(listener);	
 
 	// and here comes the drag'n'drop stuff that allows the user to copy
 	// the currently highlighted subterm/formula by mere drag'n'dop actions
 	
 	dragSource = new DragSource();
-	dragSource.createDefaultDragGestureRecognizer( this, 
-						       DnDConstants.ACTION_COPY,
-						       listener.getDragGestureListener() );
+	       dragSource.createDefaultDragGestureRecognizer(this,
+                DnDConstants.ACTION_COPY,
+                listener);
 
 	// And now the Drag'n'drop stuff ...
 	       
@@ -191,7 +190,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 
     /** sets the text being printed */
     public synchronized void printSequentImmediately() {
-	removeMouseMotionListener(listener);
 	removeMouseListener(listener);
         
         setLineWidth(computeLineWidth());
@@ -213,7 +211,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         
         updateUpdateHighlights();
 	restorePosition();
-        addMouseMotionListener(listener);
 	addMouseListener(listener);        
 	repaint();
     }
