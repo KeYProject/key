@@ -1154,12 +1154,12 @@ public final class MainWindow extends JFrame  {
         }
 
         if (SwingUtilities.isEventDispatchThread()) {
-            mainFrame.setSequentView(sequentViewLocal);
+            mainFrame.setContent(sequentViewLocal);
         } else {
             Runnable sequentUpdater = new Runnable() {
                 @Override
                 public void run() {
-                    mainFrame.setSequentView(sequentViewLocal);
+                    mainFrame.setContent(sequentViewLocal);
                 }
             };
             SwingUtilities.invokeLater(sequentUpdater);
@@ -1202,7 +1202,7 @@ public final class MainWindow extends JFrame  {
             }
 
             disableCurrentGoalView = false;
-            mainFrame.setSequentView(new EmptySequent(mainWindow));
+            mainFrame.setContent(new EmptySequent(mainWindow));
 
             updateSequentView();
 
