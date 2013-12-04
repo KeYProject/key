@@ -2,7 +2,6 @@ class Cell {
     int val;
 
     /*@ model_behavior
-      @ requires true;
       @ ensures \subset(\result, this.* );
       @ ensures \subset(\singleton(this.val), \result);
       @ accessible \nothing;
@@ -10,7 +9,6 @@ class Cell {
       @*/
 
     /*@ model_behavior
-      @ requires true;
       @ ensures \result ==> get()==x;
       @ accessible footprint();
       @ model two_state boolean post_set(int x) { return (get() == x); }
