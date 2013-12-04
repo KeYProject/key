@@ -29,7 +29,6 @@ import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Debug;
 import java.util.LinkedList;
 
 /**
@@ -49,7 +48,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
 
     // the mediator
-    private KeYMediator mediator;
+    private final KeYMediator mediator;
 
     // the mouse/mouseMotion listener
     private final CurrentGoalViewListener listener;
@@ -69,9 +68,9 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      * @param mediator the KeYMediator allowing access to the current system
      * status
      */
-    public CurrentGoalView(KeYMediator mediator, MainWindow mainWindow) {
+    public CurrentGoalView(MainWindow mainWindow) {
         super(mainWindow);
-        setMediator(mediator);
+        this.mediator = mainWindow.getMediator();
         setBackground(Color.white);
         // disables selection
         setSelectionColor(getBackground());
@@ -123,9 +122,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         // and here comes the drag'n'drop stuff that allows the user to copy
         // the currently highlighted subterm/formula by mere drag'n'dop actions
         dragSource = new DragSource();
-        dragSource.createDefaultDragGestureRecognizer(this,
-                DnDConstants.ACTION_COPY,
-                listener);
+        dragSource.createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY, listener);
 
         // And now the Drag'n'drop stuff ...
         final DragNDropInstantiator dragNDropInstantiator = new DragNDropInstantiator(this);
@@ -257,16 +254,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 
     protected SequentPrintFilter getSequentPrintFilter() {
         return filter;
-    }
-
-    /**
-     * sets the mediator
-     *
-     * @param mediator the KeYMediator used to communicate with other components
-     */
-    private void setMediator(KeYMediator mediator) {
-        Debug.assertTrue(mediator != null, "Mediator must be set");
-        this.mediator = mediator;
     }
 
     /**

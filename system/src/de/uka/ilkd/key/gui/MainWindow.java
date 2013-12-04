@@ -293,9 +293,9 @@ public final class MainWindow extends JFrame  {
         proofListener = new MainProofListener(this);
         guiListener = new MainGUIListener();
         userInterface = new WindowUserInterface(this);
-        mediator = getMediator(userInterface);
-        termLabelMenu = new TermLabelMenu(this, mediator);
-        mainFrame = new MainFrame(this, mediator);
+        mediator = getMainWindowMediator(userInterface);
+        termLabelMenu = new TermLabelMenu(this);
+        mainFrame = new MainFrame(this);
         initNotification();
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);
@@ -335,8 +335,8 @@ public final class MainWindow extends JFrame  {
      * Tries to set the system look and feel if this option is activated.
      */
     private void setLaF() {
-        try{
-        	 if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().useSystemLaF()) {
+        try {
+            if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().useSystemLaF()) {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
                 // Workarounds for GTK+
@@ -346,7 +346,7 @@ public final class MainWindow extends JFrame  {
 
                 SwingUtilities.updateComponentTreeUI(this);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -361,7 +361,7 @@ public final class MainWindow extends JFrame  {
      *
      * @param userInterface The UserInterface.
      */
-    private KeYMediator getMediator(UserInterface userInterface) {
+    private KeYMediator getMainWindowMediator(UserInterface userInterface) {
         KeYMediator result = new KeYMediator(userInterface, true);
         result.addKeYSelectionListener(proofListener);
         result.addAutoModeListener(proofListener);
@@ -375,6 +375,9 @@ public final class MainWindow extends JFrame  {
      * @return the mediator
      */
     public KeYMediator getMediator() {
+        if (mediator == null) {
+            throw new NullPointerException("KeYMediator is not set.");
+        }
         return mediator;
     }
 
@@ -561,7 +564,7 @@ public final class MainWindow extends JFrame  {
 	}
 
         Config.DEFAULT.setDefaultFonts();
-        currentGoalView = new CurrentGoalView(mediator, this);
+        currentGoalView = new CurrentGoalView(this);
     }
 
     private ComplexButton createSMTComponent() {
@@ -1420,11 +1423,13 @@ public final class MainWindow extends JFrame  {
 	}
 
         @Override
-	public boolean isEnabled() {
-	    boolean b = super.isEnabled() && solverUnion != SolverTypeCollection.EMPTY_COLLECTION &&
- 	      mediator != null && mediator.getSelectedProof() != null && !mediator.getSelectedProof().closed();
-	    return b;
-	}
+        public boolean isEnabled() {
+            boolean b = super.isEnabled() && solverUnion != SolverTypeCollection.EMPTY_COLLECTION
+                    && mediator != null
+                    && mediator.getSelectedProof() != null
+                    && !mediator.getSelectedProof().closed();
+            return b;
+        }
 
         @Override
 	public void actionPerformed(ActionEvent e) {

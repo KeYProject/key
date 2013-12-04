@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
@@ -22,7 +21,7 @@ public class TermLabelMenu extends JMenu {
     private final MainWindow mainWindow;
     private final VisibleTermLabels visibleTermLabels;
 
-    public TermLabelMenu(final MainWindow mainWindow, final KeYMediator mediator) {
+    public TermLabelMenu(final MainWindow mainWindow) {
 
         setText("Term Labels");
         checkBoxMap = new TreeMap<Name, TermLabelCheckBox>();
@@ -40,7 +39,8 @@ public class TermLabelMenu extends JMenu {
 
         addSeparator();
         for (Name labelName
-                : mediator.getProfile().getTermLabelManager().getSupportedTermLabelNames()) {
+                : mainWindow.getMediator()
+                .getProfile().getTermLabelManager().getSupportedTermLabelNames()) {
             TermLabelCheckBox checkBox = new TermLabelCheckBox(labelName);
             checkBox.setSelected(true);
             checkBox.setEnabled(!hideAllCheckBox.isSelected());
