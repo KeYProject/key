@@ -29,6 +29,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * They work similar to the idea of 'Predicate Transformer Semantics' as introduced by Dijkstra in
  * "Guarded commands, nondeterminacy and formal derivation of programs".
  *
+ * Note that in the taclets, arguments such as "a -> b" need to be written as "(a -> b)", in order
+ * to let the parser know that the argument is "a -> b" and not "a" followed by a syntactic error.
+ *
  * @author Michael Kirsten
  */
 public class Transformer extends Function {

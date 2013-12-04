@@ -35,7 +35,8 @@ public final class ParameterlessTermLabel implements TermLabel {
     * Label attached to anonymisation heap function symbols as for instance
     * introduce in UseOperationContractRule or WhileInvariantRule.
     */
-   public static final TermLabel ANON_HEAP_LABEL = new ParameterlessTermLabel(ANON_HEAP_LABEL_NAME);
+   public static final TermLabel ANON_HEAP_LABEL =
+           new ParameterlessTermLabel(ANON_HEAP_LABEL_NAME);
 
    /**
     * Name of {@link #SELECT_SKOLEM_LABEL}.
@@ -45,7 +46,8 @@ public final class ParameterlessTermLabel implements TermLabel {
    /**
     * Label attached to skolem constants introduced by the rule pullOutSelect.
     */
-   public static final TermLabel SELECT_SKOLEM_LABEL = new ParameterlessTermLabel(SELECT_SKOLEM_LABEL_NAME);
+   public static final TermLabel SELECT_SKOLEM_LABEL =
+           new ParameterlessTermLabel(SELECT_SKOLEM_LABEL_NAME);
 
    /**
     * Name of {@link #LOOP_BODY_LABEL}.
@@ -56,12 +58,14 @@ public final class ParameterlessTermLabel implements TermLabel {
     * Label attached to the modality which executes a loop body in branch
     * "Body Preserves Invariant" of applied "Loop Invariant" rules.
     */
-   public static final TermLabel LOOP_BODY_LABEL = new ParameterlessTermLabel(LOOP_BODY_LABEL_NAME);
+   public static final TermLabel LOOP_BODY_LABEL =
+           new ParameterlessTermLabel(LOOP_BODY_LABEL_NAME);
 
    /**
     * Name of {@link #LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL}.
     */
-   public static final Name LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME = new Name("LoopInvariantNormalBehavior");
+   public static final Name LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME =
+           new Name("LoopInvariantNormalBehavior");
 
    /**
     * Label attached to the implication when a loop body execution terminated
@@ -69,7 +73,8 @@ public final class ParameterlessTermLabel implements TermLabel {
     * "Body Preserves Invariant" of applied "Loop Invariant" rules to show the
     * loop invariant.
     */
-   public static final TermLabel LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL = new ParameterlessTermLabel(LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME);
+   public static final TermLabel LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL =
+           new ParameterlessTermLabel(LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME);
 
    /**
     * Name of {@link #IMPLICIT_SPECIFICATION_LABEL}.
@@ -100,7 +105,10 @@ public final class ParameterlessTermLabel implements TermLabel {
    public static final Name UNDEFINED_VALUE_LABEL_NAME = new Name("undef");
 
    /**
-    * Label attached to a term which denotes an undefined value.
+    * Label attached to a term which denotes an undefined value. At present it is only
+    * used for the else-part of the {@link #IfExThenElse} operator, when it is used
+    * for the translation of JML's \min and \max operator. It is necessary to evaluate
+    * this constant expression to be not well-defined.
     */
    public static final TermLabel UNDEFINED_VALUE_LABEL =
            new ParameterlessTermLabel(UNDEFINED_VALUE_LABEL_NAME);
