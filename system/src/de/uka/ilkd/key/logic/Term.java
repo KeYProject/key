@@ -16,6 +16,7 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -147,13 +148,13 @@ public interface Term extends SVSubstitute, Sorted {
      * checks if the given label is attached to the term
      * @param label the ITermLabel for which to look (must not be null)
      */
-    public boolean containsLabel(ITermLabel label);
+    public boolean containsLabel(TermLabel label);
     
     /**
      * returns list of labels attached to this term
      * @return list of labels (maybe be empty but never <code>null</code>
      */
-    public ImmutableArray<ITermLabel> getLabels();
+    public ImmutableArray<TermLabel> getLabels();
     
     /**
      * Returns a serial number for a term. The serial number is not persistent.

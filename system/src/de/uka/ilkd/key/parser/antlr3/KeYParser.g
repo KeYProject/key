@@ -2780,22 +2780,63 @@ accessterm returns [Term _accessterm = null]
                     ". Casts between primitive and reference types are not allowed. ");
          }
          result = tf.createTerm(s.getCastSymbol(getServices()), result);
-	  } |
+	}
+      |
       ( {isStaticQuery()}? // look for package1.package2.Class.query(
         result = static_query
-      | 
+      |
         {isStaticAttribute()}?            // look for package1.package2.Class.attr
         result = static_attribute_suffix
-      | 	
+      |
         result = atom
-      )   
-         ((result = array_access_suffix[result] | result = attribute_or_query_suffix[result]))*
+      )
+         ( result = array_access_suffix[result] 
+         | result = attribute_or_query_suffix[result] 
+         | result = heap_update_suffix[result]
+         )*
  ;
         catch [TermCreationException ex] {
               semanticError(ex.getMessage());
         }
 
+heap_update_suffix [Term heap] returns [Term _heap_update_suffix = null]
+@init { result = heap; }
+@after { _heap_update_suffix = result; }
+    :
+    LBRACE
+    result=elementary_heap_update[result]
+    ( PARALLEL result=elementary_heap_update[result] )*
+    RBRACE
+    ; 
 
+elementary_heap_update [Term heap] returns [Term result=heap]
+    : // TODO find the right kind of super non-terminal for "o.f" and "a[i]"
+      // and do not resign to parsing an arbitrary term
+    ( (equivalence_term ASSIGN) => target=equivalence_term ASSIGN val=equivalence_term 
+        {
+           Term objectTerm = target.sub(1);
+           Term fieldTerm  = target.sub(2);
+           result = TermBuilder.DF.store(getServices(), heap, objectTerm, fieldTerm, val);
+        }
+    | id=simple_ident args=argument_list
+        {
+           Function f = (Function)functions().lookup(new Name(id));
+           if(f == null) {
+             semanticError("Unknown heap constructor " + id);
+           }
+           Term[] augmentedArgs = new Term[args.length+1];
+           System.arraycopy(args, 0, augmentedArgs, 1, args.length);
+           augmentedArgs[0] = heap;
+           result = tf.createTerm(f, augmentedArgs);
+           if(!result.sort().name().toString().equals("Heap")) {
+              semanticError(id + " is not a heap constructor ");
+           }
+        }
+    )
+    ;
+        catch [TermCreationException ex] {
+              semanticError(ex.getMessage());
+        }
 
 array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = null] 
 @init{
@@ -2868,36 +2909,39 @@ atom returns [Term _atom = null]
 			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
         }
 
-label returns [ImmutableArray<ITermLabel> labels = new ImmutableArray<ITermLabel>()] 
+label returns [ImmutableArray<TermLabel> labels = new ImmutableArray<TermLabel>()] 
 @init {
-  ArrayList<ITermLabel> labelList = new ArrayList<ITermLabel>();
+  ArrayList<TermLabel> labelList = new ArrayList<TermLabel>();
 }
 :
    l=single_label {labelList.add(l);} (COMMA l=single_label {labelList.add(l);})*
    {
-   	labels = new ImmutableArray<ITermLabel>((ITermLabel[])labelList.toArray(new ITermLabel[labelList.size()]));
+   	labels = new ImmutableArray<TermLabel>((TermLabel[])labelList.toArray(new TermLabel[labelList.size()]));
    }
 ;
 
-single_label returns [ITermLabel label=null]
+single_label returns [TermLabel label=null]
 @init {
   String labelName = "";
-  ITermLabel left = null;
-  ITermLabel right = null;
+  TermLabel left = null;
+  TermLabel right = null;
   List<String> parameters = new LinkedList<String>();
 }
 :
   (name=IDENT {labelName=name.getText();} | star=STAR {labelName=star.getText();} ) (LPAREN param1=STRING_LITERAL {parameters.add(param1.getText().substring(1,param1.getText().length()-1));} (COMMA param2=STRING_LITERAL {parameters.add(param2.getText().substring(1,param2.getText().length()-1));})* RPAREN)? 
   {
-  	label = LabelFactory.createLabel(labelName, parameters);
+      try {
+          label = getServices().getProfile().
+                   getTermLabelManager().parseLabel(labelName, parameters);
+      } catch(TermLabelException ex) {
+          Exception semEx = new KeYSemanticException(ex.getMessage(), getSourceName(), getLine(), getColumn());
+          semEx.initCause(ex);
+          keh.reportException(semEx);
+      }
   }
- 
-;
-        catch [UnknownLabelException ex] {
-              keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
-        }
+  ; 
+
+       
 
 
 abbreviation returns [Term _abbreviation=null]
@@ -3224,14 +3268,13 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
         { a = toZNotation(neg+number.getText(), functions());}    
     | AT a = abbreviation
     | varfuncid = funcpred_name (LIMITED {limited = true;})?
-        (
-            (
+        ( (~LBRACE | LBRACE bound_variables) =>
+            ( 
                LBRACE 
                boundVars = bound_variables 
                RBRACE 
-               args = argument_list
-            )
-            |
+            )?
+
             args = argument_list
         )? 
         
