@@ -1586,8 +1586,6 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
                                 }
                             } else if (new Name("any").equals(sort_name)) {
                                 s = Sort.ANY;
-                            } else if (new Name("Formula").equals(sort_name)) {
-                                s = Sort.FORMULA;
                             } else  {
                                 ImmutableSet<Sort>  ext = DefaultImmutableSet.<Sort>nil();
 
@@ -2076,22 +2074,53 @@ func_decls
         RBRACE
     ;
 
+// like arg_sorts but admits also the keyword "\formula"
+arg_sorts_or_formula[boolean checkSort] returns [Sort[] argSorts = null] 
+{
+    List args = new LinkedList();
+    Sort s;
+}
+    :
+        (
+            LPAREN
+
+            ( s = sortId_check[checkSort] { args.add(s); }
+            | FORMULA {args.add(Sort.FORMULA);} )
+
+            (
+                COMMA ( s = sortId_check[checkSort] {args.add(s);}
+                      | FORMULA {args.add(Sort.FORMULA);} )
+            ) *
+            RPAREN
+        ) ?
+        {
+            argSorts = (Sort[])args.toArray(AN_ARRAY_OF_SORTS);
+        }
+    ;
+
+
 transform_decl
 {
     Sort[] argSorts;
+    Sort retSort = null;
     String trans_name;
 }
     :
+        (
+          retSort = any_sortId_check[!skip_transformers]
+        | FORMULA { retSort = Sort.FORMULA; }
+        )
+
         trans_name = funcpred_name
 
-        argSorts = arg_sorts[!skip_transformers]
+        argSorts = arg_sorts_or_formula[!skip_transformers]
 
         {
             if (!skip_transformers) {
 
                 Transformer t =
                     new Transformer(new Name(trans_name),
-                                    Sort.FORMULA,
+                                    retSort,
                                     new ImmutableArray<Sort>(argSorts));
 
                 if (lookup(t.name()) != null) {
@@ -3734,7 +3763,7 @@ varexp[TacletBuilder b]
         | varcond_staticmethod[b,negated]  
         | varcond_typecheck[b, negated]
         | varcond_induction_variable[b, negated]
-        | varcond_atomic[b, negated]
+        | varcond_constant[b, negated]
         | varcond_label[b, negated]
         | varcond_static_field[b, negated]
         | varcond_subFormulas[b, negated]
@@ -4231,18 +4260,18 @@ varcond_induction_variable [TacletBuilder b, boolean negated]
    }
 ;
 
-varcond_atomic [TacletBuilder b, boolean negated]
+varcond_constant [TacletBuilder b, boolean negated]
 {
   ParsableVariable x = null;
 }
 :
-   ISATOMIC
+   ISCONSTANT
         LPAREN x=varId RPAREN {
            if (x instanceof TermSV) {
-                b.addVariableCondition(new AtomicCondition((TermSV) x, negated ));
+                b.addVariableCondition(new ConstantCondition((TermSV) x, negated ));
            } else {
                 assert x instanceof FormulaSV;
-                b.addVariableCondition(new AtomicCondition((FormulaSV) x, negated ));
+                b.addVariableCondition(new ConstantCondition((FormulaSV) x, negated ));
            }
         }
 ;

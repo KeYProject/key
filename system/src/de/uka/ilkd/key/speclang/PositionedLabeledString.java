@@ -62,6 +62,7 @@ public class PositionedLabeledString extends PositionedString {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean hasLabels() {
             return true;
     }
@@ -93,6 +94,7 @@ public class PositionedLabeledString extends PositionedString {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean equals(Object o) {
             if (!(o instanceof PositionedLabeledString)) {
                     return false;
@@ -115,6 +117,7 @@ public class PositionedLabeledString extends PositionedString {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int hashCode() {
             return super.hashCode() * 17 + labels.hashCode();
     }
@@ -122,6 +125,7 @@ public class PositionedLabeledString extends PositionedString {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
             StringBuilder result = new StringBuilder(super.toString());
             result.append("<<");
@@ -130,8 +134,8 @@ public class PositionedLabeledString extends PositionedString {
             for (int i = 1; i<labels.size();i++) {
                     result.append(", \"");
                     result.append(labels.get(i).toString());                        
-     result.append("\"");
-            }               
+                    result.append("\"");
+            }
             result.append(">>");
             return result.toString();
     }

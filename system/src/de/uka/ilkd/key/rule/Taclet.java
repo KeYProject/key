@@ -542,13 +542,14 @@ public abstract class Taclet implements Rule, Named {
                 
 	if (template.hasLabels()) {
 	    final ImmutableArray<TermLabel> labels = template.getLabels();
-	    if (!(labels.get(0) instanceof SchemaVariable)) {
-	        Debug.out("FAILED 3x.");
-	        return null; ///FAILED
-	    } else {
-	        for (TermLabel l: labels) {
+	    for (TermLabel l: labels) {
+	        // ignore all labels which are not schema variables
+	        // if intended to match concrete label, match against schema label
+	        // and use an appropriate variable condition
+	        if (l instanceof SchemaVariable) {
+	            SchemaVariable schemaLabel = (SchemaVariable) l;
 	            final MatchConditions cond =
-	                    ((SchemaVariable)l).match(term, matchCond, services);
+	                    schemaLabel.match(term, matchCond, services);
 	            if (cond == null) {
 	                return null;
 	            }

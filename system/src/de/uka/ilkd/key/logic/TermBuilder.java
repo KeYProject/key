@@ -1509,14 +1509,22 @@ public class TermBuilder {
                     allLocs(services),
                         freshLocs(services, getBaseHeap(services)));
     }
+    
+    // The template of the well-definedness transformer for terms.
+    public static final Transformer WD_ANY =
+            new Transformer(new Name("wd"), Sort.ANY);
+
+    // The template of the well-definedness transformer for formulas.
+    public static final Transformer WD_FORMULA =
+            new Transformer(new Name("WD"), Sort.FORMULA);
 
     public Term wd(Term t, Services services) {
         if(t.op() == Junctor.FALSE || t.op() == Junctor.TRUE) {
             return tt();
         } else if (t.sort().equals(Sort.FORMULA)) {
-            return func(Transformer.wdFormula(services), t);
+            return func(Transformer.getTransformer(WD_FORMULA, services), t);
         } else {
-            return func(Transformer.wdAny(services), t);
+            return func(Transformer.getTransformer(WD_ANY, services), t);
         }
     }
 

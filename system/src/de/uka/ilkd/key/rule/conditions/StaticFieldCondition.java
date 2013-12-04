@@ -24,9 +24,14 @@ import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * This variable condition checks if an instantiation for a field is static or an instance.
+ * This variable condition checks if the instantiation of a schemavariable (of
+ * type Field) refers to a Java field declared as "static".
+ * 
+ * The negated condition is true if the instantiation refers to an instance
+ * (non-static) field.
+ * 
  * Inspired by {@link de.uka.ilkd.key.rule.conditions.FieldTypeToSortCondition}.
- *
+ * 
  * @author Michael Kirsten
  */
 public class StaticFieldCondition extends VariableConditionAdapter {

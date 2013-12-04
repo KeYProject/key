@@ -33,14 +33,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public class Transformer extends Function {
 
-    // The template of the well-definedness transformer for terms.
-    private static final Transformer WD_ANY =
-            new Transformer(new Name("wd"), Sort.ANY);
-
-    // The template of the well-definedness transformer for formulas.
-    private static final Transformer WD_FORMULA =
-            new Transformer(new Name("WD"), Sort.FORMULA);
-
     public Transformer(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
         super(name, sort, argSorts, false);
     }
@@ -71,14 +63,6 @@ public class Transformer extends Function {
             return t;
         }
         return new Transformer(name, sort, argSorts);
-    }
-
-    public static Transformer wdFormula(Services services) {
-        return getTransformer(WD_FORMULA, services);
-    }
-
-    public static Transformer wdAny(Services services) {
-        return getTransformer(WD_ANY, services);
     }
 
     /**
