@@ -11,7 +11,6 @@ import de.uka.ilkd.key.proof.init.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
-import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.MiscTools;
 
 
@@ -19,18 +18,18 @@ import de.uka.ilkd.key.util.MiscTools;
  *
  * @author christoph
  */
-public class LoopInfFlowUnfouldTacletBuilder extends AbstractInfFlowUnfouldTacletBuilder {
+public class MethodInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfouldTacletBuilder {
 
-    private LoopInvariant loopInv;
+    private InformationFlowContract contract;
 
 
-    public LoopInfFlowUnfouldTacletBuilder(Services services) {
+    public MethodInfFlowUnfoldTacletBuilder(Services services) {
         super(services);
     }
 
 
-    public void setLoopInv(LoopInvariant loopInv) {
-        this.loopInv = loopInv;
+    public void setContract(InformationFlowContract c) {
+        this.contract = c;
     }
 
 
@@ -38,16 +37,16 @@ public class LoopInfFlowUnfouldTacletBuilder extends AbstractInfFlowUnfouldTacle
     Name getTacletName() {
         return MiscTools.toValidTacletName("unfold computed formula " +
                                            unfoldCounter + " of " +
-                                           loopInv.getUniqueName());
+                                           contract.getTarget().getFullName());
     }
 
 
     @Override
     Term createFindTerm(IFProofObligationVars ifVars) {
         InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(loopInv,
+                POSnippetFactory.getInfFlowFactory(contract,
                                                    ifVars.c1, ifVars.c2,
                                                    services);
-        return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
+        return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
     }
 }

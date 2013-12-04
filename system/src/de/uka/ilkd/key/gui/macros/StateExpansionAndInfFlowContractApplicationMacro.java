@@ -36,7 +36,7 @@ public class StateExpansionAndInfFlowContractApplicationMacro extends Sequential
     protected ProofMacro[] createProofMacroArray() {
         return new ProofMacro[] {
                 new SelfcompositionStateExpansionMacro(),
-                new PropositionalExpansionWithSimpificationMacro(),
+                new PropositionalExpansionWithSimplificationMacro(),
                 new FullUseInformationFlowContractMacro()
         };
     }

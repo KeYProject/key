@@ -51,14 +51,15 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
     @Override
     public boolean canApplyTo(KeYMediator mediator,
                               PosInOccurrence posInOcc) {
-        if (posInOcc == null || posInOcc.subTerm() == null) {
+        if (posInOcc == null
+                || posInOcc.subTerm() == null) {
             return false;
         }
         Proof proof = mediator.getSelectedProof();
         Services services = proof.getServices();
 
         Goal goal = mediator.getSelectedGoal();
-        if (goal.node().parent() == null) {
+        if (goal == null || goal.node() == null || goal.node().parent() == null) {
             return false;
         }
         RuleApp app = goal.node().parent().getAppliedRuleApp();

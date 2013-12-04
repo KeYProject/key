@@ -10,7 +10,7 @@ import java.util.Set;
  *
  * @author christoph
  */
-public class PropositionalExpansionWithSimpificationMacro extends AbstractPropositionalExpansionMacro {
+public class PropositionalExpansionWithSimplificationMacro extends AbstractPropositionalExpansionMacro {
 
     @Override 
     public String getName() {

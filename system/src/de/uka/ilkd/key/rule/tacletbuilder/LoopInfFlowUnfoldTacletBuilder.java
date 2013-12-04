@@ -10,7 +10,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
-import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.InformationFlowContract;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.MiscTools;
 
 
@@ -18,18 +19,18 @@ import de.uka.ilkd.key.util.MiscTools;
  *
  * @author christoph
  */
-public class BlockInfFlowUnfouldTacletBuilder extends AbstractInfFlowUnfouldTacletBuilder {
+public class LoopInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfouldTacletBuilder {
 
-    private BlockContract contract;
+    private LoopInvariant loopInv;
 
 
-    public BlockInfFlowUnfouldTacletBuilder(Services services) {
+    public LoopInfFlowUnfoldTacletBuilder(Services services) {
         super(services);
     }
 
 
-    public void setContract(BlockContract c) {
-        this.contract = c;
+    public void setLoopInv(LoopInvariant loopInv) {
+        this.loopInv = loopInv;
     }
 
 
@@ -37,16 +38,16 @@ public class BlockInfFlowUnfouldTacletBuilder extends AbstractInfFlowUnfouldTacl
     Name getTacletName() {
         return MiscTools.toValidTacletName("unfold computed formula " +
                                            unfoldCounter + " of " +
-                                           contract.getUniqueName());
+                                           loopInv.getUniqueName());
     }
 
 
     @Override
     Term createFindTerm(IFProofObligationVars ifVars) {
         InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(contract,
+                POSnippetFactory.getInfFlowFactory(loopInv,
                                                    ifVars.c1, ifVars.c2,
                                                    services);
-        return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
+        return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
     }
 }

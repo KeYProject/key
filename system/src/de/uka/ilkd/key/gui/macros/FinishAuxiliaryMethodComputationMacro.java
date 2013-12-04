@@ -1,3 +1,7 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package de.uka.ilkd.key.gui.macros;
 
 import de.uka.ilkd.key.gui.KeYMediator;
@@ -9,21 +13,26 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
-import de.uka.ilkd.key.proof.init.LoopInvExecutionPO;
-import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
+import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.tacletbuilder.LoopInfFlowUnfoldTacletBuilder;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.rule.tacletbuilder.MethodInfFlowUnfoldTacletBuilder;
+import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.GuiUtilities;
 import javax.swing.KeyStroke;
 
-public class FinishAuxiliaryLoopComputationMacro extends
-        AbstractFinishAuxiliaryComputationMacro {
+
+/**
+ *
+ * @author christoph
+ */
+public class FinishAuxiliaryMethodComputationMacro
+        extends AbstractFinishAuxiliaryComputationMacro {
 
     @Override
-    public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(KeYMediator mediator,
+                              PosInOccurrence posInOcc) {
         final Proof proof = mediator.getSelectedProof();
         if (proof == null) {
             return false;
@@ -34,8 +43,9 @@ public class FinishAuxiliaryLoopComputationMacro extends
         }
         final ContractPO poForProof =
                 services.getSpecificationRepository().getPOForProof(proof);
-        return poForProof instanceof LoopInvExecutionPO;
+        return poForProof instanceof SymbolicExecutionPO;
     }
+
 
     @Override
     public void applyTo(final KeYMediator mediator,
@@ -47,32 +57,23 @@ public class FinishAuxiliaryLoopComputationMacro extends
         }
         final ContractPO poForProof =
                 proof.getServices().getSpecificationRepository().getPOForProof(proof);
-        if (!(poForProof instanceof LoopInvExecutionPO)) {
+        if (!(poForProof instanceof SymbolicExecutionPO)) {
             return;
         }
-
-        final Goal initiatingGoal = ((LoopInvExecutionPO) poForProof).getInitiatingGoal();
-        final Services services = initiatingGoal.proof().getServices();
-
-        if (initiatingGoal.node().parent() == null) {
-            return;
-        }
-        final RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
-        if (!(app instanceof LoopInvariantBuiltInRuleApp)) {
-            return;
-        }
-        final LoopInvariantBuiltInRuleApp loopInvRuleApp =
-                (LoopInvariantBuiltInRuleApp)app;
-        LoopInvariant loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
-        loopInv = loopInv != null ? loopInv : loopInvRuleApp.getInvariant();
-        IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
-        ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();
+        final Goal initiatingGoal = ((SymbolicExecutionPO) poForProof).getInitiatingGoal();
+        final Proof initiatingProof = initiatingGoal.proof();
+        final Services services = initiatingProof.getServices();
+        final InfFlowContractPO ifPO =
+                (InfFlowContractPO) services.getSpecificationRepository()
+                                         .getPOForProof(initiatingProof);
+        final IFProofObligationVars ifVars = ifPO.getIFVars().labelHeapAtPreAsAnonHeapFunc();
+        final InformationFlowContract ifContract = ifPO.getContract();
 
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
-        final LoopInfFlowUnfoldTacletBuilder tacletBuilder =
-                new LoopInfFlowUnfoldTacletBuilder(services);
-        tacletBuilder.setLoopInv(loopInv);
+        final MethodInfFlowUnfoldTacletBuilder tacletBuilder =
+                new MethodInfFlowUnfoldTacletBuilder(services);
+        tacletBuilder.setContract(ifContract);
         tacletBuilder.setInfFlowVars(ifVars);
         tacletBuilder.setReplacewith(result);
         final Taclet rwTaclet = tacletBuilder.buildTaclet();
@@ -96,6 +97,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
             }
         });
     }
+
 
     @Override
     public KeyStroke getKeyStroke() {

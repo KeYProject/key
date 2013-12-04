@@ -10,7 +10,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 
@@ -18,17 +18,17 @@ import de.uka.ilkd.key.util.MiscTools;
  *
  * @author christoph
  */
-public class MethodInfFlowUnfouldTacletBuilder extends AbstractInfFlowUnfouldTacletBuilder {
+public class BlockInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfouldTacletBuilder {
 
-    private InformationFlowContract contract;
+    private BlockContract contract;
 
 
-    public MethodInfFlowUnfouldTacletBuilder(Services services) {
+    public BlockInfFlowUnfoldTacletBuilder(Services services) {
         super(services);
     }
 
 
-    public void setContract(InformationFlowContract c) {
+    public void setContract(BlockContract c) {
         this.contract = c;
     }
 
@@ -37,7 +37,7 @@ public class MethodInfFlowUnfouldTacletBuilder extends AbstractInfFlowUnfouldTac
     Name getTacletName() {
         return MiscTools.toValidTacletName("unfold computed formula " +
                                            unfoldCounter + " of " +
-                                           contract.getTarget().getFullName());
+                                           contract.getUniqueName());
     }
 
 
@@ -47,6 +47,6 @@ public class MethodInfFlowUnfouldTacletBuilder extends AbstractInfFlowUnfouldTac
                 POSnippetFactory.getInfFlowFactory(contract,
                                                    ifVars.c1, ifVars.c2,
                                                    services);
-        return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
+        return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
     }
 }
