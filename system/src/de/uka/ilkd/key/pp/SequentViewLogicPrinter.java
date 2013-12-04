@@ -21,11 +21,6 @@ public class SequentViewLogicPrinter extends LogicPrinter {
      */
     private final VisibleTermLabels visibleTermLabels;
 
-    public SequentViewLogicPrinter(VisibleTermLabels visibleTermLabels) {
-        super();
-        this.visibleTermLabels = visibleTermLabels;
-    }
-
     public SequentViewLogicPrinter(ProgramPrinter prgPrinter,
             NotationInfo notationInfo,
             Services services,

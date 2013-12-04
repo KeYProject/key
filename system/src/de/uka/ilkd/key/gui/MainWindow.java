@@ -350,7 +350,6 @@ public final class MainWindow extends JFrame  {
         }
     }
 
-
     private void initNotification() {
     	notificationManager = new NotificationManager(mediator, this);
     }
@@ -1129,15 +1128,13 @@ public final class MainWindow extends JFrame  {
      * Updates the sequent displayed in the main frame.
      */
     private synchronized void updateSequentView() {
-
+        
         if (disableCurrentGoalView) {
             return;
         }
 
-        if (getMediator() == null
-                || getMediator().getSelectedProof() == null) {
-            //There is no proof. Either not loaded yet or it is abandoned
-            currentGoalView.setPrinterNoProof();
+        if (getMediator().getSelectedProof() == null) {
+            mainFrame.setContent(new EmptySequent(this));
             return;
         }
 
@@ -1199,8 +1196,6 @@ public final class MainWindow extends JFrame  {
             }
 
             disableCurrentGoalView = false;
-            mainFrame.setContent(new EmptySequent(mainWindow));
-
             updateSequentView();
             makePrettyView();
         }

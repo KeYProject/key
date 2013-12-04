@@ -18,10 +18,9 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import java.awt.Color;
-import java.awt.Font;
 
 /**
+ * Use this class in case no proof is loaded.
  *
  * @author Kai Wallisch
  */
@@ -31,6 +30,7 @@ public class EmptySequent extends SequentView {
         super(mainWindow);
     }
 
+    @Override
     public String getTitle() {
         return "No proof loaded";
     }

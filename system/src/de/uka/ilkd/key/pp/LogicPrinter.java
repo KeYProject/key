@@ -229,14 +229,6 @@ public class LogicPrinter {
              services, 
              false);
     }
-    
-    public LogicPrinter() {
-	this(new ProgramPrinter(null), 
-             null, 
-             new PosTableStringBackend(DEFAULT_LINE_WIDTH), 
-             null, 
-             false);
-    }
 
     /**
      * Creates a LogicPrinter.  Sets the sequent to be printed, as
@@ -2038,10 +2030,10 @@ public class LogicPrinter {
         try {
             layouter.flush();
         } catch (IOException e) {
-            throw new RuntimeException (
-              "IO Exception in pretty printer:\n"+e);
+            throw new RuntimeException(
+                    "IO Exception in pretty printer:\n" + e);
         }
-        return ((PosTableStringBackend)backend).getString()+"\n";
+        return ((PosTableStringBackend) backend).getString() + "\n";
     }
 
     /**

@@ -235,13 +235,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     }
 
     /**
-     * sets the LogicPrinter to use in case there is no proof available.
-     */
-    public void setPrinterNoProof() {
-        setLogicPrinter(new SequentViewLogicPrinter(getVisibleTermLabels()));
-    }
-
-    /**
      * sets the LogicPrinter to use
      */
     public void setPrinter(Goal goal) {
