@@ -10,7 +10,6 @@
 // The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
 //
-
 package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -46,36 +45,36 @@ import javax.swing.text.Highlighter;
 public abstract class SequentView extends JTextArea {
 
     private final MainWindow mainWindow;
-    
-    public MainWindow getMainWindow(){
+
+    public MainWindow getMainWindow() {
         return mainWindow;
     }
-    
+
     /* 
      * The current line width. Static declaration for this prevents constructors from
      * using lineWidth 0.
      */
     private static int lineWidth;
-    
+
     public static void setLineWidth(int i) {
         if (i != 0) {
             lineWidth = i;
         }
     }
-    
+
     public static int getLineWidth() {
         return lineWidth;
     }
-    
-    public VisibleTermLabels getVisibleTermLabels(){
+
+    public VisibleTermLabels getVisibleTermLabels() {
         return mainWindow.getVisibleTermLabels();
     }
-    
+
     private final ConfigChangeListener configChangeListener;
     SequentPrintFilter filter;
     private LogicPrinter printer;
     public boolean refreshHighlightning = true;
-    
+
     // the default tag of the highlight
     private final Object defaultHighlight;
 
@@ -84,15 +83,15 @@ public abstract class SequentView extends JTextArea {
 
     // an additional highlight to mark the first active java statement
     private final Object additionalJavaHighlight;
-    
+
     // Highlighting color during drag and drop action.
     public final Object dndHighlight;
-    
+
     /*
      * Store highlights in a HashMap in order to prevent duplicate highlights.
      */
-    private final HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight =
-            new LinkedHashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
+    private final HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight
+            = new LinkedHashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
 
     SequentView(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
@@ -102,18 +101,18 @@ public abstract class SequentView extends JTextArea {
         setEditable(false);
         setBackground(new Color(249, 249, 249));
         setFont();
-        
+
         SequentViewInputListener sequentViewInputListener = new SequentViewInputListener(this);
         addKeyListener(sequentViewInputListener);
         addMouseMotionListener(sequentViewInputListener);
         addMouseListener(sequentViewInputListener);
-        
-	// sets the painter for the highlightning
-	setHighlighter(new DefaultHighlighter());
+
+        // sets the painter for the highlightning
+        setHighlighter(new DefaultHighlighter());
         additionalJavaHighlight = getColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR);
-	defaultHighlight = getColorHighlight(DEFAULT_HIGHLIGHT_COLOR);
+        defaultHighlight = getColorHighlight(DEFAULT_HIGHLIGHT_COLOR);
         dndHighlight = getColorHighlight(CurrentGoalView.DND_HIGHLIGHT_COLOR);
-	currentHighlight = defaultHighlight;
+        currentHighlight = defaultHighlight;
 
         // add a SeqViewChangeListener to this component
         SequentViewChangeListener changeListener = new SequentViewChangeListener(this);
@@ -121,7 +120,7 @@ public abstract class SequentView extends JTextArea {
         addPropertyChangeListener("font", changeListener);
         addHierarchyBoundsListener(changeListener);
     }
-    
+
     public final void setFont() {
         Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
         if (myFont != null) {
@@ -130,7 +129,7 @@ public abstract class SequentView extends JTextArea {
             Debug.out("KEY_FONT_SEQUENT_VIEW not available. Use standard font.");
         }
     }
-    
+
     public void unregisterListener() {
         if (configChangeListener != null) {
             Config.DEFAULT.removeConfigChangeListener(configChangeListener);
@@ -149,7 +148,7 @@ public abstract class SequentView extends JTextArea {
         super.removeNotify();
         unregisterListener();
     }
-    
+
     @Override
     protected void finalize() {
         try {
@@ -208,8 +207,8 @@ public abstract class SequentView extends JTextArea {
         }
         Highlighter.HighlightPainter hp = color2Highlight.get(color);
         try {
-            highlight =
-                    getHighlighter().addHighlight(0, 0, hp);
+            highlight
+                    = getHighlighter().addHighlight(0, 0, hp);
         } catch (BadLocationException e) {
             Debug.out("Highlight range out of scope.");
             e.printStackTrace();
@@ -234,14 +233,18 @@ public abstract class SequentView extends JTextArea {
         }
     }
 
-    /** Return used LogicPrinter.
+    /**
+     * Return used LogicPrinter.
+     *
      * @return The LogicPrinter that is used.
      */
     public LogicPrinter getLogicPrinter() {
         return printer;
     }
 
-    /** Set the LogicPrinter to be used.
+    /**
+     * Set the LogicPrinter to be used.
+     *
      * @param p The LogicPrinter to be used
      */
     protected void setLogicPrinter(SequentViewLogicPrinter p) {
@@ -249,7 +252,9 @@ public abstract class SequentView extends JTextArea {
     }
 
     public String getHighlightedText(PosInSequent pos) {
-        if(pos == null) return "";
+        if (pos == null) {
+            return "";
+        }
         String s = "";
         try {
             s = getText(pos.getBounds().start(),
@@ -261,7 +266,7 @@ public abstract class SequentView extends JTextArea {
     }
 
     public String getHighlightedText() {
-       return getHighlightedText(getPosInSequent(getMousePosition()));
+        return getHighlightedText(getPosInSequent(getMousePosition()));
     }
 
     /**
@@ -280,112 +285,118 @@ public abstract class SequentView extends JTextArea {
                 ? seqText.length() - 1
                 : cursorPosition);
         cursorPosition = (cursorPosition >= 0 ? cursorPosition : 0);
-        int previousCharacterWidth =
-                getFontMetrics(getFont()).charWidth(seqText.charAt(cursorPosition));
+        int previousCharacterWidth
+                = getFontMetrics(getFont()).charWidth(seqText.charAt(cursorPosition));
         int characterIndex = viewToModel(new Point((int) p.getX() - (previousCharacterWidth / 2),
                 (int) p.getY()));
         return characterIndex;
     }
-    
+
     /**
      * removes highlight by setting it to position (0,0)
      */
     public void disableHighlight(Object highlight) {
         try {
-            getHighlighter().changeHighlight(highlight,0,0);
+            getHighlighter().changeHighlight(highlight, 0, 0);
         } catch (BadLocationException e) {
             Debug.out("Invalid range for highlight");
             e.printStackTrace();
         }
     }
-    
+
     /**
-     * removes the term and first statement highlighter by setting them to 
-     * position (0,0)     
+     * removes the term and first statement highlighter by setting them to
+     * position (0,0)
      */
     public void disableHighlights() {
         disableHighlight(currentHighlight);
-        disableHighlight(additionalJavaHighlight);        
+        disableHighlight(additionalJavaHighlight);
     }
-    
-    /** 
-     * sets the correct highlighter for the given color  
-     * @param tag the Object used as tag for highlighting     
+
+    /**
+     * sets the correct highlighter for the given color
+     *
+     * @param tag the Object used as tag for highlighting
      */
-    public void setCurrentHighlight(Object tag) {                
+    public void setCurrentHighlight(Object tag) {
         currentHighlight = tag;
     }
-    
+
     /**
      * returns the current tag used for highligthing
+     *
      * @return the current tag used for highlighting
      */
-    public Object getCurrentHighlight() {        
+    public Object getCurrentHighlight() {
         return currentHighlight;
     }
-    
-    /** the startposition and endposition+1 of the string to be
-     * highlighted
+
+    /**
+     * the startposition and endposition+1 of the string to be highlighted
+     *
      * @param p the mouse pointer coordinates
      */
     public void paintHighlights(Point p) {
-	// Change highlight for additional Java statement ...
-	paintHighlight(getFirstStatementRange(p), additionalJavaHighlight);
-	// Change Highlighter for currently selected sequent part 
-	paintHighlight(getHighlightRange(p), currentHighlight);
-    }
-    
-    /** Get the character range to be highlighted for the given
-     * coordinate in the displayed sequent. */
-    synchronized Range getHighlightRange(Point p) {
-	String seqText = getText();
-	if (seqText.length() > 0) {
-	    int characterIndex = correctedViewToModel(p);	    
-	    return printer.getInitialPositionTable().
-		rangeForIndex(characterIndex);
-	} else {
-	    return null;
-	}
+        // Change highlight for additional Java statement ...
+        paintHighlight(getFirstStatementRange(p), additionalJavaHighlight);
+        // Change Highlighter for currently selected sequent part 
+        paintHighlight(getHighlightRange(p), currentHighlight);
     }
 
-    /** Get the character range to be highlighted for the first
-     * statement in a java block at the given
-     * coordinate in the displayed sequent.  Returns null
-     * if there is no java block there.*/
-    protected synchronized Range getFirstStatementRange(Point p) {
-	String seqText = getText();
-	if (seqText.length() > 0) {
-	    int characterIndex = correctedViewToModel(p);
-	    return printer.getInitialPositionTable().
-		firstStatementRangeForIndex(characterIndex);
-	} else {
-	    return null;
-	}
+    /**
+     * Get the character range to be highlighted for the given coordinate in the
+     * displayed sequent.
+     */
+    synchronized Range getHighlightRange(Point p) {
+        String seqText = getText();
+        if (seqText.length() > 0) {
+            int characterIndex = correctedViewToModel(p);
+            return printer.getInitialPositionTable().rangeForIndex(characterIndex);
+        } else {
+            return null;
+        }
     }
-    
+
+    /**
+     * Get the character range to be highlighted for the first statement in a
+     * java block at the given coordinate in the displayed sequent. Returns null
+     * if there is no java block there.
+     */
+    protected synchronized Range getFirstStatementRange(Point p) {
+        String seqText = getText();
+        if (seqText.length() > 0) {
+            int characterIndex = correctedViewToModel(p);
+            return printer.getInitialPositionTable().
+                    firstStatementRangeForIndex(characterIndex);
+        } else {
+            return null;
+        }
+    }
+
     public void highlight(Point p) {
         setCurrentHighlight(defaultHighlight);
         paintHighlights(p);
     }
-    
+
     @Override
     public void updateUI() {
         super.updateUI();
         setFont();
     }
-    
+
     /**
      * computes the line width
      */
     public int computeLineWidth() {
         // assumes we have a uniform font width
-        int maxChars = (int) 
-            (getVisibleRect().getWidth()/getFontMetrics(getFont()).charWidth('W'));
-        
-        if (maxChars > 1) maxChars-=1;
+        int maxChars = (int) (getVisibleRect().getWidth() / getFontMetrics(getFont()).charWidth('W'));
+
+        if (maxChars > 1) {
+            maxChars -= 1;
+        }
         return maxChars;
     }
-    
+
     public abstract void printSequent();
 
 }
