@@ -305,7 +305,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	
 	filter.addRuleToSet(MiscTools.findOneStepSimplifier(getProof()));
 
-        return ConditionalFeature.createConditional(filter, cost);        
+    return ConditionalFeature.createConditional(filter, cost);        
     }
     
    
@@ -1072,6 +1072,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer equation = new TermBuffer ();
         final TermBuffer left = new TermBuffer (), right = new TermBuffer ();
 
+                
         // applying equations less deep/less leftish in terms/formulas is preferred
         // this is important for reducing polynomials (start with the biggest
         // summands)
