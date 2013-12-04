@@ -10,37 +10,37 @@ import java.util.List;
 
 /**
  * This class optionally hides specific TermLabels. Visibility property of a
- * TermLabel can be retrieved from parameter hiddenTermLabels.
+ * TermLabel can be retrieved from parameter visibleTermLabels.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class SequentViewLogicPrinter extends LogicPrinter {
 
     /* 
-     * Set containing hidden TermLabels.
+     * Set containing visible TermLabels.
      */
-    private final HiddenTermLabels hiddenTermLabels;
+    private final VisibleTermLabels visibleTermLabels;
 
-    public SequentViewLogicPrinter(HiddenTermLabels hiddenTermLabels) {
+    public SequentViewLogicPrinter(VisibleTermLabels visibleTermLabels) {
         super();
-        this.hiddenTermLabels = hiddenTermLabels;
+        this.visibleTermLabels = visibleTermLabels;
     }
 
     public SequentViewLogicPrinter(ProgramPrinter prgPrinter,
             NotationInfo notationInfo,
             Services services,
-            HiddenTermLabels hiddenTermLabels) {
+            VisibleTermLabels visibleTermLabels) {
         super(prgPrinter, notationInfo, services);
-        this.hiddenTermLabels = hiddenTermLabels;
+        this.visibleTermLabels = visibleTermLabels;
     }
 
     public SequentViewLogicPrinter(ProgramPrinter prgPrinter,
             NotationInfo notationInfo,
             Services services,
             boolean purePrint,
-            HiddenTermLabels hiddenTermLabels) {
+            VisibleTermLabels visibleTermLabels) {
         super(prgPrinter, notationInfo, services, purePrint);
-        this.hiddenTermLabels = hiddenTermLabels;
+        this.visibleTermLabels = visibleTermLabels;
     }
 
     public SequentViewLogicPrinter(ProgramPrinter prgPrinter,
@@ -48,9 +48,9 @@ public class SequentViewLogicPrinter extends LogicPrinter {
             Backend backend,
             Services services,
             boolean purePrint,
-            HiddenTermLabels hiddenTermLabels) {
+            VisibleTermLabels visibleTermLabels) {
         super(prgPrinter, notationInfo, backend, services, purePrint);
-        this.hiddenTermLabels = hiddenTermLabels;
+        this.visibleTermLabels = visibleTermLabels;
     }
 
     @Override
@@ -58,7 +58,7 @@ public class SequentViewLogicPrinter extends LogicPrinter {
 
         List<TermLabel> termLabelList = new LinkedList();
         for (TermLabel label : t.getLabels()) {
-            if (!hiddenTermLabels.contains(label)) {
+            if (visibleTermLabels.contains(label)) {
                 termLabelList.add(label);
             }
         }

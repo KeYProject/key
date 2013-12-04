@@ -55,7 +55,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
                 connectedTo.instantiations()),
                 notationInfo, backend, null,
                 true,
-                MainWindow.getInstance().getHiddenTermLabels());
+                MainWindow.getInstance().getVisibleTermLabels());
         tp.printTaclet(connectedTo.taclet(), 
         	       connectedTo.instantiations(),
         	       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),

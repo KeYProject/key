@@ -1,14 +1,13 @@
 package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.KeYSelectionEvent;
-import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.pp.HiddenTermLabels;
+import de.uka.ilkd.key.pp.VisibleTermLabels;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 
@@ -19,76 +18,57 @@ import javax.swing.JMenu;
  */
 public class TermLabelMenu extends JMenu {
 
-    private final JCheckBoxMenuItem hideAllCheckBox;
-    private final List<TermLabelCheckBox> checkBoxList;
-    private final KeYMediator mediator;
+    private final Map<Name, TermLabelCheckBox> checkBoxMap;
     private final MainWindow mainWindow;
-    private final HiddenTermLabels hiddenTermLabels;
+    private final VisibleTermLabels visibleTermLabels;
 
     public TermLabelMenu(final KeYMediator mediator, final MainWindow mainWindow) {
 
-        this.setText("Term Labels");
-        checkBoxList = new LinkedList();
+        setText("Term Labels");
+        checkBoxMap = new TreeMap<Name, TermLabelCheckBox>();
         this.mainWindow = mainWindow;
-        this.mediator = mediator;
 
-        hideAllCheckBox = new TermLabelToggleAction(mainWindow);
-        hideAllCheckBox.setName("hideAllCheckBox");
-
-        hiddenTermLabels = new HiddenTermLabels(hideAllCheckBox);
-
-        mediator.addKeYSelectionListener(new KeYSelectionListener() {
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
-                rebuildMenu();
-            }
-
-            @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
-                rebuildMenu();
-            }
-        });
-
-        rebuildMenu();
-    }
-
-    private void rebuildMenu() {
-        removeAll();
-        checkBoxList.clear();
+        final HideAllCheckBox hideAllCheckBox = new HideAllCheckBox(mainWindow);
         add(hideAllCheckBox);
 
-        if (mediator.getSelectedProof() != null) {
-            addSeparator();
-            for (Name labelName
-                    : mediator.getProfile().getTermLabelManager().getSupportedTermLabelNames()) {
-                TermLabelCheckBox checkBox = new TermLabelCheckBox(labelName) {
-                };
+        visibleTermLabels = new VisibleTermLabels() {
+            @Override
+            public boolean contains(Name name) {
+                return !hideAllCheckBox.isSelected() && checkBoxMap.get(name).isSelected();
+            }
+        };
 
-                checkBox.setSelected(!hiddenTermLabels.contains(labelName));
-                checkBox.setEnabled(!hideAllCheckBox.isSelected());
-                checkBoxList.add(checkBox);
-            }
-            Collections.sort(checkBoxList);
-            for (TermLabelCheckBox c : checkBoxList) {
-                add(c);
-            }
+        addSeparator();
+        for (Name labelName
+                : mediator.getProfile().getTermLabelManager().getSupportedTermLabelNames()) {
+            TermLabelCheckBox checkBox = new TermLabelCheckBox(labelName);
+            checkBox.setSelected(true);
+            checkBox.setEnabled(!hideAllCheckBox.isSelected());
+            checkBoxMap.put(labelName, checkBox);
+        }
+        ArrayList<TermLabelCheckBox> checkBoxList
+                = new ArrayList<TermLabelCheckBox>(checkBoxMap.values());
+        Collections.sort(checkBoxList);
+        for (TermLabelCheckBox c : checkBoxList) {
+            add(c);
         }
     }
 
-    public HiddenTermLabels getHiddenTermLabels() {
-        return hiddenTermLabels;
+    public VisibleTermLabels getVisibleTermLabels() {
+        return visibleTermLabels;
     }
 
-    private class TermLabelToggleAction extends KeYMenuCheckBox {
+    private class HideAllCheckBox extends KeYMenuCheckBox {
 
-        public TermLabelToggleAction(MainWindow mainWindow) {
+        public HideAllCheckBox(MainWindow mainWindow) {
             super(mainWindow, "Hide all term labels");
             setTooltip("Turn off term labels, if not needed.");
+            setName("hideAllCheckBox");
         }
 
         @Override
         public void handleClickEvent() {
-            for (JCheckBoxMenuItem checkBox : checkBoxList) {
+            for (JCheckBoxMenuItem checkBox : checkBoxMap.values()) {
                 checkBox.setEnabled(!isSelected());
             }
             mainWindow.makePrettyView();
@@ -102,21 +82,18 @@ public class TermLabelMenu extends JMenu {
         TermLabelCheckBox(Name labelName) {
             super(mainWindow, labelName.toString());
             this.labelName = labelName;
+            setName(labelName.toString());
         }
 
         @Override
         public void handleClickEvent() {
-            if (isSelected()) {
-                hiddenTermLabels.remove(labelName);
-            } else {
-                hiddenTermLabels.add(labelName);
-            }
             mainWindow.makePrettyView();
         }
 
         @Override
         public int compareTo(TermLabelCheckBox t) {
-            return this.mainWindowAction.getName().toLowerCase().compareTo(t.mainWindowAction.getName().toLowerCase());
+            return mainWindowAction.getName().toLowerCase().
+                    compareTo(t.mainWindowAction.getName().toLowerCase());
         }
     }
 }

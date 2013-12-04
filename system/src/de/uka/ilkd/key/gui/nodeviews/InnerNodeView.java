@@ -70,7 +70,7 @@ public class InnerNodeView extends SequentView {
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(),
                 mediator.getNotationInfo(),
                 mediator.getServices(),
-                getHiddenTermLabels()));
+                getVisibleTermLabels()));
         setSelectionColor(new Color(10,180,50));
 
         tacletInfo = new JTextArea(getTacletDescription(mediator, node, filter));
@@ -197,7 +197,7 @@ public class InnerNodeView extends SequentView {
                         mediator.getNotationInfo(),
                         mediator.getServices(),
                         true,
-                        getHiddenTermLabels());
+                        getVisibleTermLabels());
                 tacPrinter.printTaclet((Taclet) (app.rule()));
                 s += tacPrinter;
             } else {
