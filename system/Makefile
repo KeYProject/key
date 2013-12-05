@@ -337,17 +337,19 @@ $(PROOFJAVA_PARSER) \
 	@cp $(SRC)$(PFX)parser/proofjava/Token.java.source $(GENERATED_SRC_PATH)$(PFX)parser/proofjava/Token.java
 	@$(JAVA) -cp $(CLASSPATH) $(JAVACC_MAIN) -OUTPUT_DIRECTORY=$(GENERATED_SRC_PATH)$(PFX)parser/proofjava $< 
 
-$(GENERATED_SRC_PATH)$(PFX)parser/KeYLexer.java : $(SRC)$(PFX)parser/KeYLexer.g
+$(GENERATED_SRC_PATH)$(PFX)parser/KeYLexer.java \
+	: $(SRC)$(PFX)parser/KeYLexer.g
+	@echo [creating KeYLexer]
+	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser
 	@$(ANTLR3) -fo $(GENERATED_SRC_PATH)$(PFX)parser $<
 
-$(GENERATED_SRC_PATH)$(PFX)parser/KeYParser.java : $(SRC)$(PFX)parser/KeYParser.g
-	@$(ANTLR3) -fo $(GENERATED_SRC_PATH)$(PFX)parser $<
-
-$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreLexer.java : $(SRC)$(PFX)speclang/jml/pretranslation/KeYJMLPreLexer.g
-	@$(ANTLR3) -fo $(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation $<
-
-$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreParser.java : $(SRC)$(PFX)speclang/jml/pretranslation/KeYJMLPreParser.g
-	@$(ANTLR3) -fo $(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation $<
+$(GENERATED_SRC_PATH)$(PFX)parser/KeYParser.java \
+	: $(SRC)$(PFX)parser/KeYParser.g \
+	  $(SRC)$(PFX)parser/KeYLexer.g
+	@echo [creating global KeY parser]
+	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser
+	@$(ANTLR3) -glib $(SRC)$(PFX)parser/KeYLexer.g \
+			-fo $(GENERATED_SRC_PATH)$(PFX)parser $<
 
 $(GENERATED_SRC_PATH)$(PFX)parser/simplify/SimplifyLexer.java \
 $(GENERATED_SRC_PATH)$(PFX)parser/simplify/SimplifyLexerTokenTypes.txt \
@@ -364,6 +366,20 @@ $(GENERATED_SRC_PATH)$(PFX)parser/simplify/SimplifyParser.java \
 	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser/simplify
 	@$(JAVA) -cp $(CLASSPATH) antlr.Tool  -glib $(SRC)$(PFX)parser/simplify/lexer.g \
 			 -o $(GENERATED_SRC_PATH)$(PFX)parser/simplify $<
+
+$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreLexer.java \
+	: $(SRC)$(PFX)speclang/jml/pretranslation/KeYJMLPreLexer.g
+	@echo [creating JML pre lexer]
+	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation
+	@$(ANTLR3) -fo $(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation $<
+
+$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreParser.java \
+	: $(SRC)$(PFX)speclang/jml/pretranslation/KeYJMLPreParser.g \
+	  $(SRC)$(PFX)speclang/jml/pretranslation/KeYJMLPreLexer.g
+	@echo [creating JML pre parser]
+	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation
+	@$(ANTLR3) -glib $(SRC)$(PFX)speclang/jml/pretranslation/KeYJMLPreLexer.g \
+			-fo $(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation $<
 
 $(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLLexer.java \
 $(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLLexerTokenTypes.txt \
