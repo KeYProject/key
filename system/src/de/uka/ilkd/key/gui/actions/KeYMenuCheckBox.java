@@ -14,7 +14,6 @@ public abstract class KeYMenuCheckBox extends JCheckBoxMenuItem {
     protected final MainWindowAction mainWindowAction;
 
     KeYMenuCheckBox(MainWindow mainWindow, String label) {
-        super();
         final KeYMenuCheckBox checkBox = this;
         mainWindowAction = new MainWindowAction(mainWindow) {
             @Override

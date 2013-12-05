@@ -443,7 +443,6 @@ public class KeYMediator {
                     firstApp.tryToInstantiate(getServices());
                 if (tmpApp != null) firstApp = tmpApp;
 
-
             }
 	    if (ifSeqInteraction || !firstApp.complete()) {
 	    	LinkedList<TacletApp> l = new LinkedList<TacletApp>();

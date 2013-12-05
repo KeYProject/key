@@ -841,7 +841,7 @@ public final class MainWindow extends JFrame  {
 //	options.add(setupSpeclangMenu()); // legacy since only JML supported
 	options.addSeparator();
         options.add(new JCheckBoxMenuItem(new ToggleConfirmExitAction(this)));
-        options.add(new JCheckBoxMenuItem(new MinimizeInteraction(this)));
+        options.add(new MinimizeInteraction(this));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
         options.add(new JCheckBoxMenuItem(oneStepSimplAction));
 
