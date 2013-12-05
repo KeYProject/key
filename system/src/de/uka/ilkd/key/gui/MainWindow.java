@@ -1456,7 +1456,6 @@ public final class MainWindow extends JFrame  {
 	    if(!(obj instanceof SMTInvokeAction)){
 		return false;
 	    }
-
 	    return this.solverUnion.equals(((SMTInvokeAction)obj).solverUnion);
 	}
 
@@ -1480,14 +1479,11 @@ public final class MainWindow extends JFrame  {
     }
 
     public void popupInformationMessage(Object message, String title) {
-        JOptionPane.showMessageDialog
-        (this, message,
-         title, JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void popupWarning(Object message, String title) {
-        JOptionPane.showMessageDialog(this, message, title,
-                JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(this, message, title, JOptionPane.WARNING_MESSAGE);
     }
 
     /**
@@ -1581,16 +1577,17 @@ public final class MainWindow extends JFrame  {
         return notificationManager;
     }
 
-	protected void addRecentFile(String absolutePath) {
-		recentFiles.addRecentFile(absolutePath);
-	}
+    protected void addRecentFile(String absolutePath) {
+        recentFiles.addRecentFile(absolutePath);
+    }
 
-	public void openExamples() {
-		openExampleAction.actionPerformed(null);    }
+    public void openExamples() {
+        openExampleAction.actionPerformed(null);
+    }
 
-	public void loadProblem(File file) {
-		getUserInterface().loadProblem(file);
-	}
+    public void loadProblem(File file) {
+        getUserInterface().loadProblem(file);
+    }
 
    public void loadProblem(File file, List<File> classPath, File bootClassPath) {
       getUserInterface().loadProblem(file, classPath, bootClassPath);

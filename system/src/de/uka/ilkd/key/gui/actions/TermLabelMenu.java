@@ -1,11 +1,16 @@
 package de.uka.ilkd.key.gui.actions;
 
+import de.uka.ilkd.key.gui.KeYSelectionEvent;
+import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -52,6 +57,27 @@ public class TermLabelMenu extends JMenu {
         for (TermLabelCheckBox c : checkBoxList) {
             add(c);
         }
+
+        mainWindow.getMediator().addKeYSelectionListener(new KeYSelectionListener() {
+
+            @Override
+            public void selectedNodeChanged(KeYSelectionEvent e) {
+                Set<Name> labelNames
+                        = mainWindow.getMediator().getSelectedNode().sequent().getOccuringTermLabels();
+                for (Entry<Name, TermLabelCheckBox> entry : checkBoxMap.entrySet()) {
+                    TermLabelCheckBox checkBox = entry.getValue();
+                    if (labelNames.contains(entry.getKey())) {
+                        checkBox.setFont(checkBox.getFont().deriveFont(Font.BOLD));
+                    } else {
+                        checkBox.setFont(checkBox.getFont().deriveFont(Font.PLAIN));
+                    }
+                }
+            }
+
+            @Override
+            public void selectedProofChanged(KeYSelectionEvent e) {
+            }
+        });
     }
 
     public VisibleTermLabels getVisibleTermLabels() {

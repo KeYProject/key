@@ -19,9 +19,12 @@ import java.util.Iterator;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /** This class represents a sequent. A sequent consists of an
@@ -443,5 +446,36 @@ public class Sequent implements Iterable<SequentFormula> {
         public void remove() {
             throw new UnsupportedOperationException();
         }
-    }    
+    }
+    
+    /*
+     * Returns names of TermLabels, that occur in term or one of its subterms.
+     */
+    private static Set<Name> getLabelsForTermRecursively(Term term) {
+        Set<Name> result = new HashSet();
+
+        if (term.hasLabels()) {
+            for (TermLabel label : term.getLabels()) {
+                result.add(label.name());
+            }
+        }
+
+        for (Term subTerm : term.subs()) {
+            result.addAll(getLabelsForTermRecursively(subTerm));
+        }
+
+        return result;
+    }
+
+    /*
+     * Returns names of TermLabels, that occur in this sequent.
+     */
+    public Set<Name> getOccuringTermLabels() {
+        Set<Name> result = new HashSet();
+        Iterator<SequentFormula> iterator = iterator();
+        while (iterator.hasNext()) {
+            result.addAll(getLabelsForTermRecursively(iterator.next().formula()));
+        }
+        return result;
+    }
 }
