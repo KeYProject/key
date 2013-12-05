@@ -266,8 +266,12 @@ public final class MainWindow extends JFrame  {
     public final Object monitor = new Object();
 
     private NotificationManager notificationManager;
-    private PreferenceSaver prefSaver =
+    private final PreferenceSaver prefSaver =
         new PreferenceSaver(Preferences.userNodeForPackage(MainWindow.class));
+    
+    public PreferenceSaver getPreferenceSaver(){
+        return prefSaver;
+    }
 
     private ComplexButton smtComponent;
 

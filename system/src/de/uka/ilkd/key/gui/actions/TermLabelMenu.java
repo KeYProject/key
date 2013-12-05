@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.actions;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -35,7 +36,6 @@ public class TermLabelMenu extends JMenu {
         this.mainWindow = mainWindow;
 
         hideAllCheckBox = new HideAllCheckBox(mainWindow);
-        add(hideAllCheckBox);
 
         visibleTermLabels = new VisibleTermLabels() {
             @Override
@@ -44,30 +44,22 @@ public class TermLabelMenu extends JMenu {
             }
         };
 
-        addSeparator();
-        for (Name labelName
-                : mainWindow.getMediator()
-                .getProfile().getTermLabelManager().getSupportedTermLabelNames()) {
-            TermLabelCheckBox checkBox = new TermLabelCheckBox(labelName);
-            checkBox.setSelected(true);
-            checkBox.setEnabled(!hideAllCheckBox.isSelected());
-            checkBoxMap.put(labelName, checkBox);
-        }
-        ArrayList<TermLabelCheckBox> checkBoxList
-                = new ArrayList<TermLabelCheckBox>(checkBoxMap.values());
-        Collections.sort(checkBoxList);
-        for (TermLabelCheckBox c : checkBoxList) {
-            add(c);
-        }
+        rebuildMenu();
 
         mainWindow.getMediator().addKeYSelectionListener(new KeYSelectionListener() {
 
+            /*
+             * Change font style for TermLabelCheckBox instances when the selected node changes.
+             */
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
                 Set<Name> labelNames
                         = mainWindow.getMediator().getSelectedNode().sequent().getOccuringTermLabels();
                 for (Entry<Name, TermLabelCheckBox> entry : checkBoxMap.entrySet()) {
                     TermLabelCheckBox checkBox = entry.getValue();
+                    /*
+                     * Font style indicates whether a label occurs in the currently displayed sequent.
+                     */
                     if (labelNames.contains(entry.getKey())) {
                         checkBox.setBoldFont();
                     } else {
@@ -76,10 +68,49 @@ public class TermLabelMenu extends JMenu {
                 }
             }
 
+            /*
+             * This function only has effect if the Profile gets changed.
+             */
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
+                rebuildMenu();
             }
         });
+    }
+
+    private void rebuildMenu() {
+        removeAll();
+        add(hideAllCheckBox);
+        addSeparator();
+
+        /* 
+         * Get list of labels from profile. This list is not always identical,
+         * since the used Profile may change during execution.
+         */
+        ImmutableList<Name> labelNamesFromProfile = mainWindow.getMediator()
+                .getProfile().getTermLabelManager().getSupportedTermLabelNames();
+
+        /* 
+         * Add labels from Profile to checkBoxMap and checkBoxList.
+         */
+        ArrayList<TermLabelCheckBox> checkBoxList = new ArrayList<TermLabelCheckBox>();
+        for (Name labelName : labelNamesFromProfile) {
+            TermLabelCheckBox checkBox = checkBoxMap.get(labelName);
+            if (checkBox == null) {
+                checkBox = new TermLabelCheckBox(labelName);
+                checkBoxMap.put(labelName, checkBox);
+            }
+            checkBox.setEnabled(!hideAllCheckBox.isSelected());
+            checkBoxList.add(checkBox);
+        }
+
+        /*
+         * Sort checkBoxList and add remaining menu entries.
+         */
+        Collections.sort(checkBoxList);
+        for (TermLabelCheckBox c : checkBoxList) {
+            add(c);
+        }
     }
 
     public VisibleTermLabels getVisibleTermLabels() {
@@ -117,6 +148,8 @@ public class TermLabelMenu extends JMenu {
             super(mainWindow, labelName.toString());
             this.labelName = labelName;
             setName(labelName.toString());
+            setSelected(true);
+            mainWindow.getPreferenceSaver().load(this);
             setItalicFont();
         }
 

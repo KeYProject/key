@@ -84,7 +84,7 @@ public class PreferenceSaver {
     }
 
     /** do the storing/loading from this object */
-    private Preferences prefs;
+    private final Preferences prefs;
 
     /**
      * Create a new instance allowing to store and load UI properties from the
