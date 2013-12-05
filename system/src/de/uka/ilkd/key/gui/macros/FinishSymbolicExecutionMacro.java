@@ -34,7 +34,7 @@ import de.uka.ilkd.key.strategy.Strategy;
  * The macro FinishSymbolicExecutionMacro continues automatic rule application
  * until there is no more modality on the sequent.
  *
- * This is done by implementing a delegating {@link Strategy} which assigns to
+ * This is done by implementing a delegation {@link Strategy} which assigns to
  * any rule application infinite costs if there is no modality on the sequent.
  *
  * @author mattias ulbrich

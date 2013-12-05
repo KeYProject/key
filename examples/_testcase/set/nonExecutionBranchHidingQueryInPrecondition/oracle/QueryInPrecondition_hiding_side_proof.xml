@@ -15,12 +15,12 @@ mod: \if (true)  \then ({})  \else (allLocs)
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
                <methodReturn name="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return
-	-4711 {!(x &gt;= 0 &amp; y &lt;= -1)},
-	42 {x &gt;= 0 &amp; y &lt;= -1}
+	42 {result_0 = 42 &amp; x &gt;= 0 &amp; y &lt;= -1},
+	-4711 {!(y &lt;= -1 &amp; x &gt;= 0)}
 as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
-                  <methodReturnValue name="-4711 {!(x &gt;= 0 &amp; y &lt;= -1)}" returnValueString="-4711" hasCondition="true" conditionString="!(x &gt;= 0 &amp; y &lt;= -1)">
+                  <methodReturnValue name="42 {result_0 = 42 &amp; x &gt;= 0 &amp; y &lt;= -1}" returnValueString="42" hasCondition="true" conditionString="result_0 = 42 &amp; x &gt;= 0 &amp; y &lt;= -1">
                   </methodReturnValue>
-                  <methodReturnValue name="42 {x &gt;= 0 &amp; y &lt;= -1}" returnValueString="42" hasCondition="true" conditionString="x &gt;= 0 &amp; y &lt;= -1">
+                  <methodReturnValue name="-4711 {!(y &lt;= -1 &amp; x &gt;= 0)}" returnValueString="-4711" hasCondition="true" conditionString="!(y &lt;= -1 &amp; x &gt;= 0)">
                   </methodReturnValue>
                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
