@@ -268,10 +268,6 @@ public final class MainWindow extends JFrame  {
     private NotificationManager notificationManager;
     private final PreferenceSaver prefSaver =
         new PreferenceSaver(Preferences.userNodeForPackage(MainWindow.class));
-    
-    public PreferenceSaver getPreferenceSaver(){
-        return prefSaver;
-    }
 
     private ComplexButton smtComponent;
 
@@ -489,7 +485,7 @@ public final class MainWindow extends JFrame  {
 
         // load preferred sizes from system preferences
         setName("mainWindow");
-        prefSaver.load(this);
+        loadPreferences(this);
     }
 
     private JTabbedPane createTabbedPane() {
@@ -1548,13 +1544,17 @@ public final class MainWindow extends JFrame  {
     	return unicodeToggleAction;
     }
 
-    public void savePreferences() {
+    public void savePreferences(Component component) {
         try {
-            prefSaver.save(this);
+            prefSaver.save(component);
         } catch (BackingStoreException e) {
             // it is not tragic if the preferences cannot be stored.
             e.printStackTrace();
         }
+    }
+
+    public final void loadPreferences(Component component) {
+        prefSaver.load(component);
     }
 
     /**

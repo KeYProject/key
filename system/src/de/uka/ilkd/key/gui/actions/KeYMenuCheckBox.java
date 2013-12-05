@@ -5,8 +5,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.JCheckBoxMenuItem;
 
 /**
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  * This class can be used for adding Checkboxes to the menu.
+ *
+ * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public abstract class KeYMenuCheckBox extends JCheckBoxMenuItem {
 
@@ -14,10 +15,12 @@ public abstract class KeYMenuCheckBox extends JCheckBoxMenuItem {
 
     KeYMenuCheckBox(MainWindow mainWindow, String label) {
         super();
+        final KeYMenuCheckBox checkBox = this;
         mainWindowAction = new MainWindowAction(mainWindow) {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 handleClickEvent();
+                mainWindow.savePreferences(checkBox);
             }
         };
         mainWindowAction.setName(label);
@@ -28,13 +31,17 @@ public abstract class KeYMenuCheckBox extends JCheckBoxMenuItem {
         mainWindowAction.setTooltip(s);
     }
 
-    // Make sure getState() does the same as isVisible().
+    /* 
+     * Make sure getState() does the same as isSelected().
+     */
     @Override
     public boolean getState() {
         return isSelected();
     }
 
-    // Make sure setState() does the same as setVisible().
+    /*
+     * Make sure setState(boolean) does the same as setSelected(boolean).
+     */
     @Override
     public void setState(boolean b) {
         setSelected(b);

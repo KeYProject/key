@@ -149,7 +149,7 @@ public class TermLabelMenu extends JMenu {
             this.labelName = labelName;
             setName(labelName.toString());
             setSelected(true);
-            mainWindow.getPreferenceSaver().load(this);
+            mainWindow.loadPreferences(this);
             setItalicFont();
         }
 
