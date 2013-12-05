@@ -398,7 +398,7 @@ termination: diamond" pathCondition="   null.length &gt;= 0 &amp; array.length &
                         </branchCondition>
                      </branchStatement>
                   </branchCondition>
-                  <branchCondition name="array = null" pathCondition="   null.length &gt;= 0 &amp; array.length &gt;= 0
+                  <branchCondition name="array = null" pathCondition="   array.length &gt;= 0 &amp; null.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -425,7 +425,7 @@ post: self_1.message = null
 &amp; self_1.&lt;inv&gt;
 &amp; exc_4 = null
 mod: {(self_1, message)} \cup {(self_1, cause)}
-termination: diamond" pathCondition="   null.length &gt;= 0 &amp; array.length &gt;= 0
+termination: diamond" pathCondition="   array.length &gt;= 0 &amp; null.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -445,7 +445,7 @@ termination: diamond" pathCondition="   null.length &gt;= 0 &amp; array.length &
        &amp; index_1 &gt;= 0
        &amp; array.length &gt;= i_0)
    &amp; array = null" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="   null.length &gt;= 0 &amp; array.length &gt;= 0
+                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="   array.length &gt;= 0 &amp; null.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)

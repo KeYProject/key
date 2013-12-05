@@ -71,7 +71,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
          &amp; array.length &gt;= 0
          &amp; array.length &gt;= i_0
       -&gt; array = null))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
-                  <branchCondition name="!array = null" pathCondition="   array.length &gt;= 0 &amp; null.length &gt;= 0
+                  <branchCondition name="!array = null" pathCondition="   null.length &gt;= 0 &amp; array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -91,7 +91,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
               &amp; array.length &gt;= i_0
            -&gt; array = null))
    &amp; !array = null" pathConditionChanged="true" branchCondition="!array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <methodCall name="WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_4,i_4);" pathCondition="   array.length &gt;= 0 &amp; null.length &gt;= 0
+                     <methodCall name="WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_4,i_4);" pathCondition="   null.length &gt;= 0 &amp; array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -111,7 +111,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
               &amp; array.length &gt;= i_0
            -&gt; array = null))
    &amp; !array = null" pathConditionChanged="false">
-                        <branchStatement name="if (i_4&lt;0) {throw new RuntimeException (); }else  {return    i_4&lt;array_4.length; }" pathCondition="   array.length &gt;= 0 &amp; null.length &gt;= 0
+                        <branchStatement name="if (i_4&lt;0) {throw new RuntimeException (); }else  {return    i_4&lt;array_4.length; }" pathCondition="   null.length &gt;= 0 &amp; array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -131,7 +131,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
               &amp; array.length &gt;= i_0
            -&gt; array = null))
    &amp; !array = null" pathConditionChanged="false">
-                           <statement name="return i_4&lt;array_4.length;" pathCondition="   array.length &gt;= 0 &amp; null.length &gt;= 0
+                           <statement name="return i_4&lt;array_4.length;" pathCondition="   null.length &gt;= 0 &amp; array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -151,7 +151,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
               &amp; array.length &gt;= i_0
            -&gt; array = null))
    &amp; !array = null" pathConditionChanged="false">
-                              <methodReturn name="&lt;return of WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_4,i_4);&gt;" pathCondition="   array.length &gt;= 0 &amp; null.length &gt;= 0
+                              <methodReturn name="&lt;return of WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_4,i_4);&gt;" pathCondition="   null.length &gt;= 0 &amp; array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -173,7 +173,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
    &amp; !array = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return TRUE as result of WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_4,i_4);&gt;" isReturnValueComputed="true">
                                  <methodReturnValue name="TRUE" returnValueString="TRUE" hasCondition="false">
                                  </methodReturnValue>
-                                 <statement name="result_1++;" pathCondition="   array.length &gt;= 0 &amp; null.length &gt;= 0
+                                 <statement name="result_1++;" pathCondition="   null.length &gt;= 0 &amp; array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -193,7 +193,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
               &amp; array.length &gt;= i_0
            -&gt; array = null))
    &amp; !array = null" pathConditionChanged="false">
-                                    <statement name="i++;" pathCondition="   array.length &gt;= 0 &amp; null.length &gt;= 0
+                                    <statement name="i++;" pathCondition="   null.length &gt;= 0 &amp; array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -213,7 +213,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
               &amp; array.length &gt;= i_0
            -&gt; array = null))
    &amp; !array = null" pathConditionChanged="false">
-                                       <termination name="&lt;loop body end&gt;" pathCondition="   array.length &gt;= 0 &amp; null.length &gt;= 0
+                                       <termination name="&lt;loop body end&gt;" pathCondition="   null.length &gt;= 0 &amp; array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -241,7 +241,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                         </branchStatement>
                      </methodCall>
                   </branchCondition>
-                  <branchCondition name="array = null" pathCondition="   null.length &gt;= 0 &amp; array.length &gt;= 0
+                  <branchCondition name="array = null" pathCondition="   array.length &gt;= 0 &amp; null.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -261,7 +261,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
               &amp; array.length &gt;= i_0
            -&gt; array = null))
    &amp; array = null" pathConditionChanged="true" branchCondition="array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <methodCall name="WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_3,i_3);" pathCondition="   null.length &gt;= 0 &amp; array.length &gt;= 0
+                     <methodCall name="WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_3,i_3);" pathCondition="   array.length &gt;= 0 &amp; null.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -281,7 +281,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
               &amp; array.length &gt;= i_0
            -&gt; array = null))
    &amp; array = null" pathConditionChanged="false">
-                        <branchStatement name="if (i_3&lt;0) {throw new RuntimeException (); }else  {return    i_3&lt;array_3.length; }" pathCondition="   null.length &gt;= 0 &amp; array.length &gt;= 0
+                        <branchStatement name="if (i_3&lt;0) {throw new RuntimeException (); }else  {return    i_3&lt;array_3.length; }" pathCondition="   array.length &gt;= 0 &amp; null.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -301,7 +301,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
               &amp; array.length &gt;= i_0
            -&gt; array = null))
    &amp; array = null" pathConditionChanged="false">
-                           <statement name="return i_3&lt;array_3.length;" pathCondition="   null.length &gt;= 0 &amp; array.length &gt;= 0
+                           <statement name="return i_3&lt;array_3.length;" pathCondition="   array.length &gt;= 0 &amp; null.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -321,7 +321,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
               &amp; array.length &gt;= i_0
            -&gt; array = null))
    &amp; array = null" pathConditionChanged="false">
-                              <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="   null.length &gt;= 0 &amp; array.length &gt;= 0
+                              <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="   array.length &gt;= 0 &amp; null.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
