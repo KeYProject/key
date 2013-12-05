@@ -443,13 +443,6 @@ public class KeYProgModelInfo{
             getRecoderConstructors(ct, signature);
         if (constructors.size()==1) {
             return (IProgramMethod) rec2key().toKeY(constructors.get(0));
-//	    Object o = rec2key().toKeY(constructors.get(0));
-//	    if(o instanceof Constructor){
-//		return (Constructor) o;
-//	    }
-//	    if(o instanceof IProgramMethod){
-//		return (Constructor) ((IProgramMethod) o).getMethodDeclaration();
-//	    }
         }
         if (constructors.size()==0) {
             Debug.out("javainfo: Constructor not found: ",ct);

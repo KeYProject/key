@@ -241,7 +241,7 @@ public class TermTacletAppIndexCacheSet {
     ////////////////////////////////////////////////////////////////////////////
     
     private class TopLevelCache extends PrefixTermTacletAppIndexCacheImpl {
-        public TopLevelCache(ImmutableList<QuantifiableVariable> prefix, Map<CacheKey, TermTacletAppIndex> cache) {
+        protected TopLevelCache(ImmutableList<QuantifiableVariable> prefix, Map<CacheKey, TermTacletAppIndex> cache) {
             super ( prefix, cache );
         }
 
@@ -292,7 +292,7 @@ public class TermTacletAppIndexCacheSet {
     ////////////////////////////////////////////////////////////////////////////
     
     private class BelowProgCache extends PrefixTermTacletAppIndexCacheImpl {
-        public BelowProgCache(ImmutableList<QuantifiableVariable> prefix, Map<CacheKey, TermTacletAppIndex> cache) {
+        protected BelowProgCache(ImmutableList<QuantifiableVariable> prefix, Map<CacheKey, TermTacletAppIndex> cache) {
             super ( prefix, cache );
         }
 
