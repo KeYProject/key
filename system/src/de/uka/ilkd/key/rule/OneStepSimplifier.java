@@ -68,10 +68,10 @@ public final class OneStepSimplifier implements BuiltInRule,
                                        .append("update_apply")
                                        .append("update_join")
 	                               .append("elimQuantifier")
-	                               .append("simplify_literals");
+                                       ;
 
     private static final boolean[] bottomUp
-        = {false, false, true, true, true, false, false};
+        = {false, false, true, true, true, false };
     private final Map<SequentFormula,Boolean> applicabilityCache
     		= new LRUCache<SequentFormula,Boolean>(100);
 
