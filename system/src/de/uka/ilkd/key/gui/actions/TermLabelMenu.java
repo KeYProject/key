@@ -25,6 +25,7 @@ public class TermLabelMenu extends JMenu {
     private final Map<Name, TermLabelCheckBox> checkBoxMap;
     private final MainWindow mainWindow;
     private final VisibleTermLabels visibleTermLabels;
+    private final HideAllCheckBox hideAllCheckBox;
 
     public TermLabelMenu(final MainWindow mainWindow) {
 
@@ -32,7 +33,7 @@ public class TermLabelMenu extends JMenu {
         checkBoxMap = new TreeMap<Name, TermLabelCheckBox>();
         this.mainWindow = mainWindow;
 
-        final HideAllCheckBox hideAllCheckBox = new HideAllCheckBox(mainWindow);
+        hideAllCheckBox = new HideAllCheckBox(mainWindow);
         add(hideAllCheckBox);
 
         visibleTermLabels = new VisibleTermLabels() {
@@ -67,9 +68,9 @@ public class TermLabelMenu extends JMenu {
                 for (Entry<Name, TermLabelCheckBox> entry : checkBoxMap.entrySet()) {
                     TermLabelCheckBox checkBox = entry.getValue();
                     if (labelNames.contains(entry.getKey())) {
-                        checkBox.setFont(checkBox.getFont().deriveFont(Font.BOLD));
+                        checkBox.setBoldFont();
                     } else {
-                        checkBox.setFont(checkBox.getFont().deriveFont(Font.PLAIN));
+                        checkBox.setItalicFont();
                     }
                 }
             }
@@ -88,7 +89,7 @@ public class TermLabelMenu extends JMenu {
 
         public HideAllCheckBox(MainWindow mainWindow) {
             super(mainWindow, "Hide all term labels");
-            setTooltip("Turn off term labels, if not needed.");
+            setTooltip("Use this checkbox to toggle term label visibility.");
             setName("hideAllCheckBox");
         }
 
@@ -109,6 +110,7 @@ public class TermLabelMenu extends JMenu {
             super(mainWindow, labelName.toString());
             this.labelName = labelName;
             setName(labelName.toString());
+            setItalicFont();
         }
 
         @Override
@@ -120,6 +122,31 @@ public class TermLabelMenu extends JMenu {
         public int compareTo(TermLabelCheckBox t) {
             return mainWindowAction.getName().toLowerCase().
                     compareTo(t.mainWindowAction.getName().toLowerCase());
+        }
+
+        private static final String allHiddenToolTip = "You turned off visibility for all term labels, "
+                + "which disables this checkbox.";
+
+        private void setItalicFont() {
+            setFont(getFont().deriveFont(Font.ITALIC));
+            boolean enabled = !hideAllCheckBox.isSelected();
+            setEnabled(enabled);
+            if (enabled) {
+                setToolTipText("Term label " + labelName + " does not occur in the current sequent.");
+            } else {
+                setToolTipText(allHiddenToolTip);
+            }
+        }
+
+        private void setBoldFont() {
+            setFont(getFont().deriveFont(Font.BOLD));
+            boolean enabled = !hideAllCheckBox.isSelected();
+            setEnabled(enabled);
+            if (enabled) {
+                setToolTipText("Click to toggle visibility for term label " + labelName + ".");
+            } else {
+                setToolTipText(allHiddenToolTip);
+            }
         }
     }
 }
