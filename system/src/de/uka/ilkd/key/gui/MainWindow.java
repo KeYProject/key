@@ -155,8 +155,8 @@ public final class MainWindow extends JFrame  {
     }
 
     // Search bar for Sequent Views.
-    public SequentViewSearchBar sequentViewSearchBar;
-
+    public final SequentViewSearchBar sequentViewSearchBar;
+    
     /**
      * The maximum number of recent files displayed.
      */
@@ -174,17 +174,20 @@ public final class MainWindow extends JFrame  {
     /** the second toolbar */
     private JToolBar fileOpToolBar;
 
-    /** JScrollPane for displaying SequentViews*/
-    private final MainFrame mainFrame;
-    
     /** the current proof tree*/
     private ProofTreeView proofTreeView;
 
     /** the list of current open goals*/
     private JScrollPane openGoalsView;
+    
+    /** JScrollPane for displaying SequentViews*/
+    private final MainFrame mainFrame;
 
     /** SequentView for the current goal */
-    public CurrentGoalView currentGoalView;
+    public final CurrentGoalView currentGoalView;
+    
+    /** Use this SequentView in case no proof is loaded. */
+    private final EmptySequent emptySequent;
 
     /** the rule view */
     private RuleView ruleView = null;
@@ -293,8 +296,11 @@ public final class MainWindow extends JFrame  {
         guiListener = new MainGUIListener();
         userInterface = new WindowUserInterface(this);
         mediator = getMainWindowMediator(userInterface);
+        currentGoalView = new CurrentGoalView(this);
+        emptySequent = new EmptySequent(this);
+        sequentViewSearchBar = new SequentViewSearchBar(emptySequent);
         termLabelMenu = new TermLabelMenu(this);
-        mainFrame = new MainFrame(this);
+        mainFrame = new MainFrame(this, emptySequent);
         initNotification();
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);
@@ -460,7 +466,6 @@ public final class MainWindow extends JFrame  {
         leftPane.setName("leftPane");
         leftPane.setOneTouchExpandable(true);
 
-        this.sequentViewSearchBar = new SequentViewSearchBar(currentGoalView);
         JPanel rightPane = new JPanel();
         rightPane.setLayout(new BorderLayout());
 	rightPane.add(mainFrame, BorderLayout.CENTER);
@@ -562,7 +567,6 @@ public final class MainWindow extends JFrame  {
 	}
 
         Config.DEFAULT.setDefaultFonts();
-        currentGoalView = new CurrentGoalView(this);
     }
 
     private ComplexButton createSMTComponent() {
@@ -1134,7 +1138,7 @@ public final class MainWindow extends JFrame  {
         }
 
         if (getMediator().getSelectedProof() == null) {
-            mainFrame.setContent(new EmptySequent(this));
+            mainFrame.setContent(emptySequent);
             return;
         }
 

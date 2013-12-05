@@ -60,7 +60,7 @@ public final class MainFrame extends JScrollPane {
         return oldContent;
     }
 
-    public MainFrame(final MainWindow mainWindow) {
+    public MainFrame(final MainWindow mainWindow, EmptySequent emptySequent) {
         this.mainWindow = mainWindow;
         setBorder(new EmptyBorder(0, 0, 0, 0));
         getVerticalScrollBar().setUnitIncrement(30);
@@ -81,7 +81,7 @@ public final class MainFrame extends JScrollPane {
             }
         });
 
-        setContent(new EmptySequent(mainWindow));
+        setContent(emptySequent);
     }
 
 }
