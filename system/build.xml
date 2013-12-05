@@ -91,11 +91,9 @@
   	<echo message="Please set (if you have not yet done so)  the environment variable ANT_OPTS to -Xms512m -Xmx512m" />
   	
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser"/>
-	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/antlr3"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/schemajava"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/proofjava"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation"/>
-	<mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/antlr3"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation"/>
   	
 	<mkdir dir="${build.dir}"/>
@@ -129,8 +127,8 @@
   </target>
 
 
-  <target name="compile" depends="prepare, keyparser-antlr3, proofjavaparser, schemajavaparser, 
-  	                                   jmlparser, jmlpreparser-antlr3, copy"
+  <target name="compile" depends="prepare, keyparser, proofjavaparser, schemajavaparser, 
+  	                                   jmlparser, jmlpreparser, copy"
           description="Compiles all java files into the source directory.">
   	
      <javac srcdir= "${src.dir}:${gen.dir}:${test.dir}"
@@ -169,77 +167,35 @@
 
 
   <target name="keylexer">
-     <antlr
-         target="${src.dir}/de/uka/ilkd/key/parser/lexer.g"
-         outputdirectory="${gen.dir}/de/uka/ilkd/key/parser">
-        <classpath>
-           <pathelement location="${ext.dir}/antlr.jar" />
-        </classpath>
-     </antlr>
+        <java jar="${ext.dir}/antlr.jar" fork="true">
+        <arg value="-o" />
+        <arg value="${gen.dir}/de/uka/ilkd/key/parser" />
+        <arg value="${src.dir}/de/uka/ilkd/key/parser/KeYLexer.g" />
+     </java>
   </target>
 
 
   <target name="keyparser"  depends="keylexer">
-     <antlr
-         target="${src.dir}/de/uka/ilkd/key/parser/keyparser.g"
-         outputdirectory="${gen.dir}/de/uka/ilkd/key/parser">
-        <classpath>
-           <pathelement location="${ext.dir}/antlr.jar" />
-        </classpath>
-     </antlr>
-  </target>
-
-  <target name="keylexer-antlr3">
-        <java jar="${ext.dir}/antlr.jar" fork="true">
-        <arg value="-o" />
-        <arg value="${gen.dir}/de/uka/ilkd/key/parser/antlr3" />
-        <arg value="${src.dir}/de/uka/ilkd/key/parser/antlr3/KeYLexer.g" />
-     </java>
-  </target>
-
-
-  <target name="keyparser-antlr3"  depends="keylexer-antlr3">
      <java jar="${ext.dir}/antlr.jar" fork="true">
         <arg value="-o" />
-        <arg value="${gen.dir}/de/uka/ilkd/key/parser/antlr3" />
-        <arg value="${src.dir}/de/uka/ilkd/key/parser/antlr3/KeYParser.g" />
+        <arg value="${gen.dir}/de/uka/ilkd/key/parser" />
+        <arg value="${src.dir}/de/uka/ilkd/key/parser/KeYParser.g" />
      </java>
   </target>
 	
-	<target name="jmlprelexer">
-	     <antlr
-	         target="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/jmlprelexer.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation">
-	        <classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-	  </target>
-
-
-	  <target name="jmlpreparser"  depends="jmlprelexer">
-	     <antlr
-	         target="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/jmlpreparser.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation">
-	        <classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-	  </target>
-
-  <target name="jmlprelexer-antlr3">
+  <target name="jmlprelexer">
     <java jar="${ext.dir}/antlr.jar" fork="true">
       <arg value="-o" />
-      <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/antlr3" />
-      <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/antlr3/KeYJMLPreLexer.g" />
+      <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation" />
+      <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.g" />
     </java>
   </target>
 
-  <target name="jmlpreparser-antlr3" depends="jmlprelexer-antlr3">
+  <target name="jmlpreparser" depends="jmlprelexer">
     <java jar="${ext.dir}/antlr.jar" fork="true">
       <arg value="-o" />
-      <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/antlr3" />
-      <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/antlr3/KeYJMLPreParser.g" />
+      <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation" />
+      <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreParser.g" />
     </java>
   </target>
 

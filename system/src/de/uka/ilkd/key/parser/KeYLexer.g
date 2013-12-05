@@ -25,7 +25,7 @@ lexer grammar KeYLexer;
 /* -*-Antlr-*- */
 
 @header {
-    package de.uka.ilkd.key.parser.antlr3;
+    package de.uka.ilkd.key.parser;
 
     import java.io.InputStream;
     import de.uka.ilkd.key.util.*;

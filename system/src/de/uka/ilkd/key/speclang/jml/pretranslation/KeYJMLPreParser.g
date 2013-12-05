@@ -11,15 +11,23 @@
 // Public License. See LICENSE.TXT for details.
 //
 
+parser grammar KeYJMLPreParser;
 
-header {
+options {
+    k = 1;     //do not change - interplay with lexer depends on k=1!
+    tokenVocab = KeYJMLPreLexer;
+}
+
+@rulecatch { }
+
+@header {
     package de.uka.ilkd.key.speclang.jml.pretranslation;
 
     import java.io.StringReader;
     import java.util.ArrayList;
     import java.util.Iterator;
     import java.util.List;
-    
+
     import de.uka.ilkd.key.collection.*;
     import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.speclang.*;
@@ -27,20 +35,22 @@ header {
     import de.uka.ilkd.key.ldt.HeapLDT;
     import de.uka.ilkd.key.logic.Name;
     import de.uka.ilkd.key.logic.TermBuilder;
+
+    import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
+    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassAxiom;
+    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
+    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLDepends;
+    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLFieldDecl;
+    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLInitially;
+    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
+    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
+    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
+    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
+    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 }
 
-
-class KeYJMLPreParser extends Parser;
-
-
-options {
-    k = 1;	//do not change - interplay with lexer depends on k=1!
-    defaultErrorHandler = false;
-    importVocab = KeYJMLPreLexer;
-}
-
-
-{
+@members {
     private KeYJMLPreLexer lexer;
     private SLTranslationExceptionManager excManager;
     private ImmutableSet<PositionedString> warnings
@@ -50,7 +60,7 @@ options {
     private KeYJMLPreParser(KeYJMLPreLexer lexer,
                             String fileName,
                             Position offsetPos) {
-    	this(lexer);
+    	this(new CommonTokenStream(lexer));
     	this.lexer      = lexer;
     	this.excManager = new SLTranslationExceptionManager(this,
     							    fileName,
@@ -61,7 +71,7 @@ options {
     public KeYJMLPreParser(String comment,
     			   String fileName,
     			   Position offsetPos) {
-	this(new KeYJMLPreLexer(new StringReader(comment)),
+	this(new KeYJMLPreLexer(new ANTLRStringStream(comment)),
 	     fileName,
 	     offsetPos);
     }
@@ -90,7 +100,7 @@ options {
     		throws SLTranslationException {
         try {
             return classlevel_comment();
-        } catch(ANTLRException e) {
+        } catch(RecognitionException e) {
 	    throw excManager.convertException(e);
         }
     }
@@ -100,7 +110,7 @@ options {
     		throws SLTranslationException {
         try {
             return methodlevel_comment();
-        } catch(ANTLRException e) {
+        } catch(RecognitionException e) {
 	    throw excManager.convertException(e);
         }
     }
@@ -151,9 +161,8 @@ classlevel_comment
 	returns [ImmutableList<TextualJMLConstruct> result
 		 = ImmutableSLList.<TextualJMLConstruct>nil()]
 	throws SLTranslationException
-{
-    ImmutableList<String> mods = ImmutableSLList.<String>nil();
-    ImmutableList<TextualJMLConstruct> list;
+@init {
+    mods = ImmutableSLList.<String>nil();
 }
 :
     (
@@ -172,13 +181,15 @@ classlevel_comment
 
 
 classlevel_element[ImmutableList<String> mods]
-	returns [ImmutableList<TextualJMLConstruct> result = null]
+	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
         result=class_invariant[mods]
-    |   (depends_clause[mods]) => result=depends_clause[mods]
+    |   (accessible_keyword expression) => result=depends_clause[mods]
     |   result=method_specification[mods]
-    |   (method_declaration[mods]) => result=method_declaration[mods]
+    |   (IDENT IDENT param_list (BODY | SEMICOLON)) => result=method_declaration[mods]
     |   result=field_declaration[mods]
     |   result=represents_clause[mods]
     |   result=history_constraint[mods]
@@ -200,9 +211,8 @@ methodlevel_comment
 	returns [ImmutableList<TextualJMLConstruct> result
 		 = ImmutableSLList.<TextualJMLConstruct>nil()]
 	throws SLTranslationException
-{
-    ImmutableList<String> mods = ImmutableSLList.<String>nil();
-    ImmutableList<TextualJMLConstruct> list;
+@init {
+    mods = ImmutableSLList.<String>nil();
 }
 :
     (
@@ -214,8 +224,10 @@ methodlevel_comment
 
 
 methodlevel_element[ImmutableList<String> mods]
-	returns [ImmutableList<TextualJMLConstruct> result = null]
+	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
         result=field_declaration[mods]
     |   result=set_statement[mods]
@@ -235,9 +247,6 @@ methodlevel_element[ImmutableList<String> mods]
 modifiers
 	returns [ImmutableList<String> result = ImmutableSLList.<String>nil()]
 	throws SLTranslationException
-{
-    String s;
-}
 :
     (
     	options { greedy = true; }
@@ -248,31 +257,31 @@ modifiers
 
 
 modifier returns [String result = null]:
-        abs:ABSTRACT            { result = abs.getText(); }
-    |   fin:FINAL               { result = fin.getText(); }
-    |   gho:GHOST               { result = gho.getText(); }
-    |   hel:HELPER              { result = hel.getText(); }
-    |   ins:INSTANCE            { result = ins.getText(); }
-    |   mod:MODEL               { result = mod.getText(); }
-    |   nnu:NON_NULL            { result = nnu.getText(); }
-    |   nul:NULLABLE            { result = nul.getText(); }
-    |   nld:NULLABLE_BY_DEFAULT { result = nld.getText(); }
-    |   pri:PRIVATE             { result = pri.getText(); }
-    |   pro:PROTECTED           { result = pro.getText(); }
-    |   pub:PUBLIC              { result = pub.getText(); }
-    |   pur:PURE                { result = pur.getText(); }
-    |   stp:STRICTLY_PURE       { result = stp.getText(); }
-    |   spr:SPEC_PROTECTED      { result = spr.getText(); }
-    |   spu:SPEC_PUBLIC         { result = spu.getText(); }
-    |   sta:STATIC              { result = sta.getText(); }
-    |   tst:TWO_STATE           { result = tst.getText(); }
-    |   nst:NO_STATE            { result = nst.getText(); }
-    |   sjm:SPEC_JAVA_MATH      { result = sjm.getText(); }
-    |   ssm:SPEC_SAVE_MATH      { result = ssm.getText(); }
-    |   sbm:SPEC_BIGINT_MATH    { result = sbm.getText(); }
-    |   cjm:CODE_JAVA_MATH      { result = cjm.getText(); }
-    |   csm:CODE_SAVE_MATH      { result = csm.getText(); }
-    |   cbm:CODE_BIGINT_MATH    { result = cbm.getText(); }
+        abs=ABSTRACT            { result = abs.getText(); }
+    |   fin=FINAL               { result = fin.getText(); }
+    |   gho=GHOST               { result = gho.getText(); }
+    |   hel=HELPER              { result = hel.getText(); }
+    |   ins=INSTANCE            { result = ins.getText(); }
+    |   mod=MODEL               { result = mod.getText(); }
+    |   nnu=NON_NULL            { result = nnu.getText(); }
+    |   nul=NULLABLE            { result = nul.getText(); }
+    |   nld=NULLABLE_BY_DEFAULT { result = nld.getText(); }
+    |   pri=PRIVATE             { result = pri.getText(); }
+    |   pro=PROTECTED           { result = pro.getText(); }
+    |   pub=PUBLIC              { result = pub.getText(); }
+    |   pur=PURE                { result = pur.getText(); }
+    |   stp=STRICTLY_PURE       { result = stp.getText(); }
+    |   spr=SPEC_PROTECTED      { result = spr.getText(); }
+    |   spu=SPEC_PUBLIC         { result = spu.getText(); }
+    |   sta=STATIC              { result = sta.getText(); }
+    |   tst=TWO_STATE           { result = tst.getText(); }
+    |   nst=NO_STATE            { result = nst.getText(); }
+    |   sjm=SPEC_JAVA_MATH      { result = sjm.getText(); }
+    |   ssm=SPEC_SAVE_MATH      { result = ssm.getText(); }
+    |   sbm=SPEC_BIGINT_MATH    { result = sbm.getText(); }
+    |   cjm=CODE_JAVA_MATH      { result = cjm.getText(); }
+    |   csm=CODE_SAVE_MATH      { result = csm.getText(); }
+    |   cbm=CODE_BIGINT_MATH    { result = cbm.getText(); }
 ;
 
 
@@ -284,8 +293,7 @@ modifier returns [String result = null]:
 class_invariant[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 	throws SLTranslationException
-{
-    PositionedString ps;
+@init {
     String name = null;
 }
 :
@@ -301,7 +309,7 @@ class_invariant[ImmutableList<String> mods]
 /** Introduce a user-given name to axiom-like declarations. */
 axiom_name returns [String result = null] throws SLTranslationException
 :
-    AXIOM_NAME_BEGIN id:IDENT AXIOM_NAME_END
+    AXIOM_NAME_BEGIN id=IDENT AXIOM_NAME_END
     { result = id.getText(); }
 ;
 
@@ -316,9 +324,6 @@ invariant_keyword
 class_axiom[ImmutableList<String> mods]
             returns [ImmutableList<TextualJMLConstruct> result = null]
                      throws SLTranslationException
-                     {
-    PositionedString ps;
-                     }
 :
     AXIOM ps=expression
     {
@@ -333,9 +338,6 @@ class_axiom[ImmutableList<String> mods]
 initially_clause[ImmutableList<String> mods]
         returns [ImmutableList<TextualJMLConstruct> result = null]
         throws SLTranslationException
-{
-    PositionedString ps;
-}
 :
     INITIALLY ps=expression
     {
@@ -353,11 +355,13 @@ initially_clause[ImmutableList<String> mods]
 //-----------------------------------------------------------------------------
 
 method_specification[ImmutableList<String> mods]
-	returns [ImmutableList<TextualJMLConstruct> result = null]
+	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
-{
-    ImmutableList<TextualJMLConstruct> list = ImmutableSLList.<TextualJMLConstruct>nil();
+@init {
+    list = ImmutableSLList.<TextualJMLConstruct>nil();
+    result = r;
 }
+@after { r = result; }
 :
     (also_keyword)*
     result=spec_case[mods]
@@ -381,8 +385,10 @@ also_keyword
 
 
 spec_case[ImmutableList<String> mods]
-	returns [ImmutableList<TextualJMLConstruct> result = null]
+	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
       	result=lightweight_spec_case[mods]
     | 	result=heavyweight_spec_case[mods]
@@ -395,8 +401,10 @@ spec_case[ImmutableList<String> mods]
 //-----------------------------------------------------------------------------
 
 lightweight_spec_case[ImmutableList<String> mods]
-	returns [ImmutableList<TextualJMLConstruct> result = null]
+	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
     result=generic_spec_case[mods, Behavior.NONE]
 ;
@@ -408,11 +416,12 @@ lightweight_spec_case[ImmutableList<String> mods]
 //-----------------------------------------------------------------------------
 
 heavyweight_spec_case[ImmutableList<String> mods]
-	returns [ImmutableList<TextualJMLConstruct> result = null]
+	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
-{
-    String s;
+@init {
+    result = r;
 }
+@after { r = result; }
 :
     (s=modifier  { mods = mods.append(s); })?
     (
@@ -428,8 +437,10 @@ heavyweight_spec_case[ImmutableList<String> mods]
 
 
 behavior_spec_case[ImmutableList<String> mods]
-	returns [ImmutableList<TextualJMLConstruct> result = null]
+	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
     behavior_keyword
     result=generic_spec_case[mods, Behavior.BEHAVIOR]
@@ -444,8 +455,10 @@ behavior_keyword
 
 
 normal_behavior_spec_case[ImmutableList<String> mods]
-	returns [ImmutableList<TextualJMLConstruct> result = null]
+	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
     normal_behavior_keyword
     result=generic_spec_case[mods, Behavior.NORMAL_BEHAVIOR]
@@ -459,8 +472,10 @@ normal_behavior_keyword
 ;
 
 model_behavior_spec_case[ImmutableList<String> mods]
-	returns [ImmutableList<TextualJMLConstruct> result = null]
+	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
     model_behavior_keyword
     result=generic_spec_case[mods, Behavior.MODEL_BEHAVIOR]
@@ -474,8 +489,10 @@ model_behavior_keyword
 ;
 
 exceptional_behavior_spec_case[ImmutableList<String> mods]
-	returns [ImmutableList<TextualJMLConstruct> result = null]
+	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
     exceptional_behavior_keyword
     result=generic_spec_case[mods, Behavior.EXCEPTIONAL_BEHAVIOR]
@@ -495,20 +512,18 @@ exceptional_behavior_keyword
 //-----------------------------------------------------------------------------
 
 generic_spec_case[ImmutableList<String> mods, Behavior b]
-	returns [ImmutableList<TextualJMLConstruct> result
+	returns [ImmutableList<TextualJMLConstruct> r
 		 = ImmutableSLList.<TextualJMLConstruct>nil()]
 	throws SLTranslationException
-{
-    ImmutableList<PositionedString> requires;
-    ImmutableList<PositionedString[]> abbrvs = null;
+@init {
+    result = r;
 }
+@after { r = result; }
 :
     (abbrvs=spec_var_decls)?
     (
         requires=spec_header
         (
-            (generic_spec_body[mods, b])
-            =>
             result=generic_spec_body[mods, b]
         )?
         {
@@ -534,12 +549,8 @@ generic_spec_case[ImmutableList<String> mods, Behavior b]
 
 
 spec_var_decls
-	returns [ ImmutableList<PositionedString[]> result = ImmutableSLList.<PositionedString[]>nil() ]
+	returns [ ImmutableList<PositionedString[\]> result = ImmutableSLList.<PositionedString[\]>nil() ]
 throws SLTranslationException
-{
-	PositionedString[] pz = new PositionedString[3];
-	PositionedString ps;
-}
 :
     (
             pz=old_clause
@@ -557,9 +568,6 @@ spec_header
 	returns [ImmutableList<PositionedString> result
 		 = ImmutableSLList.<PositionedString>nil()]
 	throws SLTranslationException
-{
-    PositionedString ps;
-}
 :
     (
     	options { greedy = true; }
@@ -570,8 +578,10 @@ spec_header
 
 
 requires_clause
-	returns [PositionedString result = null]
+	returns [PositionedString r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
     requires_keyword result=expression { result = flipHeaps("requires", result); }
 ;
@@ -585,11 +595,13 @@ requires_keyword
 
 
 generic_spec_body[ImmutableList<String> mods, Behavior b]
-	returns [ImmutableList<TextualJMLConstruct> result = null]
+	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
-{
+@init {
     TextualJMLSpecCase sc;
+    result = r;
 }
+@after { r = result; }
 :
     result=simple_spec_body[mods, b]
     |
@@ -602,11 +614,12 @@ generic_spec_body[ImmutableList<String> mods, Behavior b]
 
 
 generic_spec_case_seq[ImmutableList<String> mods, Behavior b]
-	returns [ImmutableList<TextualJMLConstruct> result = null]
+	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
-{
-    ImmutableList<TextualJMLConstruct> list;
+@init {
+    result = r;
 }
+@after { r = result; }
 :
     result=generic_spec_case[mods, b]
     (
@@ -622,7 +635,7 @@ generic_spec_case_seq[ImmutableList<String> mods, Behavior b]
 simple_spec_body[ImmutableList<String> mods, Behavior b]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 	throws SLTranslationException
-{
+@init {
     TextualJMLSpecCase sc = new TextualJMLSpecCase(mods, b);
     result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(sc);
 }
@@ -637,8 +650,7 @@ simple_spec_body[ImmutableList<String> mods, Behavior b]
 
 simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	throws SLTranslationException
-{
-    PositionedString ps;
+@init {
     PositionedString[] pss;
 }
 :
@@ -689,8 +701,10 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 //-----------------------------------------------------------------------------
 
 assignable_clause
-	returns [PositionedString result = null]
+	returns [PositionedString r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
     assignable_keyword result=expression { result = flipHeaps("assignable", result); }
 ;
@@ -708,8 +722,10 @@ assignable_keyword
 
 
 accessible_clause
-	returns [PositionedString result = null]
+	returns [PositionedString r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
     accessible_keyword result=expression { result = flipHeaps("accessible", result, true); }
 ;
@@ -723,8 +739,10 @@ accessible_keyword
 
 
 measured_by_clause
-	returns [PositionedString result = null]
+	returns [PositionedString r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
     measured_by_keyword result=expression { result = result.prepend("decreases "); }
 ;
@@ -738,8 +756,10 @@ measured_by_keyword
 
 
 ensures_clause
-	returns [PositionedString result = null]
+	returns [PositionedString r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
     ensures_keyword result=expression { result = flipHeaps("ensures", result); }
 ;
@@ -753,8 +773,10 @@ ensures_keyword
 
 
 signals_clause
-	returns [PositionedString result = null]
+	returns [PositionedString r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
     signals_keyword result=expression { result = result.prepend("signals "); }
 ;
@@ -770,8 +792,10 @@ signals_keyword
 
 
 signals_only_clause
-	returns [PositionedString result = null]
+	returns [PositionedString r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
     signals_only_keyword result=expression { result = result.prepend("signals_only "); }
 ;
@@ -785,8 +809,10 @@ signals_only_keyword
 
 
 diverges_clause
-	returns [PositionedString result = null]
+	returns [PositionedString r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
     diverges_keyword result=expression
 ;
@@ -800,9 +826,6 @@ diverges_keyword
 
 
 captures_clause throws SLTranslationException
-{
-    PositionedString ps;
-}
 :
     captures_keyword ps=expression
     {
@@ -822,7 +845,7 @@ name_clause
 	returns [PositionedString result = null]
 	throws SLTranslationException
 :
-    spec:SPEC_NAME name:STRING_LITERAL SEMICOLON
+    spec=SPEC_NAME name=STRING_LITERAL SEMICOLON
     {
 	result=createPositionedString(name.getText(), spec);
     }
@@ -830,9 +853,6 @@ name_clause
 
 
 when_clause throws SLTranslationException
-{
-    PositionedString ps;
-}
 :
     when_keyword ps=expression
     {
@@ -849,9 +869,6 @@ when_keyword
 
 
 working_space_clause throws SLTranslationException
-{
-    PositionedString ps;
-}
 :
     working_space_keyword ps=expression
     {
@@ -868,9 +885,6 @@ working_space_keyword
 
 
 duration_clause throws SLTranslationException
-{
-    PositionedString ps;
-}
 :
     duration_keyword ps=expression
     {
@@ -886,16 +900,13 @@ duration_keyword
 ;
 
 old_clause
-	returns [ PositionedString[] result = new PositionedString[3] ]
+	returns [ PositionedString[\] result = new PositionedString[3\] ]
 	throws SLTranslationException
-{
-	ImmutableList<String> mods;
-}
 :
 	OLD mods=modifiers
-	type:IDENT
-	name:IDENT
-	init:INITIALISER
+	type=IDENT
+	name=IDENT
+	init=INITIALISER
 	{ // modifiers are ignored, don't make any sense here
 	  result[0] = new PositionedString(type.getText(),type);
 	  result[1] = new PositionedString(name.getText(),name);
@@ -910,16 +921,17 @@ old_clause
 
 field_declaration[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
-{
+@init {
     StringBuffer sb = new StringBuffer();
     String s;
 }
 :
-    type:IDENT 	      { sb.append(type.getText() + " "); }
-    name:IDENT 	      { sb.append(name.getText()); }
+    type=IDENT 	      { sb.append(type.getText() + " "); }
+    name=IDENT 	      { sb.append(name.getText()); }
+    (t=EMPTYBRACKETS { sb.append(t.getText()); })*
     (
-    	    init:INITIALISER  { sb.append(init.getText()); }
-    	|   semi:SEMICOLON    { sb.append(semi.getText()); }
+    	    init=initialiser  { sb.append(init); }
+    	|   semi=SEMICOLON    { sb.append(semi.getText()); }
     )
     {
         PositionedString ps = createPositionedString(sb.toString(), type);
@@ -936,25 +948,25 @@ field_declaration[ImmutableList<String> mods]
 
 method_declaration[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
-{
+@init {
     StringBuffer sb = new StringBuffer();
     StringBuffer sbDefinition = new StringBuffer();
     String s;
 }
 :
-    type:IDENT 	   	{ sb.append(type.getText() + " "); }
-    name:IDENT 	   	{ sb.append(name.getText()); }
-    params:PARAM_LIST   { sb.append(params.getText()); }
+    type=IDENT 	   	{ sb.append(type.getText() + " "); }
+    name=IDENT 	   	{ sb.append(name.getText()); }
+    params=param_list   { sb.append(params); }
     (
-    	    body:BODY  	    { sbDefinition.append(body.getText()); }
-    	|   semi:SEMICOLON
+    	    body=BODY  	    { sbDefinition.append(body.getText()); }
+    	|   semi=SEMICOLON
     )
     {
 	sb.append(";");
         PositionedString ps = createPositionedString(sb.toString(), type);
         PositionedString psDefinition = null;
         if(sbDefinition.length() > 0) {
-          String paramsString = params.getText().trim();
+          String paramsString = params.trim();
           String bodyString = new String(sbDefinition).trim();
           assert paramsString.charAt(0) == '(' && paramsString.charAt(paramsString.length()-1) == ')';
           paramsString = paramsString.substring(1, paramsString.length()-1).trim();
@@ -978,12 +990,56 @@ method_declaration[ImmutableList<String> mods]
           psDefinition = createPositionedString("<heap> "+name.getText() +
                paramsString + " == "+bodyString, type);
         }
-    	TextualJMLMethodDecl md 
+
+    	TextualJMLMethodDecl md
     		= new TextualJMLMethodDecl(mods, ps, name.getText(), psDefinition);
     	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(md);
     }
 ;
 
+param_list returns [String s = null]
+@init {
+    final StringBuilder text = new StringBuilder();
+}
+@after {
+    s = text.toString();
+}
+    :
+        t=LPAREN { text.append(t.getText()); }
+        (
+            param=param_decl { text.append(param); }
+            (
+                t=COMMA
+                param=param_decl
+                { text.append(t.getText() + param); }
+            )*
+        )?
+        t=RPAREN { text.append(t.getText()); }
+    ;
+
+param_decl returns [String s = null]
+@init {
+    final StringBuilder text = new StringBuilder();
+}
+@after {
+    s = text.toString();
+}
+    :
+        (
+             t=(NON_NULL | NULLABLE)
+             {
+                text.append("/*@" + t.getText() + "@*/");
+             }
+        )?
+        t=IDENT
+        {
+            text.append(t.getText() + " ");
+        }
+        IDENT
+        {
+            text.append(t.getText());
+        }
+    ;
 
 
 //-----------------------------------------------------------------------------
@@ -994,9 +1050,6 @@ method_declaration[ImmutableList<String> mods]
 represents_clause[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 	throws SLTranslationException
-{
-    PositionedString ps;
-}
 :
     represents_keyword ps=expression
     {
@@ -1022,9 +1075,6 @@ represents_keyword
 depends_clause[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 	throws SLTranslationException
-{
-    PositionedString ps;
-}
 :
     accessible_keyword ps=expression
     {
@@ -1043,9 +1093,6 @@ depends_clause[ImmutableList<String> mods]
 history_constraint[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 	throws SLTranslationException
-{
-    PositionedString ps;
-}
 :
     constraint_keyword ps=expression
     {
@@ -1066,9 +1113,6 @@ constraint_keyword
 monitors_for_clause[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 	throws SLTranslationException
-{
-    PositionedString ps;
-}
 :
     MONITORS_FOR ps=expression
     {
@@ -1081,9 +1125,6 @@ monitors_for_clause[ImmutableList<String> mods]
 readable_if_clause[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 	throws SLTranslationException
-{
-    PositionedString ps;
-}
 :
     READABLE ps=expression
     {
@@ -1096,9 +1137,6 @@ readable_if_clause[ImmutableList<String> mods]
 writable_if_clause[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 	throws SLTranslationException
-{
-    PositionedString ps;
-}
 :
     WRITABLE ps=expression
     {
@@ -1117,9 +1155,6 @@ datagroup_clause[ImmutableList<String> mods]
 
 
 in_group_clause  throws SLTranslationException
-{
-    PositionedString ps;
-}
 :
     in_keyword ps=expression
     {
@@ -1136,9 +1171,6 @@ in_keyword
 
 
 maps_into_clause throws SLTranslationException
-{
-    PositionedString ps;
-}
 :
     maps_keyword ps=expression
     {
@@ -1157,9 +1189,6 @@ maps_keyword
 nowarn_pragma[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 	throws SLTranslationException
-{
-    PositionedString ps;
-}
 :
     NOWARN ps=expression
     {
@@ -1176,9 +1205,6 @@ nowarn_pragma[ImmutableList<String> mods]
 
 set_statement[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
-{
-    PositionedString ps;
-}
 :
     SET ps=expression
     {
@@ -1196,8 +1222,7 @@ set_statement[ImmutableList<String> mods]
 loop_specification[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 	throws SLTranslationException
-{
-   PositionedString ps;
+@init {
    TextualJMLLoopSpec ls = new TextualJMLLoopSpec(mods);
    result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(ls);
 }
@@ -1213,7 +1238,9 @@ loop_specification[ImmutableList<String> mods]
 ;
 
 
-loop_invariant returns [PositionedString result = null]
+loop_invariant returns [PositionedString r = null]
+@init { result = r; }
+@after { r = result; }
 :
     maintaining_keyword result=expression { result = flipHeaps("", result); }
 ;
@@ -1227,7 +1254,9 @@ maintaining_keyword
 ;
 
 
-variant_function returns [PositionedString result = null]
+variant_function returns [PositionedString r = null]
+@init { result = r; }
+@after { r = result; }
 :
     decreasing_keyword result=expression { result = result.prepend("decreases "); }
 ;
@@ -1251,9 +1280,6 @@ decreasing_keyword
 assume_statement[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 	throws SLTranslationException
-{
-    PositionedString ps;
-}
 :
     assume_keyword ps=expression
     {
@@ -1277,18 +1303,31 @@ assume_keyword
 
 
 expression returns [PositionedString result = null]
-{
-    lexer.setExpressionMode(true);
-    LT(1);
-    lexer.setExpressionMode(false);
+@init {
+    int parenthesesCounter = 0;
+    final StringBuilder text = new StringBuilder();
+    Token begin = null;
 }
 :
-    t:EXPRESSION
+    (
+        (
+            t=LPARENT { parenthesesCounter++; }
+        |   t=RPARENT { parenthesesCounter--; }
+        |   { parenthesesCounter > 0 }? t=SEMICOLON
+        |   t=~(LPARENT|RPARENT|SEMICOLON)
+        )
+        { if (begin == null) { begin = t; } text.append(" " + t.getText()); }
+    )*
+    { parenthesesCounter == 0 }? t=SEMICOLON { if (begin == null) { begin = t; } text.append(t.getText()); }
     {
-    	result = createPositionedString(t.getText(), t);
+    	result = createPositionedString(text.toString(), begin);
     }
 ;
 
+initialiser returns [String s = null]
+    :
+        EQUALITY ps=expression { s = "=" + ps.text; }
+    ;
 
 
 //-----------------------------------------------------------------------------
@@ -1296,8 +1335,10 @@ expression returns [PositionedString result = null]
 //-----------------------------------------------------------------------------
 
 block_specification[ImmutableList<String> mods]
-	returns [ImmutableList<TextualJMLConstruct> result = null]
+	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
 
     result=method_specification[mods]
@@ -1307,9 +1348,6 @@ block_specification[ImmutableList<String> mods]
 assert_statement[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 	throws SLTranslationException
-{
-    PositionedString ps;
-}
 :
     assert_keyword ps=expression
     {
@@ -1325,8 +1363,10 @@ assert_keyword
 ;
 
 breaks_clause
-	returns [PositionedString result = null]
+	returns [PositionedString r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
 	breaks_keyword result=expression { result = result.prepend("breaks "); }
 ;
@@ -1339,8 +1379,10 @@ breaks_keyword
 
 
 continues_clause
-	returns [PositionedString result = null]
+	returns [PositionedString r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
 	continues_keyword result=expression { result = result.prepend("continues "); }
 ;
@@ -1353,8 +1395,10 @@ continues_keyword
 
 
 returns_clause
-	returns [PositionedString result = null]
+	returns [PositionedString r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
 	returns_keyword result=expression { result = result.prepend("returns "); }
 ;
@@ -1367,8 +1411,10 @@ returns_keyword
 
 
 break_behavior_spec_case[ImmutableList<String> mods]
-	returns [ImmutableList<TextualJMLConstruct> result = null]
+	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
     break_behavior_keyword
     result=generic_spec_case[mods, Behavior.BREAK_BEHAVIOR]
@@ -1383,8 +1429,10 @@ break_behavior_keyword
 
 
 continue_behavior_spec_case[ImmutableList<String> mods]
-	returns [ImmutableList<TextualJMLConstruct> result = null]
+	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
     continue_behavior_keyword
     result=generic_spec_case[mods, Behavior.CONTINUE_BEHAVIOR]
@@ -1399,8 +1447,10 @@ continue_behavior_keyword
 
 
 return_behavior_spec_case[ImmutableList<String> mods]
-	returns [ImmutableList<TextualJMLConstruct> result = null]
+	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
 :
     return_behavior_keyword
     result=generic_spec_case[mods, Behavior.RETURN_BEHAVIOR]

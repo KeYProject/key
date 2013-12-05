@@ -21,7 +21,7 @@ import antlr.Token;
 import antlr.TokenStreamException;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.antlr3.KeYJMLPreParser;
+import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
 
 
 /**

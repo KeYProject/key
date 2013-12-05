@@ -9,7 +9,6 @@ import antlr.CharScanner;
 import antlr.Token;
 import antlr.TokenStreamException;
 
-import de.uka.ilkd.key.parser.antlr3.KeYLexer;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 public class KeYLexerF extends CharScanner {

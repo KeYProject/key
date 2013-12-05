@@ -16,7 +16,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.parser.antlr3.KeYParser;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.io.IProofFileParser;

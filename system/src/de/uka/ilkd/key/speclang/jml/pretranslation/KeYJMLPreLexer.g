@@ -14,7 +14,7 @@
 lexer grammar KeYJMLPreLexer;
 
 @header {
-    package de.uka.ilkd.key.speclang.jml.pretranslation.antlr3;
+    package de.uka.ilkd.key.speclang.jml.pretranslation;
 
     import de.uka.ilkd.key.util.Debug;
 }
