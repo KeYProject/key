@@ -174,7 +174,6 @@
      </java>
   </target>
 
-
   <target name="keyparser"  depends="keylexer">
      <java jar="${ext.dir}/antlr.jar" fork="true">
         <arg value="-o" />
@@ -182,7 +181,7 @@
         <arg value="${src.dir}/de/uka/ilkd/key/parser/KeYParser.g" />
      </java>
   </target>
-	
+
   <target name="jmlprelexer">
     <java jar="${ext.dir}/antlr.jar" fork="true">
       <arg value="-o" />
