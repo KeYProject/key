@@ -288,22 +288,22 @@ public class PreferenceSaver {
 
     private static class AbstractButtonSaver implements Saver<AbstractButton> {
 
+        private static String getButtonId(AbstractButton component) {
+            return component.getClass().getSimpleName() + "." + component.getName() + ".selected";
+        }
+
         @Override
         public void load(AbstractButton component, Preferences prefs) {
-            String name = component.getName();
-            assert name != null;
-            
-            boolean selected = prefs.getBoolean(name + ".AbstractButtonSelected", component.isSelected());
+            assert component.getName() != null;
+            boolean selected = prefs.getBoolean(getButtonId(component), component.isSelected());
             component.setSelected(selected);
         }
 
         @Override
         public void save(AbstractButton component, Preferences prefs) {
-            String name = component.getName();
-            assert name != null;
-
+            assert component.getName() != null;
             boolean selected = component.isSelected();
-            prefs.putBoolean(name + ".AbstractButtonSelected", selected);
+            prefs.putBoolean(getButtonId(component), selected);
         }
 
         @Override
