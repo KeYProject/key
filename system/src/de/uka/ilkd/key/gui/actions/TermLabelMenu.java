@@ -89,7 +89,7 @@ public class TermLabelMenu extends JMenu {
 
         public HideAllCheckBox(MainWindow mainWindow) {
             super(mainWindow, "Hide all term labels");
-            setTooltip("Use this checkbox to toggle term label visibility.");
+            setTooltip("Use this checkbox to toggle visibility for all term labels.");
             setName("hideAllCheckBox");
         }
 
@@ -99,6 +99,12 @@ public class TermLabelMenu extends JMenu {
                 checkBox.setEnabled(!isSelected());
             }
             mainWindow.makePrettyView();
+        }
+
+        @Override
+        public void setSelected(boolean b) {
+            super.setSelected(b);
+            handleClickEvent();
         }
     }
 
@@ -124,29 +130,32 @@ public class TermLabelMenu extends JMenu {
                     compareTo(t.mainWindowAction.getName().toLowerCase());
         }
 
-        private static final String allHiddenToolTip = "You turned off visibility for all term labels, "
-                + "which disables this checkbox.";
+        @Override
+        public void setEnabled(boolean b) {
+            if (!b) {
+                setToolTipText("You turned off visibility for all term labels, "
+                        + "which disables this checkbox.");
+            }
+            super.setEnabled(b);
+        }
 
         private void setItalicFont() {
             setFont(getFont().deriveFont(Font.ITALIC));
             boolean enabled = !hideAllCheckBox.isSelected();
-            setEnabled(enabled);
             if (enabled) {
                 setToolTipText("Term label " + labelName + " does not occur in the current sequent.");
-            } else {
-                setToolTipText(allHiddenToolTip);
             }
+            setEnabled(enabled);
         }
 
         private void setBoldFont() {
             setFont(getFont().deriveFont(Font.BOLD));
             boolean enabled = !hideAllCheckBox.isSelected();
-            setEnabled(enabled);
             if (enabled) {
                 setToolTipText("Click to toggle visibility for term label " + labelName + ".");
-            } else {
-                setToolTipText(allHiddenToolTip);
             }
+            setEnabled(enabled);
         }
+
     }
 }
