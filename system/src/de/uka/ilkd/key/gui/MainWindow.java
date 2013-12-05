@@ -1132,39 +1132,40 @@ public final class MainWindow extends JFrame  {
      * Updates the sequent displayed in the main frame.
      */
     private synchronized void updateSequentView() {
-        
+
         if (disableCurrentGoalView) {
             return;
         }
 
+        final SequentView newSequentView;
+
         if (getMediator().getSelectedProof() == null) {
-            mainFrame.setContent(emptySequent);
-            return;
+            newSequentView = emptySequent;
+        } else {
+            Goal goal = getMediator().getSelectedGoal();
+            if (goal != null && !goal.node().isClosed()) {
+                currentGoalView.setPrinter(goal);
+                currentGoalView.printSequent();
+                newSequentView = currentGoalView;
+            } else {
+                newSequentView = new InnerNodeView(getMediator().getSelectedNode(), this);
+            }
         }
 
-        Goal goal = getMediator().getSelectedGoal();
-        final SequentView sequentViewLocal;
-        if (goal != null && !goal.node().isClosed()) {
-            currentGoalView.setPrinter(goal);
-            currentGoalView.printSequent();
-            sequentViewLocal = currentGoalView;
-        } else {
-            sequentViewLocal = new InnerNodeView(getMediator().getSelectedNode(), this);
-        }
+        Runnable sequentUpdater = new Runnable() {
+            @Override
+            public void run() {
+                mainFrame.setContent(newSequentView);
+                sequentViewSearchBar.setSequentView(newSequentView);
+            }
+        };
 
         if (SwingUtilities.isEventDispatchThread()) {
-            mainFrame.setContent(sequentViewLocal);
+            sequentUpdater.run();
         } else {
-            Runnable sequentUpdater = new Runnable() {
-                @Override
-                public void run() {
-                    mainFrame.setContent(sequentViewLocal);
-                }
-            };
             SwingUtilities.invokeLater(sequentUpdater);
         }
 
-        sequentViewSearchBar.setSequentView(sequentViewLocal);
     }
 
     class MainProofListener implements AutoModeListener, KeYSelectionListener,
