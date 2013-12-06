@@ -196,7 +196,7 @@ fragment ML_COMMENT
         (~('*').|'*'~'/')
         =>
         (	'\n'         { newline(); }
-            | 	~'@'
+            | 	~('@' | '\n')
         )
     	(
     	    options { greedy = false; }
@@ -297,7 +297,7 @@ BODY
     '{'
     (
 	   '{'                      { braceCounter++; ignoreAt = false; }
-    	|  {braceCounter > 0}? '}'  { braceCounter--; ignoreAt = false; }
+    	|  '}'  { if (braceCounter > 0) { braceCounter--; }; ignoreAt = false; }
     	|  '\n'                     { newline(); ignoreAt = true; }
     	|  ' '
     	|  '\u000C'
@@ -305,7 +305,7 @@ BODY
     	|  '\r'
     	|  {!ignoreAt}? '@'
     	|  {ignoreAt}? { s = getText(); } '@'	    { setText(s); ignoreAt = false; }
-    	|  ~'}'			    { ignoreAt = false; }
+    	|  ~('{' | '}' | '\n' | ' ' | '\u000C' | '\r' | '\t' | '@' )    { ignoreAt = false; }
     )*
     {braceCounter == 0}? '}'
 ;

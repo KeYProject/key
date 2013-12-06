@@ -120,7 +120,7 @@ public class TestJMLPreTranslator extends TestCase {
     
     public void testFailure() {
         try {
-            parseMethodSpec("/*@ normal_behaviour  @ signals ohoh;" + "  @*/");
+            parseMethodSpec("/*@ normal_behaviour \n @ signals ohoh;" + "  @*/");
             assertTrue(false);
         } catch (SLTranslationException e) {
             //fine

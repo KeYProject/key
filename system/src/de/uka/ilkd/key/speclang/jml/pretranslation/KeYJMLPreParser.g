@@ -203,7 +203,6 @@ classlevel_element[ImmutableList<String> mods]
     |   result=assert_statement[mods] //RecodeR workaround
     |   result=assume_statement[mods] //RecodeR workaround
     |   result=nowarn_pragma[mods]
-    |   EOF
 ;
 
 
@@ -520,30 +519,27 @@ generic_spec_case[ImmutableList<String> mods, Behavior b]
 }
 @after { r = result; }
 :
-    (abbrvs=spec_var_decls)?
-    (
-        requires=spec_header
-        (
-            result=generic_spec_body[mods, b]
-        )?
+    (abbrvs=spec_var_decls)?  
+    (requires=spec_header 
+       ( options { greedy = true; }
+    	 : result = generic_spec_body[mods, b] )? 
         {
-            if(result.isEmpty()) {
-                result = result.append(new TextualJMLSpecCase(mods, b));
-            }
+	    	if (result.isEmpty()) {
+            		result = result.append(new TextualJMLSpecCase(mods, b));
+              	}
 
-            for(Iterator<TextualJMLConstruct> it = result.iterator();
-                it.hasNext(); ) {
-            	TextualJMLSpecCase sc = (TextualJMLSpecCase) it.next();
-                sc.addRequires(requires);
+            	for(Iterator<TextualJMLConstruct> it = result.iterator();
+                    it.hasNext(); ) {
+                	TextualJMLSpecCase sc = (TextualJMLSpecCase) it.next();
+                  	sc.addRequires(requires);
     			if (abbrvs!=null) {
     				for (PositionedString[] pz: abbrvs) {
     					sc.addAbbreviation(pz);
     			    }
     			}
-            }
-        }
-      	|
-      	result=generic_spec_body[mods, b]
+    	        }
+        }    	    	     	 
+    | result = generic_spec_body[mods, b]
     )
 ;
 
