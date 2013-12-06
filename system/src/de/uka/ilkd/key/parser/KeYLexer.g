@@ -301,8 +301,8 @@ lexer grammar KeYLexer;
 	INSTANTIATE_GENERIC : '\\instantiateGeneric';
 
 	// Quantifiers, binding, substitution
-        FORALL : '\\forall';
-        EXISTS : '\\exists';
+        FORALL : '\\forall' | '\u2200';
+        EXISTS : '\\exists' | '\u2203';
         SUBST  : '\\subst';
 	IF   : '\\if';
 	IFEX   : '\\ifEx';
@@ -482,25 +482,25 @@ PARALLEL
 OR
 @init { paraphrase.push("`|'"); }
 @after { paraphrase.pop(); }
-:	'|'
+:	'|' | '\u2228'
 	;
 
 AND
 @init { paraphrase.push("`&'"); }
 @after { paraphrase.pop(); }
-:	'&'
+:	'&' | '\u2227'
 	;
 
 NOT
 @init { paraphrase.push("`!'"); }
 @after { paraphrase.pop(); }
-:	'!'
+:	'!' | '\u00AC'
 	;
 
 IMP
 @init { paraphrase.push("`->'"); }
 @after { paraphrase.pop(); }
-:	'->'
+:	'->' | '\u2192'
 	;
 
 EQUALS
@@ -512,7 +512,7 @@ EQUALS
 NOT_EQUALS
 @init { paraphrase.push("`!='"); }
 	@after { paraphrase.pop(); }
-:	'!='
+:	'!=' | '\u2260'
 	;
 
 SEQARROW
@@ -566,7 +566,7 @@ GREATER
 GREATEREQUAL
 @init { paraphrase.push("`>='"); }
 @after { paraphrase.pop(); }
-:   '>' '='
+:   '>' '=' | '\u2265'
       ;
 
 RGUILLEMETS
@@ -621,7 +621,7 @@ fragment LESSEQUAL
 @init { paraphrase.push("'<='"); }
 @after { paraphrase.pop(); }
 :
-  '<' '='
+  '<' '=' | '\u2264'
     ;
 
 fragment LGUILLEMETS
@@ -642,7 +642,7 @@ fragment IMPLICIT_IDENT
 fragment EQV
 @init { paraphrase.push("`<->'"); }
 @after { paraphrase.pop(); }
-:	'<->'
+:	'<->' | '\u2194'
 ;
 
 PRIMES_OR_CHARLITERAL
