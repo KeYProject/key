@@ -2414,8 +2414,8 @@ equality_term returns [Term _equality_term = null]
     :
         a =  logicTermReEntry // accessterm 
         // a term like {o:=u}x=y is parsed as {o:=u}(x=y)
-        (  
-	    (EQUALS | NOT_EQUALS {negated = true;}) a1 = logicTermReEntry
+        (  (EQUALS | NOT_EQUALS) =>
+	      (EQUALS | NOT_EQUALS {negated = true;}) a1 = logicTermReEntry
             { 
                 if (a.sort() == Sort.FORMULA ||
                     a1.sort() == Sort.FORMULA) {
@@ -2477,7 +2477,6 @@ weak_arith_op returns [Function op = null]
        semanticError("Function symbol '"+op_name+"' not found.");
      }
    }
- 
 ;
 
 strong_arith_op returns [Function op = null]
@@ -2501,7 +2500,7 @@ strong_arith_op returns [Function op = null]
 logicTermReEntry returns [Term _logic_term_re_entry = null]
 @after { _logic_term_re_entry = a; }
 :
-   a = weak_arith_op_term ((relation_op)=> op = relation_op a1=weak_arith_op_term {
+   a = weak_arith_op_term ((relation_op) => op = relation_op a1=weak_arith_op_term {
                  a = tf.createTerm(op, a, a1);
               })?
 ;
@@ -2515,7 +2514,7 @@ logicTermReEntry returns [Term _logic_term_re_entry = null]
 weak_arith_op_term returns [Term _weak_arith_op_term = null]
 @after { _weak_arith_op_term = a; }
 :
-   a = strong_arith_op_term ( op = weak_arith_op a1=strong_arith_op_term {
+   a = strong_arith_op_term ((weak_arith_op)=> op = weak_arith_op a1=strong_arith_op_term {
                   a = tf.createTerm(op, a, a1);
                 })*
 ;
@@ -2528,7 +2527,7 @@ weak_arith_op_term returns [Term _weak_arith_op_term = null]
 strong_arith_op_term returns [Term _strong_arith_op_term = null]
 @after { _strong_arith_op_term = a; }
 :
-   a = term110 ( op = strong_arith_op a1=term110 {
+   a = term110 ( (strong_arith_op) => op = strong_arith_op a1=term110 {
                   a = tf.createTerm(op, a, a1);
                 })*
 ;
