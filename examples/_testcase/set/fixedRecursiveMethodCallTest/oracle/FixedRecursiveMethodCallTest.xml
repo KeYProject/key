@@ -3,16 +3,16 @@
    <methodCall name="FixedRecursiveMethodCallTest.decreaseValue();" pathCondition="true" pathConditionChanged="false">
       <statement name="return decrease(3);" pathCondition="true" pathConditionChanged="false">
          <methodCall name="FixedRecursiveMethodCallTest.decrease(n);" pathCondition="true" pathConditionChanged="false">
-            <branchStatement name="if (n&gt;=1) {return decrease(n-1); }" pathCondition="true" pathConditionChanged="false">
+            <branchStatement name="if (n&gt;=1)" pathCondition="true" pathConditionChanged="false">
                <statement name="return decrease(n-1);" pathCondition="true" pathConditionChanged="false">
                   <methodCall name="FixedRecursiveMethodCallTest.decrease(n_1);" pathCondition="true" pathConditionChanged="false">
-                     <branchStatement name="if (n_1&gt;=1) {return decrease(n_1-1); }" pathCondition="true" pathConditionChanged="false">
+                     <branchStatement name="if (n_1&gt;=1)" pathCondition="true" pathConditionChanged="false">
                         <statement name="return decrease(n_1-1);" pathCondition="true" pathConditionChanged="false">
                            <methodCall name="FixedRecursiveMethodCallTest.decrease(n_2);" pathCondition="true" pathConditionChanged="false">
-                              <branchStatement name="if (n_2&gt;=1) {return decrease(n_2-1); }" pathCondition="true" pathConditionChanged="false">
+                              <branchStatement name="if (n_2&gt;=1)" pathCondition="true" pathConditionChanged="false">
                                  <statement name="return decrease(n_2-1);" pathCondition="true" pathConditionChanged="false">
                                     <methodCall name="FixedRecursiveMethodCallTest.decrease(n_3);" pathCondition="true" pathConditionChanged="false">
-                                       <branchStatement name="if (n_3&gt;=1) {return decrease(n_3-1); }" pathCondition="true" pathConditionChanged="false">
+                                       <branchStatement name="if (n_3&gt;=1)" pathCondition="true" pathConditionChanged="false">
                                           <statement name="return n_3;" pathCondition="true" pathConditionChanged="false">
                                              <methodReturn name="&lt;return of FixedRecursiveMethodCallTest.decrease(n_3);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                                 <methodReturn name="&lt;return of FixedRecursiveMethodCallTest.decrease(n_2);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">

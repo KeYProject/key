@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_bac5cf26-66b7-4224-85cd-39f4594c82e4" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_ca527c6e-72c3-411d-8d52-5319d320cc93" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_9837b53d-b0f9-415e-acd3-3032f7bfeafb" name="UseOperationContractFalsePreconditionTest.main();" pathCondition="true" lineNumber="-1" charStart="79" charEnd="83">
-            <sedStatement xml:id="_401e0af8-9225-40e7-8847-dbdbfe1e419e" name="int magicNumber = magic(123);" pathCondition="true" lineNumber="-1" charStart="91" charEnd="120">
-               <sedMethodContract xml:id="_2724862a-cd8f-4661-aed0-7c9ecaf0e77b" name="result_0 = magic(123) catch(exc_0)
+   <sedTarget xml:id="_cc72320f-00e7-4895-b94b-286cf01bcc81" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_0d0ac93c-2d15-427c-a5ef-023811615695" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_ed469e19-9039-4e38-881b-d582755c0c36" name="UseOperationContractFalsePreconditionTest.main();" pathCondition="true" lineNumber="-1" charStart="79" charEnd="83">
+            <sedStatement xml:id="_8b776241-961f-4823-a728-16be9613c129" name="int magicNumber = magic(123);" pathCondition="true" lineNumber="-1" charStart="91" charEnd="120">
+               <sedMethodContract xml:id="_576ff411-2ede-4b41-8458-cc660eb68e1c" name="result_0 = magic(123) catch(exc_0)
 pre: false
 post: result_0 = 42 &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="true" lineNumber="-1" charStart="315" charEnd="320" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
-                  <sedBranchCondition xml:id="_690d0c95-73dc-4084-bbbd-12dff99a6b64" name="Post (magic): true" pathCondition="true">
-                     <sedStatement xml:id="_2235b1de-0f61-465f-b79f-5f948025e8ec" name="int magicNumberCopy = magicNumber;" pathCondition="true" lineNumber="-1" charStart="124" charEnd="158">
-                        <sedStatement xml:id="_21b07371-71bb-4033-bd4f-3055396fdc64" name="return magicNumber+magicNumberCopy;" pathCondition="true" lineNumber="-1" charStart="162" charEnd="199">
-                           <sedMethodReturn xml:id="_ffeec3d0-a738-44cf-a170-46f514159771" name="&lt;return of UseOperationContractFalsePreconditionTest.main();&gt;" pathCondition="true" lineNumber="-1" charStart="79" charEnd="83">
-                              <sedTermination xml:id="_3660c3cc-284a-4673-a352-a54d3871e390" name="&lt;end&gt;" pathCondition="true" verified="true">
+                  <sedBranchCondition xml:id="_3744c16d-7fbb-4cc0-a1fb-4772e4936c5d" name="Post (magic): true" pathCondition="true">
+                     <sedStatement xml:id="_cc0ca49b-668b-4860-98d4-d67ba937814a" name="int magicNumberCopy = magicNumber;" pathCondition="true" lineNumber="-1" charStart="124" charEnd="158">
+                        <sedStatement xml:id="_ca3ef8da-4313-4df6-8975-9cd57b4d6089" name="return magicNumber+magicNumberCopy;" pathCondition="true" lineNumber="-1" charStart="162" charEnd="199">
+                           <sedMethodReturn xml:id="_549298d4-ce71-4086-987d-c83728f69a1a" name="&lt;return of UseOperationContractFalsePreconditionTest.main();&gt;" pathCondition="true" lineNumber="-1" charStart="79" charEnd="83">
+                              <sedTermination xml:id="_da08e81e-3fe0-4f3f-81e8-c0a0a0a0c23a" name="&lt;end&gt;" pathCondition="true" verified="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>

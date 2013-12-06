@@ -38,7 +38,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
    &amp; array.length &gt;= i_0
    &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="false">
                         <callStackEntry path="/0"/>
-                        <branchStatement name="if (array.length==3) {throw new RuntimeException (); }" pathCondition="   array.length &gt;= 0
+                        <branchStatement name="if (array.length==3)" pathCondition="   array.length &gt;= 0
 -&gt;   i_0 &gt;= 0
    &amp; array.length &gt;  i
    &amp; array.length &gt;= i_0

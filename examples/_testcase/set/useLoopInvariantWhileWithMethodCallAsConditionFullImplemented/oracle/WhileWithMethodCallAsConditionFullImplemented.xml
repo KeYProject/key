@@ -41,7 +41,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
    &amp; !array = null" pathConditionChanged="false">
-                        <branchStatement name="if (i_4&lt;0) {throw new RuntimeException (); }else  {return    i_4&lt;array_4.length; }" pathCondition="   array.length &gt;= 0
+                        <branchStatement name="if (i_4&lt;0)" pathCondition="   array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -107,7 +107,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
    &amp; array = null" pathConditionChanged="false">
-                        <branchStatement name="if (i_3&lt;0) {throw new RuntimeException (); }else  {return    i_3&lt;array_3.length; }" pathCondition="   array.length &gt;= 0
+                        <branchStatement name="if (i_3&lt;0)" pathCondition="   array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)

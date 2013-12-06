@@ -8,8 +8,8 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
          <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
             <branchCondition name="x_0 &gt;  -1" pathCondition="x_0 &gt;  -1" pathConditionChanged="true" branchCondition="x_0 &gt;  -1" mergedBranchCondition="false" isBranchConditionComputed="true">
                <methodCall name="LoopInvariantWithSplittingQuery.magic(x_44);" pathCondition="x_0 &gt;  -1" pathConditionChanged="false">
-                  <branchStatement name="if (x_44==0) {return 0; }else if (x_44&gt;=0) {return x_44;   }else  {return      -x_44;   }" pathCondition="x_0 &gt;  -1" pathConditionChanged="false">
-                     <branchStatement name="if (x_44&gt;=0) {return x_44; }else  {return    -x_44; }" pathCondition="x_0 &gt;  -1" pathConditionChanged="false">
+                  <branchStatement name="if (x_44==0)" pathCondition="x_0 &gt;  -1" pathConditionChanged="false">
+                     <branchStatement name="if (x_44&gt;=0)" pathCondition="x_0 &gt;  -1" pathConditionChanged="false">
                         <statement name="return x_44;" pathCondition="x_0 &gt;  -1" pathConditionChanged="false">
                            <methodReturn name="&lt;return of LoopInvariantWithSplittingQuery.magic(x_44);&gt;" pathCondition="x_0 &gt;  -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return magic_sk_1 as result of LoopInvariantWithSplittingQuery.magic(x_44);&gt;" isReturnValueComputed="true">
                               <methodReturnValue name="magic_sk_1" returnValueString="magic_sk_1" hasCondition="false">
@@ -26,8 +26,8 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
             </branchCondition>
             <branchCondition name="x_0 &lt; 0" pathCondition="x_0 &lt; 0" pathConditionChanged="true" branchCondition="x_0 &lt; 0" mergedBranchCondition="false" isBranchConditionComputed="true">
                <methodCall name="LoopInvariantWithSplittingQuery.magic(x_34);" pathCondition="x_0 &lt; 0" pathConditionChanged="false">
-                  <branchStatement name="if (x_34==0) {return 0; }else if (x_34&gt;=0) {return x_34;   }else  {return      -x_34;   }" pathCondition="x_0 &lt; 0" pathConditionChanged="false">
-                     <branchStatement name="if (x_34&gt;=0) {return x_34; }else  {return    -x_34; }" pathCondition="x_0 &lt; 0" pathConditionChanged="false">
+                  <branchStatement name="if (x_34==0)" pathCondition="x_0 &lt; 0" pathConditionChanged="false">
+                     <branchStatement name="if (x_34&gt;=0)" pathCondition="x_0 &lt; 0" pathConditionChanged="false">
                         <statement name="return -x_34;" pathCondition="x_0 &lt; 0" pathConditionChanged="false">
                            <methodReturn name="&lt;return of LoopInvariantWithSplittingQuery.magic(x_34);&gt;" pathCondition="x_0 &lt; 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return magic_sk_1 as result of LoopInvariantWithSplittingQuery.magic(x_34);&gt;" isReturnValueComputed="true">
                               <methodReturnValue name="magic_sk_1" returnValueString="magic_sk_1" hasCondition="false">

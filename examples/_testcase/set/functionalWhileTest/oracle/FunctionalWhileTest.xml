@@ -3,7 +3,7 @@
    <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
-            <loopStatement name="while ( invert(i)&gt;-3 ) {   result_1++;   i++; }" pathCondition="true" pathConditionChanged="false">
+            <loopStatement name="while ( invert(i)&gt;-3 )" pathCondition="true" pathConditionChanged="false">
                <loopCondition name="invert(i)&gt;-3" pathCondition="true" pathConditionChanged="false">
                   <methodCall name="self.invert(i_1);" pathCondition="true" pathConditionChanged="false">
                      <statement name="return i_1*-1;" pathCondition="true" pathConditionChanged="false">

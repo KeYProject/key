@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="MultiArrayIndexReadWriteAccess.compute(array);" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (array!=null) {if (array.length==1) {if (array[0].length==1) {if (array[0][0]==42) {         array[0][0]=5;return array[0][0];       }else  {return          -400;       }     }else  {return        -300;     }   }else  {return      -200;   } }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (array!=null)" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="!array = null" pathCondition="!array = null" pathConditionChanged="true" branchCondition="!array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <branchStatement name="if (array.length==1) {if (array[0].length==1) {if (array[0][0]==42) {       array[0][0]=5;return array[0][0];     }else  {return        -400;     }   }else  {return      -300;   } }else  {return    -200; }" pathCondition="!array = null" pathConditionChanged="false">
+            <branchStatement name="if (array.length==1)" pathCondition="!array = null" pathConditionChanged="false">
                <branchCondition name="array.length &gt;= 0 -&gt; array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="true" branchCondition="array.length &gt;= 0 -&gt; array.length = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <branchStatement name="if (array[0].length==1) {if (array[0][0]==42) {     array[0][0]=5;return array[0][0];   }else  {return      -400;   } }else  {return    -300; }" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false">
+                  <branchStatement name="if (array[0].length==1)" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false">
                      <branchCondition name="!array[0] = null" pathCondition="   array.length &gt;= 0
 -&gt; !array = null &amp; array.length = 1 &amp; !array[0] = null" pathConditionChanged="true" branchCondition="!array[0] = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <branchCondition name="array[0].length &gt;= 0 -&gt; array[0].length = 1" pathCondition="   array[0].length &gt;= 0 &amp; array.length &gt;= 0
@@ -13,7 +13,7 @@
    &amp; array.length = 1
    &amp; !array[0] = null
    &amp; array[0].length = 1" pathConditionChanged="true" branchCondition="array[0].length &gt;= 0 -&gt; array[0].length = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
-                           <branchStatement name="if (array[0][0]==42) {   array[0][0]=5;return array[0][0]; }else  {return    -400; }" pathCondition="   array[0].length &gt;= 0 &amp; array.length &gt;= 0
+                           <branchStatement name="if (array[0][0]==42)" pathCondition="   array[0].length &gt;= 0 &amp; array.length &gt;= 0
 -&gt;   !array = null
    &amp; array.length = 1
    &amp; !array[0] = null

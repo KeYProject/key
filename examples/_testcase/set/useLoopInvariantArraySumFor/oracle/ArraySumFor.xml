@@ -3,7 +3,7 @@
    <methodCall name="ArraySumFor.sum(array);" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
-         <loopStatement name="for ( int i = 0; i&lt;array.length; i++ ) {   result_1+=array[i]; }" pathCondition="true" pathConditionChanged="false">
+         <loopStatement name="for ( int i = 0; i&lt;array.length; i++ )" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
             <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
                <callStackEntry path="/0"/>

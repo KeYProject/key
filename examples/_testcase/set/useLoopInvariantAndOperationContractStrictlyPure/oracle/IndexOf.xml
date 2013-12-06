@@ -22,7 +22,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
       -&gt; i_0 = 0)
    &amp; !array = null" pathConditionChanged="true" branchCondition="!array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <branchStatement name="if (!comperator.equals(array[i],toSearch)) {   index_1=i; }" pathCondition="   array.length &gt;= 0
+                     <branchStatement name="if (!comperator.equals(array[i],toSearch))" pathCondition="   array.length &gt;= 0
 -&gt;   (     (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
       -&gt; i_0 = 0)

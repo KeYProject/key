@@ -7,8 +7,8 @@ variant: magic(x)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
          <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
             <methodCall name="LoopInvariantWithSplittingQuery.magic(x_10);" pathCondition="true" pathConditionChanged="false">
-               <branchStatement name="if (x_10==0) {return 0; }else if (x_10&gt;=0) {return x_10;   }else  {return      -x_10;   }" pathCondition="true" pathConditionChanged="false">
-                  <branchStatement name="if (x_10&gt;=0) {return x_10; }else  {return    -x_10; }" pathCondition="true" pathConditionChanged="false">
+               <branchStatement name="if (x_10==0)" pathCondition="true" pathConditionChanged="false">
+                  <branchStatement name="if (x_10&gt;=0)" pathCondition="true" pathConditionChanged="false">
                      <branchCondition name="x_0 &gt;  -1" pathCondition="x_0 &gt;  -1" pathConditionChanged="true" branchCondition="x_0 &gt;  -1" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <statement name="return x_10;" pathCondition="x_0 &gt;  -1" pathConditionChanged="false">
                            <methodReturn name="&lt;return of LoopInvariantWithSplittingQuery.magic(x_10);&gt;" pathCondition="x_0 &gt;  -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return magic_sk_1 as result of LoopInvariantWithSplittingQuery.magic(x_10);&gt;" isReturnValueComputed="true">
