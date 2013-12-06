@@ -369,6 +369,15 @@ lexer grammar KeYLexer;
         LOCSET : '\\locset';
         SEQ : '\\seq';
         BIGINT : '\\bigint';
+        
+    // Unicode symbols for special functions/predicates
+    UTF_PRECEDES = '\u227A';
+    UTF_IN = '\u220A';
+    UTF_EMPTY = '\u2205';
+    UTF_UNION = '\u222A';
+    UTF_INTERSECT = '\u2229';
+    UTF_SUBSET = '\u2286';
+    UTF_SETMINUS = '\u2216';
 
 fragment
 VOCAB
