@@ -160,6 +160,7 @@ doc: argfile
 	-link http://recoder.sourceforge.net/doc/api \
 	-link http://docs.oracle.com/javase/7/docs/api/ \
 	-link http://www.antlr2.org/javadoc/ \
+	-link http://www.antlr3.org/api/Java/ \
 	-windowtitle "KeY API Documentation" \
 	-doctitle "KeY API Documentation ($(KEY_VERSION_LONG))" \
 	-header "KeY $(KEY_VERSION_LONG)" \
