@@ -34,8 +34,8 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.AmbigiousDeclException;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 
@@ -54,7 +54,7 @@ public class TestDeclParser extends TestCase {
 	nss = serv.getNamespaces();
 	
 	String sorts = "\\sorts{boolean;int;LocSet;}";
-	KeYParser basicSortsParser = new KeYParser(ParserMode.DECLARATION, new KeYLexer(new StringReader(sorts),null),
+	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(sorts,null),
 			      "No file. Call of parser from logic/TestClashFreeSubst.java",
 			      serv, nss);
 	try {
@@ -67,15 +67,15 @@ public class TestDeclParser extends TestCase {
 	r2k.parseSpecialClasses();
     }
 
-    private KeYParser stringParser(String s) {
-	return new KeYParser(ParserMode.DECLARATION, new KeYLexer(new StringReader(s),null),
+    private KeYParserF stringParser(String s) {
+	return new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s,null),
 			      "No file. Call of parser from parser/TestDeclParser.java",
 			      serv, nss);
     }
 
     public void parseDecls(String s) {
 	try {
-	    KeYParser p = stringParser(s);
+	    KeYParserF p = stringParser(s);
 	    p.decls();
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
@@ -217,7 +217,7 @@ public class TestDeclParser extends TestCase {
 	nss = new NamespaceSet ();
 	String str = "\\sorts { \\generic G; \\generic H \\oneof {G}; }";
 	try {
-	    KeYParser p = stringParser(str);
+	    KeYParserF p = stringParser(str);
 	    p.decls();
 
 	    fail ( "Expected an GenericSortException" );
@@ -458,14 +458,10 @@ public class TestDeclParser extends TestCase {
 		 "  \\formula b;\n" +
 		 "}\n").decls();
 	  fail("Parsed in ambigious declaration");
-	} catch (AmbigiousDeclException ade) {
-	    // everything ok  
 	} catch(RuntimeException e){
 	    if(!(e.getCause() instanceof AmbigiousDeclException)){
 		fail("Unexpected excpetion. Testcase failed." +e);
 	    }
-	}catch(antlr.TokenStreamException tse) {
-	    fail("Unexpected excpetion. Testcase failed." + tse);
 	} catch(antlr.RecognitionException re) {
 	    fail("Unexpected excpetion. Testcase failed." + re);
 	} 
