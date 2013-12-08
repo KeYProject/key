@@ -49,6 +49,9 @@ public class PositionedString {
         this(text, t.getFilename(), new Position(t.getLine(),t.getColumn()));
     }
     
+    public PositionedString(String text, org.antlr.runtime.Token t){
+        this(text, t.getInputStream().getSourceName(), new Position(t.getLine(),t.getCharPositionInLine()));
+    }
     
     public PositionedString(String text, String fileName) {
         this(text, fileName, null);

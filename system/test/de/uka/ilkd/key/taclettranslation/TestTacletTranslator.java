@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.taclettranslation;
 
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
@@ -23,8 +22,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.Taclet;
@@ -60,15 +59,15 @@ public class TestTacletTranslator extends TestCase {
     //
     // Utility Methods for test cases.
     //
-    private KeYParser stringTacletParser(String s) {
-        return new KeYParser(ParserMode.TACLET, new KeYLexer(new StringReader(s), null),
+    private KeYParserF stringTacletParser(String s) {
+        return new KeYParserF(ParserMode.TACLET, new KeYLexerF(s, null),
                 "No file. parser/TestTacletParser.stringTacletParser(" + s + ")",
                 services, nss);
     }
 
     private void parseDecls(String s) {
         try {
-            KeYParser p = new KeYParser(ParserMode.DECLARATION, new KeYLexer(new StringReader(s),
+            KeYParserF p = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s,
                     null),
                     "No file. parser/TestTacletParser.stringDeclParser(" + s + ")",
                     services, nss);
@@ -83,7 +82,7 @@ public class TestTacletTranslator extends TestCase {
 
     private Term parseTerm(String s) {
         try {
-            KeYParser p = stringTacletParser(s);
+            KeYParserF p = stringTacletParser(s);
             return p.term();
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
@@ -95,7 +94,7 @@ public class TestTacletTranslator extends TestCase {
 
     private Term parseFma(String s) {
         try {
-            KeYParser p = stringTacletParser(s);
+            KeYParserF p = stringTacletParser(s);
 
             return p.formula();
         } catch (Exception e) {
@@ -108,7 +107,7 @@ public class TestTacletTranslator extends TestCase {
 
     private Taclet parseTaclet(String s) {
         try {
-            KeYParser p = stringTacletParser(s);
+            KeYParserF p = stringTacletParser(s);
 
             return p.taclet(DefaultImmutableSet.<Choice> nil());
         } catch (Exception e) {

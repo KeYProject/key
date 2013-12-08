@@ -47,7 +47,8 @@
                <callStackEntry path="/0"/>
                <operationContract name="result_0 = self.sum(array) catch(exc_0)
 pre: !array = null &amp; (self.&lt;inv&gt; &amp; !array = null)
-post: result_0 = bsum{int i;}(0, array.length, array[i])
+post: result_0
+  = javaCastInt(bsum{int i;}(0, array.length, array[i]))
 &amp; self.&lt;inv&gt;
 &amp; exc_0 = null
 mod: allLocs

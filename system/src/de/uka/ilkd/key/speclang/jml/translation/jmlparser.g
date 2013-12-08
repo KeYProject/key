@@ -1837,7 +1837,7 @@ specquantifiedexpression returns [SLExpression result = null] throws SLTranslati
 	    resolverManager.popLocalVariablesNamespace();
 
 	    p = TB.convertToFormula(p, services);
-	    result = translator.translate(q.getText(), SLExpression.class, p, expr.getTerm(), declVars.first, declVars.second, nullable, services);
+	    result = translator.translate(q.getText(), SLExpression.class, p, expr.getTerm(), declVars.first, declVars.second, nullable, expr.getType(), services);
 	}
 	RPAREN
 ;
