@@ -279,8 +279,7 @@ BODY
     String s = null;
 }
 @after { paraphrase.pop(); }
-:  {System.out.println(getText());}
-   
+:  
    '{' 
       (
 	   '{'                    { braceCounter++; ignoreAt = false; }  

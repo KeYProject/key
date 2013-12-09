@@ -96,7 +96,7 @@ public abstract class SLResolverManager {
     private SLExpression resolveLocal(String name) {
         Name n = new Name(name);
         for(Namespace ns : localVariablesNamespaces) {
-            ParsableVariable localVar = (ParsableVariable) ns.lookup(n);
+            ParsableVariable localVar = (ParsableVariable) ns.lookup(n);            
             if(localVar != null) {
                 Term varTerm = TB.var(localVar);
                 return new SLExpression(varTerm, kjts.get(localVar));

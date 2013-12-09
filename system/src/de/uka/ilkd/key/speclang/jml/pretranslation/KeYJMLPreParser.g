@@ -990,6 +990,7 @@ method_declaration[ImmutableList<String> mods, Token type, Token name]
           // TODO Other heaps? There is only one return statement.....
           psDefinition = createPositionedString("<heap> "+name.getText() +
                paramsString + " == "+bodyString, type);
+               
         }
 
     	TextualJMLMethodDecl md
@@ -1036,7 +1037,7 @@ param_decl returns [String s = null]
         {
             text.append(t.getText() + " ");
         }
-        IDENT
+        t=IDENT
         {
             text.append(t.getText());
         }

@@ -1332,8 +1332,6 @@ final class JMLTranslator {
                 symbol = progVars.lookup(new Name(functName));
 
                 if (symbol == null) {
-                    
-                    System.out.println(funcs.toString());
                     throw excManager.createException("Unknown escaped symbol "
                                                      + functName, escape);
                 }
@@ -1647,6 +1645,7 @@ final class JMLTranslator {
                                   Class<T> resultClass,
                                   Services services)
             throws SLTranslationException {
+        
         final KeYJMLParser parser = new KeYJMLParser(expr, services,
                                                      specInClass, selfVar,
                                                      paramVars, resultVar,
