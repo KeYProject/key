@@ -168,12 +168,15 @@ public class KeYProgModelInfo{
         
         
        if (rt instanceof recoder.java.declaration.ClassDeclaration) {
+           
+           // check for inner types
            result = searchType(shortName, ((recoder.java.declaration.ClassDeclaration) rt).getTypes());
+           
            if (result != null) {
                return (KeYJavaType) rec2key().toKeY(result);
            }
            
-           
+           // check for imported types
            recoder.java.NonTerminalProgramElement rct = (recoder.java.NonTerminalProgramElement) rt;
            recoder.java.CompilationUnit cunit = null;
            while (!(rct.getASTParent() instanceof recoder.java.CompilationUnit)) {
@@ -192,10 +195,8 @@ public class KeYProgModelInfo{
                        types = type.getTypes();
                    } else {
                        types = new LinkedList<recoder.abstraction.ClassType>();
-                       ((LinkedList<recoder.abstraction.ClassType>)types).add((recoder.abstraction.ClassType)i.getTypeReference());
+                       ((LinkedList<recoder.abstraction.ClassType>)types).add((recoder.abstraction.ClassType)sc.getCrossReferenceSourceInfo().getType(i.getTypeReference()));
                    }
-                   
-                   
                }
                result = searchType(shortName, types);
                if (result != null) {
@@ -210,9 +211,9 @@ public class KeYProgModelInfo{
 
     private recoder.abstraction.ClassType searchType(String shortName,
             final List<? extends ClassType> types) {
-        for (recoder.abstraction.ClassType packageType : types) {
-            if (packageType.getName().equals(shortName)) {
-                return packageType;
+        for (recoder.abstraction.ClassType type : types) {
+            if (type.getName().equals(shortName)) {
+                return type;
             }
         }
         return null;
