@@ -169,13 +169,13 @@ classlevel_comment
         options { greedy = false; }
     	:
     	mods=modifiers
-    	list=classlevel_element[mods]
+    	list=classlevel_element[mods] 
     	{
 	    if(list!=null) {
 	    	result = result.append(list);
 	    }
-	}
-    )* 
+	}           
+    )* EOF
 ;
 
 
@@ -188,8 +188,7 @@ classlevel_element[ImmutableList<String> mods]
         result=class_invariant[mods]
     |   (accessible_keyword expression) => result=depends_clause[mods]
     |   result=method_specification[mods]
-    |   (IDENT IDENT param_list (BODY | SEMICOLON)) => result=method_declaration[mods]
-    |   result=field_declaration[mods]
+    |   result=field_or_method_declaration[mods]
     |   result=represents_clause[mods]
     |   result=history_constraint[mods]
     |   result=initially_clause[mods]
@@ -217,8 +216,7 @@ methodlevel_comment
     (
     	mods=modifiers
     	list=methodlevel_element[mods]  { result = result.append(list); }
-    )*
-    EOF
+    )* EOF
 ;
 
 
@@ -228,7 +226,7 @@ methodlevel_element[ImmutableList<String> mods]
 @init { result = r; }
 @after { r = result; }
 :
-        result=field_declaration[mods]
+        result=field_or_method_declaration[mods]
     |   result=set_statement[mods]
     |   result=loop_specification[mods]
     |   result=assert_statement[mods]
@@ -911,19 +909,28 @@ old_clause
 ;
 
 
+field_or_method_declaration[ImmutableList<String> mods]
+	returns [ImmutableList<TextualJMLConstruct> result = null]
+:
+    type=IDENT 	name=IDENT 
+    ( (LPAREN) => methodDecl = method_declaration[mods, type, name] {result = methodDecl;}
+      |
+      fieldDecl = field_declaration[mods, type, name] {result = fieldDecl;}
+    ) 
+;
+
+
 //-----------------------------------------------------------------------------
 //field declarations
 //-----------------------------------------------------------------------------
 
-field_declaration[ImmutableList<String> mods]
+field_declaration[ImmutableList<String> mods, Token type, Token name]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 @init {
-    StringBuffer sb = new StringBuffer();
+    StringBuffer sb = new StringBuffer(type.getText() + " " + name.getText());
     String s;
 }
 :
-    type=IDENT 	      { sb.append(type.getText() + " "); }
-    name=IDENT 	      { sb.append(name.getText()); }
     (t=EMPTYBRACKETS { sb.append(t.getText()); })*
     (
     	    init=initialiser  { sb.append(init); }
@@ -942,16 +949,14 @@ field_declaration[ImmutableList<String> mods]
 //method declarations
 //-----------------------------------------------------------------------------
 
-method_declaration[ImmutableList<String> mods]
+method_declaration[ImmutableList<String> mods, Token type, Token name]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 @init {
-    StringBuffer sb = new StringBuffer();
+    StringBuffer sb = new StringBuffer(type.getText() + " " + name.getText());
     StringBuffer sbDefinition = new StringBuffer();
     String s;
 }
 :
-    type=IDENT 	   	{ sb.append(type.getText() + " "); }
-    name=IDENT 	   	{ sb.append(name.getText()); }
     params=param_list   { sb.append(params); }
     (
     	    body=BODY  	    { sbDefinition.append(body.getText()); }
@@ -1307,10 +1312,10 @@ expression returns [PositionedString result = null]
 :
     (
         (
-            t=LPARENT { parenthesesCounter++; }
-        |   t=RPARENT { parenthesesCounter--; }
+            t=LPAREN { parenthesesCounter++; }
+        |   t=RPAREN { parenthesesCounter--; }
         |   { parenthesesCounter > 0 }? t=SEMICOLON
-        |   t=~(LPARENT|RPARENT|SEMICOLON)
+        |   t=~(LPAREN | RPAREN | SEMICOLON)
         )
         { if (begin == null) { begin = t; } text.append(" " + t.getText()); }
     )*
