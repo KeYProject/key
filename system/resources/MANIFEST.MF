@@ -1,3 +1,4 @@
 Manifest-Version: 1.0
+Permissions: all-permissions
 Main-Class: de.uka.ilkd.key.util.install.DummyInstaller
 SplashScreen-Image: de/uka/ilkd/key/gui/images/key-color.gif

@@ -33,7 +33,7 @@
                            <loopInvariant name="
 invariant: i &gt;= 0
 &amp; i &lt;= array_1.length
-&amp; sum_1 = bsum{int j;}(0, i, array_1[j]);
+&amp; sum_1 = javaCastInt(bsum{int j;}(0, i, array_1[j]));
 variant: javaSubInt(array_1.length, i)
 mod: false" pathCondition="!array = null" pathConditionChanged="false" initiallyValid="true">
                               <callStackEntry path="/0"/>

@@ -476,6 +476,7 @@ final class JMLTranslator {
         translationMethods.put(JMLKeyWord.BSUM, new JMLTranslationMethod() {
             // TODO: the bsum keyword in JML is deprecated
 
+            @SuppressWarnings("unchecked")
             @Override
             public SLExpression translate(
                     SLTranslationExceptionManager excManager,
@@ -492,7 +493,8 @@ final class JMLTranslator {
                 ImmutableList<LogicVariable> declVars =
                         (ImmutableList<LogicVariable>) params[4];
                 Services services = (Services) params[5];
-                KeYJavaType promo = services.getTypeConverter().getPromotedType(declsType, t.getType());
+                KeYJavaType promo = t.getType(); 
+                    // services.getTypeConverter().getPromotedType(declsType, t.getType());
 
                 if (!(declsType.getJavaType().equals(PrimitiveType.JAVA_INT)
                         || declsType.getJavaType().equals(PrimitiveType.JAVA_BIGINT))) {
@@ -505,9 +507,10 @@ final class JMLTranslator {
                 Term resultTerm = TB.bsum(qv, a.getTerm(), b.getTerm(), t.getTerm(), services);
                 warnings.add(new PositionedString("The keyword \\bsum is deprecated and will be removed in the future.\n" +
                 		"Please use the standard \\sum syntax."));
-                return new SLExpression(resultTerm,
-                        promo.getJavaType() == PrimitiveType.JAVA_BIGINT ?
-                                promo : t.getType());
+                final SLExpression bsumExpr = new SLExpression(resultTerm, promo);
+                final JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper(services, excManager);
+                // cast to specific JML type (fixes bug #1347)
+                return jish.buildCastExpression(promo, bsumExpr);
             }
         });
         translationMethods.put(JMLKeyWord.SUM,
@@ -575,8 +578,8 @@ final class JMLTranslator {
                     SLTranslationExceptionManager excManager,
                     Object... params)
                             throws SLTranslationException {
-                checkParameters(params, Term.class, Term.class, KeYJavaType.class, ImmutableList.class, Boolean.class, Services.class);
-                final Services services = (Services) params[5];
+                checkParameters(params, Term.class, Term.class, KeYJavaType.class, ImmutableList.class, Boolean.class, KeYJavaType.class, Services.class);
+                final Services services = (Services) params[6];
                 Term guard = TB.convertToFormula((Term) params[0],services);
                 assert guard.sort() == Sort.FORMULA;
                 final Term body = (Term) params[1];
@@ -587,7 +590,11 @@ final class JMLTranslator {
                 if (body.sort() != intSort)
                     throw excManager.createException("body of \\min expression must be integer type");
                 final Term min = TB.min(qvs, guard, body, type, services);
-                return new SLExpression(min,type);
+                final JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper(services, excManager);
+                
+                final SLExpression result = jish.buildCastExpression((KeYJavaType)params[5], new SLExpression(min,type));
+                
+                return result;
             }
 
 
@@ -601,7 +608,7 @@ final class JMLTranslator {
                     Object... params)
                             throws SLTranslationException {
                 checkParameters(params, Term.class, Term.class, KeYJavaType.class, ImmutableList.class, Boolean.class, Services.class);
-                final Services services = (Services) params[5];
+                final Services services = (Services) params[6];
                 Term guard = TB.convertToFormula((Term) params[0],services);
                 final Term body = (Term) params[1];
                 final KeYJavaType type = (KeYJavaType) params[2];
@@ -610,8 +617,14 @@ final class JMLTranslator {
                 final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
                 if (body.sort() != intSort)
                     throw excManager.createException("body of \\max expression must be integer type");
-                final Term min = TB.max(qvs, guard, body, type, services);
-                return new SLExpression(min, type);
+                final Term max = TB.max(qvs, guard, body, type, services);
+                
+                final JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper(services, excManager);
+                
+                final SLExpression result = jish.buildCastExpression((KeYJavaType)params[5], new SLExpression(max,type));
+
+                
+                return result;
             }
 
         });
@@ -1897,14 +1910,15 @@ final class JMLTranslator {
                 throws SLTranslationException {
             checkParameters(params,
                             Term.class, Term.class, KeYJavaType.class,
-                            ImmutableList.class, Boolean.class, Services.class);
+                            ImmutableList.class, Boolean.class, KeYJavaType.class, Services.class);
             Term preTerm = (Term) params[0];
             Term bodyTerm = (Term) params[1];
             KeYJavaType declsType = (KeYJavaType) params[2];
             ImmutableList<LogicVariable> declVars =
                     (ImmutableList<LogicVariable>) params[3];
             boolean nullable = (Boolean) params[4];
-            services = (Services) params[5];
+            final KeYJavaType resultType = (KeYJavaType) params[5];
+            services = (Services) params[6];
             assert services != null;
 
             Term nullTerm = TB.NULL(services);
@@ -1919,7 +1933,7 @@ final class JMLTranslator {
                 }
             }
 
-            final SLExpression res = isGeneralized()? translateGeneralizedQuantifiers(declsType,declVars,preTerm,bodyTerm)
+            final SLExpression res = isGeneralized()? translateGeneralizedQuantifiers(declsType,declVars,preTerm,bodyTerm, resultType)
                     :translateQuantifiers(declVars, preTerm, bodyTerm);
             return res;
         }
@@ -1937,15 +1951,15 @@ final class JMLTranslator {
             return new SLExpression(result);
         }
 
-        public SLExpression translateGeneralizedQuantifiers(KeYJavaType declsType, Iterable<LogicVariable> qvs, Term t1, Term t2)
+        public SLExpression translateGeneralizedQuantifiers(KeYJavaType declsType, Iterable<LogicVariable> qvs, Term t1, Term t2, KeYJavaType resultType)
         throws SLTranslationException {
             Iterator<LogicVariable> it = qvs.iterator();
             LogicVariable qv = it.next();
+            assert resultType != null;
             if (it.hasNext()) {
                 throw new SLTranslationException("Only one quantified variable is allowed in this context.");
             }
             Term cond = TB.convertToBoolean(TB.and(t1, t2),services);
-            final KeYJavaType resultType = declsType; // TODO: should be type of t2
             return new SLExpression(translateQuantifier(qv, cond),resultType);
         }
 
@@ -1990,9 +2004,6 @@ final class JMLTranslator {
     }
 
     private abstract class JMLBoundedNumericalQuantifierTranslationMethod extends JMLQuantifierTranslationMethod {
-        final static String notBounded = "Only numerical quantifier expressions of forms (\\sum int i; l<=i && i<u; t) and (\\product int i; l<=i && i<u; t) are permitted";
-        final static String notInt = "Bounded numerical quantifier variable must be of types int or \\bigint.";
-
 
         private  boolean isBoundedNumerical(Term a, LogicVariable lv){
             return lowerBound(a,lv)!=null && upperBound(a,lv)!=null;
@@ -2038,16 +2049,17 @@ final class JMLTranslator {
                 throws SLTranslationException {
             checkParameters(params,
                     Term.class, Term.class, KeYJavaType.class,
-                    ImmutableList.class, Boolean.class, Services.class);
+                    ImmutableList.class, Boolean.class, KeYJavaType.class, Services.class);
             de.uka.ilkd.key.java.abstraction.Type declsType =
                     ((KeYJavaType) params[2]).getJavaType();
-            services = (Services) params[5];
+            final KeYJavaType resultType = (KeYJavaType) params[5];
+            services = (Services) params[6];
             assert services != null;
-            final KeYJavaType bigintType = services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT);
-            if (!declsType.equals(PrimitiveType.JAVA_INT)
-                    && !declsType.equals(PrimitiveType.JAVA_BIGINT))
-                return new SLExpression(createSkolemTerm(),bigintType); // safe in this context
-            else return super.translate(excManager, params);
+            
+            if (declsType instanceof PrimitiveType && ((PrimitiveType)declsType).isIntegerType())
+                return super.translate(excManager, params);
+            else
+                return new SLExpression(createSkolemTerm(),resultType); 
         }
 
         @Override
@@ -2060,12 +2072,11 @@ final class JMLTranslator {
         @Override
         public SLExpression translateGeneralizedQuantifiers(KeYJavaType declsType, Iterable<LogicVariable> qvs,
                 Term t1,
-                Term t2)
+                Term t2, KeYJavaType resultType)
                         throws SLTranslationException {
             Iterator<LogicVariable> it = qvs.iterator();
             LogicVariable lv = it.next();
             Term t;
-            KeYJavaType resultType = declsType; // TODO: should be type of t2
             if (it.hasNext() || !isBoundedNumerical(t1, lv)) {
                 // not interval range, create skolem term
                 t = createSkolemTerm();
@@ -2075,7 +2086,9 @@ final class JMLTranslator {
                         upperBound(t1, lv),
                         t2);
             }
-            return new SLExpression(t, resultType);
+            final JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper(services, excManager);
+            // cast to specific JML type (fixes bug #1347)
+            return jish.buildCastExpression(resultType, new SLExpression(t, resultType));
         }
 
         protected abstract Term createSkolemTerm();
@@ -2089,24 +2102,24 @@ final class JMLTranslator {
         public abstract Term translateBoundedNumericalQuantifier(QuantifiableVariable qv, Term lo, Term hi, Term body);
 
 
-                /** Should not be called. */
-                @Override
-                @Deprecated
-                public Term combineQuantifiedTerms(Term t1,
-                        Term t2) {
-                    assert false;
-                    return null;
-                }
+        /** Should not be called. */
+        @Override
+        @Deprecated
+        public Term combineQuantifiedTerms(Term t1,
+                Term t2) {
+            assert false;
+            return null;
+        }
 
 
-                /** Should not be called. */
-                @Override
-                @Deprecated
-                public Term translateQuantifier(QuantifiableVariable qv,
-                        Term t) {
-                    assert false;
-                    return null;
-                }
+        /** Should not be called. */
+        @Override
+        @Deprecated
+        public Term translateQuantifier(QuantifiableVariable qv,
+                Term t) {
+            assert false;
+            return null;
+        }
     }
 
     /**

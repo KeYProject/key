@@ -67,7 +67,8 @@ provable: ./heap/block_contracts/Simple__unnecessaryLoopInvariant.key
 provable: ./standard_key/java_dl/jml-assert/assert.key
 
 # Other tests:
-provable: ./heap/fm12_01_LCP/lcp.key
+provable: ./heap/fm12_01_LRS/lcp.key
+provable: ./heap/SemanticSlicing/project.key
 provable: ./heap/information_flow/ArrayList_contains.key
 provable: ./heap/information_flow/ArrayList_get.key
 provable: ./heap/information_flow/ArrayList_size.key
@@ -214,6 +215,8 @@ provable: ./heap/WeideEtAl_02_BinarySearch/BinarySearch_search.key
 provable: ./heap/Wellfounded/ackermann.key
 provable: ./heap/strictly_pure/strictlyPureMethod.key
 provable: ./heap/strictly_pure/useStrictlyPureMethod.key
+# this file contains Unicode symbols for logic operators
+provable: ./standard_key/unicode_test.key
 provable: ./standard_key/arith/binomial1.key
 provable: ./standard_key/arith/binomial2.key
 provable: ./standard_key/arith/check_jdiv.key
