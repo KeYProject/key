@@ -292,7 +292,7 @@ public final class MainWindow extends JFrame  {
         setLaF();
         setIconImage(IconFactory.keyLogo());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        proofListener = new MainProofListener(this);
+        proofListener = new MainProofListener();
         guiListener = new MainGUIListener();
         userInterface = new WindowUserInterface(this);
         mediator = getMainWindowMediator(userInterface);
@@ -1169,14 +1169,9 @@ public final class MainWindow extends JFrame  {
     }
 
     class MainProofListener implements AutoModeListener, KeYSelectionListener,
-    	SettingsListener {
-
-        MainProofListener(MainWindow mainWindow){
-            this.mainWindow = mainWindow;
-        }
+            SettingsListener {
 
         Proof proof = null;
-        private final MainWindow mainWindow;
 
         /** focused node has changed */
         @Override
