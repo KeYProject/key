@@ -179,11 +179,12 @@ final class Tree {
              @ loop_invariant p.left == tt;
              @ loop_invariant p2.left == p;
              @ loop_invariant t.leftSubTree(p2);
+             @ loop_invariant \subset(\singleton(p2.left), t.footprint());
              // These two are actually redundant (I am almost sure)
              // @ loop_invariant t.treeRep() == \seq_concat(p2.treeRep(), t.treeRepUntilLeft(p2));
              // @ loop_invariant t.footprint() == \set_union(t.footprintUntilLeft(p2), p2.footprint());
              @ loop_invariant \disjoint(t.footprintUntilLeft(p2), p2.footprint());
-             @ decreasing tt == null ? 0 : tt.height;
+             @ decreasing tt == null ? 0 : (tt.height+1);
              @ assignable \less_than_nothing;
              @*/
            while (tt != null) {
