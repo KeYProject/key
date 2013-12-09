@@ -116,6 +116,7 @@ final class Tree {
           requires treeInvUntilLeft(t) && t.treeInv(); 
           requires \disjoint(footprintUntilLeft(t), t.footprint());
           ensures \result ==> (t.left == null || leftSubTree(t.left));
+          ensures \result ==> (t.left == null || treeInvUntilLeft(t.left));
           ensures \result ==> (treeRep() == \seq_concat(t.treeRep(), treeRepUntilLeft(t)));
           ensures \result ==> (footprint() == \set_union(footprintUntilLeft(t), t.footprint()));
           ensures \result ==> (treeInv() <==> (treeInvUntilLeft(t) && t.treeInv()));
@@ -171,8 +172,10 @@ final class Tree {
            /*@ loop_invariant t.treeInv();
              @ loop_invariant t.treeInvUntilLeft(p2);
              @ loop_invariant p != null;
+	     @ loop_invariant p.treeInv();
              @ loop_invariant p2 != null;
              @ loop_invariant p2.treeInv();
+             @ loop_invariant tt == null || tt.treeInv();
              @ loop_invariant p.left == tt;
              @ loop_invariant p2.left == p;
              @ loop_invariant t.leftSubTree(p2);
