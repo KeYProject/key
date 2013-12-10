@@ -310,9 +310,9 @@ provable: ./standard_key/java_dl/java5/for_Array.key
 provable: ./standard_key/java_dl/java5/for_Iterable.key
 provable: ./standard_key/java_dl/java5/for_ReferenceArray.key
 provable: ./standard_key/java_dl/jml-bigint/cast.key
-# commented out as proof gets too long
+# proof gets very long
 # requires further investigations
-#provable: ./standard_key/java_dl/jml-information-flow.key
+provable: ./standard_key/java_dl/jml-information-flow.key
 notprovable: ./standard_key/java_dl/jml-min/min-unprovable1.key
 notprovable: ./standard_key/java_dl/jml-min/min-unprovable2.key
 provable: ./standard_key/java_dl/methodCall.key
