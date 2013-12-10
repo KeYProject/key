@@ -578,8 +578,8 @@ final class JMLTranslator {
                     SLTranslationExceptionManager excManager,
                     Object... params)
                             throws SLTranslationException {
-                checkParameters(params, Term.class, Term.class, KeYJavaType.class, ImmutableList.class, Boolean.class, Services.class);
-                final Services services = (Services) params[5];
+                checkParameters(params, Term.class, Term.class, KeYJavaType.class, ImmutableList.class, Boolean.class, KeYJavaType.class, Services.class);
+                final Services services = (Services) params[6];
                 Term guard = TB.convertToFormula((Term) params[0],services);
                 assert guard.sort() == Sort.FORMULA;
                 final Term body = (Term) params[1];
@@ -590,7 +590,11 @@ final class JMLTranslator {
                 if (body.sort() != intSort)
                     throw excManager.createException("body of \\min expression must be integer type");
                 final Term min = TB.min(qvs, guard, body, type, services);
-                return new SLExpression(min,type);
+                final JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper(services, excManager);
+                
+                final SLExpression result = jish.buildCastExpression((KeYJavaType)params[5], new SLExpression(min,type));
+                
+                return result;
             }
 
 
@@ -604,7 +608,7 @@ final class JMLTranslator {
                     Object... params)
                             throws SLTranslationException {
                 checkParameters(params, Term.class, Term.class, KeYJavaType.class, ImmutableList.class, Boolean.class, Services.class);
-                final Services services = (Services) params[5];
+                final Services services = (Services) params[6];
                 Term guard = TB.convertToFormula((Term) params[0],services);
                 final Term body = (Term) params[1];
                 final KeYJavaType type = (KeYJavaType) params[2];
@@ -613,8 +617,14 @@ final class JMLTranslator {
                 final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
                 if (body.sort() != intSort)
                     throw excManager.createException("body of \\max expression must be integer type");
-                final Term min = TB.max(qvs, guard, body, type, services);
-                return new SLExpression(min, type);
+                final Term max = TB.max(qvs, guard, body, type, services);
+                
+                final JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper(services, excManager);
+                
+                final SLExpression result = jish.buildCastExpression((KeYJavaType)params[5], new SLExpression(max,type));
+
+                
+                return result;
             }
 
         });
@@ -1322,8 +1332,6 @@ final class JMLTranslator {
                 symbol = progVars.lookup(new Name(functName));
 
                 if (symbol == null) {
-                    
-                    System.out.println(funcs.toString());
                     throw excManager.createException("Unknown escaped symbol "
                                                      + functName, escape);
                 }
@@ -1637,6 +1645,7 @@ final class JMLTranslator {
                                   Class<T> resultClass,
                                   Services services)
             throws SLTranslationException {
+        
         final KeYJMLParser parser = new KeYJMLParser(expr, services,
                                                      specInClass, selfVar,
                                                      paramVars, resultVar,
