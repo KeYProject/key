@@ -780,8 +780,9 @@ options {
             } else if(inSchemaMode() && attributeName.equals("length")) {
                 try {
                     result = javaInfo.getArrayLength();
-                } catch(Throwable e) {
-                    semanticError("Getting array length failed");
+                } catch(Exception ex) {
+                    keh.reportException
+                       (new KeYSemanticException(input, getSourceName(), ex));
                 }
             } else if(attributeName.equals("<inv>")) {
                 // The invariant observer "<inv>" is implicit and 
@@ -1391,9 +1392,7 @@ options {
     }
 
     private void semanticError(String message) throws RecognitionException {
-      throw new RecognitionException(input);
-      //throw new KeYSemanticException
-      //  (message, getSourceName(), getLine(), getColumn());
+      throw new KeYSemanticException(input, getSourceName(), message);
     }
 
     private static class PairOfStringAndJavaBlock {
@@ -2308,8 +2307,7 @@ term returns [Term _term = null]
     ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+		(new KeYSemanticException(input, getSourceName(), ex));
         }
         
         
@@ -2326,8 +2324,7 @@ elementary_update_term returns[Term _elementary_update_term=null]
    ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+			(new KeYSemanticException(input, getSourceName(), ex));
         }
 
 
@@ -2339,8 +2336,7 @@ equivalence_term returns [Term _equivalence_term = null]
 ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+                (new KeYSemanticException(input, getSourceName(), ex));
         }
 
 implication_term returns [Term _implication_term = null] 
@@ -2351,8 +2347,7 @@ implication_term returns [Term _implication_term = null]
 ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+                (new KeYSemanticException(input, getSourceName(), ex));
         }
 
 disjunction_term returns [Term _disjunction_term = null] 
@@ -2363,8 +2358,7 @@ disjunction_term returns [Term _disjunction_term = null]
 ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+                (new KeYSemanticException(input, getSourceName(), ex));
         }
 
 conjunction_term returns [Term _conjunction_term = null] 
@@ -2376,8 +2370,7 @@ conjunction_term returns [Term _conjunction_term = null]
 ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
 term60 returns [Term _term_60 = null] 
@@ -2388,8 +2381,7 @@ term60 returns [Term _term_60 = null]
 ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+                (new KeYSemanticException(input, getSourceName(), ex));
         }
 
 unary_formula returns [Term _unary_formula = null] 
@@ -2401,8 +2393,7 @@ unary_formula returns [Term _unary_formula = null]
 ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+                (new KeYSemanticException(input, getSourceName(), ex));
         }
 
 
@@ -2441,8 +2432,7 @@ equality_term returns [Term _equality_term = null]
  ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+                (new KeYSemanticException(input, getSourceName(), ex));
         }
 
 relation_op returns [Function op = null]
@@ -2506,8 +2496,7 @@ logicTermReEntry returns [Term _logic_term_re_entry = null]
 ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+                (new KeYSemanticException(input, getSourceName(), ex));
         }
 
 
@@ -2520,8 +2509,7 @@ weak_arith_op_term returns [Term _weak_arith_op_term = null]
 ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
 strong_arith_op_term returns [Term _strong_arith_op_term = null]
@@ -2533,8 +2521,7 @@ strong_arith_op_term returns [Term _strong_arith_op_term = null]
 ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
 
@@ -2658,8 +2645,7 @@ static_attribute_suffix returns [Term result = null]
  ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
 
@@ -2684,8 +2670,7 @@ attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix 
  ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
 query [Term prefix] returns [Term result = null] 
@@ -2714,9 +2699,7 @@ query [Term prefix] returns [Term result = null]
  ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(),getColumn()));
-
+		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
 static_query returns [Term result = null] 
@@ -2746,9 +2729,7 @@ static_query returns [Term result = null]
  ;
         catch [TermCreationException ex] {
         keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(),getColumn()));
-
+		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
 //term120
@@ -2795,7 +2776,8 @@ accessterm returns [Term _accessterm = null]
          )*
  ;
         catch [TermCreationException ex] {
-              semanticError(ex.getMessage());
+               keh.reportException
+                (new KeYSemanticException(input, getSourceName(), ex));
         }
 
 heap_update_suffix [Term heap] returns [Term _heap_update_suffix = null]
@@ -2834,7 +2816,8 @@ elementary_heap_update [Term heap] returns [Term result=heap]
     )
     ;
         catch [TermCreationException ex] {
-              semanticError(ex.getMessage());
+               keh.reportException
+                (new KeYSemanticException(input, getSourceName(), ex));
         }
 
 array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = null] 
@@ -2877,7 +2860,8 @@ array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = n
     }            
     ;
         catch [TermCreationException ex] {
-              semanticError(ex.getMessage());
+               keh.reportException
+                (new KeYSemanticException(input, getSourceName(), ex));
         }
 
 
@@ -2904,8 +2888,7 @@ atom returns [Term _atom = null]
     ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
 label returns [ImmutableArray<TermLabel> labels = new ImmutableArray<TermLabel>()] 
@@ -2933,9 +2916,8 @@ single_label returns [TermLabel label=null]
           label = getServices().getProfile().
                    getTermLabelManager().parseLabel(labelName, parameters);
       } catch(TermLabelException ex) {
-          Exception semEx = new KeYSemanticException(ex.getMessage(), getSourceName(), getLine(), getColumn());
-          semEx.initCause(ex);
-          keh.reportException(semEx);
+          keh.reportException
+                (new KeYSemanticException(input, getSourceName(), ex));
       }
   }
   ; 
@@ -2979,8 +2961,7 @@ ifThenElseTerm returns [Term _if_then_else_term = null]
  ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+		(new KeYSemanticException(input, getSourceName(), ex));
         }
         
         
@@ -3018,8 +2999,7 @@ ifExThenElseTerm returns [Term _if_ex_then_else_term = null]
  ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+		(new KeYSemanticException(input, getSourceName(), ex));
         }        
 
 
@@ -3099,8 +3079,7 @@ substitutionterm returns [Term _substitution_term = null]
 ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
 
@@ -3120,8 +3099,7 @@ updateterm returns [Term _update_term = null]
    ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+		(new KeYSemanticException(input, getSourceName(), ex));
         }           
         
 bound_variables returns[ImmutableList<QuantifiableVariable> list = ImmutableSLList.<QuantifiableVariable>nil()]
@@ -3214,8 +3192,7 @@ modality_dl_term returns [Term _modality_dl_term = null]
    ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
 
@@ -3332,8 +3309,7 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
 ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
 specialTerm returns [Term _special_term = null] 
@@ -3346,8 +3322,7 @@ specialTerm returns [Term _special_term = null]
    ;
         catch [TermCreationException ex] {
               keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
 arith_op returns [String op = null]
@@ -3474,11 +3449,8 @@ seq returns [Sequent s] :
         { s = Sequent.createSequent(ant, suc); }
     ;
      catch [RuntimeException ex] {
-         KeYSemanticException betterEx = 
-         
-  	 new KeYSemanticException(ex.getMessage(), getSourceName(), getLine(), getColumn());
-	 betterEx.setStackTrace(ex.getStackTrace());	
-	 keh.reportException(betterEx);			
+         keh.reportException
+                (new KeYSemanticException(input, getSourceName(), ex));
      }
      
 termorseq returns [Object o]
@@ -4102,8 +4074,7 @@ metaTerm returns [Term result = null]
  ;
      catch [TermCreationException ex] {
          keh.reportException
-  	    (new KeYSemanticException
-			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+  	    (new KeYSemanticException(input, getSourceName(), ex));
         }
 
 contracts
