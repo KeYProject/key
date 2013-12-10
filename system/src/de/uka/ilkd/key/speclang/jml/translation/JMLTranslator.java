@@ -65,7 +65,6 @@ final class JMLTranslator {
 
     private final static TermBuilder TB = TermBuilder.DF;
     private final String fileName;
-    @SuppressWarnings("unused")
     private Services services;                          // to be used in future
     private SLTranslationExceptionManager excManager;
     private List<PositionedString> warnings = new ArrayList<PositionedString>();
@@ -1330,8 +1329,6 @@ final class JMLTranslator {
                 symbol = progVars.lookup(new Name(functName));
 
                 if (symbol == null) {
-
-                    System.out.println(funcs.toString());
                     throw excManager.createException("Unknown escaped symbol "
                                                      + functName, escape);
                 }
@@ -1645,6 +1642,7 @@ final class JMLTranslator {
                                   Class<T> resultClass,
                                   Services services)
             throws SLTranslationException {
+
         final KeYJMLParser parser = new KeYJMLParser(expr, services,
                                                      specInClass, selfVar,
                                                      paramVars, resultVar,

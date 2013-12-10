@@ -121,6 +121,7 @@ options {
 	resolverManager.pushLocalVariablesNamespace();
 	if(paramVars != null) {
 	    resolverManager.putIntoTopLocalVariablesNamespace(paramVars);
+
 	}
 	if(resultVar != null) {
 	    resolverManager.putIntoTopLocalVariablesNamespace(resultVar);
@@ -301,7 +302,7 @@ options {
 					  Token t)
 				       throws SLTranslationException {
 
-	// Identifier with suffix in parantheses? Probably a method call
+	// Identifier with suffix in parentheses? Probably a method call
 	// parse in the parameter list and call again
 	try {
 	    if (LA(1) == LPAREN) {
@@ -1271,7 +1272,7 @@ primaryexpr returns [SLExpression result=null] throws SLTranslationException
     Term s1, s2;
 }
 :
-	result=constant
+	result = constant
     |   id:IDENT     { result = lookupIdentifier(id.getText(), null, null, id); }
     |   inv:INV      { result = translator.translate(inv.getText(),services,
                                 selfVar==null? null: TB.var(selfVar),containerType);}
@@ -1316,8 +1317,8 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
 {
     lookupName = fullyQualifiedName;
 }
-(
-	DOT id:IDENT
+( DOT
+    ( id:IDENT
 	{
 	    if(receiver == null) {
 		// Receiver was only a package/classname prefix
@@ -1332,7 +1333,7 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
 	    }
 	}
     |
-    DOT THIS
+     THIS
     {
     	result = new SLExpression(
     		services.getTypeConverter().findThisForSort(receiver.getType().getSort(),
@@ -1341,16 +1342,17 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
     							    true),
                 receiver.getType());
     }
-    |
-    DOT INV
+    | INV
     {
         result = translator.translate("\\inv",services,receiver.getTerm(),receiver.getType());
     }
-    |	{
-    	    if(receiver != null) {
-		lookupName = LT(0).getText();
-	    }
-	}
+    | MULT
+         {
+	     result = new SLExpression(TB.allFields(services, receiver.getTerm()),
+	                               javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+         }
+   )
+    |
 	l:LPAREN (params=expressionlist)? RPAREN
 	{
             ImmutableList<SLExpression> preHeapParams = ImmutableSLList.<SLExpression>nil();
@@ -1360,6 +1362,8 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
               preHeapParams = preHeapParams.append(new SLExpression(p));
             }
             params = params.prepend(preHeapParams);
+
+	    lookupName = lookupName.substring(lookupName.lastIndexOf('.')+1);
 
 	    result = lookupIdentifier(lookupName, receiver, new SLParameters(params), l);
 	    if (result == null) {
@@ -1374,12 +1378,6 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
 	}
     |
 	lbrack:LBRACKET result=specarrayrefexpr[receiver, fullyQualifiedName, lbrack] RBRACKET
-    |
-         DOT MULT
-         {
-	     result = new SLExpression(TB.allFields(services, receiver.getTerm()),
-	                               javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
-         }
 
 )
 ;

@@ -13,6 +13,7 @@
 
 lexer grammar KeYJMLPreLexer;
 
+
 @header {
     package de.uka.ilkd.key.speclang.jml.pretranslation;
 
@@ -31,10 +32,6 @@ lexer grammar KeYJMLPreLexer;
     }
 }
 
-    LPARENT : '(';
-    RPARENT : ')';
-    EQUALITY : '=';
-    EMPTYBRACKETS : '[]';
     ABSTRACT 			: 'abstract';
     ACCESSIBLE                  : 'accessible';
     ACCESSIBLE_REDUNDANTLY      : 'accessible_redundantly';
@@ -274,17 +271,6 @@ IDENT
     )*
 ;
 
-NEST_START
-:
-    '{|'
-;
-
-NEST_END
-:
-    '|}'
-;
-
-
 BODY
 @init {
     paraphrase.push("a method body");
@@ -294,20 +280,19 @@ BODY
 }
 @after { paraphrase.pop(); }
 :
-    '{'
-    (
-	   '{'                      { braceCounter++; ignoreAt = false; }
-	|  '}'  { if (braceCounter > 0) { braceCounter--; }; ignoreAt = false; }
-	|  '\n'                     { newline(); ignoreAt = true; }
-	|  ' '
-	|  '\u000C'
-	|  '\t'
-	|  '\r'
-	|  {!ignoreAt}? '@'
-	|  {ignoreAt}? { s = getText(); } '@'	    { setText(s); ignoreAt = false; }
-	|  ~('{' | '}' | '\n' | ' ' | '\u000C' | '\r' | '\t' | '@' )    { ignoreAt = false; }
-    )*
-    {braceCounter == 0}? '}'
+   '{'
+      (
+	   '{'                    { braceCounter++; ignoreAt = false; }
+    	|  {braceCounter > 0}?=> '}'  { braceCounter--; ignoreAt = false; }
+    	|  '\n'                     { newline(); ignoreAt = true; }
+    	|  ' '
+    	|  '\u000C'
+    	|  '\t'
+    	|  '\r'
+    	|  {!ignoreAt}? '@'
+    	|  {ignoreAt}? { s = getText(); } '@'	    { setText(s); ignoreAt = false; }
+    	|  ~('{' | '}' | '\n' | ' ' | '\u000C' | '\t' | '\r' | '@' )    { ignoreAt = false; }
+    )* {braceCounter == 0}?=> '}'
 ;
 
 
@@ -369,11 +354,22 @@ ESC
         :
         ']'
         ;
-
+        
+    
 // http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_4.html#SEC31, 2013-06-22
+    
+    
+
+        
+LPAREN : '(';
+RPAREN : ')';
+EQUALITY : '=';
+EMPTYBRACKETS : '[]';
+        
+
 JAVASEPARATOR
     :
-        '(' | ')' | '{' | '}' | '[' | ']' | ';' | ',' | '.'
+       '{' | '}' | '[' | ']' | ';' | ',' | '.'
     ;
 
 JAVAOPERATOR
@@ -385,10 +381,20 @@ JAVAOPERATOR
         | '^=' | '%='  | '<<=' | '>>=' | '>>>='
     ;
 
+
+NEST_START
+:
+    '{|'
+;
+
+NEST_END
+:
+    '|}'
+;
+
 JMLSPECIALSYMBOL
     :
-          '==>' | '<==' | '<==>' | '<=!=>' | '->' | '<-' | '..' | '{|'
-        | '|}'
+          '==>' | '<==' | '<==>' | '<=!=>' | '->' | '<-' | '..' 
     ;
 
 INTEGERLITERAL
