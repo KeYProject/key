@@ -74,7 +74,7 @@ final class Tree {
     /*@ model_behavior 
           requires t.treeInv();
           ensures true;
-          accessible \set_union(footprintUntilLeft(t), t == this ? \singleton(this.height) : \empty);
+          accessible \set_union(footprintUntilLeft(t), t == left ? \singleton(left.height) : \empty);
           measured_by height;
           helper model boolean treeInvUntilLeft(Tree t) {
              return (t == this || 
