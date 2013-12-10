@@ -539,6 +539,16 @@ public class TermBuilder {
                     new ImmutableArray<QuantifiableVariable>(qv));
     }
 
+    /** General (unbounded) sum */
+    public Term sum (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, Services services) {
+        final Function sum = (Function)services.getNamespaces().functions().lookup("sum");
+        final Iterator<QuantifiableVariable> it = qvs.iterator();
+        Term res = func(sum, new Term[]{convertToBoolean(range, services), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        while (it.hasNext()) {
+            res = func(sum, new Term[]{TRUE(services), res}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        }
+        return res;
+    }
 
 
     /** Constructs a bounded product comprehension expression. */
@@ -553,6 +563,17 @@ public class TermBuilder {
                     new ImmutableArray<QuantifiableVariable>(qv));
     }
 
+
+    /** General (unbounded) product */
+    public Term prod (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, Services services) {
+        final Function prod = (Function)services.getNamespaces().functions().lookup("prod");
+        final Iterator<QuantifiableVariable> it = qvs.iterator();
+        Term res = func(prod, new Term[]{convertToBoolean(range, services), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        while (it.hasNext()) {
+            res = func(prod, new Term[]{TRUE(services), res}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        }
+        return res;
+    }
 
     /** Translation of JML's \min operator using \ifEx operator. */
     public Term min(ImmutableList<QuantifiableVariable> qvs, Term guard, Term t, KeYJavaType type, Services services) {
