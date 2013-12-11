@@ -170,33 +170,33 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         if(t==null) {
             return null;
         }
-    if(t.op() instanceof ProgramVariable) {
-        if(replaceMap.containsKey(t.op())) {
-            ProgramVariable replacement = replaceMap.get(t.op());
-            return TermFactory.DEFAULT.createTerm(replacement);
+        if(t.op() instanceof ProgramVariable) {
+            if(replaceMap.containsKey(t.op())) {
+                ProgramVariable replacement = replaceMap.get(t.op());
+                return TermFactory.DEFAULT.createTerm(replacement);
+            } else {
+                return t;
+            }
         } else {
-            return t;
+            Term subTerms[] = new Term[t.arity()];
+            for(int i = 0, n = t.arity(); i < n; i++) {
+                subTerms[i] = replaceVariablesInTerm(t.sub(i));
+            }
+            Operator op = t.op();
+            if(op instanceof ElementaryUpdate) {
+                ElementaryUpdate uop = (ElementaryUpdate) t.op();
+                if(replaceMap.containsKey(uop.lhs())) {
+                    UpdateableOperator replacedLhs
+                    = (UpdateableOperator) replaceMap.get(uop.lhs());
+                    op = ElementaryUpdate.getInstance(replacedLhs);
+                }
+            }
+            return TermFactory.DEFAULT.createTerm(op,
+                                                  subTerms,
+                                                  t.boundVars(),
+                                                  t.javaBlock(),
+                                                  t.getLabels());
         }
-    } else {
-        Term subTerms[] = new Term[t.arity()];
-        for(int i = 0, n = t.arity(); i < n; i++) {
-        subTerms[i] = replaceVariablesInTerm(t.sub(i));
-        }
-        Operator op = t.op();
-        if(op instanceof ElementaryUpdate) {
-        ElementaryUpdate uop = (ElementaryUpdate) t.op();
-        if(replaceMap.containsKey(uop.lhs())) {
-            UpdateableOperator replacedLhs
-                = (UpdateableOperator) replaceMap.get(uop.lhs());
-            op = ElementaryUpdate.getInstance(replacedLhs);
-        }
-        }
-        return TermFactory.DEFAULT.createTerm(op,
-                              subTerms,
-                              t.boundVars(),
-                              t.javaBlock(),
-                              t.getLabels());
-    }
     }
 
     private ImmutableSet<Term> replaceVariablesInTerms(ImmutableSet<Term> terms) {

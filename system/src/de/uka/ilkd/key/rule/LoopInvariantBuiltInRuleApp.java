@@ -117,11 +117,11 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 				result = replace(visited);
 			}
 			
-			public Term getResult(){
+			public Term getResult() {
 				return result;
 			}
 			
-			private Term replace(Term visited){
+			private Term replace(Term visited) {
 			    ImmutableArray<Term> subs = visited.subs();
 			    if (subs.isEmpty()) {
 			    	if (visited.op().name().toString().equals("index"))
@@ -147,11 +147,11 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                 result = replace(visited);
             }
             
-            public Term getResult(){
+            public Term getResult() {
                 return result;
             }
             
-            private Term replace(Term visited){
+            private Term replace(Term visited) {
                 ImmutableArray<Term> subs = visited.subs();
                 if (subs.isEmpty()) {
                     if (visited.op().name().toString().equals("values"))

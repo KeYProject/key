@@ -580,7 +580,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	//"Invariant Initially Valid":
 	// \replacewith (==> inv );
 	prepareInvInitiallyValidBranch(services, ruleApp, inst, invTerm, reachableState, initGoal);
-	
+
 	setupWdGoal(wdGoal, inst.inv, inst.u, inst.selfTerm, heapContext.get(0),
 	            anonHeap, localIns, ruleApp.posInOccurrence(), services);
 

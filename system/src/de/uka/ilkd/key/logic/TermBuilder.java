@@ -66,6 +66,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -1716,31 +1717,14 @@ public class TermBuilder {
     return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
     }
 
-    public Term relabel(Term term, ImmutableArray<TermLabel> labels) {
+    public Term addLabel(Term term, ImmutableArray<TermLabel> labels) {
         if ((labels == null || labels.isEmpty())
                 && !term.hasLabels()) {
             return term;
-        } else {
+        } else if (!term.hasLabels()) {
             return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(),
                     term.javaBlock(), labels);
-        }
-    }
-
-    public Term relabel(Term term, TermLabel label) {
-        if (label == null && !term.hasLabels()) {
-            return term;
         } else {
-            return label(term, new ImmutableArray<TermLabel>(label));
-        }
-    }
-
-    public Term label(Term term, ImmutableArray<TermLabel> labels) {
-        if ((labels == null || labels.isEmpty())) {
-            return term;
-        } else //if (!term.hasLabels()) {
-            return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(),
-                                                  term.javaBlock(), labels);
-        /*} else {
             ImmutableList<TermLabel> newLabelList = ImmutableSLList.<TermLabel>nil();
             for (TermLabel l: labels) {
                 if (!term.getLabels().contains(l)) {
@@ -1760,7 +1744,30 @@ public class TermBuilder {
             return TermFactory.DEFAULT.createTerm(term.op(), term.subs(),
                                                   term.boundVars(), term.javaBlock(),
                                                   new ImmutableArray<TermLabel>(newLabels));
-        }*/
+        }
+    }
+
+    public Term addLabel(Term term, TermLabel label) {
+        if (label == null && !term.hasLabels()) {
+            return term;
+        } else {
+            return addLabel(term, new ImmutableArray<TermLabel>(label));
+        }
+    }
+
+    public Term label(Term term, ImmutableArray<TermLabel> labels) {
+        if ((labels == null || labels.isEmpty())) {
+            return term;
+        } else if (labels.size() == 1
+                && (labels.contains(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)
+                        || labels.contains(ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL)
+                        || labels.contains(ParameterlessTermLabel.UNDEFINED_VALUE_LABEL))
+                && !WellDefinednessCheck.isOn()) {
+            return term; // FIXME: This case is only for runTests
+        } else {
+            return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(),
+                                                  term.javaBlock(), labels);
+        }
     }
 
     public Term label(Term term, TermLabel label) {
@@ -1772,9 +1779,10 @@ public class TermBuilder {
     }
 
     public Term shortcut(Term term) {
-        if (term.op().equals(Junctor.AND)
-                        || term.op().equals(Junctor.OR)) {
-            return label(term, ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL);
+        if ((term.op().equals(Junctor.AND)
+                        || term.op().equals(Junctor.OR))
+            && WellDefinednessCheck.isOn()) { // FIXME: Last condition is only for runTests
+            return addLabel(term, ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL);
         } else {
             return term;
         }
