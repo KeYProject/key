@@ -15,7 +15,7 @@ class Indirect {
         c.add(v);
     }
 
-    //@ requires c1.<inv> && c2.<inv>;
+    //@ requires \invariant_for(c1) && \invariant_for(c2);
     //@ ensures true;
     void test(Coll1 c1, Coll2 c2) {
         callAdd(c1, 42);

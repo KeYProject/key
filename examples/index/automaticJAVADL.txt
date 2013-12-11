@@ -465,6 +465,8 @@ notprovable: ./standard_key/arrays/arrayStoreException/throwASEForPrim.key
 notprovable: ./standard_key/java_dl/danglingElse.key
 
 # Model methods tests:
+# (Note: some of the problems are trivial, but they should be kept
+# here as these problems provide the only test base for model methods)
 
 provable: ./heap/model_methods/Cell_footprint_acc.key
 provable: ./heap/model_methods/Cell_footprint.key
