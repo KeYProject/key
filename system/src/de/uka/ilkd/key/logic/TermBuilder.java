@@ -1661,10 +1661,10 @@ public class TermBuilder {
     public Term label(Term term, ImmutableArray<TermLabel> labels) {
         if ((labels == null || labels.isEmpty())) {
             return term;
-        } else if (!term.hasLabels()) {
+        } else //if (!term.hasLabels()) {
             return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(),
                                                   term.javaBlock(), labels);
-        } else {
+        /*} else {
             ImmutableList<TermLabel> newLabelList = ImmutableSLList.<TermLabel>nil();
             for (TermLabel l: labels) {
                 if (!term.getLabels().contains(l)) {
@@ -1684,7 +1684,7 @@ public class TermBuilder {
             return TermFactory.DEFAULT.createTerm(term.op(), term.subs(),
                                                   term.boundVars(), term.javaBlock(),
                                                   new ImmutableArray<TermLabel>(newLabels));
-        }
+        }*/
     }
 
     public Term label(Term term, TermLabel label) {
