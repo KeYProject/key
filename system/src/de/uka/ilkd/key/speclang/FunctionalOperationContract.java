@@ -20,6 +20,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -97,6 +98,8 @@ public interface FunctionalOperationContract extends OperationContract {
                                    Term excTerm,
                                    Map<LocationVariable,Term> atPres,
                                    Services services);
+    
+    public KeYJavaType getSpecifiedIn();
 
     public boolean hasResultVar();
 }

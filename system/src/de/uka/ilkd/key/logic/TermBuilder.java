@@ -845,6 +845,33 @@ public class TermBuilder {
         
         return func(f, mby, mbyAtPre);
     }
+    
+    public Term measuredByCheck(Term mby, Services services) {
+        final Namespace funcNS = services.getNamespaces().functions();
+        final Function f = (Function)funcNS.lookup(new Name("measuredByCheck"));
+        if (f == null)
+                throw new RuntimeException("LDT: Function measuredByCheck not found.\n" +
+                                "It seems that there are definitions missing from the .key files.");        
+        return func(f, mby);
+    }
+
+    public Term measuredBy(Term mby, Services services) {
+        final Namespace funcNS = services.getNamespaces().functions();
+        final Function f = (Function)funcNS.lookup(new Name("measuredBy"));
+        if (f == null)
+                throw new RuntimeException("LDT: Function measuredBy not found.\n" +
+                                "It seems that there are definitions missing from the .key files.");        
+        return func(f, mby);
+    }
+
+    public Term measuredByEmpty(Services services) {
+        final Namespace funcNS = services.getNamespaces().functions();
+        final Function f = (Function)funcNS.lookup(new Name("measuredByEmpty"));
+        if (f == null)
+                throw new RuntimeException("LDT: Function measuredByEmpty not found.\n" +
+                                "It seems that there are definitions missing from the .key files.");        
+        return func(f);
+    }
 
     /**
      * If a is a boolean literal, the method returns the literal as a Formula.
