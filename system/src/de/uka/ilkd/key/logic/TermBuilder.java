@@ -1325,6 +1325,29 @@ public class TermBuilder {
         }
     }
 
+    public Term inByte(Term var,
+                      Services services) {
+        Function f =
+                (Function) services.getNamespaces().functions().lookup(
+                new Name("inByte"));
+        return func(f, var);
+    }
+
+    public Term inShort(Term var,
+                      Services services) {
+        Function f =
+                (Function) services.getNamespaces().functions().lookup(
+                new Name("inShort"));
+        return func(f, var);
+    }
+
+    public Term inChar(Term var,
+                      Services services) {
+        Function f =
+                (Function) services.getNamespaces().functions().lookup(
+                new Name("inChar"));
+        return func(f, var);
+    }
 
     public Term inInt(Term var,
                       Services services) {
@@ -1601,6 +1624,11 @@ public class TermBuilder {
         return func(services.getTypeConverter().getHeapLDT().getNull());
     }
 
+    /** Non-null comparison of reference types */
+    public Term notNull(Services services, Term o) {
+        return not(equals(o, NULL(services)));
+    }
+
     public Term wellFormed(Term heap, Services services) {
         return func(services.getTypeConverter().getHeapLDT().getWellFormed(heap.sort()),
                 heap);
@@ -1786,11 +1814,11 @@ public class TermBuilder {
     public Term created(Services services, Term h, Term o) {
         final TypeConverter tc = services.getTypeConverter();
         return equals(select(services,
-                tc.getBooleanLDT().targetSort(),
-                h,
-                o,
-                func(tc.getHeapLDT().getCreated())),
-                TRUE(services));
+                             tc.getBooleanLDT().targetSort(),
+                             h,
+                             o,
+                             func(tc.getHeapLDT().getCreated())),
+                      TRUE(services));
     }
 
 
@@ -1798,6 +1826,13 @@ public class TermBuilder {
         return created(services, getBaseHeap(services), o);
     }
 
+    public Term createdAndNotNull(Services services, Term heap, Term o) {
+        return and(created(services, heap, o), notNull(services, o));
+    }
+
+    public Term createdAndNotNull(Services services, Term o) {
+        return and(created(services, o), notNull(services, o));
+    }
 
 
     public Term initialized(Services services, Term o) {
