@@ -1763,7 +1763,7 @@ public class TermBuilder {
                         || labels.contains(ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL)
                         || labels.contains(ParameterlessTermLabel.UNDEFINED_VALUE_LABEL))
                 && !WellDefinednessCheck.isOn()) {
-            return term; // FIXME: This case is only for runTests
+            return term; // FIXME: This case is only for SET Tests
         } else {
             return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(),
                                                   term.javaBlock(), labels);
@@ -1781,7 +1781,7 @@ public class TermBuilder {
     public Term shortcut(Term term) {
         if ((term.op().equals(Junctor.AND)
                         || term.op().equals(Junctor.OR))
-            && WellDefinednessCheck.isOn()) { // FIXME: Last condition is only for runTests
+            && WellDefinednessCheck.isOn()) { // FIXME: Last condition is only for SET Tests
             return addLabel(term, ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL);
         } else {
             return term;
