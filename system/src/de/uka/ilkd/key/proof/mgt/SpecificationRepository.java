@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -41,6 +42,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -61,9 +63,11 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
 import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.ContractAxiom;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
@@ -1046,47 +1050,131 @@ public final class SpecificationRepository {
 
             // add invariant axiom for own class and other final classes
             for (KeYJavaType kjt : services.getJavaInfo().getAllKeYJavaTypes()) {
-                if (kjt != selfKjt && !ji.isFinal(kjt))
-                    continue; // only final classes
-                if (kjt != selfKjt && JavaInfo.isPrivate(kjt))
-                    continue; // only non-private classes
+                if (kjt != selfKjt && !ji.isFinal(kjt)) continue; // only final classes
+                if (kjt != selfKjt && JavaInfo.isPrivate(kjt)) continue; // only non-private classes
                 final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(kjt);
-                final ProgramVariable selfVar = TB
-                        .selfVar(services, kjt, false);
+                final ProgramVariable selfVar = TB.selfVar(services, kjt, false);
                 Term invDef = TB.tt();
                 for (ClassInvariant inv : myInvs) {
                     invDef = TB.and(invDef, inv.getInv(selfVar, services));
                 }
                 invDef = TB.tf().createTerm(Equality.EQV,
                         TB.inv(services, TB.var(selfVar)), invDef);
-                final IObserverFunction invSymbol = services.getJavaInfo()
-                        .getInv();
-                final ClassAxiom invRepresentsAxiom = new RepresentsAxiom(
-                        "Class invariant axiom for " + kjt.getFullName(),
-                        invSymbol, kjt, new Private(), invDef, selfVar,
-                        ImmutableSLList.<ProgramVariable> nil(), null);
+                final IObserverFunction invSymbol = services.getJavaInfo().getInv();
+                final ClassAxiom invRepresentsAxiom
+                = new RepresentsAxiom("Class invariant axiom for " + kjt.getFullName(),
+                                      invSymbol,
+                                      kjt,
+                                      new Private(),
+                                      null,
+                                      invDef,
+                                      selfVar,
+                                      ImmutableSLList.<ProgramVariable> nil(),
+                                      null);
                 result = result.add(invRepresentsAxiom);
             }
 
             // add query axioms for own class
             for (IProgramMethod pm : services.getJavaInfo()
                     .getAllProgramMethods(selfKjt)) {
-                if (!pm.isVoid() && !pm.isConstructor() && !pm.isImplicit()
-                        && !pm.isModel()) {
+                if (!pm.isVoid() && !pm.isConstructor() && !pm.isImplicit() && !pm.isModel()) {
                     pm = services.getJavaInfo().getToplevelPM(selfKjt, pm);
-                    final ClassAxiom queryAxiom = new QueryAxiom(
-                            "Query axiom for " + pm.getName() + " in "
-                                    + selfKjt.getFullName(), pm, selfKjt);
+                    final ClassAxiom queryAxiom
+                    = new QueryAxiom("Query axiom for " + pm.getName() +
+                                         " in " + selfKjt.getFullName(),
+                                     pm,
+                                     selfKjt);
                     result = result.add(queryAxiom);
                 }
             }
 
+            // add model method axioms of all kinds
+            result = result.union(getModelMethodAxioms());
             // add axioms for enclosing class, if applicable
             final KeYJavaType enclosingKJT = getEnclosingKJT(selfKjt);
             if (enclosingKJT != null) {
                 result = result.union(getClassAxioms(enclosingKJT));
             }
             allClassAxiomsCache.put(selfKjt, result);
+        }
+        return result;
+    }
+
+    private ImmutableSet<ClassAxiom> getModelMethodAxioms() {
+        ImmutableSet<ClassAxiom> result  = DefaultImmutableSet.<ClassAxiom>nil();
+        for(KeYJavaType kjt : services.getJavaInfo().getAllKeYJavaTypes()) {
+            final ProgramVariable selfVar = TB.selfVar(services, kjt, false);
+            for(IProgramMethod pm : services.getJavaInfo().getAllProgramMethods(kjt)) {
+                if(!pm.isVoid() && pm.isModel()) {
+                    pm = services.getJavaInfo().getToplevelPM(kjt, pm);
+                    ImmutableList<ProgramVariable> paramVars = TB.paramVars(services, pm, false);
+                    Map<LocationVariable,ProgramVariable> atPreVars =
+                            new LinkedHashMap<LocationVariable,ProgramVariable>();
+                    List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+                    for(LocationVariable heap : heaps) {
+                        atPreVars.put(heap,
+                                      TB.heapAtPreVar(services, heap.name().toString()+"AtPre",
+                                                      heap.sort(), false));
+                    }
+                    ProgramVariable resultVar = TB.resultVar(services, pm, false);
+
+                    boolean definitionFound = false;
+                    // This assumes there is one operation contract for each model pm per class
+                    // We need to construct an inheritance chain of contracts starting at the bottom
+                    ImmutableList<FunctionalOperationContract> lookupContracts =
+                            ImmutableSLList.<FunctionalOperationContract>nil();
+                    ImmutableSet<FunctionalOperationContract> cs = getOperationContracts(kjt, pm);
+                    ImmutableList<KeYJavaType> superTypes =
+                            services.getJavaInfo().getAllSupertypes(kjt);
+                    for(KeYJavaType superType : superTypes) {
+                        for(FunctionalOperationContract fop : cs) {
+                            if(fop.getSpecifiedIn().equals(superType)) {
+                                 lookupContracts = lookupContracts.append(fop);
+                            }
+                        }
+                    }
+                    for(FunctionalOperationContract fop : lookupContracts) {
+                        Term representsFromContract =
+                                fop.getRepresentsAxiom(heaps.get(0), selfVar, paramVars, TB.resultVar(services, pm, false), atPreVars, services);
+                        Term preContract = fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
+                        if(preContract == null) preContract = TB.tt();
+                        if(representsFromContract != null) {
+                            // TODO Wojtek: I do not understand the visibility issues of model fields/methods.
+                            // VisibilityModifier visibility = pm.isPrivate() ? new Private() :
+                            //    (pm.isProtected() ? new Protected() : (pm.isPublic() ? new Public() : null));
+
+                            final ClassAxiom modelMethodRepresentsAxiom
+                                = new RepresentsAxiom("Definition axiom for " + pm.getName() +
+                                                        " in " + kjt.getFullName(),
+                                                      pm, kjt, new Private(), preContract,
+                                                      representsFromContract, selfVar, paramVars,
+                                                      atPreVars);
+                            result = result.add(modelMethodRepresentsAxiom);
+                            definitionFound = true;
+                            break;
+                        }
+                    }
+                    for(FunctionalOperationContract fop : getOperationContracts(kjt,pm)) {
+                    	Term preFromContract =
+                    	        fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
+                    	Term postFromContract =
+                    	        fop.getPost(heaps, selfVar, paramVars, resultVar, null,
+                    	                    atPreVars, services);
+                    	if(preFromContract != null && postFromContract != null
+                    	        && postFromContract != TB.tt()) {
+                    		Term mbyFromContract = fop.hasMby() ?
+                    		        fop.getMby(selfVar, paramVars, services) : null;
+                    		final ClassAxiom modelMethodContractAxiom
+                    		= new ContractAxiom("Contract axiom for " + pm.getName()
+                    		                    + " in " + kjt.getName().toString(),
+                    		                    pm, kjt, new Private(), preFromContract,
+                    		                    postFromContract, mbyFromContract, atPreVars,
+                    		                    selfVar, resultVar, paramVars);
+                    		result = result.add(modelMethodContractAxiom);
+                    	}
+                    }
+                }
+            }
         }
         return result;
     }
@@ -1373,39 +1461,43 @@ public final class SpecificationRepository {
     public Pair<IObserverFunction, ImmutableSet<Taclet>> limitObs(IObserverFunction obs) {
         assert limitedToUnlimited.get(obs) == null : " observer is already limited: "
                 + obs;
-        if (!(obs instanceof IObserverFunction && !(obs instanceof IProgramMethod))) {
-            // TODO Was the exact class match
-            // "obs.getClass() != ObserverFunction.class" correctly converted
-            // into IProgramMethod?
-            return null;
-        }
+        // TODO Was the exact class match "obs.getClass() != ObserverFunction.class" correctly converted into IProtramMethod?
+        // Wojtek: I guess so, but why are IProgramMethods excluded from limiting?
+        // This kills limiting for model methods...
+        // if(!(obs instanceof IObserverFunction && !(obs instanceof IProgramMethod))) { 
+        //      return null;
+        // }
 
         IObserverFunction limited = unlimitedToLimited.get(obs);
         ImmutableSet<Taclet> taclets = unlimitedToLimitTaclets.get(obs);
 
         if (limited == null) {
-            final String baseName = ((ProgramElementName) obs.name())
-                    .getProgramName() + "$lmtd";
-            final Sort heapSort = services.getTypeConverter().getHeapLDT()
-                    .targetSort();
-            limited = new ObserverFunction(baseName, obs.sort(), obs.getType(),
-                    heapSort, obs.getContainerType(), obs.isStatic(),
-                    obs.getParamTypes(), obs.getHeapCount(services),
-                    obs.getStateCount());
+            final String baseName
+                = ((ProgramElementName)obs.name()).getProgramName() + "$lmtd";
+            final Sort heapSort
+                = services.getTypeConverter().getHeapLDT().targetSort();
+            limited = new ObserverFunction(baseName,
+                                           obs.sort(),
+                                           obs.getType(),
+                                           heapSort,
+                                           obs.getContainerType(),
+                                           obs.isStatic(),
+                                           obs.getParamTypes(),
+                                           obs.getHeapCount(services),
+                                           obs.getStateCount());
             unlimitedToLimited.put(obs, limited);
             limitedToUnlimited.put(limited, obs);
 
             assert taclets == null;
             taclets = DefaultImmutableSet.<Taclet> nil()
-                    .add(getLimitedToUnlimitedTaclet(limited, obs))
-                    .add(getUnlimitedToLimitedTaclet(limited, obs));
+                                .add(getLimitedToUnlimitedTaclet(limited, obs))
+                                .add(getUnlimitedToLimitedTaclet(limited, obs));
             unlimitedToLimitTaclets.put(obs, taclets);
         }
 
         assert limited != null;
         assert taclets != null;
-        return new Pair<IObserverFunction, ImmutableSet<Taclet>>(limited,
-                taclets);
+        return new Pair<IObserverFunction, ImmutableSet<Taclet>>(limited, taclets);
     }
 
     public IObserverFunction unlimitObs(IObserverFunction obs) {

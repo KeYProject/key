@@ -83,29 +83,29 @@ public final class DependencyContractPO extends AbstractPO
         //"self.<created> = TRUE" for all heaps
 
         Term selfCreated = null;
-        if(selfVar != null) {
+        if (selfVar != null) {
             for(LocationVariable h : heaps) {
                 final Term sc = TB.created(services, TB.var(h), TB.var(selfVar));
-                if(selfCreated == null) {
+                if (selfCreated == null) {
                     selfCreated = sc;
                 }else{
                     selfCreated = TB.and(selfCreated, sc);
                 }
             }
-            if(preHeaps != null) {
+            if (preHeaps != null) {
                 for(LocationVariable h : preHeaps) {
                     final Term sc = TB.created(services, TB.var(h), TB.var(selfVar));
-                    if(selfCreated == null) {
+                    if (selfCreated == null) {
                        selfCreated = sc;
-                    }else{
+                    } else {
                        selfCreated = TB.and(selfCreated, sc);
                     }
                 }
             }
-        }else{
+        } else {
             selfCreated = TB.tt();
         }
-        	      
+
         //"MyClass::exactInstance(self) = TRUE"
         final Term selfExactType
            = selfVar == null
@@ -113,8 +113,8 @@ public final class DependencyContractPO extends AbstractPO
              : TB.exactInstance(services, 
         	                selfKJT.getSort(), 
         	                TB.var(selfVar));
-             
-	
+
+
         //conjunction of... 
         //- "p_i = null | p_i.<created> = TRUE" for object parameters, and
         //- "inBounds(p_i)" for integer parameters
@@ -122,21 +122,25 @@ public final class DependencyContractPO extends AbstractPO
         for(ProgramVariable paramVar : paramVars) {
             paramsOK = TB.and(paramsOK, TB.reachableValue(services, paramVar));
         }
-        
+
         //initial value of measured_by clause
         final Term mbyAtPreDef;
-        if(contract.hasMby()) {
+        if (contract.hasMby()) {
+/*
             final Function mbyAtPreFunc
-            	= new Function(new Name(TB.newName(services, "mbyAtPre")), 
-        		       services.getTypeConverter()
-        		               .getIntegerLDT()
-        		               .targetSort());
+            = new Function(new Name(TB.newName(services, "mbyAtPre")),
+                            services.getTypeConverter()
+                                    .getIntegerLDT()
+                                    .targetSort());
             register(mbyAtPreFunc);
             mbyAtPre = TB.func(mbyAtPreFunc);
+*/
             final Term mby = contract.getMby(selfVar, paramVars, services);
-            mbyAtPreDef = TB.equals(mbyAtPre, mby);
+//            mbyAtPreDef = TB.equals(mbyAtPre, mby);
+            mbyAtPreDef = TB.measuredBy(mby, services);
         } else {
-            mbyAtPreDef = TB.tt();
+//            mbyAtPreDef = TB.tt();
+            mbyAtPreDef = TB.measuredByEmpty(services);
         }        
              
         return TB.and(new Term[]{wellFormedHeaps,

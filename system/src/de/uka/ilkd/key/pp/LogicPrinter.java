@@ -1427,27 +1427,27 @@ public final class LogicPrinter {
                 //heaps not printed
                 markEndSub();
             }
-            
+
             if(!obs.isStatic() ) {
         	  markStartSub();
         	  printTerm(t.sub(totalHeaps));
         	  markEndSub();
         	  layouter.print(".");
             }
-            
+
             final String prettyFieldName 
             	= services.getTypeConverter()
                           .getHeapLDT()
                           .getPrettyFieldName((Function)t.op());
             layouter.print(prettyFieldName);
-            
+
             if(obs.getNumParams() > 0 || obs instanceof IProgramMethod) {
         	layouter.print("(").beginC(0);
-        	for(int i = 0, n = obs.getNumParams(); i < n; i++) {
-        	    markStartSub();
-        	    printTerm(t.sub(i + (obs.isStatic() ? 1 : 2)));
-        	    markEndSub();
-                    if(i < n - 1) {
+                for (int i = 0, n = obs.getNumParams(); i < n; i++) {
+                    markStartSub();
+                    printTerm(t.sub(i + totalHeaps + (obs.isStatic() ? 0 : 1)));
+                    markEndSub();
+                    if (i < n - 1) {
                         layouter.print(",").brk(1,0);
                     }
         	}
@@ -1460,8 +1460,8 @@ public final class LogicPrinter {
             printFunctionTerm(t.op().name().toString(), t);            
         }
     }
-    
-    
+
+
     public void printSingleton(Term t) throws IOException {
 	assert t.arity() == 2;
 	startTerm(2);	 

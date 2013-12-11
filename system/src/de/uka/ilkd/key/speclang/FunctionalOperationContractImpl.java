@@ -1336,15 +1336,22 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return ContractFactory.generateContractTypeName(baseName, kjt, pm, specifiedIn);
     }
 
- 
+
     @Override
     public boolean hasResultVar() {
        return originalResultVar != null;
     }
 
+
     @Override
     public boolean hasSelfVar() {
        return originalSelfVar != null;
+    }
+
+
+    @Override
+    public KeYJavaType getSpecifiedIn() {
+	    return specifiedIn;
     }
 
 

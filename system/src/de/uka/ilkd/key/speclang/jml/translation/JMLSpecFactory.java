@@ -974,6 +974,7 @@ public class JMLSpecFactory {
                                    rep.first,
                                    kjt,
                                    visibility,
+                                   null,
                                    repFormula,
                                    selfVar,
                                    ImmutableSLList.<ProgramVariable>nil(),null);
@@ -1013,6 +1014,7 @@ public class JMLSpecFactory {
                                    rep.first,
                                    kjt,
                                    getVisibility(textualRep),
+                                   null,
                                    repFormula,
                                    selfVar,
                                    ImmutableSLList.<ProgramVariable>nil(), null);

@@ -541,6 +541,16 @@ public class TermBuilder {
                     new ImmutableArray<QuantifiableVariable>(qv));
     }
 
+    /** General (unbounded) sum */
+    public Term sum (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, Services services) {
+        final Function sum = (Function)services.getNamespaces().functions().lookup("sum");
+        final Iterator<QuantifiableVariable> it = qvs.iterator();
+        Term res = func(sum, new Term[]{convertToBoolean(range, services), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        while (it.hasNext()) {
+            res = func(sum, new Term[]{TRUE(services), res}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        }
+        return res;
+    }
 
 
     /** Constructs a bounded product comprehension expression. */
@@ -555,6 +565,17 @@ public class TermBuilder {
                     new ImmutableArray<QuantifiableVariable>(qv));
     }
 
+
+    /** General (unbounded) product */
+    public Term prod (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, Services services) {
+        final Function prod = (Function)services.getNamespaces().functions().lookup("prod");
+        final Iterator<QuantifiableVariable> it = qvs.iterator();
+        Term res = func(prod, new Term[]{convertToBoolean(range, services), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        while (it.hasNext()) {
+            res = func(prod, new Term[]{TRUE(services), res}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        }
+        return res;
+    }
 
     /** Translation of JML's \min operator using \ifEx operator. */
     public Term min(ImmutableList<QuantifiableVariable> qvs, Term guard, Term t, KeYJavaType type, Services services) {
@@ -887,6 +908,33 @@ public class TermBuilder {
                                 "It seems that there are definitions missing from the .key files.");
 
         return func(f, mby, mbyAtPre);
+    }
+
+    public Term measuredByCheck(Term mby, Services services) {
+        final Namespace funcNS = services.getNamespaces().functions();
+        final Function f = (Function)funcNS.lookup(new Name("measuredByCheck"));
+        if (f == null)
+                throw new RuntimeException("LDT: Function measuredByCheck not found.\n" +
+                                "It seems that there are definitions missing from the .key files.");
+        return func(f, mby);
+    }
+
+    public Term measuredBy(Term mby, Services services) {
+        final Namespace funcNS = services.getNamespaces().functions();
+        final Function f = (Function)funcNS.lookup(new Name("measuredBy"));
+        if (f == null)
+                throw new RuntimeException("LDT: Function measuredBy not found.\n" +
+                                "It seems that there are definitions missing from the .key files.");
+        return func(f, mby);
+    }
+
+    public Term measuredByEmpty(Services services) {
+        final Namespace funcNS = services.getNamespaces().functions();
+        final Function f = (Function)funcNS.lookup(new Name("measuredByEmpty"));
+        if (f == null)
+                throw new RuntimeException("LDT: Function measuredByEmpty not found.\n" +
+                                "It seems that there are definitions missing from the .key files.");
+        return func(f);
     }
 
     /**

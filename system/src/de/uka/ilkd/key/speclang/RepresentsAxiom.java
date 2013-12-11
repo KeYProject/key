@@ -52,6 +52,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     private final IObserverFunction target;
     private final KeYJavaType kjt;
     private final VisibilityModifier visibility;
+    private final Term originalPre;
     private final Term originalRep;
     private final ProgramVariable originalSelfVar;
     private final Map<LocationVariable,ProgramVariable> atPreVars;
@@ -62,12 +63,12 @@ public final class RepresentsAxiom extends ClassAxiom {
 			   IObserverFunction target,
 	                   KeYJavaType kjt,
 	                   VisibilityModifier visibility,
+	                   Term pre,
 	                   Term rep,
 	                   ProgramVariable selfVar,
 	                   ImmutableList<ProgramVariable> paramVars,
-	                   Map<LocationVariable, ProgramVariable> atPreVars) {
-    	      this(name,null,target,kjt,visibility,rep,selfVar, paramVars,atPreVars);
-    	 
+	                   Map<LocationVariable,ProgramVariable> atPreVars) {
+    	      this(name,null,target,kjt,visibility,pre,rep,selfVar, paramVars,atPreVars);
    }
     
     
@@ -76,11 +77,11 @@ public final class RepresentsAxiom extends ClassAxiom {
                            IObserverFunction target,
                            KeYJavaType kjt,
                            VisibilityModifier visibility,
+                           Term pre,
                            Term rep,
                            ProgramVariable selfVar,
                            ImmutableList<ProgramVariable> paramVars,
-                           Map<LocationVariable, ProgramVariable> atPreVars) {
-
+                           Map<LocationVariable,ProgramVariable> atPreVars) {
         assert name != null;
         assert kjt != null;
         assert target != null;
@@ -90,6 +91,7 @@ public final class RepresentsAxiom extends ClassAxiom {
         this.target = target;
         this.kjt = kjt;
         this.visibility = visibility;
+        this.originalPre = pre;
         this.originalRep = rep;
         this.originalSelfVar = selfVar;
         this.originalParamVars = paramVars;
@@ -164,13 +166,16 @@ public final class RepresentsAxiom extends ClassAxiom {
         if (isFunctional(services)) {
             ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
             res = res.union(TG.generateFunctionalRepresentsTaclets(
-                    tacletName, originalRep, kjt, target, heaps, self,
+                    tacletName, originalPre, originalRep, kjt, target, heaps, self,
                     originalParamVars, atPreVars, toLimit, true, services));
             res = res.union(TG.generateFunctionalRepresentsTaclets(
-                    tacletName, originalRep, kjt, target, heaps, self,
+                    tacletName, originalPre, originalRep, kjt, target, heaps, self,
                     originalParamVars, atPreVars, toLimit, false, services));
             return res;
         } else {
+        	if(originalPre != null) {
+        		assert false : "Only functional represents for model methods is currently supported, this should not have occured.";
+        	}
             Taclet tacletWithShowSatisfiability =
                     TG.generateRelationalRepresentsTaclet(tacletName,
                                                           originalRep,
@@ -218,7 +223,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     public RepresentsAxiom setKJT(KeYJavaType newKjt) {
         String newName = "JML represents clause for " + target
         		+ " (subclass " + newKjt.getName()+ ")";
-        return new RepresentsAxiom(newName, displayName, target, newKjt, visibility,
+        return new RepresentsAxiom(newName, displayName, target, newKjt, visibility, originalPre,
                                    originalRep, originalSelfVar, originalParamVars, atPreVars);
     }
     
@@ -235,8 +240,12 @@ public final class RepresentsAxiom extends ClassAxiom {
                 (VisibilityModifier.isPrivate(ax.visibility) ? ax.visibility : null)
                         : (visibility.compareTo(ax.visibility) >= 0 ? visibility : ax.visibility);
         Term newRep = TB.and(originalRep, ax.originalRep);
-        return new RepresentsAxiom(name, displayName, target, kjt, minVisibility, newRep,
-                                   originalSelfVar, originalParamVars, atPreVars);
+        Term newPre = null;
+        if(originalPre == null) newPre = ax.originalPre;
+        else if(ax.originalPre == null) newPre = originalPre;
+        else newPre = TB.and(originalPre, ax.originalPre);
+        return new RepresentsAxiom(name, displayName, target, kjt, minVisibility, newPre,
+                                   newRep, originalSelfVar, originalParamVars, atPreVars);
     }
 
     public OriginalVariables getOrigVars() {
