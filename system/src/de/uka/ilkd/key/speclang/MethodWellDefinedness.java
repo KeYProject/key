@@ -85,7 +85,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         setMby(contract.getMby());
         this.axiom = contract.getRepresentsAxiom(h, origVars.self, origVars.params, origVars.result,
                                                  origVars.atPres, services);
-        assert this.axiom != null == contract.getTarget().isModel();
+        assert this.axiom == null || contract.getTarget().isModel();
         this.globalDefs = contract.getGlobalDefs();
     }
 
@@ -164,11 +164,14 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @return the term array of arguments used to construct the method term
      */
     private static Term[] getArgs(SchemaVariable sv, ParsableVariable heap,
-                                  boolean isStatic,
+                                  ParsableVariable heapAtPre, boolean isStatic, boolean twoState,
                                   ImmutableList<ParsableVariable> params) {
-        Term[] args = new Term[params.size() + (isStatic ? 1 : 2)];
+        Term[] args = new Term[params.size() + (isStatic ? 1 : 2) + (twoState ? 1 : 0)];
         int i = 0;
         args[i++] = TB.var(heap);
+        if (twoState) {
+            args[i++] = TB.var(heapAtPre);
+        }
         if (!isStatic) {
             args[i++] = TB.var(sv);
         }
@@ -286,9 +289,18 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                 getKJT().getJavaType().getFullName() + " " +
                 methodName.substring(methodName.indexOf("::") + 2).replace("$", "");
         final boolean isStatic = target.isStatic();
+        final boolean twoState = target.getStateCount() == 2;
         final LocationVariable heap = getHeap();
+        final LocationVariable heapAtPre;
+        if (getOrigVars().atPres.get(heap) != null) {
+            heapAtPre = (LocationVariable) getOrigVars().atPres.get(heap);
+        } else {
+            heapAtPre = heap;
+        }
         final SchemaVariable heapSV =
                 SchemaVariableFactory.createTermSV(heap.name(), heap.sort());
+        final SchemaVariable heapAtPreSV =
+                SchemaVariableFactory.createTermSV(heapAtPre.name(), heapAtPre.sort());
         final SchemaVariable selfSV =
                 SchemaVariableFactory.createTermSV(new Name("callee"), getKJT().getSort());
         final ImmutableList<ParsableVariable> paramsSV = paramsSV();
@@ -296,7 +308,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         for (ParsableVariable pv: paramsSV) {
             ps = ps + " " + pv.sort();
         }
-        final Term[] args = getArgs(selfSV, heapSV, isStatic, paramsSV);
+        final Term[] args = getArgs(selfSV, heapSV, heapAtPreSV, isStatic, twoState, paramsSV);
         if (isNormal(services)) {
             prefix = WellDefinednessCheck.OP_TACLET;
             final boolean isConstructor =
@@ -304,7 +316,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             final Term pre = getPre(replaceSV(getRequires(), selfSV, paramsSV),
                                     selfSV, heapSV, paramsSV, true, services).term;
             final Term wdArgs =
-                    TB.and(TB.wd(getArgs(selfSV, heapSV, isStatic || isConstructor, paramsSV),
+                    TB.and(TB.wd(getArgs(selfSV, heapSV, heapAtPreSV, isStatic || isConstructor,
+                                         twoState, paramsSV),
                                  services));
             return createTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps,
                                 TB.var(selfSV), TB.func(target, args),
