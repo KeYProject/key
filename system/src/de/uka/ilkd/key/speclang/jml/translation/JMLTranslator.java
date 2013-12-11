@@ -33,7 +33,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
@@ -526,19 +525,12 @@ final class JMLTranslator {
             }
 
             @Override
-            protected Term createSkolemTerm ()  {
-                addUnderspecifiedWarning("\\sum over non-interval domain");
-                final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-                final Namespace fns = services.getNamespaces().functions();
-                int x = -1;
-                Name name = null;
-                do name = new Name("sum_"+ ++x);
-                while (fns.lookup(name)!= null);
-                final Function sk = new Function(name,intSort);
-                fns.addSafely(sk);
-                final Term res = TB.func(sk);
-                return res;
+            protected Term translateUnboundedNumericalQuantifier(
+                    ImmutableList<QuantifiableVariable> qvs, Term range,
+                    Term body) {
+                return TB.sum(qvs, range, body, services);
             }
+
         });
 
         translationMethods.put(JMLKeyWord.PRODUCT,
@@ -553,21 +545,13 @@ final class JMLTranslator {
                 return TB.bprod(qv, lo, hi, body, services);
             }
 
-
             @Override
-            protected Term createSkolemTerm ()  {
-                addUnderspecifiedWarning("\\prod over non-interval domain");
-                final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-                final Namespace fns = services.getNamespaces().functions();
-                int x = -1;
-                Name name = null;
-                do name = new Name("prod_"+ ++x);
-                while (fns.lookup(name)!= null);
-                final Function sk = new Function(name,intSort);
-                fns.addSafely(sk);
-                final Term res = TB.func(sk);
-                return res;
+            protected Term translateUnboundedNumericalQuantifier(
+                    ImmutableList<QuantifiableVariable> qvs, Term range,
+                    Term body) {
+                return TB.prod(qvs, range, body, services);
             }
+
         });
 
         translationMethods.put(JMLKeyWord.MIN,
@@ -687,21 +671,14 @@ final class JMLTranslator {
             }
 
             @Override
-            protected Term createSkolemTerm ()  {
-                addUnderspecifiedWarning("\\num_of over non-interval domain");
-                final TypeConverter typeConverter = services.getTypeConverter();
-                final IntegerLDT integerLDT = typeConverter.getIntegerLDT();
-                final Sort intSort = integerLDT.targetSort();
-                final Namespace fns = services.getNamespaces().functions();
-                int x = -1;
-                Name name = null;
-                do name = new Name("numOf_"+ ++x);
-                while (fns.lookup(name)!= null);
-                final Function sk = new Function(name,intSort);
-                fns.addSafely(sk);
-                final Term res = TB.func(sk);
-                return res;
+            protected Term translateUnboundedNumericalQuantifier(
+                    ImmutableList<QuantifiableVariable> qvs, Term range,
+                    Term body) {
+                final Term cond = TB.ife(TB.convertToFormula(body, services),
+                        TB.one(services), TB.zero(services));
+                return TB.sum(qvs, range, cond, services);
             }
+
         });
 
         // primary expressions
@@ -2043,6 +2020,7 @@ final class JMLTranslator {
         }
 
 
+        @SuppressWarnings("unchecked")
         @Override
         public SLExpression translate(SLTranslationExceptionManager excManager, Object... params)
                 throws SLTranslationException {
@@ -2051,14 +2029,17 @@ final class JMLTranslator {
                     ImmutableList.class, Boolean.class, KeYJavaType.class, Services.class);
             de.uka.ilkd.key.java.abstraction.Type declsType =
                     ((KeYJavaType) params[2]).getJavaType();
-            final KeYJavaType resultType = (KeYJavaType) params[5];
+            ImmutableList<QuantifiableVariable> qvs = (ImmutableList)params[3];
             services = (Services) params[6];
             assert services != null;
+            KeYJavaType resultType = (KeYJavaType) params[5];
+            if (resultType == null) // happens with num_of
+                resultType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
             
             if (declsType instanceof PrimitiveType && ((PrimitiveType)declsType).isIntegerType())
                 return super.translate(excManager, params);
             else
-                return new SLExpression(createSkolemTerm(),resultType); 
+                return new SLExpression(translateUnboundedNumericalQuantifier(qvs, (Term)params[0], (Term)params[1]),resultType); 
         }
 
         @Override
@@ -2077,8 +2058,10 @@ final class JMLTranslator {
             LogicVariable lv = it.next();
             Term t;
             if (it.hasNext() || !isBoundedNumerical(t1, lv)) {
-                // not interval range, create skolem term
-                t = createSkolemTerm();
+                // not interval range, create unbounded comprehension term
+                ImmutableList<QuantifiableVariable> _qvs = ImmutableSLList.<QuantifiableVariable>nil().prepend(lv);
+                while (it.hasNext()) _qvs = _qvs.prepend(it.next());
+                t = translateUnboundedNumericalQuantifier(_qvs, t1, t2);
             } else {
                 t = translateBoundedNumericalQuantifier(lv,
                         lowerBound(t1, lv),
@@ -2090,7 +2073,7 @@ final class JMLTranslator {
             return jish.buildCastExpression(resultType, new SLExpression(t, resultType));
         }
 
-        protected abstract Term createSkolemTerm();
+        protected abstract Term translateUnboundedNumericalQuantifier(ImmutableList<QuantifiableVariable> qvs, Term range, Term body);
 
         @Override
         protected boolean isGeneralized () {

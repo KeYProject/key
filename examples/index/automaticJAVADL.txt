@@ -16,6 +16,7 @@
 
 
 # Comprehension Tests
+provable: ./heap/comprehensions/general_sum.key
 provable: ./heap/comprehensions/sum0.key
 provable: ./heap/comprehensions/sum1.key
 provable: ./heap/comprehensions/sum2.key
