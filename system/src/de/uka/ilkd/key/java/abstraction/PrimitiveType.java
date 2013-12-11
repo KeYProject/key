@@ -190,6 +190,28 @@ public final class PrimitiveType implements Type {
 	assert arrayElementName != null;
 	return arrayElementName;
     }
+    
+    /**
+     * Returns whether this is a Java type which translates to int in DL.
+     */
+    public boolean isIntegerType () {
+        return this == JAVA_BYTE
+            || this == JAVA_CHAR
+            || this == JAVA_SHORT
+            || this == JAVA_INT
+            || this == JAVA_LONG
+            || this == JAVA_BIGINT;
+    }
+    
+    /**
+     * Returns true if this is an integer or floating point type.
+     */
+    public boolean isArithmeticType () {
+        return isIntegerType() 
+            || this == JAVA_FLOAT
+            || this == JAVA_DOUBLE
+            || this == JAVA_REAL;
+    }
 
     /**
      * Gets the name of the LDT corresponding to this primitive type.
