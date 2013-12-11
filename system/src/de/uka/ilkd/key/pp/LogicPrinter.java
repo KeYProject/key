@@ -1454,7 +1454,7 @@ public class LogicPrinter {
         	layouter.print("(").beginC(0);
         	for(int i = 0, n = obs.getNumParams(); i < n; i++) {
         	    markStartSub();
-        	    printTerm(t.sub(i + (obs.isStatic() ? 1 : 2)));
+        	    printTerm(t.sub(i + totalHeaps + (obs.isStatic() ? 0 : 1)));
         	    markEndSub();
                     if(i < n - 1) {
                         layouter.print(",").brk(1,0);

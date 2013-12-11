@@ -1377,18 +1377,24 @@ public final class JavaInfo {
     public KeYJavaType getTypeByClassName(String name, KeYJavaType containerType) {
         KeYJavaType result = getTypeByName(name);
         if (result == null) {
-            final int lastSep = (containerType == null ? 
-                    -1 : containerType.getFullName().lastIndexOf('.')); 
+            if (containerType != null) { 
+                   result = kpmi.resolveType(name, containerType);
+            }
                         
-            // try if class is in same package
-            if (lastSep >= 0) {
-                result = getTypeByClassName(
-                        containerType.getFullName().substring(0, lastSep) +
-                        "." + name);
-            }                       
-            
             if (result == null) {
-                return getTypeByName("java.lang." + name);                
+                final int lastSep = (containerType == null ? 
+                        -1 : containerType.getFullName().lastIndexOf('.')); 
+                
+                // try if class is in same package
+                if (lastSep >= 0) {
+                    result = getTypeByClassName(
+                            containerType.getFullName().substring(0, lastSep) +
+                            "." + name);
+                }                       
+
+                if (result == null) {
+                    return getTypeByName("java.lang." + name);                
+                }
             }
         }         
         return result;        

@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -43,6 +44,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -61,8 +63,10 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.ContractAxiom;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
@@ -832,6 +836,7 @@ public final class SpecificationRepository {
                       invSymbol,
                       kjt,
                       new Private(),
+                      null,
                       invDef,
                       selfVar,
                       ImmutableSLList.<ProgramVariable>nil(), null);
@@ -853,6 +858,8 @@ public final class SpecificationRepository {
               }
           }
 
+          // add model method axioms of all kinds
+          result = result.union(getModelMethodAxioms());
           //add axioms for enclosing class, if applicable
           final KeYJavaType enclosingKJT = getEnclosingKJT(selfKjt);
           if(enclosingKJT != null) {
@@ -863,6 +870,67 @@ public final class SpecificationRepository {
        return result;
     }
 
+    private ImmutableSet<ClassAxiom> getModelMethodAxioms() {
+        ImmutableSet<ClassAxiom> result  = DefaultImmutableSet.<ClassAxiom>nil();
+        for(KeYJavaType kjt : services.getJavaInfo().getAllKeYJavaTypes()) {
+            final ProgramVariable selfVar = TB.selfVar(services, kjt, false);
+            for(IProgramMethod pm : services.getJavaInfo().getAllProgramMethods(kjt)) {
+                if(!pm.isVoid() && pm.isModel()) {
+                    pm = services.getJavaInfo().getToplevelPM(kjt, pm);
+                    ImmutableList<ProgramVariable> paramVars = TB.paramVars(services, pm, false);
+                    Map<LocationVariable,ProgramVariable> atPreVars = new LinkedHashMap<LocationVariable,ProgramVariable>();
+                    List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+                    for(LocationVariable heap : heaps) {
+                        atPreVars.put(heap, TB.heapAtPreVar(services, heap.name().toString()+"AtPre", heap.sort(), false));
+                    }
+                    ProgramVariable resultVar = TB.resultVar(services, pm, false);
+
+                    boolean definitionFound = false;
+                    // This assumes there is one operation contract for each model pm per class
+                    // We need to construct an inheritance chain of contracts starting at the bottom
+                    ImmutableList<FunctionalOperationContract> lookupContracts = ImmutableSLList.<FunctionalOperationContract>nil();
+                    ImmutableSet<FunctionalOperationContract> cs = getOperationContracts(kjt, pm);
+                    ImmutableList<KeYJavaType> superTypes = services.getJavaInfo().getAllSupertypes(kjt);
+                    for(KeYJavaType superType : superTypes) {
+                        for(FunctionalOperationContract fop : cs) {
+                            if(fop.getSpecifiedIn().equals(superType)) {
+                                 lookupContracts = lookupContracts.append(fop);
+                            }
+                        }
+                    }
+                    for(FunctionalOperationContract fop : lookupContracts) {
+                        Term representsFromContract = fop.getRepresentsAxiom(heaps.get(0), selfVar, paramVars, TB.resultVar(services, pm, false), atPreVars, services);
+                        Term preContract = fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
+                        if(preContract == null) preContract = TB.tt();
+                        if(representsFromContract != null) {
+                            // TODO Wojtek: I do not understand the visibility issues of model fields/methods.
+                            // VisibilityModifier visibility = pm.isPrivate() ? new Private() :
+                            //    (pm.isProtected() ? new Protected() : (pm.isPublic() ? new Public() : null));
+
+                            final ClassAxiom modelMethodRepresentsAxiom
+                                = new RepresentsAxiom("Definition axiom for " + pm.getName() + " in " + kjt.getFullName(),
+                                       pm, kjt, new Private(), preContract, representsFromContract, selfVar, paramVars, atPreVars);
+                            result = result.add(modelMethodRepresentsAxiom);
+                            definitionFound = true;
+                            break;
+                        }
+                    }
+                    for(FunctionalOperationContract fop : getOperationContracts(kjt,pm)) {
+                    	Term preFromContract = fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
+                    	Term postFromContract = fop.getPost(heaps, selfVar, paramVars, resultVar, null, atPreVars, services);
+                    	if(preFromContract != null && postFromContract != null && postFromContract != TB.tt()) {
+                    		Term mbyFromContract = fop.hasMby() ? fop.getMby(selfVar, paramVars, services) : null;
+                    		final ClassAxiom modelMethodContractAxiom
+                    		= new ContractAxiom("Contract axiom for " + pm.getName() + " in " + kjt.getName().toString(),
+                    				pm, kjt, new Private(), preFromContract, postFromContract, mbyFromContract, atPreVars, selfVar, resultVar, paramVars);
+                    		result = result.add(modelMethodContractAxiom);
+                    	}
+                    }
+                }
+            }
+        }
+        return result;
+    }
 
     /**
      * Registers the passed class axiom.
@@ -1173,9 +1241,12 @@ public final class SpecificationRepository {
 	    					IObserverFunction obs) {
 	assert limitedToUnlimited.get(obs) == null
 	       : " observer is already limited: " + obs;
-	if(!(obs instanceof IObserverFunction && !(obs instanceof IProgramMethod))) { // TODO Was the exact class match "obs.getClass() != ObserverFunction.class" correctly converted into IProtramMethod?
-	    return null;
-	}
+	// TODO Was the exact class match "obs.getClass() != ObserverFunction.class" correctly converted into IProtramMethod?
+	// Wojtek: I guess so, but why are IProgramMethods excluded from limiting?
+	// This kills limiting for model methods...
+	// if(!(obs instanceof IObserverFunction && !(obs instanceof IProgramMethod))) { 
+	//	return null;
+	// }
 
 	IObserverFunction limited = unlimitedToLimited.get(obs);
 	ImmutableSet<Taclet> taclets = unlimitedToLimitTaclets.get(obs);

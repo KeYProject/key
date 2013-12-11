@@ -14,40 +14,31 @@
 
 package de.uka.ilkd.key.parser;
 
-import antlr.Token;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.TokenStream;
 
-public class KeYSemanticException extends antlr.SemanticException {
+public class KeYSemanticException extends RecognitionException {
     /**
      * 
      */
     private static final long serialVersionUID = -3341865050312925366L;
-    String cat;
-    String filename;
-    Token t;
+    private final String cat;
+    private final String filename;
     
-    public KeYSemanticException(String cat, Token t, String filename) {
-	super("Semantic Error", filename, t.getLine(), t.getColumn());
-	this.cat      = cat;
-	this.filename = filename;
-	this.t = t;
-	this.line     = t.getLine();
-	this.column   = t.getColumn();    
+    public KeYSemanticException(String message) {
+        this.cat = message;
+        this.filename = "<unknown>";
     }
 
-    public KeYSemanticException(String cat, String filename, int line, int column) {
-	super("Semantic Error", filename, line, column);
-	this.cat      = cat;
-	this.filename = filename;
-	this.line     = line;
-	this.column   = column;
-   }
-
-    public KeYSemanticException(String cat, int line, int column, String file){
-        this(cat, file, line, column);  
+    public KeYSemanticException(TokenStream input, String sourceName, String message) {
+        super(input);
+        this.cat = message;
+        this.filename = sourceName;
     }
 
-    public KeYSemanticException(String message){
-	super(message);    
+    public KeYSemanticException(TokenStream input, String sourceName, Exception cause) {
+        this(input, sourceName, cause.getMessage());
+        initCause(cause);
     }
 
     public String getFilename() {
@@ -59,7 +50,7 @@ public class KeYSemanticException extends antlr.SemanticException {
     }
     
     public int getColumn() {
-        return column;
+        return charPositionInLine;
     }   
 
     /**
