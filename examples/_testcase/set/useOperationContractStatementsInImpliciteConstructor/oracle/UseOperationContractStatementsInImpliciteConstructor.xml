@@ -70,7 +70,7 @@ termination: diamond" pathCondition="!array = null" pathConditionChanged="false"
                      </value>
                   </variable>
                   <callStackEntry path="/0"/>
-                  <statement name="return sum/array.length;" pathCondition="!array = null" pathConditionChanged="false">
+                  <statement name="return sum_1/array.length;" pathCondition="!array = null" pathConditionChanged="false">
                      <variable name="self" arrayIndex="-1" isArrayIndex="false">
                         <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         </value>
@@ -91,8 +91,8 @@ termination: diamond" pathCondition="!array = null" pathConditionChanged="false"
                         <value name="heap {true}" typeString="Heap" valueString="heapAfter_sum" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="sum" arrayIndex="-1" isArrayIndex="false">
-                        <value name="sum {true}" typeString="int" valueString="result_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <variable name="sum_1" arrayIndex="-1" isArrayIndex="false">
+                        <value name="sum_1 {true}" typeString="int" valueString="result_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <callStackEntry path="/0"/>
