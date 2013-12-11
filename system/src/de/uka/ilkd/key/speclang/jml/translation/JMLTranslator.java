@@ -31,6 +31,7 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
@@ -526,9 +527,11 @@ final class JMLTranslator {
 
             @Override
             protected Term translateUnboundedNumericalQuantifier(
+                    KeYJavaType declsType, boolean nullable,
                     ImmutableList<QuantifiableVariable> qvs, Term range,
                     Term body) {
-                return TB.sum(qvs, range, body, services);
+                final Term tr = typerestrict(declsType,nullable,qvs,services);
+                return TB.sum(qvs, TB.and(tr,range), body, services);
             }
 
         });
@@ -547,9 +550,11 @@ final class JMLTranslator {
 
             @Override
             protected Term translateUnboundedNumericalQuantifier(
+                    KeYJavaType declsType, boolean nullable,
                     ImmutableList<QuantifiableVariable> qvs, Term range,
                     Term body) {
-                return TB.prod(qvs, range, body, services);
+                final Term tr = typerestrict(declsType,nullable,qvs,services);
+                return TB.prod(qvs, TB.and(tr,range), body, services);
             }
 
         });
@@ -672,11 +677,13 @@ final class JMLTranslator {
 
             @Override
             protected Term translateUnboundedNumericalQuantifier(
+                    KeYJavaType declsType, boolean nullable,
                     ImmutableList<QuantifiableVariable> qvs, Term range,
                     Term body) {
+                final Term tr = typerestrict(declsType,nullable,qvs,services);
                 final Term cond = TB.ife(TB.convertToFormula(body, services),
                         TB.one(services), TB.zero(services));
-                return TB.sum(qvs, range, cond, services);
+                return TB.sum(qvs, TB.and(tr,range), cond, services);
             }
 
         });
@@ -1909,7 +1916,7 @@ final class JMLTranslator {
                 }
             }
 
-            final SLExpression res = isGeneralized()? translateGeneralizedQuantifiers(declsType,declVars,preTerm,bodyTerm, resultType)
+            final SLExpression res = isGeneralized()? translateGeneralizedQuantifiers(declsType,nullable,declVars,preTerm,bodyTerm, resultType)
                     :translateQuantifiers(declVars, preTerm, bodyTerm);
             return res;
         }
@@ -1927,7 +1934,7 @@ final class JMLTranslator {
             return new SLExpression(result);
         }
 
-        public SLExpression translateGeneralizedQuantifiers(KeYJavaType declsType, Iterable<LogicVariable> qvs, Term t1, Term t2, KeYJavaType resultType)
+        public SLExpression translateGeneralizedQuantifiers(KeYJavaType declsType, boolean nullable, Iterable<LogicVariable> qvs, Term t1, Term t2, KeYJavaType resultType)
         throws SLTranslationException {
             Iterator<LogicVariable> it = qvs.iterator();
             LogicVariable qv = it.next();
@@ -1937,6 +1944,28 @@ final class JMLTranslator {
             }
             Term cond = TB.convertToBoolean(TB.and(t1, t2),services);
             return new SLExpression(translateQuantifier(qv, cond),resultType);
+        }
+        
+        protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
+            final Type type = kjt.getJavaType();
+            Term res = TB.tt();
+            for (QuantifiableVariable qv: qvs) {
+                if (type instanceof PrimitiveType) {
+                    if (type == PrimitiveType.JAVA_BYTE) res = TB.and(res,TB.inByte(TB.var(qv),services));
+                    if (type == PrimitiveType.JAVA_SHORT) res = TB.and(res,TB.inShort(TB.var(qv),services));
+                    if (type == PrimitiveType.JAVA_CHAR) res = TB.and(res,TB.inChar(TB.var(qv),services));
+                    if (type == PrimitiveType.JAVA_INT) res = TB.and(res,TB.inInt(TB.var(qv),services));
+                    if (type == PrimitiveType.JAVA_LONG) res = TB.and(res,TB.inLong(TB.var(qv),services));
+                } else {
+                    // assume reference type
+                    if (nullable) {
+                        res = TB.and(res,TB.created(services, TB.var(qv)));
+                    } else {
+                        res = TB.and(res,TB.createdAndNotNull(services, TB.var(qv)));
+                    }
+                }
+            }
+            return res;
         }
 
         public abstract Term combineQuantifiedTerms(Term t1,
@@ -2027,9 +2056,11 @@ final class JMLTranslator {
             checkParameters(params,
                     Term.class, Term.class, KeYJavaType.class,
                     ImmutableList.class, Boolean.class, KeYJavaType.class, Services.class);
+            final KeYJavaType _declsType = (KeYJavaType) params[2];
             de.uka.ilkd.key.java.abstraction.Type declsType =
-                    ((KeYJavaType) params[2]).getJavaType();
+                    _declsType.getJavaType();
             ImmutableList<QuantifiableVariable> qvs = (ImmutableList)params[3];
+            boolean nullable = (Boolean) params[4];
             services = (Services) params[6];
             assert services != null;
             KeYJavaType resultType = (KeYJavaType) params[5];
@@ -2039,7 +2070,7 @@ final class JMLTranslator {
             if (declsType instanceof PrimitiveType && ((PrimitiveType)declsType).isIntegerType())
                 return super.translate(excManager, params);
             else
-                return new SLExpression(translateUnboundedNumericalQuantifier(qvs, (Term)params[0], (Term)params[1]),resultType); 
+                return new SLExpression(translateUnboundedNumericalQuantifier(_declsType, nullable, qvs, (Term)params[0], (Term)params[1]),resultType); 
         }
 
         @Override
@@ -2050,7 +2081,7 @@ final class JMLTranslator {
         }
 
         @Override
-        public SLExpression translateGeneralizedQuantifiers(KeYJavaType declsType, Iterable<LogicVariable> qvs,
+        public SLExpression translateGeneralizedQuantifiers(KeYJavaType declsType, boolean nullable, Iterable<LogicVariable> qvs,
                 Term t1,
                 Term t2, KeYJavaType resultType)
                         throws SLTranslationException {
@@ -2061,7 +2092,7 @@ final class JMLTranslator {
                 // not interval range, create unbounded comprehension term
                 ImmutableList<QuantifiableVariable> _qvs = ImmutableSLList.<QuantifiableVariable>nil().prepend(lv);
                 while (it.hasNext()) _qvs = _qvs.prepend(it.next());
-                t = translateUnboundedNumericalQuantifier(_qvs, t1, t2);
+                t = translateUnboundedNumericalQuantifier(declsType, nullable, _qvs, t1, t2);
             } else {
                 t = translateBoundedNumericalQuantifier(lv,
                         lowerBound(t1, lv),
@@ -2073,7 +2104,7 @@ final class JMLTranslator {
             return jish.buildCastExpression(resultType, new SLExpression(t, resultType));
         }
 
-        protected abstract Term translateUnboundedNumericalQuantifier(ImmutableList<QuantifiableVariable> qvs, Term range, Term body);
+        protected abstract Term translateUnboundedNumericalQuantifier(KeYJavaType declsType, boolean nullable, ImmutableList<QuantifiableVariable> qvs, Term range, Term body);
 
         @Override
         protected boolean isGeneralized () {
