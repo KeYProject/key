@@ -1946,6 +1946,7 @@ final class JMLTranslator {
             return new SLExpression(translateQuantifier(qv, cond),resultType);
         }
         
+        /** Provide restriction terms for the declared KeYJavaType */
         protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
             final Type type = kjt.getJavaType();
             Term res = TB.tt();
