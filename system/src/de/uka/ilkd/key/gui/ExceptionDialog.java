@@ -47,6 +47,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import de.uka.ilkd.key.parser.KeYSemanticException;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.parser.proofjava.ParseException;
@@ -105,13 +106,25 @@ public class ExceptionDialog extends JDialog {
 	    location = new Location(((antlr.RecognitionException)exc).getFilename(),
 				    ((antlr.RecognitionException) exc).getLine(),
 				    ((antlr.RecognitionException) exc).getColumn());
-	} else if (exc instanceof ParserException) {
+        }
+        if  (exc instanceof org.antlr.runtime.RecognitionException) {
+            // ANTLR 3 - Recognition Exception.
+            String filename = "";
+            if(exc instanceof KeYSemanticException) {
+                filename = ((KeYSemanticException)exc).getFilename();
+            }
+
+            org.antlr.runtime.RecognitionException recEx = 
+                    (org.antlr.runtime.RecognitionException) exc;
+            location = new Location(filename, recEx.line, recEx.charPositionInLine);
+        }
+	else if (exc instanceof ParserException) {
 	    location = ((ParserException) exc).getLocation();
 	} else if (exc instanceof ParseException) {
 	    ParseException pexc = (ParseException)exc;
 	    Token token = pexc.currentToken;
 	    // TODO find out filename here
-	    location = new Location("", token.next.beginLine, token.next.beginColumn);
+	    location = token==null? null: new Location("", token.next.beginLine, token.next.beginColumn);
         } else if (exc instanceof SLTranslationException) {
             SLTranslationException ste = (SLTranslationException) exc;
             location = new Location(ste.getFileName(), 

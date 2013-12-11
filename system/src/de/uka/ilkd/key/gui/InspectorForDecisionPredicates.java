@@ -23,8 +23,8 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
@@ -86,8 +86,8 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
     
     public static Term translate(Services services, String toBeChecked){
         try {
-            KeYParser parser =
-                    new KeYParser (ParserMode.TERM, new KeYLexer ( new StringReader ( toBeChecked ),
+            KeYParserF parser =
+                    new KeYParserF (ParserMode.TERM, new KeYLexerF ( new StringReader ( toBeChecked ),
                                      services.getExceptionHandler() ), "",
                                      services,   // should not be needed
                                      services.getNamespaces() );

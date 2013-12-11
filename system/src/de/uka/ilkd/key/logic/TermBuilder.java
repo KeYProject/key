@@ -33,6 +33,7 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -423,7 +424,7 @@ public class TermBuilder {
     }
 
 
-    public Term prog(Modality mod, JavaBlock jb, Term t, ImmutableArray<ITermLabel> labels) {
+    public Term prog(Modality mod, JavaBlock jb, Term t, ImmutableArray<TermLabel> labels) {
     return tf.createTerm(mod, new Term[]{t}, null, jb, labels);
     }
 
@@ -538,6 +539,16 @@ public class TermBuilder {
                     new ImmutableArray<QuantifiableVariable>(qv));
     }
 
+    /** General (unbounded) sum */
+    public Term sum (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, Services services) {
+        final Function sum = (Function)services.getNamespaces().functions().lookup("sum");
+        final Iterator<QuantifiableVariable> it = qvs.iterator();
+        Term res = func(sum, new Term[]{convertToBoolean(range, services), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        while (it.hasNext()) {
+            res = func(sum, new Term[]{TRUE(services), res}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        }
+        return res;
+    }
 
 
     /** Constructs a bounded product comprehension expression. */
@@ -552,6 +563,17 @@ public class TermBuilder {
                     new ImmutableArray<QuantifiableVariable>(qv));
     }
 
+
+    /** General (unbounded) product */
+    public Term prod (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, Services services) {
+        final Function prod = (Function)services.getNamespaces().functions().lookup("prod");
+        final Iterator<QuantifiableVariable> it = qvs.iterator();
+        Term res = func(prod, new Term[]{convertToBoolean(range, services), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        while (it.hasNext()) {
+            res = func(prod, new Term[]{TRUE(services), res}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        }
+        return res;
+    }
 
     /** Translation of JML's \min operator using \ifEx operator. */
     public Term min(ImmutableList<QuantifiableVariable> qvs, Term guard, Term t, KeYJavaType type, Services services) {
@@ -727,7 +749,7 @@ public class TermBuilder {
     }
 
 
-    public Term imp(Term t1, Term t2, ImmutableArray<ITermLabel> labels) {
+    public Term imp(Term t1, Term t2, ImmutableArray<TermLabel> labels) {
     if(t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
         return tt();
     } else if(t1.op() == Junctor.TRUE) {
@@ -1033,7 +1055,7 @@ public class TermBuilder {
         return apply(update,target,null);
     }
 
-    public Term apply(Term update, Term target, ImmutableArray<ITermLabel> labels) {
+    public Term apply(Term update, Term target, ImmutableArray<TermLabel> labels) {
     if(update.sort() != Sort.UPDATE) {
         throw new TermCreationException("Not an update: " + update);
     } else if(update.op() == UpdateJunctor.SKIP) {
@@ -1570,7 +1592,7 @@ public class TermBuilder {
     return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
     }
 
-    public Term label(Term term, ImmutableArray<ITermLabel> labels) {
+    public Term label(Term term, ImmutableArray<TermLabel> labels) {
         if ((labels == null || labels.isEmpty())) {
             return term;
         } else {
@@ -1579,11 +1601,11 @@ public class TermBuilder {
         }
     }
 
-    public Term label(Term term, ITermLabel label) {
+    public Term label(Term term, TermLabel label) {
         if (label == null) {
             return term;
         } else {
-            return label(term, new ImmutableArray<ITermLabel>(label));
+            return label(term, new ImmutableArray<TermLabel>(label));
         }
     }
 

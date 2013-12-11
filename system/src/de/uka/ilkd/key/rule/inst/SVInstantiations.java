@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -168,7 +169,7 @@ public class SVInstantiations {
     }
 
     public SVInstantiations add(SchemaVariable sv, 
-            ImmutableArray<ITermLabel> labels, 
+            ImmutableArray<TermLabel> labels, 
             Services services) {
         return add(sv, 
                 new TermLabelInstantiationEntry(sv, labels), 
@@ -532,7 +533,7 @@ public class SVInstantiations {
     /** adds an update to the update context 
     * @param updateApplicationlabels the ITermLabels attached to the application operator term 
     */
-    public SVInstantiations addUpdate(Term update, ImmutableArray<ITermLabel> updateApplicationlabels) {
+    public SVInstantiations addUpdate(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
 	assert update.sort() == Sort.UPDATE;
         return new SVInstantiations(map, interesting(), updateContext
                 .append(new UpdateLabelPair(update, updateApplicationlabels)),
@@ -542,9 +543,9 @@ public class SVInstantiations {
     public static class UpdateLabelPair {
        private Term update;
        
-       private ImmutableArray<ITermLabel> updateApplicationlabels;
+       private ImmutableArray<TermLabel> updateApplicationlabels;
 
-      public UpdateLabelPair(Term update, ImmutableArray<ITermLabel> updateApplicationlabels) {
+      public UpdateLabelPair(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
          this.update = update;
          this.updateApplicationlabels = updateApplicationlabels;
       }
@@ -553,7 +554,7 @@ public class SVInstantiations {
          return update;
       }
 
-      public ImmutableArray<ITermLabel> getUpdateApplicationlabels() {
+      public ImmutableArray<TermLabel> getUpdateApplicationlabels() {
          return updateApplicationlabels;
       }
 

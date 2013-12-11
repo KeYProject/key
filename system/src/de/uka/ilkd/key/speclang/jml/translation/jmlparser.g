@@ -120,6 +120,7 @@ options {
 	resolverManager.pushLocalVariablesNamespace();
 	if(paramVars != null) {
 	    resolverManager.putIntoTopLocalVariablesNamespace(paramVars);
+	    
 	}
 	if(resultVar != null) {
 	    resolverManager.putIntoTopLocalVariablesNamespace(resultVar);
@@ -300,7 +301,7 @@ options {
 					  Token t)
 				       throws SLTranslationException {
 
-	// Identifier with suffix in parantheses? Probably a method call
+	// Identifier with suffix in parentheses? Probably a method call
 	// parse in the parameter list and call again
 	try {
 	    if (LA(1) == LPAREN) {
@@ -985,8 +986,12 @@ relationalexpr returns [SLExpression result=null] throws SLTranslationException
 		if (result.getTerm() == null) {
 		    addIgnoreWarning("subtype expression <: only supported for" +
 			" \\typeof() arguments on the left side.", st);
-			final int x = (new java.util.Random()).nextInt(1000);
-			final Function z = new Function(new Name("subtype"+x),Sort.FORMULA);
+			final Namespace fns = services.getNamespaces().functions();
+			int x = -1; Name name = null;
+			do name = new Name("subtype_"+ ++x);
+			while (fns.lookup(name)!= null);
+			final Function z = new Function(name,Sort.FORMULA);
+			fns.add(z);
 			result = new SLExpression(TB.func(z));
 		} else {
 
@@ -1250,7 +1255,7 @@ primaryexpr returns [SLExpression result=null] throws SLTranslationException
     Term s1, s2;
 }
 :
-	result=constant
+	result = constant
     |   id:IDENT     { result = lookupIdentifier(id.getText(), null, null, id); }
     |   inv:INV      { result = translator.translate(inv.getText(),services,
                                 selfVar==null? null: TB.var(selfVar),containerType);}
@@ -1295,8 +1300,8 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
 {
     lookupName = fullyQualifiedName;
 }
-(
-	DOT id:IDENT
+( DOT
+    ( id:IDENT
 	{
 	    if(receiver == null) {
 		// Receiver was only a package/classname prefix
@@ -1311,7 +1316,7 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
 	    }
 	}
     |
-    DOT THIS
+     THIS
     {
     	result = new SLExpression(
     		services.getTypeConverter().findThisForSort(receiver.getType().getSort(),
@@ -1320,18 +1325,19 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
     							    true),
                 receiver.getType());
     }
-    |
-    DOT INV
+    | INV
     {
         result = translator.translate("\\inv",services,receiver.getTerm(),receiver.getType());
     }
-    |	{
-    	    if(receiver != null) {
-		lookupName = LT(0).getText();
-	    }
-	}
+    | MULT
+         {
+	     result = new SLExpression(TB.allFields(services, receiver.getTerm()),
+	                               javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+         }
+   )
+    |  
 	l:LPAREN (params=expressionlist)? RPAREN
-	{
+	{   
             ImmutableList<SLExpression> preHeapParams = ImmutableSLList.<SLExpression>nil();
             for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
               Term p;
@@ -1340,6 +1346,8 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
             }
             params = params.prepend(preHeapParams);
 
+	    lookupName = lookupName.substring(lookupName.lastIndexOf('.')+1);
+  	
 	    result = lookupIdentifier(lookupName, receiver, new SLParameters(params), l);
 	    if (result == null) {
 		raiseError("Method " + lookupName + "("
@@ -1351,14 +1359,8 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
             }
 
 	}
-    |
+    | 
 	lbrack:LBRACKET result=specarrayrefexpr[receiver, fullyQualifiedName, lbrack] RBRACKET
-    |
-         DOT MULT
-         {
-	     result = new SLExpression(TB.allFields(services, receiver.getTerm()),
-	                               javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
-         }
 
 )
 ;
@@ -1816,7 +1818,7 @@ specquantifiedexpression returns [SLExpression result = null] throws SLTranslati
 	    resolverManager.popLocalVariablesNamespace();
 
 	    p = TB.convertToFormula(p, services);
-	    result = translator.translate(q.getText(), SLExpression.class, p, expr.getTerm(), declVars.first, declVars.second, nullable, services);
+	    result = translator.translate(q.getText(), SLExpression.class, p, expr.getTerm(), declVars.first, declVars.second, nullable, expr.getType(), services);
 	}
 	RPAREN
 ;
