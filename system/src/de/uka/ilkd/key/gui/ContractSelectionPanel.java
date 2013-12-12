@@ -32,6 +32,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 
 
 /**
@@ -90,20 +91,19 @@ class ContractSelectionPanel extends JPanel {
             private static final long serialVersionUID = 9066658130231994408L;
             private final Font PLAINFONT = getFont().deriveFont(Font.PLAIN);
 
-	    public Component getListCellRendererComponent(
-                                		    JList list,
-                                		    Object value,
-                                		    int index,
-                                		    boolean isSelected,
-                                		    boolean cellHasFocus) {
+	    public Component getListCellRendererComponent(JList list,
+	                                                  Object value,
+	                                                  int index,
+	                                                  boolean isSelected,
+	                                                  boolean cellHasFocus) {
 	        assert value != null;
 		Contract contract = (Contract) value;
 		Component supComp
-		    	= super.getListCellRendererComponent(list,
-		    					     value,
-		    					     index,
-		    					     isSelected,
-		    					     cellHasFocus);
+		        = super.getListCellRendererComponent(list,
+		                                             value,
+		                                             index,
+		                                             isSelected,
+		                                             cellHasFocus);
 
 		//create label and enclosing panel
 		JLabel label = new JLabel();
@@ -166,7 +166,11 @@ class ContractSelectionPanel extends JPanel {
         //sort contracts by id (for the user's convenience)
         Arrays.sort(contracts, new Comparator<Contract> () {
             public int compare(Contract c1, Contract c2) {
-                return c1.id() - c2.id();
+                int res = c1.id() - c2.id();
+                if (res == 0) {
+                    return c2.getName().compareTo(c1.getName());
+                }
+                return res;
             }
         });
 

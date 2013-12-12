@@ -18,8 +18,6 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -191,7 +189,6 @@ public class TacletGenerator {
         pvs = pvs.append(self).append(paramVars);
         svs = svs.append(selfSV).append(paramSVs);
 
-        @SuppressWarnings("unchecked")
         final TermAndBoundVarPair schemaAxiom = createSchemaTerm(originalAxiom, pvs, svs);
 
         // create goal template
@@ -282,7 +279,6 @@ public class TacletGenerator {
         }
         pvs = pvs.append(self).append(paramVars);
         svs = svs.append(selfSV).append(paramSVs);
-        @SuppressWarnings("unchecked")
         final TermAndBoundVarPair schemaRepresents =
                 createSchemaTerm(originalRepresentsTerm, pvs, svs);
         assert schemaRepresents.term.op() instanceof Equality;
@@ -313,46 +309,46 @@ public class TacletGenerator {
 
         Term addForumlaTerm = originalPreTerm;
         final Sequent addedSeq;
-        // The presence of the precondition term means we are dealing with a model method definition 
+        // The presence of the precondition term means we are dealing with a model method definition
         // taclet, an \add section to check preconditions has to be added
         // FIXME does this also affect the satisfiability branches?
-        if(addForumlaTerm != null) {
+        if (addForumlaTerm != null) {
             Term wfFormula = null;
             Term createdFormula = null;
-        	for(SchemaVariable heapSV : heapSVs) {
-        		final Term wf = TB.wellFormed(TB.var(heapSV), services);
-        		if(wfFormula == null) {
-        			wfFormula = wf;
-        		}else{
-        			wfFormula = TB.and(wfFormula, wf);
-        		}
-        		if(!target.isStatic()) {
-        			final Term crf = TB.created(services, TB.var(heapSV), TB.var(selfSV));
-        			if(createdFormula == null) {
-        				createdFormula = crf;
-        			}else{
-        				createdFormula = TB.and(createdFormula, crf);
-        			}
-        		}
-        	}
-        	final Term selfNull = target.isStatic() ? null : TB.equals(TB.var(selfSV), TB.NULL(services));
-        	if(wfFormula != null) {
-        		addForumlaTerm = TB.and(addForumlaTerm, wfFormula);
-        	}
-        	if(createdFormula != null) {
-        		addForumlaTerm = TB.and(addForumlaTerm, createdFormula);
-        	}
-        	if(selfNull != null) {
-        		addForumlaTerm = TB.and(addForumlaTerm, TB.not(selfNull));
-        	}
+            for(SchemaVariable heapSV : heapSVs) {
+                final Term wf = TB.wellFormed(TB.var(heapSV), services);
+                if (wfFormula == null) {
+                    wfFormula = wf;
+                } else {
+                    wfFormula = TB.and(wfFormula, wf);
+                }
+                if (!target.isStatic()) {
+                    final Term crf = TB.created(services, TB.var(heapSV), TB.var(selfSV));
+                    if(createdFormula == null) {
+                        createdFormula = crf;
+                    } else {
+                        createdFormula = TB.and(createdFormula, crf);
+                    }
+                }
+            }
+            final Term selfNull = target.isStatic() ? null : TB.equals(TB.var(selfSV), TB.NULL(services));
+            if (wfFormula != null) {
+                addForumlaTerm = TB.and(addForumlaTerm, wfFormula);
+            }
+            if (createdFormula != null) {
+                addForumlaTerm = TB.and(addForumlaTerm, createdFormula);
+            }
+            if (selfNull != null) {
+                addForumlaTerm = TB.and(addForumlaTerm, TB.not(selfNull));
+            }
             final TermAndBoundVarPair schemaAdd = createSchemaTerm(addForumlaTerm, pvs, svs);
 
             final Term addedFormula = schemaAdd.term;
             final SequentFormula addedCf = new SequentFormula(addedFormula);
             final Semisequent addedSemiSeq = Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
             addedSeq = Sequent.createSuccSequent(addedSemiSeq);
-        }else{
-        	addedSeq = null;
+        } else {
+            addedSeq = null;
         }
 
         //create taclet
@@ -366,8 +362,8 @@ public class TacletGenerator {
         // FIXME - there is a chance this will have to go along with all the other associated changes
 /*
         if(addedSeq != null) {
-        	TacletGoalTemplate tgc = new TacletGoalTemplate(addedSeq, ImmutableSLList.<Taclet>nil());
-        	tgc.setName("Precondition of "+target.name());
+            TacletGoalTemplate tgc = new TacletGoalTemplate(addedSeq, ImmutableSLList.<Taclet>nil());
+            tgc.setName("Precondition of "+target.name());
             tacletBuilder.addTacletGoalTemplate (tgc);
         }
 */
@@ -469,7 +465,8 @@ public class TacletGenerator {
             Term targetSVReachable = null;
             for(SchemaVariable heapSV : heapSVs) {
                  tacletBuilder.addVarsNotFreeIn(targetSV, heapSV);
-                 final Term tReach = TB.reachableValue(services, TB.var(heapSV), TB.var(targetSV), target.getType());
+                 final Term tReach = TB.reachableValue(services, TB.var(heapSV),
+                                                       TB.var(targetSV), target.getType());
                  if(targetSVReachable == null) {
                 	 targetSVReachable = tReach;
                  }else{
@@ -491,7 +488,7 @@ public class TacletGenerator {
         }
         return axiomSatisfiable;
     }
-    
+
     public ImmutableSet<Taclet> generateContractAxiomTaclets(
             Name name,
             Term originalPre,
@@ -555,7 +552,7 @@ public class TacletGenerator {
         }
         final Term selfNull = target.isStatic() ? null : TB.equals(TB.var(selfSV), TB.NULL(services));
         final Term mbyOK = originalMby != null ? TB.measuredByCheck(originalMby, services): null;
-        
+
         // create find
         final Term[] subs = new Term[target.arity()];
         int i = 0;
@@ -582,7 +579,7 @@ public class TacletGenerator {
             addForumlaTerm = TB.and(addForumlaTerm, TB.not(selfNull));
         }
         if(mbyOK != null) {
-            addForumlaTerm = TB.and(addForumlaTerm, mbyOK);        	
+            addForumlaTerm = TB.and(addForumlaTerm, mbyOK);
         }
 
         pvs = pvs.append(originalSelfVar).append(originalParamVars); // .append(originalResultVar)
@@ -618,7 +615,7 @@ public class TacletGenerator {
 
     }
 
-    // FIXME Wojtek: This method is currently not used, hence declared private, but it should stay uncommented as 
+    // FIXME Wojtek: This method is currently not used, hence declared private, but it should stay uncommented as
     // to keep the development of model methods consistent
     // At this point I am not even certain what this method was for...
     private ImmutableSet<Taclet> generateModelMethodExecutionTaclets(Name name, KeYJavaType kjt, IObserverFunction target, Services services) {
@@ -626,7 +623,7 @@ public class TacletGenerator {
         final ProgramSV selfProgSV = target.isStatic() ? null
             : SchemaVariableFactory.createProgramSV(new ProgramElementName("#self_sv"), ProgramSVSort.VARIABLE, false);
 
-        final ProgramSV heapProgSV = target.getStateCount() == 2 ? 
+        final ProgramSV heapProgSV = target.getStateCount() == 2 ?
                  SchemaVariableFactory.createProgramSV(new ProgramElementName("#heap_sv"), ProgramSVSort.VARIABLE, false)
             : null;
 
@@ -638,7 +635,7 @@ public class TacletGenerator {
 
         final ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil()
                  .append(target.getParamTypes().toArray(new KeYJavaType[target.getNumParams()]));
-        final IProgramMethod targetImpl 
+        final IProgramMethod targetImpl
             = services.getJavaInfo().getProgramMethod(kjt, ((ProgramMethod)target).getName(), sig, kjt);
 
         final MethodBodyStatement mbs = new MethodBodyStatement(targetImpl,
@@ -692,7 +689,9 @@ public class TacletGenerator {
                                                          SchemaVariable eqSV,
                                                          Term term,
                                                          KeYJavaType kjt,
-                                                         ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
+                                                         ImmutableSet<Pair<Sort,
+                                                                           IObserverFunction>>
+                                                                  toLimit,
                                                          boolean isStatic,
                                                          boolean eqVersion,
                                                          Services services) {
@@ -951,15 +950,16 @@ public class TacletGenerator {
 
 
     private Pair<Term, ImmutableSet<Taclet>> limitTerm(Term t,
-                                                      ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
+                                                      ImmutableSet<Pair<Sort,
+                                                                        IObserverFunction>>
+                                                               toLimit,
                                                       Services services) {
         ImmutableSet<Taclet> taclets = DefaultImmutableSet.nil();
 
         //recurse to subterms
         Term[] subs = new Term[t.arity()];
         for (int i = 0; i < subs.length; i++) {
-            Pair<Term, ImmutableSet<Taclet>> pair = limitTerm(t.sub(i), toLimit,
-                                                              services);
+            Pair<Term, ImmutableSet<Taclet>> pair = limitTerm(t.sub(i), toLimit, services);
             subs[i] = pair.first;
             taclets = taclets.union(pair.second);
         }
@@ -972,8 +972,8 @@ public class TacletGenerator {
                 if (pair.second.equals(t.op())
                     && (obs.isStatic()
                         || t.sub(1).sort().extendsTrans(pair.first))) {
-                    Pair<IObserverFunction, ImmutableSet<Taclet>> limited = services.getSpecificationRepository().limitObs(
-                            obs);
+                    Pair<IObserverFunction, ImmutableSet<Taclet>> limited =
+                            services.getSpecificationRepository().limitObs(obs);
                     newOp = limited.first;
                     taclets = taclets.union(limited.second);
                 }
@@ -981,8 +981,7 @@ public class TacletGenerator {
         }
 
         //reassemble, return
-        final Term term = TB.tf().createTerm(newOp, subs, t.boundVars(),
-                                             t.javaBlock());
+        final Term term = TB.tf().createTerm(newOp, subs, t.boundVars(), t.javaBlock());
         return new Pair<Term, ImmutableSet<Taclet>>(term, taclets);
     }
 
@@ -1079,7 +1078,7 @@ public class TacletGenerator {
         final boolean finalClass =
                 kjt.getJavaType() instanceof ClassDeclaration
                 && ((ClassDeclaration) kjt.getJavaType()).isFinal();
-        // TODO: exact instance neccessary?
+        // TODO: exact instance necessary?
         // or better: instance(finalClass, selfSV, services)?
         final Term exactInstance =
                 target.isStatic() || finalClass ? TB.tt()

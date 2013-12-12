@@ -14,8 +14,8 @@ mod: \if (true)  \then ({})  \else (allLocs)
          \else (allLocs)
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
-               <methodReturn name="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	42 {result_0 = 42 &amp; x &gt;= 0 &amp; y &lt;= -1}, 
+               <methodReturn name="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return
+	42 {result_0 = 42 &amp; x &gt;= 0 &amp; y &lt;= -1},
 	-4711 {!(y &lt;= -1 &amp; x &gt;= 0)}
 as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
                   <methodReturnValue name="42 {result_0 = 42 &amp; x &gt;= 0 &amp; y &lt;= -1}" returnValueString="42" hasCondition="true" conditionString="result_0 = 42 &amp; x &gt;= 0 &amp; y &lt;= -1">

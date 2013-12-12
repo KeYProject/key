@@ -13,7 +13,7 @@ class Perm {
         @ decreasing a.length - pIdx;
         @ assignable pIdx;
         @*/
-      while (hasNext()) 
+      while (hasNext())
           s+= a[next()];
       return s;
   }
@@ -29,10 +29,10 @@ class Perm {
     @
     @ ghost \seq c; // a permuted by perm
     @ invariant \dl_seqPerm(b,c);
-    @ invariant (\forall int i; 0 <= i && i < a.length; 
+    @ invariant (\forall int i; 0 <= i && i < a.length;
     @               (int)c[i] == (int)b[(int)perm[i]]);
     @*/
-  
+
   /*@ normal_behavior
     @ ensures \result == (pIdx < a.length);
     @ strictly_pure helper

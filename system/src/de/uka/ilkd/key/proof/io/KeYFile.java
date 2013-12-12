@@ -140,9 +140,9 @@ public class KeYFile implements EnvInput {
                 return null;
             }
             try {
-               KeYParserF problemParser 
+               KeYParserF problemParser
                     = new KeYParserF(ParserMode.PROBLEM,
-                                    new KeYLexerF(getNewStream(), null), 
+                                    new KeYLexerF(getNewStream(), null),
                                     file.toString());
                problemParser.profile();
                ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
@@ -196,7 +196,7 @@ public class KeYFile implements EnvInput {
                 // during collection of includes (it is enough to mispell \include) the error
                 // message is very uninformative - ProofInputException without filename, line and column
                 // numbers. Somebody please fix that. /Woj
-                KeYParserF problemParser = new KeYParserF(ParserMode.PROBLEM, 
+                KeYParserF problemParser = new KeYParserF(ParserMode.PROBLEM,
                         new KeYLexerF(getNewStream(),
                                 null), 
                                 file.toString(), 
@@ -318,13 +318,13 @@ public class KeYFile implements EnvInput {
             final ParserConfig schemaConfig 
                     = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
 
-            CountingBufferedReader cinp = 
+            CountingBufferedReader cinp =
                     new CountingBufferedReader
                         (getNewStream(),monitor,getNumberOfChars()/100);
             try {
-                KeYParserF problemParser 
-                = new KeYParserF(ParserMode.PROBLEM, 
-                        new KeYLexerF(cinp, 
+                KeYParserF problemParser
+                = new KeYParserF(ParserMode.PROBLEM,
+                        new KeYLexerF(cinp,
                                 initConfig.getServices()
                                 .getExceptionHandler()), 
                                 file.toString(), 
@@ -366,7 +366,7 @@ public class KeYFile implements EnvInput {
         try {
             InputStream is = getNewStream();
             try { 
-                KeYParserF p=createDeclParser(is);          
+                KeYParserF p=createDeclParser(is);
                 p.parseSorts();
                 initConfig.addCategory2DefaultChoices(p.getCategory2Default());
             } finally {
@@ -409,8 +409,7 @@ public class KeYFile implements EnvInput {
      * modifying the set of rules 
      * of the initial configuration 
      */
-    public void readRulesAndProblem() 
-            throws ProofInputException {
+    public void readRulesAndProblem() throws ProofInputException {
         final ParserConfig schemaConfig = 
 	    new ParserConfig(initConfig.getServices(), initConfig.namespaces());
         final ParserConfig normalConfig = 
@@ -420,16 +419,16 @@ public class KeYFile implements EnvInput {
             final CountingBufferedReader cinp = new CountingBufferedReader
                     (getNewStream(), monitor, getNumberOfChars()/100);
             try {
-                KeYParserF problemParser 
+                KeYParserF problemParser
                 = new KeYParserF(ParserMode.PROBLEM,
-                        new KeYLexerF(cinp, 
+                        new KeYLexerF(cinp,
                                 initConfig.getServices()
                                 .getExceptionHandler()), 
                                 file.toString(),
                                 schemaConfig,
                                 normalConfig,
                                 initConfig.getTaclet2Builder(),
-                                initConfig.getTaclets());                             
+                                initConfig.getTaclets());
                 problemParser.parseTacletsAndProblem();
                 initConfig.setTaclets(problemParser.getTaclets());
             } finally {

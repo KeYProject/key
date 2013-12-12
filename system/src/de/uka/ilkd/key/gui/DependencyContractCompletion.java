@@ -68,7 +68,9 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
     		List<LocationVariable> heapContext,
             List<PosInOccurrence> steps, boolean forced, Services services) {
 
-        if (steps.size() == 0) {
+        // 2nd condition is a quickfix to avoid ClassCastExceptions (Michael Kirsten)
+        if (steps.size() == 0
+                || !(steps.get(0).subTerm().op() instanceof IObserverFunction)) {
             return null;
         }
 
@@ -80,7 +82,8 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         lp.setLineWidth(120);
 
         for (PosInOccurrence step : steps) {
-        	final Term[] heapTerms = new Term[((IObserverFunction)step.subTerm().op()).getStateCount()*heapContext.size()];
+            final Term[] heapTerms = new Term[((IObserverFunction)
+                    step.subTerm().op()).getStateCount()*heapContext.size()];
         	String prettyprint = "<html><tt>" + (heapTerms.length > 1 ? "[" : "");
         	for(int j =0 ; j < heapTerms.length; j++) {
               final Term heap = step.subTerm().sub(j);
@@ -91,7 +94,8 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
               } catch (IOException e) {
                   throw new RuntimeException(e);
               }
-              prettyprint += (j>0 ? ", " : "") + LogicPrinter.escapeHTML(lp.toString().trim(), true);
+              prettyprint += (j>0 ? ", " : "")
+                      + LogicPrinter.escapeHTML(lp.toString().trim(), true);
         	}
         	prettyprint += (heapTerms.length > 1 ? "]" : "")+"</tt></html>";
             heaps[i++] = new TermStringWrapper(heapTerms, prettyprint);

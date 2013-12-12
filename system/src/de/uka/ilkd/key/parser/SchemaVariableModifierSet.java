@@ -110,4 +110,7 @@ public abstract class SchemaVariableModifierSet {
     public static class SkolemTermSV extends SchemaVariableModifierSet {}
     
     public static class FreshProgVarSV extends SchemaVariableModifierSet {}
+    
+    public static class TermLabelSV extends SchemaVariableModifierSet {}
+
 }

@@ -28,23 +28,23 @@ public static int lcp(/*@ nullable */ int[] a, int x, int y) {
       @             && l+y <= a.length && x!=y;
       @ maintaining (\forall int z; 0 <= z && z < l;
       @                          a[x+z] == a[y+z] );
-      @ decreasing a.length-l; 
-      @ assignable \strictly_nothing; @*/ 
+      @ decreasing a.length-l;
+      @ assignable \strictly_nothing; @*/
     while (x+l<a.length && y+l<a.length && a[x+l]==a[y+l]){
-    	int yy = yy_0_helper(); // int yy = 0;
-    	yy = yy_1_helper(); // yy++;
-    	l++;
-    }    	
+	int yy = yy_0_helper(); // int yy = 0;
+	yy = yy_1_helper(); // yy++;
+	l++;
+    }
     return l;
 }
 
-		
+
 				/*@ normal_behavior
 				ensures true;
 				strictly_pure
 		*/
 		static int yy_0_helper(){}
-		
+
 				/*@ normal_behavior
 				ensures true;
 				strictly_pure

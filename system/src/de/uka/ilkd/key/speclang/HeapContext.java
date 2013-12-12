@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 
-/** Heap contexts are variaous scenarios of what happens to heap variables 
+/** Heap contexts are various scenarios of what happens to heap variables
     during PO generation and built-in rule applications, like saving atPre heaps,
     anonymisation, etc.
   */

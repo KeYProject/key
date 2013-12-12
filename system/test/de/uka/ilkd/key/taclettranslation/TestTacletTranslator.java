@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.taclettranslation;
 
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;

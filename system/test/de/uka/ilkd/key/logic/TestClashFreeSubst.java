@@ -15,7 +15,6 @@
 package de.uka.ilkd.key.logic;
 
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Stack;
 

@@ -62,14 +62,14 @@ final class Lemmas {
     }
 
 
-    /*@ public normal_behaviour 
+    /*@ public normal_behaviour
       @  requires \invariant_for(sa);
       @  requires 0 <= i && i < j && j < sa.a.length;
       @  requires
-      @     sa.suffixes[i] + k <= sa.a.length &&  sa.suffixes[j] + k <= sa.a.length && 
+      @     sa.suffixes[i] + k <= sa.a.length &&  sa.suffixes[j] + k <= sa.a.length &&
       @     (\forall int t; 0 <=t && t < k; sa.a[sa.suffixes[i]+t] == sa.a[sa.suffixes[j]+t]);
       @  ensures
-      @     sa.suffixes[i+1] + k <= sa.a.length && 
+      @     sa.suffixes[i+1] + k <= sa.a.length &&
       @     (\forall int t; 0 <=t && t < k; sa.a[sa.suffixes[i]+t] == sa.a[sa.suffixes[i+1]+t]);
       @  ensures \result;
       @  strictly_pure helper

@@ -87,7 +87,9 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
          }
          resultTerm = TermBuilder.DF.var(resultVar);
       }
-      ContractPostOrExcPostExceptionVariableResult search = SymbolicExecutionUtil.serachContractPostOrExcPostExceptionVariable(getProofNode().child(0), getServices()); // Post branch
+      ContractPostOrExcPostExceptionVariableResult search =
+              SymbolicExecutionUtil.searchContractPostOrExcPostExceptionVariable(
+                      getProofNode().child(0), getServices()); // Post branch
       // Rename variables in contract to the current one
       List<LocationVariable> heapContext = HeapContext.getModHeaps(getServices(), inst.transaction);
       Map<LocationVariable,LocationVariable> atPreVars = UseOperationContractRule.computeAtPreVars(heapContext, getServices(), inst);

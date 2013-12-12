@@ -6,10 +6,10 @@
             <statement name="array[1].value=3;" pathCondition="true" pathConditionChanged="false">
                <statement name="return w.value+array[0].value+array[1].value;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	9 {array[0] = w &amp; array[1] = w}, 
+	9 {array[0] = w &amp; array[1] = w},
 	7 {  array[0] = w &amp; !array[1] = w
 | !array[0] = w
-&amp; array[1] = array[0]}, 
+&amp; array[1] = array[0]},
 	8 {!array[0] = w &amp; array[1] = w &amp; !array[1] = array[0]}, 
 	6 {!array[0] = w &amp; !array[1] = w &amp; !array[1] = array[0]}
 as result of self.array(w,array);&gt;" isReturnValueComputed="true">

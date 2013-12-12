@@ -35,7 +35,6 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -648,10 +647,12 @@ public class InvariantConfigurator {
                 }
 
                 if (requirementsAreMet) {
-                    newInvariant = new LoopInvariantImpl(loopInv.getLoop(),
-                            invariantTerm, modifiesTerm, variantTerm, loopInv
-                            .getInternalSelfTerm(), loopInv
-                            .getInternalAtPres());
+                    newInvariant =
+                            new LoopInvariantImpl(loopInv.getLoop(), loopInv.getTarget(),
+                                                  loopInv.getKJT(), invariantTerm,
+                                                  modifiesTerm, variantTerm,
+                                                  loopInv.getInternalSelfTerm(),
+                                                  loopInv.getInternalAtPres());
                     return true;
                 } else
                     return false;

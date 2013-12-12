@@ -77,7 +77,7 @@ public class BundleUtilTest extends TestCase {
       // Test content
       assertEquals("b10a8db164e0754105b7a99be72e3fe5", BundleUtil.computeMD5(Activator.PLUGIN_ID, "data/HelloWorld.txt"));
    }
-   
+
    /**
     * Tests {@link BundleUtil#extractFromBundleToFilesystem(String, String, java.io.File)}
     */

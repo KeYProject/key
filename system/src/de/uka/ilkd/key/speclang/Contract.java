@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
@@ -35,7 +36,6 @@ public interface Contract extends SpecificationElement {
 
     public static final int INVALID_ID = Integer.MIN_VALUE;
 
-
     /**
      * Returns the id number of the contract. If a contract has instances for
      * several methods (inheritance!), all instances have the same id.
@@ -52,6 +52,12 @@ public interface Contract extends SpecificationElement {
      * Tells whether the contract contains a measured_by clause.
      */
     public boolean hasMby();
+
+    /**
+     * Returns the original ProgramVariables to replace them easier.
+     * The second list consists of the parameters.
+     */
+    public OriginalVariables getOrigVars();
 
     /**
      * Returns the precondition of the contract.
@@ -83,11 +89,39 @@ public interface Contract extends SpecificationElement {
 	               Term selfTerm,
 	    	       ImmutableList<Term> paramTerms,
                        Map<LocationVariable,Term> atPres,
-	    	       Services services);
+	    	       Services services);    
 
+    /**
+     * Returns the dependency set of the contract.
+     */
+    public Term getDep(LocationVariable heap, boolean atPre,
+                       ProgramVariable selfVar,
+                       ImmutableList<ProgramVariable> paramVars,
+                       Map<LocationVariable,? extends ProgramVariable> atPreVars,
+                       Services services);
+
+    /**
+     * Returns the dependency set of the contract.
+     */
+    public Term getDep(LocationVariable heap, boolean atPre,
+                       Term heapTerm,
+                       Term selfTerm,
+                       ImmutableList<Term> paramTerms,
+                       Map<LocationVariable, Term> atPres,
+                       Services services);
+
+    public Term getRequires(LocationVariable heap);
+
+    public Term getAssignable(LocationVariable heap);
+
+    public Term getAccessible(ProgramVariable heap);
+
+    public Term getGlobalDefs();
 
     public Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Services services);
+                              ImmutableList<Term> paramTerms, Services services);
+
+    public Term getMby();
 
     /**
      * Returns the measured_by clause of the contract.
@@ -102,7 +136,7 @@ public interface Contract extends SpecificationElement {
     public Term getMby(Map<LocationVariable,Term> heapTerms,
 	               Term selfTerm,
 	               ImmutableList<Term> paramTerms,
-                   Map<LocationVariable, Term> atPres,
+	               Map<LocationVariable, Term> atPres,
 	               Services services);
 
     /**
@@ -155,10 +189,53 @@ public interface Contract extends SpecificationElement {
      * Returns technical name for the contract type.
      */
     public String getTypeName();
-    
+
     /**
      * Checks if a self variable is originally provided.
-     * @return {@code true} self variable is originally provided, {@code false} no self variable available.
+     * @return {@code true} self variable is originally provided,
+     *         {@code false} no self variable available.
      */
     public boolean hasSelfVar();
+
+    /**
+     * Class for storing the original variables without always distinguishing
+     * several different cases depending on which variables are present/needed
+     * in order to provide a general interface. At the moment only used for
+     * well-definedness checks (as those refer to already existing structures).
+     *
+     * @author Michael Kirsten
+     */
+    final public class OriginalVariables {
+
+        public final ProgramVariable self;
+        public final ProgramVariable result;
+        public final ProgramVariable exception;
+        public final Map<LocationVariable, ProgramVariable> atPres;
+        public final ImmutableList<ProgramVariable> params;
+
+        public OriginalVariables(ProgramVariable selfVar,
+                                 ProgramVariable resVar,
+                                 ProgramVariable excVar,
+                                 Map<LocationVariable, ProgramVariable> atPreVars,
+                                 ImmutableList<ProgramVariable> paramVars) {
+            this.self = selfVar;
+            this.result = resVar;
+            this.exception = excVar;
+            this.atPres = atPreVars;
+            if (paramVars == null) {
+                this.params = ImmutableSLList.<ProgramVariable>nil();
+            } else {
+                this.params = paramVars;
+            }
+        }
+
+        /**
+         * Adds a list of parameters and deletes the prior ones (if any).
+         * @param newParams
+         * @return the changed original variables
+         */
+        public OriginalVariables add(ImmutableList<ProgramVariable> newParams) {
+            return new OriginalVariables(self, result, exception, atPres, newParams);
+        }
+    }
 }

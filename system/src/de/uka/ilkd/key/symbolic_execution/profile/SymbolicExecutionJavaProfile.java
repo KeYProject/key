@@ -59,7 +59,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     */
    public SymbolicExecutionJavaProfile() {
    }
-   
+
    /**
     * {@inheritDoc}
     */
@@ -69,7 +69,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
       result = result.prepend(getSymbolicExecutionTermLabelConfigurations());
       return result;
    }
-   
+
    /**
     * Returns the additional {@link TermLabelFactory} instances used for symbolic execution.
     * @return The additional {@link TermLabelFactory} instances used for symbolic execution.
@@ -86,7 +86,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
       ImmutableList<TermLabelRefactoring> seRefs = ImmutableSLList.<TermLabelRefactoring>nil().prepend(new RemoveInCheckBranchesTermLabelRefactoring(SymbolicExecutionTermLabel.NAME));
 
       ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
-      result = result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.LOOP_BODY_LABEL_NAME, 
+      result = result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.LOOP_BODY_LABEL_NAME,
                                                          new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.LOOP_BODY_LABEL),
                                                          null,
                                                          symExcPolicies,
@@ -94,7 +94,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
                                                          null,
                                                          lbUps,
                                                          lbRefs));
-      result = result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME, 
+      result = result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME,
                                                          new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL),
                                                          null,
                                                          symExcPolicies,
@@ -102,7 +102,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
                                                          null,
                                                          nbUps,
                                                          nbRefs));
-      result = result.prepend(new TermLabelConfiguration(SymbolicExecutionTermLabel.NAME, 
+      result = result.prepend(new TermLabelConfiguration(SymbolicExecutionTermLabel.NAME,
                                                          new SymbolicExecutionTermLabelFactory(),
                                                          null,
                                                          symExcPolicies,

@@ -1449,7 +1449,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          restoreTacletOptions(originalTacletOptions);
       }
    }
-   
+
    /**
     * Internal test method called by
     * {@link #doSETTest(File, String, String, String, boolean, boolean, boolean, int, boolean, boolean, boolean, boolean, boolean)} and
@@ -1494,7 +1494,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
-   public static HashMap<String, String> setDefaultTacletOptions(File baseDir, 
+   public static HashMap<String, String> setDefaultTacletOptions(File baseDir,
                                                                  String javaPathInBaseDir,
                                                                  String baseContractName) throws ProblemLoaderException, ProofInputException {
       if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
@@ -1514,7 +1514,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
-   public static HashMap<String, String> setDefaultTacletOptions(File baseDir, 
+   public static HashMap<String, String> setDefaultTacletOptions(File baseDir,
                                                                  String javaPathInBaseDir,
                                                                  String containerTypeName,
                                                                  String methodFullName) throws ProblemLoaderException, ProofInputException {
@@ -1524,7 +1524,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       return setDefaultTacletOptions();
    }
-   
+
    /**
     * Ensures that the default taclet options are defined.
     * @param javaFile The java file to load.
@@ -1575,7 +1575,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       return setDefaultTacletOptions();
    }
-   
+
    /**
     * Ensures that the default taclet options are defined.
     * @return The original settings which are overwritten.
@@ -1611,9 +1611,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          }
       }
    }
-   
+
    /**
-    * Makes sure that two {@link Term}s are equal. 
+    * Makes sure that two {@link Term}s are equal.
     * @param expected The expected {@link Term}.
     * @param actual The actual {@link Term}.
     */
@@ -1631,7 +1631,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertNull(actual);
       }
    }
-   
+
    /**
     * Checks if one step simplification is enabled in the given {@link Proof}.
     * @param proof The {@link Proof} to read from or {@code null} to return the general settings value.
@@ -1645,9 +1645,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          return ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
       }
    }
-   
+
    /**
-    * 
+    *
     * @param proof
     * @param enabled
     */

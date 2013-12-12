@@ -51,17 +51,17 @@ public abstract class AbstractProfile implements Profile {
     private GoalChooserBuilder prototype;
 
     private TermLabelManager termLabelManager;
-    
+
     private static
         ImmutableSet<String> extractNames(ImmutableSet<GoalChooserBuilder> supportedGCB) {
-    
+
         ImmutableSet<String> result = DefaultImmutableSet.<String>nil();
-    
+
         final Iterator<GoalChooserBuilder> it = supportedGCB.iterator();
         while (it.hasNext()) {
             result  = result.add(it.next().name());
         }
-    
+
         return result;
     }
 
@@ -91,7 +91,7 @@ public abstract class AbstractProfile implements Profile {
      * @return The {@link TermLabelConfiguration} to use in this {@link Profile}.
      */
     protected abstract ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration();
-    
+
     public RuleCollection getStandardRules() {
         return standardRules;
     }
@@ -239,7 +239,7 @@ public abstract class AbstractProfile implements Profile {
          return null;
       }
    }
-   
+
    /**
     * Returns the default profile which is used if no profile is defined in custom problem files (loaded via {@link KeYUserProblemFile}).
     * @return The default profile which is used if no profile is defined in custom problem files (loaded via {@link KeYUserProblemFile}).
@@ -256,10 +256,9 @@ public abstract class AbstractProfile implements Profile {
       assert defaultProfile != null;
       AbstractProfile.defaultProfile = defaultProfile;
    }
-   
-   @Override 
+
+   @Override
    public TermLabelManager getTermLabelManager() {
        return termLabelManager;
    }
-
 }

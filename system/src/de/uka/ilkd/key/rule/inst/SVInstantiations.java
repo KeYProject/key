@@ -140,36 +140,36 @@ public class SVInstantiations {
     public SVInstantiations add(SchemaVariable sv, 
 	    			Term subst, 
 	    			Services services) {
-        return add(sv, new TermInstantiation(sv, subst), services);    
+        return add(sv, new TermInstantiation(sv, subst), services);
     }
 
-    
-    public SVInstantiations add(ModalOperatorSV sv, 
+
+    public SVInstantiations add(ModalOperatorSV sv,
             			Operator op,
             			Services services) {
         return add(sv, new OperatorInstantiation(sv, op), services);
     }
-    
 
-    public SVInstantiations addInteresting(SchemaVariable sv, 
+
+    public SVInstantiations addInteresting(SchemaVariable sv,
 	    				   Term subst,
 	    				   Services services) {
-        return addInteresting(sv, 
+        return addInteresting(sv,
         		      new TermInstantiation(sv, subst),
         		      services);
     }
 
 
-    public SVInstantiations add(SchemaVariable sv, 
-	    		        ProgramList pes, 
+    public SVInstantiations add(SchemaVariable sv,
+			        ProgramList pes,
 	    		        Services services) {
-        return add(sv, 
-        	   new ProgramListInstantiation(sv, pes.getList()), 
-        	   services);
+        return add(sv,
+                   new ProgramListInstantiation(sv, pes.getList()),
+                   services);
     }
 
     public SVInstantiations add(SchemaVariable sv, 
-            ImmutableArray<TermLabel> labels, 
+            ImmutableArray<TermLabel> labels,
             Services services) {
         return add(sv, 
                 new TermLabelInstantiationEntry(sv, labels), 
@@ -177,18 +177,18 @@ public class SVInstantiations {
     }
 
 
-    public SVInstantiations addList(SchemaVariable sv,  
+    public SVInstantiations addList(SchemaVariable sv,
 	    		            Object[] list,
 	    		            Services services) {
-        return add(sv, 
+        return add(sv,
         	   new ListInstantiation(
-        		   sv, 
+                           sv,
         		   ImmutableSLList.<Object>nil().prepend(list)),
                    services);
     }
 
-    
-    
+
+
     /** adds the given pair to the instantiations. If the given
      * SchemaVariable has been instantiated already, the new pair is
      * taken without a warning.
@@ -197,24 +197,24 @@ public class SVInstantiations {
      * @return SVInstantiations the new SVInstantiations containing
      * the given pair
      */
-    public SVInstantiations add(SchemaVariable sv, 
+    public SVInstantiations add(SchemaVariable sv,
 	    			ProgramElement pe,
 	    			Services services) {
 	return add(sv, new ProgramInstantiation(sv, pe), services);
-    }    
+    }
 
 
-    public SVInstantiations addInteresting(SchemaVariable sv, 
+    public SVInstantiations addInteresting(SchemaVariable sv,
 	    				   ProgramElement pe,
 	    				   Services services) {
 	return addInteresting(sv, new ProgramInstantiation(sv, pe), services);
-    }    
-    
-    public SVInstantiations addInterestingList(SchemaVariable sv, 
-	    				       Object[] list, 
+    }
+
+    public SVInstantiations addInterestingList(SchemaVariable sv,
+					       Object[] list,
 	    				       Services services) {
         return addInteresting(
-        	sv, 
+                sv,
                 new ListInstantiation(sv, ImmutableSLList.<Object>nil().prepend(list)),
                 services);
     }
@@ -224,7 +224,7 @@ public class SVInstantiations {
     /**
      * adds the given pair to the instantiations for the context.If the context
      * has been instantiated already, the new pair is taken without a warning.
-     * 
+     *
      * @param prefix
      *            the PosInProgram describing the prefix
      * @param postfix
@@ -236,17 +236,17 @@ public class SVInstantiations {
      * @return SVInstantiations the new SVInstantiations containing the given
      *         pair
      */
-    public SVInstantiations add(PosInProgram prefix, 
+    public SVInstantiations add(PosInProgram prefix,
 	    			PosInProgram postfix,
-	    			ExecutionContext activeStatementContext, 
+				ExecutionContext activeStatementContext,
 	    			ProgramElement pe,
 	    			Services services) {
-        return add(CONTEXTSV, 
-        	   new ContextInstantiationEntry(CONTEXTSV, 
-        		   		         prefix, 
-        		   		         postfix, 
-        		   		         activeStatementContext, 
-        		   		         pe),
+        return add(CONTEXTSV,
+                   new ContextInstantiationEntry(CONTEXTSV,
+                                                 prefix,
+                                                 postfix,
+                                                 activeStatementContext,
+                                                 pe),
                    services);
     }
 

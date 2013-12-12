@@ -14,9 +14,9 @@ import de.uka.ilkd.key.rule.Rule;
 
 /**
  * <p>
- * A {@link TermLabelRefactoring} is used by 
+ * A {@link TermLabelRefactoring} is used by
  * {@link TermLabelManager#refactorLabels(Services, PosInOccurrence, Term, Rule, Goal, Term)}
- * to refactor the labels of each visited {@link Term}. 
+ * to refactor the labels of each visited {@link Term}.
  * </p>
  * <p>
  * For more information about {@link TermLabel}s and how they are maintained
@@ -30,11 +30,11 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
    /**
     * Defines if a refactoring is required and if so in which {@link RefactoringScope}.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten. 
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
-    * @param rule The {@link Rule} which is applied. 
+    * @param rule The {@link Rule} which is applied.
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
-    * @param tacletTerm The optional taclet {@link Term}. 
+    * @param tacletTerm The optional taclet {@link Term}.
     * @return The required {@link RefactoringScope}.
     */
    public RefactoringScope defineRefactoringScope(Services services,
@@ -43,15 +43,15 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
                                                   Rule rule,
                                                   Goal goal,
                                                   Term tacletTerm);
-   
+
    /**
     * This method is used to refactor the labels of the given {@link Term}.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten. 
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
-    * @param rule The {@link Rule} which is applied. 
+    * @param rule The {@link Rule} which is applied.
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
-    * @param tacletTerm The optional taclet {@link Term}. 
+    * @param tacletTerm The optional taclet {@link Term}.
     * @param term The {@link Term} which is now refactored.
     * @param labels The new labels the {@link Term} will have after the refactoring.
     */
@@ -60,10 +60,10 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
                                Term applicationTerm,
                                Rule rule,
                                Goal goal,
-                               Term tacletTerm, 
+                               Term tacletTerm,
                                Term term,
                                List<TermLabel> labels);
-   
+
    /**
     * Possible refactoring scopes.
     * @author Martin Hentschel
@@ -73,17 +73,17 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
        * No refactoring required.
        */
       NONE,
-      
+
       /**
        * Refactor direct children of the application term.
        */
       APPLICATION_DIRECT_CHILDREN,
-      
+
       /**
        * Refactor children and grandchildren of the application term.
        */
       APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE,
-      
+
       /**
        * Refactor the whole sequent.
        */

@@ -39,7 +39,6 @@ import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.ui.UserInterface;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 /**
  * <p>
@@ -110,7 +109,8 @@ public class DefaultProblemLoader {
     * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
     * @param mediator The {@link KeYMediator} to use.
     */
-   public DefaultProblemLoader(File file, List<File> classPath, File bootClassPath, Profile profileOfNewProofs, KeYMediator mediator) {
+   public DefaultProblemLoader(File file, List<File> classPath, File bootClassPath,
+                               Profile profileOfNewProofs, KeYMediator mediator) {
       assert mediator != null;
       this.file = file;
       this.classPath = classPath;
@@ -130,29 +130,33 @@ public class DefaultProblemLoader {
     * @throws IOException Occurred Exception.
     */
    public ProblemLoaderException load(boolean registerProof) throws ProblemLoaderException {
-      try {
-         // Read environment
-      boolean oneStepSimplifier = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
-      ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
-         envInput = createEnvInput();
-         problemInitializer = createProblemInitializer(registerProof);
-         initConfig = createInitConfig();
-         // Read proof obligation settings
-         LoadedPOContainer poContainer = createProofObligationContainer();
-         try {
-            if (poContainer == null) {
-               return selectProofObligation();
-            }
-            // Create proof and apply rules again if possible
-            proof = createProof(poContainer);
-            if (proof != null) {
-               replayProof(proof);
-            }
-            // this message is propagated to the top level in console mode
-            return null; // Everything fine
+       try {
+           // Read environment
+           boolean oneStepSimplifier =
+                   ProofIndependentSettings.DEFAULT_INSTANCE
+                           .getGeneralSettings().oneStepSimplification();
+           ProofIndependentSettings.DEFAULT_INSTANCE
+                           .getGeneralSettings().setOneStepSimplification(true);
+           envInput = createEnvInput();
+           problemInitializer = createProblemInitializer(registerProof);
+           initConfig = createInitConfig();
+           // Read proof obligation settings
+           LoadedPOContainer poContainer = createProofObligationContainer();
+           try {
+               if (poContainer == null) {
+                   return selectProofObligation();
+               }
+               // Create proof and apply rules again if possible
+               proof = createProof(poContainer);
+               if (proof != null) {
+                   replayProof(proof);
+               }
+               // this message is propagated to the top level in console mode
+               return null; // Everything fine
          }
          finally {
-    	  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(oneStepSimplifier);
+             ProofIndependentSettings.DEFAULT_INSTANCE
+                         .getGeneralSettings().setOneStepSimplification(oneStepSimplifier);
             getMediator().resetNrGoalsClosedByHeuristics();
             if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
                ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
@@ -163,7 +167,7 @@ public class DefaultProblemLoader {
           throw(e);
       }
       catch (Exception e) { // TODO give more specific exception message
-         throw new ProblemLoaderException(this, e);
+          throw new ProblemLoaderException(this, e);
       }
    }
 

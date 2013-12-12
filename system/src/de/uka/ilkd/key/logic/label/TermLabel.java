@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -30,7 +30,7 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 /**
  * <p>
  * The interface for term labels. Term labels are annotations that can be attached
- * to {@link Term}s and carry additional information. 
+ * to {@link Term}s and carry additional information.
  * <b>They must not be soundness relevant</b>. But they may be used in strategies
  * to compute the order in which rules are applied.
  * </p>
@@ -58,7 +58,7 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
  * This means that labels of new {@link Term}s created during rule application are computed
  * via {@link TermLabelManager#instantiateLabels(de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.PosInOccurrence, Term, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.logic.JavaBlock)}
  * and of existing {@link Term}s are refactored (added or removed) via
- * {@link TermLabelManager#refactorLabels(de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.PosInOccurrence, Term, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Term)}. 
+ * {@link TermLabelManager#refactorLabels(de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.PosInOccurrence, Term, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Term)}.
  * </p>
  * <p>
  * To implement a new {@link TermLabel} follow the following steps:
@@ -78,12 +78,12 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
  *       </ul>
  *    </li>
  *    <li>
- *       Define how the {@link TermLabel} is maintained during prove. 
- *       This may have to be done for different rules in different ways.  
+ *       Define how the {@link TermLabel} is maintained during prove.
+ *       This may have to be done for different rules in different ways.
  *       Orienteer yourself for each rule on the examples provided in the following.
  *       They are ordered with the less to the most performance impact during prove.
  *       Try to treat as many rules as possible with the same solution, but
- *       <b>choose always the solution with the less performance impact!</b> 
+ *       <b>choose always the solution with the less performance impact!</b>
  *       <ul>
  *          <li>{@code a(b<<l>>) ~~> c(b<<l>>)}: {@code b} is a constant which is never rewritten by rules. The label stays on the {@link Term} and will be dropped when the {@link Term} is dropped. Nothing to be done.</li>
  *          <li>{@code a ~~> b<<l>>}: The taclet rewrites {@code a} into {@code b<<l>>}. {@link TermLabel}s defined by taclets are automatically considered during rule application. Nothing to be done.</li>
@@ -99,12 +99,12 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
  *    </li>
  *    <li>
  *       Make sure that the {@link Profile} supports the new {@link TermLabel}.
- *       All implementations from the previous have to be bundled in a 
+ *       All implementations from the previous have to be bundled in a
  *       {@link TermLabelConfiguration} instance. This instance has to be
  *       created and returned in {@link AbstractProfile#computeTermLabelConfiguration()}.
  *    </li>
  *    <li>
- *       During rule application, especially for {@link BuiltInRule}, the 
+ *       During rule application, especially for {@link BuiltInRule}, the
  *       functionality of {@link TermLabelManager} to maintain {@link TermLabel}s
  *       is only called for newly created {@link Term}s labeled up to now. If
  *       your {@link TermLabelPolicy}, {@link TermLabelUpdate} or {@link TermLabelRefactoring}
@@ -113,19 +113,19 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
  *       {@link TermLabelManager#refactorLabels(de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Term)}
  *       on the right place in the rule implementation.
  *    </li>
- * </ol> 
+ * </ol>
  * </p>
  * @author Martin Hentschel
  * @see TermLabelManager
  */
 public interface TermLabel extends Named {
-    
+
     /**
      * Retrieves the i-th parameter object of this term label.
-     * 
+     *
      * <p>
      * A term label may have structure, i.e. can be parameterized.
-     * 
+     *
      * @param i
      *            the number of the parameter to retrieve (
      *            {@code 0 <= i < getChildCount()})
@@ -138,7 +138,7 @@ public interface TermLabel extends Named {
 
     /**
      * Gets the number of parameters of this term label.
-     *  
+     *
      * @return the number of parameters (a non-negative number)
      */
     public int getChildCount();

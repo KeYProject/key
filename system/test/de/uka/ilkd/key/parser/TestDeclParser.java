@@ -15,7 +15,6 @@
 package de.uka.ilkd.key.parser;
 
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
@@ -120,23 +119,23 @@ public class TestDeclParser extends TestCase {
 
 	return (Sort)p_n;
     }
-    
+
     public void testProxySortDecl() {
         nss = new NamespaceSet ();
         parseDecls("\\sorts { A; B; \\proxy P; \\proxy Q \\extends A,B; \\proxy R \\extends Q; }");
-        
+
         Sort P = (Sort) nss.sorts().lookup(new Name("P"));
         assertTrue(P instanceof ProxySort);
         assertEquals("P", P.name().toString());
         assertEquals(DefaultImmutableSet.nil().add(Sort.ANY), P.extendsSorts());
-        
+
         Sort A = (Sort) nss.sorts().lookup(new Name("A"));
         Sort B = (Sort) nss.sorts().lookup(new Name("B"));
         Sort Q = (Sort) nss.sorts().lookup(new Name("Q"));
         assertTrue(Q instanceof ProxySort);
         assertEquals("Q", Q.name().toString());
         assertEquals(DefaultImmutableSet.nil().add(A).add(B), Q.extendsSorts());
-        
+
         Sort R = (Sort) nss.sorts().lookup(new Name("R"));
         assertTrue(P instanceof ProxySort);
         assertEquals("R", R.name().toString());

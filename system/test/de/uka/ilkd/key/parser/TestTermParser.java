@@ -15,7 +15,6 @@
 package de.uka.ilkd.key.parser;
 
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
@@ -188,13 +187,13 @@ public class TestTermParser extends TestCase {
 	    PrintWriter pw = new PrintWriter(sw);
 	    e.printStackTrace(pw);
 	    throw new RuntimeException("Exc while Parsing:\n" + sw );
-	}	
+	}
     }
 
     private KeYParserF stringTermParser(String s) {
 	return new KeYParserF
 	    (ParserMode.TERM, 
-	     new KeYLexerF(s, new DefaultExceptionHandler()), 
+	     new KeYLexerF(s, new DefaultExceptionHandler()),
 	     "No file. Call of parser from parser/TestTermParser.java",
 	     r2k,
 	     serv, 
@@ -603,7 +602,7 @@ public class TestTermParser extends TestCase {
 //        t = parseTerm("3 + 2<<" + SimpleTermLabel.LOOP_BODY_LABEL_NAME + ">>");
 //        assertFalse(t.hasLabels());
 //        assertTrue(t.sub(1).hasLabels());
-//        
+//
 //        try {
 //            t = parseTerm("(3 + 2)<<unknownLabel>>");
 //            fail("Term " + t + " should not have been parsed");
@@ -611,5 +610,4 @@ public class TestTermParser extends TestCase {
 //            // expected
 //        }
 //    }
-    
 }

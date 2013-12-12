@@ -20,7 +20,7 @@ final class LCP {
   @ ensures (\forall int i; 0 <= i && i < \result;
   @                         a[x+i] == a[y+i] );
   @ ensures a[x+\result] != a[y+\result]
-  @             || \result == a.length-x 
+  @             || \result == a.length-x
   @             || \result == a.length-y;
   @ strictly_pure @*/
 static int lcp(int[] a, int x, int y) {
@@ -29,9 +29,9 @@ static int lcp(int[] a, int x, int y) {
       @             && l+y <= a.length && x!=y;
       @ maintaining (\forall int z; 0 <= z && z < l;
       @                          a[x+z] == a[y+z] );
-      @ decreasing a.length-l; 
-      @ assignable \strictly_nothing; @*/ 
-    while (x+l<a.length && y+l<a.length 
+      @ decreasing a.length-l;
+      @ assignable \strictly_nothing; @*/
+    while (x+l<a.length && y+l<a.length
              && a[x+l]==a[y+l]) l++;
     return l;
 }

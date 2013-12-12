@@ -53,14 +53,14 @@ public class TacletForTests {
         File.separator+"_testcase"+
         File.separator+"testrules.key";
     public static String standardFile = testRules;
-    
+
     public static AbbrevMap scm = new AbbrevMap();
-    
+
     public static NamespaceSet nss = new NamespaceSet();
     public static TacletIndex rules= null;
     public static Services services;
     public static File lastFile=null;
-    
+
     public static Namespace variables = null;
 
     public static Profile profile = new JavaProfile() {
@@ -186,7 +186,7 @@ public class TacletForTests {
 	try {	    
 	    br   = new StringReader(termstr);
 	    KeYParserF parser = new KeYParserF(ParserMode.TERM,
-	                                     new KeYLexerF(br,null), 
+	                                     new KeYLexerF(br,null),
 					     "No file. " +
 					     "TacletForTests.parseTerm("
 					     +termstr+")",
@@ -211,7 +211,7 @@ public class TacletForTests {
 	try {	    
 	    br = new StringReader(termstr);
 	    KeYParserF parser = new KeYParserF(ParserMode.TERM,
-	                                     new KeYLexerF(br,null), 
+	                                     new KeYLexerF(br,null),
 					     "No file. " +
 					     "TacletForTests.parseTerm("
 					     +termstr+")",

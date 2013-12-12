@@ -378,7 +378,7 @@ public class CreateTacletForTests extends TestCase {
     }
      
     private KeYParserF stringTacletParser(String s) {
-	return new KeYParserF(ParserMode.TACLET, 
+	return new KeYParserF(ParserMode.TACLET,
 		             new KeYLexerF(s,null),
 			     "No file. CreateTacletForTests.stringParser("+s+")",
 			     services, 

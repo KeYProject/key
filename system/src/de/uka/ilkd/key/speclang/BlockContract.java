@@ -28,10 +28,12 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.MiscTools;
 
 public interface BlockContract extends SpecificationElement {
@@ -64,12 +66,20 @@ public interface BlockContract extends SpecificationElement {
     public Term getPrecondition(LocationVariable heap, Services services);
 
     public Term getPostcondition(LocationVariable heap, Variables variables, Services services);
-    public Term getPostcondition(LocationVariable heapVariable, Term heap, Terms terms, Services services);
+    public Term getPostcondition(LocationVariable heapVariable, Term heap,
+                                 Terms terms, Services services);
     public Term getPostcondition(LocationVariable heap, Services services);
 
     public Term getModifiesClause(LocationVariable heap, ProgramVariable self, Services services);
-    public Term getModifiesClause(LocationVariable heapVariable, Term heap, Term self, Services services);
+    public Term getModifiesClause(LocationVariable heapVariable, Term heap,
+                                  Term self, Services services);
     public Term getModifiesClause(LocationVariable heap, Services services);
+
+    public Term getRequires(LocationVariable heap);
+
+    public Term getEnsures(LocationVariable heap);
+
+    public Term getAssignable(LocationVariable heap);
 
     public void visit(Visitor visitor);
 
@@ -84,9 +94,14 @@ public interface BlockContract extends SpecificationElement {
 
     public BlockContract setBlock(StatementBlock newBlock);
 
+    public BlockContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
+
+    public OriginalVariables getOrigVars();
+
     public static class Variables {
 
-        public static Variables create(final StatementBlock block, final List<Label> labels, final IProgramMethod method, final Services services)
+        public static Variables create(final StatementBlock block, final List<Label> labels,
+                                       final IProgramMethod method, final Services services)
         {
             return new VariablesCreator(block, labels, method, services).create();
         }
@@ -121,7 +136,8 @@ public interface BlockContract extends SpecificationElement {
 
         public Map<LocationVariable, LocationVariable> combineRemembranceVariables()
         {
-            final Map<LocationVariable, LocationVariable> result = new LinkedHashMap<LocationVariable, LocationVariable>();
+            final Map<LocationVariable, LocationVariable> result =
+                    new LinkedHashMap<LocationVariable, LocationVariable>();
             result.putAll(remembranceHeaps);
             result.putAll(remembranceLocalVariables);
             return result;
@@ -150,11 +166,16 @@ public interface BlockContract extends SpecificationElement {
             return result;
         }
 
-        private Map<LocationVariable, Term> termifyRemembranceVariables(final Map<LocationVariable, LocationVariable> remembranceVariables)
+        private Map<LocationVariable, Term>
+                        termifyRemembranceVariables(final Map<LocationVariable,
+                                                    LocationVariable> remembranceVariables)
         {
-            final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
-            for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables.entrySet()) {
-                result.put(remembranceVariable.getKey(), termifyVariable(remembranceVariable.getValue()));
+            final Map<LocationVariable, Term> result =
+                    new LinkedHashMap<LocationVariable, Term>();
+            for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable
+                    : remembranceVariables.entrySet()) {
+                result.put(remembranceVariable.getKey(),
+                           termifyVariable(remembranceVariable.getValue()));
             }
             return result;
         }
@@ -186,7 +207,8 @@ public interface BlockContract extends SpecificationElement {
         private Map<Label, ProgramVariable> continueFlags;
         private ProgramVariable returnFlag;
 
-        public VariablesCreator(final StatementBlock block, final List<Label> labels, final IProgramMethod method, final Services services)
+        public VariablesCreator(final StatementBlock block, final List<Label> labels,
+                                final IProgramMethod method, final Services services)
         {
             super(services);
             this.block = block;
@@ -211,7 +233,8 @@ public interface BlockContract extends SpecificationElement {
 
         private void createAndStoreFlags()
         {
-            final OuterBreakContinueAndReturnCollector collector = new OuterBreakContinueAndReturnCollector(block, labels, services);
+            final OuterBreakContinueAndReturnCollector collector =
+                    new OuterBreakContinueAndReturnCollector(block, labels, services);
             collector.collect();
 
             final List<Break> breaks = collector.getBreaks();
@@ -235,7 +258,8 @@ public interface BlockContract extends SpecificationElement {
             return result;
         }
 
-        private Map<Label, ProgramVariable> createFlags(final Set<Label> labels, final String baseName)
+        private Map<Label, ProgramVariable> createFlags(final Set<Label> labels,
+                                                        final String baseName)
         {
             final Map<Label, ProgramVariable> result = new LinkedHashMap<Label, ProgramVariable>();
             for (Label label : labels) {
@@ -252,7 +276,8 @@ public interface BlockContract extends SpecificationElement {
 
         private Map<LocationVariable, LocationVariable> createRemembranceHeaps()
         {
-            final Map<LocationVariable, LocationVariable> result = new LinkedHashMap<LocationVariable, LocationVariable>();
+            final Map<LocationVariable, LocationVariable> result =
+                    new LinkedHashMap<LocationVariable, LocationVariable>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 result.put(heap, heapAtPreVar(heap + REMEMBRANCE_SUFFIX, heap.sort(), false));
             }
@@ -261,12 +286,15 @@ public interface BlockContract extends SpecificationElement {
 
         private Map<LocationVariable, LocationVariable> createRemembranceLocalVariables()
         {
-            Map<LocationVariable, LocationVariable> result = new LinkedHashMap<LocationVariable, LocationVariable>();
-            ImmutableSet<ProgramVariable> localOutVariables = MiscTools.getLocalOuts(block, services);
+            Map<LocationVariable, LocationVariable> result =
+                    new LinkedHashMap<LocationVariable, LocationVariable>();
+            ImmutableSet<ProgramVariable> localOutVariables =
+                    MiscTools.getLocalOuts(block, services);
             for (ProgramVariable localOutVariable : localOutVariables) {
                 result.put(
                     (LocationVariable) localOutVariable,
-                    createVariable(localOutVariable.name() + REMEMBRANCE_SUFFIX, localOutVariable.getKeYJavaType())
+                    createVariable(localOutVariable.name() + REMEMBRANCE_SUFFIX,
+                                   localOutVariable.getKeYJavaType())
                 );
             }
             return result;

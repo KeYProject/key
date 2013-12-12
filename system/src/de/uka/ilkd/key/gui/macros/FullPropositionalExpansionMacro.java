@@ -58,6 +58,6 @@ public class FullPropositionalExpansionMacro extends AbstractPropositionalExpans
 
     @Override
     public KeyStroke getKeyStroke () {
-    	return KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_DOWN_MASK);
+	return KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_DOWN_MASK);
     }
 }
