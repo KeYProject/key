@@ -10,8 +10,8 @@ post: result_0 = subMagic(x) &amp; exc_0 = null
 mod: {}
 termination: diamond" pathCondition="true" lineNumber="-1" charStart="477" charEnd="482" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                   <sedStatement xml:id="_d0ae42fc-6ecd-4b91-908f-f4981f12c970" name="return magicValue;" pathCondition="true" lineNumber="-1" charStart="102" charEnd="120">
-                     <sedMethodReturn xml:id="_6f928dfc-ca21-4264-b66c-7fc1c536a20b" name="&lt;return 
-	42 {x &gt;  -1}, 
+                     <sedMethodReturn xml:id="_6f928dfc-ca21-4264-b66c-7fc1c536a20b" name="&lt;return
+	42 {x &gt;  -1},
 	-4711 {x &lt; 0}
 as result of SimpleIntQuery.main(x);&gt;" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56">
                         <sedTermination xml:id="_50454633-f091-4fed-9d33-396fbf5d61bd" name="&lt;end&gt;" pathCondition="true" verified="true">

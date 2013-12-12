@@ -68,7 +68,7 @@ public final class TermFactory {
 	    		   ImmutableArray<Term> subs, 
 	    		   ImmutableArray<QuantifiableVariable> boundVars,
 	    		   JavaBlock javaBlock,
-	    		   ImmutableArray<TermLabel> labels) {
+			   ImmutableArray<TermLabel> labels) {
 	if(op == null) {
 	    throw new TermCreationException("null-Operator at TermFactory");
 	}
@@ -77,7 +77,9 @@ public final class TermFactory {
 		= (labels == null || labels.isEmpty() ? 
 				new TermImpl(op, subs, boundVars, javaBlock) : 
 			new LabeledTermImpl(op, subs, boundVars, javaBlock, labels)).checked();
-	// Check if caching is possible. It is not possible if a non empty JavaBlock is available in the term or in one of its children because the meta information like PositionInfos maybe different.
+	// Check if caching is possible. It is not possible if a non empty JavaBlock is available
+	// in the term or in one of its children because the meta information like PositionInfos
+	// may be different.
 	if (!newTerm.isContainsJavaBlockRecursive()) {
 	   Term term = cache.get(newTerm);
 	   if(term == null) {
@@ -98,14 +100,29 @@ public final class TermFactory {
 	    		   JavaBlock javaBlock) {
 
     	return createTerm(op, subs, boundVars, javaBlock, null);
-    } 
-    
-    
+    }
+
+
     public Term createTerm(Operator op,
-	    		   Term[] subs, 
+                           Term[] subs,
+                           ImmutableArray<QuantifiableVariable> boundVars,
+                           JavaBlock javaBlock,
+                           TermLabel label) {
+        return createTerm(op, new ImmutableArray<Term>(subs), boundVars,
+                          javaBlock, new ImmutableArray<TermLabel>(label));
+    }
+
+
+    public Term createTerm(Operator op,
+                           Term[] subs,
 	    		   ImmutableArray<QuantifiableVariable> boundVars,
 	    		   JavaBlock javaBlock) {
-	return createTerm(op, new ImmutableArray<Term>(subs), boundVars, javaBlock);
+	return createTerm(op, new ImmutableArray<Term>(subs), boundVars, javaBlock, null);
+    }
+
+
+    public Term createTerm(Operator op, Term[] subs, TermLabel label) {
+        return createTerm(op, subs, null, null, label);
     }
     
     
@@ -130,10 +147,10 @@ public final class TermFactory {
 
     
     public Term createTerm(Operator op,
-    		Term[] subs, 
-    		ImmutableArray<QuantifiableVariable> boundVars,
-    		JavaBlock javaBlock,
-    		ImmutableArray<TermLabel> labels) {
+                           Term[] subs,
+                           ImmutableArray<QuantifiableVariable> boundVars,
+                           JavaBlock javaBlock,
+                           ImmutableArray<TermLabel> labels) {
     	return createTerm(op, new ImmutableArray<Term>(subs), boundVars, javaBlock, labels);
     }
 

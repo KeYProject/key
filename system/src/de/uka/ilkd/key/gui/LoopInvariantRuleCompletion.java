@@ -15,9 +15,9 @@ package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
@@ -51,12 +51,18 @@ public class LoopInvariantRuleCompletion implements
 
         LoopInvariant inv = loopApp.getInvariant();
         if (inv == null) { // no invariant present, get it interactively
+            MethodFrame mf = JavaTools.getInnermostMethodFrame(progPost.javaBlock(),
+                                                               services);
             inv = new LoopInvariantImpl(loop,
-                    JavaTools.getInnermostMethodFrame(progPost.javaBlock(),
-                            services) == null ? null : MiscTools
-                                    .getSelfTerm(JavaTools.getInnermostMethodFrame(
-                                            progPost.javaBlock(), services),
-                                            services), null);
+                                        mf == null ?
+                                                null : mf.getProgramMethod(),
+                                        mf == null || mf.getProgramMethod() == null ?
+                                                null : mf.getProgramMethod().getContainerType(),
+                                        mf == null ? null : MiscTools
+                                                .getSelfTerm(JavaTools.getInnermostMethodFrame(
+                                                                progPost.javaBlock(), services),
+                                                             services),
+                                        null);
             try {
                 inv = InvariantConfigurator.getInstance().getLoopInvariant(inv,
                         services, false, loopApp.getHeapContext());

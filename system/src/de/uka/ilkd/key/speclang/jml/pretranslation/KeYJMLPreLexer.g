@@ -170,8 +170,8 @@ fragment SL_COMMENT
 :
     '//'
     (
-    	(~('@'|'\n'))
-    	=>
+	(~('@'|'\n'))
+	=>
         ~('@'|'\n')
         (
             options { greedy = true; }
@@ -195,12 +195,12 @@ fragment ML_COMMENT
         (	'\n'         { newline(); }
             | 	~('@' | '\n')
         )
-    	(
-    	    options { greedy = false; }
+	(
+	    options { greedy = false; }
             :
-            	'\n'     { newline(); }
+                '\n'     { newline(); }
             |	~'\n'
-    	)*
+	)*
     )?
     '*/'
 ;
@@ -237,20 +237,20 @@ WS
 @after { paraphrase.pop(); }
 :
     (
-    	    ' '
-    	|   '\t'
-    	|   '\n'  { newline(); acceptAt = true; }
-    	|   '\r'
-    	|   {acceptAt}? '@'
-    	|   ('//@') => '//@'
-    	|   ('/*@') => '/*@'
-    	|   ('@*/') => '@*/'
-    	|   ('*/') => '*/'
-    	|   SL_COMMENT
-    	|   ML_COMMENT
+	    ' '
+	|   '\t'
+	|   '\n'  { newline(); acceptAt = true; }
+	|   '\r'
+	|   {acceptAt}? '@'
+	|   ('//@') => '//@'
+	|   ('/*@') => '/*@'
+	|   ('@*/') => '@*/'
+	|   ('*/') => '*/'
+	|   SL_COMMENT
+	|   ML_COMMENT
     )+
     {
-    	$channel = HIDDEN;
+	$channel = HIDDEN;
     }
 ;
 
@@ -265,9 +265,9 @@ IDENT
 :
     LETTER
     (	options { greedy = true; }
-    	:
-    	    LETTER
-    	|   DIGIT
+	:
+	    LETTER
+	|   DIGIT
     )*
 ;
 
@@ -279,11 +279,11 @@ BODY
     String s = null;
 }
 @after { paraphrase.pop(); }
-:  
-   '{' 
+:
+   '{'
       (
-	   '{'                    { braceCounter++; ignoreAt = false; }  
-    	|  {braceCounter > 0}?=> '}'  { braceCounter--; ignoreAt = false; } 
+	   '{'                    { braceCounter++; ignoreAt = false; }
+    	|  {braceCounter > 0}?=> '}'  { braceCounter--; ignoreAt = false; }
     	|  '\n'                     { newline(); ignoreAt = true; }
     	|  ' '
     	|  '\u000C'

@@ -326,21 +326,21 @@ public final class ProblemInitializer {
     }
     
     
-    public final void readEnvInput(EnvInput envInput, 
-			      InitConfig initConfig) 
+    public final void readEnvInput(EnvInput envInput,
+			      InitConfig initConfig)
     		throws ProofInputException {
 	if(alreadyParsed.add(envInput)){
 	    // read includes
 	    if(!(envInput instanceof LDTInput)) {
 		readIncludes(envInput, initConfig);
 	    }
-	    
+
 	    // read envInput itself
-	    reportStatus("Reading "+envInput.name(), 
+	    reportStatus("Reading "+envInput.name(),
 		    	 envInput.getNumberOfChars());
-	    envInput.setInitConfig(initConfig);	    
-	    envInput.read();	
-	    
+	    envInput.setInitConfig(initConfig);
+	    envInput.read();
+
 	    // reset the variables namespace
 	    initConfig.namespaces().setVariables(new Namespace());
 	}
@@ -466,7 +466,7 @@ public final class ProblemInitializer {
 						profile.getStandardRules().getTacletBase(),
 						progMon,
 						profile);
-				readEnvInput(tacletBaseFile, newBaseConfig);			
+				readEnvInput(tacletBaseFile, newBaseConfig);
 			}
 			// remove traces of the generic sorts within the base configuration
 			cleanupNamespaces(newBaseConfig);
@@ -524,7 +524,7 @@ public final class ProblemInitializer {
 
         //read envInput
         readEnvInput(envInput, initConfig);
-        
+
         //remove generic sorts defined in KeY file
         cleanupNamespaces(initConfig);
 

@@ -16,7 +16,7 @@ package de.uka.ilkd.key.parser;
 
 import org.antlr.runtime.RecognitionException;
 
-public class UnfittingReplacewithException 
+public class UnfittingReplacewithException
     extends RecognitionException {
     
     /**

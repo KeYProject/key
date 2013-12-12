@@ -189,6 +189,6 @@ testInsequentState_2 {
       \find (i = 0 ==>)
       \replacewith (0 = i ==>)
 };
- 
+
 }
 

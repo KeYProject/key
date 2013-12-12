@@ -309,7 +309,7 @@ public final class WhileInvariantTransformer {
      * @param applicationSequent The {@link Sequent} to rewrite.
      * @return The {@link TermLabel}s to add to the loop body modality {@link Term}.
      */
-    private ImmutableArray<TermLabel> computeLoopBodyModalityLabels(Services services, 
+    private ImmutableArray<TermLabel> computeLoopBodyModalityLabels(Services services,
                                                                      PosInOccurrence applicationPos, 
                                                                      Rule rule, 
                                                                      Goal goal, 
@@ -509,7 +509,7 @@ public final class WhileInvariantTransformer {
      * @param applicationSequent The {@link Sequent} to rewrite.
      * @return The {@link TermLabel}s to add to the new {@link Term}.
      */
-    private ImmutableArray<TermLabel> computeLoopBodyImplicatonLabels(Services services, 
+    private ImmutableArray<TermLabel> computeLoopBodyImplicatonLabels(Services services,
                                                                        PosInOccurrence applicationPos, 
                                                                        Rule rule, 
                                                                        Goal goal, 

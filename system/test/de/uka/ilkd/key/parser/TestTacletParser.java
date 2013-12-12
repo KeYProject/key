@@ -16,7 +16,6 @@ package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
@@ -25,7 +24,6 @@ import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
@@ -120,7 +118,7 @@ public class TestTacletParser extends TestCase {
     //
     private KeYParserF stringTacletParser(String s) {
 	return new KeYParserF
-	    (ParserMode.TACLET,new KeYLexerF(s, null), 
+	    (ParserMode.TACLET,new KeYLexerF(s, null),
 	     "No file. parser/TestTacletParser.stringTacletParser("+s+")",  
 	     services, nss);
     }

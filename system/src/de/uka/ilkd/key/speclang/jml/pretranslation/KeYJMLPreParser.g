@@ -54,23 +54,23 @@ options {
     private KeYJMLPreLexer lexer;
     private SLTranslationExceptionManager excManager;
     private ImmutableSet<PositionedString> warnings
-    	= DefaultImmutableSet.<PositionedString>nil();
+	= DefaultImmutableSet.<PositionedString>nil();
 
 
     private KeYJMLPreParser(KeYJMLPreLexer lexer,
                             String fileName,
                             Position offsetPos) {
-    	this(new CommonTokenStream(lexer));
-    	this.lexer      = lexer;
-    	this.excManager = new SLTranslationExceptionManager(this,
-    							    fileName,
-    							    offsetPos);
+	this(new CommonTokenStream(lexer));
+	this.lexer      = lexer;
+	this.excManager = new SLTranslationExceptionManager(this,
+							    fileName,
+							    offsetPos);
     }
 
 
     public KeYJMLPreParser(String comment,
-    			   String fileName,
-    			   Position offsetPos) {
+			   String fileName,
+			   Position offsetPos) {
 	this(new KeYJMLPreLexer(new ANTLRStringStream(comment)),
 	     fileName,
 	     offsetPos);
@@ -78,8 +78,8 @@ options {
 
 
     private PositionedString createPositionedString(String text,
-    						    Token t) {
-    	return excManager.createPositionedString(text, t);
+						    Token t) {
+	return excManager.createPositionedString(text, t);
     }
 
 
@@ -89,15 +89,15 @@ options {
 
 
     private void raiseNotSupported(String feature)
-    		throws SLTranslationException {
+		throws SLTranslationException {
 	PositionedString warning
 		= excManager.createPositionedString(feature + " not supported");
-    	warnings = warnings.add(warning);
+	warnings = warnings.add(warning);
     }
 
 
     public ImmutableList<TextualJMLConstruct> parseClasslevelComment()
-    		throws SLTranslationException {
+		throws SLTranslationException {
         try {
             return classlevel_comment();
         } catch(RecognitionException e) {
@@ -107,7 +107,7 @@ options {
 
 
     public ImmutableList<TextualJMLConstruct> parseMethodlevelComment()
-    		throws SLTranslationException {
+		throws SLTranslationException {
         try {
             return methodlevel_comment();
         } catch(RecognitionException e) {
@@ -117,7 +117,7 @@ options {
 
 
     public ImmutableSet<PositionedString> getWarnings() {
-    	return warnings;
+	return warnings;
     }
 
     private PositionedString flipHeaps(String declString, PositionedString result) {
@@ -169,12 +169,12 @@ classlevel_comment
         options { greedy = false; }
     	:
     	mods=modifiers
-    	list=classlevel_element[mods] 
+    	list=classlevel_element[mods]
     	{
 	    if(list!=null) {
-	    	result = result.append(list);
+		result = result.append(list);
 	    }
-	}           
+	}
     )* EOF
 ;
 
@@ -214,8 +214,8 @@ methodlevel_comment
 }
 :
     (
-    	mods=modifiers
-    	list=methodlevel_element[mods]  { result = result.append(list); }
+	mods=modifiers
+	list=methodlevel_element[mods]  { result = result.append(list); }
     )* EOF
 ;
 
@@ -246,8 +246,8 @@ modifiers
 	throws SLTranslationException
 :
     (
-    	options { greedy = true; }
-    	:
+	options { greedy = true; }
+	:
 	s=modifier  { result = result.append(s); }
     )*
 ;
@@ -298,8 +298,8 @@ class_invariant[ImmutableList<String> mods]
 //    (name=axiom_name)?
     ps=expression
     {
-    	TextualJMLClassInv inv = name == null ? new TextualJMLClassInv(mods, ps) : new TextualJMLClassInv(mods, ps, name);
-    	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(inv);
+	TextualJMLClassInv inv = name == null ? new TextualJMLClassInv(mods, ps) : new TextualJMLClassInv(mods, ps, name);
+	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(inv);
     }
 ;
 
@@ -363,12 +363,12 @@ method_specification[ImmutableList<String> mods]
     (also_keyword)*
     result=spec_case[mods]
     (
-    	options { greedy = true; }
-    	:
-    	(also_keyword)+ list=spec_case[ImmutableSLList.<String>nil()]
-    	{
-    	    result = result.append(list);
-    	}
+	options { greedy = true; }
+	:
+	(also_keyword)+ list=spec_case[ImmutableSLList.<String>nil()]
+	{
+	    result = result.append(list);
+	}
     )*
 ;
 
@@ -387,7 +387,7 @@ spec_case[ImmutableList<String> mods]
 @init { result = r; }
 @after { r = result; }
 :
-      	result=lightweight_spec_case[mods]
+	result=lightweight_spec_case[mods]
     | 	result=heavyweight_spec_case[mods]
 ;
 
@@ -426,9 +426,9 @@ heavyweight_spec_case[ImmutableList<String> mods]
 	    |   result=break_behavior_spec_case[mods]
 	    |   result=continue_behavior_spec_case[mods]
 	    |   result=exceptional_behavior_spec_case[mods]
-      	|   result=normal_behavior_spec_case[mods]
-      	|   result=model_behavior_spec_case[mods]
-      	|   result=return_behavior_spec_case[mods]
+	|   result=normal_behavior_spec_case[mods]
+	|   result=model_behavior_spec_case[mods]
+	|   result=return_behavior_spec_case[mods]
     )
 ;
 
@@ -464,7 +464,7 @@ normal_behavior_spec_case[ImmutableList<String> mods]
 
 normal_behavior_keyword
 :
-      	NORMAL_BEHAVIOR
+	NORMAL_BEHAVIOR
     | 	NORMAL_BEHAVIOUR
 ;
 
@@ -498,7 +498,7 @@ exceptional_behavior_spec_case[ImmutableList<String> mods]
 
 exceptional_behavior_keyword
 :
-      	EXCEPTIONAL_BEHAVIOR
+	EXCEPTIONAL_BEHAVIOR
     |	EXCEPTIONAL_BEHAVIOUR
 ;
 
@@ -517,26 +517,26 @@ generic_spec_case[ImmutableList<String> mods, Behavior b]
 }
 @after { r = result; }
 :
-    (abbrvs=spec_var_decls)?  
-    (requires=spec_header 
+    (abbrvs=spec_var_decls)?
+    (requires=spec_header
        ( options { greedy = true; }
-    	 : result = generic_spec_body[mods, b] )? 
+	 : result = generic_spec_body[mods, b] )?
         {
-	    	if (result.isEmpty()) {
-            		result = result.append(new TextualJMLSpecCase(mods, b));
-              	}
+		if (result.isEmpty()) {
+		      result = result.append(new TextualJMLSpecCase(mods, b));
+	        }
 
-            	for(Iterator<TextualJMLConstruct> it = result.iterator();
+	        for(Iterator<TextualJMLConstruct> it = result.iterator();
                     it.hasNext(); ) {
-                	TextualJMLSpecCase sc = (TextualJMLSpecCase) it.next();
-                  	sc.addRequires(requires);
-    			if (abbrvs!=null) {
-    				for (PositionedString[] pz: abbrvs) {
-    					sc.addAbbreviation(pz);
-    			    }
-    			}
-    	        }
-        }    	    	     	 
+                        TextualJMLSpecCase sc = (TextualJMLSpecCase) it.next();
+                        sc.addRequires(requires);
+			if (abbrvs!=null) {
+				for (PositionedString[] pz: abbrvs) {
+					sc.addAbbreviation(pz);
+			    }
+			}
+	        }
+        }
     | result = generic_spec_body[mods, b]
     )
 ;
@@ -550,9 +550,9 @@ throws SLTranslationException
             pz=old_clause
             { result = result.append(pz); }
             |
-    	    FORALL ps=expression
+	    FORALL ps=expression
     {
-    	raiseNotSupported("specification variables");
+	raiseNotSupported("specification variables");
     }
     )+
 ;
@@ -564,9 +564,9 @@ spec_header
 	throws SLTranslationException
 :
     (
-    	options { greedy = true; }
-    	:
-    	ps=requires_clause  { result = result.append(ps); }
+	options { greedy = true; }
+	:
+	ps=requires_clause  { result = result.append(ps); }
     )+
 ;
 
@@ -601,8 +601,8 @@ generic_spec_body[ImmutableList<String> mods, Behavior b]
     |
     (
         NEST_START
-    	result=generic_spec_case_seq[mods, b]
-    	NEST_END
+	result=generic_spec_case_seq[mods, b]
+	NEST_END
     )
 ;
 
@@ -635,9 +635,9 @@ simple_spec_body[ImmutableList<String> mods, Behavior b]
 }
 :
     (
-    	options { greedy = true; }
-    	:
-    	simple_spec_body_clause[sc, b]
+	options { greedy = true; }
+	:
+	simple_spec_body_clause[sc, b]
     )+
 ;
 
@@ -666,25 +666,25 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=returns_clause        { sc.addReturns(ps); }
     )
     {
-    	if(b == Behavior.EXCEPTIONAL_BEHAVIOR
-    	   && !sc.getEnsures().isEmpty()) {
-    	    raiseError("ensures not allowed in exceptional behavior.");
-    	} else if(b == Behavior.NORMAL_BEHAVIOR
-    	          && !sc.getSignals().isEmpty()) {
-      	    raiseError("signals not allowed in normal behavior.");
-    	} else if(b == Behavior.NORMAL_BEHAVIOR
-    	          && !sc.getSignalsOnly().isEmpty()) {
+	if(b == Behavior.EXCEPTIONAL_BEHAVIOR
+	   && !sc.getEnsures().isEmpty()) {
+	    raiseError("ensures not allowed in exceptional behavior.");
+	} else if(b == Behavior.NORMAL_BEHAVIOR
+	          && !sc.getSignals().isEmpty()) {
+	    raiseError("signals not allowed in normal behavior.");
+	} else if(b == Behavior.NORMAL_BEHAVIOR
+	          && !sc.getSignalsOnly().isEmpty()) {
 	        raiseError("signals_only not allowed in normal behavior.");
-    	} else if(b == Behavior.NORMAL_BEHAVIOR
-	              && !sc.getBreaks().isEmpty()) {
-		    raiseError("breaks not allowed in normal behavior.");
-    	} else if(b == Behavior.NORMAL_BEHAVIOR
-	              && !sc.getContinues().isEmpty()) {
-		    raiseError("continues not allowed in normal behavior.");
-		} else if(b == Behavior.NORMAL_BEHAVIOR
-	              && !sc.getReturns().isEmpty()) {
-		    raiseError("returns not allowed in normal behavior.");
-	    }
+	} else if(b == Behavior.NORMAL_BEHAVIOR
+	          && !sc.getBreaks().isEmpty()) {
+		raiseError("breaks not allowed in normal behavior.");
+	} else if(b == Behavior.NORMAL_BEHAVIOR
+	          && !sc.getContinues().isEmpty()) {
+		raiseError("continues not allowed in normal behavior.");
+	} else if(b == Behavior.NORMAL_BEHAVIOR
+	          && !sc.getReturns().isEmpty()) {
+		raiseError("returns not allowed in normal behavior.");
+	}
     }
 ;
 
@@ -706,7 +706,7 @@ assignable_clause
 
 assignable_keyword
 :
-    	ASSIGNABLE
+	ASSIGNABLE
     |   ASSIGNABLE_RED
     |   MODIFIABLE
     |   MODIFIABLE_RED
@@ -761,7 +761,7 @@ ensures_clause
 
 ensures_keyword
 :
-    	ENSURES
+	ENSURES
     |   ENSURES_RED
 ;
 
@@ -797,7 +797,7 @@ signals_only_clause
 
 signals_only_keyword
 :
-    	SIGNALS_ONLY
+	SIGNALS_ONLY
     |   SIGNALS_ONLY_RED
 ;
 
@@ -814,7 +814,7 @@ diverges_clause
 
 diverges_keyword
 :
-    	DIVERGES
+	DIVERGES
     |   DIVERGES_RED
 ;
 
@@ -823,14 +823,14 @@ captures_clause throws SLTranslationException
 :
     captures_keyword ps=expression
     {
-    	raiseNotSupported("captures clauses");
+	raiseNotSupported("captures clauses");
     }
 ;
 
 
 captures_keyword
 :
-    	CAPTURES
+	CAPTURES
     |   CAPTURES_RED
 ;
 
@@ -850,14 +850,14 @@ when_clause throws SLTranslationException
 :
     when_keyword ps=expression
     {
-    	raiseNotSupported("when clauses");
+	raiseNotSupported("when clauses");
     }
 ;
 
 
 when_keyword
 :
-    	WHEN
+	WHEN
     |   WHEN_RED
 ;
 
@@ -866,14 +866,14 @@ working_space_clause throws SLTranslationException
 :
     working_space_keyword ps=expression
     {
-    	raiseNotSupported("working_space clauses");
+	raiseNotSupported("working_space clauses");
     }
 ;
 
 
 working_space_keyword
 :
-    	WORKING_SPACE
+	WORKING_SPACE
     |   WORKING_SPACE_RED
 ;
 
@@ -882,14 +882,14 @@ duration_clause throws SLTranslationException
 :
     duration_keyword ps=expression
     {
-    	raiseNotSupported("duration clauses");
+	raiseNotSupported("duration clauses");
     }
 ;
 
 
 duration_keyword
 :
-    	DURATION
+	DURATION
     |   DURATION_RED
 ;
 
@@ -933,13 +933,13 @@ field_declaration[ImmutableList<String> mods, Token type, Token name]
 :
     (t=EMPTYBRACKETS { sb.append(t.getText()); })*
     (
-    	    init=initialiser  { sb.append(init); }
-    	|   semi=SEMICOLON    { sb.append(semi.getText()); }
+	    init=initialiser  { sb.append(init); }
+	|   semi=SEMICOLON    { sb.append(semi.getText()); }
     )
     {
         PositionedString ps = createPositionedString(sb.toString(), type);
-    	TextualJMLFieldDecl fd = new TextualJMLFieldDecl(mods, ps);
-    	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(fd);
+	TextualJMLFieldDecl fd = new TextualJMLFieldDecl(mods, ps);
+	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(fd);
     }
 ;
 
@@ -959,8 +959,8 @@ method_declaration[ImmutableList<String> mods, Token type, Token name]
 :
     params=param_list   { sb.append(params); }
     (
-    	    body=BODY  	    { sbDefinition.append(body.getText()); }
-    	|   semi=SEMICOLON
+	    body=BODY  	    { sbDefinition.append(body.getText()); }
+	|   semi=SEMICOLON
     )
     {
 	sb.append(";");
@@ -993,9 +993,9 @@ method_declaration[ImmutableList<String> mods, Token type, Token name]
                
         }
 
-    	TextualJMLMethodDecl md
-    		= new TextualJMLMethodDecl(mods, ps, name.getText(), psDefinition);
-    	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(md);
+	TextualJMLMethodDecl md
+		= new TextualJMLMethodDecl(mods, ps, name.getText(), psDefinition);
+	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(md);
     }
 ;
 
@@ -1055,8 +1055,8 @@ represents_clause[ImmutableList<String> mods]
 :
     represents_keyword ps=expression
     {
-    	TextualJMLRepresents rc
-    		= new TextualJMLRepresents(mods, ps.prepend("represents "));
+	TextualJMLRepresents rc
+		= new TextualJMLRepresents(mods, ps.prepend("represents "));
 	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(rc);
     }
 ;
@@ -1080,8 +1080,8 @@ depends_clause[ImmutableList<String> mods]
 :
     accessible_keyword ps=expression
     {
-    	TextualJMLDepends d
-    		= new TextualJMLDepends(mods, flipHeaps("depends", ps, false));
+	TextualJMLDepends d
+		= new TextualJMLDepends(mods, flipHeaps("depends", ps, false));
 	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(d);
     }
 ;
@@ -1098,8 +1098,8 @@ history_constraint[ImmutableList<String> mods]
 :
     constraint_keyword ps=expression
     {
-    	raiseNotSupported("history constraints");
-    	result = ImmutableSLList.<TextualJMLConstruct>nil();
+	raiseNotSupported("history constraints");
+	result = ImmutableSLList.<TextualJMLConstruct>nil();
     }
 ;
 
@@ -1118,8 +1118,8 @@ monitors_for_clause[ImmutableList<String> mods]
 :
     MONITORS_FOR ps=expression
     {
-    	raiseNotSupported("monitors_for clauses");
-    	result = ImmutableSLList.<TextualJMLConstruct>nil();
+	raiseNotSupported("monitors_for clauses");
+	result = ImmutableSLList.<TextualJMLConstruct>nil();
     }
 ;
 
@@ -1130,8 +1130,8 @@ readable_if_clause[ImmutableList<String> mods]
 :
     READABLE ps=expression
     {
-    	raiseNotSupported("readable-if clauses");
-    	result = ImmutableSLList.<TextualJMLConstruct>nil();
+	raiseNotSupported("readable-if clauses");
+	result = ImmutableSLList.<TextualJMLConstruct>nil();
     }
 ;
 
@@ -1142,8 +1142,8 @@ writable_if_clause[ImmutableList<String> mods]
 :
     WRITABLE ps=expression
     {
-    	raiseNotSupported("writable-if clauses");
-    	result = ImmutableSLList.<TextualJMLConstruct>nil();
+	raiseNotSupported("writable-if clauses");
+	result = ImmutableSLList.<TextualJMLConstruct>nil();
     }
 ;
 
@@ -1160,7 +1160,7 @@ in_group_clause  throws SLTranslationException
 :
     in_keyword ps=expression
     {
-    	raiseNotSupported("in-group clauses");
+	raiseNotSupported("in-group clauses");
     }
 ;
 
@@ -1176,14 +1176,14 @@ maps_into_clause throws SLTranslationException
 :
     maps_keyword ps=expression
     {
-    	raiseNotSupported("maps-into clauses");
+	raiseNotSupported("maps-into clauses");
     }
 ;
 
 
 maps_keyword
 :
-    	MAPS
+	MAPS
     | 	MAPS_RED
 ;
 
@@ -1194,8 +1194,8 @@ nowarn_pragma[ImmutableList<String> mods]
 :
     NOWARN ps=expression
     {
-    	raiseNotSupported("nowarn pragmas");
-    	result = ImmutableSLList.<TextualJMLConstruct>nil();
+	raiseNotSupported("nowarn pragmas");
+	result = ImmutableSLList.<TextualJMLConstruct>nil();
     }
 ;
 
@@ -1210,8 +1210,8 @@ set_statement[ImmutableList<String> mods]
 :
     SET ps=expression
     {
-    	TextualJMLSetStatement ss = new TextualJMLSetStatement(mods, ps);
-    	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(ss);
+	TextualJMLSetStatement ss = new TextualJMLSetStatement(mods, ps);
+	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(ss);
     }
 ;
 
@@ -1231,8 +1231,8 @@ loop_specification[ImmutableList<String> mods]
 :
     ps=loop_invariant       { ls.addInvariant(ps); }
     (
-    	options { greedy = true; }
-    	:
+	options { greedy = true; }
+	:
             ps=loop_invariant       { ls.addInvariant(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
         |   ps=variant_function     { ls.setVariant(ps); }
@@ -1286,7 +1286,7 @@ assume_statement[ImmutableList<String> mods]
     assume_keyword ps=expression
     {
         raiseNotSupported("assume statements");
-    	result = ImmutableSLList.<TextualJMLConstruct>nil();
+	result = ImmutableSLList.<TextualJMLConstruct>nil();
     }
 ;
 
@@ -1322,7 +1322,7 @@ expression returns [PositionedString result = null]
     )*
     { parenthesesCounter == 0 }? t=SEMICOLON { if (begin == null) { begin = t; } text.append(t.getText()); }
     {
-    	result = createPositionedString(text.toString(), begin);
+	result = createPositionedString(text.toString(), begin);
     }
 ;
 
@@ -1353,7 +1353,7 @@ assert_statement[ImmutableList<String> mods]
 :
     assert_keyword ps=expression
     {
-    	result = ImmutableSLList.<TextualJMLConstruct>nil().append(TextualJMLSpecCase.assert2blockContract(mods,ps));
+	result = ImmutableSLList.<TextualJMLConstruct>nil().append(TextualJMLSpecCase.assert2blockContract(mods,ps));
     }
 ;
 
@@ -1425,7 +1425,7 @@ break_behavior_spec_case[ImmutableList<String> mods]
 
 break_behavior_keyword
 :
-      	BREAK_BEHAVIOR
+	BREAK_BEHAVIOR
     |	BREAK_BEHAVIOUR
 ;
 
@@ -1443,7 +1443,7 @@ continue_behavior_spec_case[ImmutableList<String> mods]
 
 continue_behavior_keyword
 :
-      	CONTINUE_BEHAVIOR
+	CONTINUE_BEHAVIOR
     |	CONTINUE_BEHAVIOUR
 ;
 
@@ -1461,6 +1461,6 @@ return_behavior_spec_case[ImmutableList<String> mods]
 
 return_behavior_keyword
 :
-      	RETURN_BEHAVIOR
+	RETURN_BEHAVIOR
     |	RETURN_BEHAVIOUR
 ;

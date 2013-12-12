@@ -90,9 +90,9 @@ public class ExceptionDialog extends JDialog {
     // result may be null
     private Location getLocation(Throwable exc) {
         assert exc != null;
-        
+
 	Location location = null;
-	
+
 	if  (exc instanceof antlr.RecognitionException) { 
 	    location = new Location(((antlr.RecognitionException)exc).getFilename(),
 				    ((antlr.RecognitionException) exc).getLine(),
@@ -105,7 +105,7 @@ public class ExceptionDialog extends JDialog {
                 filename = ((KeYSemanticException)exc).getFilename();
             }
 
-            org.antlr.runtime.RecognitionException recEx = 
+            org.antlr.runtime.RecognitionException recEx =
                     (org.antlr.runtime.RecognitionException) exc;
             location = new Location(filename, recEx.line, recEx.charPositionInLine);
         }
@@ -126,11 +126,11 @@ public class ExceptionDialog extends JDialog {
 			       ((SVInstantiationExceptionWithPosition)exc).getRow(),
 	         	       ((SVInstantiationExceptionWithPosition)exc).getColumn());
 	} 
-	
+
 	if (location == null && exc.getCause() != null) {
 	    location = getLocation(exc.getCause());
 	}
-	
+
 	return location;
     }
 

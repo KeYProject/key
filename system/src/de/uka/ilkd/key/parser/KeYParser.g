@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 // This file is part of KeY - Integrated Deductive Software Design
@@ -11,7 +11,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -63,7 +63,6 @@ options {
   import de.uka.ilkd.key.logic.sort.*;
   import de.uka.ilkd.key.logic.label.*;
 
-  import de.uka.ilkd.key.proof.*;
   import de.uka.ilkd.key.proof.init.*;
   import de.uka.ilkd.key.proof.io.*;
   
@@ -89,7 +88,6 @@ options {
   import de.uka.ilkd.key.java.StatementBlock;
   import de.uka.ilkd.key.java.declaration.VariableDeclaration;
   import de.uka.ilkd.key.java.recoderext.*;
-  import de.uka.ilkd.key.java.recoderext.adt.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
 }
@@ -125,55 +123,56 @@ options {
       prooflabel2tag.put("autoModeTime", new Character('e'));
    }
 
-    private NamespaceSet nss;
-    private HashMap<String, String> category2Default = new LinkedHashMap<String, String>();
-    private boolean onlyWith=false;
-    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
-    private HashSet usedChoiceCategories = new LinkedHashSet();
-    private HashMap taclet2Builder;
-    private AbbrevMap scm;
-    private KeYExceptionHandler keh = null;
+   private NamespaceSet nss;
+   private HashMap<String, String> category2Default = new LinkedHashMap<String, String>();
+   private boolean onlyWith=false;
+   private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
+   private HashSet usedChoiceCategories = new LinkedHashSet();
+   private HashMap taclet2Builder;
+   private AbbrevMap scm;
+   private KeYExceptionHandler keh = null;
 
-    // these variables are set if a file is read in step by
-    // step. This used when reading in LDTs because of cyclic
-    // dependencies.
-    private boolean skip_schemavariables;
-    private boolean skip_functions;
-    private boolean skip_predicates;
-    private boolean skip_sorts;
-    private boolean skip_rulesets;
-    private boolean skip_taclets;
-    private boolean parse_includes = false;
-    private Includes includes = new Includes();
+   // these variables are set if a file is read in step by
+   // step. This used when reading in LDTs because of cyclic
+   // dependencies.
+   private boolean skip_schemavariables;
+   private boolean skip_functions;
+   private boolean skip_transformers;
+   private boolean skip_predicates;
+   private boolean skip_sorts;
+   private boolean skip_rulesets;
+   private boolean skip_taclets;
+   private boolean parse_includes = false;
+   private Includes includes = new Includes();
 
-    private boolean schemaMode = false;
-    private ParserMode parserMode;
+   private boolean schemaMode = false;
+   private ParserMode parserMode;
 
-    private String chooseContract = null;
-    private String proofObligation = null;
+   private String chooseContract = null;
+   private String proofObligation = null;
     
-    private int savedGuessing = -1;
+   private int savedGuessing = -1;
 
-    private int lineOffset=0;
-    private int colOffset=0;
-    private int stringLiteralLine=0; // HACK!
+   private int lineOffset=0;
+   private int colOffset=0;
+   private int stringLiteralLine=0; // HACK!
 
-    private Services services;
-    private JavaReader javaReader;
+   private Services services;
+   private JavaReader javaReader;
 
-    // if this is used then we can capture parts of the input for later use
-    private DeclPicker capturer = null;
-    private IProgramMethod pm = null;
+   // if this is used then we can capture parts of the input for later use
+   private DeclPicker capturer = null;
+   private IProgramMethod pm = null;
 
-    private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil(); 
-    private ImmutableSet<Contract> contracts = DefaultImmutableSet.<Contract>nil();
-    private ImmutableSet<ClassInvariant> invs = DefaultImmutableSet.<ClassInvariant>nil();
+   private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
+   private ImmutableSet<Contract> contracts = DefaultImmutableSet.<Contract>nil();
+   private ImmutableSet<ClassInvariant> invs = DefaultImmutableSet.<ClassInvariant>nil();
 
-    private ParserConfig schemaConfig;
-    private ParserConfig normalConfig;
+   private ParserConfig schemaConfig;
+   private ParserConfig normalConfig;
     
-    // the current active config
-    private ParserConfig parserConfig;
+   // the current active config
+   private ParserConfig parserConfig;
 
     private Term quantifiedArrayGuard = null;
     
@@ -195,13 +194,13 @@ options {
 	}
     }
 
-    public KeYParser(ParserMode mode, TokenStream lexer, Services services) {
-        this(mode, lexer);
-        this.keh = services.getExceptionHandler();
-    }
+   public KeYParser(ParserMode mode, TokenStream lexer, Services services) {
+       this(mode, lexer);
+       this.keh = services.getExceptionHandler();
+   }
 
-    /* Most general constructor, should only be used internally */
-    private KeYParser(TokenStream lexer,
+   /* Most general constructor, should only be used internally */
+   private KeYParser(TokenStream lexer,
 		     String filename,
                      Services services,
 		     NamespaceSet nss,
@@ -212,38 +211,37 @@ options {
           this.keh = services.getExceptionHandler();
 	this.nss = nss;
         switchToNormalMode();
-    }
+   }
 
-    /** 
-     * Used to construct Term parser - for first-order terms
-     * and formulae.
-     */  
-    public KeYParser(ParserMode mode, 
-                     TokenStream lexer,                   
-                     String filename, 
-                     JavaReader jr, 
-                     Services services,
-                     NamespaceSet nss, 
-                     AbbrevMap scm) {
+   /**
+    * Used to construct Term parser - for first-order terms
+    * and formulae.
+    */
+   public KeYParser(ParserMode mode,
+                    TokenStream lexer,
+                    String filename,
+                    JavaReader jr,
+                    Services services,
+                    NamespaceSet nss,
+                    AbbrevMap scm) {
         this(lexer, filename, services, nss, mode);
         this.javaReader = jr;
         this.scm = scm;
-    }
+   }
 
-    public KeYParser(ParserMode mode, 
-                     TokenStream lexer,
-                     String filename,
-                     Services services, 
-                     NamespaceSet nss) {
-        this(mode, 
-             lexer, 
+   public KeYParser(ParserMode mode,
+                    TokenStream lexer,
+                    String filename,
+                    Services services,
+                    NamespaceSet nss) {
+        this(mode,
+             lexer,
              filename,
              new SchemaRecoder2KeY(services, nss),
-	     services, 
-	     nss, 
+	     services,
+	     nss,
 	     new LinkedHashMap());
-    }
-
+   }
 
 
     /** ONLY FOR TEST CASES.
@@ -357,11 +355,11 @@ options {
     }
 
     public String getChooseContract() {
-      return chooseContract;
+        return chooseContract;
     }
     
     public String getProofObligation() {
-      return proofObligation;
+        return proofObligation;
     }
     
     public String getProfileName() {
@@ -369,7 +367,7 @@ options {
     }
     
     private boolean isDeclParser() {
-	return parserMode == ParserMode.DECLARATION;
+        return parserMode == ParserMode.DECLARATION;
     }
 
     private boolean isTermParser() {
@@ -496,6 +494,7 @@ options {
     private void resetSkips() {
        skip_schemavariables = false;
        skip_functions       = false;
+       skip_transformers    = false;
        skip_predicates      = false;
        skip_sorts           = false;
        skip_rulesets        = false;
@@ -505,7 +504,11 @@ options {
     private void skipFuncs() {
         skip_functions = true;
     }
-    
+
+    private void skipTransformers() {
+        skip_transformers = true;
+    }
+
     private void skipPreds() {
         skip_predicates = true;
     }
@@ -582,22 +585,24 @@ options {
     }  
 
     
-    public void parseSorts() throws RecognitionException/*, 
+    public void parseSorts() throws RecognitionException/*,
     				    TokenStreamException*/ {
-      resetSkips(); 
-      skipFuncs(); 
-      skipPreds(); 
+      resetSkips();
+      skipFuncs();
+      skipTransformers();
+      skipPreds();
       skipRuleSets();
       skipVars();
       skipTaclets();
       decls();
       resetSkips();
-    }    
+    }
 
     public void parseFunctions() throws RecognitionException/*, 
     					TokenStreamException*/ {
       resetSkips();
-      skipSorts();      
+      skipSorts();
+      skipTransformers();
       skipPreds();      
       skipRuleSets();
       skipVars();
@@ -611,6 +616,7 @@ options {
       resetSkips();
       skipSorts();
       skipFuncs();
+      skipTransformers();
       skipRuleSets();
       skipVars();
       skipTaclets();
@@ -621,20 +627,22 @@ options {
     public void parseFuncAndPred() throws RecognitionException/*, 
     					  TokenStreamException*/ {
       resetSkips();
-      skipSorts(); 
+      skipSorts();
+      skipTransformers();
       skipRuleSets();
       skipVars();
-      skipTaclets();  
+      skipTaclets();
       decls();
       resetSkips();
-    }    
+    }
     
     public void parseRuleSets() throws RecognitionException/*, 
     				       TokenStreamException*/ {
       resetSkips();
       skipSorts();      
-      skipFuncs(); 
-      skipPreds(); 
+      skipFuncs();
+      skipTransformers();
+      skipPreds();
       skipVars();
       skipTaclets();
       decls();
@@ -644,9 +652,10 @@ options {
     public void parseVariables() throws RecognitionException/*, 
                                         TokenStreamException*/ {
       resetSkips();
-      skipSorts();       
-      skipFuncs(); 
-      skipPreds(); 
+      skipSorts();
+      skipFuncs();
+      skipTransformers();
+      skipPreds();
       skipRuleSets();      
       skipTaclets();
       decls();
@@ -657,7 +666,8 @@ options {
     				      TokenStreamException*/ {
       resetSkips();
       skipSorts(); 
-      skipFuncs(); 
+      skipFuncs();
+      skipTransformers();
       skipPreds();
       skipRuleSets();
       //skipVars(); 
@@ -681,6 +691,7 @@ options {
     				 Sort s, 
     				 boolean makeVariableSV,
             			 boolean makeSkolemTermSV,
+            			 boolean makeTermLabelSV,
             			 SchemaVariableModifierSet mods) 
             			 	throws AmbigiousDeclException {
         if (!skip_schemavariables) {
@@ -702,6 +713,8 @@ options {
                 } else if(makeSkolemTermSV) {
                     v = SchemaVariableFactory.createSkolemTermSV(new Name(name), 
                     				                 s);
+                } else if (makeTermLabelSV) {
+                	 v = SchemaVariableFactory.createTermLabelSV(new Name(name));
                 } else { v = SchemaVariableFactory.createTermSV(
                 					new Name(name), 
                 					s, 
@@ -1429,8 +1442,9 @@ decls :
         |
             func_decls
         |
+            transform_decls
+        |
             {!onlyWith}?=> ruleset_decls
-
         ) *
     ;
 
@@ -1748,6 +1762,7 @@ one_schema_var_decl
 @init{
     boolean makeVariableSV  = false;
     boolean makeSkolemTermSV = false;
+    boolean makeTermLabelSV  = false;
     SchemaVariableModifierSet mods = null;
 } :   
    (MODALOPERATOR one_schema_modal_op_decl SEMI)
@@ -1774,6 +1789,11 @@ one_schema_var_decl
     ( schema_modifiers[mods] ) ?
     {s = Sort.FORMULA;}
     ids = simple_ident_comma_list 
+  | TERMLABEL 
+    { makeTermLabelSV = true; }
+    { mods = new SchemaVariableModifierSet.TermLabelSV (); }
+    ( schema_modifiers[mods] ) ?   
+    ids = simple_ident_comma_list 
   | UPDATE
     { mods = new SchemaVariableModifierSet.FormulaSV (); }
     ( schema_modifiers[mods] ) ?
@@ -1784,7 +1804,7 @@ one_schema_var_decl
     { mods = new SchemaVariableModifierSet.FormulaSV (); }
     ( schema_modifiers[mods] ) ?    
     {s = Sort.FORMULA;}
-    ids = simple_ident_comma_list
+    ids = simple_ident_comma_list  
   | (    TERM
          { mods = new SchemaVariableModifierSet.TermSV (); }
          ( schema_modifiers[mods] ) ?
@@ -1795,7 +1815,7 @@ one_schema_var_decl
       | (SKOLEMTERM 
          { makeSkolemTermSV = true; }
          { mods = new SchemaVariableModifierSet.SkolemTermSV (); }
-         ( schema_modifiers[mods] ) ?)
+         ( schema_modifiers[mods] ) ?)    	
     )
     s = any_sortId_check[true]
     ids = simple_ident_comma_list 
@@ -1806,7 +1826,8 @@ one_schema_var_decl
        schema_var_decl(it.next(),
                        s,
                        makeVariableSV,
-                       makeSkolemTermSV, 
+                       makeSkolemTermSV,
+                       makeTermLabelSV, 
 		       mods);
    }
  )
@@ -2016,12 +2037,81 @@ func_decl
         SEMI
     ;
 
-func_decls 
+func_decls
     :
         FUNCTIONS 
         LBRACE 
         (
             func_decl
+        ) *
+        RBRACE
+    ;
+
+
+// like arg_sorts but admits also the keyword "\formula"
+arg_sorts_or_formula[boolean checkSort] returns [Sort[\] argSorts = null]
+@init{
+    List args = new LinkedList();
+}
+    :
+        (
+            LPAREN
+
+            ( s = sortId_check[checkSort] { args.add(s); }
+            | FORMULA {args.add(Sort.FORMULA);} )
+
+            (
+                COMMA ( s = sortId_check[checkSort] {args.add(s);}
+                      | FORMULA {args.add(Sort.FORMULA);} )
+            ) *
+            RPAREN
+        ) ?
+        {
+            argSorts = (Sort[])args.toArray(AN_ARRAY_OF_SORTS);
+        }
+    ;
+
+
+transform_decl
+    :
+        (
+          retSort = any_sortId_check[!skip_transformers]
+        | FORMULA { retSort = Sort.FORMULA; }
+        )
+
+        trans_name = funcpred_name
+
+        argSorts = arg_sorts_or_formula[!skip_transformers]
+
+        {
+            if (!skip_transformers) {
+
+                Transformer t =
+                    new Transformer(new Name(trans_name),
+                                    retSort,
+                                    new ImmutableArray<Sort>(argSorts));
+
+                if (lookup(t.name()) != null) {
+                    if(!isProblemParser()) {
+                      throw new AmbigiousDeclException(t.name().toString(),
+                                                       getSourceName(),
+                                                       getLine(),
+                                                       getColumn());
+                    }
+                } else {
+                    addFunction(t);
+                }
+            }
+        }
+        SEMI
+    ;
+
+transform_decls
+    :
+        TRANSFORMERS
+        LBRACE
+        (
+            transform_decl
         ) *
         RBRACE
     ;
@@ -2770,8 +2860,8 @@ accessterm returns [Term _accessterm = null]
       |
         result = atom
       )
-         ( result = array_access_suffix[result] 
-         | result = attribute_or_query_suffix[result] 
+         ( result = array_access_suffix[result]
+         | result = attribute_or_query_suffix[result]
          | result = heap_update_suffix[result]
          )*
  ;
@@ -2788,12 +2878,12 @@ heap_update_suffix [Term heap] returns [Term _heap_update_suffix = null]
     result=elementary_heap_update[result]
     ( PARALLEL result=elementary_heap_update[result] )*
     RBRACE
-    ; 
+    ;
 
 elementary_heap_update [Term heap] returns [Term result=heap]
     : // TODO find the right kind of super non-terminal for "o.f" and "a[i]"
       // and do not resign to parsing an arbitrary term
-    ( (equivalence_term ASSIGN) => target=equivalence_term ASSIGN val=equivalence_term 
+    ( (equivalence_term ASSIGN) => target=equivalence_term ASSIGN val=equivalence_term
         {
            Term objectTerm = target.sub(1);
            Term fieldTerm  = target.sub(2);
@@ -2891,14 +2981,14 @@ atom returns [Term _atom = null]
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
-label returns [ImmutableArray<TermLabel> labels = new ImmutableArray<TermLabel>()] 
+label returns [ImmutableArray<TermLabel> labels = new ImmutableArray<TermLabel>()]
 @init {
   ArrayList<TermLabel> labelList = new ArrayList<TermLabel>();
 }
 :
    l=single_label {labelList.add(l);} (COMMA l=single_label {labelList.add(l);})*
    {
-   	labels = new ImmutableArray<TermLabel>((TermLabel[])labelList.toArray(new TermLabel[labelList.size()]));
+	labels = new ImmutableArray<TermLabel>((TermLabel[])labelList.toArray(new TermLabel[labelList.size()]));
    }
 ;
 
@@ -2910,19 +3000,25 @@ single_label returns [TermLabel label=null]
   List<String> parameters = new LinkedList<String>();
 }
 :
-  (name=IDENT {labelName=name.getText();} | star=STAR {labelName=star.getText();} ) (LPAREN param1=STRING_LITERAL {parameters.add(param1.getText().substring(1,param1.getText().length()-1));} (COMMA param2=STRING_LITERAL {parameters.add(param2.getText().substring(1,param2.getText().length()-1));})* RPAREN)? 
+  (name=IDENT {labelName=name.getText();} | star=STAR {labelName=star.getText();} ) (LPAREN param1=STRING_LITERAL {parameters.add(param1.getText().substring(1,param1.getText().length()-1));} (COMMA param2=STRING_LITERAL {parameters.add(param2.getText().substring(1,param2.getText().length()-1));})* RPAREN)?
   {
       try {
-          label = getServices().getProfile().
-                   getTermLabelManager().parseLabel(labelName, parameters);
+          if (inSchemaMode()) {
+               Named var = variables().lookup(new Name(labelName));
+               if (var instanceof TermLabel) {
+                    label = (TermLabel)var;
+               }
+          }
+          if (label == null) {
+                label = getServices().getProfile()
+                                .getTermLabelManager().parseLabel(labelName, parameters);
+          }
       } catch(TermLabelException ex) {
           keh.reportException
                 (new KeYSemanticException(input, getSourceName(), ex));
       }
   }
-  ; 
-
-       
+  ;
 
 
 abbreviation returns [Term _abbreviation=null]
@@ -3245,7 +3341,7 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
     | AT a = abbreviation
     | varfuncid = funcpred_name (LIMITED {limited = true;})?
         ( (~LBRACE | LBRACE bound_variables) =>
-            ( 
+            (
                LBRACE 
                boundVars = bound_variables 
                RBRACE 
@@ -3505,19 +3601,19 @@ varexp[TacletBuilder b]
 :
   ( varcond_applyUpdateOnRigid[b]
     | varcond_dropEffectlessElementaries[b]
-    | varcond_dropEffectlessStores[b] 
-    | varcond_enum_const[b] 
-    | varcond_free[b]  
+    | varcond_dropEffectlessStores[b]
+    | varcond_enum_const[b]
+    | varcond_free[b]
     | varcond_hassort[b]
     | varcond_fieldtype[b]
     | varcond_equalUnique[b]
     | varcond_new[b]
-    | varcond_newlabel[b] 
+    | varcond_newlabel[b]
     | varcond_observer[b]
     | varcond_different[b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
-    | varcond_differentFields[b]        
+    | varcond_differentFields[b]
   ) 
   | 
   ( (NOT_ {negated = true;} )? 
@@ -3534,6 +3630,10 @@ varexp[TacletBuilder b]
         | varcond_staticmethod[b,negated]  
         | varcond_typecheck[b, negated]
         | varcond_induction_variable[b, negated]
+        | varcond_constant[b, negated]
+        | varcond_label[b, negated]
+        | varcond_static_field[b, negated]
+        | varcond_subFormulas[b, negated]
       )
   )
 ;
@@ -3574,13 +3674,13 @@ varcond_dropEffectlessStores[TacletBuilder b]
 varcond_differentFields [TacletBuilder b]
 :
    DIFFERENTFIELDS
-   LPAREN      
-     x = varId COMMA y = varId                    
-   RPAREN 
-   { 
-            b.addVariableCondition(new DifferentFields((SchemaVariable)x, (SchemaVariable)y)); 
+   LPAREN
+     x = varId COMMA y = varId
+   RPAREN
+   {
+            b.addVariableCondition(new DifferentFields((SchemaVariable)x, (SchemaVariable)y));
    }
-; 
+;
 
 
 varcond_simplifyIfThenElseUpdate[TacletBuilder b]
@@ -3906,6 +4006,7 @@ varcond_equalUnique [TacletBuilder b]
         } 
 ;
 
+
 varcond_freeLabelIn [TacletBuilder b, boolean negated]
 :
 
@@ -3924,8 +4025,42 @@ varcond_induction_variable [TacletBuilder b, boolean negated]
    }
 ;
 
+varcond_constant [TacletBuilder b, boolean negated]
+:
+   ISCONSTANT
+        LPAREN x=varId RPAREN {
+           if (x instanceof TermSV) {
+                b.addVariableCondition(new ConstantCondition((TermSV) x, negated ));
+           } else {
+                assert x instanceof FormulaSV;
+                b.addVariableCondition(new ConstantCondition((FormulaSV) x, negated ));
+           }
+        }
+;
 
+varcond_label [TacletBuilder b, boolean negated]
+:
+   HASLABEL
+        LPAREN l=varId COMMA name=simple_ident RPAREN {
+           b.addVariableCondition(new TermLabelCondition((TermLabelSV) l, name, negated ));
+        }
+;
 
+varcond_static_field [TacletBuilder b, boolean negated]
+:
+   ISSTATICFIELD
+        LPAREN field=varId RPAREN {
+           b.addVariableCondition(new StaticFieldCondition((SchemaVariable) field, negated ));
+        }
+;
+
+varcond_subFormulas [TacletBuilder b, boolean negated]
+:
+   HASSUBFORMULAS
+        LPAREN x=varId RPAREN {
+           b.addVariableCondition(new SubFormulaCondition((FormulaSV) x, negated ));
+        }
+;
 
 goalspecs[TacletBuilder b, boolean ruleWithFind] :
         CLOSEGOAL
@@ -4074,7 +4209,7 @@ metaTerm returns [Term result = null]
  ;
      catch [TermCreationException ex] {
          keh.reportException
-  	    (new KeYSemanticException(input, getSourceName(), ex));
+	    (new KeYSemanticException(input, getSourceName(), ex));
         }
 
 contracts
@@ -4161,11 +4296,11 @@ problem returns [ Term _problem = null ]
 @after { _problem = a; this.chooseContract = chooseContract; this.proofObligation = proofObligation; }
     :
        { if (capturer != null) capturer.mark(); }
-    
-     profile     
-   	
+
+     profile
+
    	{ if (profileName != null && capturer != null) capturer.mark(); }
-    
+
         (pref = preferences)
         { if ((pref!=null) && (capturer != null)) capturer.begin(); }
         

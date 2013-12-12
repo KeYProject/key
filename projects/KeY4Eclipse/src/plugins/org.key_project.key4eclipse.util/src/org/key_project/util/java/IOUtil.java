@@ -84,7 +84,7 @@ public final class IOUtil {
          int read = 0;
          while( (read = in.read(buffer)) > 0) {
             digest.update(buffer, 0, read);
-         }     
+         }
          byte[] md5sum = digest.digest();
          BigInteger bigInt = new BigInteger(1, md5sum);
          return bigInt.toString(16);

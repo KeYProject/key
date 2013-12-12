@@ -149,6 +149,7 @@ public class Proof implements Named {
                         updateStrategyOnGoals();
                     }
                 };
+
         setSettings(settings);
         pis = ProofIndependentSettings.DEFAULT_INSTANCE;
     }

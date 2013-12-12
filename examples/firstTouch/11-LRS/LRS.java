@@ -61,7 +61,7 @@ public class LRS {
           @ assignable \strictly_nothing;
           @*/
         for (int x=1; x < sa.a.length; x++) {
-            int length = LCP.lcp(sa.a,sa.suffixes[x], 
+            int length = LCP.lcp(sa.a,sa.suffixes[x],
                                       sa.suffixes[x-1]);
             if (length > l) {
                 s = sa.suffixes[x];

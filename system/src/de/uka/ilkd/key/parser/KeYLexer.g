@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 // This file is part of KeY - Integrated Deductive Software Design
@@ -11,7 +11,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -59,23 +59,23 @@ lexer grammar KeYLexer;
     public KeYLexer(InputStream in, KeYExceptionHandler keh) throws IOException {
         this(new ANTLRInputStream(in));
 	if(keh != null)
-            this.keh = keh; 
+            this.keh = keh;
 	this.selector = new Stack<SaveStruct>();
 	//selector.select(this);
     }
-    
-    public KeYLexer(InputStream in, KeYExceptionHandler keh, 
+
+    public KeYLexer(InputStream in, KeYExceptionHandler keh,
                     Stack<SaveStruct> selector) throws IOException {
         this(new ANTLRInputStream(in));
 	if(keh != null)
-          this.keh = keh; 
+          this.keh = keh;
 	this.selector = selector;
     }
-    
+
     public KeYLexer(Reader in, KeYExceptionHandler keh) throws IOException {
         this(new ANTLRReaderStream(in));
 	if(keh != null)
-          this.keh = keh; 
+          this.keh = keh;
 	this.selector = new Stack<SaveStruct>();
 	//selector.select(this);
     }
@@ -93,7 +93,7 @@ lexer grammar KeYLexer;
     public void reportError(RecognitionException ex){
         keh.reportException(ex);
     }
-    
+
     public Stack<SaveStruct> getSelector() {
       return selector;
     }
@@ -127,7 +127,7 @@ lexer grammar KeYLexer;
 
    private static HashMap<String,String> modNames = new LinkedHashMap<String,String>(20);
    private static HashMap<String,String> modPairs = new LinkedHashMap<String,String>(20);
-   
+
    static {
       modNames.put("\\<","diamond");
       modNames.put("\\diamond","diamond");
@@ -154,7 +154,7 @@ lexer grammar KeYLexer;
    private void newline() {
      Debug.out("newline() was called but ANTLRv3 does not implement it anymore.");
    }
-   
+
    public void recover( RecognitionException ex, BitSet tokenSet ) throws CharStreamException {
      input.consume();
      int ttype = input.LA(1);
@@ -181,7 +181,7 @@ lexer grammar KeYLexer;
       if("\\modality".equals(modalityBegin)) {
          // Have to extract the name of (schema) modality inside the first {}
 	 while(s.charAt(index) == ' ' || s.charAt(index) == '\t' ||
-      	       s.charAt(index) == '\n' || s.charAt(index) == '\r') index++;
+	       s.charAt(index) == '\n' || s.charAt(index) == '\r') index++;
 	 if(s.charAt(index) != '{') {
            throw new NoViableAltException("Expression "+modalityBegin+" should be followed by {...}. (" +
 	     getSourceName() + ", " + getLine() + ", " + getCharPositionInLine() + ")", -1, -1, input);
@@ -241,7 +241,7 @@ lexer grammar KeYLexer;
 	PROXY : '\\proxy';
         EXTENDS : '\\extends';
         ONEOF : '\\oneof';
-	ABSTRACT : '\\abstract';        
+	ABSTRACT : '\\abstract';
 
         // Keywords used in schema variable declarations
 	SCHEMAVARIABLES : '\\schemaVariables';
@@ -254,7 +254,8 @@ lexer grammar KeYLexer;
 	VARIABLES : '\\variables';
 	SKOLEMTERM : '\\skolemTerm';
 	SKOLEMFORMULA : '\\skolemFormula';
-	
+	TERMLABEL : '\\termlabel';
+
         // used in contracts
 	MODIFIES : '\\modifies';
 
@@ -267,26 +268,30 @@ lexer grammar KeYLexer;
         DEPENDINGON : '\\dependingOn';
 	DISJOINTMODULONULL  : '\\disjointModuloNull';
 	DROP_EFFECTLESS_ELEMENTARIES : '\\dropEffectlessElementaries';
-	DROP_EFFECTLESS_STORES : '\\dropEffectlessStores';	
+	DROP_EFFECTLESS_STORES : '\\dropEffectlessStores';
 	SIMPLIFY_IF_THEN_ELSE_UPDATE : '\\simplifyIfThenElseUpdate';
-	ENUM_CONST : '\\enumConstant';	
+	ENUM_CONST : '\\enumConstant';
         FREELABELIN : '\\freeLabelIn';
 	HASSORT : '\\hasSort';
 	FIELDTYPE : '\\fieldType';
-	ELEMSORT : '\\elemSort';        
+	ELEMSORT : '\\elemSort';
+	HASLABEL : '\\hasLabel';
+	HASSUBFORMULAS : '\\hasSubFormulas';
 	ISARRAY:'\\isArray';
 	ISARRAYLENGTH:'\\isArrayLength';
+	ISCONSTANT: '\\isConstant';
         ISENUMTYPE:'\\isEnumType';
-	ISINDUCTVAR:'\\isInductVar';	
+	ISINDUCTVAR:'\\isInductVar';
 	ISLOCALVARIABLE : '\\isLocalVariable';
 	ISOBSERVER : '\\isObserver';
-	DIFFERENT : '\\different';		
+	DIFFERENT : '\\different';
 	METADISJOINT : '\\metaDisjoint';
-	ISTHISREFERENCE:'\\isThisReference';	        
-	DIFFERENTFIELDS:'\\differentFields';	        
-	ISREFERENCE:'\\isReference';	        
+	ISTHISREFERENCE:'\\isThisReference';
+	DIFFERENTFIELDS:'\\differentFields';
+	ISREFERENCE:'\\isReference';
 	ISREFERENCEARRAY:'\\isReferenceArray';
-	ISSUBTYPE : '\\sub';	
+	ISSTATICFIELD : '\\isStaticField';
+	ISSUBTYPE : '\\sub';
 	EQUAL_UNIQUE : '\\equalUnique';
         NEW : '\\new';
         NEWLABEL : '\\newLabel';
@@ -295,8 +300,8 @@ lexer grammar KeYLexer;
         NOTFREEIN : '\\notFreeIn';
 	SAME : '\\same';
 	STATIC : '\\static';
-        STATICMETHODREFERENCE : '\\staticMethodReference';	
-	STRICT    : '\\strict';	
+        STATICMETHODREFERENCE : '\\staticMethodReference';
+	STRICT    : '\\strict';
 	TYPEOF : '\\typeof';
 	INSTANTIATE_GENERIC : '\\instantiateGeneric';
 
@@ -309,7 +314,7 @@ lexer grammar KeYLexer;
 	THEN : '\\then';
 	ELSE : '\\else';
 
-        // inclusion and stuff, things that (usually) come at the beginnig 
+        // inclusion and stuff, things that (usually) come at the beginning
 	// of the file
 	INCLUDE:'\\include';
 	INCLUDELDTS:'\\includeLDTs';
@@ -339,7 +344,7 @@ lexer grammar KeYLexer;
         REPLACEWITH : '\\replacewith';
         ADDRULES : '\\addrules';
         ADDPROGVARS : '\\addprogvars';
-        HEURISTICS : '\\heuristics';	
+        HEURISTICS : '\\heuristics';
 	FIND : '\\find';
 	ADD : '\\add';
 	ASSUMES : '\\assumes';
@@ -348,6 +353,7 @@ lexer grammar KeYLexer;
 
 	PREDICATES : '\\predicates';
 	FUNCTIONS : '\\functions';
+	TRANSFORMERS : '\\transformers';
 	UNIQUE : '\\unique';
 
 	RULES : '\\rules';
@@ -362,14 +368,14 @@ lexer grammar KeYLexer;
 	IN_TYPE : '\\inType';
         IS_ABSTRACT_OR_INTERFACE : '\\isAbstractOrInterface';
         CONTAINERTYPE : '\\containerType';
-        
+
         LIMITED : '$lmtd';
-        
+
         // types that need to be declared as keywords
         LOCSET : '\\locset';
         SEQ : '\\seq';
         BIGINT : '\\bigint';
-        
+
     // Unicode symbols for special functions/predicates
     UTF_PRECEDES : '\u227A';
     UTF_IN : '\u220A';
@@ -436,7 +442,7 @@ LPAREN
 @init { paraphrase.push("`('"); }
 @after { paraphrase.pop(); }
 :
-	'(' 
+	'('
 	;
 
 RPAREN
@@ -542,7 +548,7 @@ TILDE
 :	'~'
 	;
 
-PERCENT 
+PERCENT
 @init { paraphrase.push("`\%'"); }
 @after { paraphrase.pop(); }
 :   '%'
@@ -675,10 +681,10 @@ PRIMES
 	;
 
 fragment
-CHAR_LITERAL 
+CHAR_LITERAL
 @init { paraphrase.push("a char in single quotes"); }
 @after { paraphrase.pop(); }
-: '\'' 
+: '\''
                 ((' '..'&') |
                  ('('..'[') |
                  (']'..'~') |
@@ -708,7 +714,7 @@ fragment
 QUOTED_STRING_LITERAL
 @init { paraphrase.push("a string with double quotes"); }
     : '"' ('\\' . | '\n' {newline();} | ~('\n' | '"' | '\\') )* '"' ;
-    
+
 SL_COMMENT
 @init { paraphrase.push("a comment"); }
 
@@ -766,7 +772,7 @@ DIGIT
 	;
 
 
-fragment 
+fragment
 HEX
 @init { paraphrase.push("a hexadeciamal number"); }
 @after { paraphrase.pop(); }
@@ -780,11 +786,11 @@ fragment
 LETTER
 @init { paraphrase.push("a letter"); }
 @after { paraphrase.pop(); }
-:	'a'..'z'|'A'..'Z' 
+:	'a'..'z'|'A'..'Z'
     ;
 
 
-fragment IDCHAR 
+fragment IDCHAR
 @init { paraphrase.push("an admissible character for identifiers"); }
 	@after { paraphrase.pop(); }
 : LETTER | DIGIT | '_' | '#' | '$'
@@ -796,7 +802,7 @@ IDENT
 }
 
 @after { paraphrase.pop(); }
-:  ( (LETTER | '_' | '#' | '$') (IDCHAR)* 
+:  ( (LETTER | '_' | '#' | '$') (IDCHAR)*
     )
 ;
 
@@ -804,8 +810,8 @@ fragment
 NUM_LITERAL
 @init { paraphrase.push("a number"); }
 @after { paraphrase.pop(); }
-: 
-    (DIGIT)+    
+:
+    (DIGIT)+
     ;
 
 /**
@@ -826,7 +832,7 @@ MODALITY
     //Debug.out("testLiteralsTable == ", literalTest);
     //$type = testLiteralsTable($type);
     if(/*literalTest == MODALITY && */modPairs.get(modalityBegin) != null) {
-        /* This while with the following call to mMODALITYEND is 
+        /* This while with the following call to mMODALITYEND is
          * and alternative to calling mJAVABLOCK, but it should be faster
          */
         while(true) {
@@ -861,7 +867,7 @@ MODALITY
         matchAndTransformModality(_begin);
     }else{
         if("\\includeFile".equals(modalityBegin)) {
-            // File inclusion 
+            // File inclusion
             while(input.LA(1) == ' ' || input.LA(1) == '\t' || input.LA(1) == '\n')
                 match(input.LA(1));
             int startIndex = getText().length()+1;
@@ -915,7 +921,7 @@ JAVABLOCK
 :
     (
 	SL_COMMENT
-      | ML_COMMENT 
+      | ML_COMMENT
       | '/' ~('/' | '*')
       | CHAR_LITERAL
       | QUOTED_STRING_LITERAL
@@ -925,9 +931,9 @@ JAVABLOCK
       | '0'..'9'
       | ' ' | '\t'
       | '{' | '}' | '(' | ')' | '[' | ']' | '<' | '>'
-      | '.' | ',' | ';' | ':' | '?' 
+      | '.' | ',' | ';' | ':' | '?'
       | '%' | '*' | '-' | '=' | '+' | '~' | '&' | '|' | '^'
-      | '!' | '@' | '#' | '$' 
+      | '!' | '@' | '#' | '$'
     )* MODALITYEND
    ;
 

@@ -15,7 +15,7 @@ package de.uka.ilkd.key.parser;
 
 import org.antlr.runtime.RecognitionException;
 
-public class InvalidFindException 
+public class InvalidFindException
     extends RecognitionException {
     
     /**
@@ -36,7 +36,7 @@ public class InvalidFindException
     
     public String getMessage() {
 	return (this.filename != null ? this.filename : "") +
-            "("+this.line+", "+this.charPositionInLine+ "):" + description;	
+            "("+this.line+", "+this.charPositionInLine+ "):" + description;
     }		
     
 }

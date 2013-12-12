@@ -154,12 +154,12 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 	    }
 
             problemHeader = lexer.getCapturedText();
-            if(problemHeader != null && 
+            if(problemHeader != null &&
                problemHeader.lastIndexOf(searchS) != -1){
                 problemHeader = problemHeader.substring(
                     0, problemHeader.lastIndexOf(searchS));
             }
-                        
+
             initConfig.setTaclets(problemParser.getTaclets());
             lastParser = problemParser;
         } catch (antlr.ANTLRException e) {

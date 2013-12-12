@@ -281,7 +281,7 @@ public class SymbolicConfigurationExtractor {
             Set<Term> symbolicObjectsResultingInCurrentState = new LinkedHashSet<Term>();
             symbolicObjectsResultingInCurrentState.addAll(filterOutObjectsToIgnore(updateValueObjects, objectsToIgnore));
             symbolicObjectsResultingInCurrentState.addAll(collectObjectsFromSequent(node.sequent(), objectsToIgnore));
-            symbolicObjectsResultingInCurrentState = sortTerms(symbolicObjectsResultingInCurrentState); // Sort terms alphabetically. This guarantees that in equivalence classes the representative term is for instance self.next and not self.next.next. 
+            symbolicObjectsResultingInCurrentState = sortTerms(symbolicObjectsResultingInCurrentState); // Sort terms alphabetically. This guarantees that in equivalence classes the representative term is for instance self.next and not self.next.next.
             symbolicObjectsResultingInCurrentState.add(TermBuilder.DF.NULL(getServices())); // Add null because it can happen that a object is null and this option must be included in equivalence class computation
             // Compute a Sequent with the initial conditions of the proof without modality
             Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation(pathCondition);
@@ -1138,13 +1138,13 @@ public class SymbolicConfigurationExtractor {
    }
 
    /**
-    * Collects all objects which are used in the conditions of the {@link Sequent}. 
+    * Collects all objects which are used in the conditions of the {@link Sequent}.
     * @param sequent The {@link Sequent} which provides the conditions to collect objects from.
     * @param objectsToIgnore Objects which should be excluded in the result.
     * @return The found objects.
     * @throws ProofInputException Occurred Exception.
     */
-   protected Set<Term> collectObjectsFromSequent(Sequent sequent, 
+   protected Set<Term> collectObjectsFromSequent(Sequent sequent,
                                                  Set<Term> objectsToIgnore) throws ProofInputException {
       Set<Term> result = new LinkedHashSet<Term>();
       for (SequentFormula sf : sequent) {
@@ -1366,9 +1366,9 @@ public class SymbolicConfigurationExtractor {
     * @param result The {@link SymbolicConfiguration} to add the {@link SymbolicObject} to.
     * @param objectTerm The {@link Term} which represents the {@link Object} a {@link SymbolicObject} should be created for.
     */
-   protected void createObjectForTerm(Map<Term, SymbolicObject> objects, 
-                                      ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, 
-                                      SymbolicConfiguration result, 
+   protected void createObjectForTerm(Map<Term, SymbolicObject> objects,
+                                      ImmutableList<ISymbolicEquivalenceClass> equivalentClasses,
+                                      SymbolicConfiguration result,
                                       Term objectTerm) {
       if (objectTerm != null && SymbolicExecutionUtil.hasReferenceSort(getServices(), objectTerm)) {
          ISymbolicEquivalenceClass equivalentClass = findEquivalentClass(equivalentClasses, objectTerm);

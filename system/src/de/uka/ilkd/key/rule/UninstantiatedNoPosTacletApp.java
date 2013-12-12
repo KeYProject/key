@@ -36,6 +36,7 @@ class UninstantiatedNoPosTacletApp extends NoPosTacletApp {
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.rule.NoPosTacletApp#setupMatchConditions(de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.Constraint)
      */
+    @Override
     protected MatchConditions setupMatchConditions (PosInOccurrence pos,
                                                     Services services) {
         if ( taclet() instanceof RewriteTaclet )

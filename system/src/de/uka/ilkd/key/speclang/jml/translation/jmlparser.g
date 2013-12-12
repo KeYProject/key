@@ -28,6 +28,7 @@ header {
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
     import de.uka.ilkd.key.ldt.*;
     import de.uka.ilkd.key.logic.*;
+    import de.uka.ilkd.key.logic.label.*;
     import de.uka.ilkd.key.logic.op.*;
     import de.uka.ilkd.key.logic.sort.*;
     import de.uka.ilkd.key.parser.ParserException;
@@ -120,7 +121,7 @@ options {
 	resolverManager.pushLocalVariablesNamespace();
 	if(paramVars != null) {
 	    resolverManager.putIntoTopLocalVariablesNamespace(paramVars);
-	    
+
 	}
 	if(resultVar != null) {
 	    resolverManager.putIntoTopLocalVariablesNamespace(resultVar);
@@ -410,7 +411,7 @@ dependsclause returns [Triple<ObserverFunction,Term,Term> result=null] throws SL
     ;
 
 decreasesclause returns [Term result = null] throws SLTranslationException
-{ 
+{
     Term t;
 }
 :
@@ -754,8 +755,24 @@ impliesexpr returns [SLExpression result=null] throws SLTranslationException
 	    (
 		IMPLIESBACKWARD expr=logicalorexpr
 		{
-		    result = new SLExpression(TB.imp(TB.convertToFormula(expr.getTerm(), services),
-		                                     TB.convertToFormula(result.getTerm(), services)));
+                    if (expr.isType()) {
+                        raiseError("Cannot negate type " + expr.getType().getName() + ".");
+                    }
+
+                    Term t = expr.getTerm();
+                    assert t != null;
+
+                    if (t.sort() == Sort.FORMULA) {
+                        result = new SLExpression(TB.orSC(TB.convertToFormula(result.getTerm(), services),
+                                                        TB.convertToFormula(TB.not(t), services)));
+                    } else if(t.sort() == booleanLDT.targetSort()) {
+                        result = new SLExpression(TB.orSC(TB.convertToFormula(result.getTerm(), services),
+                                                        TB.convertToFormula(
+                                                                TB.not(TB.equals(t, TB.TRUE(services))),
+                                                                services)));
+                    } else {
+                        raiseError("Wrong type in not-expression: " + t);
+                    }
 		}
 	    )+
 	)?
@@ -781,12 +798,12 @@ logicalorexpr returns [SLExpression result=null] throws SLTranslationException
     SLExpression expr;
 }
 :
-	result=logicalandexpr
+	result=inclusiveorexpr
 	(
 	    LOGICALOR expr=logicalorexpr
 	    {
-		result = new SLExpression(TB.or(TB.convertToFormula(result.getTerm(), services),
-		                                TB.convertToFormula(expr.getTerm(), services)));
+	        result = new SLExpression(TB.orSC(TB.convertToFormula(result.getTerm(), services),
+                                                  TB.convertToFormula(expr.getTerm(), services)));
 	    }
 	)?
 ;
@@ -796,12 +813,12 @@ logicalandexpr returns [SLExpression result=null] throws SLTranslationException
     SLExpression expr;
 }
 :
-	result=inclusiveorexpr
+	result=andexpr
 	(
 	    LOGICALAND expr=logicalandexpr
 	    {
-		result = new SLExpression(TB.and(TB.convertToFormula(result.getTerm(), services),
-		                                 TB.convertToFormula(expr.getTerm(), services)));
+		result = new SLExpression(TB.andSC(TB.convertToFormula(result.getTerm(), services),
+                                                   TB.convertToFormula(expr.getTerm(), services)));
 	    }
 	)?
 ;
@@ -832,7 +849,7 @@ exclusiveorexpr returns [SLExpression result=null] throws SLTranslationException
     SLExpression expr;
 }
 :
-	result=andexpr
+	result=logicalandexpr
 	(
 	    XOR expr=exclusiveorexpr
 	    {
@@ -1335,9 +1352,9 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
 	                               javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
          }
    )
-    |  
+    |
 	l:LPAREN (params=expressionlist)? RPAREN
-	{   
+	{
             ImmutableList<SLExpression> preHeapParams = ImmutableSLList.<SLExpression>nil();
             for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
               Term p;
@@ -1347,7 +1364,7 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
             params = params.prepend(preHeapParams);
 
 	    lookupName = lookupName.substring(lookupName.lastIndexOf('.')+1);
-  	
+
 	    result = lookupIdentifier(lookupName, receiver, new SLParameters(params), l);
 	    if (result == null) {
 		raiseError("Method " + lookupName + "("
@@ -1359,7 +1376,7 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
             }
 
 	}
-    | 
+    |
 	lbrack:LBRACKET result=specarrayrefexpr[receiver, fullyQualifiedName, lbrack] RBRACKET
 
 )

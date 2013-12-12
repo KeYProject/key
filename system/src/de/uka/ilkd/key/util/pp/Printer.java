@@ -47,7 +47,7 @@ class Printer {
     private Backend back;
 
     /** stack to remember value of <code>pos</code> in nested blocks */
-    private ArrayList marginStack = new ArrayList(10);
+    private ArrayList<Integer> marginStack = new ArrayList<Integer>(10);
 
 
     /** Create a printer.  It will write its output to <code>writer</code>.

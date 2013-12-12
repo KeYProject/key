@@ -275,7 +275,7 @@ public class UserDefinedSymbols {
             }
             return result;
         }
-        
+
         private void createHeaderForSorts(StringBuffer result){
                 LinkedList<Named> sorts  = new LinkedList<Named>();              
                 getAllSorts(sorts);

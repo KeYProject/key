@@ -124,7 +124,7 @@ public final class HeapLDT extends LDT {
         nullFunc          = addFunction(services, "null");
         acc               = addFunction(services, "acc");
         reach             = addFunction(services, "reach");
-        prec			  = addFunction(services, "prec");
+        prec		  = addFunction(services, "prec");
         heaps = ImmutableSLList.<LocationVariable>nil()
         		 .append((LocationVariable) progVars.lookup(BASE_HEAP_NAME))
         		 .append((LocationVariable) progVars.lookup(SAVED_HEAP_NAME));
@@ -302,9 +302,9 @@ public final class HeapLDT extends LDT {
     }
     
     public Function getPrec() {
-    	return prec;
+	return prec;
     }
-    
+
     
     public LocationVariable getHeap() {
 	return heaps.head();

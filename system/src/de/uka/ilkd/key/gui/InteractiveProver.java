@@ -483,7 +483,7 @@ public class InteractiveProver implements InterruptListener {
      * the contained TacletApps
      */
     private ImmutableList<TacletApp> filterTaclet(
-        ImmutableList<NoPosTacletApp> tacletInstances, PosInSequent pos) {
+            ImmutableList<NoPosTacletApp> tacletInstances, PosInSequent pos) {
         java.util.HashSet<Taclet> applicableRules = new java.util.HashSet<Taclet>();
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
         for (NoPosTacletApp app : tacletInstances) {
@@ -502,7 +502,7 @@ public class InteractiveProver implements InterruptListener {
                         IfFormulaInstSeq ifis = (IfFormulaInstSeq) ifs.head();
                         if (ifis.toPosInOccurrence().equals(
                             pos.getPosInOccurrence().topLevel())) {
-                            continue; // skipp app if find and if same formula
+                            continue; // skip app if find and if same formula
                         }
                     }
                 }

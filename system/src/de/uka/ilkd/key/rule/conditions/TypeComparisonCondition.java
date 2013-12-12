@@ -102,7 +102,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     private boolean checkSorts(final Sort fstSort, 
 	                       final Sort sndSort, 
 	                       final Services services) {
-        
+
         boolean proxy1 = fstSort instanceof ProxySort;
         boolean proxy2 = sndSort instanceof ProxySort;
 
@@ -113,12 +113,12 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
                 return fstSort == sndSort;
             case NOT_SAME:
                 return fstSort != sndSort;
-            case IS_SUBTYPE:        
+            case IS_SUBTYPE:
                 return fstSort.extendsTrans(sndSort);
             case STRICT_SUBTYPE:
                 return fstSort != sndSort && fstSort.extendsTrans(sndSort);
-            case NOT_IS_SUBTYPE:	    
-                return !fstSort.extendsTrans(sndSort);        
+            case NOT_IS_SUBTYPE:
+                return !fstSort.extendsTrans(sndSort);
             case DISJOINTMODULONULL:
                 return checkDisjointness(fstSort, sndSort, services);
             }
@@ -155,40 +155,40 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 
             case NOT_SAME:
             case DISJOINTMODULONULL:
-            case NOT_IS_SUBTYPE:            
+            case NOT_IS_SUBTYPE:
                 // There are cases where - based on the bounds - true could be returned.
                 // Implement them if needed. There is the Null type to consider as subtype.
                 return false;
             }
         }
-        
+
         assert false : "All cases should have been covered";
         return false;
     }
 
-    private static Map<Sort,Map<Sort,Boolean>> disjointnessCache 
+    private static Map<Sort,Map<Sort,Boolean>> disjointnessCache
     	= new WeakHashMap<Sort,Map<Sort,Boolean>>();
-    
-    
+
+
     private static Boolean lookupInCache(Sort s1, Sort s2) {
 	Boolean result = null;
-	
+
 	Map<Sort,Boolean> map = disjointnessCache.get(s1);
 	if(map != null) {
 	    result = map.get(s2);
 	}
-	
+
 	if(result == null) {
 	    map = disjointnessCache.get(s2);
 	    if(map != null) {
 		result = map.get(s1);
-	    }	    
+	    }
 	}
-	
+
 	return result;
     }
-    
-    
+
+
     private static void putIntoCache(Sort s1, Sort s2, boolean b) {
 	Map<Sort,Boolean> map = disjointnessCache.get(s1);
 	if(map == null) {
