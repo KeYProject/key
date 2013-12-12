@@ -63,27 +63,27 @@ public class ContractFactory {
      * has been added as a postcondition (regardless of termination case).
      */
     public FunctionalOperationContract addPost(FunctionalOperationContract old,
-                                               Term addedPost,
-                                               ProgramVariable selfVar,
-                                               ProgramVariable resultVar,
-                                               ProgramVariable excVar,
-                                               ImmutableList<ProgramVariable> paramVars,
-                                               Map<LocationVariable, LocationVariable> atPreVars) {
+            Term addedPost,
+            ProgramVariable selfVar,
+            ProgramVariable resultVar,
+            ProgramVariable excVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars) {
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
-    FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
-    addedPost = replaceVariables(addedPost, selfVar, resultVar, excVar, paramVars,
-                                 atPreVars, foci.originalSelfVar, foci.originalResultVar,
-                                 foci.originalExcVar, foci.originalParamVars,
-                                 foci.originalAtPreVars);
+        FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
+        addedPost = replaceVariables(addedPost, selfVar, resultVar, excVar, paramVars,
+            atPreVars, foci.originalSelfVar, foci.originalResultVar,
+            foci.originalExcVar, foci.originalParamVars,
+            foci.originalAtPreVars);
 
-    Map<LocationVariable,Term> newPosts = new LinkedHashMap<LocationVariable,Term>(10);
-    for(LocationVariable h : foci.originalPosts.keySet()) {
-       if(h == services.getTypeConverter().getHeapLDT().getHeap()) {
-          newPosts.put(h, tb.andSC(addedPost, foci.originalPosts.get(h)));
-       }else{
-          newPosts.put(h, foci.originalPosts.get(h));
-       }
-    }
+        Map<LocationVariable,Term> newPosts = new LinkedHashMap<LocationVariable,Term>(10);
+        for(LocationVariable h : foci.originalPosts.keySet()) {
+            if(h == services.getTypeConverter().getHeapLDT().getHeap()) {
+                newPosts.put(h, tb.andSC(addedPost, foci.originalPosts.get(h)));
+            }else{
+                newPosts.put(h, foci.originalPosts.get(h));
+            }
+        }
 
     //create new contract
     return new FunctionalOperationContractImpl(foci.baseName,
@@ -334,6 +334,8 @@ public class ContractFactory {
      * loaded later. The resulting contract has id "INVALID_ID".
      */
     public FunctionalOperationContract union(FunctionalOperationContract ... contracts) {
+        if (contracts.length == 0) return null;
+        if (contracts.length == 1) return contracts[0];
         assert contracts[0] instanceof FunctionalOperationContractImpl :
             UNKNOWN_CONTRACT_IMPLEMENTATION;
 
@@ -350,9 +352,6 @@ public class ContractFactory {
         for(FunctionalOperationContract contract : others) {
             assert contract.getTarget().equals(t.pm);
         }
-        if(others.length == 0) {
-            return t;
-        }
 
         //collect information
         Map<LocationVariable,Term> pres =
@@ -360,7 +359,7 @@ public class ContractFactory {
         for(LocationVariable h : t.originalPres.keySet()) {
            pres.put(h, t.originalPres.get(h));
         }
-        Term mby = t.originalMby; // TODO: what about the others?
+        Term mby = t.originalMby;
         Map<LocationVariable,Boolean> hasMod = new LinkedHashMap<LocationVariable,Boolean>();
         Map<LocationVariable,Term> posts =
                 new LinkedHashMap<LocationVariable, Term>(t.originalPosts.size());
@@ -386,73 +385,85 @@ public class ContractFactory {
         }
         Map<LocationVariable,Term> mods = t.originalMods;
         Map<ProgramVariable,Term> deps = t.originalDeps;
-        Modality moda = t.modality; // TODO: what about the others?
+        Modality moda = t.modality;
         for(FunctionalOperationContract other : others) {
-            Term otherMby = other.hasMby()
-                        ? other.getMby(t.originalSelfVar,
-                                   t.originalParamVars,
-                                   services)
-                            : null;
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-              Term otherPre = other.getPre(h, t.originalSelfVar,
-                               t.originalParamVars,
-                               t.originalAtPreVars,
-                               services);
-              Term otherPost = other.getPost(h, t.originalSelfVar,
-                                 t.originalParamVars,
-                                 t.originalResultVar,
-                                 t.originalExcVar,
-                                 t.originalAtPreVars,
-                                 services);
-              Term otherAxiom = other.getRepresentsAxiom(h, t.originalSelfVar,
-            	                                 t.originalParamVars,
-            		                             t.originalResultVar,
-            		                             t.originalAtPreVars,
-            		                             services);
-
-              if(h == services.getTypeConverter().getHeapLDT().getHeap()) {
-                // bugfix (MU)
-                // if the first or the other contract do not have a
-                // measured-by-clause, assume no clause at all
-                if(mby == null || otherMby == null) {
-                  mby = null;
+            Modality otherModality = other.getModality();
+            if (moda != otherModality) {
+                // TODO are there other modalities to appear in contracts?
+                // I know that this is extremely ugly, but I don't know how to combine other kinds of modalities.
+                if (moda == Modality.BOX) {
+                    assert otherModality == Modality.DIA : "unknown modality "+otherModality+" in contract";
+                    // do nothing
                 } else {
-                  mby = tb.ife(otherPre, otherMby, mby);
+                    assert moda == Modality.DIA: "unknown modality "+moda+" in contract";
+                    moda = Modality.BOX;
                 }
-              }
-              if(otherPre != null) {
-                pres.put(h,pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
-              }
-              if(otherPost != null) {
-                final Term oPost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
-                posts.put(h, posts.get(h) == null ? oPost : tb.and(posts.get(h), oPost));
-              }
-              if(otherAxiom != null) {
-                final Term oAxiom = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherAxiom);
-                axioms.put(h, axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom));
-              }
+            }
+            Term otherMby = other.hasMby()
+            ? other.getMby(t.originalSelfVar,
+                    t.originalParamVars,
+                    services)
+                    : null;
+            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                Term otherPre = other.getPre(h, t.originalSelfVar,
+                        t.originalParamVars,
+                        t.originalAtPreVars,
+                        services);
+                Term otherPost = other.getPost(h, t.originalSelfVar,
+                        t.originalParamVars,
+                        t.originalResultVar,
+                        t.originalExcVar,
+                        t.originalAtPreVars,
+                        services);
+                Term otherAxiom = other.getRepresentsAxiom(h, t.originalSelfVar,
+                        t.originalParamVars,
+                        t.originalResultVar,
+                        t.originalAtPreVars,
+                        services);
 
-              if (hasMod.get(h) || other.hasModifiesClause(h)) {
-                  hasMod.put(h, true);
-                  Term m1 = mods.get(h);
-                  Term m2 = other.getMod(h, t.originalSelfVar,
-                          t.originalParamVars,
-                          services);
-                  if (m1 != null || m2 != null) {
-                      Term nm;
-                      if (m1 == null) {
-                          nm = m2;
-                      } else if (m2 == null) {
-                          nm = m1;
-                      } else {
-                          Term ownPre = pres.get(h) == null ? pres.get(h) : tb.tt();
-                          nm = tb.intersect(services,
-                                  tb.ife(ownPre, m1, tb.allLocs(services)),
-                                  tb.ife(otherPre, m2, tb.allLocs(services)));
-                      }
-                      mods.put(h, nm);
-                  }
-              }
+                if(h == services.getTypeConverter().getHeapLDT().getHeap()) {
+                    // bugfix (MU)
+                    // if the first or the other contract do not have a
+                    // measured-by-clause, assume no clause at all
+                    if(mby == null || otherMby == null) {
+                        mby = null;
+                    } else {
+                        mby = tb.ife(otherPre, otherMby, mby);
+                    }
+                }
+                if(otherPre != null) {
+                    pres.put(h,pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
+                }
+                if(otherPost != null) {
+                    final Term oPost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
+                    posts.put(h, posts.get(h) == null ? oPost : tb.and(posts.get(h), oPost));
+                }
+                if(otherAxiom != null) {
+                    final Term oAxiom = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherAxiom);
+                    axioms.put(h, axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom));
+                }
+
+                if (hasMod.get(h) || other.hasModifiesClause(h)) {
+                    hasMod.put(h, true);
+                    Term m1 = mods.get(h);
+                    Term m2 = other.getMod(h, t.originalSelfVar,
+                            t.originalParamVars,
+                            services);
+                    if (m1 != null || m2 != null) {
+                        Term nm;
+                        if (m1 == null) {
+                            nm = m2;
+                        } else if (m2 == null) {
+                            nm = m1;
+                        } else {
+                            Term ownPre = pres.get(h) == null ? pres.get(h) : tb.tt();
+                            nm = tb.intersect(services,
+                                    tb.ife(ownPre, m1, tb.allLocs(services)),
+                                    tb.ife(otherPre, m2, tb.allLocs(services)));
+                        }
+                        mods.put(h, nm);
+                    }
+                }
             }
 
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
