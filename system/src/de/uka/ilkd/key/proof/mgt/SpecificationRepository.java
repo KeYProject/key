@@ -317,9 +317,14 @@ public final class SpecificationRepository {
     }
 
     /**
+     * <p>
      * Returns all known class invariants for the passed type.
+     * </p>
+     * <p>
+     * This method is used by Visual DbC and has to be public. 
+     * </p>
      */
-    private ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
+    public ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
         ImmutableSet<ClassInvariant> result = invs.get(kjt);
         return result == null ? DefaultImmutableSet.<ClassInvariant> nil()
                 : result;
