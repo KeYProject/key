@@ -22,7 +22,6 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagLayout;
 import java.awt.Point;
@@ -967,7 +966,6 @@ public final class MainWindow extends JFrame  {
             }
     });
 
-
         return result;
     }
 
@@ -993,15 +991,6 @@ public final class MainWindow extends JFrame  {
         }
     }
 
-    /**
-     * brings window in front and request focus
-     */
-    private void popup() {
-        setState(Frame.NORMAL);
-        setVisible(true);
-        requestFocus();
-    }
-
     public void addProblem(final de.uka.ilkd.key.proof.ProofAggregate plist) {
         Runnable guiUpdater = new Runnable() {
             @Override
@@ -1011,10 +1000,8 @@ public final class MainWindow extends JFrame  {
                 setUpNewProof(plist.getFirstProof());
                 disableCurrentGoalView = false;
                 updateSequentView();
-                popup();
             }
         };
-
         GuiUtilities.invokeAndWait(guiUpdater);
     }
 
