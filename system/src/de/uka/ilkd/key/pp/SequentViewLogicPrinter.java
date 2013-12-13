@@ -17,7 +17,7 @@ import java.util.List;
 public class SequentViewLogicPrinter extends LogicPrinter {
 
     /* 
-     * Set containing visible TermLabels.
+     * This object is used to determine the TermLabels, which will be printed out.
      */
     private final VisibleTermLabels visibleTermLabels;
 
@@ -49,7 +49,7 @@ public class SequentViewLogicPrinter extends LogicPrinter {
     }
 
     @Override
-    protected ImmutableArray<TermLabel> getVisibleLabels(Term t) {
+    protected ImmutableArray<TermLabel> getVisibleTermLabels(Term t) {
 
         List<TermLabel> termLabelList = new LinkedList();
         for (TermLabel label : t.getLabels()) {

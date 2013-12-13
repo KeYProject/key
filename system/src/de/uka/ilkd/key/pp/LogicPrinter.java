@@ -886,12 +886,12 @@ public class LogicPrinter {
      * The class SequentViewLogicPrinter overrides this method.
      * The default is to just print all TermLabels.
      */
-    protected ImmutableArray<TermLabel> getVisibleLabels(Term t){
+    protected ImmutableArray<TermLabel> getVisibleTermLabels(Term t){
         return t.getLabels();
     }
 
     public void printLabels(Term t) throws IOException {
-        ImmutableArray<TermLabel> termLabelList = getVisibleLabels(t);
+        ImmutableArray<TermLabel> termLabelList = getVisibleTermLabels(t);
         
         if (termLabelList.isEmpty()) {
             return;
