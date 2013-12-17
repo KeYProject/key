@@ -6,11 +6,11 @@
             <operationContract name="result_0 = magic(x) catch(exc_0)
 pre: true
 post: result_0 = subMagic(x) &amp; exc_0 = null
-mod: {}
+mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of SimpleIntQuery.mainWithSymbolicUpdates(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	42 {x &gt;  -12},
+	42 {x &gt;  -12}, 
 	-4711 {x &lt; -11}
 as result of SimpleIntQuery.mainWithSymbolicUpdates(x);&gt;" isReturnValueComputed="true">
                      <methodReturnValue name="42 {x &gt;  -12}" returnValueString="42" hasCondition="true" conditionString="x &gt;  -12">
