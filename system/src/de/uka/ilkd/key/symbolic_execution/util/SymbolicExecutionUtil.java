@@ -3144,6 +3144,9 @@ public final class SymbolicExecutionUtil {
       result.put("sequences", "sequences:on");
       result.put("runtimeExceptions", "runtimeExceptions:allow");
       result.put("integerSimplificationRules", "integerSimplificationRules:full");
+      result.put("optimisedSelectRules", "optimisedSelectRules:on");
+      result.put("wdChecks", "wdChecks:off");
+      result.put("wdOperator", "wdOperator:L");
       return result;
    }
 }
