@@ -334,7 +334,7 @@ public class TestJMLTranslator extends TestCase {
                    result.equalsModRenaming(expected));
     }
 
-    
+
     public void testBsumBigInt() {
         Term result = null;
 

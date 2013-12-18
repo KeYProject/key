@@ -8,11 +8,11 @@ import java.util.List;
 public class SymbolicExecutionTermLabelFactory implements TermLabelFactory<SymbolicExecutionTermLabel> {
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * This method accepts single arguments which can be parsed as an integer.
      */
-    @Override 
+    @Override
     public SymbolicExecutionTermLabel parseInstance(List<String> parameters) throws TermLabelException {
         if (parameters == null || parameters.size() != 1) {
             throw new TermLabelException("Label " + SymbolicExecutionTermLabel.NAME +

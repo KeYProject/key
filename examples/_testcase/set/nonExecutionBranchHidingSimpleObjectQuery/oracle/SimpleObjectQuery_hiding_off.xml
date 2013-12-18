@@ -5,7 +5,7 @@
          <operationContract name="result_0 = magic(x) catch(exc_0)
 pre: &lt;$inv&gt; &amp; !x = null
 post: result_0 = subMagic(x) &amp; &lt;$inv&gt; &amp; exc_0 = null
-mod: {}
+mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                <branchCondition name="SimpleObjectQuery.INSTANCE = x" pathCondition="SimpleObjectQuery.INSTANCE = x" pathConditionChanged="true" branchCondition="SimpleObjectQuery.INSTANCE = x" mergedBranchCondition="false" isBranchConditionComputed="true">

@@ -40,6 +40,9 @@ public interface FunctionalOperationContract extends OperationContract {
     public Modality getModality();
 
     public boolean isReadOnlyContract(Services services);
+
+    public Term getEnsures(LocationVariable heap);
+
     /**
      * Returns the postcondition of the contract.
      */
@@ -98,7 +101,7 @@ public interface FunctionalOperationContract extends OperationContract {
                                    Term excTerm,
                                    Map<LocationVariable,Term> atPres,
                                    Services services);
-    
+
     public KeYJavaType getSpecifiedIn();
 
     public boolean hasResultVar();

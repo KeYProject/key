@@ -51,7 +51,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //             ".xml",
 //             null);
 //   }
-   
+
 //   public void testSimpleLinkedOjbectsWithAdditionalInstancesPreCondition() throws Exception {
 //      doTest("examples/_testcase/set/configurationExtractorSimpleLinkedOjbectsWithAdditionalInstances/test/SimpleLinkedOjbectsWithAdditionalInstances.java",
 //             "SimpleLinkedOjbectsWithAdditionalInstances",
@@ -63,7 +63,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //             ".xml",
 //             "x != null & x.next != null & x.next.next != null & a != null & a.x == 42 & b != null");
 //   }
-   
+
    /**
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
@@ -586,21 +586,21 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
                          int numberOfReturnNodeInMostLeftBranch,
                          int expectedNumberOfConfigurations,
                          boolean useOperationContracts) throws Exception {
-      doTest(javaPathInkeyRepDirectory, 
-             containerTypeName, 
-             oraclePathInBaseDir, 
-             symbolicExecutionOracleFileName, 
-             initialStatesOraclePrefix, 
-             initialStatesOracleFileExtension, 
-             currentStatesOraclePrefix, 
-             currentStatesOracleFileExtension, 
-             precondition, 
-             numberOfReturnNodeInMostLeftBranch, 
-             expectedNumberOfConfigurations, 
-             useOperationContracts, 
+      doTest(javaPathInkeyRepDirectory,
+             containerTypeName,
+             oraclePathInBaseDir,
+             symbolicExecutionOracleFileName,
+             initialStatesOraclePrefix,
+             initialStatesOracleFileExtension,
+             currentStatesOraclePrefix,
+             currentStatesOracleFileExtension,
+             precondition,
+             numberOfReturnNodeInMostLeftBranch,
+             expectedNumberOfConfigurations,
+             useOperationContracts,
              true);
    }
-   
+
    /**
     * Executes the test steps.
     * @param javaPathInkeyRepDirectory The path to the Java file.

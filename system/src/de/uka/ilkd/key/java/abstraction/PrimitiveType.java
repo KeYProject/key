@@ -190,7 +190,7 @@ public final class PrimitiveType implements Type {
 	assert arrayElementName != null;
 	return arrayElementName;
     }
-    
+
     /**
      * Returns whether this is a Java type which translates to int in DL.
      */
@@ -202,12 +202,12 @@ public final class PrimitiveType implements Type {
             || this == JAVA_LONG
             || this == JAVA_BIGINT;
     }
-    
+
     /**
      * Returns true if this is an integer or floating point type.
      */
     public boolean isArithmeticType () {
-        return isIntegerType() 
+        return isIntegerType()
             || this == JAVA_FLOAT
             || this == JAVA_DOUBLE
             || this == JAVA_REAL;

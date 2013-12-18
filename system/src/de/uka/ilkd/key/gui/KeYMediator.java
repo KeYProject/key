@@ -115,24 +115,24 @@ public class KeYMediator {
      * main frame and the current proof settings
      */
     public KeYMediator(UserInterface ui, boolean useAutoSaver) {
-    	this.ui             = ui;
-    	if (useAutoSaver) {
-    		autoSaver = new AutoSaver();
-    	}
+	this.ui             = ui;
+	if (useAutoSaver) {
+		autoSaver = new AutoSaver();
+	}
 
-    	notationInfo        = new NotationInfo();
-    	proofListener       = new KeYMediatorProofListener();
-    	proofTreeListener   = new KeYMediatorProofTreeListener();
-    	keySelectionModel   = new KeYSelectionModel();
-    	interactiveProver   = new InteractiveProver(this);
+	notationInfo        = new NotationInfo();
+	proofListener       = new KeYMediatorProofListener();
+	proofTreeListener   = new KeYMediatorProofTreeListener();
+	keySelectionModel   = new KeYSelectionModel();
+	interactiveProver   = new InteractiveProver(this);
 
-    	addAutoModeListener(proofListener);
+	addAutoModeListener(proofListener);
 
-    	defaultExceptionHandler = new KeYRecoderExcHandler();
+	defaultExceptionHandler = new KeYRecoderExcHandler();
 
-    	// There may be other interruption listeners, but the interaction
-    	// engine listens by default.
-    	addInterruptedListener(interactiveProver);
+	// There may be other interruption listeners, but the interaction
+	// engine listens by default.
+	addInterruptedListener(interactiveProver);
     }
 
 

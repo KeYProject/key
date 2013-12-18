@@ -5,7 +5,7 @@
          <operationContract name="result_0 = self.magic(x) catch(exc_0)
 pre: self.&lt;inv&gt;
 post: result_0 = self.subMagic(x) &amp; self.&lt;inv&gt; &amp; exc_0 = null
-mod: {}
+mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="x &gt;  -1" pathCondition="x &gt;  -1" pathConditionChanged="true" branchCondition="x &gt;  -1" mergedBranchCondition="false" isBranchConditionComputed="true">
                <branchCondition name="!self.instanceField = 11" pathCondition="x &gt;= 0 &amp; !self.instanceField = 11" pathConditionChanged="true" branchCondition="!self.instanceField = 11" mergedBranchCondition="false" isBranchConditionComputed="true">

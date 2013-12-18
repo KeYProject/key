@@ -5,7 +5,7 @@
          <operationContract name="result_0 = magic(x) catch(exc_0)
 pre: true
 post: result_0 = subMagic(x) &amp; exc_0 = null
-mod: {}
+mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="x = TRUE" pathCondition="x = TRUE" pathConditionChanged="true" branchCondition="x = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="return magicValue;" pathCondition="x = TRUE" pathConditionChanged="false">

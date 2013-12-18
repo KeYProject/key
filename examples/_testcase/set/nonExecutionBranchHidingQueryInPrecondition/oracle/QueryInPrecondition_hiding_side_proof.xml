@@ -8,9 +8,9 @@ post: (   heapBefore_magic_0[xPre(x)] = TRUE &amp; y &lt; 0
    -&gt; result_0 = subFirst(x, y) &amp; exc_0 = null)
 &amp; (   !(heapBefore_magic_0[xPre(x)] = TRUE &amp; y &lt; 0)
    -&gt; result_0 = subSecond(x, y) &amp; exc_0 = null)
-mod: \if (true)  \then ({})  \else (allLocs)
+mod: \if (true)  \then (empty)  \else (allLocs)
 \cap \if (!(xPre(x) = TRUE &amp; y &lt; 0))
-         \then ({})
+         \then (empty)
          \else (allLocs)
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">

@@ -17,7 +17,7 @@ package de.uka.ilkd.key.util;
  * Contains commonly (at least in the context of KeY) used Unicode symbols.
  * The names for the constants mostly derive from the common names in LaTeX,
  * such as the bottom symbol is noted as "BOT".
- * Some symbols are however refered to by their common name within KeY,
+ * Some symbols are however referred to by their common name within KeY,
  * such as the equivalence arrow (aka. left-right arrow) is named "EQV".
  * In doubt, it is not a bad idea to give several names.
  * See <a href="http://www.fileformat.info/info/unicode/category/Sm/list.htm">

@@ -23,15 +23,15 @@ public class StayOnOperatorTermLabelPolicy implements TermLabelPolicy {
     */
    @Override
    public boolean keepLabel(Services services,
-                            PosInOccurrence applicationPosInOccurrence, 
+                            PosInOccurrence applicationPosInOccurrence,
                             Term applicationTerm,
-                            Rule rule, 
-                            Goal goal, 
+                            Rule rule,
+                            Goal goal,
                             Object hint,
-                            Term tacletTerm, 
-                            Operator newTermOp, 
-                            ImmutableArray<Term> newTermSubs, 
-                            ImmutableArray<QuantifiableVariable> newTermBoundVars, 
+                            Term tacletTerm,
+                            Operator newTermOp,
+                            ImmutableArray<Term> newTermSubs,
+                            ImmutableArray<QuantifiableVariable> newTermBoundVars,
                             JavaBlock newTermJavaBlock,
                             TermLabel label) {
       return applicationTerm != null && newTermOp == applicationTerm.op();

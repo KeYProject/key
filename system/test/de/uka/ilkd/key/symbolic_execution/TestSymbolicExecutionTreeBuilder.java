@@ -42,10 +42,10 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests example: examples/_testcase/set/useLoopInvariantAndOperationContractStrictlyPure
     */
    public void testLoopInvariantAndOperationContractStrictlyPure() throws Exception {
-      doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/useLoopInvariantAndOperationContractStrictlyPure/test/IndexOf.java", 
-                "IndexOf", 
-                "indexOf", 
+      doSETTest(keyRepDirectory,
+                "examples/_testcase/set/useLoopInvariantAndOperationContractStrictlyPure/test/IndexOf.java",
+                "IndexOf",
+                "indexOf",
                 null,
                 "examples/_testcase/set/useLoopInvariantAndOperationContractStrictlyPure/oracle/IndexOf.xml",
                 false,
@@ -58,7 +58,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false);
    }
-   
+
    /**
     * Tests example: examples/_testcase/set/instanceContractTest
     */
@@ -1755,7 +1755,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    public void testVariablesUnknownTest() throws Exception {
       doSETTestAndDispose(keyRepDirectory, 
                           "examples/_testcase/set/variablesUnknownTest/test/UnknownTest.java", 
-                          "endless.UnknownTest", 
+                          "endless.UnknownTest",
                           "main", 
                           null,
                           "examples/_testcase/set/variablesUnknownTest/oracle/UnknownTest.xml",

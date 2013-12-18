@@ -67,6 +67,6 @@ public class FullAutoPilotProofMacro extends SequentialProofMacro {
 
     @Override
     public KeyStroke getKeyStroke () {
-    	return KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.SHIFT_DOWN_MASK);
+	return KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.SHIFT_DOWN_MASK);
     }
 }

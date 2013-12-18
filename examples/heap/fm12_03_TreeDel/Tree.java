@@ -29,11 +29,11 @@ final class Tree {
           helper model boolean treeInv() {
              return (
                     (left != right || left == null || right == null)
-                 && height >= 0
-                 && (left==null || (   \disjoint(this.*, left.footprint())
-                          && left.treeInv() && height > left.height))  
-                 && (right==null || (   \disjoint(this.*, right.footprint())
-                          && right.treeInv() && height > right.height))
+                 && 0 <= height
+                 && (left==null || (left.height < height && \disjoint(this.*, left.footprint())
+                          && left.treeInv()))  
+                 && (right==null || (right.height < height && \disjoint(this.*, right.footprint())
+                          && right.treeInv()))
                  && (left==null || right==null || \disjoint(left.footprint(), right.footprint()))) ;
           } @*/
 
@@ -74,18 +74,18 @@ final class Tree {
     /*@ model_behavior 
           requires t.treeInv();
           ensures true;
-          accessible \set_union(footprintUntilLeft(t), t == left ? \singleton(left.height) : \empty);
+          accessible \set_union(footprintUntilLeft(t), \singleton(t.height));
           measured_by height;
           helper model boolean treeInvUntilLeft(Tree t) {
              return (t == this || 
-                      ( height >= 0
-                     && (left != right || left == null || right == null)
-                     && (right==null ||
-                       (\disjoint(this.*, right.footprint())
-                       && height > right.height && right.treeInv()))
+                      ( (left != right || left == null || right == null)
+                     && 0 <= height 
                      && (left==null ||
-                          (\disjoint(this.*, left.footprintUntilLeft(t))
-                         && height > left.height && left.treeInvUntilLeft(t)))  
+                          (left.height < height && \disjoint(this.*, left.footprintUntilLeft(t))
+                         && left.treeInvUntilLeft(t)))  
+                     && (right==null ||
+                       (right.height < height && \disjoint(this.*, right.footprint())
+                       && right.treeInv()))
                      && (left==null || right==null ||
                           \disjoint(left.footprintUntilLeft(t), right.footprint()))
                       )
@@ -131,10 +131,10 @@ final class Tree {
           ensures \result ==> (t.left == null || 
               (footprintUntilLeft(t.left) == 
                 \set_union(t.*,
-                  \set_union(
-                     (t.right == null) ? \empty : t.right.footprint(),
-                     footprintUntilLeft(t)
-                  )
+                    \set_union(
+                       (t.right == null) ? \empty : t.right.footprint(),
+                       footprintUntilLeft(t)
+                    )
                 )
               )
           );

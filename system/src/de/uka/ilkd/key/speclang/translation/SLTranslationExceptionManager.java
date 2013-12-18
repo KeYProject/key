@@ -58,9 +58,9 @@ public class SLTranslationExceptionManager {
 	this.fileName = fileName;
 	this.offsetPos = offsetPos;
     }
-    
-    public SLTranslationExceptionManager(KeYJMLPreParser parser, 
-                                         String fileName, 
+
+    public SLTranslationExceptionManager(KeYJMLPreParser parser,
+                                         String fileName,
                                          Position offsetPos) {
         this.line = parser.input.LT(1).getLine();
         this.column = parser.input.LT(1).getCharPositionInLine();
@@ -182,7 +182,7 @@ public class SLTranslationExceptionManager {
 	    org.antlr.runtime.Token t) {
 	return new SLWarningException(new PositionedString(message, t));
     }
-    
+
     /**
      * Converts an ANTLRException into an SLTranslationException with the same
      * message and stack trace, and with current absolute position information.
@@ -204,7 +204,7 @@ public class SLTranslationExceptionManager {
                                           pos,
                                           e.getStackTrace());
     }
-    
+
     public SLTranslationException convertException(
 	    org.antlr.runtime.RecognitionException e) {
 	Position pos;

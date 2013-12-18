@@ -5,7 +5,7 @@
          <operationContract name="result_0 = self.magic(x) catch(exc_0)
 pre: self.&lt;inv&gt;
 post: result_0 = self.subMagic(x) &amp; self.&lt;inv&gt; &amp; exc_0 = null
-mod: {}
+mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
                <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 

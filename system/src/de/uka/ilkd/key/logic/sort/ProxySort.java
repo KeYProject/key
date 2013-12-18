@@ -11,6 +11,6 @@ public class ProxySort extends AbstractSort {
     }
 
     public ProxySort(Name name) {
-        this(name, DefaultImmutableSet.<Sort>nil());        
+        this(name, DefaultImmutableSet.<Sort>nil());
     }
 }

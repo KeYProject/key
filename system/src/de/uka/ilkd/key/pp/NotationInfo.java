@@ -280,7 +280,6 @@ public final class NotationInfo {
 	
 	//set operators
 	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
-	tbl.put(setLDT.getEmpty(), new Notation.Constant("{}", PRIORITY_ATOM));
 	tbl.put(setLDT.getSingleton(), new Notation.SingletonNotation());
 	tbl.put(setLDT.getUnion(), new Notation.Infix("\\cup", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
 	tbl.put(setLDT.getIntersect(), new Notation.Infix("\\cap", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));

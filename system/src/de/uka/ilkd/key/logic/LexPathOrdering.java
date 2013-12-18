@@ -16,11 +16,10 @@ package de.uka.ilkd.key.logic;
 
 import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.WeakHashMap;
-
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;

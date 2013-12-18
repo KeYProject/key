@@ -62,7 +62,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
             return null;
         }
         
-        ImmutableList<KeYJavaType> signature = 
+        ImmutableList<KeYJavaType> signature =
                 new SLParameters(parameters.getParameters().tail()).getSignature(javaInfo.getServices());
         
         IProgramMethod pm = null;
@@ -71,7 +71,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
         
         while (true) {
             pm = javaInfo.getToplevelPM(containingType, methodName, signature);
-            
+
             LocationVariable et = (LocationVariable) javaInfo.getAttribute(
                     ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
             if(et!=null && pm==null){

@@ -15,7 +15,7 @@ post: result_0 = self.subMagic(x)
                   = javaUnaryMinusInt(55))
             &amp; self.&lt;inv&gt;))))
 &amp; exc_0 = null
-mod: {}
+mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue+this.instanceField+classField;" pathCondition="true" pathConditionChanged="false">
                <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 

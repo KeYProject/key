@@ -3,18 +3,18 @@ public final class SuffixArray {
     final /*@ spec_public @*/ int[] a;
     final /*@ spec_public @*/ int[] suffixes;
 
-    /*@ public invariant 
-      @           (\forall int i; 0 <= i && i < a.length; 
+    /*@ public invariant
+      @           (\forall int i; 0 <= i && i < a.length;
       @           (\exists int j; 0 <= j && j < a.length; suffixes[j]==i));
       @           // suffixes is a permutation on indices
       @ public invariant
       @         (\forall int i; 0 <= i && i < a.length;
       @                  0 <= suffixes[i] && suffixes[i] < a.length);
       @           // indices are in range (follows from above, cannot hurt)
-      @ public invariant (\forall int i; 0 < i && i < a.length; 
+      @ public invariant (\forall int i; 0 < i && i < a.length;
       @                        suffixes[i-1] != suffixes[i]);
       @           // indices are unique (follows from above, cannot hurt)
-      @ public invariant (\forall int i; 0 < i && i < a.length; 
+      @ public invariant (\forall int i; 0 < i && i < a.length;
       @                        compare(suffixes[i],suffixes[i-1]) > 0);
       @           // suffixes is ordered lexicographically
       @ public invariant a.length == suffixes.length;
@@ -60,7 +60,7 @@ public final class SuffixArray {
         if (y+l == a.length) return 1;
         if (a[x+l] < a[y+l]) return -1;
         if (a[x+l] > a[y+l]) return 1;
-        
+
         throw new RuntimeException();
     }
 
@@ -69,15 +69,15 @@ public final class SuffixArray {
     private void /*@ helper @*/ sort(final int[] data) {
         /*@ maintaining data.length == a.length;
           @ maintaining 0 <= k && k <= data.length;
-          @ maintaining (\forall int i; 0 <= i && i < a.length; 
+          @ maintaining (\forall int i; 0 <= i && i < a.length;
           @               (\exists int j; 0 <= j && j < a.length; data[j]==i));
-          @ maintaining (\forall int i; 0 < i && i < a.length; 
+          @ maintaining (\forall int i; 0 < i && i < a.length;
           @                        i < k? compare(data[i],data[i-1]) > 0
           @                             : data[i] == \old(data[i]));
           @ decreasing data.length - k;
           @ assignable data[*];
           @*/
-        for(int k = 0; k < data.length; k++) 
+        for(int k = 0; k < data.length; k++)
             /*@ maintaining 0 <= l && l <= k;
               @ maintaining (\forall int i; l < i && i <= k;
               @                 compare(data[i],data[i-1]) > 0);
@@ -87,7 +87,7 @@ public final class SuffixArray {
               @ decreasing l;
               @ assignable data[*];
               @*/
-            for(int l = k; l > 0 && compare(data[l - 1], data[l]) > 0; l--) 
+            for(int l = k; l > 0 && compare(data[l - 1], data[l]) > 0; l--)
                 swap(data, l);
     }
 

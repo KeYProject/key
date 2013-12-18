@@ -6,7 +6,7 @@
             <operationContract name="result_0 = magic(x) catch(exc_0)
 pre: true
 post: result_0 = subMagic(x) &amp; exc_0 = null
-mod: {}
+mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of SimpleIntQuery.mainWithSymbolicUpdates(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 

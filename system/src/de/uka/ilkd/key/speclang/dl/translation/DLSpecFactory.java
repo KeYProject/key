@@ -331,7 +331,8 @@ public final class DLSpecFactory {
 					 null,// TODO measured_by in DL contracts not supported yet
 					 posts,
 					 null, // TODO no model methods in DL contracts
-					 mods, 
+					 mods,
+					 new LinkedHashMap<ProgramVariable,Term>(),
 					 hasMod, // TODO strictly pure in DL contracts not supported yet
 					 selfVar, 
 					 paramVars, 

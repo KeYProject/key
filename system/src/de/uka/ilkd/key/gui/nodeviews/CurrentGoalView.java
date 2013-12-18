@@ -57,17 +57,17 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 
     // the mouse/mouseMotion listener
     protected SequentViewListener listener;
-    
+
     // an object that detects opening and closing of an Taclet instantiation dialog
     private GUIListener guiListener;
-    
+
     // enables this component to be a Drag Source
     DragSource dragSource = null;
 
     private static final Insets autoScrollSensitiveRegion = new Insets(20,20,20,20);
     private final Vector<Object> updateHighlights;
-    
-        
+
+
     /** 
      * creates a viewer for a sequent 
      * @param mediator the KeYMediator allowing access to the
@@ -142,7 +142,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         updateHighlights = new Vector<Object>();
 
     }
-    
+
      /**
      * updates all updateHighlights. Firstly removes all displayed ones and
      * then gets a new list of updates to highlight
@@ -165,7 +165,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
             }
         }
     }
-    
+
     protected DragSource getDragSource() {
 	return dragSource;
     }
@@ -212,16 +212,16 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 	addMouseListener(listener);        
 	repaint();
     }
-    
+
     // last highlighted caret position
     private int lastHighlightedCaretPos;
-    
+
     @Override
     public void highlight(Point p) {
         super.highlight(p);
         lastHighlightedCaretPos = correctedViewToModel(p);
     }
-    
+
     /** makes the last caret position visible (if possible) */
     public void restorePosition() {
 	int lastHighlightedCaretPosTmp = lastHighlightedCaretPos;
@@ -230,14 +230,14 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 	    setCaretPosition(lastHighlightedCaretPosTmp);
 	}
     }
-    
+
     /** sets the LogicPrinter to use in case there is no proof available.
      * @param sp the LogicPrinter that is used
      */
     public void setPrinterNoProof() {
-    	setLogicPrinter(new LogicPrinter(new ProgramPrinter(null), null, null));
+        setLogicPrinter(new LogicPrinter(new ProgramPrinter(null), null, null));
     }
-    
+
     /** sets the LogicPrinter to use
      * @param sp the LogicPrinter that is used
      * @param f the SequentPrintFilter that is used
@@ -283,9 +283,9 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      * @param allowDragNDrop enables drag'n'drop iff set to true.
      */
     public synchronized void setModalDragNDropEnabled(boolean allowDragNDrop){
-	    listener.setModalDragNDropEnabled(allowDragNDrop);
-	}
-    
+        listener.setModalDragNDropEnabled(allowDragNDrop);
+    }
+
     /**
      * Checks whether drag'n'drop of highlighted subterms in the sequent window
      * currently is enabled..
@@ -298,7 +298,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     public PosInSequent getMousePosInSequent() {
        return getPosInSequent(getMousePosition());
     }
-    
+
     /**
      * used for autoscrolling when performing drag and drop actions.
      * Computes the rectangle to be made visible. 
@@ -330,5 +330,4 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     public String getTitle() {
         return "Current Goal";
     }
-
 }

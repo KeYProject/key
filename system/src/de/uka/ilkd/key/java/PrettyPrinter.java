@@ -430,7 +430,7 @@ public class PrettyPrinter {
 
     /**
        Replace all unicode characters above ?
-       by their explicite representation.
+       by their explicit representation.
        @param str the input string.
        @return the encoded string.
     */

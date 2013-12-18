@@ -200,12 +200,12 @@ options {
 ;
 
 LT_IMPLICIT_GT_DISPATCH
-    :   
+    :
       LT (LETTER)+ GT {$setType(IDENT);}
     |
       LT {$setType(LT);}
-    | 
-      GT {$setType(GT);}     
+    |
+      GT {$setType(GT);}
     ;
 
 LPAREN
