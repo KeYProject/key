@@ -24,31 +24,30 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.Pair;
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class ExhaustiveProofMacro implements ProofMacro {
 
-    /** Cache for those nodes which have already been checked whether
-        a given macro can be applied on them or not. */
-    private static Map<Pair<ProofMacro, Node>, PosInOccurrence> isApplicalbeOnNode =
-            new HashMap<Pair<ProofMacro, Node>, PosInOccurrence>();
+    /** Cache for nodes which have already been checked for an applicable
+        position. */
+    private Map<Node, PosInOccurrence> applicalbeOnNodeAtPos =
+            new HashMap<Node, PosInOccurrence>();
 
-    private static PosInOccurrence getApplicablePosInOcc(KeYMediator mediator,
+    private PosInOccurrence getApplicablePosInOcc(KeYMediator mediator,
                                                          PosInOccurrence posInOcc,
                                                          ProofMacro macro) {
-        if (posInOcc == null
-                || posInOcc.subTerm() == null) {
+        if (posInOcc == null || posInOcc.subTerm() == null) {
             return null;
         } else if (macro.canApplyTo(mediator, posInOcc)) {
             return posInOcc;
+        } else {
+            Term subTerm = posInOcc.subTerm();
+            for (int i = 0; i < subTerm.arity(); i++) {
+                return getApplicablePosInOcc(mediator, posInOcc.down(i), macro);
+            }
+            return null;
         }
-        Term subTerm = posInOcc.subTerm();
-        for (int i = 0; i < subTerm.arity(); i++) {
-            return getApplicablePosInOcc(mediator, posInOcc.down(i), macro);
-        }
-        return null;
     }
 
     @Override
@@ -66,23 +65,26 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
         for (Goal goal : proof.openGoals()) {
             mediator.getSelectionModel().setSelectedGoal(goal);
             final Sequent seq = goal.sequent();
-            final Pair macroNodePair = new Pair(macro, goal.node());
-            for (int i = 1; i <= seq.size(); i++) {
-                if (!isApplicalbeOnNode.containsKey(macroNodePair)) {
+            if (!applicalbeOnNodeAtPos.containsKey(goal.node())) {
+                // node has not been checked before, so do it
+                for (int i = 1; i <= seq.size() &&
+                                applicalbeOnNodeAtPos.get(goal.node()) == null; i++) {
+                    PosInOccurrence searchPos =
+                            PosInOccurrence.findInSequent(seq, i, PosInTerm.TOP_LEVEL);
                     PosInOccurrence applicableAt =
-                            getApplicablePosInOcc(mediator,
-                                                 PosInOccurrence.findInSequent(seq, i, PosInTerm.TOP_LEVEL),
-                                                 macro);
-                    isApplicalbeOnNode.put(macroNodePair, applicableAt);
-                }
-                if (isApplicalbeOnNode.get(macroNodePair) != null) {
-                    if (savedSelectedGoal != null) {
-                        mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
-                    }
-                    return true;
+                            getApplicablePosInOcc(mediator, searchPos, macro);
+                    applicalbeOnNodeAtPos.put(goal.node(), applicableAt);
                 }
             }
+            if (applicalbeOnNodeAtPos.get(goal.node()) != null) {
+                // applicable position found
+                if (savedSelectedGoal != null) {
+                    mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
+                }
+                return true;
+            }
         }
+        // no applicable postition found
         if (savedSelectedGoal != null) {
             mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
         }
@@ -99,23 +101,23 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
             mediator.getSelectionModel().setSelectedGoal(goal);
             final Sequent seq = goal.sequent();
             final ProofMacro macro = getProofMacro();
-            final Pair macroNodePair = new Pair(macro, goal.node());
-            PosInOccurrence searchPos;
-            for (int i = 1; i <= seq.size(); i++) {
-                if (!isApplicalbeOnNode.containsKey(macroNodePair)) {
-                    searchPos = PosInOccurrence.findInSequent(seq, i, PosInTerm.TOP_LEVEL);
-                    PosInOccurrence applicableAt =
-                            getApplicablePosInOcc(mediator, searchPos, macro);
-                    isApplicalbeOnNode.put(macroNodePair, applicableAt);
-                }
-                if (isApplicalbeOnNode.get(macroNodePair) != null) {
-                    PosInOccurrence pos = isApplicalbeOnNode.get(macroNodePair);
-                    macro.applyTo(mediator, pos, listener);
-                    if (savedSelectedGoal != null) {
-                        mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
-                    }
+            if (!applicalbeOnNodeAtPos.containsKey(goal.node())) {
+                // node has not been checked before, so do it
+                boolean canBeApplied = canApplyTo(mediator, posInOcc);
+                if (!canBeApplied) {
+                    // canApplyTo checks all open goals. thus, if it returns
+                    // false, then this macro is not applicable at all and
+                    // we can return
                     return;
                 }
+            }
+            PosInOccurrence applicableAt = applicalbeOnNodeAtPos.get(goal.node());
+            if (applicableAt != null) {
+                macro.applyTo(mediator, applicableAt, listener);
+                if (savedSelectedGoal != null) {
+                    mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
+                }
+                return;
             }
         }
         if (savedSelectedGoal != null) {
