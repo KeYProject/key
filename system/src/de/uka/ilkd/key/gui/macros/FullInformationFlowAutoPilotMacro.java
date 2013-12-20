@@ -38,7 +38,7 @@ public class FullInformationFlowAutoPilotMacro extends
                     @Override
                     ProofMacro getProofMacro() { return new AuxiliaryComputationAutoPilotMacro(); }
         };
-        final SequentialProofMacro stateExpansionMacro = new SequentialProofMacro() {
+        final SequentialProofMacro stateExpansionAndCloseMacro = new SequentialProofMacro() {
             @Override
             protected ProofMacro[] createProofMacroArray() {
                 return new ProofMacro[] {new StateExpansionAndInfFlowContractApplicationMacro(),
@@ -49,18 +49,18 @@ public class FullInformationFlowAutoPilotMacro extends
             @Override
             public String getDescription() { return "Anonymous Macro"; }
         };
-        final SequentialProofMacro fullmainCompMacro =
+        final SequentialProofMacro finishMainCompMacro =
                 new SequentialOnLastGoalProofMacro() {
             @Override
             protected ProofMacro[] createProofMacroArray() {
                 return new ProofMacro[] {new FinishAuxiliaryComputationMacro(),
-                                         stateExpansionMacro};}
+                                         stateExpansionAndCloseMacro};}
             @Override
             public String getName() { return "Anonymous Macro"; }
             @Override
             public String getDescription() { return "Anonymous Macro"; }
         };
-        AlternativeProofMacro exhaustiveCompMacro =
+        AlternativeProofMacro alternativesMacro =
                 new AlternativeProofMacro() {
                     @Override
                     public String getName() { return "Anonymous Macro"; }
@@ -69,8 +69,8 @@ public class FullInformationFlowAutoPilotMacro extends
                     @Override
                     protected ProofMacro[] createProofMacroArray() {
                         return new ProofMacro[] {exhaustiveAutoPilotMacro,
-                                                 fullmainCompMacro};}
+                                                 finishMainCompMacro};}
         };
-        return new DoWhileElseMacro(exhaustiveCompMacro, NUMBER_OF_TRY_STEPS);
+        return new DoWhileElseMacro(alternativesMacro, NUMBER_OF_TRY_STEPS);
     }
 }
