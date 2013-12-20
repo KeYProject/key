@@ -529,7 +529,7 @@ final class JMLTranslator {
                     ImmutableList<QuantifiableVariable> qvs, Term range,
                     Term body) {
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
-                return TB.sum(qvs, TB.and(tr,range), body, services);
+                return TB.sum(qvs, TB.andSC(tr,range), body, services);
             }
 
         });
@@ -552,7 +552,7 @@ final class JMLTranslator {
                     ImmutableList<QuantifiableVariable> qvs, Term range,
                     Term body) {
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
-                return TB.prod(qvs, TB.and(tr,range), body, services);
+                return TB.prod(qvs, TB.andSC(tr,range), body, services);
             }
 
         });
@@ -603,7 +603,7 @@ final class JMLTranslator {
                 if (body.sort() != intSort)
                     throw excManager.createException("body of \\min expression must be integer type");
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
-                final Term min = TB.min(qvs, TB.and(guard, tr), body, services);
+                final Term min = TB.min(qvs, TB.andSC(tr, guard), body, services);
                 final KeYJavaType type = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 
                 final SLExpression result = new SLExpression(min,type);
@@ -656,7 +656,7 @@ final class JMLTranslator {
                 if (body.sort() != intSort)
                     throw excManager.createException("body of \\max expression must be integer type");
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
-                final Term max = TB.max(qvs, TB.and(guard, tr), body, services);
+                final Term max = TB.max(qvs, TB.andSC(tr, guard), body, services);
                 final KeYJavaType type = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 
                 final SLExpression result = new SLExpression(max,type);
@@ -731,7 +731,7 @@ final class JMLTranslator {
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
                 final Term cond = TB.ife(TB.convertToFormula(body, services),
                         TB.one(services), TB.zero(services));
-                return TB.sum(qvs, TB.and(tr,range), cond, services);
+                return TB.sum(qvs, TB.andSC(tr,range), cond, services);
             }
 
         });
