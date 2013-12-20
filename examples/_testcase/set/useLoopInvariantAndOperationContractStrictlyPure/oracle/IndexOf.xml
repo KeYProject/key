@@ -135,7 +135,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                            <operationContract name="result_0 = var.equals(var_1, var_2) catch(exc_5)
 pre: var.&lt;inv&gt; &amp; (!var_1 = null &amp; !var_2 = null)
 post: var.&lt;inv&gt; &amp; exc_5 = null
-mod: {}, creates no new objects
+mod: empty, creates no new objects
 termination: diamond" pathCondition="   null.length &gt;= 0 &amp; array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
