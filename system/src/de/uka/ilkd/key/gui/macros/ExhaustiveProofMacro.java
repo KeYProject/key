@@ -10,7 +10,6 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 package de.uka.ilkd.key.gui.macros;
 
 import javax.swing.KeyStroke;
@@ -27,16 +26,18 @@ import de.uka.ilkd.key.proof.Proof;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public abstract class ExhaustiveProofMacro implements ProofMacro {
 
     /** Cache for nodes which have already been checked for an applicable
-        position. */
+     * position. */
     private Map<Node, PosInOccurrence> applicalbeOnNodeAtPos =
             new HashMap<Node, PosInOccurrence>();
 
+
     private PosInOccurrence getApplicablePosInOcc(KeYMediator mediator,
-                                                         PosInOccurrence posInOcc,
-                                                         ProofMacro macro) {
+                                                  PosInOccurrence posInOcc,
+                                                  ProofMacro macro) {
         if (posInOcc == null || posInOcc.subTerm() == null) {
             return null;
         } else if (macro.canApplyTo(mediator, posInOcc)) {
@@ -50,18 +51,54 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
         }
     }
 
+
     @Override
-    public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(KeYMediator mediator,
+                              PosInOccurrence posInOcc) {
         final ProofMacro macro = getProofMacro();
+
         assert macro != null;
         assert mediator != null;
         assert mediator.getSelectionModel() != null;
-        final Proof proof = mediator.getSelectedProof();
-        if (proof == null) {
+
+        if (mediator.getSelectedProof() == null) {
             // can happen during initialisation
             return false;
         }
-        Goal savedSelectedGoal  = mediator.getSelectedGoal();
+
+        // stop interface, because the following changes of the goals should
+        // not be observable in the interface
+        // --> didn't work...
+//        mediator.stopInterface(true);
+//        mediator.setInteractive(false);
+
+        // save the original selected goal and the original selected node
+        Goal savedSelectedGoal = mediator.getSelectedGoal();
+        Node savedSelectedNode = mediator.getSelectedNode();
+
+        // check whether macro can be applied
+        boolean isApplicable = canApplyToWorker(mediator, posInOcc, macro);
+
+        // restart interface
+//        mediator.startInterface(true);
+//        mediator.setInteractive(true);
+
+        // restore the original selected goal and the original selected node
+        if (savedSelectedGoal != null) {
+            mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
+        }
+        if (savedSelectedNode != null) {
+            mediator.getSelectionModel().setSelectedNode(savedSelectedNode);
+        }
+
+        return isApplicable;
+    }
+
+
+    public boolean canApplyToWorker(KeYMediator mediator,
+                                    PosInOccurrence posInOcc,
+                                    ProofMacro macro) {
+        final Proof proof = mediator.getSelectedProof();
         for (Goal goal : proof.openGoals()) {
             mediator.getSelectionModel().setSelectedGoal(goal);
             final Sequent seq = goal.sequent();
@@ -78,25 +115,42 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
             }
             if (applicalbeOnNodeAtPos.get(goal.node()) != null) {
                 // applicable position found
-                if (savedSelectedGoal != null) {
-                    mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
-                }
                 return true;
             }
         }
         // no applicable postition found
-        if (savedSelectedGoal != null) {
-            mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
-        }
         return false;
     }
+
 
     @Override
     public void applyTo(KeYMediator mediator,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
         final Proof proof = mediator.getSelectedProof();
-        Goal savedSelectedGoal  = mediator.getSelectedGoal();
+
+        // save the original selected goal and the original selected node
+        Goal savedSelectedGoal = mediator.getSelectedGoal();
+        Node savedSelectedNode = mediator.getSelectedNode();
+
+        // apply macro
+        applyToWorker(mediator, posInOcc, listener);
+
+        // restore the original selected goal and the original selected node
+        if (savedSelectedGoal != null) {
+            mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
+        }
+        if (savedSelectedNode != null) {
+            mediator.getSelectionModel().setSelectedNode(savedSelectedNode);
+        }
+    }
+
+
+    public void applyToWorker(KeYMediator mediator,
+                              PosInOccurrence posInOcc,
+                              ProverTaskListener listener) throws InterruptedException {
+        final Proof proof = mediator.getSelectedProof();
+
         for (Goal goal : proof.openGoals()) {
             mediator.getSelectionModel().setSelectedGoal(goal);
             final Sequent seq = goal.sequent();
@@ -111,26 +165,23 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
                     return;
                 }
             }
-            PosInOccurrence applicableAt = applicalbeOnNodeAtPos.get(goal.node());
+            PosInOccurrence applicableAt =
+                    applicalbeOnNodeAtPos.get(goal.node());
             if (applicableAt != null) {
                 macro.applyTo(mediator, applicableAt, listener);
-                if (savedSelectedGoal != null) {
-                    mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
-                }
                 return;
             }
         }
-        if (savedSelectedGoal != null) {
-            mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
-        }
     }
+
 
     /**
      * Gets the proof macros.
-     *
+     * <p/>
      * @return the proofMacro.
      */
     abstract ProofMacro getProofMacro();
+
 
     @Override
     public KeyStroke getKeyStroke() {
