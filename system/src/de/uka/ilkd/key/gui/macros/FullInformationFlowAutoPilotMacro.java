@@ -1,7 +1,11 @@
 package de.uka.ilkd.key.gui.macros;
 
-public class FullInformationFlowAutoPilotMacro extends
-        ExhaustiveProofMacro {
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import javax.swing.KeyStroke;
+
+public class FullInformationFlowAutoPilotMacro implements ProofMacro {
 
     /**
      * The number of proof steps that should be run by the {@link TryCloseMacro}
@@ -9,6 +13,12 @@ public class FullInformationFlowAutoPilotMacro extends
      * greater or equal to 0.
      */
     private static final int NUMBER_OF_TRY_STEPS = -1;
+
+    private final ProofMacro wrappedMacro;
+
+    public FullInformationFlowAutoPilotMacro() {
+        wrappedMacro = createProofMacro();
+    }
 
     @Override
     public String getName() {
@@ -27,8 +37,7 @@ public class FullInformationFlowAutoPilotMacro extends
                 "<li>Try to close as many goals as possible</ol>";
     }
 
-    @Override
-    ProofMacro getProofMacro() {
+    private ProofMacro createProofMacro() {
         final ExhaustiveProofMacro exhaustiveAutoPilotMacro =
                 new ExhaustiveProofMacro() {
                     @Override
@@ -72,5 +81,26 @@ public class FullInformationFlowAutoPilotMacro extends
                                                  finishMainCompMacro};}
         };
         return new DoWhileElseMacro(alternativesMacro, NUMBER_OF_TRY_STEPS);
+    }
+
+
+    @Override
+    public boolean canApplyTo(KeYMediator mediator,
+                              PosInOccurrence posInOcc) {
+        return wrappedMacro.canApplyTo(mediator, posInOcc);
+    }
+
+
+    @Override
+    public void applyTo(KeYMediator mediator,
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) throws InterruptedException {
+        wrappedMacro.applyTo(mediator, posInOcc, listener);
+    }
+
+
+    @Override
+    public KeyStroke getKeyStroke() {
+        return null;  // default implementation
     }
 }
