@@ -1957,9 +1957,13 @@ final class JMLTranslator {
             ImmutableList<LogicVariable> declVars =
                     (ImmutableList<LogicVariable>) params[3];
             boolean nullable = (Boolean) params[4];
-            final KeYJavaType resultType = (KeYJavaType) params[5];
+            KeYJavaType resultType = (KeYJavaType) params[5];
             services = (Services) params[6];
             assert services != null;
+            if (resultType == null) {
+                // quick fix. may happen with \num_of
+                resultType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+            }
 
             Term nullTerm = TB.NULL(services);
             for (LogicVariable lv : declVars) {
