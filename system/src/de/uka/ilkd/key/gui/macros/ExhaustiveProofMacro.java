@@ -22,9 +22,18 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.Pair;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class ExhaustiveProofMacro implements ProofMacro {
+
+    /** Cache for those nodes which have already been checked whether
+        a given macro can be applied on them or not. */
+    private static Map<Pair<ProofMacro, Node>, PosInOccurrence> isApplicableOnNode =
+            new HashMap<Pair<ProofMacro, Node>, PosInOccurrence>();
 
     private static PosInOccurrence getApplicablePosInOcc(KeYMediator mediator,
                                                          PosInOccurrence posInOcc,
@@ -36,10 +45,11 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
             return posInOcc;
         }
         Term subTerm = posInOcc.subTerm();
-        for (int i = 0; i < subTerm.arity(); i++) {
-            return getApplicablePosInOcc(mediator, posInOcc.down(i), macro);
+        PosInOccurrence res = null;
+        for (int i = 0; i < subTerm.arity() && res == null; i++) {
+            res = getApplicablePosInOcc(mediator, posInOcc.down(i), macro);
         }
-        return null;
+        return res;
     }
 
     @Override
@@ -54,13 +64,21 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
             return false;
         }
         Goal savedSelectedGoal  = mediator.getSelectedGoal();
-        for (Goal goal : proof.openGoals()) {
+        for (final Goal goal : proof.openGoals()) {
             mediator.getSelectionModel().setSelectedGoal(goal);
             final Sequent seq = goal.sequent();
+            final Pair<ProofMacro, Node> macroNodePair =
+                    new Pair<ProofMacro, Node>(macro, goal.node());
             for (int i = 1; i <= seq.size(); i++) {
-                if (getApplicablePosInOcc(mediator,
-                                          PosInOccurrence.findInSequent(seq, i, PosInTerm.TOP_LEVEL),
-                                          macro) != null) {
+                if (!isApplicableOnNode.containsKey(macroNodePair)) {
+                    final PosInOccurrence applicableAt =
+                            getApplicablePosInOcc(
+                                    mediator,
+                                    PosInOccurrence.findInSequent(seq, i, PosInTerm.TOP_LEVEL),
+                                    macro);
+                    isApplicableOnNode.put(macroNodePair, applicableAt);
+                }
+                if (isApplicableOnNode.get(macroNodePair) != null) {
                     if (savedSelectedGoal != null) {
                         mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
                     }
@@ -84,11 +102,18 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
             mediator.getSelectionModel().setSelectedGoal(goal);
             final Sequent seq = goal.sequent();
             final ProofMacro macro = getProofMacro();
+            final Pair<ProofMacro, Node> macroNodePair =
+                    new Pair<ProofMacro, Node>(macro, goal.node());
             PosInOccurrence searchPos;
             for (int i = 1; i <= seq.size(); i++) {
-                searchPos = PosInOccurrence.findInSequent(seq, i, PosInTerm.TOP_LEVEL);
-                PosInOccurrence pos = getApplicablePosInOcc(mediator, searchPos, macro);
-                if (pos != null) {
+                if (!isApplicableOnNode.containsKey(macroNodePair)) {
+                    searchPos = PosInOccurrence.findInSequent(seq, i, PosInTerm.TOP_LEVEL);
+                    PosInOccurrence applicableAt =
+                            getApplicablePosInOcc(mediator, searchPos, macro);
+                    isApplicableOnNode.put(macroNodePair, applicableAt);
+                }
+                if (isApplicableOnNode.get(macroNodePair) != null) {
+                    final PosInOccurrence pos = isApplicableOnNode.get(macroNodePair);
                     macro.applyTo(mediator, pos, listener);
                     if (savedSelectedGoal != null) {
                         mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
