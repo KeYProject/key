@@ -560,6 +560,31 @@ final class JMLTranslator {
         translationMethods.put(JMLKeyWord.MIN,
                                new JMLTranslationMethod() {
 
+
+            // TODO: make subtype of JMLBoundedNumericalQuantifierTranslationMethod and remove this
+            private Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
+                final Type type = kjt.getJavaType();
+                Term res = TB.tt();
+                for (QuantifiableVariable qv: qvs) {
+                    if (type instanceof PrimitiveType) {
+                        if (type == PrimitiveType.JAVA_BYTE) res = TB.and(res,TB.inByte(TB.var(qv),services));
+                        if (type == PrimitiveType.JAVA_SHORT) res = TB.and(res,TB.inShort(TB.var(qv),services));
+                        if (type == PrimitiveType.JAVA_CHAR) res = TB.and(res,TB.inChar(TB.var(qv),services));
+                        if (type == PrimitiveType.JAVA_INT) res = TB.and(res,TB.inInt(TB.var(qv),services));
+                        if (type == PrimitiveType.JAVA_LONG) res = TB.and(res,TB.inLong(TB.var(qv),services));
+                    } else {
+                        // assume reference type
+                        if (nullable) {
+                            res = TB.and(res,TB.created(services, TB.var(qv)));
+                        } else {
+                            res = TB.and(res,TB.createdAndNotNull(services, TB.var(qv)));
+                        }
+                    }
+                }
+                return res;
+            }
+
+            
             @Override
             public Object translate(
                     SLTranslationExceptionManager excManager,
@@ -570,16 +595,18 @@ final class JMLTranslator {
                 Term guard = TB.convertToFormula((Term) params[0],services);
                 assert guard.sort() == Sort.FORMULA;
                 final Term body = (Term) params[1];
-                final KeYJavaType type = (KeYJavaType) params[2];
+                final KeYJavaType declsType = (KeYJavaType) params[2];
+                final boolean nullable = (Boolean) params[4];
                 @SuppressWarnings("unchecked")
                 final ImmutableList<QuantifiableVariable> qvs = (ImmutableList<QuantifiableVariable>) params[3];
                 final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
                 if (body.sort() != intSort)
                     throw excManager.createException("body of \\min expression must be integer type");
-                final Term min = TB.min(qvs, guard, body, type, services);
-                final JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper(services, excManager);
+                final Term tr = typerestrict(declsType,nullable,qvs,services);
+                final Term min = TB.min(qvs, TB.and(guard, tr), body, services);
+                final KeYJavaType type = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 
-                final SLExpression result = jish.buildCastExpression((KeYJavaType)params[5], new SLExpression(min,type));
+                final SLExpression result = new SLExpression(min,type);
 
                 return result;
             }
@@ -589,26 +616,50 @@ final class JMLTranslator {
         translationMethods.put(JMLKeyWord.MAX,
                 new JMLTranslationMethod() {
 
+            // TODO: make subtype of JMLBoundedNumericalQuantifierTranslationMethod and remove this
+            private Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
+                final Type type = kjt.getJavaType();
+                Term res = TB.tt();
+                for (QuantifiableVariable qv: qvs) {
+                    if (type instanceof PrimitiveType) {
+                        if (type == PrimitiveType.JAVA_BYTE) res = TB.and(res,TB.inByte(TB.var(qv),services));
+                        if (type == PrimitiveType.JAVA_SHORT) res = TB.and(res,TB.inShort(TB.var(qv),services));
+                        if (type == PrimitiveType.JAVA_CHAR) res = TB.and(res,TB.inChar(TB.var(qv),services));
+                        if (type == PrimitiveType.JAVA_INT) res = TB.and(res,TB.inInt(TB.var(qv),services));
+                        if (type == PrimitiveType.JAVA_LONG) res = TB.and(res,TB.inLong(TB.var(qv),services));
+                    } else {
+                        // assume reference type
+                        if (nullable) {
+                            res = TB.and(res,TB.created(services, TB.var(qv)));
+                        } else {
+                            res = TB.and(res,TB.createdAndNotNull(services, TB.var(qv)));
+                        }
+                    }
+                }
+                return res;
+            }
+            
             @Override
             public Object translate(
                     SLTranslationExceptionManager excManager,
                     Object... params)
                             throws SLTranslationException {
-                checkParameters(params, Term.class, Term.class, KeYJavaType.class, ImmutableList.class, Boolean.class, Services.class);
+                checkParameters(params, Term.class, Term.class, KeYJavaType.class, ImmutableList.class, Boolean.class, KeYJavaType.class, Services.class);
                 final Services services = (Services) params[6];
                 Term guard = TB.convertToFormula((Term) params[0],services);
                 final Term body = (Term) params[1];
-                final KeYJavaType type = (KeYJavaType) params[2];
+                final KeYJavaType declsType = (KeYJavaType) params[2];
+                final boolean nullable = (Boolean) params[4];
                 @SuppressWarnings("unchecked")
                 final ImmutableList<QuantifiableVariable> qvs = (ImmutableList<QuantifiableVariable>) params[3];
                 final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
                 if (body.sort() != intSort)
                     throw excManager.createException("body of \\max expression must be integer type");
-                final Term max = TB.max(qvs, guard, body, type, services);
+                final Term tr = typerestrict(declsType,nullable,qvs,services);
+                final Term max = TB.max(qvs, TB.and(guard, tr), body, services);
+                final KeYJavaType type = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 
-                final JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper(services, excManager);
-
-                final SLExpression result = jish.buildCastExpression((KeYJavaType)params[5], new SLExpression(max,type));
+                final SLExpression result = new SLExpression(max,type);
 
                 return result;
             }

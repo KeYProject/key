@@ -578,99 +578,28 @@ public class TermBuilder {
         return res;
     }
 
-    /** Translation of JML's \min operator using \ifEx operator. */
-    public Term min(ImmutableList<QuantifiableVariable> qvs, Term guard, Term t, KeYJavaType type, Services services) {
-        final TypeConverter tc = services.getTypeConverter();
-        final KeYJavaType longType = tc.getKeYJavaType(PrimitiveType.JAVA_LONG);
-        final KeYJavaType bigintType = tc.getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 
-
-        final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-        Term origGuard = guard;
-        ImmutableList<QuantifiableVariable> xs = ImmutableSLList.nil();
-        ImmutableList<Term> xvars = ImmutableSLList.nil();
-        Term body = tt();
-        Term qvsInInt = tt();
-        Term tx = t;
-
-        for (QuantifiableVariable qv: qvs){
-            // prepare forall part
-            final QuantifiableVariable x = new LogicVariable(
-                    new Name("_"+qv.name().toString()),qv.sort());
-            xs = xs.append(x);
-            final Term xvar = var(x);
-            xvars = xvars.append(xvar);
-            guard = subst(qv, xvar, guard);
-            tx = subst(qv, xvar, tx);
-            if (type == longType) {
-                body = and(inLong(xvar,services),body);
-            } else if (type != bigintType && qv.sort() == tc.getIntegerLDT().targetSort()) {
-                body = and(inInt(xvar,services),body);
-            }
-
-            // prepare terms for quantified variables
-            final Term qvar = var(qv);
-            if (type == longType) {
-                origGuard = and(inLong(qvar,services),origGuard);
-            } else if (type != bigintType && qv.sort() == tc.getIntegerLDT().targetSort()) {
-                origGuard = and(inInt(qvar,services),origGuard);
-            }
+    /** minimum operator */
+    public Term min (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, Services services) {
+        final Function min = (Function)services.getNamespaces().functions().lookup("min");
+        final Iterator<QuantifiableVariable> it = qvs.iterator();
+        Term res = func(min, new Term[]{convertToBoolean(range, services), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        while (it.hasNext()) {
+            res = func(min, new Term[]{TRUE(services), res}, new ImmutableArray<QuantifiableVariable>(it.next()));
         }
-        body = and(body,guard);
-        final Term forall = all(xs, imp(body, leq(t, tx, services)));
-        final Term minForm = and(qvsInInt, origGuard, forall);
-
-        final Term undef = label(func(new Function(new Name("undefMin"), intSort)),
-                                 ParameterlessTermLabel.UNDEFINED_VALUE_LABEL);
-        return ifEx(qvs, minForm, t, undef);
+        return res;
     }
 
 
-    /** Translation of JML's \max operator using \ifEx operator. */
-    public Term max(ImmutableList<QuantifiableVariable> qvs, Term guard, Term t, KeYJavaType type, Services services) {
-        final TypeConverter tc = services.getTypeConverter();
-        final KeYJavaType longType = tc.getKeYJavaType(PrimitiveType.JAVA_LONG);
-        final KeYJavaType bigintType = tc.getKeYJavaType(PrimitiveType.JAVA_BIGINT);
-
-
-        final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-        Term origGuard = guard;
-        ImmutableList<QuantifiableVariable> xs = ImmutableSLList.nil();
-        ImmutableList<Term> xvars = ImmutableSLList.nil();
-        Term body = tt();
-        Term qvsInInt = tt();
-        Term tx = t;
-
-        for (QuantifiableVariable qv: qvs){
-            // prepare forall part
-            final QuantifiableVariable x = new LogicVariable(
-                    new Name("_"+qv.name().toString()),qv.sort());
-            xs = xs.append(x);
-            final Term xvar = var(x);
-            xvars = xvars.append(xvar);
-            guard = subst(qv, xvar, guard);
-            tx = subst(qv, xvar, tx);
-            if (type == longType) {
-                body = and(inLong(xvar,services),body);
-            } else if (type != bigintType && qv.sort() == tc.getIntegerLDT().targetSort()) {
-                body = and(inInt(xvar,services),body);
-            }
-
-            // prepare terms for quantified variables
-            final Term qvar = var(qv);
-            if (type == longType) {
-                origGuard = and(inLong(qvar,services),origGuard);
-            } else if (type != bigintType && qv.sort() == tc.getIntegerLDT().targetSort()) {
-                origGuard = and(inInt(qvar,services),origGuard);
-            }
+    /** minimum operator */
+    public Term max (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, Services services) {
+        final Function max = (Function)services.getNamespaces().functions().lookup("max");
+        final Iterator<QuantifiableVariable> it = qvs.iterator();
+        Term res = func(max, new Term[]{convertToBoolean(range, services), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        while (it.hasNext()) {
+            res = func(max, new Term[]{TRUE(services), res}, new ImmutableArray<QuantifiableVariable>(it.next()));
         }
-        body = and(body,guard);
-        final Term forall = all(xs, imp(body, geq(t, tx, services)));
-        final Term maxForm = and(qvsInInt, origGuard, forall);
-
-        final Term undef = label(func(new Function(new Name("undefMax"), intSort)),
-                                 ParameterlessTermLabel.UNDEFINED_VALUE_LABEL);
-        return ifEx(qvs, maxForm, t, undef);
+        return res;
     }
 
 
