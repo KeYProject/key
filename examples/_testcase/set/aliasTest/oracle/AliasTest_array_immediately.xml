@@ -3,60 +3,60 @@
    <methodCall name="self.array(w,array);" pathCondition="true" pathConditionChanged="false">
       <statement name="w.value=1;" pathCondition="true" pathConditionChanged="false">
          <statement name="array[0].value=2;" pathCondition="true" pathConditionChanged="false">
-            <branchCondition name="!array[0] = w" pathCondition="!array[0] = w" pathConditionChanged="true" branchCondition="!array[0] = w" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <statement name="array[1].value=3;" pathCondition="!array[0] = w" pathConditionChanged="false">
-                  <branchCondition name="!array[1] = array[0]" pathCondition="!array[0] = w &amp; !array[1] = array[0]" pathConditionChanged="true" branchCondition="!array[1] = array[0]" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <branchCondition name="!array[1] = w" pathCondition="!array[0] = w &amp; !array[1] = w &amp; !array[1] = array[0]" pathConditionChanged="true" branchCondition="!array[1] = w" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <statement name="return w.value+array[0].value+array[1].value;" pathCondition="!array[0] = w &amp; !array[1] = w &amp; !array[1] = array[0]" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="!array[0] = w &amp; !array[1] = w &amp; !array[1] = array[0]" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 6 as result of self.array(w,array);&gt;" isReturnValueComputed="true">
-                              <methodReturnValue name="6" returnValueString="6" hasCondition="false">
+            <branchCondition name="not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w))" pathCondition="not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w))" pathConditionChanged="true" branchCondition="not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="array[1].value=3;" pathCondition="not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w))" pathConditionChanged="false">
+                  <branchCondition name="not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#))))))" pathCondition="and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))))" pathConditionChanged="true" branchCondition="not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <branchCondition name="not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w))" pathCondition="and(and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w))),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))))" pathConditionChanged="true" branchCondition="not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <statement name="return w.value+array[0].value+array[1].value;" pathCondition="and(and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w))),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))))" pathConditionChanged="false">
+                           <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="and(and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w))),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(6(#)) as result of self.array(w,array);&gt;" isReturnValueComputed="true">
+                              <methodReturnValue name="Z(6(#))" returnValueString="Z(6(#))" hasCondition="false">
                               </methodReturnValue>
-                              <termination name="&lt;end&gt;" pathCondition="!array[0] = w &amp; !array[1] = w &amp; !array[1] = array[0]" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                              <termination name="&lt;end&gt;" pathCondition="and(and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w))),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
                         </statement>
                      </branchCondition>
-                     <branchCondition name="array[1] = w" pathCondition="!array[0] = w &amp; array[1] = w &amp; !array[1] = array[0]" pathConditionChanged="true" branchCondition="array[1] = w" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <statement name="return w.value+array[0].value+array[1].value;" pathCondition="!array[0] = w &amp; array[1] = w &amp; !array[1] = array[0]" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="!array[0] = w &amp; array[1] = w &amp; !array[1] = array[0]" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 8 as result of self.array(w,array);&gt;" isReturnValueComputed="true">
-                              <methodReturnValue name="8" returnValueString="8" hasCondition="false">
+                     <branchCondition name="equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w)" pathCondition="and(and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w)),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))))" pathConditionChanged="true" branchCondition="equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <statement name="return w.value+array[0].value+array[1].value;" pathCondition="and(and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w)),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))))" pathConditionChanged="false">
+                           <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="and(and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w)),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(8(#)) as result of self.array(w,array);&gt;" isReturnValueComputed="true">
+                              <methodReturnValue name="Z(8(#))" returnValueString="Z(8(#))" hasCondition="false">
                               </methodReturnValue>
-                              <termination name="&lt;end&gt;" pathCondition="!array[0] = w &amp; array[1] = w &amp; !array[1] = array[0]" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                              <termination name="&lt;end&gt;" pathCondition="and(and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w)),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
                         </statement>
                      </branchCondition>
                   </branchCondition>
-                  <branchCondition name="array[1] = array[0]" pathCondition="!array[0] = w &amp; array[1] = array[0]" pathConditionChanged="true" branchCondition="array[1] = array[0]" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <statement name="return w.value+array[0].value+array[1].value;" pathCondition="!array[0] = w &amp; array[1] = array[0]" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="!array[0] = w &amp; array[1] = array[0]" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 7 as result of self.array(w,array);&gt;" isReturnValueComputed="true">
-                           <methodReturnValue name="7" returnValueString="7" hasCondition="false">
+                  <branchCondition name="equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))" pathCondition="and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#))))))" pathConditionChanged="true" branchCondition="equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <statement name="return w.value+array[0].value+array[1].value;" pathCondition="and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#))))))" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(7(#)) as result of self.array(w,array);&gt;" isReturnValueComputed="true">
+                           <methodReturnValue name="Z(7(#))" returnValueString="Z(7(#))" hasCondition="false">
                            </methodReturnValue>
-                           <termination name="&lt;end&gt;" pathCondition="!array[0] = w &amp; array[1] = array[0]" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           <termination name="&lt;end&gt;" pathCondition="and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>
                   </branchCondition>
                </statement>
             </branchCondition>
-            <branchCondition name="array[0] = w" pathCondition="array[0] = w" pathConditionChanged="true" branchCondition="array[0] = w" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <statement name="array[1].value=3;" pathCondition="array[0] = w" pathConditionChanged="false">
-                  <branchCondition name="!array[1] = w" pathCondition="array[0] = w &amp; !array[1] = w" pathConditionChanged="true" branchCondition="!array[1] = w" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <statement name="return w.value+array[0].value+array[1].value;" pathCondition="array[0] = w &amp; !array[1] = w" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="array[0] = w &amp; !array[1] = w" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 7 as result of self.array(w,array);&gt;" isReturnValueComputed="true">
-                           <methodReturnValue name="7" returnValueString="7" hasCondition="false">
+            <branchCondition name="equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)" pathCondition="equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)" pathConditionChanged="true" branchCondition="equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="array[1].value=3;" pathCondition="equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)" pathConditionChanged="false">
+                  <branchCondition name="not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w))" pathCondition="and(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w)))" pathConditionChanged="true" branchCondition="not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <statement name="return w.value+array[0].value+array[1].value;" pathCondition="and(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w)))" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="and(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(7(#)) as result of self.array(w,array);&gt;" isReturnValueComputed="true">
+                           <methodReturnValue name="Z(7(#))" returnValueString="Z(7(#))" hasCondition="false">
                            </methodReturnValue>
-                           <termination name="&lt;end&gt;" pathCondition="array[0] = w &amp; !array[1] = w" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           <termination name="&lt;end&gt;" pathCondition="and(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>
                   </branchCondition>
-                  <branchCondition name="array[1] = w" pathCondition="array[0] = w &amp; array[1] = w" pathConditionChanged="true" branchCondition="array[1] = w" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <statement name="return w.value+array[0].value+array[1].value;" pathCondition="array[0] = w &amp; array[1] = w" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="array[0] = w &amp; array[1] = w" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 9 as result of self.array(w,array);&gt;" isReturnValueComputed="true">
-                           <methodReturnValue name="9" returnValueString="9" hasCondition="false">
+                  <branchCondition name="equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w)" pathCondition="and(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w))" pathConditionChanged="true" branchCondition="equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <statement name="return w.value+array[0].value+array[1].value;" pathCondition="and(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w))" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="and(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(9(#)) as result of self.array(w,array);&gt;" isReturnValueComputed="true">
+                           <methodReturnValue name="Z(9(#))" returnValueString="Z(9(#))" hasCondition="false">
                            </methodReturnValue>
-                           <termination name="&lt;end&gt;" pathCondition="array[0] = w &amp; array[1] = w" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           <termination name="&lt;end&gt;" pathCondition="and(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>

@@ -2,14 +2,14 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main(instance);" pathCondition="true" pathConditionChanged="false">
       <statement name="return instance.x;" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="!instance = null" pathCondition="!instance = null" pathConditionChanged="true" branchCondition="!instance = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <methodReturn name="&lt;return of self.main(instance);&gt;" pathCondition="!instance = null" pathConditionChanged="false" isReturnValueComputed="false">
-               <termination name="&lt;end&gt;" pathCondition="!instance = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+         <branchCondition name="not(equals(instance,null))" pathCondition="not(equals(instance,null))" pathConditionChanged="true" branchCondition="not(equals(instance,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <methodReturn name="&lt;return of self.main(instance);&gt;" pathCondition="not(equals(instance,null))" pathConditionChanged="false" isReturnValueComputed="false">
+               <termination name="&lt;end&gt;" pathCondition="not(equals(instance,null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                </termination>
             </methodReturn>
          </branchCondition>
-         <branchCondition name="instance = null" pathCondition="instance = null" pathConditionChanged="true" branchCondition="instance = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="instance = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+         <branchCondition name="equals(instance,null)" pathCondition="equals(instance,null)" pathConditionChanged="true" branchCondition="equals(instance,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(instance,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
             </termination>
          </branchCondition>
       </statement>

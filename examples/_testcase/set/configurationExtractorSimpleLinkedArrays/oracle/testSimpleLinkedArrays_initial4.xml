@@ -2,12 +2,12 @@
 <model>
    <equivalenceClass representativeTerm="x">
       <term term="x"/>
-      <term term="x.next[0]"/>
-      <term term="x.next[0].next[0]"/>
+      <term term="SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next),arr(Z(0(#))))"/>
+      <term term="SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next),arr(Z(0(#)))),SimpleLinkedArrays::$next),arr(Z(0(#))))"/>
    </equivalenceClass>
-   <equivalenceClass representativeTerm="x.next">
-      <term term="x.next"/>
-      <term term="x.next[0].next"/>
+   <equivalenceClass representativeTerm="SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next)">
+      <term term="SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next)"/>
+      <term term="SimpleLinkedArrays[]::select(heap,SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next),arr(Z(0(#)))),SimpleLinkedArrays::$next)"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return x.value+x.next[0].value+x.next[0].next[0].value+x.next.length;">
       <association name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" target="o1"/>
@@ -15,8 +15,8 @@
    <object xml:id="o1" name="x" type="SimpleLinkedArrays">
       <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </object>
-   <object xml:id="o2" name="x.next" type="SimpleLinkedArrays[]">
-      <value name="length" programVariable="length" isArrayIndex="false" arrayIndex="-1" value="x.next.length" type="int"/>
+   <object xml:id="o2" name="SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next)" type="SimpleLinkedArrays[]">
+      <value name="length" programVariable="length" isArrayIndex="false" arrayIndex="-1" value="length(SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next))" type="int"/>
       <association name="[0]" isArrayIndex="true" arrayIndex="0" target="o1"/>
    </object>
 </model>

@@ -61,7 +61,6 @@ import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 
@@ -232,7 +231,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           proof = ui.createProof(initConfig, input);
        }
        // Create symbolic execution tree builder
-       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, settings.isMergeBranchConditions());
+       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, settings.isMergeBranchConditions(), true);
        builder.analyse();
        // Create environment used for symbolic execution
        return new SymbolicExecutionEnvironment<UserInterface>(ui, initConfig, builder);

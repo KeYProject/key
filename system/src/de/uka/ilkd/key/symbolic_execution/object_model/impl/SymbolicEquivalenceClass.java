@@ -19,7 +19,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
@@ -29,11 +29,11 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
  * Default implementation of {@link ISymbolicEquivalenceClass}.
  * @author Martin Hentschel
  */
-public class SymbolicEquivalenceClass implements ISymbolicEquivalenceClass {
+public class SymbolicEquivalenceClass extends AbstractElement implements ISymbolicEquivalenceClass {
    /**
     * The {@link Services} to use.
     */
-   private Services services;
+   private final Services services;
    
    /**
     * The contained {@link Term}s which represents the same {@link ISymbolicObject}.
@@ -43,17 +43,20 @@ public class SymbolicEquivalenceClass implements ISymbolicEquivalenceClass {
    /**
     * Constructor.
     * @param services The {@link Services} to use.
+    * @param settings The {@link IModelSettings} to use.
     */
-   public SymbolicEquivalenceClass(Services services) {
-      this(services, ImmutableSLList.<Term>nil());
+   public SymbolicEquivalenceClass(Services services, IModelSettings settings) {
+      this(services, ImmutableSLList.<Term>nil(), settings);
    }
 
    /**
     * Constructor.
     * @param services The {@link Services} to use.
     * @param terms The contained {@link Term}s which represents the same {@link ISymbolicObject}.
+    * @param settings The {@link IModelSettings} to use.
     */
-   public SymbolicEquivalenceClass(Services services, ImmutableList<Term> terms) {
+   public SymbolicEquivalenceClass(Services services, ImmutableList<Term> terms, IModelSettings settings) {
+      super(settings);
       this.services = services;
       this.terms = terms;
    }
@@ -89,8 +92,7 @@ public class SymbolicEquivalenceClass implements ISymbolicEquivalenceClass {
    public ImmutableList<String> getTermStrings() {
       ImmutableList<String> strings = ImmutableSLList.nil();
       for (Term term : terms) {
-         StringBuffer sb = ProofSaver.printTerm(term, services, true);
-         strings = strings.append(sb.toString());
+         strings = strings.append(formatTerm(term, services));
       }
       return strings;
    }
@@ -132,8 +134,7 @@ public class SymbolicEquivalenceClass implements ISymbolicEquivalenceClass {
    public String getRepresentativeString() {
       Term representative = getRepresentative();
       if (representative != null) {
-         StringBuffer sb = ProofSaver.printTerm(representative, services, true);
-         return sb.toString();
+         return formatTerm(representative, services);
       }
       else {
          return null;

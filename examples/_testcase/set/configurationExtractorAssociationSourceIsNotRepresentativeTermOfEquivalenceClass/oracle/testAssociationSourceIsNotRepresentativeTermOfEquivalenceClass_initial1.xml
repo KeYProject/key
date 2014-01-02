@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <equivalenceClass representativeTerm="current.right">
-      <term term="current.right"/>
-      <term term="current.right.left"/>
+   <equivalenceClass representativeTerm="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right)">
+      <term term="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right)"/>
+      <term term="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right),algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$left)"/>
    </equivalenceClass>
    <equivalenceClass representativeTerm="null">
-      <term term="current.parent"/>
+      <term term="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$parent)"/>
       <term term="null"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return current;">
@@ -16,7 +16,7 @@
       <value name="parent" programVariable="parent" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
       <association name="right" programVariable="right" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </object>
-   <object xml:id="o2" name="current.right" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node">
+   <object xml:id="o2" name="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right)" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node">
       <association name="left" programVariable="left" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </object>
    <object xml:id="o3" name="self" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass">

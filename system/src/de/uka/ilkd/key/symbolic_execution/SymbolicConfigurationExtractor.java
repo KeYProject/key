@@ -58,11 +58,13 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.AbstractSymbolicAssociationValueContainer;
+import de.uka.ilkd.key.symbolic_execution.object_model.impl.ModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicConfiguration;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicEquivalenceClass;
@@ -179,7 +181,12 @@ public class SymbolicConfigurationExtractor {
    /**
     * Contains the {@link Node} of KeY's proof tree to compute configurations for.
     */
-   private Node node;
+   private final Node node;
+   
+   /**
+    * The used {@link IModelSettings}.
+    */
+   private final IModelSettings settings;
    
    /**
     * Contains the applied cuts of each possible configuration.
@@ -245,9 +252,10 @@ public class SymbolicConfigurationExtractor {
     * Constructor.
     * @param node The {@link Node} of KeY's proof tree to compute configurations for.
     */
-   public SymbolicConfigurationExtractor(Node node) {
+   public SymbolicConfigurationExtractor(Node node, boolean usePrettyPrinting) {
       assert node != null;
       this.node = node;
+      this.settings = new ModelSettings(usePrettyPrinting);
    }
 
    /**
@@ -1231,7 +1239,7 @@ public class SymbolicConfigurationExtractor {
                ec = findEquivalentClass(result, iter.next());
             }
             if (ec == null) {
-               ec = new SymbolicEquivalenceClass(getServices());
+               ec = new SymbolicEquivalenceClass(getServices(), settings);
                result = result.append(ec); 
             }
             for (Term sub : term.subs()) {
@@ -1273,9 +1281,9 @@ public class SymbolicConfigurationExtractor {
    protected ISymbolicConfiguration createConfigurationFromExecutionVariableValuePairs(ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, 
                                                                                        Set<ExecutionVariableValuePair> pairs,
                                                                                        String stateName) throws ProofInputException {
-      SymbolicConfiguration result = new SymbolicConfiguration(equivalentClasses);
+      SymbolicConfiguration result = new SymbolicConfiguration(settings, equivalentClasses);
       // Create state
-      SymbolicState state = new SymbolicState(stateName);
+      SymbolicState state = new SymbolicState(stateName, settings);
       result.setState(state);
       // Create objects
       Map<Term, SymbolicObject> objects = new LinkedHashMap<Term, SymbolicObject>();
@@ -1315,10 +1323,10 @@ public class SymbolicConfigurationExtractor {
             if (target != null) {
                SymbolicAssociation association;
                if (pair.isArrayIndex()) {
-                  association = new SymbolicAssociation(getServices(), pair.getArrayIndex(), target, pair.getCondition());
+                  association = new SymbolicAssociation(getServices(), pair.getArrayIndex(), target, pair.getCondition(), settings);
                }
                else {
-                  association = new SymbolicAssociation(getServices(), pair.getProgramVariable(), target, pair.getCondition());
+                  association = new SymbolicAssociation(getServices(), pair.getProgramVariable(), target, pair.getCondition(), settings);
                }
                // Add association only if not already present
                ISymbolicAssociation existingAssociation = container.getAssociation(association.getProgramVariable(), association.isArrayIndex(), association.getArrayIndex(), association.getCondition());
@@ -1336,10 +1344,10 @@ public class SymbolicConfigurationExtractor {
             else {
                SymbolicValue value;
                if (pair.isArrayIndex()) {
-                  value = new SymbolicValue(getServices(), pair.getArrayIndex(), valueTerm, pair.getCondition());
+                  value = new SymbolicValue(getServices(), pair.getArrayIndex(), valueTerm, pair.getCondition(), settings);
                }
                else {
-                  value = new SymbolicValue(getServices(), pair.getProgramVariable(), valueTerm, pair.getCondition());
+                  value = new SymbolicValue(getServices(), pair.getProgramVariable(), valueTerm, pair.getCondition(), settings);
                }
                // Add value only if not already present
                ISymbolicValue existingValue = container.getValue(value.getProgramVariable(), value.isArrayIndex(), value.getArrayIndex(), value.getCondition());
@@ -1358,7 +1366,7 @@ public class SymbolicConfigurationExtractor {
       }
       return result;
    }
-   
+
    /**
     * Creates for the object defined by the given {@link Term} an {@link SymbolicObject} instance if not already available.
     * @param objects The already available {@link SymbolicObject}s.
@@ -1377,7 +1385,7 @@ public class SymbolicConfigurationExtractor {
          }
          SymbolicObject object = objects.get(objectTerm);
          if (object == null) {
-            object = new SymbolicObject(getServices(), objectTerm);
+            object = new SymbolicObject(getServices(), objectTerm, settings);
             objects.put(objectTerm, object);
             result.addObject(object);
          }

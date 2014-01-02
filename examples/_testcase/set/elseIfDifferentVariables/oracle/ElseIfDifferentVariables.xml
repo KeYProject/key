@@ -2,28 +2,28 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main(a,b);" pathCondition="true" pathConditionChanged="false">
       <branchStatement name="if (a) {return 1; }else if (b) {return 2;   }else  {return 3;   }" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="a = TRUE" pathCondition="a = TRUE" pathConditionChanged="true" branchCondition="a = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <statement name="return 1;" pathCondition="a = TRUE" pathConditionChanged="false">
-               <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="a = TRUE" pathConditionChanged="false" isReturnValueComputed="false">
-                  <termination name="&lt;end&gt;" pathCondition="a = TRUE" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+         <branchCondition name="equals(a,TRUE)" pathCondition="equals(a,TRUE)" pathConditionChanged="true" branchCondition="equals(a,TRUE)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="return 1;" pathCondition="equals(a,TRUE)" pathConditionChanged="false">
+               <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="equals(a,TRUE)" pathConditionChanged="false" isReturnValueComputed="false">
+                  <termination name="&lt;end&gt;" pathCondition="equals(a,TRUE)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>
          </branchCondition>
-         <branchCondition name="!a = TRUE" pathCondition="!a = TRUE" pathConditionChanged="true" branchCondition="!a = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <branchStatement name="if (b) {return 2; }else  {return 3; }" pathCondition="!a = TRUE" pathConditionChanged="false">
-               <branchCondition name="b = TRUE" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="true" branchCondition="b = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <statement name="return 2;" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+         <branchCondition name="not(equals(a,TRUE))" pathCondition="not(equals(a,TRUE))" pathConditionChanged="true" branchCondition="not(equals(a,TRUE))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchStatement name="if (b) {return 2; }else  {return 3; }" pathCondition="not(equals(a,TRUE))" pathConditionChanged="false">
+               <branchCondition name="equals(b,TRUE)" pathCondition="and(not(equals(a,TRUE)),equals(b,TRUE))" pathConditionChanged="true" branchCondition="equals(b,TRUE)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="return 2;" pathCondition="and(not(equals(a,TRUE)),equals(b,TRUE))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="and(not(equals(a,TRUE)),equals(b,TRUE))" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="and(not(equals(a,TRUE)),equals(b,TRUE))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
                </branchCondition>
-               <branchCondition name="!b = TRUE" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="true" branchCondition="!b = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <statement name="return 3;" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+               <branchCondition name="not(equals(b,TRUE))" pathCondition="and(not(equals(a,TRUE)),not(equals(b,TRUE)))" pathConditionChanged="true" branchCondition="not(equals(b,TRUE))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="return 3;" pathCondition="and(not(equals(a,TRUE)),not(equals(b,TRUE)))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="and(not(equals(a,TRUE)),not(equals(b,TRUE)))" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="and(not(equals(a,TRUE)),not(equals(b,TRUE)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

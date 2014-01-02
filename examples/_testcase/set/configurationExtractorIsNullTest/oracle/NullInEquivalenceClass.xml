@@ -2,18 +2,18 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="IsNullTest.compute(obj);" pathCondition="true" pathConditionChanged="false">
       <branchStatement name="if (obj==null) {return 1; }else  {return 0; }" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="obj = null" pathCondition="obj = null" pathConditionChanged="true" branchCondition="obj = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <statement name="return 1;" pathCondition="obj = null" pathConditionChanged="false">
-               <methodReturn name="&lt;return of IsNullTest.compute(obj);&gt;" pathCondition="obj = null" pathConditionChanged="false" isReturnValueComputed="false">
-                  <termination name="&lt;end&gt;" pathCondition="obj = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+         <branchCondition name="equals(obj,null)" pathCondition="equals(obj,null)" pathConditionChanged="true" branchCondition="equals(obj,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="return 1;" pathCondition="equals(obj,null)" pathConditionChanged="false">
+               <methodReturn name="&lt;return of IsNullTest.compute(obj);&gt;" pathCondition="equals(obj,null)" pathConditionChanged="false" isReturnValueComputed="false">
+                  <termination name="&lt;end&gt;" pathCondition="equals(obj,null)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>
          </branchCondition>
-         <branchCondition name="!obj = null" pathCondition="!obj = null" pathConditionChanged="true" branchCondition="!obj = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <statement name="return 0;" pathCondition="!obj = null" pathConditionChanged="false">
-               <methodReturn name="&lt;return of IsNullTest.compute(obj);&gt;" pathCondition="!obj = null" pathConditionChanged="false" isReturnValueComputed="false">
-                  <termination name="&lt;end&gt;" pathCondition="!obj = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+         <branchCondition name="not(equals(obj,null))" pathCondition="not(equals(obj,null))" pathConditionChanged="true" branchCondition="not(equals(obj,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="return 0;" pathCondition="not(equals(obj,null))" pathConditionChanged="false">
+               <methodReturn name="&lt;return of IsNullTest.compute(obj);&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" isReturnValueComputed="false">
+                  <termination name="&lt;end&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>

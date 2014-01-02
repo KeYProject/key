@@ -38,7 +38,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicConfiguratio
  * @see SymbolicConfigurationReader
  * @see SymbolicConfiguration
  */
-public interface ISymbolicConfiguration {
+public interface ISymbolicConfiguration extends ISymbolicElement {
    /**
     * Returns the equivalence classes. 
     * @return The equivalence classes.

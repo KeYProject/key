@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <branchStatement name="if (asdf&lt;0) {   x=x*-1;   x+=2; }else  {   x-=42;return x; }" pathCondition="true" pathConditionChanged="false">
-      <branchCondition name="asdf &lt; 0" pathCondition="asdf &lt; 0" pathConditionChanged="true" branchCondition="asdf &lt; 0" mergedBranchCondition="false" isBranchConditionComputed="true">
-         <statement name="x=x*-1;" pathCondition="asdf &lt; 0" pathConditionChanged="false">
-            <statement name="x+=2;" pathCondition="asdf &lt; 0" pathConditionChanged="false">
-               <termination name="&lt;end&gt;" pathCondition="asdf &lt; 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+      <branchCondition name="lt(asdf,Z(0(#)))" pathCondition="lt(asdf,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(asdf,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+         <statement name="x=x*-1;" pathCondition="lt(asdf,Z(0(#)))" pathConditionChanged="false">
+            <statement name="x+=2;" pathCondition="lt(asdf,Z(0(#)))" pathConditionChanged="false">
+               <termination name="&lt;end&gt;" pathCondition="lt(asdf,Z(0(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                </termination>
             </statement>
          </statement>
       </branchCondition>
-      <branchCondition name="asdf &gt;  -1" pathCondition="asdf &gt;  -1" pathConditionChanged="true" branchCondition="asdf &gt;  -1" mergedBranchCondition="false" isBranchConditionComputed="true">
-         <statement name="x-=42;" pathCondition="asdf &gt;  -1" pathConditionChanged="false">
-            <statement name="return x;" pathCondition="asdf &gt;  -1" pathConditionChanged="false">
-               <termination name="&lt;end&gt;" pathCondition="asdf &gt;  -1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+      <branchCondition name="gt(asdf,Z(neglit(1(#))))" pathCondition="gt(asdf,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(asdf,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+         <statement name="x-=42;" pathCondition="gt(asdf,Z(neglit(1(#))))" pathConditionChanged="false">
+            <statement name="return x;" pathCondition="gt(asdf,Z(neglit(1(#))))" pathConditionChanged="false">
+               <termination name="&lt;end&gt;" pathCondition="gt(asdf,Z(neglit(1(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                </termination>
             </statement>
          </statement>

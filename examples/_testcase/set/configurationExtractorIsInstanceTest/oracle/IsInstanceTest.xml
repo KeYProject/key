@@ -2,18 +2,18 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="IsInstanceTest.compute(obj);" pathCondition="true" pathConditionChanged="false">
       <branchStatement name="if (obj==IsInstanceTest.A) {return 1; }else  {return 0; }" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="IsInstanceTest.A = obj" pathCondition="IsInstanceTest.A = obj" pathConditionChanged="true" branchCondition="IsInstanceTest.A = obj" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <statement name="return 1;" pathCondition="IsInstanceTest.A = obj" pathConditionChanged="false">
-               <methodReturn name="&lt;return of IsInstanceTest.compute(obj);&gt;" pathCondition="IsInstanceTest.A = obj" pathConditionChanged="false" isReturnValueComputed="false">
-                  <termination name="&lt;end&gt;" pathCondition="IsInstanceTest.A = obj" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+         <branchCondition name="equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj)" pathCondition="equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj)" pathConditionChanged="true" branchCondition="equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="return 1;" pathCondition="equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj)" pathConditionChanged="false">
+               <methodReturn name="&lt;return of IsInstanceTest.compute(obj);&gt;" pathCondition="equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj)" pathConditionChanged="false" isReturnValueComputed="false">
+                  <termination name="&lt;end&gt;" pathCondition="equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>
          </branchCondition>
-         <branchCondition name="!IsInstanceTest.A = obj" pathCondition="!IsInstanceTest.A = obj" pathConditionChanged="true" branchCondition="!IsInstanceTest.A = obj" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <statement name="return 0;" pathCondition="!IsInstanceTest.A = obj" pathConditionChanged="false">
-               <methodReturn name="&lt;return of IsInstanceTest.compute(obj);&gt;" pathCondition="!IsInstanceTest.A = obj" pathConditionChanged="false" isReturnValueComputed="false">
-                  <termination name="&lt;end&gt;" pathCondition="!IsInstanceTest.A = obj" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+         <branchCondition name="not(equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj))" pathCondition="not(equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj))" pathConditionChanged="true" branchCondition="not(equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="return 0;" pathCondition="not(equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj))" pathConditionChanged="false">
+               <methodReturn name="&lt;return of IsInstanceTest.compute(obj);&gt;" pathCondition="not(equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj))" pathConditionChanged="false" isReturnValueComputed="false">
+                  <termination name="&lt;end&gt;" pathCondition="not(equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>

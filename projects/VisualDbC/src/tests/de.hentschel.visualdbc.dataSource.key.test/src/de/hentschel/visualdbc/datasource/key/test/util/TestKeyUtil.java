@@ -104,10 +104,10 @@ import de.hentschel.visualdbc.generation.operation.CreateOperation;
 import de.hentschel.visualdbc.generation.test.util.TestGenerationUtil;
 import de.hentschel.visualdbc.interactive.proving.ui.test.util.TestInteractiveProvingUtil;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
@@ -1901,10 +1901,10 @@ public final class TestKeyUtil {
                                         IDSConnection expectedConnection) throws Exception {
       IDSConnection connection = null;
       ConnectionLogger logger = new ConnectionLogger();
-      boolean usePrettyPrinting = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
+      boolean usePrettyPrinting = SymbolicExecutionUtil.isUsePrettyPrinting();
       try {
          // Disable pretty printing to make tests more robust against different term representations
-         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(false);
+         SymbolicExecutionUtil.setUsePrettyPrinting(false);
          // Create project and fill it with test data
          IProject project = TestUtilsUtil.createProject(projectName);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, testDataInBundle, project);
@@ -1931,7 +1931,7 @@ public final class TestKeyUtil {
          compareModels(expectedConnection, connection, modelFile, diagramFile);
       }
       finally {
-         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);
+         SymbolicExecutionUtil.setUsePrettyPrinting(usePrettyPrinting);
          try {
             if (connection != null) {
                TestGenerationUtil.closeConnection(connection);
@@ -2069,10 +2069,10 @@ public final class TestKeyUtil {
       ConnectionLogger logger = new ConnectionLogger();
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       LoggingKeYConnectionListener listener = new LoggingKeYConnectionListener();
-      boolean usePrettyPrinting = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
+      boolean usePrettyPrinting = SymbolicExecutionUtil.isUsePrettyPrinting();
       try {
          // Disable pretty printing to make tests more robust against different term representations
-         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(false);
+         SymbolicExecutionUtil.setUsePrettyPrinting(false);
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 2;
          // Create project and fill it with test data
          IProject project = TestUtilsUtil.createProject(projectName);
@@ -2194,7 +2194,7 @@ public final class TestKeyUtil {
          fail(e.getMessage());
       }
       finally {
-         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);
+         SymbolicExecutionUtil.setUsePrettyPrinting(usePrettyPrinting);
          SWTBotPreferences.TIMEOUT = originalTimeout;
          try {
             if (connection != null) {
