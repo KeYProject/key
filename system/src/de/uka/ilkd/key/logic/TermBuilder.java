@@ -80,6 +80,8 @@ import de.uka.ilkd.key.util.Pair;
  */
 public class TermBuilder {
 
+    private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
+
     public static final TermBuilder DF = new TermBuilder();
 
     private static final TermFactory tf = TermFactory.DEFAULT;
@@ -323,8 +325,7 @@ public class TermBuilder {
         name = newName(services, name);
     }
         return new LocationVariable(new ProgramElementName(name),
-                                    services.getJavaInfo().getTypeByClassName(
-                                                   "java.lang.Exception"));
+                                    services.getJavaInfo().getTypeByClassName(JAVA_LANG_THROWABLE));
     }
 
 

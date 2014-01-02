@@ -89,7 +89,9 @@ import de.uka.ilkd.key.speclang.HeapContext;
  * @author Martin Hentschel
  */
 public abstract class AbstractOperationPO extends AbstractPO {
-   /**
+   private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
+
+/**
     * If this is {@code true} an uninterpreted predicate is added to the
     * postconditions which contains the heap and all parameters as arguments.
     * @see #buildUninterpretedPredicate(ImmutableList, String)
@@ -332,7 +334,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
       // add axioms
       collectClassAxioms(getCalleeKeYJavaType());
 
-      // for jml annotation statements
+      // for JML annotation statements
       generateWdTaclets();
    }
 
@@ -692,7 +694,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
        final StatementBlock finallyBlock = sb.tail().tail().tail().head();
 
       // create variables for try statement
-      final KeYJavaType eType = javaInfo.getTypeByClassName("java.lang.Exception");
+       // changed from Exception to Throwable (issue #1379)
+      final KeYJavaType eType = javaInfo.getTypeByClassName(JAVA_LANG_THROWABLE);
       final TypeReference excTypeRef = javaInfo.createTypeReference(eType);
       final ProgramElementName ePEN = new ProgramElementName("e");
       final ProgramVariable eVar = new LocationVariable(ePEN, eType);
