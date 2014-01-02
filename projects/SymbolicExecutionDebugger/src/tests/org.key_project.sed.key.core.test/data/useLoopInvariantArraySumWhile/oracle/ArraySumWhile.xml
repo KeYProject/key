@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_0a1a297d-ce9a-4153-8687-7a193b457bef" name="sum(int[])" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_39422c25-0f21-4a99-b52a-2f13d4557522" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_a67dac40-5525-4a9e-a971-fafcf8c190dd" name="ArraySumWhile.sum(array);" pathCondition="true" lineNumber="-1" charStart="166" charEnd="169">
-            <sedStatement xml:id="_6e2ed880-af9c-4cdf-8bb4-ae40846973d5" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="188" charEnd="203">
-               <sedStatement xml:id="_e832ee82-2fb8-4c0e-85b5-99a13fbf2e80" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="207" charEnd="217">
-                  <sedLoopInvariant xml:id="_52b381d4-d7a2-440f-935a-0772c504d7c7" name="
+   <sedTarget xml:id="_b163a5aa-db23-474b-b401-f41ced0820a1" name="sum(int[])" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_c8b1a523-09ac-48a7-92b6-4d2505284ab7" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_f5e27904-6dbe-4720-9b41-6fb646bdc91b" name="ArraySumWhile.sum(array);" pathCondition="true" lineNumber="-1" charStart="166" charEnd="169">
+            <sedStatement xml:id="_a32cb61b-7241-4e75-b77c-5127e9cee50f" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="188" charEnd="203">
+               <sedStatement xml:id="_5597bcd1-7708-4178-9ce9-df24077a07ff" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="207" charEnd="217">
+                  <sedLoopInvariant xml:id="_b770002b-adbb-497d-84b1-1393896c2799" name="
 invariant: i &gt;= 0
 &amp; (  i &lt;= array.length
-   &amp; result_1 = bsum{int j;}(0, i, array[j]));
+   &amp;   result_1
+     = javaCastInt(bsum{int j;}(0, i, array[j])));
 variant: javaSubInt(array.length, i)
 mod: false" pathCondition="true" lineNumber="-1" charStart="407" charEnd="471" initiallyValid="true">
-                     <sedBranchCondition xml:id="_7edc0f4b-38e4-4309-82be-62913e5fe2ea" name="Body Preserves Invariant: !(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
+                     <sedBranchCondition xml:id="_dbf9fce8-6523-4c6e-91e8-605cbd7405e0" name="Body Preserves Invariant: !(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
   | i_0 &lt;= -1
   &amp; array.length &gt;= 0
   &amp; array.length &gt;= i_0
@@ -24,7 +25,7 @@ mod: false" pathCondition="true" lineNumber="-1" charStart="407" charEnd="471" i
        &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
      | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
          -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))">
-                        <sedBranchCondition xml:id="_b970b053-c4e7-4fea-acd0-07ab64709ed3" name="!array = null" pathCondition="   array.length &gt;= 0
+                        <sedBranchCondition xml:id="_1bf2938a-1696-4fbe-af50-eef204ca8555" name="!array = null" pathCondition="   array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -32,7 +33,7 @@ mod: false" pathCondition="true" lineNumber="-1" charStart="407" charEnd="471" i
            -&gt;   bsum{int j;}(0, i_0, array[j])
               = result_1_0))
    &amp; !array = null">
-                           <sedStatement xml:id="_d72abd7b-3de0-49dd-bbe3-1d64ec175df8" name="result_1+=array[i];" pathCondition="   array.length &gt;= 0
+                           <sedStatement xml:id="_46270030-8b46-4fe5-b04f-6631d248e2a4" name="result_1+=array[i];" pathCondition="   array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -40,7 +41,7 @@ mod: false" pathCondition="true" lineNumber="-1" charStart="407" charEnd="471" i
            -&gt;   bsum{int j;}(0, i_0, array[j])
               = result_1_0))
    &amp; !array = null" lineNumber="-1" charStart="438" charEnd="457">
-                              <sedStatement xml:id="_4a0ad92c-faf4-4ddc-ac13-eb5e11763d6d" name="i++;" pathCondition="   array.length &gt;= 0
+                              <sedStatement xml:id="_f3df46a9-bbd0-4b29-b422-38afd6920897" name="i++;" pathCondition="   array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -48,7 +49,7 @@ mod: false" pathCondition="true" lineNumber="-1" charStart="407" charEnd="471" i
            -&gt;   bsum{int j;}(0, i_0, array[j])
               = result_1_0))
    &amp; !array = null" lineNumber="-1" charStart="462" charEnd="466">
-                                 <sedLoopBodyTermination xml:id="_969fda40-44f4-426e-bf40-1754be4d1897" name="&lt;loop body end&gt;" pathCondition="   array.length &gt;= 0
+                                 <sedLoopBodyTermination xml:id="_04f69fa8-26fe-452d-9164-4372c72c8ec4" name="&lt;loop body end&gt;" pathCondition="   array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -60,7 +61,7 @@ mod: false" pathCondition="true" lineNumber="-1" charStart="407" charEnd="471" i
                               </sedStatement>
                            </sedStatement>
                         </sedBranchCondition>
-                        <sedBranchCondition xml:id="_2031a973-76aa-43e6-8c8d-838bbb3917c7" name="array = null" pathCondition="   array.length &gt;= 0
+                        <sedBranchCondition xml:id="_ae92fbf9-1576-4b92-b37f-9b7d78cb56c9" name="array = null" pathCondition="   array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -68,7 +69,7 @@ mod: false" pathCondition="true" lineNumber="-1" charStart="407" charEnd="471" i
            -&gt;   bsum{int j;}(0, i_0, array[j])
               = result_1_0))
    &amp; array = null">
-                           <sedExceptionalTermination xml:id="_14f3d62d-7f73-4f32-9d78-5a3dad86fa60" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="   array.length &gt;= 0
+                           <sedExceptionalTermination xml:id="_d78a7bd1-88ab-43b9-9d7d-c36907cb06fb" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="   array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
@@ -79,7 +80,7 @@ mod: false" pathCondition="true" lineNumber="-1" charStart="407" charEnd="471" i
                            </sedExceptionalTermination>
                         </sedBranchCondition>
                      </sedBranchCondition>
-                     <sedBranchCondition xml:id="_d2a4ba11-1664-4863-a590-95d1b51e265e" name="Use Case: !(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
+                     <sedBranchCondition xml:id="_a2b4fdf4-0978-4dcc-b858-b14d43cd8b09" name="Use Case: !(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
   | i_0 &lt;= -1
   &amp; array.length &gt;= 0
   &amp; array.length &gt;= i_0
@@ -92,19 +93,19 @@ mod: false" pathCondition="true" lineNumber="-1" charStart="407" charEnd="471" i
        &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
      | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
          -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))">
-                        <sedStatement xml:id="_11b790fe-be12-4218-a9aa-252e8c2e66db" name="return result_1;" pathCondition="!(  array.length &gt;= 0
+                        <sedStatement xml:id="_b230f72a-6267-4d91-b4b5-76a487b6b047" name="return result_1;" pathCondition="!(  array.length &gt;= 0
   &amp; (    !i_0 = 0
        &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
        &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
      | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
          -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))" lineNumber="-1" charStart="475" charEnd="489">
-                           <sedMethodReturn xml:id="_71c430ae-70f0-4a37-b317-2a7729c53089" name="&lt;return of ArraySumWhile.sum(array);&gt;" pathCondition="!(  array.length &gt;= 0
+                           <sedMethodReturn xml:id="_28533947-fee1-4f5f-8b62-362824f6f459" name="&lt;return of ArraySumWhile.sum(array);&gt;" pathCondition="!(  array.length &gt;= 0
   &amp; (    !i_0 = 0
        &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
        &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
      | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
          -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))" lineNumber="-1" charStart="166" charEnd="169">
-                              <sedTermination xml:id="_b53ccfa5-2bd9-46ad-b779-1e0966d21733" name="&lt;end&gt;" pathCondition="!(  array.length &gt;= 0
+                              <sedTermination xml:id="_097ace14-e4d1-4ac9-b733-d528119e2c81" name="&lt;end&gt;" pathCondition="!(  array.length &gt;= 0
   &amp; (    !i_0 = 0
        &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
        &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
