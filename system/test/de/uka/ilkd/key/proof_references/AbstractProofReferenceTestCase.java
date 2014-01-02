@@ -21,6 +21,7 @@ import java.util.LinkedHashSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -297,7 +298,10 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
       KeYEnvironment<?> environment = null;
       Proof proof = null;
       HashMap<String, String> originalTacletOptions = null;
+      boolean usePrettyPrinting = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
       try {
+         // Disable pretty printing to make tests more robust against different term representations
+         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(false);
          // Make sure that required files exists
          File javaFile = new File(baseDir, javaPathInBaseDir);
          assertTrue(javaFile.exists());
@@ -328,6 +332,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          doProofTest(environment, proof, useContracts, tester);
       }
       finally {
+         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);
          // Restore taclet options
          restoreTacletOptions(originalTacletOptions);
          // Dispose proof and environment
@@ -360,7 +365,10 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
       KeYEnvironment<?> environment = null;
       Proof proof = null;
       HashMap<String, String> originalTacletOptions = null;
+      boolean usePrettyPrinting = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
       try {
+         // Disable pretty printing to make tests more robust against different term representations
+         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(false);
          // Make sure that required files exists
          File javaFile = new File(baseDir, javaPathInBaseDir);
          assertTrue(javaFile.exists());
@@ -381,6 +389,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          doProofTest(environment, proof, useContracts, tester);
       }
       finally {
+         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);
          // Restore taclet options
          restoreTacletOptions(originalTacletOptions);
          // Dispose proof and environment
