@@ -35,7 +35,6 @@ public class PayCard {
    /*@
      @ public normal_behavior
      @ requires amount>0;
-     @ {|
      @     requires amount + balance < limit && isValid() == true;
      @     ensures \result == true;
      @     ensures balance == amount + \old(balance);
@@ -43,11 +42,12 @@ public class PayCard {
      @
      @     also
      @
+     @ public normal_behavior
+     @ requires amount>0;
      @     requires amount + balance >= limit || isValid() == false;
      @     ensures \result == false;
      @     ensures unsuccessfulOperations == \old(unsuccessfulOperations) + 1; 
      @     assignable unsuccessfulOperations;
-     @ |}
      @  
      @ also
      @
