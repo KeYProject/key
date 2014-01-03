@@ -92,7 +92,7 @@ public class SWTBotKeYSourceCodeLookupTest extends AbstractSetupTestCase {
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 8;
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, null, null, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE);
+         TestSEDKeyCoreUtil.launchKeY(method, null, null, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
@@ -188,7 +188,7 @@ public class SWTBotKeYSourceCodeLookupTest extends AbstractSetupTestCase {
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 8;
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, null, null, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE);
+         TestSEDKeyCoreUtil.launchKeY(method, null, null, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();

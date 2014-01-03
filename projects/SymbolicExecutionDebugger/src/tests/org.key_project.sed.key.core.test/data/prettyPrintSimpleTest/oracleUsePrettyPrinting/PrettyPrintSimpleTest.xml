@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_51bab1c9-514d-4b17-900e-66689fb3bda5" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_1e3c1e39-f206-4dee-b8f6-07cf12ded0b2" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_49bc6511-8015-4a7f-83b7-a7e8310946cc" name="PrettyPrintSimpleTest.main(x);" pathCondition="true" lineNumber="-1" charStart="59" charEnd="63">
+            <sedBranchStatement xml:id="_a8731e66-271d-4491-9c15-4c53803142c5" name="if (x&gt;0) {return 1; }else  {return    -1; }" pathCondition="true" lineNumber="-1" charStart="76" charEnd="137">
+               <sedBranchCondition xml:id="_b615c92c-29dc-4737-a4c2-92e826593d98" name="x &gt;  0" pathCondition="x &gt;  0">
+                  <sedStatement xml:id="_317cc203-d53f-40bc-bcd6-b149fdb04f2a" name="return 1;" pathCondition="x &gt;  0" lineNumber="-1" charStart="93" charEnd="102">
+                     <sedMethodReturn xml:id="_9272d23d-18db-400f-b7c4-962fdcde89fb" name="&lt;return of PrettyPrintSimpleTest.main(x);&gt;" pathCondition="x &gt;  0" lineNumber="-1" charStart="59" charEnd="63">
+                        <sedTermination xml:id="_7e589f35-e74a-41a4-9417-6ed1248851f2" name="&lt;end&gt;" pathCondition="x &gt;  0" verified="true">
+                        </sedTermination>
+                     </sedMethodReturn>
+                  </sedStatement>
+               </sedBranchCondition>
+               <sedBranchCondition xml:id="_d4a5cc8a-75fb-4adf-bb2c-659cd032e666" name="x &lt; 1" pathCondition="x &lt; 1">
+                  <sedStatement xml:id="_deb9d32c-c536-48d0-9a61-176fdc0e8bbc" name="return -1;" pathCondition="x &lt; 1" lineNumber="-1" charStart="122" charEnd="132">
+                     <sedMethodReturn xml:id="_80ce2b56-2549-4ce3-978a-be6529e75413" name="&lt;return of PrettyPrintSimpleTest.main(x);&gt;" pathCondition="x &lt; 1" lineNumber="-1" charStart="59" charEnd="63">
+                        <sedTermination xml:id="_00210569-2fbd-4ecd-bcb4-99037244e717" name="&lt;end&gt;" pathCondition="x &lt; 1" verified="true">
+                        </sedTermination>
+                     </sedMethodReturn>
+                  </sedStatement>
+               </sedBranchCondition>
+            </sedBranchStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

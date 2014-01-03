@@ -1,116 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_b163a5aa-db23-474b-b401-f41ced0820a1" name="sum(int[])" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_c8b1a523-09ac-48a7-92b6-4d2505284ab7" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_f5e27904-6dbe-4720-9b41-6fb646bdc91b" name="ArraySumWhile.sum(array);" pathCondition="true" lineNumber="-1" charStart="166" charEnd="169">
-            <sedStatement xml:id="_a32cb61b-7241-4e75-b77c-5127e9cee50f" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="188" charEnd="203">
-               <sedStatement xml:id="_5597bcd1-7708-4178-9ce9-df24077a07ff" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="207" charEnd="217">
-                  <sedLoopInvariant xml:id="_b770002b-adbb-497d-84b1-1393896c2799" name="
+   <sedTarget xml:id="_c45178ab-3765-45b1-b71b-feab4657ebe6" name="sum(int[])" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_ef7b863b-562c-45ca-8916-00e21e1568b5" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_6d4e1a4d-5b07-4890-bc43-735f6441efa5" name="ArraySumWhile.sum(array);" pathCondition="true" lineNumber="-1" charStart="166" charEnd="169">
+            <sedStatement xml:id="_f986ac61-1b31-4164-b3b2-5a0a0e285d64" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="188" charEnd="203">
+               <sedStatement xml:id="_5cfdc063-7ec5-4026-9c77-cf6f1ebf436d" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="207" charEnd="217">
+                  <sedLoopInvariant xml:id="_cee0a0e7-ecea-4345-ab4e-87a02653f881" name="
 invariant: i &gt;= 0
 &amp; (  i &lt;= array.length
    &amp;   result_1
      = javaCastInt(bsum{int j;}(0, i, array[j])));
 variant: javaSubInt(array.length, i)
 mod: false" pathCondition="true" lineNumber="-1" charStart="407" charEnd="471" initiallyValid="true">
-                     <sedBranchCondition xml:id="_dbf9fce8-6523-4c6e-91e8-605cbd7405e0" name="Body Preserves Invariant: !(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
-  | i_0 &lt;= -1
-  &amp; array.length &gt;= 0
-  &amp; array.length &gt;= i_0
-  | !(     i_0 &gt;= 0
-         &amp; array.length &gt;= 0
-         &amp; array.length &gt;= i_0
-      -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0))" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))">
-                        <sedBranchCondition xml:id="_1bf2938a-1696-4fbe-af50-eef204ca8555" name="!array = null" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt;   bsum{int j;}(0, i_0, array[j])
-              = result_1_0))
-   &amp; !array = null">
-                           <sedStatement xml:id="_46270030-8b46-4fe5-b04f-6631d248e2a4" name="result_1+=array[i];" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt;   bsum{int j;}(0, i_0, array[j])
-              = result_1_0))
-   &amp; !array = null" lineNumber="-1" charStart="438" charEnd="457">
-                              <sedStatement xml:id="_f3df46a9-bbd0-4b29-b422-38afd6920897" name="i++;" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt;   bsum{int j;}(0, i_0, array[j])
-              = result_1_0))
-   &amp; !array = null" lineNumber="-1" charStart="462" charEnd="466">
-                                 <sedLoopBodyTermination xml:id="_04f69fa8-26fe-452d-9164-4372c72c8ec4" name="&lt;loop body end&gt;" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt;   bsum{int j;}(0, i_0, array[j])
-              = result_1_0))
-   &amp; !array = null" verified="true">
+                     <sedBranchCondition xml:id="_a4332eec-9d62-422a-bdc4-547d38705541" name="Body Preserves Invariant: not(or(or(and(and(geq(i_0,Z(1(#))),geq(length(array),Z(0(#)))),lt(length(array),i_0)),and(and(leq(i_0,Z(neglit(1(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0))),not(imp(and(and(geq(i_0,Z(0(#))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))))" pathCondition="not(and(geq(length(array),Z(0(#))),or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0))))))">
+                        <sedBranchCondition xml:id="_eafe221e-f767-4cd8-9811-b05520781d37" name="not(equals(array,null))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0))))),not(equals(array,null))))">
+                           <sedStatement xml:id="_86f855d8-0977-46a1-af01-98a508a56479" name="result_1+=array[i];" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0))))),not(equals(array,null))))" lineNumber="-1" charStart="438" charEnd="457">
+                              <sedStatement xml:id="_6ca77fcf-bc15-4eae-bfd1-5bc187c430c4" name="i++;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0))))),not(equals(array,null))))" lineNumber="-1" charStart="462" charEnd="466">
+                                 <sedLoopBodyTermination xml:id="_808e8a45-36a8-4a7d-b192-50da433416ab" name="&lt;loop body end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0))))),not(equals(array,null))))" verified="true">
                                  </sedLoopBodyTermination>
                               </sedStatement>
                            </sedStatement>
                         </sedBranchCondition>
-                        <sedBranchCondition xml:id="_ae92fbf9-1576-4b92-b37f-9b7d78cb56c9" name="array = null" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt;   bsum{int j;}(0, i_0, array[j])
-              = result_1_0))
-   &amp; array = null">
-                           <sedExceptionalTermination xml:id="_d78a7bd1-88ab-43b9-9d7d-c36907cb06fb" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt;   bsum{int j;}(0, i_0, array[j])
-              = result_1_0))
-   &amp; array = null" verified="true">
+                        <sedBranchCondition xml:id="_c30b74c8-4e0c-4bc1-b193-4f29c1c408b6" name="equals(array,null)" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0))))),equals(array,null)))">
+                           <sedExceptionalTermination xml:id="_2185d65e-e794-4846-aaf6-7382b20ed9b1" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0))))),equals(array,null)))" verified="true">
                            </sedExceptionalTermination>
                         </sedBranchCondition>
                      </sedBranchCondition>
-                     <sedBranchCondition xml:id="_a2b4fdf4-0978-4dcc-b858-b14d43cd8b09" name="Use Case: !(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
-  | i_0 &lt;= -1
-  &amp; array.length &gt;= 0
-  &amp; array.length &gt;= i_0
-  | !(     i_0 &gt;= 0
-         &amp; array.length &gt;= 0
-         &amp; array.length &gt;= i_0
-      -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0))" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))">
-                        <sedStatement xml:id="_b230f72a-6267-4d91-b4b5-76a487b6b047" name="return result_1;" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))" lineNumber="-1" charStart="475" charEnd="489">
-                           <sedMethodReturn xml:id="_28533947-fee1-4f5f-8b62-362824f6f459" name="&lt;return of ArraySumWhile.sum(array);&gt;" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))" lineNumber="-1" charStart="166" charEnd="169">
-                              <sedTermination xml:id="_097ace14-e4d1-4ac9-b733-d528119e2c81" name="&lt;end&gt;" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))" verified="true">
+                     <sedBranchCondition xml:id="_78fb1605-71e4-479f-82ce-cf5597e81bf6" name="Use Case: not(or(or(and(and(geq(i_0,Z(1(#))),geq(length(array),Z(0(#)))),lt(length(array),i_0)),and(and(leq(i_0,Z(neglit(1(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0))),not(imp(and(and(geq(i_0,Z(0(#))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))))" pathCondition="not(and(geq(length(array),Z(0(#))),or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0))))))">
+                        <sedStatement xml:id="_a5b8f37f-4bc2-4fec-957a-88a00259ac1b" name="return result_1;" pathCondition="not(and(geq(length(array),Z(0(#))),or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0))))))" lineNumber="-1" charStart="475" charEnd="489">
+                           <sedMethodReturn xml:id="_f50bee48-e453-43da-aaad-97a805ad6bd8" name="&lt;return of ArraySumWhile.sum(array);&gt;" pathCondition="not(and(geq(length(array),Z(0(#))),or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0))))))" lineNumber="-1" charStart="166" charEnd="169">
+                              <sedTermination xml:id="_4a80f4c5-a489-485e-bb9e-87bdfe670c76" name="&lt;end&gt;" pathCondition="not(and(geq(length(array),Z(0(#))),or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0))))))" verified="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_bf64cb9e-5bb2-4841-b2de-38498652a235" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_644d12cc-d7a4-451e-8012-c3ea5bd10ee5" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_8594fac0-feab-477c-b480-49baeccb13aa" name="self.main(a);" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56">
-            <sedBranchStatement xml:id="_5e700cc8-0790-4add-bbfd-5fafab3470f1" name="if (a==0) {int i = 2;int j = 3;int x = valueLonger(i);int y = value(j);int z = valueLonger(x)+valueLonger(y);int zz = value(-3)+value(-4);return value(z+zz); }else  {int i = 2;int j = 3;int x = value(i);int y = valueLonger(j);int z = value(x)+value(y);int zz = valueLonger(-3)+valueLonger(-4);return valueLonger(z+zz); }" pathCondition="true" lineNumber="-1" charStart="69" charEnd="497">
-               <sedBranchCondition xml:id="_0e103900-f8c6-4552-a183-3b9bb5b1aba4" name="a = 0" pathCondition="a = 0">
-                  <sedStatement xml:id="_f29c2a78-501e-4b3d-9d8e-40847ccebdbd" name="int i = 2;" pathCondition="a = 0" lineNumber="-1" charStart="87" charEnd="97">
-                     <sedStatement xml:id="_35700dcc-fc93-45cb-9e5a-91e182f62ec5" name="int j = 3;" pathCondition="a = 0" lineNumber="-1" charStart="102" charEnd="112">
+   <sedTarget xml:id="_2397a4c1-3241-4fea-92d5-3ad1c2ffb157" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_4a5c1e25-aeaf-4e3c-893f-dfbdeada9493" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_fdc37d3a-18af-4421-9e73-dd16ba33b8d7" name="self.main(a);" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56">
+            <sedBranchStatement xml:id="_f18fa4a7-e67b-4773-b559-58e436d1a67f" name="if (a==0) {int i = 2;int j = 3;int x = valueLonger(i);int y = value(j);int z = valueLonger(x)+valueLonger(y);int zz = value(-3)+value(-4);return value(z+zz); }else  {int i = 2;int j = 3;int x = value(i);int y = valueLonger(j);int z = value(x)+value(y);int zz = valueLonger(-3)+valueLonger(-4);return valueLonger(z+zz); }" pathCondition="true" lineNumber="-1" charStart="69" charEnd="497">
+               <sedBranchCondition xml:id="_c9e7cd79-309b-49f0-aedb-c86fffe778ee" name="equals(a,Z(0(#)))" pathCondition="equals(a,Z(0(#)))">
+                  <sedStatement xml:id="_065d6d76-ba79-4c28-aaa4-bf1ecdcb49fd" name="int i = 2;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="87" charEnd="97">
+                     <sedStatement xml:id="_13902a2f-7fcf-4137-bf66-7bfa1af6e47a" name="int j = 3;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="102" charEnd="112">
                      </sedStatement>
                   </sedStatement>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_cf246436-94e5-423d-9375-5a2d3be0bd43" name="!a = 0" pathCondition="!a = 0">
-                  <sedStatement xml:id="_16dac9f2-69c6-4d50-b914-ff8aeba9bbd1" name="int i = 2;" pathCondition="!a = 0" lineNumber="-1" charStart="297" charEnd="307">
-                     <sedStatement xml:id="_e05da2d0-860a-40f6-8b55-1f7d316caf20" name="int j = 3;" pathCondition="!a = 0" lineNumber="-1" charStart="312" charEnd="322">
+               <sedBranchCondition xml:id="_d3c6f598-5fdb-4d2f-b153-ae40e5c4a914" name="not(equals(a,Z(0(#))))" pathCondition="not(equals(a,Z(0(#))))">
+                  <sedStatement xml:id="_d7129ae1-f6cb-4ec8-804c-2f96942b2491" name="int i = 2;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="297" charEnd="307">
+                     <sedStatement xml:id="_668ac9a2-912a-45cb-8de3-8a97db4a071d" name="int j = 3;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="312" charEnd="322">
                      </sedStatement>
                   </sedStatement>
                </sedBranchCondition>

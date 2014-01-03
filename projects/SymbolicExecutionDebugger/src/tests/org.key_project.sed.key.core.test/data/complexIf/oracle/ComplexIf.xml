@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_ff8ab75f-79a7-4fd3-bf4a-a0e8f9258ec8" name="min(int, int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_aa930d80-9f1f-4066-adbb-a6b7487bd99e" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_5bc0be40-ae45-4b36-ab47-11a40bdf5d53" name="self.min(i,j);" pathCondition="true" lineNumber="-1" charStart="424" charEnd="427">
-            <sedStatement xml:id="_2e0e9a12-c522-45c0-82d9-b8b7e4410b78" name="int result;" pathCondition="true" lineNumber="-1" charStart="447" charEnd="458">
-               <sedBranchStatement xml:id="_ff40319f-7c41-45d9-b2e5-c077b9800258" name="if (i&lt;j&amp;&amp;i!=j) {   result_1=i; }else  {   result_1=j; }" pathCondition="true" lineNumber="-1" charStart="462" charEnd="536">
-                  <sedBranchCondition xml:id="_9863645b-63cc-4cac-abce-5912c71fa010" name="j &lt;= i" pathCondition="j &lt;= i">
-                     <sedStatement xml:id="_e40d8262-c69c-4529-801b-e5b97f5b1580" name="result_1=j;" pathCondition="j &lt;= i" lineNumber="-1" charStart="520" charEnd="531">
-                        <sedStatement xml:id="_090c5503-c011-4e77-b0d1-699f08755ed5" name="return result_1;" pathCondition="j &lt;= i" lineNumber="-1" charStart="540" charEnd="554">
-                           <sedMethodReturn xml:id="_782fec9b-0e1d-4567-8b80-22ed70cca869" name="&lt;return j as result of self.min(i,j);&gt;" pathCondition="j &lt;= i" lineNumber="-1" charStart="424" charEnd="427">
-                              <sedTermination xml:id="_9db7e527-82c3-4f1d-ae0e-6175cded2a6f" name="&lt;end&gt;" pathCondition="j &lt;= i" verified="true">
+   <sedTarget xml:id="_8f979ab8-3e58-4deb-90ef-789f42d6ecc4" name="min(int, int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_33fcbef9-c9b1-4a29-b0c6-d550ffb2a68c" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_00b771f6-7fb4-4a8b-85c4-f93513601e23" name="self.min(i,j);" pathCondition="true" lineNumber="-1" charStart="424" charEnd="427">
+            <sedStatement xml:id="_2e93c3de-47c8-41ee-89c5-c82eb2d7bae2" name="int result;" pathCondition="true" lineNumber="-1" charStart="447" charEnd="458">
+               <sedBranchStatement xml:id="_08695801-4750-4a1b-b383-f4e5870b10f7" name="if (i&lt;j&amp;&amp;i!=j) {   result_1=i; }else  {   result_1=j; }" pathCondition="true" lineNumber="-1" charStart="462" charEnd="536">
+                  <sedBranchCondition xml:id="_9bdd8188-7549-458b-b2a3-84ef18c154d2" name="leq(j,i)" pathCondition="leq(j,i)">
+                     <sedStatement xml:id="_31c836bf-720f-4262-b0bd-672ad2203f68" name="result_1=j;" pathCondition="leq(j,i)" lineNumber="-1" charStart="520" charEnd="531">
+                        <sedStatement xml:id="_70726578-9ec6-4167-a71f-c4063844c263" name="return result_1;" pathCondition="leq(j,i)" lineNumber="-1" charStart="540" charEnd="554">
+                           <sedMethodReturn xml:id="_bb2025d5-4030-4533-bffd-5175e857e9df" name="&lt;return j as result of self.min(i,j);&gt;" pathCondition="leq(j,i)" lineNumber="-1" charStart="424" charEnd="427">
+                              <sedTermination xml:id="_746ec84f-9f70-4b99-9133-fa7a37299647" name="&lt;end&gt;" pathCondition="leq(j,i)" verified="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_9cc469ef-7dd1-4445-a933-86173ecb6115" name="j &gt;  i" pathCondition="j &gt;  i">
-                     <sedStatement xml:id="_20224301-f47f-4ab8-bb51-633115823a09" name="result_1=i;" pathCondition="j &gt;  i" lineNumber="-1" charStart="489" charEnd="500">
-                        <sedStatement xml:id="_a1592ea7-4c3e-47dc-a939-c4e0fb7bb25f" name="return result_1;" pathCondition="j &gt;  i" lineNumber="-1" charStart="540" charEnd="554">
-                           <sedMethodReturn xml:id="_45fd5652-962a-4edb-9a14-5a9a38be832b" name="&lt;return i as result of self.min(i,j);&gt;" pathCondition="j &gt;  i" lineNumber="-1" charStart="424" charEnd="427">
-                              <sedTermination xml:id="_c04fdca0-24c8-42c3-8d2b-a1936366587b" name="&lt;end&gt;" pathCondition="j &gt;  i" verified="true">
+                  <sedBranchCondition xml:id="_a5c6d9b8-c368-42ad-b2b7-4de7733f162b" name="gt(j,i)" pathCondition="gt(j,i)">
+                     <sedStatement xml:id="_4e6da1e9-2ec4-43a6-8081-cccaa006aaf6" name="result_1=i;" pathCondition="gt(j,i)" lineNumber="-1" charStart="489" charEnd="500">
+                        <sedStatement xml:id="_2baa18a2-db81-4bdc-83e0-792b4014e728" name="return result_1;" pathCondition="gt(j,i)" lineNumber="-1" charStart="540" charEnd="554">
+                           <sedMethodReturn xml:id="_0d8af2b0-6da2-42d1-8ebe-c0854e86e868" name="&lt;return i as result of self.min(i,j);&gt;" pathCondition="gt(j,i)" lineNumber="-1" charStart="424" charEnd="427">
+                              <sedTermination xml:id="_996712ac-ed88-43fe-9257-9863b2d7a5f2" name="&lt;end&gt;" pathCondition="gt(j,i)" verified="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>
