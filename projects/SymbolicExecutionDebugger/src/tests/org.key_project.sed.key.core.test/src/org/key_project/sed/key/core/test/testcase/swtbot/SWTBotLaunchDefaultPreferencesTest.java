@@ -41,7 +41,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
     */
    @Test
    public void testMergeBranchCondtions() throws Exception {
-      doTestShowVariableValues("SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions", true);
+      doTestMergeBranchConditions("SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions", true);
    }
 
    /**
@@ -49,7 +49,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
     */
    @Test
    public void testDoNotMergeBranchCondtions() throws Exception {
-      doTestShowVariableValues("SWTBotLaunchDefaultPreferencesTest_testDoNotMergeBranchCondtions", false);
+      doTestMergeBranchConditions("SWTBotLaunchDefaultPreferencesTest_testDoNotMergeBranchCondtions", false);
    }
    
    /**
@@ -83,10 +83,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Do run
                resume(bot, item, target);
                if (mergeBranchConditions) {
-                  assertDebugTargetViaOracle(target, "data/switchCaseTest/oracleMergeBranchConditions/SwitchCaseTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, "data/switchCaseTest/oracleMergeBranchConditions/MergedSwitchCaseTest.xml", false, false);
                }
                else {
-                  assertDebugTargetViaOracle(target, "data/switchCaseTest/oracle/SwitchCaseTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, "data/switchCaseTest/oracleMergeBranchConditions/NotMergedSwitchCaseTest.xml", false, false);
                }
             }
          };
