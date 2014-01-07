@@ -2,12 +2,12 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main(a);" pathCondition="true" pathConditionChanged="false">
       <branchStatement name="if (a==0) {int i = 2;int j = 3;int x = valueLonger(i);int y = value(j);int z = valueLonger(x)+valueLonger(y);int zz = value(-3)+value(-4);return value(z+zz); }else  {int i = 2;int j = 3;int x = value(i);int y = valueLonger(j);int z = value(x)+value(y);int zz = valueLonger(-3)+valueLonger(-4);return valueLonger(z+zz); }" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="a = 0" pathCondition="a = 0" pathConditionChanged="true" branchCondition="a = 0" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <statement name="int i = 2;" pathCondition="a = 0" pathConditionChanged="false">
+         <branchCondition name="equals(a,Z(0(#)))" pathCondition="equals(a,Z(0(#)))" pathConditionChanged="true" branchCondition="equals(a,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="int i = 2;" pathCondition="equals(a,Z(0(#)))" pathConditionChanged="false">
             </statement>
          </branchCondition>
-         <branchCondition name="!a = 0" pathCondition="!a = 0" pathConditionChanged="true" branchCondition="!a = 0" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <statement name="int i = 2;" pathCondition="!a = 0" pathConditionChanged="false">
+         <branchCondition name="not(equals(a,Z(0(#))))" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="true" branchCondition="not(equals(a,Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="int i = 2;" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="false">
             </statement>
          </branchCondition>
       </branchStatement>

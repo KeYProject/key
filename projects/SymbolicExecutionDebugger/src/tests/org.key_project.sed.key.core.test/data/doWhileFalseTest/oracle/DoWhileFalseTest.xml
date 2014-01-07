@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_6553a278-a7c7-441c-a56a-197a8058fbac" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_0126a893-06ea-43bf-9100-4eb219d95e73" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_1593b05d-234a-40c5-94d2-d076b9f05c78" name="self.main();" pathCondition="true" lineNumber="-1" charStart="96" charEnd="100">
-            <sedStatement xml:id="_015869ce-69ae-47ec-bcc7-c04fa013cb53" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="108" charEnd="123">
-               <sedLoopStatement xml:id="_b418de7d-29a9-4b8a-b51f-6f39d87837ac" name="do {result_1++;}while ( false );" pathCondition="true" lineNumber="-1" charStart="127" charEnd="169">
-                  <sedStatement xml:id="_b593d077-1a9f-4c0f-a764-0138b3d7bc04" name="result_1++;" pathCondition="true" lineNumber="-1" charStart="136" charEnd="146">
-                     <sedLoopCondition xml:id="_1445bcf1-8b2b-4db4-a56a-b2d680965e42" name="false" pathCondition="true" lineNumber="-1" charStart="162" charEnd="167">
-                        <sedStatement xml:id="_3a719730-902f-4d37-b74f-eba80d0e76a2" name="return result_1;" pathCondition="true" lineNumber="-1" charStart="173" charEnd="187">
-                           <sedMethodReturn xml:id="_2251474a-1937-4904-957d-deab52f564a3" name="&lt;return 1 as result of self.main();&gt;" pathCondition="true" lineNumber="-1" charStart="96" charEnd="100">
-                              <sedTermination xml:id="_44904cbc-6bb6-4ff3-9eca-c6364e444709" name="&lt;end&gt;" pathCondition="true" verified="true">
+   <sedTarget xml:id="_e459fe16-76e2-4ead-a011-dfb91d275d45" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_af679bcf-09c0-4c36-ae45-e161d8449e9d" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_cfb621dc-3d5e-4cfd-aca9-e3f30e52b791" name="self.main();" pathCondition="true" lineNumber="-1" charStart="96" charEnd="100">
+            <sedStatement xml:id="_9614cd06-4548-4776-9406-25a5dd8dadd1" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="108" charEnd="123">
+               <sedLoopStatement xml:id="_2b00edac-5559-46bf-ae06-5a0c242e1aa9" name="do {result_1++;}while ( false );" pathCondition="true" lineNumber="-1" charStart="127" charEnd="169">
+                  <sedStatement xml:id="_da36c6a2-922e-45f8-95bb-ba062dbbf75c" name="result_1++;" pathCondition="true" lineNumber="-1" charStart="136" charEnd="146">
+                     <sedLoopCondition xml:id="_55907a39-ed78-4ca0-823c-038ac06ccd27" name="false" pathCondition="true" lineNumber="-1" charStart="162" charEnd="167">
+                        <sedStatement xml:id="_509bf0bd-e448-40aa-9a12-878887a601f1" name="return result_1;" pathCondition="true" lineNumber="-1" charStart="173" charEnd="187">
+                           <sedMethodReturn xml:id="_8195bd36-2add-40e5-a51b-8cb53bb7006e" name="&lt;return Z(1(#)) as result of self.main();&gt;" pathCondition="true" lineNumber="-1" charStart="96" charEnd="100">
+                              <sedTermination xml:id="_2320638c-8989-47b7-beb9-4d99971e55ef" name="&lt;end&gt;" pathCondition="true" verified="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>

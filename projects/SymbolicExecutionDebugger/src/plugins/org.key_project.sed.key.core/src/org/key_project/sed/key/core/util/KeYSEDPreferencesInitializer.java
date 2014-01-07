@@ -35,5 +35,6 @@ public class KeYSEDPreferencesInitializer extends AbstractPreferenceInitializer 
       KeYSEDPreferences.setDefaultShowVariablesOfSelectedDebugNode(true);
       KeYSEDPreferences.setDefaultShowKeYMainWindow(false);
       KeYSEDPreferences.setDefaultMergeBranchConditions(false);
+      KeYSEDPreferences.setDefaultUsePrettyPrinting(true);
    }
 }

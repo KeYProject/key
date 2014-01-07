@@ -2,45 +2,45 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="TwoLoops.main(x);" pathCondition="true" pathConditionChanged="false">
       <branchStatement name="if (x&gt;=0) {while ( x&gt;0 ) {     x--;   } }else  {ghostint originalX = x;while ( x&lt;0 ) {     x++;   } }" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="x &gt;  -1" pathCondition="x &gt;  -1" pathConditionChanged="true" branchCondition="x &gt;  -1" mergedBranchCondition="false" isBranchConditionComputed="true">
+         <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <loopInvariant name="
 invariant: x &gt;= 0;
 variant: x
-mod: false" pathCondition="x &gt;  -1" pathConditionChanged="false" initiallyValid="true">
-               <branchCondition name="x &gt;= 1 &amp; x_0 &gt;= 0" pathCondition="x &gt;= 1 &amp; x_0 &gt;= 0" pathConditionChanged="true" branchCondition="x &gt;= 1 &amp; x_0 &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
-                  <statement name="x--;" pathCondition="x &gt;= 1 &amp; x_0 &gt;= 0" pathConditionChanged="false">
-                     <termination name="&lt;loop body end&gt;" pathCondition="x &gt;= 1 &amp; x_0 &gt;= 0" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
+mod: false" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" initiallyValid="true">
+               <branchCondition name="and(geq(x,Z(1(#))),geq(x_0,Z(0(#))))" pathCondition="and(geq(x,Z(1(#))),geq(x_0,Z(0(#))))" pathConditionChanged="true" branchCondition="and(geq(x,Z(1(#))),geq(x_0,Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                  <statement name="x--;" pathCondition="and(geq(x,Z(1(#))),geq(x_0,Z(0(#))))" pathConditionChanged="false">
+                     <termination name="&lt;loop body end&gt;" pathCondition="and(geq(x,Z(1(#))),geq(x_0,Z(0(#))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
                      </termination>
                   </statement>
                </branchCondition>
-               <branchCondition name="x &lt;= 0 &amp; x_0 &gt;= 0" pathCondition="x = 0 &amp; x_0 &gt;= 0" pathConditionChanged="true" branchCondition="x &lt;= 0 &amp; x_0 &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
-                  <statement name="return x;" pathCondition="x = 0 &amp; x_0 &gt;= 0" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of TwoLoops.main(x);&gt;" pathCondition="x = 0 &amp; x_0 &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 0 as result of TwoLoops.main(x);&gt;" isReturnValueComputed="true">
-                        <methodReturnValue name="0" returnValueString="0" hasCondition="false">
+               <branchCondition name="and(leq(x,Z(0(#))),geq(x_0,Z(0(#))))" pathCondition="and(equals(x,Z(0(#))),geq(x_0,Z(0(#))))" pathConditionChanged="true" branchCondition="and(leq(x,Z(0(#))),geq(x_0,Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                  <statement name="return x;" pathCondition="and(equals(x,Z(0(#))),geq(x_0,Z(0(#))))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of TwoLoops.main(x);&gt;" pathCondition="and(equals(x,Z(0(#))),geq(x_0,Z(0(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(0(#)) as result of TwoLoops.main(x);&gt;" isReturnValueComputed="true">
+                        <methodReturnValue name="Z(0(#))" returnValueString="Z(0(#))" hasCondition="false">
                         </methodReturnValue>
-                        <termination name="&lt;end&gt;" pathCondition="x = 0 &amp; x_0 &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <termination name="&lt;end&gt;" pathCondition="and(equals(x,Z(0(#))),geq(x_0,Z(0(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
                </branchCondition>
             </loopInvariant>
          </branchCondition>
-         <branchCondition name="x &lt; 0" pathCondition="x &lt; 0" pathConditionChanged="true" branchCondition="x &lt; 0" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <statement name="ghostint originalX = x;" pathCondition="x &lt; 0" pathConditionChanged="false">
+         <branchCondition name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="ghostint originalX = x;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
                <loopInvariant name="
 invariant: x &lt;= 0;
 variant: javaSubInt(originalX, x)
-mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid="true">
-                  <branchCondition name="x_4 &lt; 1" pathCondition="x &lt;= -1 &amp; x_4 &lt;= 0" pathConditionChanged="true" branchCondition="x_4 &lt; 1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
-                     <statement name="x++;" pathCondition="x &lt;= -1 &amp; x_4 &lt;= 0" pathConditionChanged="false">
-                        <termination name="&lt;loop body end&gt;" pathCondition="x &lt;= -1 &amp; x_4 &lt;= 0" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initiallyValid="true">
+                  <branchCondition name="lt(x_4,Z(1(#)))" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(x_4,Z(0(#))))" pathConditionChanged="true" branchCondition="lt(x_4,Z(1(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                     <statement name="x++;" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(x_4,Z(0(#))))" pathConditionChanged="false">
+                        <termination name="&lt;loop body end&gt;" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(x_4,Z(0(#))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                         </termination>
                      </statement>
                   </branchCondition>
                   <branchCondition name="false" pathCondition="false" pathConditionChanged="true" branchCondition="false" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                      <statement name="return x;" pathCondition="false" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of TwoLoops.main(x);&gt;" pathCondition="false" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 0 as result of TwoLoops.main(x);&gt;" isReturnValueComputed="true">
-                           <methodReturnValue name="0" returnValueString="0" hasCondition="false">
+                        <methodReturn name="&lt;return of TwoLoops.main(x);&gt;" pathCondition="false" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(0(#)) as result of TwoLoops.main(x);&gt;" isReturnValueComputed="true">
+                           <methodReturnValue name="Z(0(#))" returnValueString="Z(0(#))" hasCondition="false">
                            </methodReturnValue>
                            <termination name="&lt;end&gt;" pathCondition="false" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>

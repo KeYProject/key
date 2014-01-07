@@ -10,19 +10,6 @@
       </category>
       <wizard
             category="org.eclipse.ui.Examples/de.hentschel.visualdbc.example.category"
-            class="de.hentschel.visualdbc.example.wizard.KeyQuicktourWizard"
-            finalPerspective="de.hentschel.visualdbc.perspective"
-            icon="icon/ExampleIcon.gif"
-            id="de.hentschel.visualdbc.example.wizard.KeyQuicktourWizard"
-            name="KeY Quicktour"
-            preferredPerspectives="de.hentschel.visualdbc.perspective"
-            project="true">
-         <description>
-            Create a new Java Project and fill it with the KeY Quicktour.
-         </description>
-      </wizard>
-      <wizard
-            category="org.eclipse.ui.Examples/de.hentschel.visualdbc.example.category"
             class="de.hentschel.visualdbc.example.wizard.BankingWizard"
             finalPerspective="de.hentschel.visualdbc.perspective"
             icon="icon/ExampleIcon.gif"
@@ -41,16 +28,8 @@
             name="BankingExample"
             replaces="runAction?pluginId=de.hentschel.visualdbc.example&amp;class=de.hentschel.visualdbc.example.action.BankingWizardIntroAction">
       </action>
-      <action
-            name="KeYQuicktour"
-            replaces="runAction?pluginId=de.hentschel.visualdbc.example&amp;class=de.hentschel.visualdbc.example.action.KeyQuicktourWizardIntroAction">
-      </action>
       <configExtension
             content="intro/bankingExample.xml"
-            configId="org.eclipse.ui.intro.universalConfig">
-      </configExtension>
-      <configExtension
-            content="intro/keyQuicktour.xml"
             configId="org.eclipse.ui.intro.universalConfig">
       </configExtension>
    </extension>

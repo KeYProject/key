@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_a9a442f0-3a1e-404b-9b3a-e799b89f94e6" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_e295ec4f-e471-4569-8e33-6d85b586c696" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_8f3a24ee-f2d5-434b-a5a1-bb655b456b3d" name="PrettyPrintSimpleTest.main(x);" pathCondition="true" lineNumber="-1" charStart="59" charEnd="63">
+            <sedBranchStatement xml:id="_c30a9120-1798-46b6-b24b-6e9920aa34f6" name="if (x&gt;0) {return 1; }else  {return    -1; }" pathCondition="true" lineNumber="-1" charStart="76" charEnd="137">
+               <sedBranchCondition xml:id="_dc202591-00be-42ca-a67b-8f640e89e35f" name="gt(x,Z(0(#)))" pathCondition="gt(x,Z(0(#)))">
+                  <sedStatement xml:id="_3bdd6ba4-9085-4c5d-98bb-5cf212217a29" name="return 1;" pathCondition="gt(x,Z(0(#)))" lineNumber="-1" charStart="93" charEnd="102">
+                     <sedMethodReturn xml:id="_c99fac68-ac2a-4bcf-95b4-03df81b30b74" name="&lt;return of PrettyPrintSimpleTest.main(x);&gt;" pathCondition="gt(x,Z(0(#)))" lineNumber="-1" charStart="59" charEnd="63">
+                        <sedTermination xml:id="_9f1ca0fb-7917-4db9-a9e0-ec545cc59916" name="&lt;end&gt;" pathCondition="gt(x,Z(0(#)))" verified="true">
+                        </sedTermination>
+                     </sedMethodReturn>
+                  </sedStatement>
+               </sedBranchCondition>
+               <sedBranchCondition xml:id="_8c4c58b1-06a9-42e9-bf7e-cced72d918a0" name="lt(x,Z(1(#)))" pathCondition="lt(x,Z(1(#)))">
+                  <sedStatement xml:id="_2f3865c7-bdeb-4b00-ad76-0d66ec12965f" name="return -1;" pathCondition="lt(x,Z(1(#)))" lineNumber="-1" charStart="122" charEnd="132">
+                     <sedMethodReturn xml:id="_e23275f7-d215-46ca-8e77-be244b1f0603" name="&lt;return of PrettyPrintSimpleTest.main(x);&gt;" pathCondition="lt(x,Z(1(#)))" lineNumber="-1" charStart="59" charEnd="63">
+                        <sedTermination xml:id="_be1900fa-b3e2-4596-a1cb-ff30fd1d3d78" name="&lt;end&gt;" pathCondition="lt(x,Z(1(#)))" verified="true">
+                        </sedTermination>
+                     </sedMethodReturn>
+                  </sedStatement>
+               </sedBranchCondition>
+            </sedBranchStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

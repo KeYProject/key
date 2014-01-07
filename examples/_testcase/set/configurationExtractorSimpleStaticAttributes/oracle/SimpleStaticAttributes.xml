@@ -5,25 +5,20 @@
          <branchStatement name="if (SimpleStaticAttributes.finalStaticint==42&amp;&amp;SimpleStaticAttributes.staticInt==1) {   SimpleStaticAttributes.instance=newInstance;return    SimpleStaticAttributes.instance.x+SimpleStaticAttributes.finalInstance.x+SimpleStaticAttributes.staticInt+SimpleStaticAttributes.finalStaticint; }else  {return    -1; }" pathCondition="true" pathConditionChanged="false">
             <statement name="SimpleStaticAttributes.instance=newInstance;" pathCondition="true" pathConditionChanged="false">
                <statement name="return SimpleStaticAttributes.instance.x+SimpleStaticAttributes.finalInstance.x+SimpleStaticAttributes.staticInt+SimpleStaticAttributes.finalStaticint;" pathCondition="true" pathConditionChanged="false">
-                  <branchCondition name="!newInstance = null" pathCondition="!newInstance = null" pathConditionChanged="true" branchCondition="!newInstance = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <branchCondition name="!SimpleStaticAttributes.finalInstance = null" pathCondition="  !newInstance = null
-&amp; !SimpleStaticAttributes.finalInstance = null" pathConditionChanged="true" branchCondition="!SimpleStaticAttributes.finalInstance = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <methodReturn name="&lt;return of SimpleStaticAttributes.compute(newInstance);&gt;" pathCondition="  !newInstance = null
-&amp; !SimpleStaticAttributes.finalInstance = null" pathConditionChanged="false" isReturnValueComputed="false">
-                           <termination name="&lt;end&gt;" pathCondition="  !newInstance = null
-&amp; !SimpleStaticAttributes.finalInstance = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  <branchCondition name="not(equals(newInstance,null))" pathCondition="not(equals(newInstance,null))" pathConditionChanged="true" branchCondition="not(equals(newInstance,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <branchCondition name="not(equals(SimpleStaticAttributes::select(heap,null,SimpleStaticAttributes::$finalInstance),null))" pathCondition="and(not(equals(newInstance,null)),not(equals(SimpleStaticAttributes::select(heap,null,SimpleStaticAttributes::$finalInstance),null)))" pathConditionChanged="true" branchCondition="not(equals(SimpleStaticAttributes::select(heap,null,SimpleStaticAttributes::$finalInstance),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <methodReturn name="&lt;return of SimpleStaticAttributes.compute(newInstance);&gt;" pathCondition="and(not(equals(newInstance,null)),not(equals(SimpleStaticAttributes::select(heap,null,SimpleStaticAttributes::$finalInstance),null)))" pathConditionChanged="false" isReturnValueComputed="false">
+                           <termination name="&lt;end&gt;" pathCondition="and(not(equals(newInstance,null)),not(equals(SimpleStaticAttributes::select(heap,null,SimpleStaticAttributes::$finalInstance),null)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </branchCondition>
-                     <branchCondition name="SimpleStaticAttributes.finalInstance = null" pathCondition="  !newInstance = null
-&amp; SimpleStaticAttributes.finalInstance = null" pathConditionChanged="true" branchCondition="SimpleStaticAttributes.finalInstance = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="  !newInstance = null
-&amp; SimpleStaticAttributes.finalInstance = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                     <branchCondition name="equals(SimpleStaticAttributes::select(heap,null,SimpleStaticAttributes::$finalInstance),null)" pathCondition="and(not(equals(newInstance,null)),equals(SimpleStaticAttributes::select(heap,null,SimpleStaticAttributes::$finalInstance),null))" pathConditionChanged="true" branchCondition="equals(SimpleStaticAttributes::select(heap,null,SimpleStaticAttributes::$finalInstance),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(not(equals(newInstance,null)),equals(SimpleStaticAttributes::select(heap,null,SimpleStaticAttributes::$finalInstance),null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                         </termination>
                      </branchCondition>
                   </branchCondition>
-                  <branchCondition name="newInstance = null" pathCondition="newInstance = null" pathConditionChanged="true" branchCondition="newInstance = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="newInstance = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                  <branchCondition name="equals(newInstance,null)" pathCondition="equals(newInstance,null)" pathConditionChanged="true" branchCondition="equals(newInstance,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(newInstance,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                      </termination>
                   </branchCondition>
                </statement>

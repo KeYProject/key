@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -25,31 +25,31 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * Default implementation of {@link ISymbolicValue}.
  * @author Martin Hentschel
  */
-public class SymbolicValue implements ISymbolicValue {
+public class SymbolicValue extends AbstractElement implements ISymbolicValue {
    /**
     * The {@link Services} to use.
     */
-   private Services services;
+   private final Services services;
 
    /**
     * The array index.
     */
-   private int arrayIndex;
+   private final int arrayIndex;
    
    /**
     * The {@link IProgramVariable}.
     */
-   private IProgramVariable programVariable;
+   private final IProgramVariable programVariable;
    
    /**
     * The value {@link Term}.
     */
-   private Term value;
+   private final Term value;
    
    /**
     * The optional condition under which this value is valid.
     */
-   private Term condition;
+   private final Term condition;
 
    /**
     * Constructor.
@@ -57,11 +57,18 @@ public class SymbolicValue implements ISymbolicValue {
     * @param arrayIndex The array index.
     * @param value The value {@link Term}.
     * @param condition The optional condition under which this value is valid.
+    * @param settings The {@link IModelSettings} to use.
     */
-   public SymbolicValue(Services services, int arrayIndex, Term value, Term condition) {
+   public SymbolicValue(Services services, 
+                        int arrayIndex, 
+                        Term value, 
+                        Term condition, 
+                        IModelSettings settings) {
+      super(settings);
       assert services != null;
       assert arrayIndex >= 0;
       this.services = services;
+      this.programVariable = null;
       this.arrayIndex = arrayIndex;
       this.value = value;
       this.condition = condition;
@@ -73,8 +80,14 @@ public class SymbolicValue implements ISymbolicValue {
     * @param programVariable The {@link IProgramVariable}.
     * @param value The value {@link Term}.
     * @param condition The optional condition under which this value is valid.
+    * @param settings The {@link IModelSettings} to use.
     */
-   public SymbolicValue(Services services, IProgramVariable programVariable, Term value, Term condition) {
+   public SymbolicValue(Services services, 
+                        IProgramVariable programVariable, 
+                        Term value, 
+                        Term condition, 
+                        IModelSettings settings) {
+      super(settings);
       assert services != null;
       assert programVariable != null;
       this.services = services;
@@ -151,8 +164,7 @@ public class SymbolicValue implements ISymbolicValue {
     */
    @Override
    public String getValueString() {
-      StringBuffer sb = ProofSaver.printTerm(value, services, true);
-      return sb.toString();
+      return formatTerm(value, services);
    }
 
    /**
@@ -193,12 +205,6 @@ public class SymbolicValue implements ISymbolicValue {
     */
    @Override
    public String getConditionString() {
-      if (condition != null) {
-         StringBuffer sb = ProofSaver.printTerm(condition, services, true);
-         return sb.toString();
-      }
-      else {
-         return null;
-      }
+      return condition != null ? formatTerm(condition, services) : null;
    }
 }

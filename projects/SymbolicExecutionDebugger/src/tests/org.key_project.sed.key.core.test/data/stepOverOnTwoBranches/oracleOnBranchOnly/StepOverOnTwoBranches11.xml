@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_ff95fc06-2b6b-4d08-94de-362d3374ba27" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_8b4e55b4-f232-4727-8590-896ef8775168" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_7f51b841-388f-4b98-aa0a-8c1590b54ca4" name="self.main(a);" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56">
-            <sedBranchStatement xml:id="_125cecb0-12b0-489e-b370-be34bcd2f6a0" name="if (a==0) {int i = 2;int j = 3;int x = valueLonger(i);int y = value(j);int z = valueLonger(x)+valueLonger(y);int zz = value(-3)+value(-4);return value(z+zz); }else  {int i = 2;int j = 3;int x = value(i);int y = valueLonger(j);int z = value(x)+value(y);int zz = valueLonger(-3)+valueLonger(-4);return valueLonger(z+zz); }" pathCondition="true" lineNumber="-1" charStart="69" charEnd="497">
-               <sedBranchCondition xml:id="_f9ac0f71-3a3b-46f9-9e91-36602f3dbc38" name="a = 0" pathCondition="a = 0">
-                  <sedStatement xml:id="_4ce9cf10-d1a0-4b05-8fd5-05947d2cdc0b" name="int i = 2;" pathCondition="a = 0" lineNumber="-1" charStart="87" charEnd="97">
-                     <sedStatement xml:id="_981aae49-a09c-4ea7-951e-554fd4223f87" name="int j = 3;" pathCondition="a = 0" lineNumber="-1" charStart="102" charEnd="112">
-                        <sedStatement xml:id="_cb05243e-3d0b-4af0-b655-0019e0fdbf2f" name="int x = valueLonger(i_1);" pathCondition="a = 0" lineNumber="-1" charStart="117" charEnd="140">
-                           <sedMethodCall xml:id="_69050696-3a58-4116-84fc-7f308e2c53a2" name="self.valueLonger(i_2);" pathCondition="a = 0" lineNumber="-1" charStart="568" charEnd="579">
-                              <sedStatement xml:id="_614b7c64-266f-4ba4-ad64-02967e76ca29" name="int j = i_2;" pathCondition="a = 0" lineNumber="-1" charStart="592" charEnd="602">
-                                 <sedStatement xml:id="_a9d7c517-9781-4d8e-b077-153c7ba11ee9" name="i_2=j_1;" pathCondition="a = 0" lineNumber="-1" charStart="606" charEnd="612">
-                                    <sedStatement xml:id="_928e582b-3fe1-49cc-9033-b1ccdee6e920" name="return j_1;" pathCondition="a = 0" lineNumber="-1" charStart="616" charEnd="625">
-                                       <sedMethodReturn xml:id="_e728e177-0413-4d99-8ddd-1e01ef71863a" name="&lt;return of self.valueLonger(i_2);&gt;" pathCondition="a = 0" lineNumber="-1" charStart="568" charEnd="579">
-                                          <sedStatement xml:id="_5658d98f-c8cf-4afc-bbb2-e209ea70b4c1" name="int y = value(j);" pathCondition="a = 0" lineNumber="-1" charStart="145" charEnd="162">
-                                             <sedMethodCall xml:id="_4c8950cd-6803-4b6d-ad1d-6f4fd7545144" name="self.value(i_3);" pathCondition="a = 0" lineNumber="-1" charStart="518" charEnd="523">
-                                                <sedStatement xml:id="_b5417f60-e2c1-4dc6-973d-205c684ff972" name="return i_3;" pathCondition="a = 0" lineNumber="-1" charStart="536" charEnd="545">
-                                                   <sedMethodReturn xml:id="_2ab913f1-eb41-412a-8a2b-9185f58d7bf7" name="&lt;return of self.value(i_3);&gt;" pathCondition="a = 0" lineNumber="-1" charStart="518" charEnd="523">
-                                                      <sedStatement xml:id="_17095385-77cb-45b2-9d94-79afe8251b75" name="int z = valueLonger(x)+valueLonger(y);" pathCondition="a = 0" lineNumber="-1" charStart="167" charEnd="207">
+   <sedTarget xml:id="_18f250f3-63df-4ddb-ba91-24b1f0ba2cd2" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_c86726d8-1461-4c61-9f41-494371152332" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_449bb435-3441-48b4-a12a-3eab1ec6fd6a" name="self.main(a);" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56">
+            <sedBranchStatement xml:id="_69e3f45d-6217-45e1-87c9-39d05021d555" name="if (a==0) {int i = 2;int j = 3;int x = valueLonger(i);int y = value(j);int z = valueLonger(x)+valueLonger(y);int zz = value(-3)+value(-4);return value(z+zz); }else  {int i = 2;int j = 3;int x = value(i);int y = valueLonger(j);int z = value(x)+value(y);int zz = valueLonger(-3)+valueLonger(-4);return valueLonger(z+zz); }" pathCondition="true" lineNumber="-1" charStart="69" charEnd="497">
+               <sedBranchCondition xml:id="_3b71f98b-99d5-4003-9b94-3f812bd9cc85" name="equals(a,Z(0(#)))" pathCondition="equals(a,Z(0(#)))">
+                  <sedStatement xml:id="_8c407e59-3f7e-4be8-869f-9c26e0111d43" name="int i = 2;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="87" charEnd="97">
+                     <sedStatement xml:id="_664166fa-6f10-4cdf-84c2-a5b09297ebb4" name="int j = 3;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="102" charEnd="112">
+                        <sedStatement xml:id="_a2678777-56ba-46ae-b239-38d20a7f9fe6" name="int x = valueLonger(i_1);" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="117" charEnd="140">
+                           <sedMethodCall xml:id="_e1a208a0-bc1e-4d4a-92a5-0d1bcbdf8536" name="self.valueLonger(i_2);" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="568" charEnd="579">
+                              <sedStatement xml:id="_5808d1de-4dc0-4aec-9731-662635ebfcd2" name="int j = i_2;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="592" charEnd="602">
+                                 <sedStatement xml:id="_514ce5a9-e79b-4ae3-8f66-4265a27c9916" name="i_2=j_1;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="606" charEnd="612">
+                                    <sedStatement xml:id="_fcbd11f1-260d-4856-81bb-11b16044778d" name="return j_1;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="616" charEnd="625">
+                                       <sedMethodReturn xml:id="_14644a9d-f70e-4b83-924f-50978b507f7d" name="&lt;return of self.valueLonger(i_2);&gt;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="568" charEnd="579">
+                                          <sedStatement xml:id="_5b64b925-bef3-44a0-964f-b93c09721921" name="int y = value(j);" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="145" charEnd="162">
+                                             <sedMethodCall xml:id="_2ca49fde-cc87-4812-95b2-776e5cb052e2" name="self.value(i_3);" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="518" charEnd="523">
+                                                <sedStatement xml:id="_3e7654e0-a487-4cb7-89b2-76e5356faf7b" name="return i_3;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="536" charEnd="545">
+                                                   <sedMethodReturn xml:id="_625e2405-afbb-453b-b0be-f33177016237" name="&lt;return of self.value(i_3);&gt;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="518" charEnd="523">
+                                                      <sedStatement xml:id="_de5d42e4-b567-48c6-bfbb-ef11c863f4c4" name="int z = valueLonger(x)+valueLonger(y);" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="167" charEnd="207">
                                                       </sedStatement>
                                                    </sedMethodReturn>
                                                 </sedStatement>
@@ -32,20 +32,20 @@
                      </sedStatement>
                   </sedStatement>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_ff56fafb-4b6f-4f67-9e97-d4e0ab96bdf2" name="!a = 0" pathCondition="!a = 0">
-                  <sedStatement xml:id="_32e6f34b-0a68-4664-8eb6-4afbc96178da" name="int i = 2;" pathCondition="!a = 0" lineNumber="-1" charStart="297" charEnd="307">
-                     <sedStatement xml:id="_c7336f96-18c7-4a06-9475-53d657dd5eca" name="int j = 3;" pathCondition="!a = 0" lineNumber="-1" charStart="312" charEnd="322">
-                        <sedStatement xml:id="_225ef2be-66cc-4d96-8a84-72d0f4eb64ef" name="int x = value(i);" pathCondition="!a = 0" lineNumber="-1" charStart="327" charEnd="344">
-                           <sedMethodCall xml:id="_8bc0fa6b-9c3b-469f-acce-b144f5eac669" name="self.value(i_4);" pathCondition="!a = 0" lineNumber="-1" charStart="518" charEnd="523">
-                              <sedStatement xml:id="_cfa25fe0-d11d-4e0b-a52f-5b5dfffa09f4" name="return i_4;" pathCondition="!a = 0" lineNumber="-1" charStart="536" charEnd="545">
-                                 <sedMethodReturn xml:id="_783255fa-3ad2-4d8b-8699-e9f65aa78b7e" name="&lt;return of self.value(i_4);&gt;" pathCondition="!a = 0" lineNumber="-1" charStart="518" charEnd="523">
-                                    <sedStatement xml:id="_3e8a26cc-c585-4252-84a0-6bbf9c8de88e" name="int y = valueLonger(j_2);" pathCondition="!a = 0" lineNumber="-1" charStart="349" charEnd="372">
-                                       <sedMethodCall xml:id="_69961144-33b3-4d49-8d0b-54b053673d9a" name="self.valueLonger(i_5);" pathCondition="!a = 0" lineNumber="-1" charStart="568" charEnd="579">
-                                          <sedStatement xml:id="_95a61a0b-4e2c-459c-a75d-946ae2623707" name="int j = i_5;" pathCondition="!a = 0" lineNumber="-1" charStart="592" charEnd="602">
-                                             <sedStatement xml:id="_2077487e-802d-481a-b5c3-792719800b1c" name="i_5=j_3;" pathCondition="!a = 0" lineNumber="-1" charStart="606" charEnd="612">
-                                                <sedStatement xml:id="_01212291-4b72-4d41-b6e3-c3c375f3680d" name="return j_3;" pathCondition="!a = 0" lineNumber="-1" charStart="616" charEnd="625">
-                                                   <sedMethodReturn xml:id="_88933156-67da-4f75-8673-fae151bc47f4" name="&lt;return of self.valueLonger(i_5);&gt;" pathCondition="!a = 0" lineNumber="-1" charStart="568" charEnd="579">
-                                                      <sedStatement xml:id="_9098cb76-413f-4fa3-b300-c3289fc89106" name="int z = value(x_4)+value(y_1);" pathCondition="!a = 0" lineNumber="-1" charStart="377" charEnd="405">
+               <sedBranchCondition xml:id="_2da597cf-3d8d-417f-b750-87725925e005" name="not(equals(a,Z(0(#))))" pathCondition="not(equals(a,Z(0(#))))">
+                  <sedStatement xml:id="_400d06ce-0997-4086-a426-b920f5c0cf49" name="int i = 2;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="297" charEnd="307">
+                     <sedStatement xml:id="_a7e5a9a6-4669-417a-b5ae-bbabfca71d8b" name="int j = 3;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="312" charEnd="322">
+                        <sedStatement xml:id="_b03b76b7-9780-44c1-a30c-4bd328e38972" name="int x = value(i);" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="327" charEnd="344">
+                           <sedMethodCall xml:id="_b04395be-cfe8-49c2-a160-fa0058d0e16d" name="self.value(i_4);" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="518" charEnd="523">
+                              <sedStatement xml:id="_b98ea140-c38e-4c91-8001-1a56108e7440" name="return i_4;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="536" charEnd="545">
+                                 <sedMethodReturn xml:id="_041a8495-e835-4b14-81a6-722d6dd69869" name="&lt;return of self.value(i_4);&gt;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="518" charEnd="523">
+                                    <sedStatement xml:id="_b4173d87-486b-4e90-84bd-ef5f744604fc" name="int y = valueLonger(j_2);" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="349" charEnd="372">
+                                       <sedMethodCall xml:id="_677c2d21-cb4c-4ce0-be3b-4b491a60cd44" name="self.valueLonger(i_5);" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="568" charEnd="579">
+                                          <sedStatement xml:id="_f2d231c5-b252-4c03-8594-312d50a31f3d" name="int j = i_5;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="592" charEnd="602">
+                                             <sedStatement xml:id="_1d487ffe-c2a8-41b2-9222-8a71f5612a84" name="i_5=j_3;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="606" charEnd="612">
+                                                <sedStatement xml:id="_3746ce24-3eb8-4304-921c-f19fe1dfb0c5" name="return j_3;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="616" charEnd="625">
+                                                   <sedMethodReturn xml:id="_56ee11fc-2388-4f42-b819-ab43bfdd57a0" name="&lt;return of self.valueLonger(i_5);&gt;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="568" charEnd="579">
+                                                      <sedStatement xml:id="_065b5f82-3253-463c-9db4-10d9056f6676" name="int z = value(x_4)+value(y_1);" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="377" charEnd="405">
                                                       </sedStatement>
                                                    </sedMethodReturn>
                                                 </sedStatement>

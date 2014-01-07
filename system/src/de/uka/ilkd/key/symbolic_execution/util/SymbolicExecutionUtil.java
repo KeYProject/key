@@ -30,6 +30,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaProgramElement;
@@ -93,6 +94,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Node.NodeIterator;
@@ -3148,5 +3150,48 @@ public final class SymbolicExecutionUtil {
       result.put("wdChecks", "wdChecks:off");
       result.put("wdOperator", "wdOperator:L");
       return result;
+   }
+   
+   /**
+    * Converts the given {@link Term} into a {@link String} respecting {@link #isUsePretty()}.
+    * @param term The {@link Term} to convert.
+    * @param services The {@link Services} to use.
+    * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
+    * @return The {@link String} representation of the given {@link Term}.
+    */
+   public static String formatTerm(Term term, Services services, boolean usePrettyPrinting) {
+      if (usePrettyPrinting) {
+         synchronized (NotationInfo.class) {
+            boolean originalPrettySyntax = NotationInfo.PRETTY_SYNTAX;
+            try {
+               NotationInfo.PRETTY_SYNTAX = true;
+               StringBuffer sb = ProofSaver.printTerm(term, services, true);
+               return sb.toString();
+            }
+            finally {
+               NotationInfo.PRETTY_SYNTAX = originalPrettySyntax;
+            }
+         }
+      }
+      else {
+         return term.toString();
+      }
+   }
+   
+   /**
+    * Checks if pretty printing is enabled or not.
+    * @return {@code true} pretty printing is enabled, {@code false} pretty printing is disabled.
+    */
+   public static boolean isUsePrettyPrinting() {
+      return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
+   }
+
+   /**
+    * Defines if pretty printing is enabled or not.
+    * @param usePrettyPrinting {@code true} pretty printing is enabled, {@code false} pretty printing is disabled.
+    */
+   public static void setUsePrettyPrinting(boolean usePrettyPrinting) {
+      ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);
+      NotationInfo.PRETTY_SYNTAX = usePrettyPrinting;
    }
 }

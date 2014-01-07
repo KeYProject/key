@@ -637,7 +637,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, useOperationContracts, false, false, false);
+         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, useOperationContracts, false, false, false, false);
          setOneStepSimplificationEnabled(null, true);
          // Resume
          resume(env.getUi(), env.getBuilder(), oraclePathInBaseDir + symbolicExecutionOracleFileName, keyRepDirectory);
@@ -669,7 +669,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
             nodeToTest = returnNode;
          }
          // Extract possible heaps
-         SymbolicConfigurationExtractor extractor = new SymbolicConfigurationExtractor(nodeToTest.getProofNode());
+         SymbolicConfigurationExtractor extractor = new SymbolicConfigurationExtractor(nodeToTest.getProofNode(), false);
          extractor.analyse();
          // Test the initial configurations (first time with lazy computation)
          List<ISymbolicConfiguration> initialConfigurationsFirstTime = new ArrayList<ISymbolicConfiguration>(extractor.getConfigurationsCount());
