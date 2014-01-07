@@ -1,23 +1,11 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui.macros;
 
-/**
- *
- * @author christoph scheben
- */
-public class FullInformationFlowAutoPilotMacro extends SequentialOnLastGoalProofMacro {
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import javax.swing.KeyStroke;
+
+public class FullInformationFlowAutoPilotMacro implements ProofMacro {
 
     /**
      * The number of proof steps that should be run by the {@link TryCloseMacro}
@@ -25,7 +13,12 @@ public class FullInformationFlowAutoPilotMacro extends SequentialOnLastGoalProof
      * greater or equal to 0.
      */
     private static final int NUMBER_OF_TRY_STEPS = -1;
-//            Integer.getInteger("key.autopilot.closesteps", 1000);
+
+    private final ProofMacro wrappedMacro;
+
+    public FullInformationFlowAutoPilotMacro() {
+        wrappedMacro = createProofMacro();
+    }
 
     @Override
     public String getName() {
@@ -34,27 +27,80 @@ public class FullInformationFlowAutoPilotMacro extends SequentialOnLastGoalProof
 
     @Override
     public String getDescription() {
-        return "...";
+        return "<html><ol><li>Search exhaustively for applicable position, then" +
+                "<li>Start auxiliary computation" +
+                "<li>Finish symbolic execution" +
+                "<li>Try to close as many goals as possible" +
+                "<li>Apply macro recursively" +
+                "<li>Finish auxiliary computation" +
+                "<li>Use information flow contracts" +
+                "<li>Try to close as many goals as possible</ol>";
     }
 
-    @Override
-    protected ProofMacro[] createProofMacroArray() {
-        // The StateExpansionAndInfFlowContractApplicationMacro and the
-        // TryCloseMacro shall be started at the same node. Therefore they are
-        // encapsulated in an own (anonymous) SequentialProofMacro.
-        SequentialProofMacro fullmainCompMacro =
-                new SequentialProofMacro() {
+    private ProofMacro createProofMacro() {
+        final ExhaustiveProofMacro exhaustiveAutoPilotMacro =
+                new ExhaustiveProofMacro() {
+                    @Override
+                    public String getName() { return "Anonymous Macro"; }
+                    @Override
+                    public String getDescription() { return "Anonymous Macro"; }
+                    @Override
+                    ProofMacro getProofMacro() { return new AuxiliaryComputationAutoPilotMacro(); }
+        };
+        final SequentialProofMacro stateExpansionAndCloseMacro = new SequentialProofMacro() {
             @Override
             protected ProofMacro[] createProofMacroArray() {
                 return new ProofMacro[] {new StateExpansionAndInfFlowContractApplicationMacro(),
-                                         new TryCloseMacro(NUMBER_OF_TRY_STEPS)};}
+                                         new TryCloseMacro(NUMBER_OF_TRY_STEPS)};
+            }
             @Override
             public String getName() { return "Anonymous Macro"; }
             @Override
             public String getDescription() { return "Anonymous Macro"; }
         };
-//        return new ProofMacro[] {new ExhaustiveOrFinishAuxiliaryComputationAutoPilotMacro(),
-//                                 fullmainCompMacro};
-        return new ProofMacro[] {new ExhaustiveOrFinishAuxiliaryComputationAutoPilotMacro()};
+        final SequentialProofMacro finishMainCompMacro =
+                new SequentialOnLastGoalProofMacro() {
+            @Override
+            protected ProofMacro[] createProofMacroArray() {
+                return new ProofMacro[] {new FinishAuxiliaryComputationMacro(),
+                                         stateExpansionAndCloseMacro};}
+            @Override
+            public String getName() { return "Anonymous Macro"; }
+            @Override
+            public String getDescription() { return "Anonymous Macro"; }
+        };
+        AlternativeProofMacro alternativesMacro =
+                new AlternativeProofMacro() {
+                    @Override
+                    public String getName() { return "Anonymous Macro"; }
+                    @Override
+                    public String getDescription() { return "Anonymous Macro"; }
+                    @Override
+                    protected ProofMacro[] createProofMacroArray() {
+                        return new ProofMacro[] {exhaustiveAutoPilotMacro,
+                                                 finishMainCompMacro};}
+        };
+        return new DoWhileElseMacro(alternativesMacro, NUMBER_OF_TRY_STEPS);
+    }
+
+
+    @Override
+    public boolean canApplyTo(KeYMediator mediator,
+                              PosInOccurrence posInOcc) {
+        return wrappedMacro.canApplyTo(mediator, posInOcc);
+    }
+
+
+    @Override
+    public void applyTo(KeYMediator mediator,
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) throws InterruptedException {
+        wrappedMacro.applyTo(mediator, posInOcc, listener);
+    }
+
+
+    @Override
+    public KeyStroke getKeyStroke() {
+        return null;  // default implementation
     }
 }
