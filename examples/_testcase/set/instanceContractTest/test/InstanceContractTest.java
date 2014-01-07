@@ -56,6 +56,7 @@ public class InstanceContractTest {
 	}
 
 	/*@ exceptional_behavior
+	  @ signals_only Exception;
 	  @ signals (Exception) true;
 	  @*/
 	public void exceptinalVoid(boolean x) throws Exception {
@@ -71,6 +72,7 @@ public class InstanceContractTest {
 	}
 
 	/*@ exceptional_behavior
+	  @ signals_only Exception;
 	  @ signals (Exception) true;
 	  @*/
 	public boolean exceptinal(boolean x) throws Exception {
@@ -116,6 +118,7 @@ public class InstanceContractTest {
 		public int value;
 
 		/*@ exceptional_behavior
+		  @ signals_only Exception;
 		  @ signals (Exception e) true;
 		  @*/
 		public IntWrapper() throws Exception {

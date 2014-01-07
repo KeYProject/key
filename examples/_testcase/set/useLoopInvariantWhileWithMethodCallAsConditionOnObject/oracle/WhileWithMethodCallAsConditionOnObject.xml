@@ -17,10 +17,11 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
 pre: i &lt; 0 &amp; x.&lt;inv&gt; | !array = null &amp; i &gt;= 0 &amp; x.&lt;inv&gt;
 post: (   i &lt; 0 &amp; heapBefore_goOnNice_5[x.&lt;inv&gt;]
    -&gt;   !exc_8 = null
-      &amp; (  (     java.lang.Exception::instance(exc_8)
+      &amp; (  (     java.lang.Throwable::instance(exc_8)
                = TRUE
             -&gt; x.&lt;inv&gt;)
-         &amp; (    java.lang.RuntimeException::instance(exc_8)
+         &amp; (  java.lang.Error::instance(exc_8) = TRUE
+            |   java.lang.RuntimeException::instance(exc_8)
               = TRUE
             |   java.lang.RuntimeException::instance(exc_8)
               = TRUE)))
@@ -104,7 +105,7 @@ termination: diamond" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(a
                         </branchCondition>
                         <branchCondition name="and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))))" pathConditionChanged="true" branchCondition="and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (goOnNice)">
                            <callStackEntry path="/0"/>
-                           <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                           <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                            </termination>
                         </branchCondition>
                      </operationContract>
@@ -114,10 +115,11 @@ termination: diamond" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(a
 pre: i &lt; 0 &amp; x.&lt;inv&gt; | !array = null &amp; i &gt;= 0 &amp; x.&lt;inv&gt;
 post: (   i &lt; 0 &amp; heapBefore_goOnNice_5[x.&lt;inv&gt;]
    -&gt;   !exc_9 = null
-      &amp; (  (     java.lang.Exception::instance(exc_9)
+      &amp; (  (     java.lang.Throwable::instance(exc_9)
                = TRUE
             -&gt; x.&lt;inv&gt;)
-         &amp; (    java.lang.RuntimeException::instance(exc_9)
+         &amp; (  java.lang.Error::instance(exc_9) = TRUE
+            |   java.lang.RuntimeException::instance(exc_9)
               = TRUE
             |   java.lang.RuntimeException::instance(exc_9)
               = TRUE)))
@@ -201,7 +203,7 @@ termination: diamond" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(a
                         </branchCondition>
                         <branchCondition name="and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))))" pathConditionChanged="true" branchCondition="and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (goOnNice)">
                            <callStackEntry path="/0"/>
-                           <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                           <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                            </termination>
                         </branchCondition>
                      </operationContract>

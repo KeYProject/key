@@ -17,10 +17,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
 pre: i &lt; 0 | !array = null &amp; i &gt;= 0
 post: (   i &lt; 0
    -&gt;   !exc_6 = null
-      &amp; (    java.lang.RuntimeException::instance(exc_6)
-           = TRUE
-         |   java.lang.RuntimeException::instance(exc_6)
-           = TRUE))
+      &amp; java.lang.Exception::instance(exc_6) = TRUE)
 &amp; (   !array = null &amp; i &gt;= 0
    -&gt;     result_4
         = \if (i &lt; array.length)
@@ -84,7 +81,7 @@ termination: diamond" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(a
                         </branchCondition>
                         <branchCondition name="lt(i_0,Z(0(#)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(geq(i_0,Z(0(#))),not(equals(array,null)))),leq(i_0,Z(neglit(1(#))))))" pathConditionChanged="true" branchCondition="lt(i_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (goOnNice)">
                            <callStackEntry path="/0"/>
-                           <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(geq(i_0,Z(0(#))),not(equals(array,null)))),leq(i_0,Z(neglit(1(#))))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                           <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(geq(i_0,Z(0(#))),not(equals(array,null)))),leq(i_0,Z(neglit(1(#))))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                            </termination>
                         </branchCondition>
                      </operationContract>
@@ -94,10 +91,7 @@ termination: diamond" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(a
 pre: i &lt; 0 | !array = null &amp; i &gt;= 0
 post: (   i &lt; 0
    -&gt;   !exc_7 = null
-      &amp; (    java.lang.RuntimeException::instance(exc_7)
-           = TRUE
-         |   java.lang.RuntimeException::instance(exc_7)
-           = TRUE))
+      &amp; java.lang.Exception::instance(exc_7) = TRUE)
 &amp; (   !array = null &amp; i &gt;= 0
    -&gt;     result_5
         = \if (i &lt; array.length)
@@ -161,7 +155,7 @@ termination: diamond" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(a
                         </branchCondition>
                         <branchCondition name="lt(i_0,Z(0(#)))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),leq(i_0,Z(neglit(1(#))))))" pathConditionChanged="true" branchCondition="lt(i_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (goOnNice)">
                            <callStackEntry path="/0"/>
-                           <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),leq(i_0,Z(neglit(1(#))))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                           <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),leq(i_0,Z(neglit(1(#))))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                            </termination>
                         </branchCondition>
                      </operationContract>
