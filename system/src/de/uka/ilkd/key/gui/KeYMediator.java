@@ -562,14 +562,14 @@ public class KeYMediator {
      * changed
      * @param listener the KeYSelectionListener to add
      */
-    public synchronized void addKeYSelectionListener(KeYSelectionListener listener) {
+    public void addKeYSelectionListener(KeYSelectionListener listener) {
 	keySelectionModel.addKeYSelectionListener(listener);
     }
 
     /** removes a listener from the KeYSelectionModel
      * @param listener the KeYSelectionListener to be removed
      */
-    public synchronized void removeKeYSelectionListener(KeYSelectionListener listener) {
+    public void removeKeYSelectionListener(KeYSelectionListener listener) {
 	keySelectionModel.removeKeYSelectionListener(listener);
     }
 

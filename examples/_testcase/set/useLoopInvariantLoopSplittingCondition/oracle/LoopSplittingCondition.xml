@@ -9,12 +9,12 @@ variant: i
 mod: false" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" initiallyValid="true">
                <branchCondition name="not(or(leq(i_1,Z(neglit(1(#)))),and(leq(x,Z(0(#))),geq(i_1,Z(0(#))))))" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="true" branchCondition="not(or(leq(i_1,Z(neglit(1(#)))),and(leq(x,Z(0(#))),geq(i_1,Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <methodCall name="LoopSplittingCondition.goOn(x_17);" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="false">
-                     <branchStatement name="if (x_17&gt;0) {return true; }else  {return false; }" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="false">
+                     <branchStatement name="if (x_17&gt;0)" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="false">
                         <statement name="return true;" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="false">
                            <methodReturn name="&lt;return of LoopSplittingCondition.goOn(x_17);&gt;" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return TRUE as result of LoopSplittingCondition.goOn(x_17);&gt;" isReturnValueComputed="true">
                               <methodReturnValue name="TRUE" returnValueString="TRUE" hasCondition="false">
                               </methodReturnValue>
-                              <branchStatement name="if (i&gt;=0) {   x--; }else  {   x++; }" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="false">
+                              <branchStatement name="if (i&gt;=0)" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="false">
                                  <statement name="x--;" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="false">
                                     <statement name="i--;" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="false">
                                        <termination name="&lt;loop body end&gt;" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
@@ -46,12 +46,12 @@ variant: i
 mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initiallyValid="true">
                <branchCondition name="not(or(leq(i_0,Z(neglit(1(#)))),geq(i_0,Z(0(#)))))" pathCondition="false" pathConditionChanged="true" branchCondition="not(or(leq(i_0,Z(neglit(1(#)))),geq(i_0,Z(0(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <methodCall name="LoopSplittingCondition.goOn(x_7);" pathCondition="false" pathConditionChanged="false">
-                     <branchStatement name="if (x_7&gt;0) {return true; }else  {return false; }" pathCondition="false" pathConditionChanged="false">
+                     <branchStatement name="if (x_7&gt;0)" pathCondition="false" pathConditionChanged="false">
                         <statement name="return true;" pathCondition="false" pathConditionChanged="false">
                            <methodReturn name="&lt;return of LoopSplittingCondition.goOn(x_7);&gt;" pathCondition="false" pathConditionChanged="false" nameIncludingReturnValue="&lt;return TRUE as result of LoopSplittingCondition.goOn(x_7);&gt;" isReturnValueComputed="true">
                               <methodReturnValue name="TRUE" returnValueString="TRUE" hasCondition="false">
                               </methodReturnValue>
-                              <branchStatement name="if (i&gt;=0) {   x--; }else  {   x++; }" pathCondition="false" pathConditionChanged="false">
+                              <branchStatement name="if (i&gt;=0)" pathCondition="false" pathConditionChanged="false">
                                  <statement name="x--;" pathCondition="false" pathConditionChanged="false">
                                     <statement name="i--;" pathCondition="false" pathConditionChanged="false">
                                        <termination name="&lt;loop body end&gt;" pathCondition="false" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">

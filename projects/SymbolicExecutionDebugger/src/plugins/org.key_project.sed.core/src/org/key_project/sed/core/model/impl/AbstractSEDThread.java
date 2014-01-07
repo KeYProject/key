@@ -230,6 +230,6 @@ public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements 
     */
    @Override
    public String getNodeType() {
-      return "Thread";
+      return "Start";
    }
 }

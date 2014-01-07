@@ -2,7 +2,7 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.elseIf(x);" pathCondition="true" pathConditionChanged="false">
       <statement name="int a;" pathCondition="true" pathConditionChanged="false">
-         <branchStatement name="if (x==0) {   a=1; }else if (x==1||x==2||x==3) {if (x==1||x==2) {       a=-1;     }     a=x*x;   }else if (x==4) {return 42;     }else  {       a=x;     }" pathCondition="true" pathConditionChanged="false">
+         <branchStatement name="if (x==0)" pathCondition="true" pathConditionChanged="false">
             <branchCondition name="equals(x,Z(0(#)))" pathCondition="equals(x,Z(0(#)))" pathConditionChanged="true" branchCondition="equals(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="a=1;" pathCondition="equals(x,Z(0(#)))" pathConditionChanged="false">
                   <statement name="return a;" pathCondition="equals(x,Z(0(#)))" pathConditionChanged="false">
@@ -14,9 +14,9 @@
                </statement>
             </branchCondition>
             <branchCondition name="not(equals(x,Z(0(#))))" pathCondition="not(equals(x,Z(0(#))))" pathConditionChanged="true" branchCondition="not(equals(x,Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <branchStatement name="if (x==1||x==2||x==3) {if (x==1||x==2) {     a=-1;   }   a=x*x; }else if (x==4) {return 42;   }else  {     a=x;   }" pathCondition="not(equals(x,Z(0(#))))" pathConditionChanged="false">
+               <branchStatement name="if (x==1||x==2||x==3)" pathCondition="not(equals(x,Z(0(#))))" pathConditionChanged="false">
                   <branchCondition name="equals(x,Z(1(#)))" pathCondition="equals(x,Z(1(#)))" pathConditionChanged="true" branchCondition="equals(x,Z(1(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <branchStatement name="if (x==1||x==2) {   a=-1; }" pathCondition="equals(x,Z(1(#)))" pathConditionChanged="false">
+                     <branchStatement name="if (x==1||x==2)" pathCondition="equals(x,Z(1(#)))" pathConditionChanged="false">
                         <statement name="a=-1;" pathCondition="equals(x,Z(1(#)))" pathConditionChanged="false">
                            <statement name="a=x*x;" pathCondition="equals(x,Z(1(#)))" pathConditionChanged="false">
                               <statement name="return a;" pathCondition="equals(x,Z(1(#)))" pathConditionChanged="false">
@@ -30,7 +30,7 @@
                      </branchStatement>
                   </branchCondition>
                   <branchCondition name="equals(x,Z(2(#)))" pathCondition="equals(x,Z(2(#)))" pathConditionChanged="true" branchCondition="equals(x,Z(2(#)))" mergedBranchCondition="true" isBranchConditionComputed="true">
-                     <branchStatement name="if (x==1||x==2) {   a=-1; }" pathCondition="equals(x,Z(2(#)))" pathConditionChanged="false">
+                     <branchStatement name="if (x==1||x==2)" pathCondition="equals(x,Z(2(#)))" pathConditionChanged="false">
                         <statement name="a=-1;" pathCondition="equals(x,Z(2(#)))" pathConditionChanged="false">
                            <statement name="a=x*x;" pathCondition="equals(x,Z(2(#)))" pathConditionChanged="false">
                               <statement name="return a;" pathCondition="equals(x,Z(2(#)))" pathConditionChanged="false">
@@ -44,7 +44,7 @@
                      </branchStatement>
                   </branchCondition>
                   <branchCondition name="equals(x,Z(3(#)))" pathCondition="equals(x,Z(3(#)))" pathConditionChanged="true" branchCondition="equals(x,Z(3(#)))" mergedBranchCondition="true" isBranchConditionComputed="true">
-                     <branchStatement name="if (x==1||x==2) {   a=-1; }" pathCondition="equals(x,Z(3(#)))" pathConditionChanged="false">
+                     <branchStatement name="if (x==1||x==2)" pathCondition="equals(x,Z(3(#)))" pathConditionChanged="false">
                         <statement name="a=x*x;" pathCondition="equals(x,Z(3(#)))" pathConditionChanged="false">
                            <statement name="return a;" pathCondition="equals(x,Z(3(#)))" pathConditionChanged="false">
                               <methodReturn name="&lt;return of self.elseIf(x);&gt;" pathCondition="equals(x,Z(3(#)))" pathConditionChanged="false" isReturnValueComputed="false">
@@ -56,7 +56,7 @@
                      </branchStatement>
                   </branchCondition>
                   <branchCondition name="and(and(not(equals(x,Z(1(#)))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#)))))" pathCondition="and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#)))))" pathConditionChanged="true" branchCondition="and(and(not(equals(x,Z(1(#)))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#)))))" mergedBranchCondition="true" isBranchConditionComputed="true">
-                     <branchStatement name="if (x==4) {return 42; }else  {   a=x; }" pathCondition="and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#)))))" pathConditionChanged="false">
+                     <branchStatement name="if (x==4)" pathCondition="and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#)))))" pathConditionChanged="false">
                         <branchCondition name="equals(x,Z(4(#)))" pathCondition="equals(x,Z(4(#)))" pathConditionChanged="true" branchCondition="equals(x,Z(4(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <statement name="return 42;" pathCondition="equals(x,Z(4(#)))" pathConditionChanged="false">
                               <methodReturn name="&lt;return of self.elseIf(x);&gt;" pathCondition="equals(x,Z(4(#)))" pathConditionChanged="false" isReturnValueComputed="false">

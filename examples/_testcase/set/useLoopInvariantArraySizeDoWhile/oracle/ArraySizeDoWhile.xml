@@ -5,7 +5,7 @@
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <loopStatement name="do {result_1++;i++;}while ( i&lt;array.length );" pathCondition="true" pathConditionChanged="false">
+            <loopStatement name="do ... while ( i&lt;array.length );" pathCondition="true" pathConditionChanged="false">
                <callStackEntry path="/0"/>
                <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
                   <callStackEntry path="/0"/>

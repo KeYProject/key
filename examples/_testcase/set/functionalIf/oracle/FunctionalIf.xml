@@ -2,7 +2,7 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.min(i,j);" pathCondition="true" pathConditionChanged="false">
       <statement name="int result;" pathCondition="true" pathConditionChanged="false">
-         <branchStatement name="if (invert(i)&lt;invert(j)) {   result_1=i; }else  {   result_1=j; }" pathCondition="true" pathConditionChanged="false">
+         <branchStatement name="if (invert(i)&lt;invert(j))" pathCondition="true" pathConditionChanged="false">
             <methodCall name="self.invert(a);" pathCondition="true" pathConditionChanged="false">
                <statement name="return a*-1;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of self.invert(a);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">

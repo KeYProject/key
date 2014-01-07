@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <branchStatement name="if (asdf&lt;0) {   x=x*-1;   x+=2; }else  {   x-=42;return x; }" pathCondition="true" pathConditionChanged="false">
+   <branchStatement name="if (asdf&lt;0)" pathCondition="true" pathConditionChanged="false">
       <branchCondition name="lt(asdf,Z(0(#)))" pathCondition="lt(asdf,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(asdf,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
          <statement name="x=x*-1;" pathCondition="lt(asdf,Z(0(#)))" pathConditionChanged="false">
             <statement name="x+=2;" pathCondition="lt(asdf,Z(0(#)))" pathConditionChanged="false">

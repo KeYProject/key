@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="VerifiedTest.loop(_x);" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (_x&lt;0) {   _x=-_x; }" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (_x&lt;0)" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="_x=-_x;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
                <loopInvariant name="

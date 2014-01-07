@@ -3136,7 +3136,7 @@ public final class SymbolicExecutionUtil {
       HashMap<String, String> result = new HashMap<String, String>();
       result.put("Strings", "Strings:on");
       result.put("reach", "reach:on");
-      result.put("JavaCard", "JavaCard:on");
+      result.put("JavaCard", "JavaCard:off");
       result.put("assertions", "assertions:on");
       result.put("bigint", "bigint:on");
       result.put("intRules", "intRules:arithmeticSemanticsIgnoringOF");
