@@ -132,5 +132,35 @@ The non-optimised rules use in-place rewriting for the evaluation of select term
 The optimised rules pull out select-terms before they evaluate them. Because other occurences of the same select-term are replaced by the skolem constant introduced by the pullout-rule (application of equalities), each select term has to be evaluated only once. Intelligent hiding of no longer needed auxiliary equations holds the sequent human-readable and increases performance. The result of the evaluation of a select term is stored such that it can be reapplied immediately if the same select term occurs again.
 </entry>
 
+<entry key="wdOperator">
+Treatment of formulas and terms for Well-Definedness checks:
+
+* L-Operator:
+     More intuitive for software developers and along the lines of
+     runtime assertion semantics. Well-Definedness checks will be
+     stricter using this operator, since the order of terms/formulas
+     matters. It is based on McCarthy logic.
+     Cf. "Are the Logical Foundations of Verifying Compiler
+     Prototypes Matching User Expectations?" by Patrice Chalin.
+
+* Y-Operator:
+     Complete and along the lines of classical logic, where the
+     order of terms/formulas is irrelevant. This operator is
+     equivalent to the D-operator, but more efficient.
+     Cf. "Efficient Well-Definedness Checking" by Ádám Darvas,
+     Farhad Mehta, and Arsenii Rudich.
+
+* D-Operator:
+     Complete and along the lines of classical logic, where the
+     order of terms/formulas is irrelevant. This operator is not as
+     strict as the L-operator, based on strong Kleene logic. To be
+     used with care, since formulas may blow up exponentially.
+     Cf. "Well Defined B" by Patrick Behm, Lilian Burdy, and
+     Jean-Marc Meynadier
+</entry>
+
+<entry key="wdChecks">
+Well-Definedness checks of JML specifications can be turned on/off. This includes class invariants, operation contracts, model fields as well as JML (annotation) statements as loop invariants and block contracts. The former ones are checked "on-the-fly", i.e. directly when they are applied in the code while proving an operation contract, since the context is needed.
+</entry>
 </properties>
 

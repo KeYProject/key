@@ -15,7 +15,6 @@
 package de.uka.ilkd.key.speclang.translation;
 
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

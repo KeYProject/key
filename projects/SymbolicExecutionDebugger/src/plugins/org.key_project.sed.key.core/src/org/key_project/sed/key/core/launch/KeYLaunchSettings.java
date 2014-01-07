@@ -37,89 +37,94 @@ public class KeYLaunchSettings {
    /**
     * {@code true} new debug session, {@code false} continue existing *.proof file.
     */
-   private boolean newDebugSession;
+   private final boolean newDebugSession;
    
    /**
     * The path to the proof file to continue.
     */
-   private String proofFileToContinue;
+   private final String proofFileToContinue;
 
    /**
     * The {@link IMethod} to debug.
     */
-   private IMethod method;
+   private final IMethod method;
    
    /**
     * The signature of {@link #method} computed via {@link KeySEDUtil#getMethodValue(IMethod)}.
     */
-   private String methodSignature;
+   private final String methodSignature;
    
    /**
     * Use an existing contract or generate default contract?
     */
-   private boolean useExistingContract;
+   private final boolean useExistingContract;
    
    /**
     * The ID of the existing contract to use.
     */
-   private String existingContract;
+   private final String existingContract;
    
    /**
     * The precondition.
     */
-   private String precondition;
+   private final String precondition;
    
    /**
     * If this is {@code true} an {@link ISEDMethodReturn} will contain the return value,
     * but the performance will suffer.
     * If it is {@code false} only the name of the returned method is shown in an {@link ISEDMethodReturn}.
     */
-   private boolean showMethodReturnValues;
+   private final boolean showMethodReturnValues;
    
    /**
     * Show variables of selected debug node?
     */
-   private boolean showVariablesOfSelectedDebugNode;
+   private final boolean showVariablesOfSelectedDebugNode;
    
    /**
     * Show KeY's main window?
     */
-   private boolean showKeYMainWindow;
+   private final boolean showKeYMainWindow;
    
    /**
     * Merge branch conditions?
     */
-   private boolean mergeBranchConditions;
+   private final boolean mergeBranchConditions;
    
    /**
     * {@code true} execute method range, {@code false} execute complete method body.
     */
-   private boolean executeMethodRange;
+   private final boolean executeMethodRange;
    
    /**
     * The start of the method range to execute.
     */
-   private Position methodRangeStart;
+   private final Position methodRangeStart;
    
    /**
     * The end of the method range to execute.
     */
-   private Position methodRangeEnd;
+   private final Position methodRangeEnd;
 
    /**
     * The launched location.
     */
-   private File location;
+   private final File location;
    
    /**
     * The used class path entries.
     */
-   private List<File> classPaths;
+   private final List<File> classPaths;
    
    /**
     * The used boot class path.
     */
-   private File bootClassPath;
+   private final File bootClassPath;
+   
+   /**
+    * Use pretty printing?
+    */
+   private final boolean usePrettyPrinting;
    
    /**
     * Constructor.
@@ -139,6 +144,7 @@ public class KeYLaunchSettings {
     * @param location The launched location.
     * @param classPaths The used class path entries.
     * @param bootClassPath The used boot class path.
+    * @param usePrettyPrinting Use pretty printing?
     * @throws JavaModelException Occurred Exception.
     */
    public KeYLaunchSettings(boolean newDebugSession,
@@ -156,7 +162,8 @@ public class KeYLaunchSettings {
                             Position methodRangeEnd,
                             File location,
                             List<File> classPaths,
-                            File bootClassPath) throws JavaModelException {
+                            File bootClassPath,
+                            boolean usePrettyPrinting) throws JavaModelException {
       this.newDebugSession = newDebugSession;
       this.proofFileToContinue = proofFileToContinue;
       this.method = method;
@@ -174,6 +181,7 @@ public class KeYLaunchSettings {
       this.location = location;
       this.classPaths = classPaths;
       this.bootClassPath = bootClassPath;
+      this.usePrettyPrinting = usePrettyPrinting;
    }
 
    /**
@@ -310,5 +318,13 @@ public class KeYLaunchSettings {
     */
    public File getBootClassPath() {
       return bootClassPath;
+   }
+
+   /**
+    * Checks if pretty printing should be used.
+    * @return {@code true} use pretty printing, {@code false} do not use pretty printing.
+    */
+   public boolean isUsePrettyPrinting() {
+      return usePrettyPrinting;
    }
 }

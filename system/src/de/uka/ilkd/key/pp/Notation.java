@@ -343,7 +343,7 @@ public abstract class Notation {
 
         public abstract void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException;
     }
-    
+
     /**
      * The standard concrete syntax for store.
      */
@@ -360,7 +360,7 @@ public abstract class Notation {
             sp.printStore(t, false);
         }
     }
-    
+
     /**
      * The standard concrete syntax for anon.
      */
@@ -377,7 +377,7 @@ public abstract class Notation {
             sp.printAnon(t, false);
         }
     }
-    
+
     /**
      * The standard concrete syntax for Create.
      */
@@ -394,7 +394,7 @@ public abstract class Notation {
             sp.printCreate(t, false);
         }
     }
-    
+
     /**
      * The standard concrete syntax for memset.
      */

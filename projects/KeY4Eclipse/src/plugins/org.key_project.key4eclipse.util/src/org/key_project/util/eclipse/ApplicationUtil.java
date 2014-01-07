@@ -49,14 +49,14 @@ public final class ApplicationUtil {
             return new File(folder, launcher).getAbsolutePath();
          }
          else {
-            return launcher; 
+            return launcher;
          }
       }
       else {
          return launcher;
       }
    }
-   
+
    /**
     * Returns the path to the launcher which has started this application.
     * @return The path to the launcher which has started this application.

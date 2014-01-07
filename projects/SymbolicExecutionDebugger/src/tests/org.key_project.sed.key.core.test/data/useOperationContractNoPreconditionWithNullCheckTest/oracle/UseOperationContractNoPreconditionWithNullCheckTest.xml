@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_a31a5eff-a841-4a04-9d3e-8f046a700b78" name="main(UseOperationContractNoPreconditionWithNullCheckTest)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_4bd7656a-0efe-4925-b54a-7c5ac891ee9a" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_68f40f29-76c4-40be-90ed-af893c13212b" name="UseOperationContractNoPreconditionWithNullCheckTest.main(obj);" pathCondition="true" lineNumber="-1" charStart="89" charEnd="93">
-            <sedStatement xml:id="_b0108374-d5e6-460b-9414-076b16537d6d" name="int magicNumber = obj.magic(123);" pathCondition="true" lineNumber="-1" charStart="156" charEnd="189">
-               <sedMethodContract xml:id="_3feb37a0-32b1-4a3f-bee5-20021a71ebdb" name="result_0 = obj.magic(123) catch(exc_0)
+   <sedTarget xml:id="_ccb98aad-39b4-4e1b-9829-82724f8718e9" name="main(UseOperationContractNoPreconditionWithNullCheckTest)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_90289688-9052-49f4-b8a4-def686ceb7e3" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_9612ec8b-c41e-4edb-9ba3-cf1459ed02ac" name="UseOperationContractNoPreconditionWithNullCheckTest.main(obj);" pathCondition="true" lineNumber="-1" charStart="89" charEnd="93">
+            <sedStatement xml:id="_b05d7baa-4244-4e6e-8a3a-5bdc777608d9" name="int magicNumber = obj.magic(123);" pathCondition="true" lineNumber="-1" charStart="156" charEnd="189">
+               <sedMethodContract xml:id="_c0cea96a-692d-44ae-be53-fbccc74a7027" name="result_0 = obj.magic(123) catch(exc_0)
 pre: obj.&lt;inv&gt;
 post: result_0 = 42 &amp; obj.&lt;inv&gt; &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="true" lineNumber="-1" charStart="355" charEnd="360" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
-                  <sedBranchCondition xml:id="_dba8766d-c392-4127-bb1f-8ca01a142f45" name="Post (magic): !obj = null" pathCondition="!obj = null">
-                     <sedStatement xml:id="_d591dc34-6397-4209-83f7-832d58ae73e3" name="int magicNumberCopy = magicNumber;" pathCondition="!obj = null" lineNumber="-1" charStart="193" charEnd="227">
-                        <sedStatement xml:id="_caf5125e-5236-46a1-a0ab-231e7e39ada4" name="return magicNumber+magicNumberCopy;" pathCondition="!obj = null" lineNumber="-1" charStart="231" charEnd="268">
-                           <sedMethodReturn xml:id="_0de7412b-9e6c-40eb-907f-6727d4cd26d5" name="&lt;return of UseOperationContractNoPreconditionWithNullCheckTest.main(obj);&gt;" pathCondition="!obj = null" lineNumber="-1" charStart="89" charEnd="93">
-                              <sedTermination xml:id="_465505b5-4bbb-4650-9253-479ed7b2dbc9" name="&lt;end&gt;" pathCondition="!obj = null" verified="true">
+                  <sedBranchCondition xml:id="_8d6ce745-f9f4-4bab-8d23-79576dcb4f07" name="Post (magic): not(equals(obj,null))" pathCondition="not(equals(obj,null))">
+                     <sedStatement xml:id="_0492f1c3-07df-4b91-ae7c-eb70d1eaab57" name="int magicNumberCopy = magicNumber;" pathCondition="not(equals(obj,null))" lineNumber="-1" charStart="193" charEnd="227">
+                        <sedStatement xml:id="_ad082d17-bbdb-4586-9a57-32d7b4861fea" name="return magicNumber+magicNumberCopy;" pathCondition="not(equals(obj,null))" lineNumber="-1" charStart="231" charEnd="268">
+                           <sedMethodReturn xml:id="_be3d3117-edeb-4ef9-b9d4-86e685723663" name="&lt;return of UseOperationContractNoPreconditionWithNullCheckTest.main(obj);&gt;" pathCondition="not(equals(obj,null))" lineNumber="-1" charStart="89" charEnd="93">
+                              <sedTermination xml:id="_1d900ef3-fb3e-4435-af03-13a3324683c3" name="&lt;end&gt;" pathCondition="not(equals(obj,null))" verified="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>

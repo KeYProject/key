@@ -71,15 +71,28 @@ public class JavaProfile extends AbstractProfile {
     public JavaProfile() {
         this("standardRules.key");
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
        ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
-       result = result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.ANON_HEAP_LABEL_NAME, new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL)));
-       result = result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.SELECT_SKOLEM_LABEL_NAME, new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.SELECT_SKOLEM_LABEL)));
+       result = result.prepend(new TermLabelConfiguration(
+               ParameterlessTermLabel.ANON_HEAP_LABEL_NAME,
+               new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL)));
+       result = result.prepend(new TermLabelConfiguration(
+               ParameterlessTermLabel.SELECT_SKOLEM_LABEL_NAME,
+               new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.SELECT_SKOLEM_LABEL)));
+       result = result.prepend(new TermLabelConfiguration(
+               ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL_NAME,
+               new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)));
+       result = result.prepend(new TermLabelConfiguration(
+               ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL_NAME,
+               new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL)));
+       result = result.prepend(new TermLabelConfiguration(
+               ParameterlessTermLabel.UNDEFINED_VALUE_LABEL_NAME,
+               new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.UNDEFINED_VALUE_LABEL)));
        return result;
     }
 
@@ -156,7 +169,7 @@ public class JavaProfile extends AbstractProfile {
     public StrategyFactory getDefaultStrategyFactory() {
         return DEFAULT;
     }
-    
+
     /**
      * <p>
      * Returns the default instance of this class.

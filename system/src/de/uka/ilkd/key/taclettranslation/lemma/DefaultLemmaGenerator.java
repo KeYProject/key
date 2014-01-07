@@ -315,7 +315,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                         // }
                         i++;
                 }
-                
+
                 Operator newOp = replaceOp(term.op(), services);
 
                 return TermFactory.DEFAULT
@@ -329,10 +329,10 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         /**
          * Sometimes operators must be replaced during lemma generation.
          * Override this method to accomplish this in a subclass.
-         * 
+         *
          * <p>
          * By default, this method returns the argument <tt>op</tt>.
-         * 
+         *
          * @param op the operator to be replaced, not <code>null</code>
          * @param services A services object for lookups
          * @return the replacement operator, not <code>null</code>
@@ -344,10 +344,10 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         /**
          * Sometimes sorts must be replaced during lemma generation.
          * Override this method to accomplish this in a subclass.
-         * 
+         *
          * <p>
          * By default, this method returns the argument <tt>sort</tt>.
-         * 
+         *
          * @param sort the sort to be replaced, not <code>null</code>
          * @param services A services object for lookups
          * @return the replacement sort, not <code>null</code>

@@ -15,6 +15,7 @@ package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
@@ -24,7 +25,12 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
  * Default implementation of {@link ISymbolicConfiguration}.
  * @author Martin Hentschel
  */
-public class SymbolicConfiguration implements ISymbolicConfiguration {
+public class SymbolicConfiguration extends AbstractElement implements ISymbolicConfiguration {
+   /**
+    * The contained {@link ISymbolicEquivalenceClass}.
+    */
+   private final ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses;
+   
    /**
     * The {@link ISymbolicState}.
     */
@@ -36,15 +42,13 @@ public class SymbolicConfiguration implements ISymbolicConfiguration {
    private ImmutableList<ISymbolicObject> objects = ImmutableSLList.nil();
 
    /**
-    * The contained {@link ISymbolicEquivalenceClass}.
-    */
-   private ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses;
-
-   /**
     * Constructor.
     * @param equivalenceClasses The provided equivalence classes.
+    * @param settings The {@link IModelSettings} to use.
     */
-   public SymbolicConfiguration(ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses) {
+   public SymbolicConfiguration(IModelSettings settings, 
+                                ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses) {
+      super(settings);
       assert equivalenceClasses != null;
       this.equivalenceClasses = equivalenceClasses;
    }

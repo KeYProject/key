@@ -328,7 +328,7 @@ public final class JavaInfo {
      * @return a class matching the name
      */
     public KeYJavaType getTypeByClassName(String className) {
-    	return getTypeByClassName(className, null);
+        return getTypeByClassName(className, null);
     }
 
     /**
@@ -938,7 +938,7 @@ public final class JavaInfo {
 
     	KeYJavaType kjt = null;
     	try {
-    		kjt = getTypeByClassName(qualifiedClassName);
+	    kjt = getTypeByClassName(qualifiedClassName);
     	} catch (Exception e) {
     		if (qualifiedClassName.endsWith("]")) {
     			readJavaBlock("{" + qualifiedClassName + " k;}");
@@ -1367,9 +1367,9 @@ public final class JavaInfo {
 
     /**
      * retrieves the KeYJavaType of the given type name. If the type is not fully qualified,
-     * it is looked for in the context of the <code>containerType</code> first and 
+     * it is looked for in the context of the <code>containerType</code> first and
      * then in the <code>java.lang</code>
-     * package.  
+     * package.
      * @param name the name of the type (if possible fully qualified)
      * @param containerType the KeYJavaType of the context in which the type should be resolved
      * @return the KeYJavaType of the given type or <code>null</code> if type name is unknown
@@ -1377,21 +1377,26 @@ public final class JavaInfo {
     public KeYJavaType getTypeByClassName(String name, KeYJavaType containerType) {
         KeYJavaType result = getTypeByName(name);
         if (result == null) {
-            final int lastSep = (containerType == null ? 
-                    -1 : containerType.getFullName().lastIndexOf('.')); 
-                        
-            // try if class is in same package
-            if (lastSep >= 0) {
-                result = getTypeByClassName(
-                        containerType.getFullName().substring(0, lastSep) +
-                        "." + name);
-            }                       
-            
-            if (result == null) {
-                return getTypeByName("java.lang." + name);                
+            if (containerType != null) {
+                   result = kpmi.resolveType(name, containerType);
             }
-        }         
-        return result;        
-    }
 
+            if (result == null) {
+                final int lastSep = (containerType == null ?
+                        -1 : containerType.getFullName().lastIndexOf('.'));
+
+                // try if class is in same package
+                if (lastSep >= 0) {
+                    result = getTypeByClassName(
+                            containerType.getFullName().substring(0, lastSep) +
+                            "." + name);
+                }
+
+                if (result == null) {
+                    return getTypeByName("java.lang." + name);
+                }
+            }
+        }
+        return result;
+    }
 }

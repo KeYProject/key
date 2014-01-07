@@ -50,5 +50,4 @@ public class TacletOptionsAction extends MainWindowAction {
             (ProofSettings.DEFAULT_SETTINGS.getChoiceSettings());
         }
     }
-
 }

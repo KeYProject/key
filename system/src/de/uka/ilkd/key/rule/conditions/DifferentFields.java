@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 package de.uka.ilkd.key.rule.conditions;
@@ -35,12 +35,12 @@ public final class DifferentFields extends VariableConditionAdapter {
         this.var1 = var1;
 	this.var2 = var2;
     }
-          
+
     @Override
-    public boolean check(SchemaVariable var, 
-	    		 SVSubstitute instCandidate,
-	    		 SVInstantiations instMap, 
-	    		 Services services) {
+    public boolean check(SchemaVariable var,
+			 SVSubstitute instCandidate,
+			 SVInstantiations instMap,
+			 Services services) {
 
 	if(var == var1) {
 	    final Object inst2 = instMap.getInstantiation(var2);
@@ -53,7 +53,7 @@ public final class DifferentFields extends VariableConditionAdapter {
 	}
     }
 
-    public boolean checkHelp(Object o1, Object o2) {       
+    public boolean checkHelp(Object o1, Object o2) {
 	if (o1 instanceof Term && o2 instanceof Term) {
 	    final Term t1 = (Term) o1;
 	    final Term t2 = (Term) o2;
@@ -66,13 +66,13 @@ public final class DifferentFields extends VariableConditionAdapter {
 
 		return op1.isUnique() && op2.isUnique();
 	    }
-	}		
+	}
 	return false;
     }
-    
-    
+
+
     @Override
-    public String toString() {      
+    public String toString() {
         return "\\differentFields (" + var1 + ", " + var2 + ")";
     }
 }

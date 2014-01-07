@@ -70,6 +70,11 @@ import de.uka.ilkd.key.util.Pair;
 
 public final class ProofManagementDialog extends JDialog {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3543411893273433386L;
+
     private static final ImageIcon keyIcon = IconFactory.keyHole(20, 20);
     private static final ImageIcon keyAlmostClosedIcon = IconFactory.keyHoleAlmostClosed(20, 20);
     private static final ImageIcon keyClosedIcon = IconFactory.keyHoleClosed(20, 20);
@@ -512,27 +517,28 @@ public final class ProofManagementDialog extends JDialog {
     }
 
     private void updateContractPanel() {
-        if (getActiveContractPanel() == contractPanelByMethod) {
-            final ClassTree.Entry entry = classTree.getSelectedEntry();
-            if (entry != null && entry.target != null) {
-                final ImmutableSet<Contract> contracts = specRepos.getContracts(entry.kjt, entry.target);
-                getActiveContractPanel().setContracts(contracts, "Contracts");
-            } else {
-                getActiveContractPanel().setContracts(
-                        DefaultImmutableSet.<Contract>nil(), "Contracts");
-            }
-        } else {
-            if (proofList.getSelectedValue() != null) {
-                final Proof p = ((ProofWrapper) proofList.getSelectedValue()).proof;
-                final ImmutableSet<Contract> usedContracts = p.mgt().getUsedContracts();
-                getActiveContractPanel().setContracts(usedContracts,
-                        "Contracts used in proof \""
-                        + p.name() + "\"");
-            } else {
-                getActiveContractPanel().setContracts(
-                        DefaultImmutableSet.<Contract>nil(), "Contracts");
-            }
-        }
+        ContractSelectionPanel pan = getActiveContractPanel();
+	if (pan == contractPanelByMethod) {
+	    final ClassTree.Entry entry = classTree.getSelectedEntry();
+	    if(entry != null && entry.target != null) {
+		final ImmutableSet<Contract> contracts
+			= specRepos.getContracts(entry.kjt, entry.target);
+		pan.setContracts(contracts, "Contracts");
+	    } else {
+		pan.setContracts(DefaultImmutableSet.<Contract>nil(), "Contracts");
+	    }
+	} else if (pan == contractPanelByProof) {
+	    if(proofList.getSelectedValue() != null) {
+		final Proof p 
+			= ((ProofWrapper)proofList.getSelectedValue()).proof;
+		final ImmutableSet<Contract> usedContracts 
+			= p.mgt().getUsedContracts();
+		pan.setContracts(usedContracts,
+		                 "Contracts used in proof \"" + p.name() + "\"");
+	    } else {
+		pan.setContracts(DefaultImmutableSet.<Contract>nil(), "Contracts");
+	    }
+	}
         updateStartButton();
     }
 

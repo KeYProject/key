@@ -53,24 +53,25 @@ import javax.swing.text.Highlighter;
 public abstract class SequentView extends JTextArea
         implements KeyListener, MouseMotionListener, MouseListener {
 
+    private static final long serialVersionUID = -7474938556691063384L;
     private final MainWindow mainWindow;
-    
+
     /* 
      * The current line width. Static declaration for this prevents constructors from
      * using lineWidth 0.
      */
     private static int lineWidth;
-    
+
     public static void setLineWidth(int i) {
         if (i != 0) {
             lineWidth = i;
         }
     }
-    
+
     public static int getLineWidth() {
         return lineWidth;
     }
-    
+
     private ConfigChangeListener configChangeListener;
     SequentPrintFilter filter;
     private LogicPrinter printer;
@@ -250,6 +251,10 @@ public abstract class SequentView extends JTextArea
     public String getHighlightedText(PosInSequent pos) {
         String s = "";
         try {
+            if (pos == null) {
+                pos = PosInSequent.createSequentPos();
+            }
+            assert pos != null;
             s = getText(pos.getBounds().start(),
                     pos.getBounds().length());
         } catch (Exception e) {

@@ -2,7 +2,7 @@
 <model>
    <equivalenceClass representativeTerm="null">
       <term term="obj"/>
-      <term term="IsInstanceTest.A"/>
+      <term term="IsInstanceTest::select(heap,null,IsInstanceTest::$A)"/>
       <term term="null"/>
    </equivalenceClass>
    <state name="return 1;">

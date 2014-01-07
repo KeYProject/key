@@ -304,7 +304,7 @@ public class TestJMLTranslator extends TestCase {
     }
 
 
-    public void testBsum() {
+    public void testBsumInt() {
         Term result = null;
 
         try {
@@ -323,12 +323,43 @@ public class TestJMLTranslator extends TestCase {
                 new LogicVariable(new Name("i"),
                                   (Sort) nss.sorts().lookup(new Name("int")));
         Term expected =
+                TB.func(services.getTypeConverter().getIntegerLDT().getJavaCastInt(),
+                TB.bsum(i,
+                        TB.zTerm(services, "0"),
+                        TB.zTerm(services, "2147483647"),
+                        TB.var(i), services));
+        assertTrue(result != null);
+        assertSame(q, result.sub(0).op());
+        assertTrue("Result was: " + result + "; \nExpected was: " + expected,
+                   result.equalsModRenaming(expected));
+    }
+
+
+    public void testBsumBigInt() {
+        Term result = null;
+
+        try {
+            result = JMLTranslator.translate(
+                    new PositionedString(
+                    "(\\bsum \\bigint i; 0; 2147483647; i)"),
+                    testClassType, null, null, null, null,
+                    null, Term.class, services);
+        } catch (SLTranslationException e) {
+            assertTrue(e.getMessage(), false);
+        }
+
+        NamespaceSet nss = services.getNamespaces();
+        Function q = (Function) nss.functions().lookup(new Name("bsum"));
+        LogicVariable i =
+                new LogicVariable(new Name("i"),
+                                  (Sort) nss.sorts().lookup(new Name("int")));
+        Term expected =
                 TB.bsum(i,
                         TB.zTerm(services, "0"),
                         TB.zTerm(services, "2147483647"),
                         TB.var(i), services);
         assertTrue(result != null);
-        assertTrue(result.op().equals(q));
+        assertSame(q, result.op());
         assertTrue("Result was: " + result + "; \nExpected was: " + expected,
                    result.equalsModRenaming(expected));
     }

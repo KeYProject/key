@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_e099464a-992c-41ae-b77a-167773501d3c" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_f56d2739-1e4b-41c7-8332-19eeed927b5d" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_d0e5fd44-9bd4-44ac-9676-ba337cef9452" name="SimpleIntQuery.main(x);" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56">
-            <sedStatement xml:id="_aa1635ac-e387-4f36-9063-d2734dd0b9a3" name="int magicValue = magic(x);" pathCondition="true" lineNumber="-1" charStart="69" charEnd="95">
-               <sedMethodContract xml:id="_f7e1fe55-ab3c-4157-8dbe-141de2b1dabf" name="result_0 = magic(x) catch(exc_0)
+   <sedTarget xml:id="_5a52c066-8717-4fdc-86c0-20d0cadb2a88" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_3a195c2c-8614-4338-be08-e3bb30ddca3c" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_0d22c308-6013-4307-b6db-1c8533342409" name="SimpleIntQuery.main(x);" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56">
+            <sedStatement xml:id="_cf3c271f-4676-4a86-bd2a-049e8ac3b48d" name="int magicValue = magic(x);" pathCondition="true" lineNumber="-1" charStart="69" charEnd="95">
+               <sedMethodContract xml:id="_e8ea1f73-0208-4b43-8fc9-45f12a362df8" name="result_0 = magic(x) catch(exc_0)
 pre: true
 post: result_0 = subMagic(x) &amp; exc_0 = null
-mod: {}
+mod: empty
 termination: diamond" pathCondition="true" lineNumber="-1" charStart="477" charEnd="482" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-                  <sedBranchCondition xml:id="_779229f4-c12c-48ca-aede-9452ad75a8be" name="x &gt;  -1" pathCondition="x &gt;  -1">
-                     <sedStatement xml:id="_a8e62c6d-d2f9-42b4-8b4a-934e91ea4ec0" name="return magicValue;" pathCondition="x &gt;  -1" lineNumber="-1" charStart="102" charEnd="120">
-                        <sedMethodReturn xml:id="_6c1748a5-0c4a-4e63-bfde-1315679a6ba7" name="&lt;return 42 as result of SimpleIntQuery.main(x);&gt;" pathCondition="x &gt;  -1" lineNumber="-1" charStart="52" charEnd="56">
-                           <sedTermination xml:id="_2d1f541e-dc96-46da-84b1-9de02cc97e35" name="&lt;end&gt;" pathCondition="x &gt;  -1" verified="true">
+                  <sedBranchCondition xml:id="_77ae3cd8-4969-4f14-a82a-1ecb7ba0fdae" name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))">
+                     <sedStatement xml:id="_73020c59-7e68-479d-9107-a66002c26ad3" name="return magicValue;" pathCondition="gt(x,Z(neglit(1(#))))" lineNumber="-1" charStart="102" charEnd="120">
+                        <sedMethodReturn xml:id="_02a10368-7fe2-4494-a389-306629c0fda8" name="&lt;return Z(2(4(#))) as result of SimpleIntQuery.main(x);&gt;" pathCondition="gt(x,Z(neglit(1(#))))" lineNumber="-1" charStart="52" charEnd="56">
+                           <sedTermination xml:id="_24a67f5a-83e0-459d-b543-154532900a94" name="&lt;end&gt;" pathCondition="gt(x,Z(neglit(1(#))))" verified="true">
                            </sedTermination>
                         </sedMethodReturn>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_7346197e-e445-4e33-9978-1c22f03c8986" name="x &lt; 0" pathCondition="x &lt; 0">
-                     <sedStatement xml:id="_f605c9e2-7281-4085-aeb3-9d7a0d7df8f2" name="return magicValue;" pathCondition="x &lt; 0" lineNumber="-1" charStart="102" charEnd="120">
-                        <sedMethodReturn xml:id="_2ccfefed-d5f3-49bf-baa1-a0dd266794af" name="&lt;return -4711 as result of SimpleIntQuery.main(x);&gt;" pathCondition="x &lt; 0" lineNumber="-1" charStart="52" charEnd="56">
-                           <sedTermination xml:id="_704bb9dd-6423-43a0-9439-ef523bf89ede" name="&lt;end&gt;" pathCondition="x &lt; 0" verified="true">
+                  <sedBranchCondition xml:id="_14b99be6-71fb-45f5-8a46-b8e74292c672" name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))">
+                     <sedStatement xml:id="_e697273b-e13e-4a8e-b7e0-35950ac3b9f2" name="return magicValue;" pathCondition="lt(x,Z(0(#)))" lineNumber="-1" charStart="102" charEnd="120">
+                        <sedMethodReturn xml:id="_04c6ce5b-486e-4741-acd8-4254f04af989" name="&lt;return Z(neglit(1(1(7(4(#)))))) as result of SimpleIntQuery.main(x);&gt;" pathCondition="lt(x,Z(0(#)))" lineNumber="-1" charStart="52" charEnd="56">
+                           <sedTermination xml:id="_cb87ed54-19f0-466f-a410-ab47c6a38fb0" name="&lt;end&gt;" pathCondition="lt(x,Z(0(#)))" verified="true">
                            </sedTermination>
                         </sedMethodReturn>
                      </sedStatement>

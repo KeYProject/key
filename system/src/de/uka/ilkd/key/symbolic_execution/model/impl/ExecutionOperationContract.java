@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -47,6 +48,7 @@ import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.ContractPostOrExcPostExceptionVariableResult;
 
@@ -57,11 +59,14 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.ContractPos
 public class ExecutionOperationContract extends AbstractExecutionStateNode<SourceElement> implements IExecutionOperationContract {
    /**
     * Constructor.
+    * @param settings The {@link ITreeSettings} to use.
     * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
-   public ExecutionOperationContract(KeYMediator mediator, Node proofNode) {
-      super(mediator, proofNode);
+   public ExecutionOperationContract(ITreeSettings settings, 
+                                     KeYMediator mediator, 
+                                     Node proofNode) {
+      super(settings, mediator, proofNode);
    }
 
    /**
@@ -87,7 +92,9 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
          }
          resultTerm = TermBuilder.DF.var(resultVar);
       }
-      ContractPostOrExcPostExceptionVariableResult search = SymbolicExecutionUtil.serachContractPostOrExcPostExceptionVariable(getProofNode().child(0), getServices()); // Post branch
+      ContractPostOrExcPostExceptionVariableResult search =
+              SymbolicExecutionUtil.searchContractPostOrExcPostExceptionVariable(
+                      getProofNode().child(0), getServices()); // Post branch
       // Rename variables in contract to the current one
       List<LocationVariable> heapContext = HeapContext.getModHeaps(getServices(), inst.transaction);
       Map<LocationVariable,LocationVariable> atPreVars = UseOperationContractRule.computeAtPreVars(heapContext, getServices(), inst);
@@ -129,17 +136,26 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
       }
       ImmutableList<Term> contractParams = UseOperationContractRule.computeParams(baseHeapTerm, atPres, baseHeap, inst);
       // Compute contract text
-      return FunctionalOperationContractImpl.getText(contract, 
-                                                     contractParams, 
-                                                     resultTerm, 
-                                                     contractSelf, 
-                                                     search.getExceptionEquality().sub(0), 
-                                                     baseHeap, 
-                                                     baseHeapTerm, 
-                                                     heapContext, 
-                                                     atPres, 
-                                                     false, 
-                                                     getServices());
+      synchronized (NotationInfo.class) {
+         boolean originalPrettySyntax = NotationInfo.PRETTY_SYNTAX;
+         try {
+            NotationInfo.PRETTY_SYNTAX = true;
+            return FunctionalOperationContractImpl.getText(contract, 
+                                                           contractParams, 
+                                                           resultTerm, 
+                                                           contractSelf, 
+                                                           search.getExceptionEquality().sub(0), 
+                                                           baseHeap, 
+                                                           baseHeapTerm, 
+                                                           heapContext, 
+                                                           atPres, 
+                                                           false, 
+                                                           getServices());
+         }
+         finally {
+            NotationInfo.PRETTY_SYNTAX = originalPrettySyntax;
+         }
+      }
    }
    
    /**

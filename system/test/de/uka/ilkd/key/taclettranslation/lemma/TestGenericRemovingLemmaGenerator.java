@@ -21,18 +21,18 @@ public class TestGenericRemovingLemmaGenerator extends TestCase {
 
         TacletForTests.parse();
         NoPosTacletApp app = TacletForTests.getRules().lookup(new Name("TestRemovingGenericSorts"));
-        
+
         GenericRemovingLemmaGenerator g = new GenericRemovingLemmaGenerator();
         TacletFormula result = g.translate(app.taclet(), TacletForTests.services());
-        
+
         Set<Sort> sorts = new HashSet<Sort>();
         collectSorts(result.getFormula(), sorts);
-        
+
         Name nameG = new Name("G");
         boolean found = false;
         for (Sort sort : sorts) {
             assertFalse("No generic sorts must survive", sort instanceof GenericSort);
-            
+
             if(!found && sort instanceof ProxySort && sort.name().equals(nameG)) {
                 found = true;
             }
@@ -44,18 +44,16 @@ public class TestGenericRemovingLemmaGenerator extends TestCase {
         for (Term t : term.subs()) {
             collectSorts(t, sorts);
         }
-        
+
         sorts.add(term.sort());
-        
+
         if (term.op() instanceof SortDependingFunction){
             SortDependingFunction sdf = (SortDependingFunction) term.op();
             sorts.add(sdf.getSortDependingOn());
         }
-        
+
         for (QuantifiableVariable v : term.boundVars()) {
             sorts.add(v.sort());
         }
     }
-    
-    
 }

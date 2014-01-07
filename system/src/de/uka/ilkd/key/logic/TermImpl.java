@@ -34,7 +34,8 @@ class TermImpl implements Term {
     private static final ImmutableArray<QuantifiableVariable> EMPTY_VAR_LIST
     	= new ImmutableArray<QuantifiableVariable>();
 	
-    private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST = new ImmutableArray<TermLabel>();
+    private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST
+        = new ImmutableArray<TermLabel>();
     
 	private static int serialNumberCounter =0;
 
@@ -540,20 +541,20 @@ class TermImpl implements Term {
         return serialNumber;
     }
 
-	@Override
-	public boolean hasLabels() {
-		return false;
-	}
+    @Override
+    public boolean hasLabels() {
+        return false;
+    }
 
-	@Override
-	public boolean containsLabel(TermLabel label) {
-		return false;
-	}
+    @Override
+    public boolean containsLabel(TermLabel label) {
+        return false;
+    }
 
-	@Override
-	public ImmutableArray<TermLabel> getLabels() {
-		return EMPTY_LABEL_LIST;
-	}
+    @Override
+    public ImmutableArray<TermLabel> getLabels() {
+        return EMPTY_LABEL_LIST;
+    }
     
     /**
      * {@inheritDoc}

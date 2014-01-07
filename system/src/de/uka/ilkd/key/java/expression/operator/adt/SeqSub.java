@@ -65,7 +65,7 @@ public class SeqSub extends Operator {
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         // bugfix, this used to return the join for the the first two arguments'
-        // types. 
+        // types.
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
     }
 }

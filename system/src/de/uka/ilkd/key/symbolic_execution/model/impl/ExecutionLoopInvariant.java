@@ -16,12 +16,14 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -31,11 +33,14 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 public class ExecutionLoopInvariant extends AbstractExecutionStateNode<SourceElement> implements IExecutionLoopInvariant {
    /**
     * Constructor.
+    * @param settings The {@link ITreeSettings} to use.
     * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
-   public ExecutionLoopInvariant(KeYMediator mediator, Node proofNode) {
-      super(mediator, proofNode);
+   public ExecutionLoopInvariant(ITreeSettings settings, 
+                                 KeYMediator mediator, 
+                                 Node proofNode) {
+      super(settings, mediator, proofNode);
    }
 
    /**
@@ -43,7 +48,16 @@ public class ExecutionLoopInvariant extends AbstractExecutionStateNode<SourceEle
     */
    @Override
    protected String lazyComputeName() {
-      return getLoopInvariant().getPlainText(getServices());
+      synchronized (NotationInfo.class) {
+         boolean originalPrettySyntax = NotationInfo.PRETTY_SYNTAX;
+         try {
+            NotationInfo.PRETTY_SYNTAX = true;
+            return getLoopInvariant().getPlainText(getServices());
+         }
+         finally {
+            NotationInfo.PRETTY_SYNTAX = originalPrettySyntax;
+         }
+      }
    }
    
    /**

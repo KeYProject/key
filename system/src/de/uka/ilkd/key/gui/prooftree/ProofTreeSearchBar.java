@@ -25,6 +25,7 @@ import javax.swing.tree.TreePath;
 class ProofTreeSearchBar
         extends SearchBar implements TreeModelListener {
 
+    private static final long serialVersionUID = 683318838568020629L;
     private final ProofTreeView proofTreeView;
     private int startRow = 0;
     private int currentRow = 0;

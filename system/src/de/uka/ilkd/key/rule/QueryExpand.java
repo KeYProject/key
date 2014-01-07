@@ -57,6 +57,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -614,15 +615,22 @@ public class QueryExpand implements BuiltInRule {
      * for <code>QueryExpandCost</cost>.
      */
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        if (pio!=null && pio.subTerm().op() instanceof IProgramMethod && pio.subTerm().freeVars().isEmpty()) {
+        if (pio != null
+                && pio.subTerm().op() instanceof IProgramMethod
+                && pio.subTerm().freeVars().isEmpty()) {
             final Term pmTerm = pio.subTerm();
             IProgramMethod pm = (IProgramMethod) pmTerm.op();
             if(pm.isModel()) {
               return false;
             }
+            // abort if inside of transformer
+            if (Transformer.inTransformer(pio)) {
+                return false;
+            }
             final Sort nullSort = goal.proof().getJavaInfo().nullSort();
-            if (pm.isStatic() || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort()) &&
-                    !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
+            if (pm.isStatic()
+                    || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort())
+                            && !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
                 PIOPathIterator it = pio.iterator();
                 while ( it.next() != -1 ) {
                     Term focus = it.getSubTerm();

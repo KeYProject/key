@@ -64,13 +64,15 @@ public final class TestSEDKeyCoreUtil {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node? Use {@code null} to use default value.
     * @param showKeYMainWindow Show KeY's main window? Use {@code null} to use default value.
     * @param mergeBranchConditions Merge branch conditions?
+    * @param usePrettyPrinting Use pretty printing?
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IFile file,
                                 final Boolean showMethodReturnValues,
                                 final Boolean showVariablesOfSelectedDebugNode,
                                 final Boolean showKeYMainWindow,
-                                final Boolean mergeBranchConditions) throws Exception {
+                                final Boolean mergeBranchConditions,
+                                final Boolean usePrettyPrinting) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
@@ -88,6 +90,9 @@ public final class TestSEDKeyCoreUtil {
                }
                if (mergeBranchConditions != null) {
                   wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditions);
+               }
+               if (usePrettyPrinting != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrinting);
                }
                config = wc.doSave();
                DebugUITools.launch(config, KeySEDUtil.MODE);
@@ -130,6 +135,7 @@ public final class TestSEDKeyCoreUtil {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node? Use {@code null} to use default value.
     * @param showKeYMainWindow Show KeY's main window? Use {@code null} to use default value.
     * @param mergeBranchConditions Merge branch conditions?
+    * @param usePrettyPrinting Use pretty printing?
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IMethod method,
@@ -138,7 +144,8 @@ public final class TestSEDKeyCoreUtil {
                                 final Boolean showMethodReturnValues,
                                 final Boolean showVariablesOfSelectedDebugNode,
                                 final Boolean showKeYMainWindow,
-                                final Boolean mergeBranchConditions) throws Exception {
+                                final Boolean mergeBranchConditions,
+                                final Boolean usePrettyPrinting) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
@@ -172,6 +179,9 @@ public final class TestSEDKeyCoreUtil {
                }
                if (mergeBranchConditions != null) {
                   wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditions);
+               }
+               if (usePrettyPrinting != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrinting);
                }
                config = wc.doSave();
                DebugUITools.launch(config, KeySEDUtil.MODE);

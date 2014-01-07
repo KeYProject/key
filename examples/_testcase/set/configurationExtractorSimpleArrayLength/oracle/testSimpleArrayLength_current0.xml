@@ -5,7 +5,7 @@
       <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </state>
    <object xml:id="o1" name="array" type="java.lang.Object[]">
-      <value name="length" programVariable="length" isArrayIndex="false" arrayIndex="-1" value="1" type="int"/>
+      <value name="length" programVariable="length" isArrayIndex="false" arrayIndex="-1" value="Z(1(#))" type="int"/>
    </object>
    <object xml:id="o2" name="self" type="SimpleArrayLength">
    </object>

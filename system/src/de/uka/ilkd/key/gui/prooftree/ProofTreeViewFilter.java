@@ -10,87 +10,87 @@ import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
  *
  */
 public abstract class ProofTreeViewFilter {
-	
+
 	public final static ProofTreeViewFilter HIDE_INTERMEDIATE = new HideIntermediateFilter();
 	public final static ProofTreeViewFilter HIDE_CLOSED_SUBTREES = new HideClosedSubtreesFilter();
 	public final static ProofTreeViewFilter ONLY_INTERACTIVE = new OnlyInteractiveFilter();
-	
-	public final static ProofTreeViewFilter[] ALL = 
+
+	public final static ProofTreeViewFilter[] ALL =
 		new ProofTreeViewFilter[] {HIDE_INTERMEDIATE, ONLY_INTERACTIVE, HIDE_CLOSED_SUBTREES};
-	
+
 	/**
 	 * Name of the filter used in GUI elements.
 	 */
 	public abstract String name();
-	
+
 	/**
 	 * Whether the filter is currently active.
 	 */
 	public abstract boolean isActive ();
-	
+
 	/**
 	 * Should only be called through GUIProofTreeNode#setFilter().
 	 */
 	abstract void setActive(boolean active);
-	
+
 	/**
 	 * Returns whether the filter's scope is on the whole tree (like hiding subtrees).
 	 */
 	abstract boolean global();
-	
+
 	/**
 	 * Filters working locally on nodes.
 	 * There may only be one such filter active at any time.
 	 * @author bruns
 	 */
 	abstract static class NodeFilter extends ProofTreeViewFilter {
-		@Override
-		boolean global() {
-			return false;
-		}
-		
-	    public abstract boolean countChild(GUIProofTreeNode child, TreeNode parent); 
-	    
+	    @Override
+	    boolean global() {
+	        return false;
+	    }
+
+	    public abstract boolean countChild(GUIProofTreeNode child, TreeNode parent);
+
 	    public int getChildCount(Object parent) {
-	    	TreeNode child;
-	    	int count = 0;
-	    	for (int i = 0; i < ((TreeNode) parent).getChildCount(); i++) {
-	    		child = ((TreeNode) parent).getChildAt(i);
-	    		if (countChild(child, (TreeNode) parent)) {
-	    			count++;
-	    		}
-	    	}
-	    	return count;
+	        TreeNode child;
+	        int count = 0;
+	        for (int i = 0; i < ((TreeNode) parent).getChildCount(); i++) {
+	            child = ((TreeNode) parent).getChildAt(i);
+	            if (countChild(child, (TreeNode) parent)) {
+	                count++;
+	            }
+	        }
+	        return count;
 	    }
 
 	    public Object getChild(Object parent, int index) {
-	    	TreeNode child;
-	    	int count = -1;
-	    	for (int i = 0; i < ((TreeNode) parent).getChildCount(); i++) {
-	    		child = ((TreeNode) parent).getChildAt(i);
-	    		if (countChild(child, (TreeNode) parent)) {
-	    			count++;
-	    			if (index == count) {
-	    				return child;
-	    			}
-	    		}
-	    	}
-	    	return null;
+	        TreeNode child;
+	        int count = -1;
+	        for (int i = 0; i < ((TreeNode) parent).getChildCount(); i++) {
+	            child = ((TreeNode) parent).getChildAt(i);
+	            if (countChild(child, (TreeNode) parent)) {
+	                count++;
+	                if (index == count) {
+	                    return child;
+	                }
+	            }
+	        }
+	        return null;
 	    }
-	    
+
 
 	    public int getIndexOfChild(Object parent, Object child) {
-	    	TreeNode guiParent = (TreeNode)parent;
-	    	int count = -1;
-	    	for (int i = 0; i < guiParent.getChildCount();i++) {
-	    		if (countChild(guiParent.getChildAt(i), guiParent)) {
-	    			count++;
-	    			if (guiParent.getChildAt(i) == child) {
-	    				return count;
-	    			}
-	    		}
-	    	}
-	    	return -1;
+	        TreeNode guiParent = (TreeNode)parent;
+	        int count = -1;
+	        for (int i = 0; i < guiParent.getChildCount();i++) {
+	            if (countChild(guiParent.getChildAt(i), guiParent)) {
+	                count++;
+	                if (guiParent.getChildAt(i) == child) {
+	                    return count;
+	                }
+	            }
+	        }
+	        return -1;
 	    }
 
 
@@ -103,7 +103,7 @@ public abstract class ProofTreeViewFilter {
 	     */
 	    protected boolean countChild(TreeNode child, TreeNode parent) {
 	        if (child instanceof GUIProofTreeNode) {
-	        	return countChild((GUIProofTreeNode)child, parent);
+	            return countChild((GUIProofTreeNode)child, parent);
 	        } else if (child instanceof GUIBranchNode) {
 	            return true;
 	        }
@@ -120,7 +120,7 @@ public abstract class ProofTreeViewFilter {
 
 		@Override
 		void setActive(boolean active) {
-			ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHideIntermediateProofsteps(active);	
+			ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHideIntermediateProofsteps(active);
 		}
 
 		@Override
@@ -150,7 +150,7 @@ public abstract class ProofTreeViewFilter {
 			return false;
 		}
 	}
-	
+
 	private static class OnlyInteractiveFilter extends NodeFilter {
 
 		@Override
@@ -192,7 +192,7 @@ public abstract class ProofTreeViewFilter {
 			return false;
 		}
 	}
-	
+
 	private static class HideClosedSubtreesFilter extends ProofTreeViewFilter {
 
 		@Override
@@ -214,6 +214,5 @@ public abstract class ProofTreeViewFilter {
 		boolean global() {
 			return true;
 		}
-		
 	}
 }

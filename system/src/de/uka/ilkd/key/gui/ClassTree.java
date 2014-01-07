@@ -17,7 +17,6 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;

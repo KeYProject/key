@@ -39,20 +39,20 @@ mod: \if (true)
          \then (allLocs)
          \else (allLocs)
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-            <branchCondition name="value &gt;  -1" pathCondition="value &gt;  -1" pathConditionChanged="true" branchCondition="value &gt;  -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
-               <statement name="int magicNumberCopy = magicNumber;" pathCondition="value &gt;  -1" pathConditionChanged="false">
-                  <statement name="return magicNumber+magicNumberCopy;" pathCondition="value &gt;  -1" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" pathCondition="value &gt;  -1" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="value &gt;  -1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+            <branchCondition name="gt(value,Z(neglit(1(#))))" pathCondition="gt(value,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(value,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
+               <statement name="int magicNumberCopy = magicNumber;" pathCondition="gt(value,Z(neglit(1(#))))" pathConditionChanged="false">
+                  <statement name="return magicNumber+magicNumberCopy;" pathCondition="gt(value,Z(neglit(1(#))))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" pathCondition="gt(value,Z(neglit(1(#))))" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="gt(value,Z(neglit(1(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
                </statement>
             </branchCondition>
-            <branchCondition name="value &lt; 0" pathCondition="value &lt; 0" pathConditionChanged="true" branchCondition="value &lt; 0" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (magic)">
-               <statement name="return -1;" pathCondition="value &lt; 0" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" pathCondition="value &lt; 0" pathConditionChanged="false" isReturnValueComputed="false">
-                     <termination name="&lt;end&gt;" pathCondition="value &lt; 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+            <branchCondition name="lt(value,Z(0(#)))" pathCondition="lt(value,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(value,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (magic)">
+               <statement name="return -1;" pathCondition="lt(value,Z(0(#)))" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" pathCondition="lt(value,Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false">
+                     <termination name="&lt;end&gt;" pathCondition="lt(value,Z(0(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>

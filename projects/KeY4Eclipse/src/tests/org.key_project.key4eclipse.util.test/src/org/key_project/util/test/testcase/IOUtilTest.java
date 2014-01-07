@@ -78,7 +78,7 @@ public class IOUtilTest extends TestCase {
          file.delete();
       }
    }
-   
+
    /**
     * Tests {@link IOUtil#computeMD5(InputStream)}.
     */
@@ -98,7 +98,7 @@ public class IOUtilTest extends TestCase {
       assertEquals("b10a8db164e0754105b7a99be72e3fe5", IOUtil.computeMD5(in));
       assertTrue(in.isClosed());
    }
-      
+
    /**
     * {@link InputStream} with a fixed text.
     * @author Martin Hentschel
@@ -134,7 +134,7 @@ public class IOUtilTest extends TestCase {
          return closed;
       }
    }
-   
+
    /**
     * Tests {@link IOUtil#visit(File, org.key_project.util.java.IOUtil.IFileVisitor)}.
     */

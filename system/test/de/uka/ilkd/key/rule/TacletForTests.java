@@ -30,8 +30,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -53,14 +53,14 @@ public class TacletForTests {
         File.separator+"_testcase"+
         File.separator+"testrules.key";
     public static String standardFile = testRules;
-    
+
     public static AbbrevMap scm = new AbbrevMap();
-    
+
     public static NamespaceSet nss = new NamespaceSet();
     public static TacletIndex rules= null;
     public static Services services;
     public static File lastFile=null;
-    
+
     public static Namespace variables = null;
 
     public static Profile profile = new JavaProfile() {
@@ -185,8 +185,8 @@ public class TacletForTests {
 	StringReader br = null;
 	try {	    
 	    br   = new StringReader(termstr);
-	    KeYParser parser = new KeYParser(ParserMode.TERM,
-	                                     new KeYLexer(br,null), 
+	    KeYParserF parser = new KeYParserF(ParserMode.TERM,
+	                                     new KeYLexerF(br,null),
 					     "No file. " +
 					     "TacletForTests.parseTerm("
 					     +termstr+")",
@@ -210,8 +210,8 @@ public class TacletForTests {
 	StringReader br = null;
 	try {	    
 	    br = new StringReader(termstr);
-	    KeYParser parser = new KeYParser(ParserMode.TERM,
-	                                     new KeYLexer(br,null), 
+	    KeYParserF parser = new KeYParserF(ParserMode.TERM,
+	                                     new KeYLexerF(br,null),
 					     "No file. " +
 					     "TacletForTests.parseTerm("
 					     +termstr+")",

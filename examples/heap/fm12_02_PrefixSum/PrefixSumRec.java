@@ -78,7 +78,7 @@ final class PrefixSumRec {
 	return 2*left - right + 1;
     }
 
-    /*@ normal_behavior 
+    /*@ normal_behavior
       @   requires k >= 0;
       @   ensures 0 <= \result && \result <= k;
       @   ensures pow2(\result) <= k+1;

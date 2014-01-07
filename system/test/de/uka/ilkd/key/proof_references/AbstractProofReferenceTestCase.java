@@ -21,12 +21,12 @@ import java.util.LinkedHashSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.ClassAxiom;
@@ -37,6 +37,7 @@ import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Provides the basic functionality to test the proof reference API.
@@ -298,7 +299,10 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
       KeYEnvironment<?> environment = null;
       Proof proof = null;
       HashMap<String, String> originalTacletOptions = null;
+      boolean usePrettyPrinting = SymbolicExecutionUtil.isUsePrettyPrinting();
       try {
+         // Disable pretty printing to make tests more robust against different term representations
+         SymbolicExecutionUtil.setUsePrettyPrinting(false);
          // Make sure that required files exists
          File javaFile = new File(baseDir, javaPathInBaseDir);
          assertTrue(javaFile.exists());
@@ -329,6 +333,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          doProofTest(environment, proof, useContracts, tester);
       }
       finally {
+         SymbolicExecutionUtil.setUsePrettyPrinting(usePrettyPrinting);
          // Restore taclet options
          restoreTacletOptions(originalTacletOptions);
          // Dispose proof and environment
@@ -361,7 +366,10 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
       KeYEnvironment<?> environment = null;
       Proof proof = null;
       HashMap<String, String> originalTacletOptions = null;
+      boolean usePrettyPrinting = SymbolicExecutionUtil.isUsePrettyPrinting();
       try {
+         // Disable pretty printing to make tests more robust against different term representations
+         SymbolicExecutionUtil.setUsePrettyPrinting(false);
          // Make sure that required files exists
          File javaFile = new File(baseDir, javaPathInBaseDir);
          assertTrue(javaFile.exists());
@@ -382,6 +390,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          doProofTest(environment, proof, useContracts, tester);
       }
       finally {
+         SymbolicExecutionUtil.setUsePrettyPrinting(usePrettyPrinting);
          // Restore taclet options
          restoreTacletOptions(originalTacletOptions);
          // Dispose proof and environment

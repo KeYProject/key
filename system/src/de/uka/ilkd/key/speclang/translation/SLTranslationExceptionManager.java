@@ -18,8 +18,10 @@ import antlr.ANTLRException;
 import antlr.LLkParser;
 import antlr.RecognitionException;
 import antlr.Token;
+import antlr.TokenStreamException;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
 
 
 /**
@@ -28,9 +30,10 @@ import de.uka.ilkd.key.speclang.PositionedString;
  */
 public class SLTranslationExceptionManager {
     
-    private final LLkParser parser;
     private final String fileName;
     private final Position offsetPos;
+    private final int line;
+    private final int column;
     
     
     //-------------------------------------------------------------------------
@@ -40,7 +43,27 @@ public class SLTranslationExceptionManager {
     public SLTranslationExceptionManager(LLkParser parser, 
                                          String fileName, 
                                          Position offsetPos) {
-        this.parser    = parser;
+	int line;
+	int column;
+	try {
+	    line = parser.LT(1).getLine();
+	    column = parser.LT(1).getColumn();
+	} catch (final TokenStreamException e) {
+	    line = 1;
+	    column = 1;
+	}
+
+	this.line = line;
+	this.column = column;
+	this.fileName = fileName;
+	this.offsetPos = offsetPos;
+    }
+
+    public SLTranslationExceptionManager(KeYJMLPreParser parser,
+                                         String fileName,
+                                         Position offsetPos) {
+        this.line = parser.input.LT(1).getLine();
+        this.column = parser.input.LT(1).getCharPositionInLine();
         this.fileName  = fileName;
         this.offsetPos = offsetPos;
     }
@@ -60,23 +83,6 @@ public class SLTranslationExceptionManager {
     }
     
     
-    /**
-     * Returns the  absolute source code position of the previous token.
-     */
-    private Position getPosition() {
-        int line, column;
-        try {
-            line   = parser.LT(0).getLine();
-            column = parser.LT(0).getColumn();
-        } catch(Exception e) {
-            line   = 1;
-            column = 1;
-        }
-        return createAbsolutePosition(line, column);
-    }
-    
-    
-    
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
@@ -91,6 +97,11 @@ public class SLTranslationExceptionManager {
                                                            t.getColumn()));
     }   
     
+    public PositionedString createPositionedString(String text,
+	    org.antlr.runtime.Token t) {
+	return new PositionedString(text, fileName, createAbsolutePosition(
+		t.getLine(), t.getCharPositionInLine()));
+    }
     
     /**
      * Creates a string with the current absolute position information
@@ -98,7 +109,7 @@ public class SLTranslationExceptionManager {
     public PositionedString createPositionedString(String text) {
         return new PositionedString(text, 
                                     fileName, 
-                                    getPosition());
+                                    createAbsolutePosition(this.line, this.column));
     }
     
     
@@ -109,7 +120,7 @@ public class SLTranslationExceptionManager {
     public SLTranslationException createException(String message) {
         return new SLTranslationException(message, 
                                           fileName, 
-                                          getPosition());
+                                          createAbsolutePosition(this.line, this.column));
     }
             
     
@@ -122,6 +133,12 @@ public class SLTranslationExceptionManager {
                                           fileName,
                                           createAbsolutePosition(t.getLine(),
                                                                  t.getColumn()));
+    }
+
+    public SLTranslationException createException(String message,
+	    org.antlr.runtime.Token t) {
+	return new SLTranslationException(message, fileName,
+		createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
     }
 
     /**
@@ -154,13 +171,18 @@ public class SLTranslationExceptionManager {
     public SLTranslationException createWarningException(String message) {
         return new SLWarningException(message, 
                                       fileName, 
-                                      getPosition());
+                                      createAbsolutePosition(this.line, this.column));
     }
     
     public SLTranslationException createWarningException(String message, Token t) {
         return new SLWarningException(new PositionedString(message, t));
     }
     
+    public SLTranslationException createWarningException(String message,
+	    org.antlr.runtime.Token t) {
+	return new SLWarningException(new PositionedString(message, t));
+    }
+
     /**
      * Converts an ANTLRException into an SLTranslationException with the same
      * message and stack trace, and with current absolute position information.
@@ -171,7 +193,7 @@ public class SLTranslationExceptionManager {
             RecognitionException re = (RecognitionException) e;
             pos = createAbsolutePosition(re.getLine(), re.getColumn());
         } else {
-            pos = getPosition();
+            pos = createAbsolutePosition(this.line, this.column);
         }
         
         return new SLTranslationException(e.getMessage() 
@@ -181,5 +203,15 @@ public class SLTranslationExceptionManager {
                                           fileName, 
                                           pos,
                                           e.getStackTrace());
+    }
+
+    public SLTranslationException convertException(
+	    org.antlr.runtime.RecognitionException e) {
+	Position pos;
+	pos = createAbsolutePosition(e.line, e.charPositionInLine);
+
+	return new SLTranslationException(e.getMessage() + " ("
+		+ e.getClass().getName() + ")", fileName, pos,
+		e.getStackTrace());
     }
 }

@@ -61,7 +61,6 @@ import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 
@@ -92,6 +91,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           boolean showMethodReturnValues = KeySEDUtil.isShowMethodReturnValuesInDebugNodes(configuration);
           boolean showVariablesOfSelectedDebugNode = KeySEDUtil.isShowVariablesOfSelectedDebugNode(configuration);
           boolean executeMethodRange = KeySEDUtil.isExecuteMethodRange(configuration);
+          boolean usePrettyPrinting = KeySEDUtil.isUsePrettyPrinting(configuration);
           Position methodRangeStart = new KeYUtil.CursorPosition(KeySEDUtil.getMethodRangeStartLine(configuration), KeySEDUtil.getMethodRangeStartColumn(configuration));
           Position methodRangeEnd = new KeYUtil.CursorPosition(KeySEDUtil.getMethodRangeEndLine(configuration), KeySEDUtil.getMethodRangeEndColumn(configuration));
           // Determine location and class path entries
@@ -122,7 +122,23 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
              Assert.isTrue(location.exists());
           }
           // Instantiate proof settings
-          KeYLaunchSettings settings = new KeYLaunchSettings(newDebugSession, proofFileToContinue, method, useExistingContract, existingContract, precondition, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, executeMethodRange, methodRangeStart, methodRangeEnd, location, classPaths, bootClassPath); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
+          KeYLaunchSettings settings = new KeYLaunchSettings(newDebugSession, 
+                                                             proofFileToContinue, 
+                                                             method, 
+                                                             useExistingContract, 
+                                                             existingContract, 
+                                                             precondition, 
+                                                             showMethodReturnValues, 
+                                                             showVariablesOfSelectedDebugNode, 
+                                                             showKeYMainWindow, 
+                                                             mergeBranchConditions, 
+                                                             executeMethodRange, 
+                                                             methodRangeStart, 
+                                                             methodRangeEnd, 
+                                                             location, 
+                                                             classPaths, 
+                                                             bootClassPath, 
+                                                             usePrettyPrinting); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
           // Validate proof settings
           if (newDebugSession) {
              if (method == null) {
@@ -232,7 +248,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           proof = ui.createProof(initConfig, input);
        }
        // Create symbolic execution tree builder
-       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, settings.isMergeBranchConditions());
+       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, settings.isMergeBranchConditions(), settings.isUsePrettyPrinting());
        builder.analyse();
        // Create environment used for symbolic execution
        return new SymbolicExecutionEnvironment<UserInterface>(ui, initConfig, builder);

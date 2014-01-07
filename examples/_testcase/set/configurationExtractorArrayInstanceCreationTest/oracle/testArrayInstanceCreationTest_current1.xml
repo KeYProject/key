@@ -2,7 +2,7 @@
 <model>
    <equivalenceClass representativeTerm="self">
       <term term="self"/>
-      <term term="self.next"/>
+      <term term="ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next)"/>
    </equivalenceClass>
    <state name="return localArray[0]+localArray[1];">
       <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
@@ -14,16 +14,16 @@
       <association name="instanceArray" programVariable="instanceArray" isArrayIndex="false" arrayIndex="-1" target="o3"/>
    </object>
    <object xml:id="o2" name="x_arr_18" type="int[]">
-      <value name="[1]" isArrayIndex="true" arrayIndex="1" value="5" type="int"/>
-      <value name="[0]" isArrayIndex="true" arrayIndex="0" value="4" type="int"/>
+      <value name="[1]" isArrayIndex="true" arrayIndex="1" value="Z(5(#))" type="int"/>
+      <value name="[0]" isArrayIndex="true" arrayIndex="0" value="Z(4(#))" type="int"/>
    </object>
    <object xml:id="o3" name="x_arr_14" type="int[]">
-      <value name="[0]" isArrayIndex="true" arrayIndex="0" value="3" type="int"/>
+      <value name="[0]" isArrayIndex="true" arrayIndex="0" value="Z(3(#))" type="int"/>
    </object>
    <object xml:id="o4" name="x_arr_9" type="int[]">
-      <value name="[0]" isArrayIndex="true" arrayIndex="0" value="2" type="int"/>
+      <value name="[0]" isArrayIndex="true" arrayIndex="0" value="Z(2(#))" type="int"/>
    </object>
    <object xml:id="o5" name="x_arr_3" type="int[]">
-      <value name="[0]" isArrayIndex="true" arrayIndex="0" value="1" type="int"/>
+      <value name="[0]" isArrayIndex="true" arrayIndex="0" value="Z(1(#))" type="int"/>
    </object>
 </model>

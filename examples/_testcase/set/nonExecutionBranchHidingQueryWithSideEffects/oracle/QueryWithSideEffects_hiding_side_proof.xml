@@ -15,16 +15,16 @@ post: result_0 = self.subMagic(x)
                   = javaUnaryMinusInt(55))
             &amp; self.&lt;inv&gt;))))
 &amp; exc_0 = null
-mod: {}
+mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue+this.instanceField+classField;" pathCondition="true" pathConditionChanged="false">
                <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	120 {x &gt;  -1}, 
-	-4787 {x &lt; 0}
+	Z(0(2(1(#)))) {gt(x,Z(neglit(1(#))))}, 
+	Z(neglit(7(8(7(4(#)))))) {lt(x,Z(0(#)))}
 as result of self.main(x);&gt;" isReturnValueComputed="true">
-                  <methodReturnValue name="120 {x &gt;  -1}" returnValueString="120" hasCondition="true" conditionString="x &gt;  -1">
+                  <methodReturnValue name="Z(0(2(1(#)))) {gt(x,Z(neglit(1(#))))}" returnValueString="Z(0(2(1(#))))" hasCondition="true" conditionString="gt(x,Z(neglit(1(#))))">
                   </methodReturnValue>
-                  <methodReturnValue name="-4787 {x &lt; 0}" returnValueString="-4787" hasCondition="true" conditionString="x &lt; 0">
+                  <methodReturnValue name="Z(neglit(7(8(7(4(#)))))) {lt(x,Z(0(#)))}" returnValueString="Z(neglit(7(8(7(4(#))))))" hasCondition="true" conditionString="lt(x,Z(0(#)))">
                   </methodReturnValue>
                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>

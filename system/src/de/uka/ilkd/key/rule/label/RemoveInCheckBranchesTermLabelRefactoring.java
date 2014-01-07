@@ -30,7 +30,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     * The {@link Name} of the supported {@link TermLabel}.
     */
    private final Name termLabelNameToRemove;
-   
+
    /**
     * Constructor.
     * @param termLabelNameToRemove The {@link Name} of the supported {@link TermLabel}.
@@ -61,7 +61,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
                                                   Term tacletTerm) {
       if (goal != null) {
          if (rule instanceof UseOperationContractRule &&
-               (goal.node().getNodeInfo().getBranchLabel().startsWith("Pre") || 
+               (goal.node().getNodeInfo().getBranchLabel().startsWith("Pre") ||
                 goal.node().getNodeInfo().getBranchLabel().startsWith("Null reference"))) {
             return RefactoringScope.SEQUENT;
          }
@@ -86,7 +86,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
                                PosInOccurrence applicationPosInOccurrence,
                                Term applicationTerm,
                                Rule rule,Goal goal,
-                               Term tacletTerm, 
+                               Term tacletTerm,
                                Term term,
                                List<TermLabel> labels) {
       Iterator<TermLabel> iter = labels.iterator();

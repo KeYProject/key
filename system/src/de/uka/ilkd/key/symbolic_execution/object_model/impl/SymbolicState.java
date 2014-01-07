@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
+import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 
 /**
@@ -23,14 +24,15 @@ public class SymbolicState extends AbstractSymbolicAssociationValueContainer imp
    /**
     * The name of this state.
     */
-   private String name;
+   private final String name;
 
    /**
     * Constructor.
     * @param name The name of this state.
+    * @param settings The {@link IModelSettings} to use.
     */
-   public SymbolicState(String name) {
-      super();
+   public SymbolicState(String name, IModelSettings settings) {
+      super(settings);
       this.name = name;
    }
 

@@ -27,8 +27,8 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
@@ -289,8 +289,8 @@ public class CreateTacletForTests extends TestCase {
 	Term t_test1=null;
 	try{
 	    StringReader fr = new StringReader(test1);
-	    KeYParser parser=
-		new KeYParser(ParserMode.PROBLEM,new KeYLexer(fr,null));
+	    KeYParserF parser=
+		new KeYParserF(ParserMode.PROBLEM,new KeYLexerF(fr,null));
 	    t_test1=parser.problem();
 	} catch (Exception e) {
 	    System.err.println("Parser Error or Input Error");
@@ -359,15 +359,15 @@ public class CreateTacletForTests extends TestCase {
 
     }
     
-    private KeYParser stringDeclParser(String s) {
-	return new KeYParser(ParserMode.DECLARATION, new KeYLexer(new StringReader(s),null),
+    private KeYParserF stringDeclParser(String s) {
+	return new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s,null),
 			      "No file. CreateTacletForTests.stringParser("+s+")",
 			      services, nss);
     }
 
     public void parseDecls(String s) {
 	try {
-	    KeYParser p = stringDeclParser(s);
+	    KeYParserF p = stringDeclParser(s);
 	    p.decls();
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
@@ -377,9 +377,9 @@ public class CreateTacletForTests extends TestCase {
 	}
     }
      
-    private KeYParser stringTacletParser(String s) {
-	return new KeYParser(ParserMode.TACLET, 
-		             new KeYLexer(new StringReader(s),null),
+    private KeYParserF stringTacletParser(String s) {
+	return new KeYParserF(ParserMode.TACLET,
+		             new KeYLexerF(s,null),
 			     "No file. CreateTacletForTests.stringParser("+s+")",
 			     services, 
 			     nss);
@@ -387,7 +387,7 @@ public class CreateTacletForTests extends TestCase {
     
     Taclet parseTaclet(String s) {
    	try {
-	    KeYParser p = stringTacletParser(s);
+	    KeYParserF p = stringTacletParser(s);
 	    
 	    return p.taclet(DefaultImmutableSet.<Choice>nil());
 	} catch (Exception e) {

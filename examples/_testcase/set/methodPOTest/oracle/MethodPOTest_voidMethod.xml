@@ -2,14 +2,14 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="MethodPOTest.voidMethod(param);" pathCondition="true" pathConditionChanged="false">
       <statement name="int value = param.x;" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="!param = null" pathCondition="!param = null" pathConditionChanged="true" branchCondition="!param = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <methodReturn name="&lt;return of MethodPOTest.voidMethod(param);&gt;" pathCondition="!param = null" pathConditionChanged="false" isReturnValueComputed="false">
-               <termination name="&lt;end&gt;" pathCondition="!param = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+         <branchCondition name="not(equals(param,null))" pathCondition="not(equals(param,null))" pathConditionChanged="true" branchCondition="not(equals(param,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <methodReturn name="&lt;return of MethodPOTest.voidMethod(param);&gt;" pathCondition="not(equals(param,null))" pathConditionChanged="false" isReturnValueComputed="false">
+               <termination name="&lt;end&gt;" pathCondition="not(equals(param,null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                </termination>
             </methodReturn>
          </branchCondition>
-         <branchCondition name="param = null" pathCondition="param = null" pathConditionChanged="true" branchCondition="param = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="param = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+         <branchCondition name="equals(param,null)" pathCondition="equals(param,null)" pathConditionChanged="true" branchCondition="equals(param,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(param,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
             </termination>
          </branchCondition>
       </statement>

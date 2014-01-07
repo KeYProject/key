@@ -7,11 +7,11 @@
                <statement name="return x.doSomething();" pathCondition="true" pathConditionChanged="false">
                   <methodCall name="x.doSomething();" pathCondition="true" pathConditionChanged="false">
                      <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of x.doSomething();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of x.doSomething();&gt;" isReturnValueComputed="true">
-                           <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                        <methodReturn name="&lt;return of x.doSomething();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of x.doSomething();&gt;" isReturnValueComputed="true">
+                           <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                            </methodReturnValue>
-                           <methodReturn name="&lt;return of MethodCallOnObject.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of MethodCallOnObject.main();&gt;" isReturnValueComputed="true">
-                              <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                           <methodReturn name="&lt;return of MethodCallOnObject.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodCallOnObject.main();&gt;" isReturnValueComputed="true">
+                              <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                               </methodReturnValue>
                               <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>

@@ -7,9 +7,9 @@
       <association name="y" programVariable="y" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </state>
    <object xml:id="o1" name="x" type="ConfigurationExtractorWithOperationContractsTest.IntWrapper">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="x.value" type="int"/>
+      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="int::select(heap,x,ConfigurationExtractorWithOperationContractsTest.IntWrapper::$value)" type="int"/>
    </object>
    <object xml:id="o2" name="y" type="ConfigurationExtractorWithOperationContractsTest.IntWrapper">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="y.value" type="int"/>
+      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="int::select(heap,y,ConfigurationExtractorWithOperationContractsTest.IntWrapper::$value)" type="int"/>
    </object>
 </model>

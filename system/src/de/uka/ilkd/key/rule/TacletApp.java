@@ -637,7 +637,9 @@ public abstract class TacletApp implements RuleApp {
             nv = it.next();
             if(nv.first() == sv) {
                 Term term = (Term) instantiations.getInstantiation(nv.second());
-                term.execPostOrder(vcv);
+                if (term != null) {
+                    term.execPostOrder(vcv);
+                }
             }
         }
 
@@ -754,7 +756,7 @@ public abstract class TacletApp implements RuleApp {
 	    final SchemaVariable sv = svIt.next();
 	    if(sv instanceof SkolemTermSV) {
 		final Term inst = (Term) insts.getInstantiation(sv);
-		final Namespace functions = 
+		final Namespace functions =
                         services.getNamespaces().functions();
 
                 // skolem constant might already be registed in

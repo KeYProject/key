@@ -39,7 +39,7 @@ class Instantiation {
 
     private final static TermBuilder tb = TermBuilder.DF;
 
-    /** universally quatifiable variable bound in<code>allTerm</code> */
+    /** universally quantifiable variable bound in<code>allTerm</code> */
     private final QuantifiableVariable firstVar;
 
     private final Term matrix;

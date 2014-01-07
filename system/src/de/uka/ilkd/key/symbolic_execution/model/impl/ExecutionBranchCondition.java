@@ -22,9 +22,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -32,6 +32,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * @author Martin Hentschel
  */
 public class ExecutionBranchCondition extends AbstractExecutionNode implements IExecutionBranchCondition {
+   /**
+    * The optional additional branch label.
+    */
+   private final String additionalBranchLabel;
+   
    /**
     * The {@link Term} which represents the branch condition.
     */
@@ -61,20 +66,19 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     * Contains the merged branch conditions.
     */
    private Term[] mergedBranchCondtions;
-
-   /**
-    * The optional additional branch label.
-    */
-   private String additionalBranchLabel;
    
    /**
     * Constructor.
+    * @param settings The {@link ITreeSettings} to use.
     * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param additionalBranchLabel The optional additional branch label.
     */
-   public ExecutionBranchCondition(KeYMediator mediator, Node proofNode, String additionalBranchLabel) {
-      super(mediator, proofNode);
+   public ExecutionBranchCondition(ITreeSettings settings, 
+                                   KeYMediator mediator, 
+                                   Node proofNode, 
+                                   String additionalBranchLabel) {
+      super(settings, mediator, proofNode);
       this.additionalBranchLabel = additionalBranchLabel;
    }
 
@@ -142,8 +146,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
          branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true, true);
       }
       // Format branch condition
-      StringBuffer sb = ProofSaver.printTerm(branchCondition, getServices(), true);
-      formatedBranchCondition = sb.toString();
+      formatedBranchCondition = formatTerm(branchCondition);
    }
 
    /**
@@ -196,8 +199,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
       pathCondition = SymbolicExecutionUtil.simplify(getProof(), pathCondition);
       pathCondition = SymbolicExecutionUtil.improveReadability(pathCondition, getServices());
       // Format path condition
-      StringBuffer sb = ProofSaver.printTerm(pathCondition, getServices(), true);
-      formatedPathCondition = sb.toString();
+      formatedPathCondition = formatTerm(pathCondition);
    }
 
    /**

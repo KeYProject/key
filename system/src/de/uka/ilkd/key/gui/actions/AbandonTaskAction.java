@@ -17,8 +17,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 
 public final class AbandonTaskAction extends MainWindowAction {
 

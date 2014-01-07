@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -36,11 +37,14 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 public class ExecutionLoopStatement extends AbstractExecutionStateNode<LoopStatement> implements IExecutionLoopStatement {
    /**
     * Constructor.
+    * @param settings The {@link ITreeSettings} to use.
     * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
-   public ExecutionLoopStatement(KeYMediator mediator, Node proofNode) {
-      super(mediator, proofNode);
+   public ExecutionLoopStatement(ITreeSettings settings, 
+                                 KeYMediator mediator, 
+                                 Node proofNode) {
+      super(settings, mediator, proofNode);
    }
 
    /**
