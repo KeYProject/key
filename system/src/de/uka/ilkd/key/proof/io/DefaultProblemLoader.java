@@ -128,7 +128,8 @@ public class DefaultProblemLoader {
     * @throws ProofInputException Occurred Exception.
     * @throws IOException Occurred Exception.
     */
-   public ProblemLoaderException load(boolean registerProof) throws ProblemLoaderException {
+   public ProblemLoaderException load(boolean registerProof)
+           throws ProblemLoaderException {
       try {
          // Read environment
       boolean oneStepSimplifier = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
@@ -147,6 +148,7 @@ public class DefaultProblemLoader {
             if (proof != null) {
                replayProof(proof);
             }
+            mediator.getUI().applyMacro();
             // this message is propagated to the top level in console mode
             return null; // Everything fine
          }
