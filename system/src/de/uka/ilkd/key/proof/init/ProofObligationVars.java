@@ -24,9 +24,16 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
  */
 public class ProofObligationVars {
 
+    /** Variables for the pre and post condition. */
     public final StateVars pre, post;
+
+    /** Exception Variable for the try-catch statement. */
     public final Term catchVar;
 
+    /** If this object was created form another ProofObligationVars
+     *  object by adding a postfix to the variable names, then this
+     *  variable contains the used postfix.
+     */
     public final String postfix;
 
 
