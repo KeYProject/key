@@ -25,30 +25,29 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.Strategy;
 
 /**
- * The macro FinishSymbolicExecutionMacro continues automatic rule application
- * until there is no more modality on the sequent.
- *
- * This is done by implementing a delegation {@link Strategy} which assigns to
- * any rule application infinite costs if there is no modality on the sequent.
- *
- * @author mattias ulbrich
+ * The macro applies only symbolic execution and update rules.
+ * This is in contrast to FinishSymbolicExecution, which applies <i>any</i>
+ * rule as long as there is a modality on the sequent.
+ * @author bruns
  */
-public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
+public class SymbolicExecutionMacro extends StrategyProofMacro {
 
     @Override
     public String getName() {
-        return "Finish symbolic execution";
+        return "Finish Symbolic Execution (SymEx only)";
     }
 
     @Override
     public String getDescription() {
-        return "Continue automatic strategy application until no more modality is on the sequent.";
+        return "Symbolically execute programs (including update simplification).";
     }
 
     /*
@@ -84,25 +83,20 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
-        return new FilterSymbexStrategy(
+        return new FilterSymbexStrict(
                 mediator.getInteractiveProver().getProof().getActiveStrategy());
     }
 
     @Override
     public KeyStroke getKeyStroke () {
-        return null;
-//	return KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.SHIFT_DOWN_MASK);
+	return KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.SHIFT_DOWN_MASK);
     }
 
-    /**
-     * The Class FilterAppManager is a special strategy assigning to any rule
-     * infinite costs if the goal has no modality
-     */
-    private static class FilterSymbexStrategy extends FilterStrategy {
+    private static class FilterSymbexStrict extends FilterStrategy {
 
-        private static final Name NAME = new Name(FilterSymbexStrategy.class.getSimpleName());
+        private static final Name NAME = new Name(FilterSymbexStrict.class.getSimpleName());
 
-        public FilterSymbexStrategy(Strategy delegate) {
+        public FilterSymbexStrict(Strategy delegate) {
             super(delegate);
         }
 
@@ -116,8 +110,12 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
             if(!hasModality(goal.node())) {
                 return false;
             }
-
-            return super.isApprovedApp(app, pio, goal);
+            if (pio == null || pio.subTerm() == null) return false;
+            final Operator target = pio.subTerm().op();
+            
+            if (target instanceof Modality || target instanceof UpdateApplication)
+                return super.isApprovedApp(app, pio, goal);
+            else return false;
         }
 
     }
