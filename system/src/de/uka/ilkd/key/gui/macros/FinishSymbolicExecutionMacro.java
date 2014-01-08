@@ -27,7 +27,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.Strategy;
 
 /**
@@ -100,9 +103,23 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     private static class FilterSymbexStrategy extends FilterStrategy {
 
         private static final Name NAME = new Name(FilterSymbexStrategy.class.getSimpleName());
+        private final Strategy delegate;
 
         public FilterSymbexStrategy(Strategy delegate) {
             super(delegate);
+            this.delegate = delegate;
+        }
+        
+
+        @Override
+        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+
+            // increase cost of invariant rule, keep everything else
+            Rule rule = app.rule();
+            String name = rule.name().toString();
+            if(name.startsWith("Class_invariant_axiom_for")) {
+                return LongRuleAppCost.create(2000);
+            } else return super.computeCost(app, pio, goal);
         }
 
         @Override
@@ -116,7 +133,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
                 return false;
             }
 
-            return super.isApprovedApp(app, pio, goal);
+            return delegate.isApprovedApp(app, pio, goal);
         }
 
     }
