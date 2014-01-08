@@ -145,13 +145,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         final ImmutableList<Term> localVarsAtPost =
                 localInsWithoutOutDuplicates.append(localOutsAtPost);
 
-        // build variable for try statement
-        JavaInfo javaInfo = services.getJavaInfo();
-        final KeYJavaType eType =
-            javaInfo.getTypeByClassName("java.lang.Exception");
-        final ProgramElementName ePEN = new ProgramElementName("e");
-        final Term catchVar = TB.var(new LocationVariable(ePEN, eType));
-
         // generate proof obligation variables
         final StateVars instantiationPreVars =
                 new StateVars(selfTerm, guardAtPre, localVarsAtPre, heapAtPre);
@@ -160,7 +153,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final ProofObligationVars instantiationVars =
                 new ProofObligationVars(instantiationPreVars,
                                         instantiationPostVars,
-                                        catchVar);
+                                        services);
 
         // generate information flow invariant application predicate
         // and associated taclet
@@ -169,9 +162,9 @@ public final class WhileInvariantRule implements BuiltInRule {
                 new InfFlowLoopInvariantTacletBuilder(services);
         ifInvariantBuilder.setInvariant(inv);
         ifInvariantBuilder.setContextUpdate(/*inst.u*/);
-        ifInvariantBuilder.setPreVars(instantiationPreVars);
-        ifInvariantBuilder.setPostVars(instantiationPostVars);
-        ifInvariantBuilder.setCatchVar(catchVar);
+        ifInvariantBuilder.setPreVars(instantiationVars.pre);
+        ifInvariantBuilder.setPostVars(instantiationVars.post);
+        ifInvariantBuilder.setCatchVar(instantiationVars.catchVar);
 
         final Term loopInvApplPredTerm =
                 ifInvariantBuilder.buildContractApplPredTerm();

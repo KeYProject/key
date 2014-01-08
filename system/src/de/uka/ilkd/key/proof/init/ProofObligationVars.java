@@ -74,6 +74,20 @@ public class ProofObligationVars {
         this.postfix = "";
     }
 
+    public ProofObligationVars(StateVars pre,
+                               StateVars post,
+                               Services services) {
+        this.pre = pre;
+        this.post = post;
+        this.postfix = "";
+
+        // build variable for try statement
+        JavaInfo javaInfo = services.getJavaInfo();
+        final KeYJavaType eType =
+            javaInfo.getTypeByClassName("java.lang.Exception");
+        final ProgramElementName ePEN = new ProgramElementName("e");
+        catchVar = TermBuilder.DF.var(new LocationVariable(ePEN, eType));
+    }
 
     public ProofObligationVars labelHeapAtPreAsAnonHeapFunc() {
             final TermBuilder TB = TermBuilder.DF;

@@ -493,13 +493,6 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term heapAtPre = anonUpdateData.methodHeapAtPre;
         final Term heapAtPost = anonUpdateData.methodHeap;
 
-        // build variable for try statement
-        JavaInfo javaInfo = services.getJavaInfo();
-        final KeYJavaType eType =
-            javaInfo.getTypeByClassName("java.lang.Exception");
-        final ProgramElementName ePEN = new ProgramElementName("e");
-        final Term catchVar = TB.var(new LocationVariable(ePEN, eType));
-
         // generate proof obligation variables
         final boolean hasSelf = self != null;
         final boolean hasRes = result != null;
@@ -517,6 +510,8 @@ public final class UseOperationContractRule implements BuiltInRule {
                               hasRes ? result : null,
                               hasExc ? exception : null,
                               heapAtPost, mby);
+        final ProofObligationVars poVars =
+                new ProofObligationVars(preVars, postVars, services);
 
         // generate information flow contract application predicate
         // and associated taclet
@@ -524,9 +519,9 @@ public final class UseOperationContractRule implements BuiltInRule {
                 new InfFlowMethodContractTacletBuilder(services);
         ifContractBuilder.setContract(contract);
         ifContractBuilder.setContextUpdate(atPreUpdates, inst.u);
-        ifContractBuilder.setPreVars(preVars);
-        ifContractBuilder.setPostVars(postVars);
-        ifContractBuilder.setCatchVar(catchVar);
+        ifContractBuilder.setPreVars(poVars.pre);
+        ifContractBuilder.setPostVars(poVars.post);
+        ifContractBuilder.setCatchVar(poVars.catchVar);
 
         Term contractApplPredTerm = ifContractBuilder.buildContractApplPredTerm();
         Taclet informationFlowContractApp = ifContractBuilder.buildTaclet();

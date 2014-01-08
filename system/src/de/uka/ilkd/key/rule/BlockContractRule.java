@@ -349,13 +349,6 @@ public class BlockContractRule implements BuiltInRule {
         final Term exceptionAtPost =
                 hasExc ? buildAfterVar(exceptionAtPre, "BLOCK", services) : TB.NULL(services);
         
-        // build variable for try statement
-        JavaInfo javaInfo = services.getJavaInfo();
-        final KeYJavaType eType =
-            javaInfo.getTypeByClassName("java.lang.Exception");
-        final ProgramElementName ePEN = new ProgramElementName("e");
-        final Term catchVar = TB.var(new LocationVariable(ePEN, eType));
-
         // generate proof obligation variables
         final StateVars instantiationPreVars =
                 new StateVars(hasSelf ? selfAtPre : null,
@@ -372,7 +365,7 @@ public class BlockContractRule implements BuiltInRule {
         final ProofObligationVars instantiationVars =
                 new ProofObligationVars(instantiationPreVars,
                                         instantiationPostVars,
-                                        catchVar);
+                                        services);
         final IFProofObligationVars ifVars =
                 new IFProofObligationVars(instantiationVars, services);
         application.update(ifVars, instantiation.context);
@@ -383,9 +376,9 @@ public class BlockContractRule implements BuiltInRule {
                 new InfFlowBlockContractTacletBuilder(services);
         ifContractBuilder.setContract(contract);
         ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
-        ifContractBuilder.setPreVars(instantiationPreVars);
-        ifContractBuilder.setPostVars(instantiationPostVars);
-        ifContractBuilder.setCatchVar(catchVar);
+        ifContractBuilder.setPreVars(instantiationVars.pre);
+        ifContractBuilder.setPostVars(instantiationVars.post);
+        ifContractBuilder.setCatchVar(instantiationVars.catchVar);
 
         final Term contractApplTerm =
                 ifContractBuilder.buildContractApplPredTerm();
