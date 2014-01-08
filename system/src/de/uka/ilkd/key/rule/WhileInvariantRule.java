@@ -162,6 +162,8 @@ public final class WhileInvariantRule implements BuiltInRule {
                                         instantiationPostVars,
                                         catchVar);
 
+        // generate information flow invariant application predicate
+        // and associated taclet
         final Pair<Term, Term> updates = new Pair<Term, Term> (inst.u, anonUpdate);
         final InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
                 new InfFlowLoopInvariantTacletBuilder(services);
@@ -171,8 +173,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         ifInvariantBuilder.setPostVars(instantiationPostVars);
         ifInvariantBuilder.setCatchVar(catchVar);
 
-        // generate information flow invariant application predicate
-        // and associated taclet
         final Term loopInvApplPredTerm =
                 ifInvariantBuilder.buildContractApplPredTerm();
         final Taclet informationFlowInvariantApp =
