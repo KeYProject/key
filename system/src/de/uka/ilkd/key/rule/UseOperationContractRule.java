@@ -525,7 +525,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         ifContractBuilder.setContract(contract);
         ifContractBuilder.setContextUpdate(atPreUpdates, inst.u);
         ifContractBuilder.setPreVars(preVars);
-        ifContractBuilder.setPreVars(postVars);
+        ifContractBuilder.setPostVars(postVars);
         ifContractBuilder.setCatchVar(catchVar);
 
         Term contractApplPredTerm = ifContractBuilder.buildContractApplPredTerm();
