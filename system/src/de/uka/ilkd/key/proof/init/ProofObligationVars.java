@@ -5,10 +5,13 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -16,6 +19,7 @@ import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 
 /**
@@ -30,6 +34,9 @@ public class ProofObligationVars {
     /** Exception Variable for the try-catch statement. */
     public final Term catchVar;
 
+    /** The formal parameters of a method. */
+    public final ImmutableList<Term> formalParams;
+
     /** If this object was created form another ProofObligationVars
      *  object by adding a postfix to the variable names, then this
      *  variable contains the used postfix.
@@ -42,14 +49,8 @@ public class ProofObligationVars {
                                Services services) {
         this.pre = StateVars.buildMethodContractPreVars(pm, kjt, services);
         this.post = StateVars.buildMethodContractPostVars(this.pre, pm, kjt, services);
-
-        // create variable for try statement
-        JavaInfo javaInfo = services.getJavaInfo();
-        final KeYJavaType eType =
-            javaInfo.getTypeByClassName("java.lang.Exception");
-        final ProgramElementName ePEN = new ProgramElementName("e");
-        catchVar = TermBuilder.DF.var(new LocationVariable(ePEN, eType));
-
+        this.catchVar = buildCatchVar(services);
+        this.formalParams = buildFormalParamVars(services);
         this.postfix = "";
     }
 
@@ -59,25 +60,21 @@ public class ProofObligationVars {
                                Services services) {
         this.pre = StateVars.buildInfFlowPreVars(orig.pre, postfix, services);
         this.post = StateVars.buildInfFlowPostVars(orig.pre, orig.post, pre, postfix, services);
-
-        // create variable for try statement
-        JavaInfo javaInfo = services.getJavaInfo();
-        final KeYJavaType eType =
-            javaInfo.getTypeByClassName("java.lang.Exception");
-        final ProgramElementName ePEN =
-                new ProgramElementName(orig.catchVar.toString()); // + postfix);
-        catchVar = TermBuilder.DF.var(new LocationVariable(ePEN, eType));
-
+        this.catchVar = buildCatchVar(services);
+        this.formalParams = orig.formalParams != null ?
+                            buildFormalParamVars(services) : null;
         this.postfix = postfix;
     }
 
 
     public ProofObligationVars(StateVars pre,
                                StateVars post,
-                               Term catchVar) {
+                               Term catchVar,
+                               ImmutableList<Term> formalParams) {
         this.pre = pre;
         this.post = post;
         this.catchVar = catchVar;
+        this.formalParams = formalParams;
         this.postfix = "";
     }
 
@@ -87,13 +84,10 @@ public class ProofObligationVars {
         this.pre = pre;
         this.post = post;
         this.postfix = "";
-
-        // build variable for try statement
-        JavaInfo javaInfo = services.getJavaInfo();
-        final KeYJavaType eType =
-            javaInfo.getTypeByClassName("java.lang.Exception");
-        final ProgramElementName ePEN = new ProgramElementName("e");
-        catchVar = TermBuilder.DF.var(new LocationVariable(ePEN, eType));
+        this.catchVar = buildCatchVar(services);
+        // formal parameters are need only for proof obligations
+        // of methods
+        this.formalParams = null;
     }
 
     public ProofObligationVars labelHeapAtPreAsAnonHeapFunc() {
@@ -109,9 +103,55 @@ public class ProofObligationVars {
                                              pre.exception,
                                              TB.label(pre.heap, new ImmutableArray<ITermLabel>(newLabels)),
                                              pre.mbyAtPre);
-            return new ProofObligationVars(newPre, post, catchVar);
+            return new ProofObligationVars(newPre, post, catchVar, formalParams);
         } else {
             return this;
+        }
+    }
+
+
+    /**
+     * Build variable for try statement.
+     * @param services  the services object.
+     * @return  the generated variable.
+     */
+    private Term buildCatchVar(Services services) {
+        JavaInfo javaInfo = services.getJavaInfo();
+        final KeYJavaType eType =
+            javaInfo.getTypeByClassName("java.lang.Exception");
+        final ProgramElementName ePEN = new ProgramElementName("e");
+        return TermBuilder.DF.var(new LocationVariable(ePEN, eType));
+    }
+
+    /**
+     * Create formal parameters.
+     * @throws IllegalArgumentException
+     */
+    private ImmutableList<Term> buildFormalParamVars(
+            Services services) throws IllegalArgumentException {
+        ImmutableList<Term> formalParamVars = ImmutableSLList.<Term>nil();
+        for (Term param : pre.localVars) {
+            ProgramVariable paramVar = param.op(ProgramVariable.class);
+            ProgramElementName pen = new ProgramElementName("_" +
+                     paramVar.name());
+            LocationVariable formalParamVar =
+                    new LocationVariable(pen, paramVar.getKeYJavaType());
+            register(formalParamVar, services);
+            Term formalParam = TermBuilder.DF.var(formalParamVar);
+            formalParamVars = formalParamVars.append(formalParam);
+// The following line raises a null pointer exception because getProof()
+// might return null
+//              tb.getServices().getProof().addIFSymbol(formalParamVar);
+        }
+        return formalParamVars;
+    }
+
+
+    static void register(ProgramVariable pv,
+                         Services services) {
+        Namespace progVarNames = services.getNamespaces().programVariables();
+        if (pv != null && progVarNames.lookup(pv.name()) == null) {
+            progVarNames.addSafely(pv);
         }
     }
 }

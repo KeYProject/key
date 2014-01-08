@@ -75,24 +75,8 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
                 BasicSnippetData.Key.MODALITY);
 
 
-        //create formal parameters
-        ImmutableList<LocationVariable> formalParamVars =
-                ImmutableSLList.<LocationVariable>nil();
-        for (Term param : vs.pre.localVars) {
-            ProgramVariable paramVar = param.op(ProgramVariable.class);
-            ProgramElementName pen = new ProgramElementName("_"
-                    + paramVar.name());
-            LocationVariable formalParamVar =
-                    new LocationVariable(pen, paramVar.getKeYJavaType());
-            formalParamVars = formalParamVars.append(formalParamVar);
-            register(formalParamVar, tb.getServices());
-// The following line raises a null pointer exception because getProof()
-// might return null
-//            tb.getServices().getProof().addIFSymbol(formalParamVar);
-        }
-
         //create java block
-        final JavaBlock jb = buildJavaBlock(d, formalParamVars,
+        final JavaBlock jb = buildJavaBlock(d, vs.formalParams,
                                             vs.pre.self != null
                                             ? vs.pre.self.op(ProgramVariable.class)
                                             : null,
@@ -116,10 +100,13 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
 
         //create update
         Term update = tb.skip();
-        Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
+        Iterator<Term> formalParamIt = vs.formalParams.iterator();
         Iterator<Term> paramIt = vs.pre.localVars.iterator();
         while (formalParamIt.hasNext()) {
-            Term paramUpdate = tb.elementary(formalParamIt.next(),
+            Term formalParam = formalParamIt.next();
+            LocationVariable formalParamVar =
+                    formalParam.op(LocationVariable.class);
+            Term paramUpdate = tb.elementary(formalParamVar,
                                              paramIt.next());
             update = tb.parallel(update, paramUpdate);
         }
@@ -128,7 +115,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
     }
 
     private JavaBlock buildJavaBlock(BasicSnippetData d,
-                                     ImmutableList<LocationVariable> formalParVars,
+                                     ImmutableList<Term> formalPars,
                                      ProgramVariable selfVar,
                                      ProgramVariable resultVar,
                                      ProgramVariable exceptionVar,
@@ -141,11 +128,11 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
         }
         JavaInfo javaInfo = d.tb.getServices().getJavaInfo();
         IProgramMethod pm = (IProgramMethod) targetMethod;
-
+        
         //create method call
+        ProgramVariable[] formalParVars = extractProgramVariables(formalPars);
         final ImmutableArray<Expression> formalArray =
-                new ImmutableArray<Expression>(formalParVars.toArray(
-                new ProgramVariable[formalParVars.size()]));
+                new ImmutableArray<Expression>(formalParVars);
         final StatementBlock sb;
         if (pm.isConstructor()) {
             assert selfVar != null;
@@ -189,5 +176,17 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
         JavaBlock result = JavaBlock.createJavaBlock(sb2);
 
         return result;
+    }
+
+
+    private ProgramVariable[] extractProgramVariables(
+                                                      ImmutableList<Term> formalPars)
+            throws IllegalArgumentException {
+        ProgramVariable[] formalParVars = new ProgramVariable[formalPars.size()];
+        int i = 0;
+        for(Term formalPar : formalPars) {
+            formalParVars[i++] = formalPar.op(ProgramVariable.class);
+        }
+        return formalParVars;
     }
 }

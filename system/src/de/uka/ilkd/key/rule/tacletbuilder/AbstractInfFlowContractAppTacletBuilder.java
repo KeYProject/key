@@ -148,7 +148,8 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
                               null);
 
         // return proof obligation schema variables
-        return new ProofObligationVars(pre, post, poVars.catchVar);
+        return new ProofObligationVars(pre, post, poVars.catchVar,
+                                       poVars.formalParams);
     }
 
 
