@@ -162,9 +162,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                 new InfFlowLoopInvariantTacletBuilder(services);
         ifInvariantBuilder.setInvariant(inv);
         ifInvariantBuilder.setContextUpdate(/*inst.u*/);
-        ifInvariantBuilder.setPreVars(instantiationVars.pre);
-        ifInvariantBuilder.setPostVars(instantiationVars.post);
-        ifInvariantBuilder.setCatchVar(instantiationVars.catchVar);
+        ifInvariantBuilder.setProofObligationVars(instantiationVars);
 
         final Term loopInvApplPredTerm =
                 ifInvariantBuilder.buildContractApplPredTerm();

@@ -34,9 +34,7 @@ import java.util.Map;
 abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTacletBuilder {
 
     private Term[] contextUpdates;
-    private StateVars pre;
-    private StateVars post;
-    private Term catchVar;
+    private ProofObligationVars poVars;
 
     public AbstractInfFlowContractAppTacletBuilder(final Services services) {
         super(services);
@@ -47,22 +45,13 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     }
 
 
-    public void setPreVars(StateVars pre) {
-        this.pre = pre;
+    public void setProofObligationVars(ProofObligationVars poVars) {
+        this.poVars = poVars;
     }
 
-
-    public void setPostVars(StateVars post) {
-        this.post = post;
-    }
-
-
-    public void setCatchVar(Term catchVar) {
-        this.catchVar = catchVar;
-    }
 
     public Term buildContractApplPredTerm() {
-        ProofObligationVars appData = getProofObligationVars();
+        ProofObligationVars appData = poVars;
         Term contractApplPredTerm = getContractApplPred(appData);
         for (Term update : contextUpdates) {
             contractApplPredTerm = apply(update, contractApplPredTerm);
@@ -72,7 +61,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
 
     public Taclet buildTaclet() {
-        ProofObligationVars appData = getProofObligationVars();
+        ProofObligationVars appData = poVars;
         return genInfFlowContractApplTaclet(appData, services);
     }
 
@@ -86,12 +75,6 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
     abstract Term generateSchemaFind(ProofObligationVars schemaDataFind,
                                      Services services);
-
-
-    private ProofObligationVars getProofObligationVars() {
-        assert pre.paddedTermList.size() == post.paddedTermList.size();
-        return new ProofObligationVars(pre, post, catchVar);
-    }
 
 
     abstract Term getContractApplPred(ProofObligationVars appData);
@@ -165,7 +148,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
                               null);
 
         // return proof obligation schema variables
-        return new ProofObligationVars(pre, post, catchVar);
+        return new ProofObligationVars(pre, post, poVars.catchVar);
     }
 
 

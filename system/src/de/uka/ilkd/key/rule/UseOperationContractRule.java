@@ -519,9 +519,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                 new InfFlowMethodContractTacletBuilder(services);
         ifContractBuilder.setContract(contract);
         ifContractBuilder.setContextUpdate(atPreUpdates, inst.u);
-        ifContractBuilder.setPreVars(poVars.pre);
-        ifContractBuilder.setPostVars(poVars.post);
-        ifContractBuilder.setCatchVar(poVars.catchVar);
+        ifContractBuilder.setProofObligationVars(poVars);
 
         Term contractApplPredTerm = ifContractBuilder.buildContractApplPredTerm();
         Taclet informationFlowContractApp = ifContractBuilder.buildTaclet();
