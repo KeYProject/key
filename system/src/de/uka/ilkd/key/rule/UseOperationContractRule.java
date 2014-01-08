@@ -25,6 +25,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
@@ -53,6 +54,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInProgram;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -488,6 +490,13 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term heapAtPre = anonUpdateData.methodHeapAtPre;
         final Term heapAtPost = anonUpdateData.methodHeap;
 
+        // build variable for try statement
+        JavaInfo javaInfo = services.getJavaInfo();
+        final KeYJavaType eType =
+            javaInfo.getTypeByClassName("java.lang.Exception");
+        final ProgramElementName ePEN = new ProgramElementName("e");
+        final Term catchVar = TB.var(new LocationVariable(ePEN, eType));
+
         InfFlowMethodContractTacletBuilder ifContractBuilder =
                 new InfFlowMethodContractTacletBuilder(services);
         ifContractBuilder.setContract(contract);
@@ -503,6 +512,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         ifContractBuilder.setLocalVarsAtPost(params);
         ifContractBuilder.setResultAtPost(result);
         ifContractBuilder.setExceptionAtPost(exception);
+        ifContractBuilder.setCatchVar(catchVar);
 
         // generate information flow contract application predicate
         // and associated taclet

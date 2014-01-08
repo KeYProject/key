@@ -24,6 +24,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -143,6 +144,12 @@ public final class WhileInvariantRule implements BuiltInRule {
         // variables for the variables which are read only.
         final ImmutableList<Term> localVarsAtPost =
                 localInsWithoutOutDuplicates.append(localOutsAtPost);
+        // build variable for try statement
+        JavaInfo javaInfo = services.getJavaInfo();
+        final KeYJavaType eType =
+            javaInfo.getTypeByClassName("java.lang.Exception");
+        final ProgramElementName ePEN = new ProgramElementName("e");
+        final Term catchVar = TB.var(new LocationVariable(ePEN, eType));
 
         final Pair<Term, Term> updates = new Pair<Term, Term> (inst.u, anonUpdate);
         final InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
@@ -157,6 +164,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         ifInvariantBuilder.setSelfAtPost(selfAtPost);
         ifInvariantBuilder.setLocalVarsAtPre(localVarsAtPre);
         ifInvariantBuilder.setLocalVarsAtPost(localVarsAtPost);
+        ifInvariantBuilder.setCatchVar(catchVar);
 
         // generate information flow invariant application predicate
         // and associated taclet
@@ -171,7 +179,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         final StateVars instantiationPostVars =
                 new StateVars(selfAtPost, guardAtPost, localVarsAtPost, heapAtPost);
         final ProofObligationVars instantiationVars =
-                new ProofObligationVars(instantiationPreVars, instantiationPostVars);
+                new ProofObligationVars(instantiationPreVars,
+                                        instantiationPostVars,
+                                        catchVar);
         InfFlowData infFlowData = new InfFlowData(instantiationVars, guardAtPre,
                                                   guardAtPost, guardJb,
                                                   guardTerm, localOutTerms,

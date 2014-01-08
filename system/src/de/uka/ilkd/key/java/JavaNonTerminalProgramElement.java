@@ -112,7 +112,7 @@ public abstract class JavaNonTerminalProgramElement
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         
-        Debug.out("Program match start (template, source)", this, src);
+        Debug.out("Program match start (template, source)", this, src); // this.toString().equals("e")
         
         if (src == null) {
             return null;

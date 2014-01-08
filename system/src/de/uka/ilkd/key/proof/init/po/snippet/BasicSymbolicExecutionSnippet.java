@@ -44,6 +44,9 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
     public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
+        assert poVars.catchVar.op() instanceof LocationVariable :
+                "Something is wrong with the catch variable";
+
         ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
         if (poVars.post.self != null) {
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
@@ -83,7 +86,9 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
                     new LocationVariable(pen, paramVar.getKeYJavaType());
             formalParamVars = formalParamVars.append(formalParamVar);
             register(formalParamVar, tb.getServices());
-            tb.getServices().getProof().addIFSymbol(formalParamVar);
+// The following line raises a null pointer exception because getProof()
+// might return null
+//            tb.getServices().getProof().addIFSymbol(formalParamVar);
         }
 
         //create java block
@@ -96,7 +101,8 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
                                             : null,
                                             vs.pre.exception != null
                                             ? vs.pre.exception.op(ProgramVariable.class)
-                                            : null);
+                                            : null,
+                                            vs.catchVar.op(LocationVariable.class));
 
         //create program term
         final Modality symbExecMod;
@@ -125,7 +131,8 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
                                      ImmutableList<LocationVariable> formalParVars,
                                      ProgramVariable selfVar,
                                      ProgramVariable resultVar,
-                                     ProgramVariable exceptionVar) {
+                                     ProgramVariable exceptionVar,
+                                     LocationVariable eVar) {
         IObserverFunction targetMethod =
                 (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
         if (!(targetMethod instanceof IProgramMethod)) {
@@ -158,12 +165,10 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
             sb = new StatementBlock(call);
         }
 
-        //create variables for try statement
+        //type of the variable for the try statement
         final KeYJavaType eType =
             javaInfo.getTypeByClassName("java.lang.Exception");
         final TypeReference excTypeRef = javaInfo.createTypeReference(eType);
-        final ProgramElementName ePEN = new ProgramElementName("e");
-        final ProgramVariable eVar = new LocationVariable(ePEN, eType);
 
         //create try statement
         final CopyAssignment nullStat =

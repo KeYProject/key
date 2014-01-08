@@ -41,6 +41,10 @@ public interface BasicPOSnippetFactory {
         //      exc = excAtPost)
         SYMBOLIC_EXEC (BasicSymbolicExecutionSnippet.class),
 
+        // [P] (heap = heapAtPost & self = selfAtPost & result = resultAtPost &
+        //      exc = excAtPost)
+        SYMBOLIC_EXEC_WITH_PRE (BasicSymbolicExecutionWithPreconditionSnippet.class),
+
         LOOP_EXEC (BasicLoopExecutionSnippet.class),
 
         BLOCK_EXEC (BasicBlockExecutionSnippet.class),

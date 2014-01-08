@@ -173,7 +173,7 @@ abstract class AbstractInfFlowUnfouldTacletBuilder extends AbstractInfFlowTaclet
         post = filterSchemaVars(poVars.post, post);
 
         // return proof obligation schema variables
-        return new ProofObligationVars(pre, post);
+        return new ProofObligationVars(pre, post, poVars.catchVar);
     }
 
 

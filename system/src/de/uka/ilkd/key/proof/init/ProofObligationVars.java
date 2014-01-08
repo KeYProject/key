@@ -5,13 +5,18 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 
 /**
@@ -21,6 +26,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 public class ProofObligationVars {
 
     public final StateVars pre, post;
+    public final Term catchVar;
 
     public final String postfix;
 
@@ -30,6 +36,14 @@ public class ProofObligationVars {
                                Services services) {
         this.pre = StateVars.buildMethodContractPreVars(pm, kjt, services);
         this.post = StateVars.buildMethodContractPostVars(this.pre, pm, kjt, services);
+
+        // create variable for try statement
+        JavaInfo javaInfo = services.getJavaInfo();
+        final KeYJavaType eType =
+            javaInfo.getTypeByClassName("java.lang.Exception");
+        final ProgramElementName ePEN = new ProgramElementName("e");
+        catchVar = TermBuilder.DF.var(new LocationVariable(ePEN, eType));
+
         this.postfix = "";
     }
 
@@ -39,14 +53,25 @@ public class ProofObligationVars {
                                Services services) {
         this.pre = StateVars.buildInfFlowPreVars(orig.pre, postfix, services);
         this.post = StateVars.buildInfFlowPostVars(orig.pre, orig.post, pre, postfix, services);
+
+        // create variable for try statement
+        JavaInfo javaInfo = services.getJavaInfo();
+        final KeYJavaType eType =
+            javaInfo.getTypeByClassName("java.lang.Exception");
+        final ProgramElementName ePEN =
+                new ProgramElementName(orig.catchVar.toString()); // + postfix);
+        catchVar = TermBuilder.DF.var(new LocationVariable(ePEN, eType));
+
         this.postfix = postfix;
     }
 
 
     public ProofObligationVars(StateVars pre,
-                               StateVars post) {
+                               StateVars post,
+                               Term catchVar) {
         this.pre = pre;
         this.post = post;
+        this.catchVar = catchVar;
         this.postfix = "";
     }
 
@@ -64,7 +89,7 @@ public class ProofObligationVars {
                                              pre.exception,
                                              TB.label(pre.heap, new ImmutableArray<ITermLabel>(newLabels)),
                                              pre.mbyAtPre);
-            return new ProofObligationVars(newPre, post);
+            return new ProofObligationVars(newPre, post, catchVar);
         } else {
             return this;
         }

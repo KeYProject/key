@@ -23,8 +23,6 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 
@@ -49,7 +47,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     private Term loopGuardAtPre;
     private Term loopGuardAtPost;
     private Term mbyAtPre;
-
+    private Term catchVar;
 
     public AbstractInfFlowContractAppTacletBuilder(final Services services) {
         super(services);
@@ -114,6 +112,10 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         this.mbyAtPre = mby;
     }
 
+    public void setCatchVar(Term catchVar) {
+        this.catchVar = catchVar;
+    }
+
     public Term buildContractApplPredTerm() {
         ProofObligationVars appData = getProofObligationVars();
         Term contractApplPredTerm = getContractApplPred(appData);
@@ -150,7 +152,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
                 new StateVars(contractSelfAtPost, loopGuardAtPost, localVarsAtPost,
                               contractResultAtPost, exceptionVarAtPost, heapAtPost);
         assert pre.paddedTermList.size() == post.paddedTermList.size();
-        return new ProofObligationVars(pre, post);
+        return new ProofObligationVars(pre, post, catchVar);
     }
 
 
@@ -225,7 +227,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
                               null);
 
         // return proof obligation schema variables
-        return new ProofObligationVars(pre, post);
+        return new ProofObligationVars(pre, post, catchVar);
     }
 
 

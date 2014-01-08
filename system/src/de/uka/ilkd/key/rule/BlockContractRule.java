@@ -348,6 +348,13 @@ public class BlockContractRule implements BuiltInRule {
         final Term exceptionAtPre = hasExc ? TB.var(variables.exception) : TB.NULL(services);
         final Term exceptionAtPost =
                 hasExc ? buildAfterVar(exceptionAtPre, "BLOCK", services) : TB.NULL(services);
+        
+        // build variable for try statement
+        JavaInfo javaInfo = services.getJavaInfo();
+        final KeYJavaType eType =
+            javaInfo.getTypeByClassName("java.lang.Exception");
+        final ProgramElementName ePEN = new ProgramElementName("e");
+        final Term catchVar = TB.var(new LocationVariable(ePEN, eType));
 
         final InfFlowBlockContractTacletBuilder ifContractBuilder =
                 new InfFlowBlockContractTacletBuilder(services);
@@ -363,6 +370,7 @@ public class BlockContractRule implements BuiltInRule {
         if (hasRes) ifContractBuilder.setResultAtPost(resultAtPost);
         if (hasExc) ifContractBuilder.setExceptionAtPre(exceptionAtPre);
         if (hasExc) ifContractBuilder.setExceptionAtPost(exceptionAtPost);
+        ifContractBuilder.setCatchVar(catchVar);
 
         // generate information flow contract application predicate
         // and associated taclet
@@ -385,7 +393,8 @@ public class BlockContractRule implements BuiltInRule {
                               heapAtPost);
         final ProofObligationVars instantiationVars =
                 new ProofObligationVars(instantiationPreVars,
-                                            instantiationPostVars);
+                                        instantiationPostVars,
+                                        catchVar);
         final IFProofObligationVars ifVars =
                 new IFProofObligationVars(instantiationVars, services);
         application.update(ifVars, instantiation.context);
