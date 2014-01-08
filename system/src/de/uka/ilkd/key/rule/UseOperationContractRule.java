@@ -71,6 +71,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.IFProofObligationVars;
+import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
@@ -497,25 +500,34 @@ public final class UseOperationContractRule implements BuiltInRule {
         final ProgramElementName ePEN = new ProgramElementName("e");
         final Term catchVar = TB.var(new LocationVariable(ePEN, eType));
 
+        // generate proof obligation variables
+        final boolean hasSelf = self != null;
+        final boolean hasRes = result != null;
+        final boolean hasExc = exception != null;
+
+        final StateVars preVars =
+                new StateVars(hasSelf ? self : null,
+                              params,
+                              hasRes ? result : null,
+                              hasExc ? exception : null,
+                              heapAtPre, mby);
+        final StateVars postVars =
+                new StateVars(hasSelf ? self : null,
+                              params,
+                              hasRes ? result : null,
+                              hasExc ? exception : null,
+                              heapAtPost, mby);
+
+        // generate information flow contract application predicate
+        // and associated taclet
         InfFlowMethodContractTacletBuilder ifContractBuilder =
                 new InfFlowMethodContractTacletBuilder(services);
         ifContractBuilder.setContract(contract);
         ifContractBuilder.setContextUpdate(atPreUpdates, inst.u);
-        ifContractBuilder.setHeapAtPre(heapAtPre);
-        ifContractBuilder.setSelfAtPre(self);
-        ifContractBuilder.setLocalVarsAtPre(params);
-        ifContractBuilder.setMbyAtPre(mby);
-        ifContractBuilder.setResultAtPre(result);
-        ifContractBuilder.setExceptionAtPre(exception);
-        ifContractBuilder.setHeapAtPost(heapAtPost);
-        ifContractBuilder.setSelfAtPost(self);
-        ifContractBuilder.setLocalVarsAtPost(params);
-        ifContractBuilder.setResultAtPost(result);
-        ifContractBuilder.setExceptionAtPost(exception);
+        ifContractBuilder.setPreVars(preVars);
+        ifContractBuilder.setPreVars(postVars);
         ifContractBuilder.setCatchVar(catchVar);
 
-        // generate information flow contract application predicate
-        // and associated taclet
         Term contractApplPredTerm = ifContractBuilder.buildContractApplPredTerm();
         Taclet informationFlowContractApp = ifContractBuilder.buildTaclet();
 

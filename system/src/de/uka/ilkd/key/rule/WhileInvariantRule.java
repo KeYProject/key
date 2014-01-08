@@ -144,34 +144,13 @@ public final class WhileInvariantRule implements BuiltInRule {
         // variables for the variables which are read only.
         final ImmutableList<Term> localVarsAtPost =
                 localInsWithoutOutDuplicates.append(localOutsAtPost);
+
         // build variable for try statement
         JavaInfo javaInfo = services.getJavaInfo();
         final KeYJavaType eType =
             javaInfo.getTypeByClassName("java.lang.Exception");
         final ProgramElementName ePEN = new ProgramElementName("e");
         final Term catchVar = TB.var(new LocationVariable(ePEN, eType));
-
-        final Pair<Term, Term> updates = new Pair<Term, Term> (inst.u, anonUpdate);
-        final InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
-                new InfFlowLoopInvariantTacletBuilder(services);
-        ifInvariantBuilder.setInvariant(inv);
-        ifInvariantBuilder.setGuard(guardAtPre);
-        ifInvariantBuilder.setGuardAtPost(guardAtPost);
-        ifInvariantBuilder.setContextUpdate(/*inst.u*/);
-        ifInvariantBuilder.setHeapAtPre(heapAtPre);
-        ifInvariantBuilder.setHeapAtPost(heapAtPost);
-        ifInvariantBuilder.setSelfAtPre(selfTerm);
-        ifInvariantBuilder.setSelfAtPost(selfAtPost);
-        ifInvariantBuilder.setLocalVarsAtPre(localVarsAtPre);
-        ifInvariantBuilder.setLocalVarsAtPost(localVarsAtPost);
-        ifInvariantBuilder.setCatchVar(catchVar);
-
-        // generate information flow invariant application predicate
-        // and associated taclet
-        final Term loopInvApplPredTerm =
-                ifInvariantBuilder.buildContractApplPredTerm();
-        final Taclet informationFlowInvariantApp =
-                ifInvariantBuilder.buildTaclet();
 
         // generate proof obligation variables
         final StateVars instantiationPreVars =
@@ -182,6 +161,24 @@ public final class WhileInvariantRule implements BuiltInRule {
                 new ProofObligationVars(instantiationPreVars,
                                         instantiationPostVars,
                                         catchVar);
+
+        final Pair<Term, Term> updates = new Pair<Term, Term> (inst.u, anonUpdate);
+        final InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
+                new InfFlowLoopInvariantTacletBuilder(services);
+        ifInvariantBuilder.setInvariant(inv);
+        ifInvariantBuilder.setContextUpdate(/*inst.u*/);
+        ifInvariantBuilder.setPreVars(instantiationPreVars);
+        ifInvariantBuilder.setPostVars(instantiationPostVars);
+        ifInvariantBuilder.setCatchVar(catchVar);
+
+        // generate information flow invariant application predicate
+        // and associated taclet
+        final Term loopInvApplPredTerm =
+                ifInvariantBuilder.buildContractApplPredTerm();
+        final Taclet informationFlowInvariantApp =
+                ifInvariantBuilder.buildTaclet();
+
+        // return information flow data
         InfFlowData infFlowData = new InfFlowData(instantiationVars, guardAtPre,
                                                   guardAtPost, guardJb,
                                                   guardTerm, localOutTerms,

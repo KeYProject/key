@@ -356,28 +356,6 @@ public class BlockContractRule implements BuiltInRule {
         final ProgramElementName ePEN = new ProgramElementName("e");
         final Term catchVar = TB.var(new LocationVariable(ePEN, eType));
 
-        final InfFlowBlockContractTacletBuilder ifContractBuilder =
-                new InfFlowBlockContractTacletBuilder(services);
-        ifContractBuilder.setContract(contract);
-        ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
-        ifContractBuilder.setHeapAtPre(heapAtPre);
-        ifContractBuilder.setHeapAtPost(heapAtPost);
-        if (hasSelf) ifContractBuilder.setSelfAtPre(selfAtPre);
-        if (hasSelf) ifContractBuilder.setSelfAtPost(selfAtPost);
-        ifContractBuilder.setLocalVarsAtPre(localVarsAtPre);
-        ifContractBuilder.setLocalVarsAtPost(localVarsAtPost);
-        if (hasRes) ifContractBuilder.setResultAtPre(resultAtPre);
-        if (hasRes) ifContractBuilder.setResultAtPost(resultAtPost);
-        if (hasExc) ifContractBuilder.setExceptionAtPre(exceptionAtPre);
-        if (hasExc) ifContractBuilder.setExceptionAtPost(exceptionAtPost);
-        ifContractBuilder.setCatchVar(catchVar);
-
-        // generate information flow contract application predicate
-        // and associated taclet
-        final Term contractApplTerm =
-                ifContractBuilder.buildContractApplPredTerm();
-        Taclet informationFlowContractApp = ifContractBuilder.buildTaclet();
-
         // generate proof obligation variables
         final StateVars instantiationPreVars =
                 new StateVars(hasSelf ? selfAtPre : null,
@@ -398,6 +376,20 @@ public class BlockContractRule implements BuiltInRule {
         final IFProofObligationVars ifVars =
                 new IFProofObligationVars(instantiationVars, services);
         application.update(ifVars, instantiation.context);
+
+        // generate information flow contract application predicate
+        // and associated taclet
+        final InfFlowBlockContractTacletBuilder ifContractBuilder =
+                new InfFlowBlockContractTacletBuilder(services);
+        ifContractBuilder.setContract(contract);
+        ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
+        ifContractBuilder.setPreVars(instantiationPreVars);
+        ifContractBuilder.setPostVars(instantiationPostVars);
+        ifContractBuilder.setCatchVar(catchVar);
+
+        final Term contractApplTerm =
+                ifContractBuilder.buildContractApplPredTerm();
+        Taclet informationFlowContractApp = ifContractBuilder.buildTaclet();
 
         // get infFlowAssumptions
         final Term infFlowPreAssumption =
