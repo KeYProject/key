@@ -57,7 +57,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     private static boolean hasModality(Node node) {
         Sequent sequent = node.sequent();
         for (SequentFormula sequentFormula : sequent) {
-            if(getNextModality(sequentFormula.formula()) != null) {
+            if(hasModality(sequentFormula.formula())) {
                 return true;
             }
         }
@@ -65,21 +65,21 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
         return false;
     }
 
-    /**
-     * Recursively descent into the term to find a modality term.
-     * Return null if none found.
+    /*
+     * recursively descent into the term to detect a modality.
      */
-    private static Term getNextModality(Term term) {
+    private static boolean hasModality(Term term) {
         if(term.op() instanceof Modality) {
-            return term;
+            return true;
         }
 
         for (Term sub : term.subs()) {
-            final Term nextMod = getNextModality(sub);
-            if (nextMod != null) return nextMod;
+            if(hasModality(sub)) {
+                return true;
+            }
         }
 
-        return null;
+        return false;
     }
 
     @Override
@@ -90,8 +90,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
     @Override
     public KeyStroke getKeyStroke () {
-        return null;
-//	return KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.SHIFT_DOWN_MASK);
+	return KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.SHIFT_DOWN_MASK);
     }
 
     /**
