@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="TwoLoops.main(x);" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (x&gt;=0) {while ( x&gt;0 ) {     x--;   } }else  {ghostint originalX = x;while ( x&lt;0 ) {     x++;   } }" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (x&gt;=0)" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <loopInvariant name="
 invariant: x &gt;= 0;

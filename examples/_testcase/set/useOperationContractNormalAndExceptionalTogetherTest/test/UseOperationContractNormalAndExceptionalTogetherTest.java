@@ -22,6 +22,7 @@ public class UseOperationContractNormalAndExceptionalTogetherTest {
 	  @
 	  @ public exceptional_behavior
 	  @ requires x < 0;
+	  @ signals_only Exception;
 	  @ signals (Exception myExc) true;
 	  @*/
 	public static int magic(int x) throws Exception {

@@ -10,14 +10,10 @@ pre: value &lt; 0 &amp; value &gt;= javaUnaryMinusInt(10)
 | value &gt;= 10
 post: (   value &lt; 0 &amp; value &gt;= javaUnaryMinusInt(10)
    -&gt;   !exc_0 = null
-      &amp; (    java.lang.RuntimeException::instance(exc_0)
-           = TRUE
-         | java.lang.Exception::instance(exc_0) = TRUE))
+      &amp; java.lang.Exception::instance(exc_0) = TRUE)
 &amp; (   value &lt; javaUnaryMinusInt(10)
    -&gt;   !exc_0 = null
-      &amp; (    java.lang.RuntimeException::instance(exc_0)
-           = TRUE
-         | java.lang.Exception::instance(exc_0) = TRUE))
+      &amp; java.lang.Exception::instance(exc_0) = TRUE)
 &amp; (   value &gt;= 0 &amp; value &lt; 10
    -&gt; result_0 = 42 &amp; exc_0 = null)
 &amp; (value &gt;= 10 -&gt; result_0 = 84 &amp; exc_0 = null)

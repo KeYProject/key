@@ -5,7 +5,7 @@
          <callStackEntry path="/0"/>
          <methodCall name="ArrayAverage.sum(array_1);" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <branchStatement name="if (array_1==null) {throw new Exception (); }else  {int sum = 0;for ( int i = 0; i&lt;array_1.length; i++ ) {     sum+=array_1[i];   }return sum; }" pathCondition="true" pathConditionChanged="false">
+            <branchStatement name="if (array_1==null)" pathCondition="true" pathConditionChanged="false">
                <callStackEntry path="/0"/>
                <callStackEntry path="/0/0/0"/>
                <branchCondition name="equals(array,null)" pathCondition="equals(array,null)" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -24,7 +24,7 @@
                   <statement name="int sum = 0;" pathCondition="not(equals(array,null))" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
                      <callStackEntry path="/0/0/0"/>
-                     <loopStatement name="for ( int i = 0; i&lt;array_1.length; i++ ) {   sum_2+=array_1[i]; }" pathCondition="not(equals(array,null))" pathConditionChanged="false">
+                     <loopStatement name="for ( int i = 0; i&lt;array_1.length; i++ )" pathCondition="not(equals(array,null))" pathConditionChanged="false">
                         <callStackEntry path="/0"/>
                         <callStackEntry path="/0/0/0"/>
                         <statement name="int i = 0;" pathCondition="not(equals(array,null))" pathConditionChanged="false">

@@ -2,7 +2,7 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.min(i,j);" pathCondition="true" pathConditionChanged="false">
       <statement name="int result;" pathCondition="true" pathConditionChanged="false">
-         <branchStatement name="if (i&lt;j) {   result_1=i; }else  {   result_1=j; }" pathCondition="true" pathConditionChanged="false">
+         <branchStatement name="if (i&lt;j)" pathCondition="true" pathConditionChanged="false">
             <branchCondition name="gt(j,i)" pathCondition="gt(j,i)" pathConditionChanged="true" branchCondition="gt(j,i)" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="result_1=i;" pathCondition="gt(j,i)" pathConditionChanged="false">
                   <statement name="return result_1;" pathCondition="gt(j,i)" pathConditionChanged="false">

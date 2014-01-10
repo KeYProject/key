@@ -56,6 +56,7 @@ public class StaticContractTest {
 	}
 
 	/*@ exceptional_behavior
+	  @ signals_only Exception;
 	  @ signals (Exception) true;
 	  @*/
 	public static void exceptinalVoid(boolean x) throws Exception {
@@ -71,6 +72,7 @@ public class StaticContractTest {
 	}
 
 	/*@ exceptional_behavior
+	  @ signals_only Exception;
 	  @ signals (Exception) true;
 	  @*/
 	public static boolean exceptinal(boolean x) throws Exception {
@@ -116,6 +118,7 @@ public class StaticContractTest {
 		public int value;
 
 		/*@ exceptional_behavior
+		  @ signals_only Exception;
 		  @ signals (Exception e) true;
 		  @*/
 		public IntWrapper() throws Exception {

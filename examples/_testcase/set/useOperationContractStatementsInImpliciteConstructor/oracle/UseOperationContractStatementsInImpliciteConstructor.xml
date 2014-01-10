@@ -5,7 +5,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <branchStatement name="if (array!=null) {int sum = sum(array);return    sum/array.length; }else  {throw new IllegalArgumentException (&quot;Array can&apos;t be null.&quot;); }" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (array!=null)" pathCondition="true" pathConditionChanged="false">
          <variable name="self" arrayIndex="-1" isArrayIndex="false">
             <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
             </value>

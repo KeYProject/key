@@ -3,7 +3,7 @@
    <methodCall name="self.compute();" pathCondition="true" pathConditionChanged="false">
       <statement name="ArrayInstanceCreationTest.classArray=new int[]{1 };" pathCondition="true" pathConditionChanged="false">
          <statement name="this.instanceArray=new int[]{2 };" pathCondition="true" pathConditionChanged="false">
-            <branchStatement name="if (this.next!=null) {   this.next.instanceArray=new int[]{3 };  int[] localArray = {4,5 };return    localArray[0]+localArray[1]; }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
+            <branchStatement name="if (this.next!=null)" pathCondition="true" pathConditionChanged="false">
                <branchCondition name="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" pathCondition="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" pathConditionChanged="true" branchCondition="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="this.next.instanceArray=new int[]{3 };" pathCondition="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" pathConditionChanged="false">
                      <statement name="int[] localArray = {4,5 };" pathCondition="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" pathConditionChanged="false">

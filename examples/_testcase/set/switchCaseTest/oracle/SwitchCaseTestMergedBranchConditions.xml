@@ -2,7 +2,7 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.switchCase(x);" pathCondition="true" pathConditionChanged="false">
       <statement name="int a;" pathCondition="true" pathConditionChanged="false">
-         <branchStatement name="switch (x) {case 0:a=1;break ;case 1:case 2:   a=-1;case 3:   a=x*x;break ;case 4:return 42;default:   a=x; }" pathCondition="true" pathConditionChanged="false">
+         <branchStatement name="switch (x)" pathCondition="true" pathConditionChanged="false">
             <branchCondition name="equals(x,Z(0(#)))" pathCondition="equals(x,Z(0(#)))" pathConditionChanged="true" branchCondition="equals(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="a=1;" pathCondition="equals(x,Z(0(#)))" pathConditionChanged="false">
                   <statement name="return a;" pathCondition="equals(x,Z(0(#)))" pathConditionChanged="false">
