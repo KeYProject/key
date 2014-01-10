@@ -150,7 +150,7 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
                                                            heapContext, 
                                                            atPres, 
                                                            false, 
-                                                           getServices());
+                                                           getServices()).trim();
          }
          finally {
             NotationInfo.PRETTY_SYNTAX = originalPrettySyntax;
