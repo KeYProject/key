@@ -527,7 +527,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             longConst ( 100 ) ) );
         
         //class axioms
-        bindRuleSet ( d, "classAxiom", longConst(-150) );        
+        bindRuleSet ( d, "classAxiom", longConst(500) );     // was: -150   
                 
         //limit observer (must have better priority than "classAxiom")
         bindRuleSet ( d, "limitObserver",
