@@ -103,11 +103,9 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     private static class FilterSymbexStrategy extends FilterStrategy {
 
         private static final Name NAME = new Name(FilterSymbexStrategy.class.getSimpleName());
-        private final Strategy delegate;
 
         public FilterSymbexStrategy(Strategy delegate) {
             super(delegate);
-            this.delegate = delegate;
         }
         
 
@@ -133,7 +131,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
                 return false;
             }
 
-            return delegate.isApprovedApp(app, pio, goal);
+            return super.isApprovedApp(app, pio, goal);
         }
 
     }
