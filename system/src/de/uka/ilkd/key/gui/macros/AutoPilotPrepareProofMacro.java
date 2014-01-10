@@ -54,7 +54,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
 
     private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("notHumanReadable");
-
+    private static final Name CLASS_AXIOM_RULESET = new Name("classAxiom");
 
     @Override
     public String getName() {
@@ -110,19 +110,24 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
      * Checks if a rule is marked as not suited for interaction.
      */
     private static boolean isNonHumanInteractionTagged(Rule rule) {
+        return isInRuleSet(rule, NON_HUMAN_INTERACTION_RULESET);
+    }
+
+    private static boolean isInRuleSet(Rule rule, Name ruleSetName) {
         if (rule instanceof Taclet) {
             Taclet taclet = (Taclet) rule;
             for (RuleSet rs : taclet.getRuleSets()) {
-                if (NON_HUMAN_INTERACTION_RULESET.equals(rs.name())) 
+                if (ruleSetName.equals(rs.name())) 
                     return true;
             }
         }
         return false;
     }
-
+    
     private static class AutoPilotStrategy implements Strategy {
 
         private static final Name NAME = new Name("Autopilot filter strategy");
+        private static final long HIGH_COST = 2000L;
         private final KeYMediator mediator;
         private final PosInOccurrence posInOcc;
         private final Strategy delegate;
@@ -170,9 +175,10 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
             if(ADMITTED_RULES_SET.contains(name)) {
                 return LongRuleAppCost.ZERO_COST;
             }
-
-            if(name.startsWith("Class_invariant_axiom_for")) {
-                return LongRuleAppCost.ZERO_COST;
+            
+            // assign higher costs to classAxiom rules
+            if (isInRuleSet(rule, CLASS_AXIOM_RULESET)) {
+                return LongRuleAppCost.create(HIGH_COST);
             }
 
             // apply OSS to <inv>() calls.
