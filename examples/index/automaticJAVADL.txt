@@ -306,6 +306,9 @@ provable: ./standard_key/java_dl/incrementcounter.key
 # that needs a non-trivial fix.
 # provable: ./standard_key/java_dl/innerClasses/inner.key
 provable: ./standard_key/java_dl/iteratedAssignment.key
+notprovable: ./standard_key/java_dl/assert/assert1.key
+provable: ./standard_key/java_dl/assert/assert3.key
+notprovable: ./standard_key/java_dl/assert/assert3.key
 provable: ./standard_key/java_dl/java5/vararg.key
 provable: ./standard_key/java_dl/java5/for_Array.key
 provable: ./standard_key/java_dl/java5/for_Iterable.key
