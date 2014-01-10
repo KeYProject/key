@@ -74,6 +74,7 @@ public final class StrategySelectionView extends JPanel {
     private ButtonGroup quantifierGroup = new ButtonGroup();
     private ButtonGroup stopModeGroup = new ButtonGroup();
     private ButtonGroup retreatModeGroup = new ButtonGroup();
+    private ButtonGroup classAxiomGroup = new ButtonGroup();
     private ButtonGroup autoInductionGroup = new ButtonGroup();     
     private ButtonGroup[] userTacletsGroup = new ButtonGroup[StrategyProperties.USER_TACLETS_NUM];
     {
@@ -110,6 +111,9 @@ public final class StrategySelectionView extends JPanel {
     private JRadioButton quantifierNonSplitting;
     private JRadioButton quantifierNonSplittingWithProgs;
     private JRadioButton quantifierInstantiate;
+    private JRadioButton classAxiomHigh;
+    private JRadioButton classAxiomLow;
+    private JRadioButton classAxiomOff;
     private JRadioButton autoInductionOff; 
     private JRadioButton autoInductionRestricted; 
     private JRadioButton autoInductionLemmaOn; 
@@ -498,6 +502,36 @@ public final class StrategySelectionView extends JPanel {
         ++yCoord;
         addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
 
+
+        ////////////////////////////////////////////////////////////////////////
+
+        ++yCoord;
+        
+        addJavaDLOption ( new JLabel ( "Class axiom rule priority" ),
+                    javaDLOptionsLayout, 1, yCoord, 7 );
+        
+        ++yCoord;
+
+        classAxiomHigh = newButton(
+                "High", StrategyProperties.CLASS_AXIOM_HIGH, true, false);
+//        classAxiomHigh.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_METHOD_CONTRACT);
+        classAxiomGroup.add(classAxiomHigh);
+        addJavaDLOption (classAxiomHigh, javaDLOptionsLayout, 2, yCoord, 2 );        
+
+        classAxiomLow = newButton("Low", StrategyProperties.CLASS_AXIOM_LOW, false, false);
+//        classAxiomLow.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_METHOD_EXPAND);
+        classAxiomGroup.add(classAxiomLow);
+        addJavaDLOption (classAxiomLow, javaDLOptionsLayout, 4, yCoord, 2 );        
+
+        classAxiomOff = newButton("Off",
+                StrategyProperties.CLASS_AXIOM_OFF, false, false);
+//        classAxiomOff.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_METHOD_NONE);
+        classAxiomGroup.add(classAxiomOff);
+        addJavaDLOption (classAxiomOff, javaDLOptionsLayout, 6, yCoord, 2 );        
+        
+        ++yCoord;
+        addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
+
         ////////////////////////////////////////////////////////////////////////
         //chrisg
         
@@ -674,6 +708,9 @@ public final class StrategySelectionView extends JPanel {
         quantifierNonSplitting.addActionListener(optListener);
         quantifierNonSplittingWithProgs.addActionListener(optListener);
         quantifierInstantiate.addActionListener(optListener);
+        classAxiomHigh.addActionListener(optListener);
+        classAxiomLow.addActionListener(optListener);
+        classAxiomOff.addActionListener(optListener);
         autoInductionOff.addActionListener(optListener);
         autoInductionRestricted.addActionListener(optListener);
         autoInductionLemmaOn.addActionListener(optListener);
@@ -913,7 +950,10 @@ public final class StrategySelectionView extends JPanel {
             String stopmodeOptions = p.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY);
             JRadioButton bStopModeActive = getStrategyOptionButton(stopmodeOptions, 
                     StrategyProperties.STOPMODE_OPTIONS_KEY);
-            bStopModeActive.setSelected(true);            
+            bStopModeActive.setSelected(true);    
+            String classAxiomOptions = p.getProperty(StrategyProperties.CLASS_AXIOM_PRIO);
+            JRadioButton bClassAxiomOptions = getStrategyOptionButton(classAxiomOptions, StrategyProperties.CLASS_AXIOM_PRIO);
+            bClassAxiomOptions.setSelected(true);
             String autoInductionOptions = p.getProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY); 
             JRadioButton bAutoInductionOptions = getStrategyOptionButton(autoInductionOptions, 
                     StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY);
@@ -1018,6 +1058,8 @@ public final class StrategySelectionView extends JPanel {
                        quantifierGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.STOPMODE_OPTIONS_KEY, 
                        stopModeGroup.getSelection().getActionCommand());
+        p.setProperty( StrategyProperties.CLASS_AXIOM_PRIO,
+                        classAxiomGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, 
                        autoInductionGroup.getSelection().getActionCommand());
         
