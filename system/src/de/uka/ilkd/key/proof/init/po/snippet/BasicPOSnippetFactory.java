@@ -41,13 +41,19 @@ public interface BasicPOSnippetFactory {
         //      exc = excAtPost)
         SYMBOLIC_EXEC (BasicSymbolicExecutionSnippet.class),
 
-        // [P] (heap = heapAtPost & self = selfAtPost & result = resultAtPost &
-        //      exc = excAtPost)
+        //   FREE_PRE
+        // & CONTRACT_PRE
+        // & [P] (heap = heapAtPost & self = selfAtPost & result = resultAtPost &
+        //        exc = excAtPost)
         SYMBOLIC_EXEC_WITH_PRE (BasicSymbolicExecutionWithPreconditionSnippet.class),
 
         LOOP_EXEC (BasicLoopExecutionSnippet.class),
 
+        LOOP_EXEC_WITH_INV (BasicLoopExecutionWithInvariantSnippet.class),
+
         BLOCK_EXEC (BasicBlockExecutionSnippet.class),
+
+        BLOCK_EXEC_WITH_PRE (BasicBlockExecutionWithPreconditionSnippet.class),
 
         // RELATED_BY_package.class::m(self, localIn1, ..., localInN, heap,
         // localOut1, ..., localOutN, result, exc, heapAtPost)
@@ -68,23 +74,6 @@ public interface BasicPOSnippetFactory {
         // [P] (heap = heapAtPost & self = selfAtPost & result = resultAtPost &
         //      exc = excAtPost)
         BLOCK_CALL_RELATION (BlockCallPredicateSnippet.class),
-
-        // EXECUTION_OF_package.class::m_WITH_PRE(self, localIn1, ..., localInN, heap,
-        // localOut1, ..., localOutN, result, exc, heapAtPost)
-        // This predicate is semantically equivalent to:
-        // Pre & [P] (heap = heapAtPost & self = selfAtPost &
-        //            result = resultAtPost & exc = excAtPost)
-        METHOD_CALL_WITH_PRE_RELATION (MethodCallWithPreconditionPredicateSnippet.class),
-        
-        // EXECUTION_OF_package.class::m_WITH_INV(self, localIn1, ..., localInN, heap,
-        // localOut1, ..., LocalOutN, heapAtPost)
-        // This predicate is semantically equivalent to:
-        // Inv & [P] (heap = heapAtPost & self = selfAtPost &
-        //            localOuts = localOutsAtPost)
-        LOOP_CALL_WITH_INV_RELATION (LoopCallWithInvariantPredicateSnippet.class),
-
-        BLOCK_CALL_WITH_PRE_RELATION (BlockCallWithPreconditionPredicateSnippet.class),
-
 
         // miscellaneous snippets
         SELF_NOT_NULL (BasicSelfNotNullSnippet.class),       // "self != null"

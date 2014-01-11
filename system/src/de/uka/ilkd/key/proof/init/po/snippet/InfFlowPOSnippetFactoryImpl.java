@@ -53,18 +53,9 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
     InfFlowPOSnippetFactoryImpl(BlockContract contract,
                                 ProofObligationVars vars1,
                                 ProofObligationVars vars2,
+                                ExecutionContext context,
                                 Services services) {
-        this.data = new BasicSnippetData(contract, services);
-        this.poVars1 = vars1.labelHeapAtPreAsAnonHeapFunc();
-        this.poVars2 = vars2.labelHeapAtPreAsAnonHeapFunc();
-        registerFactoryMethods();
-    }
-
-    InfFlowPOSnippetFactoryImpl(LoopInvariant invariant,
-                                ProofObligationVars vars1,
-                                ProofObligationVars vars2,
-                                Services services) {
-        this.data = new BasicSnippetData(invariant, services);
+        this.data = new BasicSnippetData(contract, context, services);
         this.poVars1 = vars1.labelHeapAtPreAsAnonHeapFunc();
         this.poVars2 = vars2.labelHeapAtPreAsAnonHeapFunc();
         registerFactoryMethods();

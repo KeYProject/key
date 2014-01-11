@@ -29,13 +29,6 @@ public class POSnippetFactory {
     public static BasicPOSnippetFactory getBasicFactory(
             LoopInvariant invariant,
             ProofObligationVars vars,
-            Services services) {
-        return new BasicPOSnippetFactoryImpl(invariant, vars, services);
-    }
-    
-    public static BasicPOSnippetFactory getBasicFactory(
-            LoopInvariant invariant,
-            ProofObligationVars vars,
             ExecutionContext context,
             Services services) {
         return new BasicPOSnippetFactoryImpl(invariant, vars, context, services);
@@ -51,13 +44,6 @@ public class POSnippetFactory {
     public static BasicPOSnippetFactory getBasicFactory(
             BlockContract contract,
             ProofObligationVars vars,
-            Services services) {
-        return new BasicPOSnippetFactoryImpl(contract, vars, services);
-    }
-
-    public static BasicPOSnippetFactory getBasicFactory(
-            BlockContract contract,
-            ProofObligationVars vars,
             ExecutionContext context,
             Services services) {
         return new BasicPOSnippetFactoryImpl(contract, vars, context, services);
@@ -67,14 +53,6 @@ public class POSnippetFactory {
             BasicSnippetData data,
             ProofObligationVars poVars) {
         return new BasicPOSnippetFactoryImpl(data, poVars);
-    }
-
-    public static InfFlowPOSnippetFactory getInfFlowFactory(
-            LoopInvariant invariant,
-            ProofObligationVars vars1,
-            ProofObligationVars vars2,
-            Services services) {
-        return new InfFlowPOSnippetFactoryImpl(invariant, vars1, vars2, services);
     }
 
     public static InfFlowPOSnippetFactory getInfFlowFactory(
@@ -98,8 +76,9 @@ public class POSnippetFactory {
             BlockContract contract,
             ProofObligationVars vars1,
             ProofObligationVars vars2,
+            ExecutionContext context,
             Services services) {
-        return new InfFlowPOSnippetFactoryImpl(contract, vars1, vars2, services);
+        return new InfFlowPOSnippetFactoryImpl(contract, vars1, vars2, context, services);
     }
 
     static InfFlowPOSnippetFactory getInfFlowFactory(

@@ -43,8 +43,6 @@ public interface LoopInvariant extends SpecificationElement {
      */
     public IProgramMethod getTarget();
 
-    public ExecutionContext getExecutionContext();
-
     public boolean hasGuard();
 
     public Term getGuard();
@@ -116,18 +114,8 @@ public interface LoopInvariant extends SpecificationElement {
     public Map<LocationVariable,
                ImmutableList<InfFlowSpec>> getInternalInfFlowSpec();
 
-    public LoopInvariant create(LoopStatement loop,
-                                IProgramMethod pm,
-                                ExecutionContext innermostExecCont,
-                                Map<LocationVariable,Term> invariants,
-                                Map<LocationVariable,Term> modifies,
-                                Map<LocationVariable,
-                                    ImmutableList<InfFlowSpec>> infFlowSpecs,
-                                Term variant,
-                                Term selfTerm,
-                                ImmutableList<Term> localIns,
-                                ImmutableList<Term> localOuts,
-                                Map<LocationVariable,Term> atPres);
+    public LoopInvariant create(LoopStatement loop, IProgramMethod pm, Map<LocationVariable,Term> invariants, Map<LocationVariable,Term> modifies, Map<LocationVariable,
+                                                                                                                                                       ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant, Term selfTerm, ImmutableList<Term> localIns, ImmutableList<Term> localOuts, Map<LocationVariable,Term> atPres);
 
     public LoopInvariant create(LoopStatement loop,
                                 Map<LocationVariable,Term> invariants,

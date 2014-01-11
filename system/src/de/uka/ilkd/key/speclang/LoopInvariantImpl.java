@@ -40,7 +40,6 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
     private final LoopStatement loop;
     private final IProgramMethod pm;
-    private final ExecutionContext innermostExecCont;
     private final Term guard;
     private final Map<LocationVariable,Term> originalInvariants;
     private final Map<LocationVariable,Term> originalModifies;
@@ -67,25 +66,13 @@ public final class LoopInvariantImpl implements LoopInvariant {
      * @param selfTerm the term used for the receiver object
      * @param heapAtPre the term used for the at pre heap
      */
-    private LoopInvariantImpl(LoopStatement loop,
-                              IProgramMethod pm,
-                              ExecutionContext innermostExecCont,
-                              Map<LocationVariable,Term> invariants,
-                              Map<LocationVariable,Term> modifies,
-                              Map<LocationVariable,
-                                  ImmutableList<InfFlowSpec>> infFlowSpecs,
-                              Term variant,
-                              Term selfTerm,
-                              Term guard,
-                              ImmutableList<Term> localIns,
-                              ImmutableList<Term> localOuts,
-                              Map<LocationVariable,Term> atPres) {
+    private LoopInvariantImpl(LoopStatement loop, IProgramMethod pm, Map<LocationVariable,Term> invariants, Map<LocationVariable,Term> modifies, Map<LocationVariable,
+                                                                                                                                                     ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant, Term selfTerm, Term guard, ImmutableList<Term> localIns, ImmutableList<Term> localOuts, Map<LocationVariable,Term> atPres) {
         assert loop != null;
         //assert modifies != null;
         //assert heapAtPre != null;
         this.loop                       = loop;
         this.pm                         = pm;
-        this.innermostExecCont          = innermostExecCont;
         this.guard                      = guard;
         this.originalInvariants         =
                 invariants == null ? new LinkedHashMap<LocationVariable,Term>() : invariants;
@@ -114,7 +101,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
                              ImmutableList<Term> localIns,
                              ImmutableList<Term> localOuts,
                              Map<LocationVariable,Term> atPres) {
-        this(loop, pm, null, invariants, modifies, infFlowSpecs,
+        this(loop, pm, invariants, modifies, infFlowSpecs,
              variant, selfTerm, null, localIns, localOuts, atPres);
     }
 
@@ -125,7 +112,6 @@ public final class LoopInvariantImpl implements LoopInvariant {
 	    		     Term selfTerm, 
 	    		     Map<LocationVariable,Term> atPres) {
         this(loop,
-             null,
              null,
              null,
              null,
@@ -201,11 +187,6 @@ public final class LoopInvariantImpl implements LoopInvariant {
         return pm;
     }
     
-    @Override
-    public ExecutionContext getExecutionContext() {
-        return innermostExecCont;
-    }
-
     @Override
     public boolean hasGuard() {
         return guard != null;
@@ -341,19 +322,9 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override
-    public LoopInvariant create(LoopStatement loop,
-                                IProgramMethod pm,
-                                ExecutionContext innermostExecCont,
-                                Map<LocationVariable,Term> invariants,
-                                Map<LocationVariable,Term> modifies,
-                                Map<LocationVariable,
-                                    ImmutableList<InfFlowSpec>> infFlowSpecs,
-                                Term variant,
-                                Term selfTerm,
-                                ImmutableList<Term> localIns,
-                                ImmutableList<Term> localOuts,
-                                Map<LocationVariable,Term> atPres) {
-        return new LoopInvariantImpl(loop, pm, innermostExecCont, invariants,
+    public LoopInvariant create(LoopStatement loop, IProgramMethod pm, Map<LocationVariable,Term> invariants, Map<LocationVariable,Term> modifies, Map<LocationVariable,
+                                                                                                                                                       ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant, Term selfTerm, ImmutableList<Term> localIns, ImmutableList<Term> localOuts, Map<LocationVariable,Term> atPres) {
+        return new LoopInvariantImpl(loop, pm, invariants,
                                      modifies, infFlowSpecs, variant, selfTerm,
                                      guard, localIns, localOuts, atPres);
     }
@@ -369,7 +340,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                 ImmutableList<Term> localIns,
                                 ImmutableList<Term> localOuts,
                                 Map<LocationVariable,Term> atPres) {
-        return create(loop, pm, innermostExecCont, invariants, modifies, infFlowSpecs,
+        return create(loop, pm, invariants, modifies, infFlowSpecs,
                       variant, selfTerm, localIns, localOuts, atPres);
     }
 
@@ -393,7 +364,6 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public LoopInvariant setLoop(LoopStatement loop) {
         return new LoopInvariantImpl(loop,
                                      pm,
-                                     innermostExecCont,
                                      originalInvariants,
                                      originalModifies,
                                      originalInfFlowSpecs,
@@ -409,7 +379,6 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public LoopInvariant setTarget(IProgramMethod newPM) {
         return new LoopInvariantImpl(loop,
                                      newPM,
-                                     innermostExecCont,
                                      originalInvariants,
                                      originalModifies,
                                      originalInfFlowSpecs,
@@ -425,7 +394,6 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public LoopInvariant setExecutionContext(ExecutionContext execCont) {
         return new LoopInvariantImpl(loop,
                                      pm,
-                                     execCont,
                                      originalInvariants,
                                      originalModifies,
                                      originalInfFlowSpecs,
@@ -472,7 +440,6 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
         return new LoopInvariantImpl(loop,
                                      pm,
-                                     innermostExecCont,
                                      originalInvariants,
                                      originalModifies,
                                      newIFSpecMap,
@@ -499,7 +466,6 @@ public final class LoopInvariantImpl implements LoopInvariant {
         }
         return new LoopInvariantImpl(loop,
                                      pm,
-                                     innermostExecCont,
                                      newInvariants,
                                      originalModifies,
                                      originalInfFlowSpecs,

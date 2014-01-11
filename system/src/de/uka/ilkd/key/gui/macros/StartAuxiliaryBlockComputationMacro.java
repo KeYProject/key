@@ -78,7 +78,9 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(contract,
                                                    ifVars.c1,
-                                                   ifVars.c2, services);
+                                                   ifVars.c2,
+                                                   blockRuleApp.getExecutionContext(),
+                                                   services);
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
 

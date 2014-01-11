@@ -44,7 +44,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
     public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        assert poVars.catchVar.op() instanceof LocationVariable :
+        assert poVars.exceptionParameter.op() instanceof LocationVariable :
                 "Something is wrong with the catch variable";
 
         ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
@@ -86,7 +86,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
                                             vs.pre.exception != null
                                             ? vs.pre.exception.op(ProgramVariable.class)
                                             : null,
-                                            vs.catchVar.op(LocationVariable.class));
+                                            vs.exceptionParameter.op(LocationVariable.class));
 
         //create program term
         final Modality symbExecMod;

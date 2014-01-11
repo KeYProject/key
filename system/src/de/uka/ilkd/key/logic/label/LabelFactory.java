@@ -48,6 +48,9 @@ public class LabelFactory {
       else if (PostConditionTermLabel.NAME.toString().equals(name)) {
           return PostConditionTermLabel.INSTANCE;
       }
+      else if (SelfCompositionTermLabel.NAME.toString().equals(name)) {
+          return SelfCompositionTermLabel.INSTANCE;
+      }
       else {
          throw new UnknownLabelException(name);
       }

@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
@@ -65,7 +66,7 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
         //create java block
         Modality modality =
                 (Modality) d.get(BasicSnippetData.Key.MODALITY);
-        final JavaBlock jb = buildJavaBlock(d);
+        final JavaBlock jb = buildJavaBlock(d, vs);
 
         //create program term
         final Modality symbExecMod;
@@ -89,10 +90,13 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
     }
 
 
-    private JavaBlock buildJavaBlock(BasicSnippetData d) {
+    private JavaBlock buildJavaBlock(BasicSnippetData d,
+                                     ProofObligationVars poVars) {
         Services services = d.tb.getServices();
         ExecutionContext context =
                 (ExecutionContext) d.get(BasicSnippetData.Key.EXECUTION_CONTEXT);
+        ProgramVariable exceptionParameter =
+                poVars.exceptionParameter.op(ProgramVariable.class);
 
         //create block call
         Label[] labelsArray = (Label[]) d.get(BasicSnippetData.Key.LABELS);
@@ -103,7 +107,9 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
                 (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
         final StatementBlock sb =
                 new BlockContractRule.ValidityProgramConstructor(labels, block,
-                                                                 variables, services).construct();
+                                                                 variables,
+                                                                 exceptionParameter,
+                                                                 services).construct();
         Statement s = new MethodFrame(null, context, sb);
         JavaBlock result = JavaBlock.createJavaBlock(new StatementBlock(s));
 

@@ -83,6 +83,7 @@ public class FinishAuxiliaryBlockComputationMacro
         final BlockInfFlowUnfoldTacletBuilder tacletBuilder =
                 new BlockInfFlowUnfoldTacletBuilder(services);
         tacletBuilder.setContract(contract);
+        tacletBuilder.setExecutionContext(blockRuleApp.getExecutionContext());
         tacletBuilder.setInfFlowVars(ifVars);
         tacletBuilder.setReplacewith(result);
         final Taclet rwTaclet = tacletBuilder.buildTaclet();

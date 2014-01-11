@@ -45,7 +45,7 @@ import de.uka.ilkd.key.rule.AnonHeapTermLabelInstantiator;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.label.SelectSkolemConstantTermLabelInstantiator;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.label.PostConditionTermLabelInstantiator;
+import de.uka.ilkd.key.rule.label.PreserveTermLabelInstantiator;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.StrategyProperties;

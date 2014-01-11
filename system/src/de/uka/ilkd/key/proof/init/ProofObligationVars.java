@@ -32,7 +32,7 @@ public class ProofObligationVars {
     public final StateVars pre, post;
 
     /** Exception Variable for the try-catch statement. */
-    public final Term catchVar;
+    public final Term exceptionParameter;
 
     /** The formal parameters of a method. */
     public final ImmutableList<Term> formalParams;
@@ -49,7 +49,7 @@ public class ProofObligationVars {
                                Services services) {
         this.pre = StateVars.buildMethodContractPreVars(pm, kjt, services);
         this.post = StateVars.buildMethodContractPostVars(this.pre, pm, kjt, services);
-        this.catchVar = buildCatchVar(services);
+        this.exceptionParameter = buildExceptionParameter(services);
         this.formalParams = buildFormalParamVars(services);
         this.postfix = "";
     }
@@ -60,7 +60,7 @@ public class ProofObligationVars {
                                Services services) {
         this.pre = StateVars.buildInfFlowPreVars(orig.pre, postfix, services);
         this.post = StateVars.buildInfFlowPostVars(orig.pre, orig.post, pre, postfix, services);
-        this.catchVar = buildCatchVar(services);
+        this.exceptionParameter = buildExceptionParameter(services);
         this.formalParams = orig.formalParams != null ?
                             buildFormalParamVars(services) : null;
         this.postfix = postfix;
@@ -69,11 +69,11 @@ public class ProofObligationVars {
 
     public ProofObligationVars(StateVars pre,
                                StateVars post,
-                               Term catchVar,
+                               Term exceptionParameter,
                                ImmutableList<Term> formalParams) {
         this.pre = pre;
         this.post = post;
-        this.catchVar = catchVar;
+        this.exceptionParameter = exceptionParameter;
         this.formalParams = formalParams;
         this.postfix = "";
     }
@@ -84,7 +84,7 @@ public class ProofObligationVars {
         this.pre = pre;
         this.post = post;
         this.postfix = "";
-        this.catchVar = buildCatchVar(services);
+        this.exceptionParameter = buildExceptionParameter(services);
         // formal parameters are need only for proof obligations
         // of methods
         this.formalParams = null;
@@ -103,7 +103,7 @@ public class ProofObligationVars {
                                              pre.exception,
                                              TB.label(pre.heap, new ImmutableArray<ITermLabel>(newLabels)),
                                              pre.mbyAtPre);
-            return new ProofObligationVars(newPre, post, catchVar, formalParams);
+            return new ProofObligationVars(newPre, post, exceptionParameter, formalParams);
         } else {
             return this;
         }
@@ -115,7 +115,7 @@ public class ProofObligationVars {
      * @param services  the services object.
      * @return  the generated variable.
      */
-    private Term buildCatchVar(Services services) {
+    private Term buildExceptionParameter(Services services) {
         JavaInfo javaInfo = services.getJavaInfo();
         final KeYJavaType eType =
             javaInfo.getTypeByClassName("java.lang.Exception");

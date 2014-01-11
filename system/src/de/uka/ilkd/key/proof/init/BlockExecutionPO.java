@@ -84,20 +84,13 @@ public class BlockExecutionPO extends AbstractOperationPO
                 POSnippetFactory.getBasicFactory(contract, symbExecVars,
                                                  context, services);
 
-        // precondition
-        final Term freePre =
-                symbExecFactory.create(BasicPOSnippetFactory.Snippet.FREE_PRE);
-        final Term contractPre =
-                symbExecFactory.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
-        final Term pre = TB.and(freePre, contractPre);
-
         // symbolic execution
         final Term symExec =
-                symbExecFactory.create(BasicPOSnippetFactory.Snippet.BLOCK_EXEC);
+                symbExecFactory.create(BasicPOSnippetFactory.Snippet.BLOCK_EXEC_WITH_PRE);
 
         // final symbolic execution term
         final Term finalTerm = TB.applyElementary(services, symbExecVars.pre.heap,
-                                                  TB.not(TB.and(pre, symExec)));
+                                                  TB.not(symExec));
 
         // register final term
         assignPOTerms(finalTerm);

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
@@ -30,6 +31,7 @@ public final class InfFlowBlockContractTacletBuilder
         extends AbstractInfFlowContractAppTacletBuilder {
 
     private BlockContract blockContract;
+    private ExecutionContext executionContext;
 
 
     public InfFlowBlockContractTacletBuilder(final Services services) {
@@ -42,6 +44,11 @@ public final class InfFlowBlockContractTacletBuilder
     }
 
 
+    public void setExecutionContext(ExecutionContext context) {
+        this.executionContext = context;
+    }
+    
+
     @Override
     Name generateName() {
         return MiscTools.toValidTacletName("Use information flow contract for " +
@@ -52,7 +59,8 @@ public final class InfFlowBlockContractTacletBuilder
     Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes,
                                Services services) {
         BasicPOSnippetFactory fAssumes =
-                POSnippetFactory.getBasicFactory(blockContract, schemaDataAssumes, services);
+                POSnippetFactory.getBasicFactory(blockContract, schemaDataAssumes,
+                                                 executionContext, services);
         return fAssumes.create(BasicPOSnippetFactory.Snippet.BLOCK_CALL_RELATION);
     }
 
@@ -61,7 +69,8 @@ public final class InfFlowBlockContractTacletBuilder
     Term generateSchemaFind(ProofObligationVars schemaDataFind,
                             Services services) {
         BasicPOSnippetFactory fFind =
-                POSnippetFactory.getBasicFactory(blockContract, schemaDataFind, services);
+                POSnippetFactory.getBasicFactory(blockContract, schemaDataFind,
+                                                 executionContext, services);
         return fFind.create(BasicPOSnippetFactory.Snippet.BLOCK_CALL_RELATION);
     }
 
@@ -70,7 +79,7 @@ public final class InfFlowBlockContractTacletBuilder
     Term getContractApplPred(ProofObligationVars appData) {
         BasicPOSnippetFactory f =
                 POSnippetFactory.getBasicFactory(blockContract, appData,
-                                                 services);
+                                                 executionContext, services);
         return f.create(BasicPOSnippetFactory.Snippet.BLOCK_CALL_RELATION);
     }
 
@@ -86,7 +95,9 @@ public final class InfFlowBlockContractTacletBuilder
         for (BlockContract cont : ifContracts) {
             InfFlowPOSnippetFactory f =
                     POSnippetFactory.getInfFlowFactory(cont, contAppData,
-                                                       contAppData2, services);
+                                                       contAppData2,
+                                                       executionContext,
+                                                       services);
             contractsApplications =
                     contractsApplications.append(
                     f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_CONTRACT_APPL));

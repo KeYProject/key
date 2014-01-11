@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.label.PostConditionTermLabel;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.SelfCompositionTermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -33,18 +34,18 @@ import de.uka.ilkd.key.rule.Rule;
  * <p/>
  * @author Christoph Scheben
  */
-public final class PostConditionTermLabelInstantiator implements ITermLabelWorker {
+public final class PreserveTermLabelInstantiator implements ITermLabelWorker {
 
     /**
      * The only instance of this class.
      */
-    public static final PostConditionTermLabelInstantiator INSTANCE =
-            new PostConditionTermLabelInstantiator();
+    public static final PreserveTermLabelInstantiator INSTANCE =
+            new PreserveTermLabelInstantiator();
 
     /**
      * Constructor to forbid multiple instances.
      */
-    private PostConditionTermLabelInstantiator() {
+    private PreserveTermLabelInstantiator() {
     }
 
     /**
@@ -73,6 +74,11 @@ public final class PostConditionTermLabelInstantiator implements ITermLabelWorke
             // keep PostConditionTermLabel
             return Collections.<ITermLabel>singletonList(PostConditionTermLabel.INSTANCE);
 
+        } else if (tacletTerm != null &&
+                   tacletTerm.containsLabel(SelfCompositionTermLabel.INSTANCE)) {
+            // keep SelfCompositionTermLabel
+            return Collections.<ITermLabel>singletonList(SelfCompositionTermLabel.INSTANCE);
+
         } else {
             return null;
         }
@@ -88,7 +94,7 @@ public final class PostConditionTermLabelInstantiator implements ITermLabelWorke
                              Rule rule,
                              Goal goal,
                              List<ITermLabel> newLabels) {
-        // since we'd like to keep the PostConditionTermLabel, there is
-        // nothing to do here
+        // since we'd like to keep the PostConditionTermLabel and the
+        // SelfCompositionTermLabel, there is nothing to do here
     }
 }
