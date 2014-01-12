@@ -105,7 +105,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     private static class FilterSymbexStrategy extends FilterStrategy {
 
         private static final Name CLASS_AXIOM_RULESET = new Name("classAxiom");
-        private static final int HIGH_COST = 2000;
+        private static final int HIGH_COST = 5000;
         private static final Name NAME = new Name(FilterSymbexStrategy.class.getSimpleName());
 
         public FilterSymbexStrategy(Strategy delegate) {

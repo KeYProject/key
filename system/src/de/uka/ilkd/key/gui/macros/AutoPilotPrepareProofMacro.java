@@ -127,7 +127,6 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static class AutoPilotStrategy implements Strategy {
 
         private static final Name NAME = new Name("Autopilot filter strategy");
-        private static final long HIGH_COST = 2000L;
         private final KeYMediator mediator;
         private final PosInOccurrence posInOcc;
         private final Strategy delegate;
@@ -176,11 +175,6 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
                 return LongRuleAppCost.ZERO_COST;
             }
             
-            // assign higher costs to classAxiom rules
-            if (isInRuleSet(rule, CLASS_AXIOM_RULESET)) {
-                return LongRuleAppCost.create(HIGH_COST);
-            }
-
             // apply OSS to <inv>() calls.
             if(rule instanceof OneStepSimplifier) {
                 Term target = pio.subTerm();
