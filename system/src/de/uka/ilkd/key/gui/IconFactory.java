@@ -102,7 +102,7 @@ public class IconFactory {
 	return new ImageIcon(scaledim);
     }
 
-    public static ImageIcon abandonProof (int x) {
+    public static ImageIcon abandon(int x) {
         return scaleIcon(abandonProof ,x,x);
     }
 
