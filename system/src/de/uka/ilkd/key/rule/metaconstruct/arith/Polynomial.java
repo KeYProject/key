@@ -30,7 +30,6 @@ import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.LRUCache;
 
 /**
  * Class for analysing and modifying polynomial expressions over the integers
@@ -45,8 +44,6 @@ public class Polynomial {
         this.constantPart = constantPart;
     }
     
-    private static final LRUCache<Term, Polynomial> polynomialCache = 
-        new LRUCache<Term, Polynomial> ( 2000 );
     private static final BigInteger MINUS_ONE = BigInteger.valueOf ( -1 );
 
     public final static Polynomial ZERO =
@@ -55,10 +52,10 @@ public class Polynomial {
         new Polynomial ( ImmutableSLList.<Monomial>nil(), BigInteger.ONE );    
 
     public static Polynomial create(Term polyTerm, Services services) {
-        Polynomial res = polynomialCache.get ( polyTerm );
+        Polynomial res = services.getCaches().getPolynomialCache().get ( polyTerm );
         if ( res == null ) {
             res = createHelp ( polyTerm, services );
-            polynomialCache.put ( polyTerm, res );
+            services.getCaches().getPolynomialCache().put ( polyTerm, res );
         }
         return res;
     }

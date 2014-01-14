@@ -102,12 +102,12 @@ termination: diamond" pathCondition="not(equals(array,null))" pathConditionChang
                      </branchCondition>
                      <branchCondition name="not(equals(length(array),Z(0(#))))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(0(#))))))" pathConditionChanged="true" branchCondition="not(equals(length(array),Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <methodReturn name="&lt;return of self.average(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(0(#))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	quotient_1 {gt(result_0,Z(neglit(1(#))))}, 
-	mul(quotient_0,Z(neglit(1(#)))) {lt(result_0,Z(0(#)))}
+	quotient_3 {gt(result_0,Z(neglit(1(#))))}, 
+	mul(quotient_2,Z(neglit(1(#)))) {lt(result_0,Z(0(#)))}
 as result of self.average(array);&gt;" isReturnValueComputed="true">
-                           <methodReturnValue name="quotient_1 {gt(result_0,Z(neglit(1(#))))}" returnValueString="quotient_1" hasCondition="true" conditionString="gt(result_0,Z(neglit(1(#))))">
+                           <methodReturnValue name="quotient_3 {gt(result_0,Z(neglit(1(#))))}" returnValueString="quotient_3" hasCondition="true" conditionString="gt(result_0,Z(neglit(1(#))))">
                            </methodReturnValue>
-                           <methodReturnValue name="mul(quotient_0,Z(neglit(1(#)))) {lt(result_0,Z(0(#)))}" returnValueString="mul(quotient_0,Z(neglit(1(#))))" hasCondition="true" conditionString="lt(result_0,Z(0(#)))">
+                           <methodReturnValue name="mul(quotient_2,Z(neglit(1(#)))) {lt(result_0,Z(0(#)))}" returnValueString="mul(quotient_2,Z(neglit(1(#))))" hasCondition="true" conditionString="lt(result_0,Z(0(#)))">
                            </methodReturnValue>
                            <variable name="self" arrayIndex="-1" isArrayIndex="false">
                               <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">

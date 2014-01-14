@@ -15,6 +15,7 @@
 
 package de.uka.ilkd.key.strategy.termfeature;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 
@@ -39,7 +40,7 @@ public class EqTermFeature extends BinaryTermFeature {
         this.pattern = pattern;
     }
     
-    protected boolean filter(Term term) {
+    protected boolean filter(Term term, Services services) {
         return term.equals ( pattern.getContent () );
     }
 }
