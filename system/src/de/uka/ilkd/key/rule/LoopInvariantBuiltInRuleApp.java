@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,11 +117,11 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 				result = replace(visited);
 			}
 			
-			public Term getResult(){
+			public Term getResult() {
 				return result;
 			}
 			
-			private Term replace(Term visited){
+			private Term replace(Term visited) {
 			    ImmutableArray<Term> subs = visited.subs();
 			    if (subs.isEmpty()) {
 			    	if (visited.op().name().toString().equals("index"))
@@ -132,8 +131,10 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 			    	Term[] newSubs = new Term[subs.size()];
 			    	for (int i= 0; i < subs.size(); i++)
 			    		newSubs[i] = replace(subs.get(i));
-			    	return tb.tf().createTerm(visited.op(), new ImmutableArray<Term>(newSubs),
-			    			visited.boundVars(), visited.javaBlock());
+				return tb.tf().createTerm(
+				        visited.op(), new ImmutableArray<Term>(newSubs),
+				        visited.boundVars(), visited.javaBlock(),
+				        visited.getLabels());
 			    }
 			}
 		};
@@ -146,11 +147,11 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                 result = replace(visited);
             }
             
-            public Term getResult(){
+            public Term getResult() {
                 return result;
             }
             
-            private Term replace(Term visited){
+            private Term replace(Term visited) {
                 ImmutableArray<Term> subs = visited.subs();
                 if (subs.isEmpty()) {
                     if (visited.op().name().toString().equals("values"))
@@ -161,7 +162,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                     for (int i= 0; i < subs.size(); i++)
                         newSubs[i] = replace(subs.get(i));
                     return tb.tf().createTerm(visited.op(), new ImmutableArray<Term>(newSubs),
-                            visited.boundVars(), visited.javaBlock());
+                            visited.boundVars(), visited.javaBlock(), visited.getLabels());
                 }
             }
         };
@@ -198,9 +199,11 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             v.visit(var);
             var = v.getResult();
         }}
-		return new LoopInvariantImpl(rawInv.getLoop(), newInvs, rawInv.getInternalModifies(),
-				var, rawInv.getInternalSelfTerm(),
-				rawInv.getInternalAtPres());
+		return new LoopInvariantImpl(rawInv.getLoop(), rawInv.getTarget(),
+		                             rawInv.getKJT(), newInvs,
+		                             rawInv.getInternalModifies(), var,
+		                             rawInv.getInternalSelfTerm(),
+		                             rawInv.getInternalAtPres());
     	
     }
 

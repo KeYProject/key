@@ -389,11 +389,16 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    return false;
 	}
 
+	// abort if inside of transformer
+        if (Transformer.inTransformer(pio)) {
+            return false;
+        }
+
 	//heap term of observer must be store-term (or anon, create,
 	//memset, ...)
 	final Services services = goal.proof().getServices();
 	final IObserverFunction target = (IObserverFunction) focus.op();
-    //final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+	//final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
 	boolean hasRawSteps = false;
 	for(int i = 0; i<target.getHeapCount(services) * target.getStateCount(); i++) {
 	  if(hasRawSteps(focus.sub(i), goal.sequent(), services)) {
@@ -401,14 +406,15 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    break;
 	  }
 	}
-    if(!hasRawSteps) {
-    	return false;
-    }
+	if(!hasRawSteps) {
+	    return false;
+	}
 	//there must be contracts for the observer
 	final KeYJavaType kjt
 		= target.isStatic()
 		  ? target.getContainerType()
-	          : services.getJavaInfo().getKeYJavaType(focus.sub(target.getHeapCount(services)*target.getStateCount()).sort());
+	          : services.getJavaInfo().getKeYJavaType(
+	                  focus.sub(target.getHeapCount(services)*target.getStateCount()).sort());
 	assert kjt != null : "could not determine receiver type for " + focus;
 	if(kjt.getSort() instanceof NullSort) {
 	    return false;
@@ -580,10 +586,11 @@ public final class UseDependencyContractRule implements BuiltInRule {
 		    = services.getSpecificationRepository()
 			    .getPOForProof(goal.proof());
 	    final Term mbyOk;
-	    if(po != null && po.getMbyAtPre() != null && mby != null) {
+	    if(po != null && /* po.getMbyAtPre() != null && */ mby != null) {
 //	        mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
 //		           TB.lt(mby, po.getMbyAtPre(), services));
-                mbyOk = TB.prec(mby, po.getMbyAtPre(), services);
+//                mbyOk = TB.prec(mby, po.getMbyAtPre(), services);
+            mbyOk = TB.measuredByCheck(mby, services);
 	    } else {
 	       mbyOk = TB.tt();
 	    }

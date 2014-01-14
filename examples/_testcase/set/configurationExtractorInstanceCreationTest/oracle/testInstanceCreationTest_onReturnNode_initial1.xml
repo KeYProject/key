@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <equivalenceClass representativeTerm="self">
+      <term term="self"/>
+      <term term="InstanceCreationTest::select(heap,self,InstanceCreationTest::$next)"/>
+   </equivalenceClass>
+   <state name="One Step Simplification resulting in {}">
+      <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+   </state>
+   <object xml:id="o1" name="self" type="InstanceCreationTest">
+      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+   </object>
+</model>

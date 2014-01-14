@@ -53,27 +53,28 @@ import javax.swing.text.Highlighter;
 public abstract class SequentView extends JTextArea
         implements KeyListener, MouseMotionListener, MouseListener {
 
+    private static final long serialVersionUID = -7474938556691063384L;
     private final MainWindow mainWindow;
-    
+
     /* 
      * The current line width. Static declaration for this prevents constructors from
      * using lineWidth 0.
      */
     private static int lineWidth;
-    
+
     public static void setLineWidth(int i) {
         if (i != 0) {
             lineWidth = i;
         }
     }
-    
+
     public static int getLineWidth() {
         return lineWidth;
     }
-    
+
     private ConfigChangeListener configChangeListener;
     SequentPrintFilter filter;
-    LogicPrinter printer;
+    private LogicPrinter printer;
     public boolean refreshHighlightning = true;
     private boolean showTermInfo = false;
     
@@ -233,15 +234,37 @@ public abstract class SequentView extends JTextArea
         }
     }
 
+    /** Return used LogicPrinter.
+     * @return The LogicPrinter that is used.
+     */
+    public LogicPrinter getLogicPrinter() {
+        return printer;
+    }
+
+    /** Set the LogicPrinter to be used.
+     * @param p The LogicPrinter to be used
+     */
+    protected void setLogicPrinter(LogicPrinter p) {
+        printer = p;
+    }
+
     public String getHighlightedText(PosInSequent pos) {
         String s = "";
         try {
+            if (pos == null) {
+                pos = PosInSequent.createSequentPos();
+            }
+            assert pos != null;
             s = getText(pos.getBounds().start(),
                     pos.getBounds().length());
         } catch (Exception e) {
             e.printStackTrace();
         }
         return s;
+    }
+
+    public String getHighlightedText() {
+       return getHighlightedText(getPosInSequent(getMousePosition()));
     }
 
     private void showTermInfo(Point p) {
@@ -261,7 +284,8 @@ public abstract class SequentView extends JTextArea
                     String tOpClassString = t.op().getClass().toString();
                     String operator = tOpClassString.substring(
                             tOpClassString.lastIndexOf('.') + 1);
-                    // What is the purpose of displaying the java hashcode here?
+                    // The hash code is displayed here since sometimes terms with
+                    // equal string representation are still different.
                     info = operator + ", Sort: " + t.sort() + ", Hash:" + t.hashCode();
 
                     Sequent seq = mainWindow.getMediator().getSelectedNode().sequent();

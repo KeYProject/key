@@ -46,6 +46,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+
 public final class ExampleChooser extends JDialog {
     /**
      * This path is also accessed by the Eclipse integration of KeY
@@ -62,7 +63,7 @@ public final class ExampleChooser extends JDialog {
     
     private static ExampleChooser instance;
     
-    private final JList exampleList;  
+    private final JList exampleList;
     private final JTextArea descriptionText;    
     private final JButton loadButton;
     private final JButton cancelButton;

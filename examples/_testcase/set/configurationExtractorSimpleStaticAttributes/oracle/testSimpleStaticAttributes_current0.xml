@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <state name="return SimpleStaticAttributes.instance.x+SimpleStaticAttributes.finalInstance.x+SimpleStaticAttributes.staticInt+SimpleStaticAttributes.finalStaticint;">
-      <value name="SimpleStaticAttributes::staticInt" programVariable="SimpleStaticAttributes::staticInt" isArrayIndex="false" arrayIndex="-1" value="1" type="int"/>
+      <value name="SimpleStaticAttributes::staticInt" programVariable="SimpleStaticAttributes::staticInt" isArrayIndex="false" arrayIndex="-1" value="Z(1(#))" type="int"/>
       <association name="newInstance" programVariable="newInstance" isArrayIndex="false" arrayIndex="-1" target="o1"/>
       <association name="SimpleStaticAttributes::instance" programVariable="SimpleStaticAttributes::instance" isArrayIndex="false" arrayIndex="-1" target="o1"/>
    </state>

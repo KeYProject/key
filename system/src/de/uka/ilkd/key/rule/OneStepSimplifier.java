@@ -38,6 +38,7 @@ import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -66,10 +67,11 @@ public final class OneStepSimplifier implements BuiltInRule,
                                        .append("update_apply_on_update")
                                        .append("update_apply")
                                        .append("update_join")
-    	                               .append("elimQuantifier");
+	                               .append("elimQuantifier")
+                                       ;
 
     private static final boolean[] bottomUp
-        = {false, false, true, true, true, false};
+        = {false, false, true, true, true, false };
     private final Map<SequentFormula,Boolean> applicabilityCache
     		= new LRUCache<SequentFormula,Boolean>(100);
 
@@ -320,7 +322,8 @@ public final class OneStepSimplifier implements BuiltInRule,
 	    }
 	    return pos.isInAntec() ? TB.tt() : TB.ff();
 	} else if(in.op() instanceof Modality
-                  || in.op() instanceof UpdateApplication) {
+                  || in.op() instanceof UpdateApplication
+                  || in.op() instanceof Transformer) {
 	    return in;
 	} else {
 	    Term[] subs = new Term[in.arity()];
@@ -525,11 +528,15 @@ public final class OneStepSimplifier implements BuiltInRule,
 	    return false;
 	}
 
+	// abort if inside of transformer
+	if (Transformer.inTransformer(pio)) {
+	    return false;
+	}
+
 	//applicable to the formula?
 	return applicableTo(goal.proof().getServices(),
 			    pio.constrainedFormula());
     }
-
 
     @Override
     public ImmutableList<Goal> apply(Goal goal,

@@ -29,11 +29,11 @@ final class Tree {
           helper model boolean treeInv() {
              return (
                     (left != right || left == null || right == null)
-                 && height >= 0
-                 && (left==null || (   \disjoint(this.*, left.footprint())
-                          && left.treeInv() && height > left.height))  
-                 && (right==null || (   \disjoint(this.*, right.footprint())
-                          && right.treeInv() && height > right.height))
+                 && 0 <= height
+                 && (left==null || (left.height < height && \disjoint(this.*, left.footprint())
+                          && left.treeInv()))  
+                 && (right==null || (right.height < height && \disjoint(this.*, right.footprint())
+                          && right.treeInv()))
                  && (left==null || right==null || \disjoint(left.footprint(), right.footprint()))) ;
           } @*/
 
@@ -60,7 +60,7 @@ final class Tree {
           measured_by height;
           helper model \locset footprintUntilLeft(Tree t) {
              return (
-               this == t ? \empty : \set_union(
+               t == this ? \empty : \set_union(
                  this.*,
                  \set_union(
                     (left==null) ? \empty : left.footprintUntilLeft(t),
@@ -72,20 +72,20 @@ final class Tree {
 
 
     /*@ model_behavior 
-          requires true;
+          requires t.treeInv();
           ensures true;
-          accessible footprintUntilLeft(t);
+          accessible \set_union(footprintUntilLeft(t), \singleton(t.height));
           measured_by height;
           helper model boolean treeInvUntilLeft(Tree t) {
              return (t == this || 
-                      ( height >= 0
-                     && (left != right || left == null || right == null)
-                     && (right==null ||
-                       (\disjoint(this.*, right.footprint())
-                       && height > right.height && right.treeInv()))
+                      ( (left != right || left == null || right == null)
+                     && 0 <= height 
                      && (left==null ||
-                          (\disjoint(this.*, left.footprintUntilLeft(t))
-                          && height > left.height && left.treeInvUntilLeft(t)))  
+                          (left.height < height && \disjoint(this.*, left.footprintUntilLeft(t))
+                         && left.treeInvUntilLeft(t)))  
+                     && (right==null ||
+                       (right.height < height && \disjoint(this.*, right.footprint())
+                       && right.treeInv()))
                      && (left==null || right==null ||
                           \disjoint(left.footprintUntilLeft(t), right.footprint()))
                       )
@@ -100,7 +100,7 @@ final class Tree {
           measured_by height;
           helper model \seq treeRepUntilLeft(Tree t) {
             return (
-                (this == t) ? \seq_empty : 
+                (t == this) ? \seq_empty : 
                 \seq_concat(
                   (left == null) ? \seq_empty : left.treeRepUntilLeft(t), 
                   \seq_concat(
@@ -116,6 +116,7 @@ final class Tree {
           requires treeInvUntilLeft(t) && t.treeInv(); 
           requires \disjoint(footprintUntilLeft(t), t.footprint());
           ensures \result ==> (t.left == null || leftSubTree(t.left));
+          ensures \result ==> (t.left == null || treeInvUntilLeft(t.left));
           ensures \result ==> (treeRep() == \seq_concat(t.treeRep(), treeRepUntilLeft(t)));
           ensures \result ==> (footprint() == \set_union(footprintUntilLeft(t), t.footprint()));
           ensures \result ==> (treeInv() <==> (treeInvUntilLeft(t) && t.treeInv()));
@@ -130,10 +131,10 @@ final class Tree {
           ensures \result ==> (t.left == null || 
               (footprintUntilLeft(t.left) == 
                 \set_union(t.*,
-                  \set_union(
-                     (t.right == null) ? \empty : t.right.footprint(),
-                     footprintUntilLeft(t)
-                  )
+                    \set_union(
+                       (t.right == null) ? \empty : t.right.footprint(),
+                       footprintUntilLeft(t)
+                    )
                 )
               )
           );
@@ -171,16 +172,19 @@ final class Tree {
            /*@ loop_invariant t.treeInv();
              @ loop_invariant t.treeInvUntilLeft(p2);
              @ loop_invariant p != null;
+	     @ loop_invariant p.treeInv();
              @ loop_invariant p2 != null;
              @ loop_invariant p2.treeInv();
+             @ loop_invariant tt == null || tt.treeInv();
              @ loop_invariant p.left == tt;
              @ loop_invariant p2.left == p;
              @ loop_invariant t.leftSubTree(p2);
+             @ loop_invariant \subset(\singleton(p2.left), t.footprint());
              // These two are actually redundant (I am almost sure)
              // @ loop_invariant t.treeRep() == \seq_concat(p2.treeRep(), t.treeRepUntilLeft(p2));
              // @ loop_invariant t.footprint() == \set_union(t.footprintUntilLeft(p2), p2.footprint());
              @ loop_invariant \disjoint(t.footprintUntilLeft(p2), p2.footprint());
-             @ decreasing tt == null ? 0 : tt.height;
+             @ decreasing tt == null ? 0 : (tt.height+1);
              @ assignable \less_than_nothing;
              @*/
            while (tt != null) {

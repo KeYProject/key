@@ -33,16 +33,13 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
 import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
@@ -183,16 +180,20 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                                        ImmutableList<ProgramVariable> paramVars) {
         final Term mbyAtPreDef;
         if (contract.hasMby()) {
+/*
             final Function mbyAtPreFunc =
                     new Function(new Name(TB.newName(services, "mbyAtPre")),
                             Sort.ANY);
 //                                 services.getTypeConverter().getIntegerLDT().targetSort());
             register(mbyAtPreFunc);
             mbyAtPre = TB.func(mbyAtPreFunc);
+*/
             final Term mby = contract.getMby(selfVar, paramVars, services);
-            mbyAtPreDef = TB.equals(mbyAtPre, mby);
+//            mbyAtPreDef = TB.equals(mbyAtPre, mby);
+            mbyAtPreDef = TB.measuredBy(mby, services);
         } else {
-            mbyAtPreDef = TB.tt();
+//            mbyAtPreDef = TB.tt();
+            mbyAtPreDef = TB.measuredByEmpty(services);
         }
         return mbyAtPreDef;
     }
@@ -363,41 +364,46 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * @return The instantiated proof obligation.
      * @throws IOException Occurred Exception.
      */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException {
+    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
+            throws IOException {
        String contractName = properties.getProperty("contract");
        int proofNum = 0;
        String baseContractName = null;
        int ind = -1;
        for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
-          ind = contractName.indexOf("." + tag);
+           ind = contractName.indexOf("." + tag);
           if (ind > 0) {
-             break;
+              break;
           }
           proofNum++;
        }
        if (ind == -1) {
-          baseContractName = contractName;
-          proofNum = 0;
+           baseContractName = contractName;
+           proofNum = 0;
        }
        else {
-          baseContractName = contractName.substring(0, ind);
+           baseContractName = contractName.substring(0, ind);
        }
-       final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
+       final Contract contract =
+               initConfig.getServices().getSpecificationRepository()
+                                .getContractByName(baseContractName);
        if (contract == null) {
-          throw new RuntimeException("Contract not found: " + baseContractName);
+           throw new RuntimeException("Contract not found: " + baseContractName);
        }
        else {
-          ProofOblInput po;
-          if (isAddUninterpretedPredicate(properties)) {
-             if (!(contract instanceof FunctionalOperationContract)) {
-                throw new IOException("Found contract \"" + contract + "\" is no FunctionalOperationContract.");
-             }
-             po = new FunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract, true, true);
-          }
-          else {
-             po = contract.createProofObl(initConfig, contract);
-          }
-          return new LoadedPOContainer(po, proofNum);
+           ProofOblInput po;
+           if (isAddUninterpretedPredicate(properties)) {
+               if (!(contract instanceof FunctionalOperationContract)) {
+                   throw new IOException("Found contract \"" + contract +
+                                         "\" is no FunctionalOperationContract.");
+               }
+               po = new FunctionalOperationContractPO(
+                       initConfig, (FunctionalOperationContract)contract, true, true);
+           }
+           else {
+               po = contract.createProofObl(initConfig, contract);
+           }
+           return new LoadedPOContainer(po, proofNum);
        }
     }
 }

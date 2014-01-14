@@ -13,7 +13,7 @@
          <variable name="a" arrayIndex="-1" isArrayIndex="false">
             <value name="a {true}" typeString="AliasTest.IntWrapper" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                  <value name="value {true}" typeString="int" valueString="a.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <value name="value {true}" typeString="int" valueString="int::select(heap,a,AliasTest.IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
             </value>
@@ -21,7 +21,7 @@
          <variable name="b" arrayIndex="-1" isArrayIndex="false">
             <value name="b {true}" typeString="AliasTest.IntWrapper" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                  <value name="value {true}" typeString="int" valueString="b.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <value name="value {true}" typeString="int" valueString="int::select(heap,b,AliasTest.IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
             </value>
@@ -38,7 +38,7 @@
             <variable name="a" arrayIndex="-1" isArrayIndex="false">
                <value name="a {true}" typeString="AliasTest.IntWrapper" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                     <value name="value {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="value {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </value>
@@ -46,9 +46,9 @@
             <variable name="b" arrayIndex="-1" isArrayIndex="false">
                <value name="b {true}" typeString="AliasTest.IntWrapper" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                     <value name="value {b = a}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="b = a">
+                     <value name="value {equals(b,a)}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(b,a)">
                      </value>
-                     <value name="value {!b = a}" typeString="int" valueString="b.value" isValueAnObject="false" isValueUnknown="false" conditionString="!b = a">
+                     <value name="value {not(equals(b,a))}" typeString="int" valueString="int::select(heap,b,AliasTest.IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(b,a))">
                      </value>
                   </variable>
                </value>
@@ -65,9 +65,9 @@
                <variable name="a" arrayIndex="-1" isArrayIndex="false">
                   <value name="a {true}" typeString="AliasTest.IntWrapper" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                        <value name="value {b = a}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="b = a">
+                        <value name="value {equals(b,a)}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(b,a)">
                         </value>
-                        <value name="value {!b = a}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="!b = a">
+                        <value name="value {not(equals(b,a))}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(b,a))">
                         </value>
                      </variable>
                   </value>
@@ -75,7 +75,7 @@
                <variable name="b" arrayIndex="-1" isArrayIndex="false">
                   <value name="b {true}" typeString="AliasTest.IntWrapper" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                        <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
@@ -85,12 +85,12 @@
                   </value>
                </variable>
                <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	6 {b = a}, 
-	5 {!b = a}
+	Z(6(#)) {equals(b,a)}, 
+	Z(5(#)) {not(equals(b,a))}
 as result of self.main(a,b);&gt;" isReturnValueComputed="true">
-                  <methodReturnValue name="6 {b = a}" returnValueString="6" hasCondition="true" conditionString="b = a">
+                  <methodReturnValue name="Z(6(#)) {equals(b,a)}" returnValueString="Z(6(#))" hasCondition="true" conditionString="equals(b,a)">
                   </methodReturnValue>
-                  <methodReturnValue name="5 {!b = a}" returnValueString="5" hasCondition="true" conditionString="!b = a">
+                  <methodReturnValue name="Z(5(#)) {not(equals(b,a))}" returnValueString="Z(5(#))" hasCondition="true" conditionString="not(equals(b,a))">
                   </methodReturnValue>
                   <variable name="self" arrayIndex="-1" isArrayIndex="false">
                      <value name="self {true}" typeString="AliasTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
@@ -99,9 +99,9 @@ as result of self.main(a,b);&gt;" isReturnValueComputed="true">
                   <variable name="a" arrayIndex="-1" isArrayIndex="false">
                      <value name="a {true}" typeString="AliasTest.IntWrapper" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                           <value name="value {b = a}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="b = a">
+                           <value name="value {equals(b,a)}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(b,a)">
                            </value>
-                           <value name="value {!b = a}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="!b = a">
+                           <value name="value {not(equals(b,a))}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(b,a))">
                            </value>
                         </variable>
                      </value>
@@ -109,7 +109,7 @@ as result of self.main(a,b);&gt;" isReturnValueComputed="true">
                   <variable name="b" arrayIndex="-1" isArrayIndex="false">
                      <value name="b {true}" typeString="AliasTest.IntWrapper" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                           <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>

@@ -270,13 +270,16 @@ public final class NotationInfo {
 	//heap operators
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
+	tbl.put(heapLDT.getStore(), new Notation.StoreNotation());
+	tbl.put(heapLDT.getAnon(), new Notation.AnonNotation());
+	tbl.put(heapLDT.getCreate(), new Notation.CreateNotation());
+	tbl.put(heapLDT.getMemset(), new Notation.MemsetNotation());
 	tbl.put(IObserverFunction.class, new Notation.ObserverNotation());
 	tbl.put(IProgramMethod.class, new Notation.ObserverNotation());
 	tbl.put(heapLDT.getLength(), new Notation.LengthNotation());
 	
 	//set operators
 	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
-	tbl.put(setLDT.getEmpty(), new Notation.Constant("{}", PRIORITY_ATOM));
 	tbl.put(setLDT.getSingleton(), new Notation.SingletonNotation());
 	tbl.put(setLDT.getUnion(), new Notation.Infix("\\cup", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
 	tbl.put(setLDT.getIntersect(), new Notation.Infix("\\cap", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));

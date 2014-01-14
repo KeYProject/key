@@ -13,25 +13,30 @@
 
 package de.uka.ilkd.key.parser;
 
-class InvalidFindException 
-    extends antlr.SemanticException {
+import org.antlr.runtime.RecognitionException;
+
+public class InvalidFindException
+    extends RecognitionException {
     
     /**
      * 
      */
     private static final long serialVersionUID = 1699188390606912785L;
     private String description;
+    private String filename;
     
     public InvalidFindException(String description,
 				String filename,
 				int line, int column) {
-	super("Invalid Find: "+description, filename, line, column);
+	this.filename = filename;
+	this.line = line;
+	this.charPositionInLine = column;
 	this.description = description;
     }
     
     public String getMessage() {
-	return (getFilename() != null ? getFilename() : "") +
-            "("+getLine()+", "+getColumn()+ "):" + description;	
+	return (this.filename != null ? this.filename : "") +
+            "("+this.line+", "+this.charPositionInLine+ "):" + description;
     }		
     
 }

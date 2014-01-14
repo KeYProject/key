@@ -29,10 +29,12 @@ import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
@@ -286,8 +288,8 @@ public class TacletAppIndex  {
 
     /** 
      * collects all RewriteTacletInstantiations in a subterm of the
-     * constrainedFormula described by a
-     * PosInOccurrence
+     * constrainedFormula described by a PosInOccurrence.
+     * RewriteTaclets with wrong prefix are filtered out.
      * @param pos the PosInOccurrence to focus 
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
@@ -304,7 +306,11 @@ public class TacletAppIndex  {
 
         while ( it.hasNext () ) {
             final NoPosTacletApp tacletApp = it.next ();
-            if ( tacletApp.taclet () instanceof RewriteTaclet )
+            final Taclet t = tacletApp.taclet();
+            if (t instanceof RewriteTaclet
+                    && ((RewriteTaclet)t).checkPrefix(
+                            pos, MatchConditions.EMPTY_MATCHCONDITIONS, services)
+                            != null)
                 result = result.prepend ( tacletApp );
         }
 

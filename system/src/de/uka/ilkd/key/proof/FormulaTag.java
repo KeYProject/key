@@ -22,7 +22,7 @@ package de.uka.ilkd.key.proof;
  */
 public final class FormulaTag {
 
-	static int counter = 0;
+    static int counter = 0;
     int i;
 
     FormulaTag() {

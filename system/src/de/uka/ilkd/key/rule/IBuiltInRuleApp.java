@@ -36,7 +36,7 @@ public interface IBuiltInRuleApp extends RuleApp {
      * For an example implementation see e.g. {@link UseOperationContractRule} or {@link UseDependencyContractRule}.    
      */
     IBuiltInRuleApp tryToInstantiate(Goal goal);
-    
+
     IBuiltInRuleApp forceInstantiate(Goal goal);
 
     List<LocationVariable> getHeapContext();

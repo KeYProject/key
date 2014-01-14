@@ -14,7 +14,6 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -28,7 +27,7 @@ import de.uka.ilkd.key.util.LRUCache;
 /**
  * This class describes the relation between different clauses in a CNF.
  * If two clauses have the same existential quantifiable variable, we say
- * they are connected. And this property is transtitive.
+ * they are connected. And this property is transitive.
  */
 class ClausesGraph {
 

@@ -13,10 +13,11 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.label.LoopBodyTermLabel;
-import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
 
 public class LabeledTermImplTest extends TestCase {
@@ -27,8 +28,8 @@ public class LabeledTermImplTest extends TestCase {
 						TermFactory.DEFAULT.createTerm(Junctor.TRUE), 
 						TermFactory.DEFAULT.createTerm(Junctor.FALSE));
 		
-		ImmutableArray<ITermLabel> labels = new ImmutableArray<ITermLabel>(
-				LoopBodyTermLabel.INSTANCE);
+		ImmutableArray<TermLabel> labels = new ImmutableArray<TermLabel>(
+		      ParameterlessTermLabel.LOOP_BODY_LABEL);
 		
 		Term labeledTerm = 
 				TermFactory.DEFAULT.createTerm(Junctor.AND, 
@@ -41,7 +42,7 @@ public class LabeledTermImplTest extends TestCase {
 
 	/**
 	 * Tests {@link Term#hasLabels()}, {@link Term#hasLabels()} and
-	 * {@link Term#containsLabel(ITermLabel)}.
+	 * {@link Term#containsLabel(TermLabel)}.
 	 */
 	public void testGetHasAndContainsLabels() {
 	   // Create terms
@@ -49,14 +50,14 @@ public class LabeledTermImplTest extends TestCase {
 	   SymbolicExecutionTermLabel sedLabel = new SymbolicExecutionTermLabel(1);
       SymbolicExecutionTermLabel anotherSedLabel = new SymbolicExecutionTermLabel(2);
 	   Term oneLabel = TermBuilder.DF.label(unlabled, sedLabel);
-	   Term oneLabelChanged = TermBuilder.DF.label(oneLabel, LoopBodyTermLabel.INSTANCE);
-	   Term twoLabels = TermBuilder.DF.label(unlabled, new ImmutableArray<ITermLabel>(LoopBodyTermLabel.INSTANCE, sedLabel));
+	   Term oneLabelChanged = TermBuilder.DF.label(oneLabel, ParameterlessTermLabel.LOOP_BODY_LABEL);
+	   Term twoLabels = TermBuilder.DF.label(unlabled, new ImmutableArray<TermLabel>(ParameterlessTermLabel.LOOP_BODY_LABEL, sedLabel));
 	   // Test unlabled
 	   assertFalse(unlabled.hasLabels());
 	   assertNotNull(unlabled.getLabels());
 	   assertEquals(0, unlabled.getLabels().size());
 	   assertFalse(unlabled.containsLabel(sedLabel));
-      assertFalse(unlabled.containsLabel(LoopBodyTermLabel.INSTANCE));
+      assertFalse(unlabled.containsLabel(ParameterlessTermLabel.LOOP_BODY_LABEL));
       assertFalse(unlabled.containsLabel(anotherSedLabel));
 		// Test oneLabel
       assertTrue(oneLabel.hasLabels());
@@ -64,24 +65,24 @@ public class LabeledTermImplTest extends TestCase {
       assertEquals(1, oneLabel.getLabels().size());
       assertSame(sedLabel, oneLabel.getLabels().get(0));
       assertTrue(oneLabel.containsLabel(sedLabel));
-      assertFalse(oneLabel.containsLabel(LoopBodyTermLabel.INSTANCE));
+      assertFalse(oneLabel.containsLabel(ParameterlessTermLabel.LOOP_BODY_LABEL));
       assertFalse(oneLabel.containsLabel(anotherSedLabel));
       // Test oneLabledAgain
       assertTrue(oneLabelChanged.hasLabels());
       assertNotNull(oneLabelChanged.getLabels());
       assertEquals(1, oneLabelChanged.getLabels().size());
-      assertSame(LoopBodyTermLabel.INSTANCE, oneLabelChanged.getLabels().get(0));
+      assertSame(ParameterlessTermLabel.LOOP_BODY_LABEL, oneLabelChanged.getLabels().get(0));
       assertFalse(oneLabelChanged.containsLabel(sedLabel));
-      assertTrue(oneLabelChanged.containsLabel(LoopBodyTermLabel.INSTANCE));
+      assertTrue(oneLabelChanged.containsLabel(ParameterlessTermLabel.LOOP_BODY_LABEL));
       assertFalse(oneLabelChanged.containsLabel(anotherSedLabel));
       // Test twoLabels
       assertTrue(twoLabels.hasLabels());
       assertNotNull(twoLabels.getLabels());
       assertEquals(2, twoLabels.getLabels().size());
-      assertSame(LoopBodyTermLabel.INSTANCE, twoLabels.getLabels().get(0));
+      assertSame(ParameterlessTermLabel.LOOP_BODY_LABEL, twoLabels.getLabels().get(0));
       assertSame(sedLabel, twoLabels.getLabels().get(1));
       assertTrue(twoLabels.containsLabel(sedLabel));
-      assertTrue(twoLabels.containsLabel(LoopBodyTermLabel.INSTANCE));
+      assertTrue(twoLabels.containsLabel(ParameterlessTermLabel.LOOP_BODY_LABEL));
       assertFalse(twoLabels.containsLabel(anotherSedLabel));
 	}
 }

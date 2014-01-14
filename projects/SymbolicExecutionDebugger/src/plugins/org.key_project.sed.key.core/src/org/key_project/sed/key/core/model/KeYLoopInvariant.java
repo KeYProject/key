@@ -200,7 +200,12 @@ public class KeYLoopInvariant extends AbstractSEDLoopInvariant implements IKeYSE
       SourceLocation guardLocation = KeYUtil.convertToSourceLocation(computeGuardPositionInfo());
       // Return location of loop using JDT
       ASTNode guardASTNode = KeYModelUtil.findASTNode(this, guardLocation);
-      return KeYModelUtil.updateLocationFromAST(guardLocation, guardASTNode.getParent());
+      if (guardASTNode != null) {
+         return KeYModelUtil.updateLocationFromAST(guardLocation, guardASTNode.getParent());
+      }
+      else {
+         return guardLocation;
+      }
    }
 
    /**

@@ -27,7 +27,7 @@ import de.uka.ilkd.key.rule.*;
  * The rule application that is used when a goal is closed by means of an external solver. So far 
  * it stores the rule that that has been used and a title containing some information for the user.
  */
-public class RuleAppSMT extends AbstractBuiltInRuleApp { 
+public class RuleAppSMT extends AbstractBuiltInRuleApp {
 
     public final static SMTRule rule = new SMTRule();
     private final String title;
@@ -84,6 +84,7 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
 	public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 	    return false;
 	}
+
 
 	@Override
 	public ImmutableList<Goal> apply(Goal goal, Services services,

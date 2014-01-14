@@ -85,7 +85,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
      * The resulting contract has an empty precondition, the assert expression
      * as a postcondition, and strictly_nothing as frame.
      */
-    static TextualJMLSpecCase assert2blockContract (ImmutableList<String> mods, PositionedString assertStm) {
+    public static TextualJMLSpecCase assert2blockContract (ImmutableList<String> mods, PositionedString assertStm) {
         final TextualJMLSpecCase res = new TextualJMLSpecCase(mods, Behavior.NORMAL_BEHAVIOR);
         res.addName(new PositionedString("assert "+assertStm.text, assertStm.fileName, assertStm.pos));
         res.addEnsures(assertStm);

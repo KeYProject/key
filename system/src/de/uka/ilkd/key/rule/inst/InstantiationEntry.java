@@ -15,11 +15,11 @@ package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
-/** This is an abstract clas that encapsulates a schemvariable and its
+/** This is an abstract class that encapsulates a schemavariable and its
  *  instantiation. It is needed because schemavariables can be
  *  instantiated as ProgramElements and as Terms according to their
  *  type. But we have to put the pair (schemavariable,
- *  term/programelment) in one map. Therefore a map from
+ *  term/program-element) in one map. Therefore a map from
  *  SchemaVariable to InstantiationEntry is used
  */
 public abstract class InstantiationEntry  {
@@ -34,8 +34,8 @@ public abstract class InstantiationEntry  {
 	this.sv = sv; 
     }
 
-    /** returns the intantiation of the SchemaVariable 
-     * @return  the intantiation of the SchemaVariable 
+    /** returns the instantiation of the SchemaVariable
+     * @return  the instantiation of the SchemaVariable
     */
     public abstract Object getInstantiation();
 

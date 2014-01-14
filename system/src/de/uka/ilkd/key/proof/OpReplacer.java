@@ -14,7 +14,6 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -124,7 +123,8 @@ public class OpReplacer {
             result = TF.createTerm(newOp,
                                    newSubTerms,
                                    newBoundVars,
-                                   term.javaBlock());
+                                   term.javaBlock(),
+                                   term.getLabels());
         } else {
             result = term;
         }

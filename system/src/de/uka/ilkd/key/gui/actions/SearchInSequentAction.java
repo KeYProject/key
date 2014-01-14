@@ -18,6 +18,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import java.awt.Toolkit;
 
 /*
@@ -25,6 +26,8 @@ import java.awt.Toolkit;
  * Keyboard shortcut: STRG+F.
  */
 public class SearchInSequentAction extends MainWindowAction {
+
+    private static final long serialVersionUID = -9002009635814787502L;
 
     public SearchInSequentAction(MainWindow mainWindow) {
         super(mainWindow);
@@ -38,6 +41,10 @@ public class SearchInSequentAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        SequentView view = mainWindow.sequentSearchBar.getSequentView();
+        String searchString = view.getHighlightedText();
+        mainWindow.sequentSearchBar.searchField.setText(searchString);
         mainWindow.sequentSearchBar.setVisible(true);
+        mainWindow.sequentSearchBar.search();
     }
 }

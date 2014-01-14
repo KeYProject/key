@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.compute(array);" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (array.length==1) {return 42; }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="!array = null" pathCondition="!array = null" pathConditionChanged="true" branchCondition="!array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <branchCondition name="array.length &gt;= 0 -&gt; array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="true" branchCondition="array.length &gt;= 0 -&gt; array.length = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <statement name="return 42;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of self.compute(array);&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false" isReturnValueComputed="false">
-                     <termination name="&lt;end&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+      <branchStatement name="if (array.length==1)" pathCondition="true" pathConditionChanged="false">
+         <branchCondition name="not(equals(array,null))" pathCondition="not(equals(array,null))" pathConditionChanged="true" branchCondition="not(equals(array,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchCondition name="imp(geq(length(array),Z(0(#))),equals(length(array),Z(1(#))))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="true" branchCondition="imp(geq(length(array),Z(0(#))),equals(length(array),Z(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="return 42;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of self.compute(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="false" isReturnValueComputed="false">
+                     <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>
             </branchCondition>
-            <branchCondition name="!array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="true" branchCondition="!array.length = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <statement name="return -100;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of self.compute(array);&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" isReturnValueComputed="false">
-                     <termination name="&lt;end&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+            <branchCondition name="not(equals(length(array),Z(1(#))))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="true" branchCondition="not(equals(length(array),Z(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="return -100;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of self.compute(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="false" isReturnValueComputed="false">
+                     <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>
             </branchCondition>
          </branchCondition>
-         <branchCondition name="array = null" pathCondition="array = null" pathConditionChanged="true" branchCondition="array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="array = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+         <branchCondition name="equals(array,null)" pathCondition="equals(array,null)" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
             </termination>
          </branchCondition>
       </branchStatement>

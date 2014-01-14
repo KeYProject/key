@@ -196,10 +196,10 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
     }
-    
+
     @Override
     public KeyStroke getKeyStroke () {
-    	return KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.SHIFT_DOWN_MASK);
+	return KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.SHIFT_DOWN_MASK);
     }
 
     @Override

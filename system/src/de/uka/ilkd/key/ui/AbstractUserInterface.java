@@ -44,7 +44,7 @@ public abstract class AbstractUserInterface implements UserInterface {
 
     @Override
 	public  IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
-    	app = forced? app.forceInstantiate(goal): app.tryToInstantiate(goal);
+	app = forced? app.forceInstantiate(goal): app.tryToInstantiate(goal);
 		// cannot complete that app
 		return app.complete() ? app : null;
 	}

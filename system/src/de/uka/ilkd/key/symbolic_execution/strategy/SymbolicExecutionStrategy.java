@@ -13,9 +13,9 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import de.uka.ilkd.key.logic.label.LoopBodyTermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
@@ -115,8 +115,8 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
              return pos != null && SymbolicExecutionUtil.hasSymbolicExecutionLabel(pos.subTerm());
           }
        }), longConst(-3000)));
-       // Make sure that the modality which executes a loop body is preferred against the modalities which executes special loop terminations like return, exceptions or break. 
-       globalF = add(globalF, ifZero(new ContainsLabelFeature(LoopBodyTermLabel.INSTANCE), longConst(-2000)));       
+       // Make sure that the modality which executes a loop body is preferred against the modalities which executes special loop terminations like return, exceptions or break.
+       globalF = add(globalF, ifZero(new ContainsLabelFeature(ParameterlessTermLabel.LOOP_BODY_LABEL), longConst(-2000)));
        globalF = add(globalF, querySideProofFeature());       
        globalF = add(globalF, modalitySideProofFeature());       
        return globalF;

@@ -28,7 +28,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
    public void testInvariantInOperationContract() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/InvariantInOperationContract/InvariantInOperationContract.java", 
-                            "InvariantInOperationContract", 
+                            "InvariantInOperationContract",
                             "main", 
                             false,
                             new ClassAxiomAndInvariantProofReferencesAnalyst(),
@@ -47,7 +47,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
    public void testNestedInvariantInOperationContract() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/NestedInvariantInOperationContract/NestedInvariantInOperationContract.java", 
-                            "NestedInvariantInOperationContract", 
+                            "NestedInvariantInOperationContract",
                             "main", 
                             false,
                             new ClassAxiomAndInvariantProofReferencesAnalyst(),
@@ -66,7 +66,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
    public void testModelFieldTest_doubleX() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/ModelFieldTest/ModelFieldTest.java", 
-                            "ModelFieldTest", 
+                            "test.ModelFieldTest",
                             "doubleX", 
                             false,
                             new ClassAxiomAndInvariantProofReferencesAnalyst(),
@@ -80,7 +80,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
    public void testModelFieldTest_f() throws Exception {
       doReferenceFunctionTest(keyRepDirectory, 
                               "examples/_testcase/proofReferences/ModelFieldTest/ModelFieldTest.java", 
-                              "ModelFieldTest", 
+                              "test.ModelFieldTest",
                               "test.ModelFieldTest::$f", 
                               false,
                               new ClassAxiomAndInvariantProofReferencesAnalyst(),
@@ -94,11 +94,12 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
    public void testAccessibleTest() throws Exception {
       doReferenceFunctionTest(keyRepDirectory, 
                               "examples/_testcase/proofReferences/AccessibleTest/AccessibleTest.java", 
-                              "B", 
+                              "test.B",
                               "java.lang.Object::<inv>", 
                               false,
                               new ClassAxiomAndInvariantProofReferencesAnalyst(),
                               new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),java.lang.Object::<inv>(heap,test.AccessibleTest::select(heap,self,test.B::$c)))"),
+                              new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),true)"),
                               new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),true)"));
    }
 }

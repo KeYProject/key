@@ -4,7 +4,7 @@
       <statement name="doLoop();" pathCondition="true" pathConditionChanged="false">
          <methodCall name="self.doLoop();" pathCondition="true" pathConditionChanged="false">
             <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
-               <loopStatement name="while ( i&lt;3 ) {   i+=innerLoop(); }" pathCondition="true" pathConditionChanged="false">
+               <loopStatement name="while ( i&lt;3 )" pathCondition="true" pathConditionChanged="false">
                   <loopCondition name="i&lt;3" pathCondition="true" pathConditionChanged="false">
                      <statement name="i+=innerLoop();" pathCondition="true" pathConditionChanged="false">
                         <methodCall name="self.innerLoop();" pathCondition="true" pathConditionChanged="false">
@@ -25,7 +25,7 @@
                                                                      <statement name="doLoop();" pathCondition="true" pathConditionChanged="false">
                                                                         <methodCall name="self.doLoop();" pathCondition="true" pathConditionChanged="false">
                                                                            <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
-                                                                              <loopStatement name="while ( i_1&lt;3 ) {   i_1+=innerLoop(); }" pathCondition="true" pathConditionChanged="false">
+                                                                              <loopStatement name="while ( i_1&lt;3 )" pathCondition="true" pathConditionChanged="false">
                                                                                  <loopCondition name="i_1&lt;3" pathCondition="true" pathConditionChanged="false">
                                                                                     <statement name="i_1+=innerLoop();" pathCondition="true" pathConditionChanged="false">
                                                                                        <methodCall name="self.innerLoop();" pathCondition="true" pathConditionChanged="false">

@@ -76,8 +76,8 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
    public void testAssignment_ProofStillOpen() throws Exception {
       doStartProofTest("SWTBotManualRuleApplicationTest_testAssignment_ProofStillOpen", 
                        null,
-                       100, // x of assignment text control of editor
-                       160, // y of assignment text control of editor
+                       110, // x of assignment text control of editor
+                       180, // y of assignment text control of editor
                        "assignment",
                        false);
    }

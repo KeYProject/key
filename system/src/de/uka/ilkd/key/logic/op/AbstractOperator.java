@@ -97,7 +97,7 @@ abstract class AbstractOperator implements Operator {
     
     
     @Override
-    public final boolean validTopLevel(Term term) {
+    public boolean validTopLevel(Term term) {
 	if(arity != term.arity()
 	   || arity != term.subs().size()
 	   || (whereToBind == null) != term.boundVars().isEmpty()) {

@@ -32,6 +32,7 @@ import javax.swing.JCheckBox;
 
 public class SequentSearchBar extends SearchBar {
 
+    private static final long serialVersionUID = 9102464983776181771L;
     public static final Color SEARCH_HIGHLIGHT_COLOR_1 =
             new Color(255, 140, 0, 178);
     public static final Color SEARCH_HIGHLIGHT_COLOR_2 =
@@ -51,7 +52,11 @@ public class SequentSearchBar extends SearchBar {
         this.sequentView = sequentView;
         search();
     }
-    
+
+    public SequentView getSequentView() {
+        return this.sequentView;
+    }
+
     @Override
     public void createUI(){
         super.createUI();
@@ -170,7 +175,7 @@ public class SequentSearchBar extends SearchBar {
     }
     
     private void clearSearchResults() {
-        for (Pair result : searchResults) {
+        for (Pair<Integer, Object> result : searchResults) {
             sequentView.removeHighlight(result.second);
         }
         searchResults.clear();

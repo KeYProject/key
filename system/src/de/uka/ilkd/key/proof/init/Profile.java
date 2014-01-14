@@ -14,16 +14,14 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.label.ITermLabelWorker;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 
@@ -49,7 +47,7 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
  * </p>
  * <p>
  * Each {@link Profile} has a unique name {@link #name()}.
- * </p> 
+ * </p>
  * <p>
  * It is recommended
  * to have only one instance of each {@link Profile}. The default instances
@@ -124,28 +122,19 @@ public interface Profile {
     /** returns the (default) justification for the given rule */
     RuleJustification getJustification(Rule r);
 
-    
+
     /**
      * returns the file name of the internal class directory relative to JavaRedux
      * @return the file name of the internal class directory relative to JavaRedux
      */
     String getInternalClassDirectory();
-	
+
     /**
      * returns the file name of the internal class list
      * @return the file name of the internal class list
      */
     String getInternalClasslistFilename();
-    
-    /**
-     * <p>
-     * Returns the {@link ITermLabelWorker}s to use when a rule on a {@link Proof} of this {@link Profile} is applied.
-     * </p>
-     * <p>
-     * For more information about {@link ITermLabel} read its documentation.
-     * </p>
-     * @return The {@link ITermLabelWorker}s to use when a rule is applied.
-     * @see ITermLabel
-     */
-    ImmutableList<ITermLabelWorker> getLabelInstantiators();
+
+
+    TermLabelManager getTermLabelManager();
 }

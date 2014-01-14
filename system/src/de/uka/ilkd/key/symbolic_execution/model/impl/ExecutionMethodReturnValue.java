@@ -17,9 +17,9 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 
 /**
  * The default implementation of {@link IExecutionMethodReturnValue}.
@@ -29,7 +29,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
    /**
     * The return value.
     */
-   private Term returnValue;
+   private final Term returnValue;
 
    /**
     * The return value as human readable {@link String}.
@@ -39,22 +39,27 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
    /**
     * The optional condition.
     */
-   private Term condition;
+   private final Term condition;
 
    /**
-    * The optinal condition as human readable {@link String}.
+    * The optional condition as human readable {@link String}.
     */
    private String conditionString;
    
    /**
     * Constructor.
+    * @param settings The {@link ITreeSettings} to use.
     * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param returnValue The return value.
     * @param condition The optional condition or {@code null} if no condition is available.
     */
-   public ExecutionMethodReturnValue(KeYMediator mediator, Node proofNode, Term returnValue, Term condition) {
-      super(mediator, proofNode);
+   public ExecutionMethodReturnValue(ITreeSettings settings,
+                                     KeYMediator mediator, 
+                                     Node proofNode, 
+                                     Term returnValue, 
+                                     Term condition) {
+      super(settings, mediator, proofNode);
       assert returnValue != null;
       this.returnValue = returnValue;
       this.condition = condition;
@@ -106,8 +111,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
     * @return The human readable return value.
     */
    protected String lazyComputeReturnValueString() throws ProofInputException {
-      StringBuffer returnValueSB = ProofSaver.printTerm(returnValue, getServices(), true);
-      return returnValueSB.toString();
+      return formatTerm(returnValue);
    }
 
    /**
@@ -144,8 +148,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
     */
    protected String lazyComputeConditionString() throws ProofInputException {
       if (hasCondition()) {
-         StringBuffer conditionSB = ProofSaver.printTerm(condition, getServices(), true);
-         return conditionSB.toString();
+         return formatTerm(condition);
       }
       else {
          return null;

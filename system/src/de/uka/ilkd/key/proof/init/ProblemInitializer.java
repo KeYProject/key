@@ -48,7 +48,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
@@ -327,21 +326,21 @@ public final class ProblemInitializer {
     }
     
     
-    public final void readEnvInput(EnvInput envInput, 
-			      InitConfig initConfig) 
+    public final void readEnvInput(EnvInput envInput,
+			      InitConfig initConfig)
     		throws ProofInputException {
 	if(alreadyParsed.add(envInput)){
 	    // read includes
 	    if(!(envInput instanceof LDTInput)) {
 		readIncludes(envInput, initConfig);
 	    }
-	    
+
 	    // read envInput itself
-	    reportStatus("Reading "+envInput.name(), 
+	    reportStatus("Reading "+envInput.name(),
 		    	 envInput.getNumberOfChars());
-	    envInput.setInitConfig(initConfig);	    
-	    envInput.read();	
-	    
+	    envInput.setInitConfig(initConfig);
+	    envInput.read();
+
 	    // reset the variables namespace
 	    initConfig.namespaces().setVariables(new Namespace());
 	}
@@ -467,7 +466,7 @@ public final class ProblemInitializer {
 						profile.getStandardRules().getTacletBase(),
 						progMon,
 						profile);
-				readEnvInput(tacletBaseFile, newBaseConfig);			
+				readEnvInput(tacletBaseFile, newBaseConfig);
 			}
 			// remove traces of the generic sorts within the base configuration
 			cleanupNamespaces(newBaseConfig);
@@ -525,6 +524,9 @@ public final class ProblemInitializer {
 
         //read envInput
         readEnvInput(envInput, initConfig);
+
+        //remove generic sorts defined in KeY file
+        cleanupNamespaces(initConfig);
 
         //done
         if(listener !=null){

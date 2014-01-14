@@ -21,6 +21,7 @@ import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.NotFreeIn;
 import de.uka.ilkd.key.rule.Taclet;
@@ -80,7 +81,7 @@ public class TacletPrefixBuilder {
             t.arity() == 0 &&
 	    !(t.op() instanceof VariableSV) &&
 	    !(t.op() instanceof ProgramSV) &&
-	    !(t.op() instanceof SkolemTermSV)) { 
+	    !(t.op() instanceof SkolemTermSV)) {
 	    SchemaVariable sv = (SchemaVariable)t.op();
 	    ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
 	    TacletPrefix prefix = prefixMap.get(sv);
@@ -92,12 +93,29 @@ public class TacletPrefixBuilder {
 						 prefix, 
 						 relevantBoundVars);
 	    }
-	} 
+	}
 	for (int i=0; i<t.arity(); i++) {
 	    ImmutableSet<SchemaVariable> oldBounds=currentlyBoundVars;
 	    addVarsBoundHere(t, i);
 	    visit(t.sub(i));
 	    currentlyBoundVars=oldBounds;
+	}
+	if (t.hasLabels()) {
+	    for (TermLabel l: t.getLabels()) {
+	        if (l instanceof SchemaVariable) {
+	            SchemaVariable sv = (SchemaVariable)l;
+	            ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
+	            TacletPrefix prefix = prefixMap.get(sv);
+	            if (prefix == null || prefix.prefix().equals(relevantBoundVars)) {
+	                setPrefixOfOccurrence(sv, relevantBoundVars);
+	            } else {
+	                throw new InvalidPrefixException(tacletBuilder.getName().toString(),
+	                        sv,
+	                        prefix,
+	                        relevantBoundVars);
+	            }
+	        }
+	    }
 	}
     }
     

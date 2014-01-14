@@ -5,12 +5,12 @@
       <term term="y"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return add_1;">
-      <value name="exc_2" programVariable="exc_2" isArrayIndex="false" arrayIndex="-1" value="exc_2" type="java.lang.Exception"/>
+      <value name="exc_2" programVariable="exc_2" isArrayIndex="false" arrayIndex="-1" value="exc_2" type="java.lang.Throwable"/>
       <value name="result_0" programVariable="result_0" isArrayIndex="false" arrayIndex="-1" value="result_0" type="int"/>
       <association name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" target="o1"/>
       <association name="y" programVariable="y" isArrayIndex="false" arrayIndex="-1" target="o1"/>
    </state>
    <object xml:id="o1" name="x" type="ConfigurationExtractorWithOperationContractsTest.IntWrapper">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="x.value" type="int"/>
+      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="int::select(heap,x,ConfigurationExtractorWithOperationContractsTest.IntWrapper::$value)" type="int"/>
    </object>
 </model>

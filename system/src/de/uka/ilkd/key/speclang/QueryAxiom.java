@@ -276,7 +276,7 @@ public final class QueryAxiom extends ClassAxiom {
 	
 	return DefaultImmutableSet.<Taclet>nil().add(tacletBuilder.getTaclet());
 	//return DefaultImmutableSet.<Taclet>nil();
-    }    
+    }
     
     
     @Override

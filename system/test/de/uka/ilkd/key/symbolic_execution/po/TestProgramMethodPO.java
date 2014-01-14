@@ -37,7 +37,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
     */
    public void testComplicatedInnerMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
-             "TheInnerClass",
+             "my.packageName.TheClass.TheInnerClass",
              "complicatedInnerMethod",
              "examples/_testcase/set/fullqualifiedTypeNamesTest/oracle/TheInnerClass_complicatedInnerMethod.xml",
              null,
@@ -49,7 +49,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
     */
    public void testComplicatedMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
-             "TheClass",
+             "my.packageName.TheClass",
              "complicatedMethod",
              "examples/_testcase/set/fullqualifiedTypeNamesTest/oracle/TheClass_complicatedMethod.xml",
              "a == 2 && b && x != null && \"Hello\" == x",
@@ -61,7 +61,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
     */
    public void testComplicatedMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
-             "TheClass",
+             "my.packageName.TheClass",
              "complicatedMethod",
              "examples/_testcase/set/fullqualifiedTypeNamesTest/oracle/TheClass_complicatedMethod.xml",
              null,
@@ -127,11 +127,13 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
                          String expectedTryContent) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       HashMap<String, String> originalTacletOptions = null;
       SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = null;
+      boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
+         setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, false, false, false, false);
+         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, false, false, false, false, false);
          // Extract and test try content
          String tryContent = getTryContent(env.getProof());
          assertTrue("Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".", JavaUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent));
@@ -141,7 +143,8 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
          assertSaveAndReload(keyRepDirectory, javaPathInkeyRepDirectory, oraclePathInBaseDirFile, env);
       }
       finally {
-         // Restore taclet options
+         // Restore original options
+         setOneStepSimplificationEnabled(null, originalOneStepSimplification);
          restoreTacletOptions(originalTacletOptions);
          if (env != null) {
             env.dispose();

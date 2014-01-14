@@ -163,18 +163,18 @@ public class Semisequent implements Iterable<SequentFormula> {
 	while ( !searchList.isEmpty() ) {
 	    ++pos;
 	    cf         = searchList.head ();
-	    searchList = searchList.tail();	    
-	    
-	    if (cf.formula().equalsModRenaming(conForm.formula())) {		  
-		
+	    searchList = searchList.tail();
+
+	    if (conForm != null && cf.formula().equalsModRenaming(conForm.formula())) {
+
 	    semiCI.rejectedFormula( cf );
 		return semiCI; // semisequent already contains formula
 
 	    }
-	    newSeqList = newSeqList.prepend ( cf );	    	    
-	}           
+	    newSeqList = newSeqList.prepend ( cf );
+	}
 
-	
+
 	// compose resulting formula list
 	if ( fci == null )
 	    semiCI.addedFormula(idx, conForm);

@@ -486,7 +486,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
                 // It can be that a quantifiable variable is not a logical
                 // variable but a schema
                 // variable. In this case the schema variable is replaced with a
-                // logical varibale.
+                // logical variable.
                 if (term.op() instanceof Quantifier) {
                         LinkedList<QuantifiableVariable> list = new LinkedList<QuantifiableVariable>();
 
@@ -499,7 +499,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
                         term = TermFactory.DEFAULT.createTerm(term.op(),
                                         term.subs(), array,
-                                        JavaBlock.EMPTY_JAVABLOCK);
+                                        JavaBlock.EMPTY_JAVABLOCK,
+                                        term.getLabels());
 
                 }
 

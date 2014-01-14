@@ -606,10 +606,8 @@ public final class Goal  {
                     throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " 
                             + ruleApp);
                 }
-
                 ImmutableList<UpdateLabelPair> newUpdCtx =
                         newConditions.getInstantiations().getUpdateContext();
-
                 if(!oldUpdCtx.equals(newUpdCtx)) {
                     System.err.println("old context: " + oldUpdCtx);
                     System.err.println("new context: " + oldUpdCtx);
