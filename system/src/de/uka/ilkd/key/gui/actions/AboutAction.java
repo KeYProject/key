@@ -33,6 +33,7 @@ public class AboutAction extends MainWindowAction {
     public AboutAction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("About KeY");
+        setIcon(IconFactory.help(16));
 	// About KeY
     }
 
