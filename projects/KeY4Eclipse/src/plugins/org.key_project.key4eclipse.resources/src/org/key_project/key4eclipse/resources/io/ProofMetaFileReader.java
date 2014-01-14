@@ -1,14 +1,15 @@
 package org.key_project.key4eclipse.resources.io;
 
-import java.io.File;
 import java.util.LinkedList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.resources.IFile;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -21,20 +22,20 @@ public class ProofMetaFileReader {
    
    private Element rootElement;
    private String proofFileMD5;
-   LinkedList<ProofMetaFileTypeElement> typeElemens; // TODO: Make private
+   private LinkedList<ProofMetaFileTypeElement> typeElemens;
    
    
    /**
     * The Constructor that automatically reads the given meta{@link IFile} and Provides the content.
     * @param metaIFile
+    * @throws ParserConfigurationException 
     * @throws Exception
     */
-   public ProofMetaFileReader(IFile metaIFile) throws Exception{ // Change Exception to ProofMetaFileContentException. Other exceptions are never thrown. It is legal for me to throw SAXException 
-      File metaFile = metaIFile.getLocation().toFile();
+   public ProofMetaFileReader(IFile metaIFile) throws Exception{ //No there are more --> Change Exception to ProofMetaFileContentException. Other exceptions are never thrown. It is legal for me to throw SAXException 
       DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
       DocumentBuilder dBuilder = docFactory.newDocumentBuilder();
       try{
-         Document doc = dBuilder.parse(metaFile); // TODO: Use metaIFIle.getContents() instead
+         Document doc = dBuilder.parse(metaIFile.getContents());
          this.rootElement = doc.getDocumentElement();
          this.proofFileMD5 = readMD5();
          this.typeElemens = readAllTypeElements();
@@ -71,7 +72,20 @@ public class ProofMetaFileReader {
       NodeList nodeList = rootElement.getElementsByTagName("proofFileMD5");
       if(nodeList.getLength() == 1){
          Node node = nodeList.item(0);
-         return node.getTextContent();
+         NamedNodeMap attrMap = node.getAttributes();
+         if(attrMap.getLength() == 1){
+            Node attrNode = attrMap.item(0);
+            if("md5".equals(attrNode.getNodeName())){
+               String md5 = attrNode.getNodeValue();
+               return md5;
+            }
+            else{
+               throw new ProofMetaFileContentException("No md5 attribute found for proofFileMD5");
+            }
+         }
+         else{
+            throw new ProofMetaFileContentException("To many attributes for proofFileMD5");
+         }
       }
       else if(nodeList.getLength() > 1){
          throw new ProofMetaFileContentException("More then one prooffile-MD5 found in this file");
@@ -92,16 +106,24 @@ public class ProofMetaFileReader {
       NodeList nodeList = rootElement.getChildNodes();
       for(int i = 0; i < nodeList.getLength(); i++){
          Node node = nodeList.item(i);
-         if(i == 0){
-            if(!"proofFileMD5".equals(node.getNodeName())){
-               throw new ProofMetaFileContentException("No prooffile-MD5 found in this file");
+         if("type".equals(node.getNodeName()) && i != 0){
+            NamedNodeMap attrMap = node.getAttributes();
+            if(attrMap.getLength() == 1){
+               Node attrNode = attrMap.item(0);
+               if("name".equals(attrNode.getNodeName())){
+                  String name = attrNode.getNodeValue();
+                  typeElements.add(new ProofMetaFileTypeElement(name, readAllSubTypes(node)));
+               }
+               else{
+                  throw new ProofMetaFileContentException("No type attribute found for this type");
+               }
+            }
+            else{
+               throw new ProofMetaFileContentException("To many attributes for this type");
             }
          }
-         else if("type".equals(node.getNodeName())){
-            typeElements.add(new ProofMetaFileTypeElement(node.getFirstChild().getTextContent(), readAllSubTypes(node)));
-         }
-         else{
-            throw new ProofMetaFileContentException("Illegal entry in file");
+         else if(i == 0 && !"proofFileMD5".equals(node.getNodeName())){
+            throw new ProofMetaFileContentException("Illegal entry in file. First Element is not MD5");
          }
       }
       return typeElements;
@@ -119,13 +141,21 @@ public class ProofMetaFileReader {
       NodeList nodeList = node.getChildNodes();
       for(int i = 0; i < nodeList.getLength(); i++){
          Node subNode = nodeList.item(i);
-         if(i == 0){
-            if(!"#text".equals(subNode.getNodeName())){
-               throw new ProofMetaFileContentException("Illegal entry in this file");
+         if("subType".equals(subNode.getNodeName())){
+            NamedNodeMap attrMap = node.getAttributes();
+            if(attrMap.getLength() == 1){
+               Node attrNode = attrMap.item(0);
+               if("name".equals(attrNode.getNodeName())){
+                  String name = attrNode.getNodeValue();
+                  subTypeList.add(name);
+               }
+               else{
+                  throw new ProofMetaFileContentException("No type attribute found for this subtype");
+               }
             }
-         }
-         else if("subType".equals(subNode.getNodeName())){
-            subTypeList.add(subNode.getTextContent());
+            else{
+               throw new ProofMetaFileContentException("To many attributes for this subtype");
+            }
          }
          else{
             throw new ProofMetaFileContentException("Illegal entry in this file");
