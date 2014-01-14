@@ -71,7 +71,22 @@ public class IconFactory {
     private static Image saveFile = 
         getImage("images/toolbar/saveFile.png");
     private static Image editFile = 
-        getImage("images/toolbar/editFile.gif");    
+        getImage("images/toolbar/edit.png");    
+    private static Image abandonProof = getImage("images/toolbar/abandon.png");
+    private static Image configure = getImage("images/toolbar/config.png");
+    private static Image help = getImage("images/toolbar/help.png");
+    private static Image macros = getImage("images/toolbar/macros.png");
+    private static Image proofMgt = getImage("images/toolbar/mgt.png");
+    private static Image properties = getImage("images/toolbar/properties.png");
+    private static Image quit = getImage("images/toolbar/quit.png");
+    private static Image recentFiles = getImage("images/toolbar/recent.png");
+    private static Image search = getImage("images/toolbar/search.png");
+    private static Image search2 = getImage("images/toolbar/search2.png");
+    private static Image statistics = getImage("images/toolbar/statistics.png");
+    private static Image toolbox = getImage("images/toolbar/toolbox.png");
+
+    private static Image plus = getImage("images/toolbar/plus.png");
+    private static Image minus = getImage("images/toolbar/minus.png");
 
     private static Image interactiveAppLogo = 
         getImage("images/interactiveAppLogo.png");
@@ -85,6 +100,64 @@ public class IconFactory {
     public static ImageIcon scaleIcon(Image im, int x, int y) {
 	Image scaledim=im.getScaledInstance(x,y,Image.SCALE_SMOOTH);
 	return new ImageIcon(scaledim);
+    }
+
+    public static ImageIcon abandonProof (int x) {
+        return scaleIcon(abandonProof ,x,x);
+    }
+
+    public static ImageIcon configure (int x) {
+        return scaleIcon(configure ,x,x);
+    }
+
+    public static ImageIcon help (int x) {
+        return scaleIcon(help ,x,x);
+    }
+
+    public static ImageIcon macros (int x) {
+        return scaleIcon(macros ,x,x);
+    }
+
+    public static ImageIcon proofMgt (int x) {
+        return scaleIcon(proofMgt ,x,x);
+    }
+
+    public static ImageIcon properties (int x) {
+        return scaleIcon(properties ,x,x);
+    }
+
+    public static ImageIcon quit (int x) {
+        return scaleIcon(quit ,x,x);
+    }
+
+    public static ImageIcon recentFiles (int x) {
+        return scaleIcon(recentFiles ,x,x);
+    }
+
+    public static ImageIcon search (int x) {
+        return scaleIcon(search ,x,x);
+    }
+
+    public static ImageIcon search2 (int x) {
+        return scaleIcon(search2 ,x,x);
+    }
+
+    public static ImageIcon statistics(int x) {
+        return scaleIcon(statistics,x,x);
+    }
+
+
+    public static ImageIcon toolbox(int x) {
+        return scaleIcon(toolbox,x,x);
+    }
+
+
+    public static ImageIcon plus(int x) {
+        return scaleIcon(plus,x,x);
+    }
+
+    public static ImageIcon minus(int x) {
+        return scaleIcon(minus,x,x);
     }
 
     public static ImageIcon keyHole(int x, int y) {
