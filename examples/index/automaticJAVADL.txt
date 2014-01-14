@@ -16,6 +16,7 @@
 
 
 # Comprehension Tests
+provable: ./heap/comprehensions/general_sum.key
 provable: ./heap/comprehensions/sum0.key
 provable: ./heap/comprehensions/sum1.key
 provable: ./heap/comprehensions/sum2.key
@@ -67,7 +68,8 @@ provable: ./heap/block_contracts/Simple__unnecessaryLoopInvariant.key
 provable: ./standard_key/java_dl/jml-assert/assert.key
 
 # Other tests:
-provable: ./heap/fm12_01_LCP/lcp.key
+provable: ./heap/fm12_01_LRS/lcp.key
+provable: ./heap/SemanticSlicing/project.key
 provable: ./heap/information_flow/ArrayList_contains.key
 provable: ./heap/information_flow/ArrayList_get.key
 provable: ./heap/information_flow/ArrayList_size.key
@@ -214,6 +216,8 @@ provable: ./heap/WeideEtAl_02_BinarySearch/BinarySearch_search.key
 provable: ./heap/Wellfounded/ackermann.key
 provable: ./heap/strictly_pure/strictlyPureMethod.key
 provable: ./heap/strictly_pure/useStrictlyPureMethod.key
+# this file contains Unicode symbols for logic operators
+provable: ./standard_key/unicode_test.key
 provable: ./standard_key/arith/binomial1.key
 provable: ./standard_key/arith/binomial2.key
 provable: ./standard_key/arith/check_jdiv.key
@@ -307,9 +311,9 @@ provable: ./standard_key/java_dl/java5/for_Array.key
 provable: ./standard_key/java_dl/java5/for_Iterable.key
 provable: ./standard_key/java_dl/java5/for_ReferenceArray.key
 provable: ./standard_key/java_dl/jml-bigint/cast.key
-# commented out as proof gets too long
+# proof gets very long
 # requires further investigations
-#provable: ./standard_key/java_dl/jml-information-flow.key
+provable: ./standard_key/java_dl/jml-information-flow.key
 notprovable: ./standard_key/java_dl/jml-min/min-unprovable1.key
 notprovable: ./standard_key/java_dl/jml-min/min-unprovable2.key
 provable: ./standard_key/java_dl/methodCall.key
@@ -459,5 +463,38 @@ notprovable: ./standard_key/arrays/arrayStoreException/array2Dim.key
 notprovable: ./standard_key/arrays/arrayStoreException/array2DimClose.key
 notprovable: ./standard_key/arrays/arrayStoreException/throwASEForPrim.key
 notprovable: ./standard_key/java_dl/danglingElse.key
+
+# Model methods tests:
+# (Note: some of the problems are trivial, but they should be kept
+# here as these problems provide the only test base for model methods)
+
+provable: ./heap/model_methods/Cell_footprint_acc.key
+provable: ./heap/model_methods/Cell_footprint.key
+provable: ./heap/model_methods/Cell_get_acc.key
+provable: ./heap/model_methods/Cell_get.key
+provable: ./heap/model_methods/Cell_post_set.key
+provable: ./heap/model_methods/Cell_set.key
+provable: ./heap/model_methods/CellTest_callSet.key
+provable: ./heap/model_methods/CellTest_test2.key
+provable: ./heap/model_methods/CellTest_test.key
+provable: ./heap/model_methods/Coll1_add.key
+provable: ./heap/model_methods/Coll1_Coll1_add_pre.key
+provable: ./heap/model_methods/Coll1_Coll_add_pre.key
+provable: ./heap/model_methods/Coll2_add.key
+provable: ./heap/model_methods/Coll2_Coll2_add_pre.key
+provable: ./heap/model_methods/Coll2_Coll_add_pre.key
+provable: ./heap/model_methods/Coll_add.key
+provable: ./heap/model_methods/Coll_add_pre.key
+provable: ./heap/model_methods/Indirect_callAdd.key
+provable: ./heap/model_methods/Indirect_test.key
+provable: ./heap/model_methods/Recell_Cell_footprint.key
+provable: ./heap/model_methods/Recell_Cell_post_set.key
+provable: ./heap/model_methods/Recell_footprint_acc.key
+provable: ./heap/model_methods/Recell_get_acc.key
+provable: ./heap/model_methods/Recell_get.key
+provable: ./heap/model_methods/Recell_Recell_footprint.key
+provable: ./heap/model_methods/Recell_Recell_post_set.key
+provable: ./heap/model_methods/Recell_set.key
+provable: ./heap/model_methods/Recell_undo.key
 
 # End -- please do not remove this line.

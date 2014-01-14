@@ -51,6 +51,11 @@ public class KeYSEDPreferences {
     * Preference key to define that branch conditions are merged or not.
     */
    public static final String MERGE_BRANCH_CONDITIONS = "org.key_project.sed.key.core.preference.mergeBranchConditions";
+
+   /**
+    * Preference key to define that pretty printing is used or not.
+    */
+   public static final String USE_PRETTY_PRINTING = "org.key_project.sed.key.core.preference.usePrettyPrinting";
    
    /**
     * Returns the managed {@link IPreferenceStore}.
@@ -218,5 +223,37 @@ public class KeYSEDPreferences {
     */
    public static void setDefaultMergeBranchConditions(boolean defaultValue) {
       getStore().setDefault(MERGE_BRANCH_CONDITIONS, defaultValue);
+   }
+   
+   /**
+    * Checks if pretty printing is used or not.
+    * @return Use pretty printing?
+    */
+   public static boolean isUsePrettyPrinting() {
+      return getStore().getBoolean(USE_PRETTY_PRINTING);
+   }
+   
+   /**
+    * Checks if pretty printing is used or not by default.
+    * @return Use pretty printing?
+    */
+   public static boolean isDefaultUsePrettyPrinting() {
+      return getStore().getDefaultBoolean(USE_PRETTY_PRINTING);
+   }
+   
+   /**
+    * Sets if pretty printing is used or not.
+    * @param value Use pretty printing?
+    */
+   public static void setUsePrettyPrinting(boolean value) {
+      getStore().setValue(USE_PRETTY_PRINTING, value);
+   }
+   
+   /**
+    * Sets if pretty printing is used or not by default.
+    * @param defaultValue Use pretty printing?
+    */
+   public static void setDefaultUsePrettyPrinting(boolean defaultValue) {
+      getStore().setDefault(USE_PRETTY_PRINTING, defaultValue);
    }
 }

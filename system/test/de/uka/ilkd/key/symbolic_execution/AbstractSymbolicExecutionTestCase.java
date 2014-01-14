@@ -934,6 +934,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useLoopInvarints Use loop invariants?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
+    * @param usePrettyPrinting Use pretty printing?
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
@@ -945,7 +946,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                                 boolean useOperationContracts,
                                                                                                                 boolean useLoopInvarints,
                                                                                                                 boolean nonExecutionBranchHidingSideProofs,
-                                                                                                                boolean aliasChecks) throws ProblemLoaderException, ProofInputException {
+                                                                                                                boolean aliasChecks,
+                                                                                                                boolean usePrettyPrinting) throws ProblemLoaderException, ProofInputException {
       // Make sure that required files exists
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
@@ -960,7 +962,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
-      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions);
+      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions, usePrettyPrinting);
       builder.analyse();
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<CustomConsoleUserInterface>(environment, builder);
@@ -980,6 +982,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useLoopInvarints Use loop invariants?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
+    * @param usePrettyPrinting Use pretty printing?
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
@@ -993,7 +996,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                                 boolean useOperationContracts,
                                                                                                                 boolean useLoopInvarints,
                                                                                                                 boolean nonExecutionBranchHidingSideProofs,
-                                                                                                                boolean aliasChecks) throws ProblemLoaderException, ProofInputException {
+                                                                                                                boolean aliasChecks,
+                                                                                                                boolean usePrettyPrinting) throws ProblemLoaderException, ProofInputException {
       // Make sure that required files exists
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
@@ -1008,7 +1012,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
-      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions);
+      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions, usePrettyPrinting);
       builder.analyse();
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<CustomConsoleUserInterface>(environment, builder);
@@ -1024,6 +1028,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useLoopInvarints Use loop invariants?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
+    * @param usePrettyPrinting Use pretty printing?
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProblemLoaderException Occurred Exception.
     */
@@ -1033,7 +1038,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                                 boolean useOperationContracts,
                                                                                                                 boolean useLoopInvarints,
                                                                                                                 boolean nonExecutionBranchHidingSideProofs,
-                                                                                                                boolean aliasChecks) throws ProblemLoaderException {
+                                                                                                                boolean aliasChecks,
+                                                                                                                boolean usePrettyPrinting) throws ProblemLoaderException {
       // Make sure that required files exists
       File proofFile = new File(baseDir, proofPathInBaseDir);
       assertTrue(proofFile.exists());
@@ -1044,7 +1050,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
-      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions);
+      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions, usePrettyPrinting);
       builder.analyse();
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<CustomConsoleUserInterface>(environment, builder);
@@ -1066,6 +1072,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useLoopInvarints Use loop invariants?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
+    * @param usePrettyPrinting Use pretty printing?
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
@@ -1081,7 +1088,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                                 boolean useOperationContracts,
                                                                                                                 boolean useLoopInvarints,
                                                                                                                 boolean nonExecutionBranchHidingSideProofs,
-                                                                                                                boolean aliasChecks) throws ProblemLoaderException, ProofInputException {
+                                                                                                                boolean aliasChecks,
+                                                                                                                boolean usePrettyPrinting) throws ProblemLoaderException, ProofInputException {
       // Make sure that required files exists
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
@@ -1096,7 +1104,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
-      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions);
+      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions, usePrettyPrinting);
       builder.analyse();
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<CustomConsoleUserInterface>(environment, builder);
@@ -1155,7 +1163,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          Proof reloadedProof = reloadedEnv.getLoadedProof();
          assertNotSame(env.getProof(), reloadedProof);
          // Recreate symbolic execution tree
-         reloadedBuilder = new SymbolicExecutionTreeBuilder(env.getUi().getMediator(), reloadedProof, false);
+         reloadedBuilder = new SymbolicExecutionTreeBuilder(env.getUi().getMediator(), reloadedProof, false, false);
          reloadedBuilder.analyse();
          assertSetTreeAfterStep(reloadedBuilder, oraclePathInBaseDirFile, baseDir);
       }
@@ -1261,6 +1269,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useLoopInvariants Use loop invariants?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
+    * @param usePrettyPrinting Use pretty printing?
     * @throws ProofInputException Occurred Exception
     * @throws IOException Occurred Exception
     * @throws ParserConfigurationException Occurred Exception
@@ -1281,7 +1290,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                             boolean useOperationContracts,
                             boolean useLoopInvariants,
                             boolean nonExecutionBranchHidingSideProofs,
-                            boolean aliasChecks) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+                            boolean aliasChecks,
+                            boolean usePrettyPrinting) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       assertNotNull(maximalNumberOfExecutedSetNodesPerRun);
       for (int i = 0; i < maximalNumberOfExecutedSetNodesPerRun.length; i++) {
          SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = doSETTest(baseDir, 
@@ -1298,7 +1308,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                   useOperationContracts,
                                                                                   useLoopInvariants,
                                                                                   nonExecutionBranchHidingSideProofs,
-                                                                                  aliasChecks);
+                                                                                  aliasChecks,
+                                                                                  usePrettyPrinting);
          env.dispose();
       }
    }
@@ -1320,6 +1331,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useLoopInvariants Use loop invariants?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
+    * @param usePrettyPrinting Use pretty printing?
     * @return The tested {@link SymbolicExecutionEnvironment}.
     * @throws ProofInputException Occurred Exception
     * @throws IOException Occurred Exception
@@ -1341,8 +1353,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                       boolean useOperationContracts,
                                       boolean useLoopInvariants,
                                       boolean nonExecutionBranchHidingSideProofs,
-                                      boolean aliasChecks) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = doSETTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, oraclePathInBaseDirFile, includeVariables, includeCallStack, includeReturnValues, maximalNumberOfExecutedSetNodes, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks);
+                                      boolean aliasChecks,
+                                      boolean usePrettyPrinting) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = doSETTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, oraclePathInBaseDirFile, includeVariables, includeCallStack, includeReturnValues, maximalNumberOfExecutedSetNodes, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, usePrettyPrinting);
       env.dispose();
    }
 
@@ -1373,6 +1386,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useLoopInvariants Use loop invariants?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
+    * @param usePrettyPrinting Use pretty printing?
     * @return The tested {@link SymbolicExecutionEnvironment}.
     * @throws ProofInputException Occurred Exception
     * @throws IOException Occurred Exception
@@ -1394,7 +1408,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                 boolean useOperationContracts,
                                                                                 boolean useLoopInvariants,
                                                                                 boolean nonExecutionBranchHidingSideProofs,
-                                                                                boolean aliasChecks) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+                                                                                boolean aliasChecks,
+                                                                                boolean usePrettyPrinting) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       HashMap<String, String> originalTacletOptions = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
@@ -1412,7 +1427,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, containerTypeName, methodFullName);
          setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
-         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks);
+         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, usePrettyPrinting);
          internalDoSETTest(oracleFile, env, oraclePathInBaseDirFile, maximalNumberOfExecutedSetNodes, includeVariables, includeCallStack, includeReturnValues);
          return env;
       }
@@ -1446,6 +1461,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useLoopInvariants Use loop invariants?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
+    * @param usePrettyPrinting Use pretty printing?
     * @return The tested {@link SymbolicExecutionEnvironment}.
     * @throws ProofInputException Occurred Exception
     * @throws IOException Occurred Exception
@@ -1465,7 +1481,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                 boolean useOperationContracts,
                                                                                 boolean useLoopInvariants,
                                                                                 boolean nonExecutionBranchHidingSideProofs,
-                                                                                boolean aliasChecks) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+                                                                                boolean aliasChecks,
+                                                                                boolean usePrettyPrinting) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       HashMap<String, String> originalTacletOptions = null;
       try {
          // Make sure that parameter are valid.
@@ -1480,7 +1497,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, baseContractName);
          // Create proof environment for symbolic execution
-         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, baseContractName, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks);
+         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, baseContractName, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, usePrettyPrinting);
          internalDoSETTest(oracleFile, env, oraclePathInBaseDirFile, maximalNumberOfExecutedSetNodes, includeVariables, includeCallStack, includeReturnValues);
          return env;
       }
@@ -1489,7 +1506,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          restoreTacletOptions(originalTacletOptions);
       }
    }
-   
+
    /**
     * Internal test method called by
     * {@link #doSETTest(File, String, String, String, boolean, boolean, boolean, int, boolean, boolean, boolean, boolean, boolean)} and
@@ -1534,11 +1551,11 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
-   public static HashMap<String, String> setDefaultTacletOptions(File baseDir, 
+   public static HashMap<String, String> setDefaultTacletOptions(File baseDir,
                                                                  String javaPathInBaseDir,
                                                                  String baseContractName) throws ProblemLoaderException, ProofInputException {
       if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInBaseDir, baseContractName, false, false, false, false, false);
+         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInBaseDir, baseContractName, false, false, false, false, false, false);
          env.dispose();
       }
       return setDefaultTacletOptions();
@@ -1554,17 +1571,17 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
-   public static HashMap<String, String> setDefaultTacletOptions(File baseDir, 
+   public static HashMap<String, String> setDefaultTacletOptions(File baseDir,
                                                                  String javaPathInBaseDir,
                                                                  String containerTypeName,
                                                                  String methodFullName) throws ProblemLoaderException, ProofInputException {
       if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, null, false, false, false, false, false);
+         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, null, false, false, false, false, false, false);
          env.dispose();
       }
       return setDefaultTacletOptions();
    }
-   
+
    /**
     * Ensures that the default taclet options are defined.
     * @param javaFile The java file to load.
@@ -1615,7 +1632,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       return setDefaultTacletOptions();
    }
-   
+
    /**
     * Ensures that the default taclet options are defined.
     * @return The original settings which are overwritten.
@@ -1651,10 +1668,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          }
       }
    }
-   
-<<<<<<< HEAD
-
-
 
    /**
     * creates a new factory that should be used by others afterwards
@@ -1670,9 +1683,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          }
       };
       return programVariableCollectorFactory;
-=======
-   /**
-    * Makes sure that two {@link Term}s are equal. 
+   }
+
+      /**
+    * Makes sure that two {@link Term}s are equal.
     * @param expected The expected {@link Term}.
     * @param actual The actual {@link Term}.
     */
@@ -1690,7 +1704,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertNull(actual);
       }
    }
-   
+
    /**
     * Checks if one step simplification is enabled in the given {@link Proof}.
     * @param proof The {@link Proof} to read from or {@code null} to return the general settings value.
@@ -1704,9 +1718,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          return ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
       }
    }
-   
+
    /**
-    * 
+    *
     * @param proof
     * @param enabled
     */
@@ -1719,6 +1733,5 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             simplifier.refresh(proof);
          }
       }
->>>>>>> 482ba17d1dcfe304dd0d3b15ff15758639e3d50b
    }
 }

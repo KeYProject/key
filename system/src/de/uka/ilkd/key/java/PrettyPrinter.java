@@ -430,7 +430,7 @@ public class PrettyPrinter {
 
     /**
        Replace all unicode characters above ?
-       by their explicite representation.
+       by their explicit representation.
        @param str the input string.
        @return the encoded string.
     */
@@ -1816,24 +1816,33 @@ public class PrettyPrinter {
     }
 
     public void printDo(Do x) throws java.io.IOException {
+       printDo(x, true);
+    }
+
+    public void printDo(Do x, boolean includeBody) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
 
 	// Mark statement start ...
 	markStart(0,x);
 
-        write("do");
-        if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
-            write(";");
-            //w.writeElement(1, body);
-        } else {
-	    if (x.getBody() instanceof StatementBlock) {
-                    writeElement(1, 0, x.getBody());
-                } else {
-                    writeElement(1, +1, 0, x.getBody());
-                    changeLevel(-1);
-                }
-	}        
+   write("do");
+	if (includeBody) {
+      if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
+          write(";");
+          //w.writeElement(1, body);
+      } else {
+     if (x.getBody() instanceof StatementBlock) {
+                  writeElement(1, 0, x.getBody());
+              } else {
+                  writeElement(1, +1, 0, x.getBody());
+                  changeLevel(-1);
+              }
+ }        
+	}
+	else {
+	   write(" ... ");
+	}
 	writeSymbol(1, 0, "while");
 	noLinefeed=true;
 	noSemicolons=true;
@@ -1862,6 +1871,10 @@ public class PrettyPrinter {
     }
 
     public void printEnhancedFor(EnhancedFor x) throws IOException {
+       printEnhancedFor(x, true);
+    }
+
+    public void printEnhancedFor(EnhancedFor x, boolean includeBody) throws IOException {
         printHeader(x);
         writeInternalIndentation(x);
         output();
@@ -1889,15 +1902,17 @@ public class PrettyPrinter {
         noLinefeed = false;
         noSemicolons = false;
         
-        if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
-            write(";");
-        } else {
-            if (x.getBody() instanceof StatementBlock) {
-                writeElement(1, 0, x.getBody());
-            } else {
-                writeElement(1, +1, 0, x.getBody());
-                changeLevel(-1);
-            }
+        if (includeBody) {
+           if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
+              write(";");
+          } else {
+              if (x.getBody() instanceof StatementBlock) {
+                  writeElement(1, 0, x.getBody());
+              } else {
+                  writeElement(1, +1, 0, x.getBody());
+                  changeLevel(-1);
+              }
+          }
         }
 
         // Mark statement end ...
@@ -1907,6 +1922,10 @@ public class PrettyPrinter {
     }
 
     public void printFor(For x) throws java.io.IOException {
+       printFor(x, true);
+    }
+
+    public void printFor(For x, boolean includeBody) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         output();
@@ -1952,15 +1971,18 @@ public class PrettyPrinter {
         output();
         noLinefeed = false;
         noSemicolons = false;
-        if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
-            write(";");
-        } else {
-            if (x.getBody() instanceof StatementBlock) {
-                writeElement(1, 0, x.getBody());
-            } else {
-                writeElement(1, +1, 0, x.getBody());
-                changeLevel(-1);
-            }
+        
+        if (includeBody) {
+           if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
+              write(";");
+          } else {
+              if (x.getBody() instanceof StatementBlock) {
+                  writeElement(1, 0, x.getBody());
+              } else {
+                  writeElement(1, +1, 0, x.getBody());
+                  changeLevel(-1);
+              }
+          }
         }
 
         // Mark statement end ...
@@ -1970,6 +1992,10 @@ public class PrettyPrinter {
     }
 
     public void printWhile(While x) throws java.io.IOException {
+       printWhile(x, true);
+    }
+
+    public void printWhile(While x, boolean includeBody) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
 	output();
@@ -1987,6 +2013,8 @@ public class PrettyPrinter {
 	write(" )"); output();
 	noLinefeed=false;
 	noSemicolons=false;
+	
+	if (includeBody) {
         if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
             write(";");
         } else {
@@ -1997,6 +2025,7 @@ public class PrettyPrinter {
 		changeLevel(-1);
 	    }
         }
+	}
 
 	// Mark statement end ...
 	markEnd(0,x);
@@ -2005,6 +2034,10 @@ public class PrettyPrinter {
     }
 
     public void printIf(If x) throws java.io.IOException {
+       printIf(x, true);
+    }
+
+    public void printIf(If x, boolean includeBranches) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
 	output();
@@ -2024,16 +2057,18 @@ public class PrettyPrinter {
         noLinefeed = false;        
         noSemicolons = false;
         
-        if (x.getThen() != null) {
-	    if (x.getThen().getBody() instanceof StatementBlock) {
-		writeElement(1, 0, x.getThen());
-	    } else {
-		writeElement(1, +1, 0, x.getThen());
-		changeLevel(-1);
-	    }
-        }
-        if (x.getElse() != null) {
-	    writeElement(1, 0, x.getElse());
+        if (includeBranches) {
+           if (x.getThen() != null) {
+              if (x.getThen().getBody() instanceof StatementBlock) {
+             writeElement(1, 0, x.getThen());
+              } else {
+             writeElement(1, +1, 0, x.getThen());
+             changeLevel(-1);
+              }
+               }
+               if (x.getElse() != null) {
+              writeElement(1, 0, x.getElse());
+               }
         }
 
 	// Mark statement end ...
@@ -2043,6 +2078,10 @@ public class PrettyPrinter {
     }
 
     public void printSwitch(Switch x) throws java.io.IOException {
+       printSwitch(x, true);
+    }
+
+    public void printSwitch(Switch x, boolean includeBranches) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
 
@@ -2055,11 +2094,14 @@ public class PrettyPrinter {
             writeElement(x.getExpression());
             noSemicolons = false;
         }
-        write(") {");
-        if (x.getBranchList() != null) {
-            writeLineList(1, 0, 0, x.getBranchList());
+        write(")");
+        if (includeBranches) {
+           write(" {");
+           if (x.getBranchList() != null) {
+               writeLineList(1, 0, 0, x.getBranchList());
+           }
+           writeSymbol(1, 0, "}");
         }
-        writeSymbol(1, 0, "}");
 	
 	// Mark statement end ...
 	markEnd(0,x);

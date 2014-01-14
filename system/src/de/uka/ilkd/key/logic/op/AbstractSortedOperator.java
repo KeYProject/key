@@ -27,14 +27,14 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public abstract class AbstractSortedOperator extends AbstractOperator 
                                       implements SortedOperator, Sorted {
-    
+
     private static final ImmutableArray<Sort> EMPTY_SORT_LIST 
     	= new ImmutableArray<Sort>();
-    
+
     private final Sort sort;
     private final ImmutableArray<Sort> argSorts;
 
-    
+
     protected AbstractSortedOperator(Name name,
 	    			     ImmutableArray<Sort> argSorts,
 	    		             Sort sort,

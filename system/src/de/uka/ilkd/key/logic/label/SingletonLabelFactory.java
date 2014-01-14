@@ -4,11 +4,11 @@ import java.util.List;
 
 /**
  * A factory for creating singleton {@link TermLabel}.
- * 
+ *
  * <p>
  * The resulting factory does not accept arguments for the builder methods and
  * always returns a fixed term level value.
- * 
+ *
  * @param <T>
  *            the type of the wrapped term label can be narrowed.
  */
@@ -21,7 +21,7 @@ public final class SingletonLabelFactory<T extends TermLabel> implements TermLab
 
     /**
      * Instantiates a new singleton label factory for a label.
-     * 
+     *
      * @param singletonLabel
      *            the label to be wrapped, not <code>null</code>.
      */
@@ -32,10 +32,10 @@ public final class SingletonLabelFactory<T extends TermLabel> implements TermLab
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>This implementation does not accept arguments and returns the stored label
      */
-    @Override 
+    @Override
     public T parseInstance(List<String> arguments) throws TermLabelException {
         if (arguments.isEmpty()) {
             return singletonLabel;

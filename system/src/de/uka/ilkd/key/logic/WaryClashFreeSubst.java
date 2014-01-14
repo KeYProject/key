@@ -112,6 +112,8 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 	    if ( t.op () instanceof UpdateApplication )
 		return applyOnUpdate   ( t );
 	}
+	if ( t.op() instanceof Transformer)
+	    return applyOnTransformer ( t );
 	return super.apply1 ( t );
     }
 
@@ -126,6 +128,19 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      */
     private Term applyOnModality ( Term t ) {
 	return applyBelowModality ( t );
+    }
+
+    /**
+     * Apply the substitution (that replaces a variable with a
+     * term) on t, which has a transformer procedure as top-level
+     * operator. This is done by creating a (top-level) existential
+     * quantifier. This method is only called from <code>apply1</code>
+     * for substitutions with non-rigid terms
+     *
+     * PRECONDITION: <code>warysvars != null</code>
+     */
+    private Term applyOnTransformer ( Term t ) {
+        return applyBelowTransformer ( t );
     }
 
     /**
@@ -146,7 +161,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 
 	final Term[] newSubterms = new Term[t.arity()];
 	@SuppressWarnings("unchecked")
-    final ImmutableArray<QuantifiableVariable>[] newBoundVars =
+	final ImmutableArray<QuantifiableVariable>[] newBoundVars =
 	    new ImmutableArray[t.arity()];
 
 	for ( int i = 0; i < t.arity (); i++ ) {
@@ -170,6 +185,13 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * Apply the substitution to a term/formula below a modality or update
      */
     private Term applyBelowModality (Term t) {
+        return substWithNewVar ( t );
+    }
+
+    /**
+     * Apply the substitution to a term/formula below a transformer procedure
+     */
+    private Term applyBelowTransformer (Term t) {
         return substWithNewVar ( t );
     }
 

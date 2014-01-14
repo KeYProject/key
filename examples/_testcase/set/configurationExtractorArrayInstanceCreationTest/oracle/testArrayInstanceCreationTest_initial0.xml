@@ -6,6 +6,6 @@
    <object xml:id="o1" name="self" type="ArrayInstanceCreationTest">
       <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </object>
-   <object xml:id="o2" name="self.next" type="ArrayInstanceCreationTest">
+   <object xml:id="o2" name="ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next)" type="ArrayInstanceCreationTest">
    </object>
 </model>

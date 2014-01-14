@@ -15,7 +15,6 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import java.util.Iterator;
 
 public class NamespaceSet {

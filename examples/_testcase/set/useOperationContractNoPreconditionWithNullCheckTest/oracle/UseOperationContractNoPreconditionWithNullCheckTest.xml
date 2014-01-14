@@ -7,11 +7,11 @@ pre: obj.&lt;inv&gt;
 post: result_0 = 42 &amp; obj.&lt;inv&gt; &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
-            <branchCondition name="!obj = null" pathCondition="!obj = null" pathConditionChanged="true" branchCondition="!obj = null" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
-               <statement name="int magicNumberCopy = magicNumber;" pathCondition="!obj = null" pathConditionChanged="false">
-                  <statement name="return magicNumber+magicNumberCopy;" pathCondition="!obj = null" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of UseOperationContractNoPreconditionWithNullCheckTest.main(obj);&gt;" pathCondition="!obj = null" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="!obj = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+            <branchCondition name="not(equals(obj,null))" pathCondition="not(equals(obj,null))" pathConditionChanged="true" branchCondition="not(equals(obj,null))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
+               <statement name="int magicNumberCopy = magicNumber;" pathCondition="not(equals(obj,null))" pathConditionChanged="false">
+                  <statement name="return magicNumber+magicNumberCopy;" pathCondition="not(equals(obj,null))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of UseOperationContractNoPreconditionWithNullCheckTest.main(obj);&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

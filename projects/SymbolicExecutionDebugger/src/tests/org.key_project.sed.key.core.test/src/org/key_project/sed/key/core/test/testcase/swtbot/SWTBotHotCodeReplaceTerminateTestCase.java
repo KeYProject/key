@@ -52,6 +52,7 @@ public class SWTBotHotCodeReplaceTerminateTestCase extends
             Boolean.FALSE,
             Boolean.FALSE,
             Boolean.FALSE,
+            Boolean.FALSE,
             8,
             executor);   
    

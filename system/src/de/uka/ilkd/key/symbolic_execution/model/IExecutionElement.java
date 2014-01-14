@@ -27,6 +27,12 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
  */
 public interface IExecutionElement {
    /**
+    * Returns the {@link ITreeSettings} to use.
+    * @return The {@link ITreeSettings} to use.
+    */
+   public ITreeSettings getSettings();
+   
+   /**
     * Returns the used {@link KeYMediator} during proof.
     * @return The used {@link KeYMediator} during proof.
     */

@@ -174,7 +174,7 @@ public class TestKey extends TestSuite {
 	suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
    suite.addTest(createSuite(proofReferencesTests, "Testing Proof References"));
 	suite.addTest(createSuite(new Class[]{de.uka.ilkd.key.util.DesignTests.class}, "Test Design Constraints"));
-        
+
 	return suite;
     }
 

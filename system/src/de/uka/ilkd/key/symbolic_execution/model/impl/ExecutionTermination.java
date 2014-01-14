@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -44,7 +45,7 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
    /**
     * Contains the exception variable which is used to check if the executed program in proof terminates normally.
     */
-   private IProgramVariable exceptionVariable;
+   private final IProgramVariable exceptionVariable;
    
    /**
     * The {@link Sort} of the uncaught exception.
@@ -58,13 +59,18 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
    
    /**
     * Constructor.
+    * @param settings The {@link ITreeSettings} to use.
     * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param exceptionVariable Contains the exception variable which is used to check if the executed program in proof terminates normally.
     * @param terminationKind The {@link TerminationKind} or {@code null} to compute it when it is requested the first time (normal or exceptional termination only).
     */
-   public ExecutionTermination(KeYMediator mediator, Node proofNode, IProgramVariable exceptionVariable, TerminationKind terminationKind) {
-      super(mediator, proofNode);
+   public ExecutionTermination(ITreeSettings settings,
+                               KeYMediator mediator, 
+                               Node proofNode, 
+                               IProgramVariable exceptionVariable, 
+                               TerminationKind terminationKind) {
+      super(settings, mediator, proofNode);
       this.exceptionVariable = exceptionVariable;
       this.terminationKind = terminationKind;
    }

@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.Term;
 
 /**
  * A collection of static methods to deal with {@link TermLabel}.
- * 
+ *
  * @author Richard Bubel
  */
 class TermLabelOperationsInterpreter {
@@ -42,10 +42,10 @@ class TermLabelOperationsInterpreter {
     public static ImmutableArray<TermLabel> union(
             ImmutableArray<TermLabel> left, ImmutableArray<TermLabel> right) {
         final HashSet<TermLabel> set = new LinkedHashSet<TermLabel>();
-        for (TermLabel l : left) { 
+        for (TermLabel l : left) {
             set.add(l);
         }
-        for (TermLabel l : right) { 
+        for (TermLabel l : right) {
             set.add(l);
         }
         return new ImmutableArray<TermLabel>(set.toArray(new TermLabel[set.size()]));
@@ -54,10 +54,10 @@ class TermLabelOperationsInterpreter {
     public static ImmutableArray<TermLabel> sub(
             ImmutableArray<TermLabel> left, ImmutableArray<TermLabel> right) {
         final HashSet<TermLabel> set = new LinkedHashSet<TermLabel>();
-        for (TermLabel l : left) { 
+        for (TermLabel l : left) {
             set.add(l);
         }
-        for (TermLabel l : right) { 
+        for (TermLabel l : right) {
             set.remove(l);
         }
         return new ImmutableArray<TermLabel>(set.toArray(new TermLabel[set.size()]));

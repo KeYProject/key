@@ -115,24 +115,24 @@ public class KeYMediator {
      * main frame and the current proof settings
      */
     public KeYMediator(UserInterface ui, boolean useAutoSaver) {
-    	this.ui             = ui;
-    	if (useAutoSaver) {
-    		autoSaver = new AutoSaver();
-    	}
+	this.ui             = ui;
+	if (useAutoSaver) {
+		autoSaver = new AutoSaver();
+	}
 
-    	notationInfo        = new NotationInfo();
-    	proofListener       = new KeYMediatorProofListener();
-    	proofTreeListener   = new KeYMediatorProofTreeListener();
-    	keySelectionModel   = new KeYSelectionModel();
-    	interactiveProver   = new InteractiveProver(this);
+	notationInfo        = new NotationInfo();
+	proofListener       = new KeYMediatorProofListener();
+	proofTreeListener   = new KeYMediatorProofTreeListener();
+	keySelectionModel   = new KeYSelectionModel();
+	interactiveProver   = new InteractiveProver(this);
 
-    	addAutoModeListener(proofListener);
+	addAutoModeListener(proofListener);
 
-    	defaultExceptionHandler = new KeYRecoderExcHandler();
+	defaultExceptionHandler = new KeYRecoderExcHandler();
 
-    	// There may be other interruption listeners, but the interaction
-    	// engine listens by default.
-    	addInterruptedListener(interactiveProver);
+	// There may be other interruption listeners, but the interaction
+	// engine listens by default.
+	addInterruptedListener(interactiveProver);
     }
 
 
@@ -562,14 +562,14 @@ public class KeYMediator {
      * changed
      * @param listener the KeYSelectionListener to add
      */
-    public synchronized void addKeYSelectionListener(KeYSelectionListener listener) {
+    public void addKeYSelectionListener(KeYSelectionListener listener) {
 	keySelectionModel.addKeYSelectionListener(listener);
     }
 
     /** removes a listener from the KeYSelectionModel
      * @param listener the KeYSelectionListener to be removed
      */
-    public synchronized void removeKeYSelectionListener(KeYSelectionListener listener) {
+    public void removeKeYSelectionListener(KeYSelectionListener listener) {
 	keySelectionModel.removeKeYSelectionListener(listener);
     }
 

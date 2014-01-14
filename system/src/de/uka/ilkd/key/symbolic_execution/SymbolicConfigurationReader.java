@@ -18,7 +18,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -37,8 +36,10 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociationValueContainer;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicElement;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
@@ -400,13 +401,29 @@ public class SymbolicConfigurationReader {
    protected String getTerm(Attributes attributes) {
       return attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_TERM);
    }
+
    
+   /**
+    * An implementation of {@link ISymbolicElement} which is independent
+    * from KeY and provides such only children and default attributes.
+    * @author Martin Hentschel
+    */
+   public static abstract class AbstractKeYlessElement implements ISymbolicElement {
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IModelSettings getSettings() {
+         return null;
+      }
+   }
+
    /**
     * An implementation of {@link ISymbolicConfiguration} which is independent
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessConfiguration implements ISymbolicConfiguration {
+   public static class KeYlessConfiguration extends AbstractKeYlessElement implements ISymbolicConfiguration {
       /**
        * The state.
        */
@@ -477,7 +494,7 @@ public class SymbolicConfigurationReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static abstract class AbstractKeYlessAssociationValueContainer implements ISymbolicAssociationValueContainer {
+   public static abstract class AbstractKeYlessAssociationValueContainer extends AbstractKeYlessElement implements ISymbolicAssociationValueContainer {
       /**
        * The associations.
        */
@@ -659,7 +676,7 @@ public class SymbolicConfigurationReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessValue implements ISymbolicValue {
+   public static class KeYlessValue extends AbstractKeYlessElement implements ISymbolicValue {
       /**
        * The program variable.
        */
@@ -810,7 +827,7 @@ public class SymbolicConfigurationReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessAssociation implements ISymbolicAssociation {
+   public static class KeYlessAssociation extends AbstractKeYlessElement implements ISymbolicAssociation {
       /**
        * The program variable.
        */
@@ -950,7 +967,7 @@ public class SymbolicConfigurationReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessEquivalenceClass implements ISymbolicEquivalenceClass {
+   public static class KeYlessEquivalenceClass extends AbstractKeYlessElement implements ISymbolicEquivalenceClass {
       /**
        * The terms.
        */

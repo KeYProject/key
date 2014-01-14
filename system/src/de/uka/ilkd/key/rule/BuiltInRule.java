@@ -34,7 +34,5 @@ public interface BuiltInRule extends Rule {
     boolean isApplicable(Goal            goal, 				
 			 PosInOccurrence pio);
 
-	IBuiltInRuleApp createApp( PosInOccurrence pos );
-    
-
+    IBuiltInRuleApp createApp( PosInOccurrence pos );
 }

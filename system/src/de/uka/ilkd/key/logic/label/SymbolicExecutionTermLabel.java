@@ -38,33 +38,33 @@ public class SymbolicExecutionTermLabel implements TermLabel {
     * The unique ID of this term label in the {@link Sequent}.
     */
    private int id;
-	
-	/**
-	 * Constructor.
-	 * @param id The unique ID of this term label in the {@link Sequent}.
-	 */
-	public SymbolicExecutionTermLabel(int id) {
-	   this.id = id;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean equals(Object o) {
-		return this == o;
-	}
-		
-	/**
-	 * {@inheritDoc}
-	 */
-	public String toString() {
-		return NAME.toString() + "(" + getId() + ")";
-	}
+
+   /**
+    * Constructor.
+    * @param id The unique ID of this term label in the {@link Sequent}.
+    */
+   public SymbolicExecutionTermLabel(int id) {
+       this.id = id;
+   }
 
    /**
     * {@inheritDoc}
     */
-	@Override
+   public boolean equals(Object o) {
+       return this == o;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   public String toString() {
+       return NAME.toString() + "(" + getId() + ")";
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public Object getChild(int i) {
 	   switch (i) {
 	      case 0 : return getId();
@@ -75,15 +75,15 @@ public class SymbolicExecutionTermLabel implements TermLabel {
    /**
     * {@inheritDoc}
     */
-	@Override
+   @Override
    public int getChildCount() {
       return 1;
    }
 
-	/**
-	 * Returns the unique ID of this label in the {@link Sequent}.
-	 * @return The unique ID of this label in the {@link Sequent}.
-	 */
+   /**
+    * Returns the unique ID of this label in the {@link Sequent}.
+    * @return The unique ID of this label in the {@link Sequent}.
+    */
    public int getId() {
       return id;
    }

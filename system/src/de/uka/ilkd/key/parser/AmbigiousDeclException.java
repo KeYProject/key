@@ -14,9 +14,11 @@
 
 package de.uka.ilkd.key.parser;
 
+import org.antlr.runtime.RecognitionException;
+
 import antlr.Token;
 
-public class AmbigiousDeclException extends antlr.SemanticException {
+public class AmbigiousDeclException extends RecognitionException {
     /**
      * 
      */
@@ -26,22 +28,20 @@ public class AmbigiousDeclException extends antlr.SemanticException {
     Token t;
     
     public AmbigiousDeclException(String cat, Token t) {
-	super("Name already in use");
 	this.ambigious_symbol = t.getText();
 	this.filename = t.getFilename();
 	this.line     = t.getLine();
-	this.column   = t.getColumn();
+	this.charPositionInLine   = t.getColumn();
     }
 
     public AmbigiousDeclException(String ambigious_symbol, 
 				  String filename, 
 				  int line, 
 				  int column) {
-	super("Name already in use");
 	this.filename = filename;
 	this.ambigious_symbol = ambigious_symbol;
 	this.line   = line;
-	this.column = column;
+	this.charPositionInLine = column;
     }
     /**
      * Returns a clean error message (no line number/column information)
@@ -64,7 +64,7 @@ public class AmbigiousDeclException extends antlr.SemanticException {
      * Returns a string representation of this exception.
      */
     public String toString() {
-	return filename + "("+this.getLine()+", "+this.getColumn()+"):\n"
+	return filename + "("+this.line+", "+this.charPositionInLine+"):\n"
 	    + getMessage();
     }
 }

@@ -17,6 +17,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociationValueContainer;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
@@ -27,7 +28,7 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
  * Default implementation of {@link ISymbolicAssociationValueContainer}.
  * @author Martin Hentschel
  */
-public abstract class AbstractSymbolicAssociationValueContainer implements ISymbolicAssociationValueContainer {
+public abstract class AbstractSymbolicAssociationValueContainer extends AbstractElement implements ISymbolicAssociationValueContainer {
    /**
     * The contained {@link ISymbolicAssociation}s.
     */
@@ -37,6 +38,14 @@ public abstract class AbstractSymbolicAssociationValueContainer implements ISymb
     * The contained {@link ISymbolicValue}s.
     */
    private ImmutableList<ISymbolicValue> values = ImmutableSLList.nil();
+
+   /**
+    * Constructor.
+    * @param settings The {@link IModelSettings} to use.
+    */
+   public AbstractSymbolicAssociationValueContainer(IModelSettings settings) {
+      super(settings);
+   }
 
    /**
     * {@inheritDoc}

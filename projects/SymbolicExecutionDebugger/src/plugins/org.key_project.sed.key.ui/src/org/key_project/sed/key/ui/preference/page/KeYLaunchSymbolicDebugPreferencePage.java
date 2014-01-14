@@ -62,6 +62,9 @@ public class KeYLaunchSymbolicDebugPreferencePage extends FieldEditorPreferenceP
       edit = new BooleanFieldEditor(KeYSEDPreferences.MERGE_BRANCH_CONDITIONS, "&Merge branch conditions", SWT.NONE, spacer);
       edit.fillIntoGrid(spacer, 2);
       addField(edit);
+      edit = new BooleanFieldEditor(KeYSEDPreferences.USE_PRETTY_PRINTING, "Use &pretty printing", SWT.NONE, spacer);
+      edit.fillIntoGrid(spacer, 2);
+      addField(edit);
 
       group = SWTFactory.createGroup(getFieldEditorParent(), "KeY", 1, 1, GridData.FILL_HORIZONTAL);
       spacer = SWTFactory.createComposite(group, 1, 1, GridData.FILL_HORIZONTAL);

@@ -44,6 +44,7 @@ public class SWTBotAddBreakpointsPostTarget extends AbstractKeYDebugTargetTestCa
             Boolean.FALSE,
             Boolean.FALSE,
             Boolean.FALSE,
+            Boolean.FALSE,
             8,
             executor);   
    } 

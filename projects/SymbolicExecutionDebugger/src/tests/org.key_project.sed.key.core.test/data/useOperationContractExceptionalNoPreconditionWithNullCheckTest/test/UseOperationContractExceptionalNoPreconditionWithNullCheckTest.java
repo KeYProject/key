@@ -12,6 +12,7 @@ public class UseOperationContractExceptionalNoPreconditionWithNullCheckTest {
 	}
 	
 	/*@ public exceptional_behavior
+     @ signals_only Exception;
 	  @ signals (Exception myExc) true;
 	  @*/
 	public int magic(int x) throws Exception {

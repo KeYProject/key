@@ -218,7 +218,7 @@ public class RecentFileMenu {
             propStream = new FileInputStream(filename);
             Properties p = new Properties();
             p.load(propStream);
-            Enumeration e = p.propertyNames();
+            Enumeration<?> e = p.propertyNames();
             while (e.hasMoreElements()) {
                 String s = (String) e.nextElement();
                 if (s.indexOf("RecentFile") != -1)

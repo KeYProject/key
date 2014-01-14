@@ -8,10 +8,9 @@
       <association name="y" programVariable="y" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </state>
    <object xml:id="o1" name="x" type="ConfigurationExtractorWithOperationContractsTest.IntWrapper">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="anon_heap_sub&lt;&lt;anonHeapFunction&gt;&gt;[x.value]" type="int"/>
+      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="int::select(anon_heap_sub&lt;&lt;anonHeapFunction&gt;&gt;,x,ConfigurationExtractorWithOperationContractsTest.IntWrapper::$value)" type="int"/>
    </object>
    <object xml:id="o2" name="y" type="ConfigurationExtractorWithOperationContractsTest.IntWrapper">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="  result_0
-+ anon_heap_sub&lt;&lt;anonHeapFunction&gt;&gt;[x.value] * -1" type="int"/>
+      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="add(result_0,mul(int::select(anon_heap_sub&lt;&lt;anonHeapFunction&gt;&gt;,x,ConfigurationExtractorWithOperationContractsTest.IntWrapper::$value),Z(neglit(1(#)))))" type="int"/>
    </object>
 </model>

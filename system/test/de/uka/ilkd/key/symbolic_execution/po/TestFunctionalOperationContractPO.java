@@ -56,7 +56,7 @@ public class TestFunctionalOperationContractPO extends AbstractSymbolicExecution
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, baseContractName);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, baseContractName, false, false, false, false, false);
+         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, baseContractName, false, false, false, false, false, false);
          // Extract and test try content
          String tryContent = getTryContent(env.getProof());
          assertTrue("Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".", JavaUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent));

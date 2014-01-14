@@ -33,7 +33,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.impl.AbstractSymbolicAsso
  * @see ISymbolicObject
  * @see ISymbolicState
  */
-public interface ISymbolicAssociationValueContainer {
+public interface ISymbolicAssociationValueContainer extends ISymbolicElement {
    /**
     * Returns the contained associations.
     * @return The contained associations.

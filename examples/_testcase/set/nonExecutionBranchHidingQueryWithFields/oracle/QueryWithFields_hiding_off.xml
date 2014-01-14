@@ -5,64 +5,48 @@
          <operationContract name="result_0 = self.magic(x) catch(exc_0)
 pre: self.&lt;inv&gt;
 post: result_0 = self.subMagic(x) &amp; self.&lt;inv&gt; &amp; exc_0 = null
-mod: {}
+mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-            <branchCondition name="x &gt;  -1" pathCondition="x &gt;  -1" pathConditionChanged="true" branchCondition="x &gt;  -1" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <branchCondition name="!self.instanceField = 11" pathCondition="x &gt;= 0 &amp; !self.instanceField = 11" pathConditionChanged="true" branchCondition="!self.instanceField = 11" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <statement name="return magicValue;" pathCondition="x &gt;= 0 &amp; !self.instanceField = 11" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="x &gt;= 0 &amp; !self.instanceField = 11" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of self.main(x);&gt;" isReturnValueComputed="true">
-                        <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+            <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <branchCondition name="not(equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#)))))" pathCondition="and(geq(x,Z(0(#))),not(equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#))))))" pathConditionChanged="true" branchCondition="not(equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="return magicValue;" pathCondition="and(geq(x,Z(0(#))),not(equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#))))))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="and(geq(x,Z(0(#))),not(equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.main(x);&gt;" isReturnValueComputed="true">
+                        <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                         </methodReturnValue>
-                        <termination name="&lt;end&gt;" pathCondition="x &gt;= 0 &amp; !self.instanceField = 11" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <termination name="&lt;end&gt;" pathCondition="and(geq(x,Z(0(#))),not(equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
                </branchCondition>
-               <branchCondition name="self.instanceField = 11" pathCondition="x &gt;= 0 &amp; self.instanceField = 11" pathConditionChanged="true" branchCondition="self.instanceField = 11" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <branchCondition name="QueryWithFields.classField = 66" pathCondition="  x &gt;= 0
-&amp; QueryWithFields.classField = 66
-&amp; self.instanceField = 11" pathConditionChanged="true" branchCondition="QueryWithFields.classField = 66" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <statement name="return magicValue;" pathCondition="  x &gt;= 0
-&amp; QueryWithFields.classField = 66
-&amp; self.instanceField = 11" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="  x &gt;= 0
-&amp; QueryWithFields.classField = 66
-&amp; self.instanceField = 11" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 421166 as result of self.main(x);&gt;" isReturnValueComputed="true">
-                           <methodReturnValue name="421166" returnValueString="421166" hasCondition="false">
+               <branchCondition name="equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#))))" pathCondition="and(geq(x,Z(0(#))),equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#)))))" pathConditionChanged="true" branchCondition="equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <branchCondition name="equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#))))" pathCondition="and(and(geq(x,Z(0(#))),equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#))))),equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#)))))" pathConditionChanged="true" branchCondition="equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <statement name="return magicValue;" pathCondition="and(and(geq(x,Z(0(#))),equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#))))),equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#)))))" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="and(and(geq(x,Z(0(#))),equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#))))),equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#)))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(6(6(1(1(2(4(#))))))) as result of self.main(x);&gt;" isReturnValueComputed="true">
+                           <methodReturnValue name="Z(6(6(1(1(2(4(#)))))))" returnValueString="Z(6(6(1(1(2(4(#)))))))" hasCondition="false">
                            </methodReturnValue>
-                           <termination name="&lt;end&gt;" pathCondition="  x &gt;= 0
-&amp; QueryWithFields.classField = 66
-&amp; self.instanceField = 11" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           <termination name="&lt;end&gt;" pathCondition="and(and(geq(x,Z(0(#))),equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#))))),equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>
                   </branchCondition>
-                  <branchCondition name="!QueryWithFields.classField = 66" pathCondition="  x &gt;= 0
-&amp; !QueryWithFields.classField = 66
-&amp; self.instanceField = 11" pathConditionChanged="true" branchCondition="!QueryWithFields.classField = 66" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <statement name="return magicValue;" pathCondition="  x &gt;= 0
-&amp; !QueryWithFields.classField = 66
-&amp; self.instanceField = 11" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="  x &gt;= 0
-&amp; !QueryWithFields.classField = 66
-&amp; self.instanceField = 11" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of self.main(x);&gt;" isReturnValueComputed="true">
-                           <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                  <branchCondition name="not(equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#)))))" pathCondition="and(and(geq(x,Z(0(#))),not(equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#)))))),equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#)))))" pathConditionChanged="true" branchCondition="not(equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <statement name="return magicValue;" pathCondition="and(and(geq(x,Z(0(#))),not(equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#)))))),equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#)))))" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="and(and(geq(x,Z(0(#))),not(equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#)))))),equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#)))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.main(x);&gt;" isReturnValueComputed="true">
+                           <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                            </methodReturnValue>
-                           <termination name="&lt;end&gt;" pathCondition="  x &gt;= 0
-&amp; !QueryWithFields.classField = 66
-&amp; self.instanceField = 11" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           <termination name="&lt;end&gt;" pathCondition="and(and(geq(x,Z(0(#))),not(equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#)))))),equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>
                   </branchCondition>
                </branchCondition>
             </branchCondition>
-            <branchCondition name="x &lt; 0" pathCondition="x &lt; 0" pathConditionChanged="true" branchCondition="x &lt; 0" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <statement name="return magicValue;" pathCondition="x &lt; 0" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="x &lt; 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -4711 as result of self.main(x);&gt;" isReturnValueComputed="true">
-                     <methodReturnValue name="-4711" returnValueString="-4711" hasCondition="false">
+            <branchCondition name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="return magicValue;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of self.main(x);&gt;" isReturnValueComputed="true">
+                     <methodReturnValue name="Z(neglit(1(1(7(4(#))))))" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="false">
                      </methodReturnValue>
-                     <termination name="&lt;end&gt;" pathCondition="x &lt; 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                     <termination name="&lt;end&gt;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>

@@ -107,6 +107,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
@@ -485,15 +486,28 @@ public final class TestKeyUtil {
       MemoryMethod setRecord = new MemoryMethod("setRecord(balance : int)", "void", DSVisibility.PUBLIC);
       addOperationObligations(setRecord, true, true, true);
       MemoryOperationContract sr = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(logRecordFullqualifiedName, logRecordFullqualifiedName, "setRecord(int)", operationContractIds[0], "normal_behavior"),
-                                                               "balance >= 0 & self.<inv>", 
-                                                               "self.balance = balance\n" +
-                                                               "&   self.transactionId\n" +
-                                                               "  = heapAtPre[" + logRecordFullqualifiedName + ".transactionCounter]\n" +
-                                                               "& self.<inv>\n" +
+                                                               "geq(balance, Z(0(#)))\n" +
+                                                               "& java.lang.Object::<inv>(heap, self)", 
+                                                               "int::select(heap,\n" +
+                                                               "                self,\n" +
+                                                               "                " + logRecordFullqualifiedName + "::$balance)\n" +
+                                                               "  = balance\n" +
+                                                               "&   int::select(heap,\n" +
+                                                               "                self,\n" +
+                                                               "                " + logRecordFullqualifiedName + "::$transactionId)\n" +
+                                                               "  = int::select(heapAtPre,\n" +
+                                                               "                null,\n" +
+                                                               "                " + logRecordFullqualifiedName + "::$transactionCounter)\n" +
+                                                               "& java.lang.Object::<inv>(heap, self)\n" +
                                                                "& exc = null", 
-                                                               "mod[heap]:           {(self, empty)} \\cup {(self, balance)}\n" +
-                                                               "     \\cup {(self, transactionId)}\n" +
-                                                               "\\cup {(null, transactionCounter)}", 
+                                                               "mod[heap]: union(union(union(singleton(self,\n" +
+                                                               "                            " + logRecordFullqualifiedName + "::$empty),\n" +
+                                                               "                  singleton(self,\n" +
+                                                               "                            " + logRecordFullqualifiedName + "::$balance)),\n" +
+                                                               "            singleton(self,\n" +
+                                                               "                      " + logRecordFullqualifiedName + "::$transactionId)),\n" +
+                                                               "      singleton(null,\n" +
+                                                               "                " + logRecordFullqualifiedName + "::$transactionCounter))", 
                                                                "diamond");
       addAllOperationContractObligations(sr);
       setRecord.addOperationContract(sr);
@@ -501,9 +515,14 @@ public final class TestKeyUtil {
       MemoryMethod getBalance = new MemoryMethod("getBalance()", "int", DSVisibility.PUBLIC);
       addOperationObligations(getBalance, true, true, true);
       MemoryOperationContract gb2 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(logRecordFullqualifiedName, logRecordFullqualifiedName, "getBalance()", operationContractIds[2], "normal_behavior"),
-                                                                "self.<inv>", 
-                                                                "result = self.balance & self.<inv> & exc = null", 
-                                                                "mod[heap]: {}", 
+                                                                "java.lang.Object::<inv>(heap, self)", 
+                                                                "result\n" +
+                                                                "  = int::select(heap,\n" +
+                                                                "                self,\n" +
+                                                                "                " + logRecordFullqualifiedName + "::$balance)\n" +
+                                                                "& java.lang.Object::<inv>(heap, self)\n" +
+                                                                "& exc = null", 
+                                                                "mod[heap]: empty", 
                                                                 "diamond");
       addAllOperationContractObligations(gb2);
       getBalance.addOperationContract(gb2);
@@ -511,9 +530,14 @@ public final class TestKeyUtil {
       MemoryMethod getTransactionId = new MemoryMethod("getTransactionId()", "int", DSVisibility.PUBLIC);
       addOperationObligations(getTransactionId, true, true, true);
       MemoryOperationContract gti2 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(logRecordFullqualifiedName, logRecordFullqualifiedName, "getTransactionId()", operationContractIds[3], "normal_behavior"),
-                                                                 "self.<inv>", 
-                                                                 "result = self.transactionId & self.<inv> & exc = null", 
-                                                                 "mod[heap]: {}", 
+                                                                 "java.lang.Object::<inv>(heap, self)", 
+                                                                 "result\n" +
+                                                                 "  = int::select(heap,\n" +
+                                                                 "                self,\n" +
+                                                                 "                " + logRecordFullqualifiedName + "::$transactionId)\n" +
+                                                                 "& java.lang.Object::<inv>(heap, self)\n" +
+                                                                 "& exc = null", 
+                                                                 "mod[heap]: empty", 
                                                                  "diamond");
       addAllOperationContractObligations(gti2);
       getTransactionId.addOperationContract(gti2);
@@ -523,9 +547,24 @@ public final class TestKeyUtil {
       result.addAttribute(new MemoryAttribute("transactionId", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
       result.addAttribute(new MemoryAttribute("empty", "boolean", bugAttributeVisibility(DSVisibility.PRIVATE)));
       result.getExtendsFullnames().add("java.lang.Object");
-      result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIds[0] + " in LogRecord", "!self.empty = TRUE\n" +
-      		                                                                                                 "-> self.balance >= 0 & self.transactionId >= 0"));
-      result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIds[1] + " in LogRecord", logRecordFullqualifiedName + ".transactionCounter >= 0"));
+      result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIds[0] + " in LogRecord", 
+                                              "!  boolean::select(heap,\n" +
+                                              "                      self,\n" +
+                                              "                      " + logRecordFullqualifiedName + "::$empty)\n" +
+                                              "    = TRUE\n" +
+                                              "->   geq(int::select(heap,\n" +
+                                              "                     self,\n" +
+                                              "                     " + logRecordFullqualifiedName + "::$balance),\n" +
+                                              "         Z(0(#)))\n" +
+                                              "   & geq(int::select(heap,\n" +
+                                              "                     self,\n" +
+                                              "                     " + logRecordFullqualifiedName + "::$transactionId),\n" +
+                                              "         Z(0(#)))"));
+      result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIds[1] + " in LogRecord", 
+                                              "geq(int::select(heap,\n" +
+                                              "                null,\n" +
+                                              "                " + logRecordFullqualifiedName + "::$transactionCounter),\n" +
+                                              "    Z(0(#)))"));
       return result;
    }
 
@@ -554,7 +593,10 @@ public final class TestKeyUtil {
       addOperationObligations(createJuniorCard, true, true, true);
       MemoryOperationContract cjc = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, qualifiedPaycardName, "createJuniorCard()", operationContractIDs[0], "normal_behavior"), 
                                                                 "true", 
-                                                                "result.limit = 100 & !result = null & exc = null", 
+                                                                "int::select(heap, result, " + qualifiedPaycardName + "::$limit)\n" +
+                                                                "  = Z(0(0(1(#))))\n" +
+                                                                "& !result = null\n" +
+                                                                "& exc = null", 
                                                                 "mod[heap]: allLocs", 
                                                                 "diamond");
       addAllOperationContractObligations(cjc);
@@ -563,40 +605,75 @@ public final class TestKeyUtil {
       MemoryMethod charge = new MemoryMethod("charge(amount : int)", "boolean", DSVisibility.PUBLIC);
       addOperationObligations(charge, true, true, true);
       MemoryOperationContract c1 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, qualifiedPaycardName, "charge(int)", operationContractIDs[1], "exceptional_behavior"), 
-                                                               "amount <= 0 & self.<inv>", 
+                                                               "leq(amount, Z(0(#)))\n" +
+                                                               "& java.lang.Object::<inv>(heap, self)", 
                                                                "!exc = null\n" +
                                                                "& (  (   java.lang.Exception::instance(exc) = TRUE\n" +
-                                                               "      -> self.<inv>)\n" +
+                                                               "      -> java.lang.Object::<inv>(heap, self))\n" +
                                                                "   &   java.lang.IllegalArgumentException::instance(exc)\n" +
                                                                "     = TRUE)", 
                                                                "mod[heap]: allLocs", 
                                                                "diamond");
       addAllOperationContractObligations(c1);
       MemoryOperationContract c2 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, qualifiedPaycardName, "charge(int)", operationContractIDs[2], "normal_behavior"),
-                                                               "(  javaAddInt(amount, self.balance) >= self.limit\n" +
-                                                               "   |   self.isValid()\n" +
-                                                               "     = \\if (false)  \\then (TRUE)  \\else (FALSE))\n" +
-                                                               "& (amount >  0 & self.<inv>)", 
+                                                               "gt(amount, Z(0(#)))\n" +
+                                                               "& (  (  geq(javaAddInt(amount,\n" +
+                                                               "                       int::select(heap,\n" +
+                                                               "                                   self,\n" +
+                                                               "                                   " + qualifiedPaycardName + "::$balance)),\n" +
+                                                               (qualifiedPaycardName.contains(".") ?
+                                                               "            int::select(heap,\n" +
+                                                               "                        self,\n" +
+                                                               "                        " + qualifiedPaycardName + "::$limit))\n" :
+                                                               "            int::select(heap, self, " + qualifiedPaycardName + "::$limit))\n"
+                                                               ) +
+                                                               "      |   " + qualifiedPaycardName + "::isValid(heap, self)\n" +
+                                                               "        = \\if (false)  \\then (TRUE)  \\else (FALSE))\n" +
+                                                               "   & java.lang.Object::<inv>(heap, self))", 
                                                                "result = \\if (false)  \\then (TRUE)  \\else (FALSE)\n" +
-                                                               "& (    self.unsuccessfulOperations\n" +
-                                                               "     = javaAddInt(heapAtPre[self.unsuccessfulOperations],\n" +
-                                                               "                  1)\n" +
-                                                               "   & self.<inv>)\n" +
+                                                               "& (    int::select(heap,\n" +
+                                                               "                   self,\n" +
+                                                               "                   " + qualifiedPaycardName + "::$unsuccessfulOperations)\n" +
+                                                               "     = javaAddInt(int::select(heapAtPre,\n" +
+                                                               "                              self,\n" +
+                                                               "                              " + qualifiedPaycardName + "::$unsuccessfulOperations),\n" +
+                                                               "                  Z(1(#)))\n" +
+                                                               "   & java.lang.Object::<inv>(heap, self))\n" +
                                                                "& exc = null", 
-                                                               "mod[heap]: {(self, unsuccessfulOperations)}", 
+                                                               qualifiedPaycardName.contains(".") ? 
+                                                               "mod[heap]: singleton(self,\n" +
+                                                               "          " + qualifiedPaycardName + "::$unsuccessfulOperations)" : 
+                                                               "mod[heap]: singleton(self, " + qualifiedPaycardName + "::$unsuccessfulOperations)",
                                                                "diamond");
       addAllOperationContractObligations(c2);
       MemoryOperationContract c3 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, qualifiedPaycardName, "charge(int)", operationContractIDs[3], "normal_behavior"),
-                                                               "javaAddInt(amount, self.balance) < self.limit\n" +
-                                                               "&   self.isValid()\n" +
-                                                               "  = \\if (true)  \\then (TRUE)  \\else (FALSE)\n" +
-                                                               "& (amount >  0 & self.<inv>)", 
+                                                               "gt(amount, Z(0(#)))\n" +
+                                                               "& (  lt(javaAddInt(amount,\n" +
+                                                               "                   int::select(heap,\n" +
+                                                               "                               self,\n" +
+                                                               "                               " + qualifiedPaycardName + "::$balance)),\n" +
+                                                               (qualifiedPaycardName.contains(".") ?
+                                                               "        int::select(heap,\n" +
+                                                               "                    self,\n" +
+                                                               "                    " + qualifiedPaycardName + "::$limit))\n" :
+                                                               "        int::select(heap, self, PayCard::$limit))\n"
+                                                               )+
+                                                               "   &   " + qualifiedPaycardName + "::isValid(heap, self)\n" +
+                                                               "     = \\if (true)  \\then (TRUE)  \\else (FALSE)\n" +
+                                                               "   & java.lang.Object::<inv>(heap, self))", 
                                                                "result = \\if (true)  \\then (TRUE)  \\else (FALSE)\n" +
-                                                               "& (    self.balance\n" +
-                                                               "     = javaAddInt(amount, heapAtPre[self.balance])\n" +
-                                                               "   & self.<inv>)\n" +
+                                                               (qualifiedPaycardName.contains(".") ?
+                                                               "& (    int::select(heap,\n" +
+                                                               "                   self,\n" +
+                                                               "                   " + qualifiedPaycardName + "::$balance)\n" :
+                                                               "& (    int::select(heap, self, " + qualifiedPaycardName + "::$balance)\n") +
+                                                               "     = javaAddInt(amount,\n" +
+                                                               "                  int::select(heapAtPre,\n" +
+                                                               "                              self,\n" +
+                                                               "                              " + qualifiedPaycardName + "::$balance))\n" +
+                                                               "   & java.lang.Object::<inv>(heap, self))\n" +
                                                                "& exc = null", 
-                                                               "mod[heap]: {(self, balance)}", 
+                                                               "mod[heap]: singleton(self, " + qualifiedPaycardName + "::$balance)", 
                                                                "diamond");
       addAllOperationContractObligations(c3);
       charge.addOperationContract(c1);
@@ -606,11 +683,21 @@ public final class TestKeyUtil {
       MemoryMethod chargeAndRecord = new MemoryMethod("chargeAndRecord(amount : int)", "void", DSVisibility.PUBLIC);
       addOperationObligations(chargeAndRecord, true, true, true);
       MemoryOperationContract car = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, qualifiedPaycardName, "chargeAndRecord(int)", operationContractIDs[4], "normal_behavior"), 
-                                                                "amount >  0 & self.<inv>", 
-                                                                "self.balance >= heapAtPre[self.balance]\n" +
-                                                                "& self.<inv>\n" +
+                                                                "gt(amount, Z(0(#)))\n" +
+                                                                "& java.lang.Object::<inv>(heap, self)", 
+                                                                (qualifiedPaycardName.contains(".") ?
+                                                                "geq(int::select(heap,\n" +
+                                                                "                  self,\n" +
+                                                                "                  " + qualifiedPaycardName + "::$balance),\n" +
+                                                                "      int::select(heapAtPre,\n" +
+                                                                "                  self,\n" +
+                                                                "                  " + qualifiedPaycardName + "::$balance))\n" :
+                                                                "geq(int::select(heap, self, " + qualifiedPaycardName + "::$balance),\n" +
+                                                                "      int::select(heapAtPre, self, " + qualifiedPaycardName + "::$balance))\n"
+                                                                ) +
+                                                                "& java.lang.Object::<inv>(heap, self)\n" +
                                                                 "& exc = null", 
-                                                                "mod[heap]: allLocs \\setMinus freshLocs(heap)", 
+                                                                "mod[heap]: setMinus(allLocs, freshLocs(heap))", 
                                                                 "diamond");
       addAllOperationContractObligations(car);
       chargeAndRecord.addOperationContract(car);
@@ -618,14 +705,17 @@ public final class TestKeyUtil {
       MemoryMethod isValid = new MemoryMethod("isValid()", "boolean", DSVisibility.PUBLIC);
       addOperationObligations(isValid, true, true, true);
       MemoryOperationContract iv2 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, qualifiedPaycardName, "isValid()", operationContractIDs[6], "normal_behavior"), 
-                                                                "self.<inv>", 
+                                                                "java.lang.Object::<inv>(heap, self)", 
                                                                 "result\n" +
-                                                                "  = \\if (self.unsuccessfulOperations <= 3)\n" +
+                                                                "  = \\if (leq(int::select(heap,\n" +
+                                                                "                         self,\n" +
+                                                                "                         " + qualifiedPaycardName + "::$unsuccessfulOperations),\n" +
+                                                                "             Z(3(#))))\n" +
                                                                 "        \\then (TRUE)\n" +
                                                                 "        \\else (FALSE)\n" +
-                                                                "& self.<inv>\n" +
+                                                                "& java.lang.Object::<inv>(heap, self)\n" +
                                                                 "& exc = null", 
-                                                                "mod[heap]: {}", 
+                                                                "mod[heap]: empty", 
                                                                 "diamond");
       addAllOperationContractObligations(iv2);
       isValid.addOperationContract(iv2);
@@ -639,10 +729,21 @@ public final class TestKeyUtil {
       result.addAttribute(new MemoryAttribute("balance", "int", bugAttributeVisibility(DSVisibility.DEFAULT)));
       result.addAttribute(new MemoryAttribute("log", qualifiedLogFileName, bugAttributeVisibility(DSVisibility.PROTECTED)));
       result.getExtendsFullnames().add("java.lang.Object");
-      result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIDs[0] + " in PayCard", "!self.log = null"));
-      result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIDs[1] + " in PayCard", "self.balance >= 0"));
-      result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIDs[2] + " in PayCard", "self.limit >  0"));
-      result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIDs[3] + " in PayCard", "self.unsuccessfulOperations >= 0"));
+      result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIDs[0] + " in PayCard", 
+                                              qualifiedPaycardName.contains(".") ?
+                                              "!  " + qualifiedLogFileName + "::select(heap,\n" +
+                                              "                           self,\n" +
+                                              "                           " + qualifiedPaycardName + "::$log)\n" +
+                                              " = null" :
+                                              "!  " + qualifiedLogFileName + "::select(heap, self, " + qualifiedPaycardName + "::$log)\n = null"));
+      result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIDs[1] + " in PayCard", 
+                                              "geq(int::select(heap, self, " + qualifiedPaycardName + "::$balance),\n    Z(0(#)))"));
+      result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIDs[2] + " in PayCard", 
+                                              qualifiedPaycardName.contains(".") ?
+                                              "gt(int::select(heap, self, " + qualifiedPaycardName + "::$limit),\n   Z(0(#)))" :
+                                              "gt(int::select(heap, self, " + qualifiedPaycardName + "::$limit), Z(0(#)))"));
+      result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIDs[3] + " in PayCard", 
+                                              "geq(int::select(heap,\n                self,\n                " + qualifiedPaycardName + "::$unsuccessfulOperations),\n    Z(0(#)))"));
       return result;
    }
    
@@ -667,16 +768,37 @@ public final class TestKeyUtil {
       MemoryMethod addRecord = new MemoryMethod("addRecord(balance : int)", "void", DSVisibility.PUBLIC);
       addOperationObligations(addRecord, true, true, true);
       MemoryOperationContract ar1 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedLogFileClass, qualifiedLogFileClass, "addRecord(int)", operationContractIds[0], "normal_behavior"),
-                                                                "balance >= 0 & self.<inv>", 
-                                                                "\\if (!  javaAddInt(heapAtPre[self.currentRecord], 1)\n" +
-                                                                "        = " + qualifiedLogFileClass + ".logFileSize)\n" +
-                                                                "      \\then (  self.currentRecord\n" +
-                                                                "             = javaAddInt(heapAtPre[self.currentRecord],\n" +
-                                                                "                          1))\n" +
-                                                                "      \\else (self.currentRecord = 0)\n" +
-                                                                "& (    self.logArray[self.currentRecord].balance\n" +
+                                                                "geq(balance, Z(0(#)))\n" +
+                                                                "& java.lang.Object::<inv>(heap, self)", 
+                                                                "\\if (!  javaAddInt(int::select(heapAtPre,\n" +
+                                                                "                                 self,\n" +
+                                                                "                                 " + qualifiedLogFileClass + "::$currentRecord),\n" +
+                                                                "                     Z(1(#)))\n" +
+                                                                "        = int::select(heap,\n" +
+                                                                "                      null,\n" +
+                                                                "                      " + qualifiedLogFileClass + "::$logFileSize))\n" +
+                                                                "      \\then (  int::select(heap,\n" +
+                                                                "                           self,\n" +
+                                                                "                           " + qualifiedLogFileClass + "::$currentRecord)\n" +
+                                                                "             = javaAddInt(int::select(heapAtPre,\n" +
+                                                                "                                      self,\n" +
+                                                                "                                      " + qualifiedLogFileClass + "::$currentRecord),\n" +
+                                                                "                          Z(1(#))))\n" +
+                                                                "      \\else (  int::select(heap,\n" +
+                                                                "                           self,\n" +
+                                                                "                           " + qualifiedLogFileClass + "::$currentRecord)\n" +
+                                                                "             = Z(0(#)))\n" +
+                                                                "& (    int::select(heap,\n" +
+                                                                "                   " + qualifiedLogRecordClass + "::select(heap,\n" +
+                                                                "                   " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "         " + qualifiedLogRecordClass + "[]::select(heap,\n" +
+                                                                "                   " + StringUtil.createLine(" ", qualifiedLogRecordClass.length() + qualifiedLogRecordClass.length()) + "                    self,\n" +
+                                                                "                   " + StringUtil.createLine(" ", qualifiedLogRecordClass.length() + qualifiedLogRecordClass.length()) + "                    " + qualifiedLogFileClass + "::$logArray),\n" +
+                                                                "                   " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "         arr(int::select(heap,\n" +
+                                                                "                   " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "                         self,\n" +
+                                                                "                   " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "                         " + qualifiedLogFileClass + "::$currentRecord))),\n" +
+                                                                "                   " + qualifiedLogRecordClass + "::$balance)\n" +
                                                                 "     = balance\n" +
-                                                                "   & self.<inv>)\n" +
+                                                                "   & java.lang.Object::<inv>(heap, self))\n" +
                                                                 "& exc = null", 
                                                                 "mod[heap]: allLocs", 
                                                                 "diamond");
@@ -686,13 +808,27 @@ public final class TestKeyUtil {
       MemoryMethod getMaximumRecord = new MemoryMethod("getMaximumRecord()", qualifiedLogRecordClass, DSVisibility.PUBLIC);
       addOperationObligations(getMaximumRecord, true, true, true);
       MemoryOperationContract mr2 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedLogFileClass, qualifiedLogFileClass, "getMaximumRecord()", operationContractIds[2], "normal_behavior"), 
-                                                                "self.<inv>", 
+                                                                "java.lang.Object::<inv>(heap, self)", 
                                                                 "\\forall int i;\n" +
-                                                                "    (   0 <= i & i < self.logArray.length & inInt(i)\n" +
-                                                                "     -> self.logArray[i].balance <= result.balance)\n" +
-                                                                "& (self.<inv> & !result = null)\n" +
+                                                                "    (     leq(Z(0(#)), i)\n" +
+                                                                "        & lt(i,\n" +
+                                                                "             length(" + qualifiedLogRecordClass + "[]::select(heap,\n" +
+                                                                "                    " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "           self,\n" +
+                                                                "                    " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "           " + qualifiedLogFileClass + "::$logArray)))\n" +
+                                                                "        & inInt(i)\n" +
+                                                                "     -> leq(int::select(heap,\n" +
+                                                                "                        " + qualifiedLogRecordClass + "::select(heap,\n" +
+                                                                "                        " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "         " + qualifiedLogRecordClass + "[]::select(heap,\n" +
+                                                                "                        " + StringUtil.createLine(" ", qualifiedLogRecordClass.length() + qualifiedLogRecordClass.length()) + "                    self,\n" +
+                                                                "                        " + StringUtil.createLine(" ", qualifiedLogRecordClass.length() + qualifiedLogRecordClass.length()) + "                    " + qualifiedLogFileClass + "::$logArray),\n" +
+                                                                "                        " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "         arr(i)),\n" +
+                                                                "                        " + qualifiedLogRecordClass + "::$balance),\n" +
+                                                                "            int::select(heap,\n" +
+                                                                "                        result,\n" +
+                                                                "                        " + qualifiedLogRecordClass + "::$balance)))\n" +
+                                                                "& (java.lang.Object::<inv>(heap, self) & !result = null)\n" +
                                                                 "& exc = null", 
-                                                                "mod[heap]: {}", 
+                                                                "mod[heap]: empty", 
                                                                 "box");
       addAllOperationContractObligations(mr2);
       getMaximumRecord.addOperationContract(mr2);
@@ -701,17 +837,58 @@ public final class TestKeyUtil {
       result.addAttribute(new MemoryAttribute("currentRecord", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
       result.addAttribute(new MemoryAttribute("logArray", qualifiedLogRecordClass + KeyConnection.ARRAY_DECLARATION, bugAttributeVisibility(DSVisibility.PRIVATE)));
       result.getExtendsFullnames().add("java.lang.Object");
-      result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIds[0] + " in LogFile", "\\forall int i;\n" +
-      		                                                                                               "  (   0 <= i & i < self.logArray.length & inInt(i)\n" +
-      		                                                                                               "   -> !self.logArray[i] = null)"));
-      result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIds[1] + " in LogFile", "!self.logArray = null"));
-      result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIds[2] + " in LogFile", "self.logArray.length = " + qualifiedLogFileClass + ".logFileSize\n" +
-                                                                                                           "& (  self.currentRecord < " + qualifiedLogFileClass + ".logFileSize\n" +
-                                                                                                           "   & (  self.currentRecord >= 0\n" +
-                                                                                                           "      & (  !self.logArray = null\n" +
-                                                                                                           "         & \\forall int i;\n" +
-                                                                                                           "             (   0 <= i & i < self.logArray.length\n" +
-                                                                                                           "              -> !self.logArray[i] = null))))"));
+      result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIds[0] + " in LogFile", 
+                                              "!  " + qualifiedLogRecordClass + "[]::select(heap,\n" +
+      		                                  "   " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "           self,\n" +
+      		                                  "   " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "           " + qualifiedLogFileClass + "::$logArray)\n" +
+      	                                     " = null"));
+      result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIds[1] + " in LogFile", 
+                                              "\\forall int i;\n" +
+                    		                      "  (     leq(Z(0(#)), i)\n" +
+                    		                      "      & lt(i,\n" +
+                    		                      "           length(" + qualifiedLogRecordClass + "[]::select(heap,\n" +
+                    		                      "                  " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "           self,\n" +
+                    		                      "                  " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "           " + qualifiedLogFileClass + "::$logArray)))\n" +
+                    		                      "      & inInt(i)\n" +
+                    		                      "   -> !  " + qualifiedLogRecordClass + "::select(heap,\n" +
+                    		                      "         " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "         " + qualifiedLogRecordClass + "[]::select(heap,\n" +
+                    		                      "         " + StringUtil.createLine(" ", qualifiedLogRecordClass.length() + qualifiedLogRecordClass.length()) + "                    self,\n" +
+                    		                      "         " + StringUtil.createLine(" ", qualifiedLogRecordClass.length() + qualifiedLogRecordClass.length()) + "                    " + qualifiedLogFileClass + "::$logArray),\n" +
+                    		                      "         " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "         arr(i))\n" +
+                    		                      "       = null)"));
+      result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIds[2] + " in LogFile", 
+                                              "length(" + qualifiedLogRecordClass + "[]::select(heap,\n" +
+                                              "       " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "               self,\n" +
+                                              "       " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "               " + qualifiedLogFileClass + "::$logArray))\n" +
+                                              "  = int::select(heap,\n" +
+                                              "                null,\n" +
+                                              "                " + qualifiedLogFileClass + "::$logFileSize)\n" +
+                                              "& (  lt(int::select(heap,\n" +
+                                              "                    self,\n" +
+                                              "                    " + qualifiedLogFileClass + "::$currentRecord),\n" +
+                                              "        int::select(heap,\n" +
+                                              "                    null,\n" +
+                                              "                    " + qualifiedLogFileClass + "::$logFileSize))\n" +
+                                              "   & (  geq(int::select(heap,\n" +
+                                              "                        self,\n" +
+                                              "                        " + qualifiedLogFileClass + "::$currentRecord),\n" +
+                                              "            Z(0(#)))\n" +
+                                              "      & (  !  " + qualifiedLogRecordClass + "[]::select(heap,\n" +
+                                              "              " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "           self,\n" +
+                                              "              " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "           " + qualifiedLogFileClass + "::$logArray)\n" +
+                                              "            = null\n" +
+                                              "         & \\forall int i;\n" +
+                                              "             (     leq(Z(0(#)), i)\n" +
+                                              "                 & lt(i,\n" +
+                                              "                      length(" + qualifiedLogRecordClass + "[]::select(heap,\n" +
+                                              "                      " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "                  self,\n" +
+                                              "                      " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "                  " + qualifiedLogFileClass + "::$logArray)))\n" +
+                                              "              -> !  " + qualifiedLogRecordClass + "::select(heap,\n" +
+                                              "                    " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "         " + qualifiedLogRecordClass + "[]::select(heap,\n" +
+                                              "                    " + StringUtil.createLine(" ", qualifiedLogRecordClass.length() + qualifiedLogRecordClass.length()) + "                    self,\n" +
+                                              "                    " + StringUtil.createLine(" ", qualifiedLogRecordClass.length() + qualifiedLogRecordClass.length()) + "                    " + qualifiedLogFileClass + "::$logArray),\n" +
+                                              "                    " + StringUtil.createLine(" ", qualifiedLogRecordClass.length()) + "         arr(i))\n" +
+                                              "                  = null))))"));
       return result;
    }
 
@@ -804,9 +981,18 @@ public final class TestKeyUtil {
       b.getExtendsFullnames().add("java.lang.Object");
       b.addAttribute(new MemoryAttribute("c", "test.Test", bugAttributeVisibility(DSVisibility.PRIVATE), false, bugAttributeFinal(true)));
       b.addConstructor(new MemoryConstructor("B(x : int)", DSVisibility.DEFAULT));
-      b.addInvariant(new MemoryInvariant("JML class invariant nr 0 in B", "self.c.<inv>"));
+      b.addInvariant(new MemoryInvariant("JML class invariant nr 0 in B", 
+                                         "java.lang.Object::<inv>(heap,\n" +
+                                         "                        test.Test::select(heap,\n" +
+                                         "                                          self,\n" +
+                                         "                                          test.B::$c))"));
       MemoryAxiom axiom = new MemoryAxiom("Class invariant axiom for test.B", "equiv(java.lang.Object::<inv>(heap,self),java.lang.Object::<inv>(heap,test.Test::select(heap,self,test.B::$c)))");
-      MemoryAxiomContract axiomContract = new MemoryAxiomContract("test.B[java.lang.Object::<inv>()].JML accessible clause.0", "[heap] self.<inv>", "[heap] allFields(self) \\cup allFields(self.c)");
+      MemoryAxiomContract axiomContract = new MemoryAxiomContract("test.B[java.lang.Object::<inv>()].JML accessible clause.0", 
+                                                                  "[heap] java.lang.Object::<inv>(heap, self)", 
+                                                                  "[heap] union(allFields(self),\n" +
+                                                                  "      allFields(test.Test::select(heap,\n" +
+                                                                  "                                  self,\n" +
+                                                                  "                                  test.B::$c)))");
       addAllOperationContractObligations(axiomContract);
       axiom.addAxiomContract(axiomContract);
       b.addAxiom(axiom);
@@ -843,9 +1029,21 @@ public final class TestKeyUtil {
       packageEnum.addLiteral(new MemoryEnumLiteral("BLUE"));
       packageEnum.addConstructor(createDefaultConstructor("PackageEnum()", null, false));
       packageEnum.addMethod(new MemoryMethod("getValue()", "int", DSVisibility.PUBLIC));
-      packageEnum.addInvariant(new MemoryInvariant("JML class invariant nr 4 in PackageEnum", "!enumPackage.PackageEnum.RED = null"));
-      packageEnum.addInvariant(new MemoryInvariant("JML class invariant nr 5 in PackageEnum", "!enumPackage.PackageEnum.GREEN = null"));
-      packageEnum.addInvariant(new MemoryInvariant("JML class invariant nr 6 in PackageEnum", "!enumPackage.PackageEnum.BLUE = null"));
+      packageEnum.addInvariant(new MemoryInvariant("JML class invariant nr 4 in PackageEnum", 
+                                                   "!  enumPackage.PackageEnum::select(heap,\n" +
+                                                   "                                   null,\n" +
+                                                   "                                   enumPackage.PackageEnum::$RED)\n" +
+                                                   " = null"));
+      packageEnum.addInvariant(new MemoryInvariant("JML class invariant nr 5 in PackageEnum", 
+                                                   "!  enumPackage.PackageEnum::select(heap,\n" +
+                                                   "                                   null,\n" +
+                                                   "                                   enumPackage.PackageEnum::$GREEN)\n" +
+                                                   " = null"));
+      packageEnum.addInvariant(new MemoryInvariant("JML class invariant nr 6 in PackageEnum", 
+                                                   "!  enumPackage.PackageEnum::select(heap,\n" +
+                                                   "                                   null,\n" +
+                                                   "                                   enumPackage.PackageEnum::$BLUE)\n" +
+                                                   " = null"));
       enumPackage.addEnum(packageEnum);
       addDefaultEnumMethods(packageEnum, "enumPackage.PackageEnum");
       // Create enumeration MyEnum
@@ -857,10 +1055,14 @@ public final class TestKeyUtil {
       myEnum.addConstructor(new MemoryConstructor("MyEnum(previous : MyEnum)", DSVisibility.PRIVATE));
       myEnum.addMethod(new MemoryMethod("getValue()", "int", DSVisibility.PUBLIC));
       myEnum.addMethod(new MemoryMethod("getPrevious()", "MyEnum", DSVisibility.PUBLIC));
-      myEnum.addInvariant(new MemoryInvariant("JML class invariant nr 0 in MyEnum", "!MyEnum.A = null"));
-      myEnum.addInvariant(new MemoryInvariant("JML class invariant nr 1 in MyEnum", "!MyEnum.B = null"));
-      myEnum.addInvariant(new MemoryInvariant("JML class invariant nr 2 in MyEnum", "!MyEnum.C = null"));
-      myEnum.addInvariant(new MemoryInvariant("JML class invariant nr 3 in MyEnum", "!self.previous = null"));
+      myEnum.addInvariant(new MemoryInvariant("JML class invariant nr 0 in MyEnum", 
+                                              "!MyEnum::select(heap, null, MyEnum::$A) = null"));
+      myEnum.addInvariant(new MemoryInvariant("JML class invariant nr 1 in MyEnum", 
+                                              "!MyEnum::select(heap, null, MyEnum::$B) = null"));
+      myEnum.addInvariant(new MemoryInvariant("JML class invariant nr 2 in MyEnum", 
+                                              "!MyEnum::select(heap, null, MyEnum::$C) = null"));
+      myEnum.addInvariant(new MemoryInvariant("JML class invariant nr 3 in MyEnum", 
+                                              "!MyEnum::select(heap, self, MyEnum::$previous) = null"));
       addDefaultEnumMethods(myEnum, "MyEnum");
       con.addEnum(myEnum);
       return con;
@@ -892,8 +1094,10 @@ public final class TestKeyUtil {
       b.addConstructor(createDefaultConstructor("ModelFieldTest()", null, false));
       MemoryMethod doubleX = new MemoryMethod("doubleX()", "int", DSVisibility.PUBLIC);
       MemoryOperationContract doubleXcontract = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId("ModelFieldTest", "ModelFieldTest", "doubleX()", "0", "normal_behavior"),
-                                                                            "self.<inv>", 
-                                                                            "result = self.f & self.<inv> & exc = null", 
+                                                                            "java.lang.Object::<inv>(heap, self)", 
+                                                                            "result = ModelFieldTest::$f(heap, self)\n" +
+                                                                            "& java.lang.Object::<inv>(heap, self)\n" +
+                                                                            "& exc = null", 
                                                                             "mod[heap]: allLocs", 
                                                                             "diamond");
       addAllOperationContractObligations(doubleXcontract);
@@ -902,8 +1106,8 @@ public final class TestKeyUtil {
       MemoryAxiom axiom1 = new MemoryAxiom("JML represents clause for ModelFieldTest::$f", "equals(ModelFieldTest::$f(heap,self),javaMulInt(Z(2(#)),int::select(heap,self,ModelFieldTest::$x)))");
       if (includeAxiomContract) {
          MemoryAxiomContract axiom1contract = new MemoryAxiomContract(TestKeY4EclipseUtil.createAxiomContractId("ModelFieldTest", "$f()", "0"),
-                                                                      "[heap] self.<inv>", 
-                                                                      "[heap] {(self, x)}");
+                                                                      "[heap] java.lang.Object::<inv>(heap, self)", 
+                                                                      "[heap] singleton(self, ModelFieldTest::$x)");
          addAllOperationContractObligations(axiom1contract);
          axiom1.addAxiomContract(axiom1contract);
       }
@@ -927,17 +1131,49 @@ public final class TestKeyUtil {
       attributeTestParent.addAttribute(new MemoryAttribute("onParentStringArray", "java.lang.String[]", bugAttributeVisibility(DSVisibility.PUBLIC)));
       attributeTestParent.addAttribute(new MemoryAttribute("PARENT_CONSTANT", "int", bugAttributeVisibility(DSVisibility.PUBLIC), true, bugAttributeFinal(true)));
       attributeTestParent.getExtendsFullnames().add("java.lang.Object");
-      attributeTestParent.addInvariant(new MemoryInvariant("JML class invariant nr 0 in AttributeTestParent", "!self.onParentMyClass = null"));
-      attributeTestParent.addInvariant(new MemoryInvariant("JML class invariant nr 1 in AttributeTestParent", "\\forall int i;\n" +
-      		                                                                                                  "  (   0 <= i & i < self.onParentBool.length & inInt(i)\n" +
-      		                                                                                                  "   -> !self.onParentBool[i] = null)"));
-      attributeTestParent.addInvariant(new MemoryInvariant("JML class invariant nr 2 in AttributeTestParent", "!self.onParentBool = null"));
-      attributeTestParent.addInvariant(new MemoryInvariant("JML class invariant nr 3 in AttributeTestParent", "\\forall int i;\n" +
-      		                                                                                                  "  (     0 <= i\n" +
-      		                                                                                                  "      & i < self.onParentStringArray.length\n" +
-      		                                                                                                  "      & inInt(i)\n" +
-      		                                                                                                  "   -> !self.onParentStringArray[i] = null)"));
-      attributeTestParent.addInvariant(new MemoryInvariant("JML class invariant nr 4 in AttributeTestParent", "!self.onParentStringArray = null"));
+      attributeTestParent.addInvariant(new MemoryInvariant("JML class invariant nr 0 in AttributeTestParent", 
+                                                           "!  MyClass::select(heap,\n" +
+                                                           "                   self,\n" +
+                                                           "                   AttributeTestParent::$onParentMyClass)\n" +
+                                                           " = null"));
+      attributeTestParent.addInvariant(new MemoryInvariant("JML class invariant nr 1 in AttributeTestParent", 
+                                                           "!  boolean[][]::select(heap,\n" +
+                                                           "                       self,\n" +
+                                                           "                       AttributeTestParent::$onParentBool)\n" +
+                                                           " = null"));
+      attributeTestParent.addInvariant(new MemoryInvariant("JML class invariant nr 2 in AttributeTestParent", 
+                                                           "\\forall int i;\n" +
+                                                           "  (     leq(Z(0(#)), i)\n" +
+                                                           "      & lt(i,\n" +
+                                                           "           length(boolean[][]::select(heap,\n" +
+                                                           "                                      self,\n" +
+                                                           "                                      AttributeTestParent::$onParentBool)))\n" +
+                                                           "      & inInt(i)\n" +
+                                                           "   -> !  boolean[]::select(heap,\n" +
+                                                           "                           boolean[][]::select(heap,\n" +
+                                                           "                                               self,\n" +
+                                                           "                                               AttributeTestParent::$onParentBool),\n" +
+                                                           "                           arr(i))\n" +
+                                                           "       = null)"));
+      attributeTestParent.addInvariant(new MemoryInvariant("JML class invariant nr 3 in AttributeTestParent", 
+                                                           "!  java.lang.String[]::select(heap,\n" +
+                                                           "                              self,\n" +
+                                                           "                              AttributeTestParent::$onParentStringArray)\n" +
+                                                           " = null"));
+      attributeTestParent.addInvariant(new MemoryInvariant("JML class invariant nr 4 in AttributeTestParent", 
+                                                           "\\forall int i;\n" +
+                                                           "  (     leq(Z(0(#)), i)\n" +
+                                                           "      & lt(i,\n" +
+                                                           "           length(java.lang.String[]::select(heap,\n" +
+                                                           "                                             self,\n" +
+                                                           "                                             AttributeTestParent::$onParentStringArray)))\n" +
+                                                           "      & inInt(i)\n" +
+                                                           "   -> !  java.lang.String::select(heap,\n" +
+                                                           "                                  java.lang.String[]::select(heap,\n" +
+                                                           "                                                             self,\n" +
+                                                           "                                                             AttributeTestParent::$onParentStringArray),\n" +
+                                                           "                                  arr(i))\n" +
+                                                           "       = null)"));
       con.addClass(attributeTestParent);
       MemoryClass attributeTest = new MemoryClass("AttributesTest", DSVisibility.PUBLIC);
       attributeTest.addConstructor(createDefaultConstructor("AttributesTest()", "X"));
@@ -949,16 +1185,45 @@ public final class TestKeyUtil {
       attributeTest.addAttribute(new MemoryAttribute("counter", "int", bugAttributeVisibility(DSVisibility.PRIVATE), true));
       attributeTest.getExtendsFullnames().add("AttributeTestParent");
       attributeTest.getExtends().add(attributeTestParent);
-      attributeTest.addInvariant(new MemoryInvariant("JML class invariant nr 5 in AttributesTest", "!self.y = null"));
-      attributeTest.addInvariant(new MemoryInvariant("JML class invariant nr 6 in AttributesTest", "!self.boolArray = null"));
-      attributeTest.addInvariant(new MemoryInvariant("JML class invariant nr 7 in AttributesTest", "!self.classInstance = null"));
-      attributeTest.addInvariant(new MemoryInvariant("JML class invariant nr 8 in AttributesTest", "!self.CONST = null"));
-      attributeTest.addInvariant(new MemoryInvariant("JML class invariant nr 3 in AttributesTest", "\\forall int i;\n" +
-                                                                                                        "  (     0 <= i\n" +
-                                                                                                        "      & i < self.onParentStringArray.length\n" +
-                                                                                                        "      & inInt(i)\n" +
-                                                                                                        "   -> !self.onParentStringArray[i] = null)"));
-      attributeTest.addInvariant(new MemoryInvariant("JML class invariant nr 4 in AttributesTest", "!self.onParentStringArray = null"));
+      attributeTest.addInvariant(new MemoryInvariant("JML class invariant nr 5 in AttributesTest", 
+                                                     "!  java.lang.String::select(heap,\n" +
+                                                     "                            self,\n" +
+                                                     "                            AttributesTest::$y)\n" +
+                                                     " = null"));
+      attributeTest.addInvariant(new MemoryInvariant("JML class invariant nr 6 in AttributesTest", 
+                                                     "!  boolean[]::select(heap,\n" +
+                                                     "                     self,\n" +
+                                                     "                     AttributesTest::$boolArray)\n" +
+                                                     " = null"));
+      attributeTest.addInvariant(new MemoryInvariant("JML class invariant nr 7 in AttributesTest", 
+                                                     "!  MyClass::select(heap,\n" +
+                                                     "                   self,\n" +
+                                                     "                   AttributesTest::$classInstance)\n" +
+                                                     " = null"));
+      attributeTest.addInvariant(new MemoryInvariant("JML class invariant nr 8 in AttributesTest", 
+                                                     "!  java.lang.String::select(heap,\n" +
+                                                     "                            self,\n" +
+                                                     "                            AttributesTest::$CONST)\n" +
+                                                     " = null"));
+      attributeTest.addInvariant(new MemoryInvariant("JML class invariant nr 3 in AttributesTest", 
+                                                     "!  java.lang.String[]::select(heap,\n" +
+                                                     "                              self,\n" +
+                                                     "                              AttributeTestParent::$onParentStringArray)\n" +
+                                                     " = null"));
+      attributeTest.addInvariant(new MemoryInvariant("JML class invariant nr 4 in AttributesTest", 
+                                                     "\\forall int i;\n" +
+                                                     "  (     leq(Z(0(#)), i)\n" +
+                                                     "      & lt(i,\n" +
+                                                     "           length(java.lang.String[]::select(heap,\n" +
+                                                     "                                             self,\n" +
+                                                     "                                             AttributeTestParent::$onParentStringArray)))\n" +
+                                                     "      & inInt(i)\n" +
+                                                     "   -> !  java.lang.String::select(heap,\n" +
+                                                     "                                  java.lang.String[]::select(heap,\n" +
+                                                     "                                                             self,\n" +
+                                                     "                                                             AttributeTestParent::$onParentStringArray),\n" +
+                                                     "                                  arr(i))\n" +
+                                                     "       = null)"));
       con.addClass(attributeTest);
       MemoryClass myClass = new MemoryClass("MyClass", DSVisibility.PUBLIC);
       myClass.getExtendsFullnames().add("java.lang.Object");
@@ -1024,13 +1289,15 @@ public final class TestKeyUtil {
       classA.addConstructor(createDefaultConstructor("ClassA()", "X"));
       classA.addAttribute(new MemoryAttribute("limit", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
       classA.getExtendsFullnames().add("java.lang.Object");
-      classA.addInvariant(new MemoryInvariant("JML class invariant nr 0 in ClassA", "self.limit >  0"));
+      classA.addInvariant(new MemoryInvariant("JML class invariant nr 0 in ClassA", 
+                                              "gt(int::select(heap, self, ClassA::$limit), Z(0(#)))"));
       con.addClass(classA);
       MemoryInterface interfaceA = new MemoryInterface("InterfaceA", DSVisibility.PUBLIC);
       MemoryMethod getLimit = new MemoryMethod("getLimit()", "int", DSVisibility.PUBLIC, false, false, true);
       addOperationObligations(getLimit, true, true, true);
       interfaceA.addMethod(getLimit);
-      interfaceA.addInvariant(new MemoryInvariant("JML class invariant nr 2 in InterfaceA", "self.getLimit() >  0"));
+      interfaceA.addInvariant(new MemoryInvariant("JML class invariant nr 2 in InterfaceA", 
+                                                  "gt(InterfaceA::getLimit(heap, self), Z(0(#)))"));
       con.addInterface(interfaceA);
       return con;
    }
@@ -1115,7 +1382,14 @@ public final class TestKeyUtil {
       classConstructor.addAttribute(new MemoryAttribute("value", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
       MemoryConstructor classConstructorConstructor = new MemoryConstructor("ConstructorTest(x : int, a : B)", DSVisibility.PUBLIC);
       classConstructor.addConstructor(classConstructorConstructor);
-      MemoryOperationContract classConstructorConstructorOC = new MemoryOperationContract("ConstructorTest[ConstructorTest::ConstructorTest(int,B)].JML normal_behavior operation contract.0", "!a = null", "self.value = javaSubInt(42, 4711)\n& self.<inv>\n& exc = null", "mod[heap]: allLocs", "diamond");
+      MemoryOperationContract classConstructorConstructorOC = new MemoryOperationContract("ConstructorTest[ConstructorTest::ConstructorTest(int,B)].JML normal_behavior operation contract.0", 
+                                                                                          "!a = null", 
+                                                                                          "int::select(heap, self, ConstructorTest::$value)\n" +
+                                                                                          "  = javaSubInt(Z(2(4(#))), Z(1(1(7(4(#))))))\n" +
+                                                                                          "& java.lang.Object::<inv>(heap, self)\n" +
+                                                                                          "& exc = null", 
+                                                                                          "mod[heap]: allLocs", 
+                                                                                          "diamond");
       addAllOperationContractObligations(classConstructorConstructorOC);
       classConstructorConstructor.addOperationContract(classConstructorConstructorOC);
       con.addClass(classA);
@@ -1319,10 +1593,18 @@ public final class TestKeyUtil {
       result.addConstructor(createDefaultConstructor(className + "()", null, false));
       result.addLiteral(new MemoryEnumLiteral("INSTANCE"));
 //      if (multilineInvariant) {
-//         result.addInvariant(new MemoryInvariant("JML class invariant nr " + enumInvariantIds[0] + " in " + className, "!  " + fullName + ".INSTANCE\n = null"));
+         result.addInvariant(new MemoryInvariant("JML class invariant nr " + enumInvariantIds[0] + " in " + className, 
+               "!  " + fullName + "::select(heap,\n" +
+               "   " + StringUtil.createLine(" ", fullName.length()) + "         null,\n" +
+               "   " + StringUtil.createLine(" ", fullName.length()) + "         " + fullName + "::$INSTANCE)\n" +
+               " = null"));
 //      }
 //      else {
-         result.addInvariant(new MemoryInvariant("JML class invariant nr " + enumInvariantIds[0] + " in " + className, "!" + fullName + ".INSTANCE = null"));
+//         result.addInvariant(new MemoryInvariant("JML class invariant nr " + enumInvariantIds[0] + " in " + className, 
+//                                                 "!  " + fullName + "::select(heap,\n" +
+//                                                 "   " + StringUtil.createLine(" ", fullName.length()) + "         null,\n" +
+//                                                 "   " + StringUtil.createLine(" ", fullName.length()) + "         " + fullName + "::$INSTANCE)\n" +
+//                                                 " = null"));
 //      }
       MemoryClass anonymousClass = new MemoryClass("ClassContainer.30390029.20920809", DSVisibility.DEFAULT);
       anonymousClass.setAnonymous(true);
@@ -1356,12 +1638,20 @@ public final class TestKeyUtil {
       MemoryEnum result = new MemoryEnum(className, bugEnumVisibility(DSVisibility.DEFAULT));
       result.addConstructor(createDefaultConstructor(className + "()", null, false));
       result.addLiteral(new MemoryEnumLiteral("INSTANCE"));
-      if (multilineInvariant) {
-         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, "!  " + fullName + ".INSTANCE\n = null"));
-      }
-      else {
-         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, "!" + fullName + ".INSTANCE = null"));
-      }
+//      if (multilineInvariant) {
+         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, 
+                                                 "!  " + fullName + "::select(heap,\n" +
+                                                 "   " + StringUtil.createLine(" ", fullName.length()) + "         null,\n" +
+                                                 "   " + StringUtil.createLine(" ", fullName.length()) + "         " + fullName + "::$INSTANCE)\n" +
+                                                 " = null"));
+//      }
+//      else {
+//         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, 
+//                                                 "!  " + fullName + "::select(heap,\n" +
+//                                                 "   " + StringUtil.createLine(" ", fullName.length()) + "         null,\n" +
+//                                                 "   " + StringUtil.createLine(" ", fullName.length()) + "         " + fullName + "::$INSTANCE)\n" +
+//                                                 " = null"));
+//      }
       addDefaultEnumMethods(result, fullName);
       return result;
    }
@@ -1395,12 +1685,20 @@ public final class TestKeyUtil {
       MemoryEnum result = new MemoryEnum(className, bugEnumVisibility(DSVisibility.DEFAULT));
       result.addConstructor(createDefaultConstructor(className + "()", null, false));
       result.addLiteral(new MemoryEnumLiteral("INSTANCE"));
-      if (multilineInvariant) {
-         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, "!  " + fullName + ".INSTANCE\n = null"));
-      }
-      else {
-         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, "!" + fullName + ".INSTANCE = null"));
-      }
+//      if (multilineInvariant) {
+         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, 
+                                                 "!  " + fullName + "::select(heap,\n" +
+                                                       "   " + StringUtil.createLine(" ", fullName.length()) + "         null,\n" +
+                                                       "   " + StringUtil.createLine(" ", fullName.length()) + "         " + fullName + "::$INSTANCE)\n" +
+                                                 " = null"));
+//      }
+//      else {
+//         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, 
+//                                                 "!  " + fullName + "::select(heap,\n" +
+//                                                       "   " + StringUtil.createLine(" ", fullName.length()) + "         null,\n" +
+//                                                       "   " + StringUtil.createLine(" ", fullName.length()) + "         " + fullName + "::$INSTANCE)\n" +
+//                                                 " = null"));
+//      }
       addDefaultEnumMethods(result, fullName);
       return result;
    }
@@ -1421,12 +1719,20 @@ public final class TestKeyUtil {
       anonymousClass.getExtendsFullnames().add("java.lang.Object");
       result.addInnerClass(anonymousClass);
       result.addLiteral(new MemoryEnumLiteral("INSTANCE"));
-      if (multilineInvariant) {
-         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, "!  " + fullName + ".INSTANCE\n = null"));
-      }
-      else {
-         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, "!" + fullName + ".INSTANCE = null"));
-      }
+//      if (multilineInvariant) {
+         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, 
+                                                 "!  " + fullName + "::select(heap,\n" +
+                                                 "   " + StringUtil.createLine(" ", fullName.length()) + "         null,\n" +
+                                                 "   " + StringUtil.createLine(" ", fullName.length()) + "         " + fullName + "::$INSTANCE)\n" +
+                                                 " = null"));
+//      }
+//      else {
+//         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, 
+//                                                 "!  " + fullName + "::select(heap,\n" +
+//                                                 "   " + StringUtil.createLine(" ", fullName.length()) + "         null,\n" +
+//                                                 "   " + StringUtil.createLine(" ", fullName.length()) + "         " + fullName + "::$INSTANCE)\n" +
+//                                                 " = null"));
+//      }
       result.addAttribute(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
       result.addConstructor(new MemoryConstructor(className + "(x : int)", DSVisibility.PRIVATE));
       MemoryMethod run = new MemoryMethod("run()", "void", DSVisibility.PUBLIC);
@@ -1595,7 +1901,10 @@ public final class TestKeyUtil {
                                         IDSConnection expectedConnection) throws Exception {
       IDSConnection connection = null;
       ConnectionLogger logger = new ConnectionLogger();
+      boolean usePrettyPrinting = SymbolicExecutionUtil.isUsePrettyPrinting();
       try {
+         // Disable pretty printing to make tests more robust against different term representations
+         SymbolicExecutionUtil.setUsePrettyPrinting(false);
          // Create project and fill it with test data
          IProject project = TestUtilsUtil.createProject(projectName);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, testDataInBundle, project);
@@ -1622,6 +1931,7 @@ public final class TestKeyUtil {
          compareModels(expectedConnection, connection, modelFile, diagramFile);
       }
       finally {
+         SymbolicExecutionUtil.setUsePrettyPrinting(usePrettyPrinting);
          try {
             if (connection != null) {
                TestGenerationUtil.closeConnection(connection);
@@ -1759,7 +2069,10 @@ public final class TestKeyUtil {
       ConnectionLogger logger = new ConnectionLogger();
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       LoggingKeYConnectionListener listener = new LoggingKeYConnectionListener();
+      boolean usePrettyPrinting = SymbolicExecutionUtil.isUsePrettyPrinting();
       try {
+         // Disable pretty printing to make tests more robust against different term representations
+         SymbolicExecutionUtil.setUsePrettyPrinting(false);
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 2;
          // Create project and fill it with test data
          IProject project = TestUtilsUtil.createProject(projectName);
@@ -1881,6 +2194,7 @@ public final class TestKeyUtil {
          fail(e.getMessage());
       }
       finally {
+         SymbolicExecutionUtil.setUsePrettyPrinting(usePrettyPrinting);
          SWTBotPreferences.TIMEOUT = originalTimeout;
          try {
             if (connection != null) {

@@ -2,7 +2,7 @@
 <model>
    <equivalenceClass representativeTerm="self">
       <term term="self"/>
-      <term term="self.next"/>
+      <term term="ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next)"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return localArray[0]+localArray[1];">
       <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>

@@ -478,6 +478,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
+    * @param usePrettyPrinting Use pretty printing?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -493,6 +494,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showVariablesOfSelectedDebugNode,
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
+                                       Boolean usePrettyPrinting,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       doKeYDebugTargetTest(projectName,
@@ -507,6 +509,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            showVariablesOfSelectedDebugNode, 
                            showKeYMainWindow, 
                            mergeBranchConditions,
+                           usePrettyPrinting,
                            timeoutFactor, 
                            executor);
    }
@@ -578,6 +581,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
+    * @param usePrettyPrinting Use pretty printing?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -594,6 +598,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showVariablesOfSelectedDebugNode,
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
+                                       Boolean usePrettyPrinting,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       doKeYDebugTargetTest(projectName, 
@@ -609,6 +614,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            showVariablesOfSelectedDebugNode, 
                            showKeYMainWindow, 
                            mergeBranchConditions, 
+                           usePrettyPrinting,
                            timeoutFactor, 
                            executor);
    }
@@ -683,6 +689,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
+    * @param usePrettyPrinting Use pretty printing?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -700,6 +707,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showVariablesOfSelectedDebugNode,
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
+                                       Boolean usePrettyPrinting,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       // Create bot
@@ -738,7 +746,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          assertEquals(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions);
+         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, usePrettyPrinting);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
@@ -796,7 +804,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
     */
-   protected void doKeYDebugTargetTest(String projectName,
+   protected void doKeYDebugTargetTest(String projectName, // TODO: Merge with method above to have only one method which executes the test
                                        String plugin,
                                        String pathInBundle,
                                        IProjectConfigurator projectConfigurator,
@@ -858,7 +866,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          assertEquals(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions);
+         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, false);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
@@ -953,6 +961,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
+    * @param usePrettyPrinting Use pretty printing?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetProofFileTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -967,6 +976,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showVariablesOfSelectedDebugNode,
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
+                                       Boolean usePrettyPrinting,
                                        int timeoutFactor,
                                        IKeYDebugTargetProofFileTestExecutor executor) throws Exception {
       // Create bot
@@ -999,7 +1009,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * timeoutFactor;
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(file, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions);
+         TestSEDKeyCoreUtil.launchKeY(file, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, usePrettyPrinting);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();

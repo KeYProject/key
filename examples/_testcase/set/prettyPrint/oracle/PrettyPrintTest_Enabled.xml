@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="PrettyPrintTest.main(x);" pathCondition="true" pathConditionChanged="false">
+      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
+      <branchStatement name="if (x&gt;=0)" pathCondition="true" pathConditionChanged="false">
+         <variable name="x" arrayIndex="-1" isArrayIndex="false">
+            <value name="x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
+         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
+         <callStackEntry path="/0"/>
+         <branchCondition name="x &gt;  -1" pathCondition="x &gt;  -1" pathConditionChanged="true" branchCondition="x &gt;  -1" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <callStackEntry path="/0"/>
+            <statement name="return magic();" pathCondition="x &gt;  -1" pathConditionChanged="false">
+               <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                  <value name="x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <callStackEntry path="/0"/>
+               <operationContract name="result_0 = magic() catch(exc_0)
+pre: true
+post: result_0 = 42 &amp; exc_0 = null
+mod: empty
+termination: diamond" pathCondition="x &gt;  -1" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+                  <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                     <value name="x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <callStackEntry path="/0"/>
+                  <methodReturn name="&lt;return of PrettyPrintTest.main(x);&gt;" pathCondition="x &gt;  -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of PrettyPrintTest.main(x);&gt;" isReturnValueComputed="true">
+                     <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                     </methodReturnValue>
+                     <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                        <value name="x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="heap" arrayIndex="-1" isArrayIndex="false">
+                        <value name="heap {true}" typeString="Heap" valueString="heapAfter_magic" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <callStackEntry path="/0"/>
+                     <termination name="&lt;end&gt;" pathCondition="x &gt;  -1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                     </termination>
+                  </methodReturn>
+               </operationContract>
+            </statement>
+         </branchCondition>
+         <branchCondition name="x &lt; 0" pathCondition="x &lt; 0" pathConditionChanged="true" branchCondition="x &lt; 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <callStackEntry path="/0"/>
+            <loopInvariant name="
+invariant: x &lt;= javaUnaryMinusInt(1);
+variant: javaSubInt(0, x)
+mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid="true">
+               <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                  <value name="x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <callStackEntry path="/0"/>
+               <branchCondition name="x &lt;= -2 &amp; x_0 &lt;= -1" pathCondition="x &lt;= -2 &amp; x_0 &lt;= -1" pathConditionChanged="true" branchCondition="x &lt;= -2 &amp; x_0 &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                  <callStackEntry path="/0"/>
+                  <statement name="x++;" pathCondition="x &lt;= -2 &amp; x_0 &lt;= -1" pathConditionChanged="false">
+                     <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                        <value name="x {true}" typeString="int" valueString="x_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="heapBeforeLoop" arrayIndex="-1" isArrayIndex="false">
+                        <value name="heapBeforeLoop {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="variant" arrayIndex="-1" isArrayIndex="false">
+                        <value name="variant {true}" typeString="int" valueString="x_0 * -1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="exc_1" arrayIndex="-1" isArrayIndex="false">
+                        <value name="exc_1 {true}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <callStackEntry path="/0"/>
+                     <termination name="&lt;loop body end&gt;" pathCondition="x &lt;= -2 &amp; x_0 &lt;= -1" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
+                     </termination>
+                  </statement>
+               </branchCondition>
+               <branchCondition name="x &gt;= -1 &amp; x_0 &lt;= -1" pathCondition="x = -1 &amp; x_0 &lt;= -1" pathConditionChanged="true" branchCondition="x &gt;= -1 &amp; x_0 &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                  <callStackEntry path="/0"/>
+                  <statement name="return -1;" pathCondition="x = -1 &amp; x_0 &lt;= -1" pathConditionChanged="false">
+                     <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                        <value name="x {true}" typeString="int" valueString="-1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <callStackEntry path="/0"/>
+                     <methodReturn name="&lt;return of PrettyPrintTest.main(x);&gt;" pathCondition="x = -1 &amp; x_0 &lt;= -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -1 as result of PrettyPrintTest.main(x);&gt;" isReturnValueComputed="true">
+                        <methodReturnValue name="-1" returnValueString="-1" hasCondition="false">
+                        </methodReturnValue>
+                        <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                           <value name="x {true}" typeString="int" valueString="-1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <callStackEntry path="/0"/>
+                        <termination name="&lt;end&gt;" pathCondition="x = -1 &amp; x_0 &lt;= -1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </branchCondition>
+            </loopInvariant>
+         </branchCondition>
+      </branchStatement>
+   </methodCall>
+</start>

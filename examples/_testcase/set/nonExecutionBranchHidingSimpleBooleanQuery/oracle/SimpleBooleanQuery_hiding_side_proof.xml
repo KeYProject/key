@@ -5,16 +5,16 @@
          <operationContract name="result_0 = magic(x) catch(exc_0)
 pre: true
 post: result_0 = subMagic(x) &amp; exc_0 = null
-mod: {}
+mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
                <methodReturn name="&lt;return of SimpleBooleanQuery.main(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	42 {x = TRUE}, 
-	-4711 {!x = TRUE}
+	Z(2(4(#))) {equals(x,TRUE)}, 
+	Z(neglit(1(1(7(4(#)))))) {not(equals(x,TRUE))}
 as result of SimpleBooleanQuery.main(x);&gt;" isReturnValueComputed="true">
-                  <methodReturnValue name="42 {x = TRUE}" returnValueString="42" hasCondition="true" conditionString="x = TRUE">
+                  <methodReturnValue name="Z(2(4(#))) {equals(x,TRUE)}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="equals(x,TRUE)">
                   </methodReturnValue>
-                  <methodReturnValue name="-4711 {!x = TRUE}" returnValueString="-4711" hasCondition="true" conditionString="!x = TRUE">
+                  <methodReturnValue name="Z(neglit(1(1(7(4(#)))))) {not(equals(x,TRUE))}" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="true" conditionString="not(equals(x,TRUE))">
                   </methodReturnValue>
                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>

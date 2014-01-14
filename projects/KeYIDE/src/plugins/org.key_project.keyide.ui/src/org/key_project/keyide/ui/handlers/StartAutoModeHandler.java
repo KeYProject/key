@@ -61,7 +61,7 @@ public class StartAutoModeHandler extends AbstractSaveExecutionHandler {
                      KeYBreakpointManager breakpointManager = (KeYBreakpointManager) editor.getAdapter(KeYBreakpointManager.class);
                      proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(breakpointManager.getBreakpointStopConditions());
                      proof.getServices().setFactory(KeYBreakpointManager.createNewFactory(breakpointManager.getBreakpointStopConditions()));
-                     SymbolicExecutionUtil.configureProof(proof);
+//                     SymbolicExecutionUtil.configureProof(proof); // TODO: Fix it
                      StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
                      proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
                   }else{

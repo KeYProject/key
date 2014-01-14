@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.gui.macros;
 
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.KeyStroke;
@@ -102,7 +101,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
 
     @Override
     public KeyStroke getKeyStroke () {
-    	return KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0);
+	return KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0);
     }
 
     @Override

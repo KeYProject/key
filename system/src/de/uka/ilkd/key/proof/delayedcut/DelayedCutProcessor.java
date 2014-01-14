@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.proof.delayedcut;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
