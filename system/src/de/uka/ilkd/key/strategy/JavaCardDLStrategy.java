@@ -329,10 +329,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     
     private RuleSetDispatchFeature setupCostComputationF(Proof p_proof) {
+        final Services services = p_proof.getServices();
         final IntegerLDT numbers =
-            p_proof.getServices().getTypeConverter().getIntegerLDT();
+            services.getTypeConverter().getIntegerLDT();
         final LocSetLDT locSetLDT =
-                p_proof.getServices().getTypeConverter().getLocSetLDT();
+                services.getTypeConverter().getLocSetLDT();
             
         final RuleSetDispatchFeature d = RuleSetDispatchFeature.create ();
             
@@ -364,7 +365,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet (d, "update_join", -4600);
         bindRuleSet (d, "update_apply", -4500);
              
-        setUpStringNormalisation ( d, p_proof.getServices() );
+        setUpStringNormalisation ( d, services );
         
         setupSplitting ( d );
 
@@ -438,7 +439,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         final TermBuffer superFor = new TermBuffer ();
         bindRuleSet ( d, "split_if",
-           add ( sum ( superFor, SuperTermGenerator.upwards ( any () ),
+           add ( sum ( superFor, SuperTermGenerator.upwards ( any (), services ),
                        applyTF ( superFor, not ( ff.program ) ) ),
                  longConst ( 50 ) ) );
         
@@ -451,9 +452,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             
         bindRuleSet ( d, "simplify_prog",
            ifZero ( ThrownExceptionFeature.create( exceptionsWithPenalty, 
-                                                   p_proof.getServices() ),
+                                                   services ),
                     longConst ( 500 ),
-                    ifZero ( isBelow ( add ( ff.forF, not ( ff.atom ) ) ),
+                    ifZero ( isBelow ( add ( ff.forF, not ( ff.atom ) ), services ),
                              longConst ( 200 ), longConst ( -100 ) ) ) );
                 
         
@@ -560,13 +561,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupPolySimp ( d, numbers );        
         setupInEqSimp ( d, p_proof, numbers );
         
-        setupDefOpsPrimaryCategories ( d );
+        setupDefOpsPrimaryCategories ( d, services );
         
         setupSystemInvariantSimp(d);
                
         
         if ( quantifierInstantiatedEnabled() ) {
-            setupFormulaNormalisation (d, numbers, locSetLDT);
+            setupFormulaNormalisation (d, numbers, locSetLDT, services);
         } else {
             bindRuleSet ( d, "negationNormalForm", inftyConst() );
             bindRuleSet ( d, "moveQuantToLeft", inftyConst() );
@@ -676,7 +677,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	final TermFeature emptyF = OperatorTF.create( charListLDT.getClEmpty() );
 	
 	bindRuleSet ( d, "charLiteral_to_intLiteral",
-		ifZero ( isBelow ( keepChar ), inftyConst (), longConst (-100) ) ); 
+		ifZero ( isBelow ( keepChar, services ), inftyConst (), longConst (-100) ) ); 
 	
 	
 	// establish normalform 
@@ -685,7 +686,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	final TermFeature stringLiteral = rec ( any(), or ( or ( op (charListLDT.getClEmpty()), 
 		                                op ( charListLDT.getClCons() ) ), tf.charLiteral) );
 
-	Feature belowModOpPenality = ifZero  ( isBelow ( ff.modalOperator ),
+	Feature belowModOpPenality = ifZero  ( isBelow ( ff.modalOperator, services ),
 		  longConst ( 500 ) );	
 
 
@@ -1120,7 +1121,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private void setupFormulaNormalisation(RuleSetDispatchFeature d,
                                            IntegerLDT numbers,
-                                           LocSetLDT locSetLDT) {
+                                           LocSetLDT locSetLDT,
+                                           Services services) {
        
         bindRuleSet ( d, "negationNormalForm",
            add ( not ( NotBelowBinderFeature.INSTANCE ),
@@ -1238,17 +1240,17 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         final TermBuffer superFor = new TermBuffer ();
         final Feature onlyBelowQuanAndOr =
-            sum ( superFor, SuperTermGenerator.upwards ( any () ),
+            sum ( superFor, SuperTermGenerator.upwards ( any (), services ),
                   applyTF ( superFor,
                             or ( ff.quantifiedFor, ff.andF, ff.orF ) ) );
         
         final Feature belowUnskolemisableQuantifier =
             ifZero ( FocusInAntecFeature.INSTANCE,
               not ( sum ( superFor,
-                          SuperTermGenerator.upwards ( any () ),
+                          SuperTermGenerator.upwards ( any (), services ),
                           not ( applyTF ( superFor, op ( Quantifier.ALL ) ) ) ) ),
               not ( sum ( superFor,
-                          SuperTermGenerator.upwards ( any () ),
+                          SuperTermGenerator.upwards ( any (), services ),
                           not ( applyTF ( superFor, op ( Quantifier.EX ) ) ) ) ) );
        
         bindRuleSet ( d, "cnf_expandIfThenElse",
@@ -2178,7 +2180,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
 
-    private void setupDefOpsPrimaryCategories(RuleSetDispatchFeature d) {
+    private void setupDefOpsPrimaryCategories(RuleSetDispatchFeature d, Services services) {
         
         if ( arithDefOps () ) {
         // the axiom defining division only has to be inserted once, because
@@ -2190,7 +2192,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                  applyTF ( "divDenom", tf.polynomial ),
                  applyTF ( "divNum", tf.notContainsDivMod ),
                  applyTF ( "divDenom", tf.notContainsDivMod ),
-                 ifZero ( isBelow ( ff.modalOperator ),
+                 ifZero ( isBelow ( ff.modalOperator, services ),
                           longConst ( 200 ) ) } ) );
         
             bindRuleSet ( d, "defOps_jdiv",
@@ -2200,7 +2202,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                  applyTF ( "divDenom", tf.polynomial ),
                  applyTF ( "divNum", tf.notContainsDivMod ),
                  applyTF ( "divDenom", tf.notContainsDivMod ),
-                 ifZero ( isBelow ( ff.modalOperator ),
+                 ifZero ( isBelow ( ff.modalOperator, services ),
                           longConst ( 200 ) ) } ) );
 
             bindRuleSet ( d, "defOps_jdiv_inline",
@@ -2208,7 +2210,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                 applyTF ( "divDenom", tf.polynomial ),
                                 longConst ( -5000 ) ) );
                    
-            setupDefOpsExpandMod ( d );
+            setupDefOpsExpandMod ( d, services );
             
             bindRuleSet ( d, "defOps_expandRanges", -5000 );
             bindRuleSet ( d, "defOps_expandJNumericOp", -500 );
@@ -2234,7 +2236,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
     }
 
-    private void setupDefOpsExpandMod(RuleSetDispatchFeature d) {
+    private void setupDefOpsExpandMod(RuleSetDispatchFeature d, Services services) {
         final TermBuffer superTerm = new TermBuffer ();
         
         final Feature subsumedModulus =
@@ -2249,7 +2251,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             add ( applyTF ( "divDenom", tf.literal ),
                   not ( sum ( superTerm,
                               SuperTermGenerator.upwardsWithIndex
-                                   ( sub ( or ( tf.addF, tf.mulF ), any () ) ),
+                                   ( sub ( or ( tf.addF, tf.mulF ), any () ), services ),
                               not ( subsumedModulus ) ) ) );
         
         bindRuleSet ( d, "defOps_mod",
@@ -2259,7 +2261,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     SumFeature.createSum ( new Feature[] {
                        applyTF ( "divNum", tf.polynomial ),
                        applyTF ( "divDenom", tf.polynomial ),
-		       ifZero ( isBelow ( ff.modalOperator ),
+		       ifZero ( isBelow ( ff.modalOperator, services ),
 				exSubsumedModulus,
 				or ( add ( applyTF ( "divNum",
 						     tf.notContainsDivMod ),
@@ -2270,10 +2272,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     } ) ) );
     }
 
-    private Feature isBelow(TermFeature t) {
+    private Feature isBelow(TermFeature t, Services services) {
         final TermBuffer superTerm = new TermBuffer ();
         return not ( sum ( superTerm,
-                           SuperTermGenerator.upwards ( any () ),
+                           SuperTermGenerator.upwards ( any (), services ),
                            not ( applyTF ( superTerm, t ) ) ) );
     }
 
@@ -2448,7 +2450,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupQuantifierInstantiation ( d );
         
         setupArithPrimaryCategories ( d );
-        setupDefOpsPrimaryCategories ( d );
+        setupDefOpsPrimaryCategories ( d, p_proof.getServices() );
         
         setupInstantiationWithoutRetry ( d, p_proof );
 

@@ -37,11 +37,10 @@ public class ProofMarkerResolutionGenerator implements IMarkerResolutionGenerato
       LinkedList<IMarkerResolution> resolutions = new LinkedList<IMarkerResolution>();
       try{
          if (StarterUtil.areFileStartersAvailable()) {
-            resolutions.add(new ProofMarkerResolution(marker.getType(), false));
-            resolutions.add(new ProofMarkerResolution(marker.getType(), true));
+            resolutions.add(new ProofMarkerResolution(marker));
          }
       } catch (CoreException e){
-         LogUtil.getLogger().createErrorStatus(e); // TODO: You do nothing with the created status. I guess you mean LogUtil.getLogger().logError(e); which writes the exception into the eclipse log
+         LogUtil.getLogger().logError(e);
       }
       return (IMarkerResolution[])resolutions.toArray(new IMarkerResolution[resolutions.size()]);
    }

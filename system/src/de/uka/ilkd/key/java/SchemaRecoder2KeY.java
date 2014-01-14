@@ -19,8 +19,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTArrayList;
@@ -38,12 +36,6 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
     /** the namespace containing the program schema variables allowed here */
     protected Namespace svns;
 
-    /** caches access to methods for reflection */
-    private final static HashMap schemaCt2meth = new LinkedHashMap(400);
-
-    /** caches constructor access for reflection */
-    private final static HashMap recClass2schemakeyClassCons = new LinkedHashMap(400);
-
     // could this be the servConf of the super class?
     private static SchemaCrossReferenceServiceConfiguration schemaServConf = new SchemaCrossReferenceServiceConfiguration(
             new KeYRecoderExcHandler());
@@ -55,19 +47,6 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
     @Override
     protected Recoder2KeYConverter makeConverter(Services services, NamespaceSet nss) {
         return new SchemaRecoder2KeYConverter(this, services, nss);
-    }
-
-    /**
-     * returns the hashmap of a concrete RecodeR class to the constructor of its
-     * corresponding KeY class. Speeds up reflection. Attention must be
-     * overwritten by subclasses!
-     */
-    protected HashMap getKeYClassConstructorCache() {
-        return recClass2schemakeyClassCons;
-    }
-
-    protected HashMap getMethodCache() {
-        return schemaCt2meth;
     }
 
     public void setSVNamespace(Namespace svns) {
