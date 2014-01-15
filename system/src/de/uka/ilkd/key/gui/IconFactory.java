@@ -45,18 +45,12 @@ public class IconFactory {
     private static Icon expandedIcon   = KeYControlIcon.getKeYExpandedIcon();
     private static Icon collapsedIcon  = KeYControlIcon.getKeYCollapsedIcon();
 
-    private static Image reuse    = getImage("images/toolbar/ff.gif");
     private static Image prune		= getImage("images/toolbar/pruneProof.png");
     private static Image goalBack = getImage("images/toolbar/goalBack.png");
-    private static Image autoResume = getImage("images/toolbar/autoResume.png");
-    private static Image autoResumeDisabled = 
-	getImage("images/toolbar/autoResumeDisabled.png");
     private static Image autoModeStart =
         getImage("images/toolbar/autoModeStart.png");
     private static Image autoModeStop =
         getImage("images/toolbar/autoModeStop.png");
-    private static Image autoModeConfigArrow = 
-    getImage("images/toolbar/autoModeConfigArrow.png");
     private static Image decisionProcedureConfigArrow = 
 	    getImage("images/toolbar/decProcArrow.png");
 
@@ -75,7 +69,6 @@ public class IconFactory {
     private static Image abandonProof = getImage("images/toolbar/abandon.png");
     private static Image configure = getImage("images/toolbar/config.png");
     private static Image help = getImage("images/toolbar/help.png");
-    private static Image macros = getImage("images/toolbar/macros.png");
     private static Image proofMgt = getImage("images/toolbar/mgt.png");
     private static Image properties = getImage("images/toolbar/properties.png");
     private static Image quit = getImage("images/toolbar/quit.png");
@@ -112,10 +105,6 @@ public class IconFactory {
 
     public static ImageIcon help (int x) {
         return scaleIcon(help ,x,x);
-    }
-
-    public static ImageIcon macros (int x) {
-        return scaleIcon(macros ,x,x);
     }
 
     public static ImageIcon proofMgt (int x) {
@@ -180,16 +169,19 @@ public class IconFactory {
 	return  scaleIcon(keyLogo,x,y);
     }
 
+    @Deprecated
     public static ImageIcon reuseLogo() {
-	return scaleIcon(reuse, 15, 15);
+	return null;
     }
 
+    @Deprecated
     public static ImageIcon resumeLogo(int size) {
-	return scaleIcon(autoResume, size, size);
+	return null;
     }
 
+    @Deprecated
     public static ImageIcon resumeDisabledLogo(int size) {
-	return scaleIcon(autoResumeDisabled, size, size);
+	return null;
     }
 
     public static ImageIcon autoModeStartLogo(int size) {
@@ -200,8 +192,9 @@ public class IconFactory {
         return scaleIcon(autoModeStop, size, size);
     }
 
+    @Deprecated
     public static ImageIcon selectStrategyArrow(int size) {
-        return scaleIcon(autoModeConfigArrow, size / 2, size);
+        return null;
     }
     
     public static ImageIcon selectDecProcArrow(int size) {
