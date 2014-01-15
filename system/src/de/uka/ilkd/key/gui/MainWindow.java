@@ -395,7 +395,6 @@ public final class MainWindow extends JFrame  {
                 mediator.getUI().loadProblem(new File(recentFiles.getAbsolutePath((JMenuItem) e.getSource())));
             }
         }, MAX_RECENT_FILES, null);
-//        recentFiles.setIcon(IconFactory.recentFiles(16));
         recentFiles.load(PathConfig.getRecentFileStorage());
 
 
