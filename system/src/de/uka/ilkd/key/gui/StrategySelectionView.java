@@ -23,7 +23,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -53,7 +52,8 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 public final class StrategySelectionView extends JPanel {
     
-    private static final long serialVersionUID = -2808575255579411116L;
+
+    private static final long serialVersionUID = -267867794853527874L;
 
     private static final String JAVACARDDL_STRATEGY_NAME 
     	= "JavaCardDLStrategy";
@@ -62,7 +62,6 @@ public final class StrategySelectionView extends JPanel {
     
 
    
-    private ButtonGroup stratGroup = new ButtonGroup();
     private ButtonGroup splittingGroup = new ButtonGroup();
     private ButtonGroup loopGroup = new ButtonGroup();
     private ButtonGroup blockGroup = new ButtonGroup();
@@ -73,7 +72,6 @@ public final class StrategySelectionView extends JPanel {
     private ButtonGroup nonLinArithGroup = new ButtonGroup();
     private ButtonGroup quantifierGroup = new ButtonGroup();
     private ButtonGroup stopModeGroup = new ButtonGroup();
-    private ButtonGroup retreatModeGroup = new ButtonGroup();
     private ButtonGroup classAxiomGroup = new ButtonGroup();
     private ButtonGroup autoInductionGroup = new ButtonGroup();     
     private ButtonGroup[] userTacletsGroup = new ButtonGroup[StrategyProperties.USER_TACLETS_NUM];
@@ -92,8 +90,6 @@ public final class StrategySelectionView extends JPanel {
     private JRadioButton blockContractRadioButton;
     private JRadioButton blockExpandRadioButton;
     //JRadioButton blockNoneRadioButton;
-    private JRadioButton noRetreat;
-    private JRadioButton retreat;
     private JRadioButton splittingNormal;
     private JRadioButton splittingOff;
     private JRadioButton splittingDelayed;
@@ -191,7 +187,6 @@ public final class StrategySelectionView extends JPanel {
         javaDLOptionsPanel.setEnabled(true);
 
         
-        StratListener stratListener = new StratListener();
         OptListener optListener = new OptListener();
         
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -507,25 +502,25 @@ public final class StrategySelectionView extends JPanel {
 
         ++yCoord;
         
-        addJavaDLOption ( new JLabel ( "Class axiom rule priority" ),
+        addJavaDLOption ( new JLabel ( "Class axiom rule" ),
                     javaDLOptionsLayout, 1, yCoord, 7 );
         
         ++yCoord;
 
         classAxiomHigh = newButton(
-                "High", StrategyProperties.CLASS_AXIOM_HIGH, true, false);
-//        classAxiomHigh.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_METHOD_CONTRACT);
+                "Free", StrategyProperties.CLASS_AXIOM_HIGH, true, false);
+        classAxiomHigh.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_CLASSAXIOM_FREE);
         classAxiomGroup.add(classAxiomHigh);
         addJavaDLOption (classAxiomHigh, javaDLOptionsLayout, 2, yCoord, 2 );        
 
-        classAxiomLow = newButton("Low", StrategyProperties.CLASS_AXIOM_LOW, false, false);
-//        classAxiomLow.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_METHOD_EXPAND);
+        classAxiomLow = newButton("Delayed", StrategyProperties.CLASS_AXIOM_DELAYED, false, false);
+        classAxiomLow.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_CLASSAXIOM_DELAYED);
         classAxiomGroup.add(classAxiomLow);
         addJavaDLOption (classAxiomLow, javaDLOptionsLayout, 4, yCoord, 2 );        
 
         classAxiomOff = newButton("Off",
                 StrategyProperties.CLASS_AXIOM_OFF, false, false);
-//        classAxiomOff.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_METHOD_NONE);
+        classAxiomOff.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_CLASSAXIOM_OFF);
         classAxiomGroup.add(classAxiomOff);
         addJavaDLOption (classAxiomOff, javaDLOptionsLayout, 6, yCoord, 2 );        
         
@@ -836,11 +831,6 @@ public final class StrategySelectionView extends JPanel {
         maxSlider.setMediator(mediator);
         
         mediator.addKeYSelectionListener(new SelectionChangedListener());
-                
-        final StrategyFactory defaultStrategyFactory = 
-            mediator.getProfile().getDefaultStrategyFactory();
-        
-
     }
 
 
@@ -1106,26 +1096,6 @@ public final class StrategySelectionView extends JPanel {
             updateStrategySettings(
         	    mediator.getSelectedProof().getActiveStrategy().name().toString(),
                     props);
-        }
-    }
-    
-
-    private static class JRadioButtonHashMap extends JRadioButton {
-        
-        private static final long serialVersionUID = 7686260531440322733L;
-
-        JRadioButtonHashMap(String text, String command, boolean selected, 
-                boolean enabled) {
-            super(text, selected);
-            this.setEnabled(enabled);        
-            this.setActionCommand(command);        
-            hashmap.put(command, this);        
-        }
-
-        static HashMap<String, JRadioButtonHashMap> hashmap = new LinkedHashMap<String, JRadioButtonHashMap>();
-
-        public static JRadioButton getButton(String command) {
-            return hashmap.get(command);       
         }
     }
 

@@ -27,12 +27,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.Strategy;
 
 /**
@@ -104,30 +99,11 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
      */
     private static class FilterSymbexStrategy extends FilterStrategy {
 
-        private static final Name CLASS_AXIOM_RULESET = new Name("classAxiom");
-        private static final int HIGH_COST = 5000;
         private static final Name NAME = new Name(FilterSymbexStrategy.class.getSimpleName());
 
         public FilterSymbexStrategy(Strategy delegate) {
             super(delegate);
         }
-//        
-//
-//        @Override
-//        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
-//
-//            // increase cost of class axiom rules, keep everything else
-//            final Rule rule = app.rule();
-//            if (rule instanceof Taclet) {
-//                Taclet taclet = (Taclet) rule;
-//                for (RuleSet rs : taclet.getRuleSets()) {
-//                    if (CLASS_AXIOM_RULESET.equals(rs.name())) 
-//                        return LongRuleAppCost.create(HIGH_COST);
-//                }
-//            }
-//            
-//            return super.computeCost(app, pio, goal);
-//        }
 
         @Override
         public Name name() {
