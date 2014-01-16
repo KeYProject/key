@@ -533,7 +533,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             // default as before
             bindRuleSet ( d, "classAxiom", longConst(-150) );
         else if (StrategyProperties.CLASS_AXIOM_LOW.equals(classAxiomPrio))
-            bindRuleSet(d, "classAxiom", longConst(5000) ); // TODO: find appropriate value
+            bindRuleSet(d, "classAxiom", add (sequentContainsNoPrograms(), longConst(-150) ));
         else if (StrategyProperties.CLASS_AXIOM_OFF.equals(classAxiomPrio))
             bindRuleSet(d, "classAxiom", inftyConst());
         else assert false : "Unknown strategy property "+classAxiomPrio;
