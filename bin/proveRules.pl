@@ -72,6 +72,7 @@ Command line options:
   -x  --xml-junit <filename>  to store the result of the tests in an xml-format
                               which can be understood by Jenkins.
   -p  --prove-only            to only rerun the proofs w/o checking annotations
+  -q  --quick-check           to only check the annotations w/o running the proofs.
 DOC
 
 my (undef, $log_file) = tempfile();
@@ -152,7 +153,7 @@ sub runAuto {
     print "Time elapsed: " . (time() - $starttime) . " sec\n";
 #    print "Return value: $result\n";
 
-    my $taclet = "???";
+    my $taclet = "$file";
     my $open_goals = 0;
     foreach (@output) {
 	print $_;
