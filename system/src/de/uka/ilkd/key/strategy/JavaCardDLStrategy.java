@@ -529,11 +529,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         //class axioms
         final String classAxiomPrio = strategyProperties.getProperty(StrategyProperties.CLASS_AXIOM_PRIO);
+        final Feature classAxiomDefaultCost = longConst(-150);
         if (StrategyProperties.CLASS_AXIOM_HIGH.equals(classAxiomPrio))
             // default as before
-            bindRuleSet ( d, "classAxiom", longConst(-150) );
-        else if (StrategyProperties.CLASS_AXIOM_LOW.equals(classAxiomPrio))
-            bindRuleSet(d, "classAxiom", add (sequentContainsNoPrograms(), longConst(-150) ));
+            bindRuleSet ( d, "classAxiom", classAxiomDefaultCost );
+        else if (StrategyProperties.CLASS_AXIOM_DELAYED.equals(classAxiomPrio))
+            bindRuleSet(d, "classAxiom", add (sequentContainsNoPrograms(), classAxiomDefaultCost ));
         else if (StrategyProperties.CLASS_AXIOM_OFF.equals(classAxiomPrio))
             bindRuleSet(d, "classAxiom", inftyConst());
         else assert false : "Unknown strategy property "+classAxiomPrio;
@@ -2595,6 +2596,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
        public static final String TOOL_TIP_METHOD_NONE = "<html>" +
              "Stop when encountering a method" +
              "</html>";
+       public static final String TOOL_TIP_CLASSAXIOM_FREE =
+           "<html>Expand class axioms (such as invariants) freely.</html>";
+       public static final String TOOL_TIP_CLASSAXIOM_DELAYED =
+           "<html>Expand class axioms (such as invariants) only after symbolic execution.</html>";
+       public static final String TOOL_TIP_CLASSAXIOM_OFF =
+           "<html>Do not expand class axioms (such as invariants).</html>";
        public static final String TOOL_TIP_DEPENDENCY_ON = "<html>Uses the information in JML's <tt>accessible</tt> clauses<br>" +
              "in order to simplify heap terms. For instance, consider the term<br>" +
              "<center><i>f(store(heap,o,a,1))</i></center>" +
