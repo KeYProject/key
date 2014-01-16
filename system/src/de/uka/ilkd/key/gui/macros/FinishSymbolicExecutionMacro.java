@@ -111,23 +111,23 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
         public FilterSymbexStrategy(Strategy delegate) {
             super(delegate);
         }
-        
-
-        @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
-
-            // increase cost of class axiom rules, keep everything else
-            final Rule rule = app.rule();
-            if (rule instanceof Taclet) {
-                Taclet taclet = (Taclet) rule;
-                for (RuleSet rs : taclet.getRuleSets()) {
-                    if (CLASS_AXIOM_RULESET.equals(rs.name())) 
-                        return LongRuleAppCost.create(HIGH_COST);
-                }
-            }
-            
-            return super.computeCost(app, pio, goal);
-        }
+//        
+//
+//        @Override
+//        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+//
+//            // increase cost of class axiom rules, keep everything else
+//            final Rule rule = app.rule();
+//            if (rule instanceof Taclet) {
+//                Taclet taclet = (Taclet) rule;
+//                for (RuleSet rs : taclet.getRuleSets()) {
+//                    if (CLASS_AXIOM_RULESET.equals(rs.name())) 
+//                        return LongRuleAppCost.create(HIGH_COST);
+//                }
+//            }
+//            
+//            return super.computeCost(app, pio, goal);
+//        }
 
         @Override
         public Name name() {
