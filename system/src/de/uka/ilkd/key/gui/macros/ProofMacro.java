@@ -127,7 +127,9 @@ public interface ProofMacro {
             ProverTaskListener listener) throws InterruptedException;
 
     /**
-     * Assigns a key shortcut to the macro (optional).
+     * Gets the keyboard shortcut to invoke the macro (optional).
+     * 
+     * @return null if no shortcut or the key stroke to invoke the macro.
      */
     public javax.swing.KeyStroke getKeyStroke();
 }
