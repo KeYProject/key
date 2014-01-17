@@ -85,7 +85,7 @@ my %proved_taclets = ();
 sub check_annotations {
     print "Checking proved annotations ...\n";
  
-    foreach my $ruleFile (<$path_to_rules/*.key>) {
+    foreach my $ruleFile (<"$path_to_rules/*.key">) {
 	open IN, "$ruleFile" or die "cannot read $ruleFile";
 	my $tagFound = 0;
 	while(<IN>) {
