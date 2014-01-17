@@ -132,12 +132,13 @@ class BasicSnippetData {
     }
     
     BasicSnippetData(LoopInvariant invariant,
+                     ExecutionContext context,
                      Services services) {
         this.hasMby = false;
         this.tb = new TermBuilder.Serviced(services);
 
         contractContents.put(Key.TARGET_METHOD, invariant.getTarget());
-        contractContents.put(Key.EXECUTION_CONTEXT, invariant.getExecutionContext());
+        contractContents.put(Key.EXECUTION_CONTEXT, context);
         contractContents.put(Key.LOOP_INVARIANT, invariant);
         contractContents.put(Key.LOOP_INVARIANT_TERM, invariant.getInvariant(services));
         contractContents.put(Key.MODIFIES, invariant.getModifies());
@@ -166,14 +167,6 @@ class BasicSnippetData {
     }
     
     
-    BasicSnippetData(LoopInvariant invariant,
-                     ExecutionContext context,
-                     Services services) {
-        this(invariant, services);
-        contractContents.put(Key.EXECUTION_CONTEXT, context);
-    }
-
-
     BasicSnippetData(InformationFlowContract contract,
                      Services services) {
         this.hasMby = contract.hasMby();
@@ -196,6 +189,7 @@ class BasicSnippetData {
 
 
     BasicSnippetData(BlockContract contract,
+                     ExecutionContext context,
                      Services services) {
         this.hasMby = contract.hasMby();
         this.tb = new TermBuilder.Serviced(services);
@@ -212,6 +206,7 @@ class BasicSnippetData {
         List<Label> labels = contract.getLabels();
         contractContents.put(Key.LABELS,
                              labels.toArray(new Label[labels.size()]));
+        contractContents.put(Key.EXECUTION_CONTEXT, context);
 
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         BlockContract.Terms vars = contract.getVariablesAsTerms();
@@ -229,13 +224,6 @@ class BasicSnippetData {
                                  vars.result, vars.exception, heap);
     }
 
-
-    BasicSnippetData(BlockContract contract,
-                     ExecutionContext context,
-                     Services services) {
-        this(contract, services);
-        contractContents.put(Key.EXECUTION_CONTEXT, context);
-    }
 
     private ImmutableList<Term> toTermList(ImmutableSet<ProgramVariable> vars) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();

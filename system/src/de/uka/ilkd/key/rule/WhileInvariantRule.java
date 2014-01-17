@@ -24,6 +24,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -47,6 +48,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.SelfCompositionTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -144,34 +146,32 @@ public final class WhileInvariantRule implements BuiltInRule {
         final ImmutableList<Term> localVarsAtPost =
                 localInsWithoutOutDuplicates.append(localOutsAtPost);
 
-        final Pair<Term, Term> updates = new Pair<Term, Term> (inst.u, anonUpdate);
-        final InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
-                new InfFlowLoopInvariantTacletBuilder(services);
-        ifInvariantBuilder.setInvariant(inv);
-        ifInvariantBuilder.setGuard(guardAtPre);
-        ifInvariantBuilder.setGuardAtPost(guardAtPost);
-        ifInvariantBuilder.setContextUpdate(/*inst.u*/);
-        ifInvariantBuilder.setHeapAtPre(heapAtPre);
-        ifInvariantBuilder.setHeapAtPost(heapAtPost);
-        ifInvariantBuilder.setSelfAtPre(selfTerm);
-        ifInvariantBuilder.setSelfAtPost(selfAtPost);
-        ifInvariantBuilder.setLocalVarsAtPre(localVarsAtPre);
-        ifInvariantBuilder.setLocalVarsAtPost(localVarsAtPost);
-
-        // generate information flow invariant application predicate
-        // and associated taclet
-        final Term loopInvApplPredTerm =
-                ifInvariantBuilder.buildContractApplPredTerm();
-        final Taclet informationFlowInvariantApp =
-                ifInvariantBuilder.buildTaclet();
-
         // generate proof obligation variables
         final StateVars instantiationPreVars =
                 new StateVars(selfTerm, guardAtPre, localVarsAtPre, heapAtPre);
         final StateVars instantiationPostVars =
                 new StateVars(selfAtPost, guardAtPost, localVarsAtPost, heapAtPost);
         final ProofObligationVars instantiationVars =
-                new ProofObligationVars(instantiationPreVars, instantiationPostVars);
+                new ProofObligationVars(instantiationPreVars,
+                                        instantiationPostVars,
+                                        services);
+
+        // generate information flow invariant application predicate
+        // and associated taclet
+        final Pair<Term, Term> updates = new Pair<Term, Term> (inst.u, anonUpdate);
+        final InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
+                new InfFlowLoopInvariantTacletBuilder(services);
+        ifInvariantBuilder.setInvariant(inv);
+        ifInvariantBuilder.setExecutionContext(inst.innermostExecutionContext);
+        ifInvariantBuilder.setContextUpdate(/*inst.u*/);
+        ifInvariantBuilder.setProofObligationVars(instantiationVars);
+
+        final Term loopInvApplPredTerm =
+                ifInvariantBuilder.buildContractApplPredTerm();
+        final Taclet informationFlowInvariantApp =
+                ifInvariantBuilder.buildTaclet();
+
+        // return information flow data
         InfFlowData infFlowData = new InfFlowData(instantiationVars, guardAtPre,
                                                   guardAtPost, guardJb,
                                                   guardTerm, localOutTerms,
@@ -491,19 +491,26 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                   localIns, localOuts,
                                                   anonUpdate, guardJb);
 
-        // generate proof obligation variables
+        // generate information flow proof obligation variables
         final IFProofObligationVars ifVars =
                 new IFProofObligationVars(infFlowData.symbExecVars, services);
         ((LoopInvariantBuiltInRuleApp) ruleApp).setInformationFlowProofObligationVars(ifVars);
 
+        // set execution context
+        ((LoopInvariantBuiltInRuleApp) ruleApp).setExecutionContext(inst.innermostExecutionContext);
+
         // create proof obligation
         InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(inv, ifVars.c1, ifVars.c2, services);
+                POSnippetFactory.getInfFlowFactory(inv, ifVars.c1, ifVars.c2,
+                                                   inst.innermostExecutionContext,
+                                                   services);
         final Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
         final Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
 
-        final Term finalTerm = TB.imp(selfComposedExec, post);
+        final Term finalTerm =
+                TB.imp(TB.label(selfComposedExec,
+                                SelfCompositionTermLabel.INSTANCE), post);
         infFlowGoal.proof().addLabeledIFSymbol(selfComposedExec);
         infFlowGoal.addFormula(new SequentFormula(finalTerm), false, true);
 

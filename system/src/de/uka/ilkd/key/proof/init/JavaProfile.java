@@ -31,7 +31,7 @@ import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.label.ITermLabelWorker;
-import de.uka.ilkd.key.rule.label.PostConditionTermLabelInstantiator;
+import de.uka.ilkd.key.rule.label.PreserveTermLabelInstantiator;
 import de.uka.ilkd.key.rule.label.SelectSkolemConstantTermLabelInstantiator;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -154,7 +154,7 @@ public class JavaProfile extends AbstractProfile {
        ImmutableList<ITermLabelWorker> result = ImmutableSLList.nil();
        result = result.prepend(SelectSkolemConstantTermLabelInstantiator.INSTANCE);
        result = result.append(AnonHeapTermLabelInstantiator.INSTANCE);
-       result = result.append(PostConditionTermLabelInstantiator.INSTANCE);
+       result = result.append(PreserveTermLabelInstantiator.INSTANCE);
        return result;
     }
 

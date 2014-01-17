@@ -161,7 +161,6 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 final LoopInvariant newInv
                        = inv.create(loop,
                                     frame.getProgramMethod(),
-                                    ec,
                                     newInvariants,
                                     newMods,
                                     newInfFlowSpecs,

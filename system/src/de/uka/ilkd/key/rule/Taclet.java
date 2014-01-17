@@ -535,7 +535,7 @@ public abstract class Taclet implements Rule, Named {
 						   MatchConditions matchCond,
 						   Services services) {
       
-	if (term.javaBlock().isEmpty()) {
+	if (term.javaBlock().isEmpty()) { // this.name().toString().startsWith("unfold_computed_formula")
 	    if (!template.javaBlock().isEmpty()){
 		Debug.out("Match Failed. No program to match.");
 		return null; //FAILED

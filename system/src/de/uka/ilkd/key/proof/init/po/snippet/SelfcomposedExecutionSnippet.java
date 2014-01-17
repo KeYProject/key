@@ -23,9 +23,9 @@ class SelfcomposedExecutionSnippet extends ReplaceAndRegisterMethod
                 POSnippetFactory.getBasicFactory(d, poVars2);
 
         final Term exec1 =
-                f1.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_WITH_PRE_RELATION);
+                f1.create(BasicPOSnippetFactory.Snippet.SYMBOLIC_EXEC_WITH_PRE);
         final Term exec2 =
-                f2.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_WITH_PRE_RELATION);
+                f2.create(BasicPOSnippetFactory.Snippet.SYMBOLIC_EXEC_WITH_PRE);
 
         return d.tb.and(exec1, exec2);
     }

@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -31,7 +31,7 @@ import java.util.Map;
  * <p/>
  * @author christoph
  */
-abstract class AbstractInfFlowUnfouldTacletBuilder extends AbstractInfFlowTacletBuilder {
+abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletBuilder {
 
     private static final String SCHEMA_PREFIX = "sv_";
 
@@ -43,7 +43,7 @@ abstract class AbstractInfFlowUnfouldTacletBuilder extends AbstractInfFlowTaclet
     private Term replacewith;
 
 
-    public AbstractInfFlowUnfouldTacletBuilder(Services services) {
+    public AbstractInfFlowUnfoldTacletBuilder(Services services) {
         super(services);
     }
 
@@ -173,7 +173,8 @@ abstract class AbstractInfFlowUnfouldTacletBuilder extends AbstractInfFlowTaclet
         post = filterSchemaVars(poVars.post, post);
 
         // return proof obligation schema variables
-        return new ProofObligationVars(pre, post);
+        return new ProofObligationVars(pre, post, poVars.exceptionParameter,
+                                       poVars.formalParams);
     }
 
 

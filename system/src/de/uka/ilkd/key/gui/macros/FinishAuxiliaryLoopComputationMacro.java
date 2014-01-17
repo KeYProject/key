@@ -73,6 +73,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
         final LoopInfFlowUnfoldTacletBuilder tacletBuilder =
                 new LoopInfFlowUnfoldTacletBuilder(services);
         tacletBuilder.setLoopInv(loopInv);
+        tacletBuilder.setExecutionContext(loopInvRuleApp.getExecutionContext());
         tacletBuilder.setInfFlowVars(ifVars);
         tacletBuilder.setReplacewith(result);
         final Taclet rwTaclet = tacletBuilder.buildTaclet();

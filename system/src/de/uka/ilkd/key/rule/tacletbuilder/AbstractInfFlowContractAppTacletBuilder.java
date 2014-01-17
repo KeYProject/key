@@ -23,8 +23,6 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 
@@ -36,20 +34,7 @@ import java.util.Map;
 abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTacletBuilder {
 
     private Term[] contextUpdates;
-    private Term contractSelfAtPre;
-    private Term contractSelfAtPost;
-    private ImmutableList<Term> localVarsAtPre;
-    private Term heapAtPre;
-    private ImmutableList<Term> localVarsAtPost;
-    private Term contractResultAtPre;
-    private Term contractResultAtPost;
-    private Term exceptionVarAtPre;
-    private Term exceptionVarAtPost;
-    private Term heapAtPost;
-    private Term loopGuardAtPre;
-    private Term loopGuardAtPost;
-    private Term mbyAtPre;
-
+    private ProofObligationVars poVars;
 
     public AbstractInfFlowContractAppTacletBuilder(final Services services) {
         super(services);
@@ -60,62 +45,13 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     }
 
 
-    public void setHeapAtPre(Term heapAtPre) {
-        this.heapAtPre = heapAtPre;
+    public void setProofObligationVars(ProofObligationVars poVars) {
+        this.poVars = poVars;
     }
 
-
-    public void setHeapAtPost(Term heapAtPost) {
-        this.heapAtPost = heapAtPost;
-    }
-
-
-    public void setSelfAtPre(Term contractSelf) {
-        this.contractSelfAtPre = contractSelf;
-    }
-    
-    public void setSelfAtPost(Term contractSelfAtPost) {
-        this.contractSelfAtPost = contractSelfAtPost;
-    }
-
-    public void setGuard(Term guard) {
-        this.loopGuardAtPre = guard;
-    }
-
-    public void setGuardAtPost(Term guardAtPost) {
-        this.loopGuardAtPost = guardAtPost;
-    }
-
-    public void setLocalVarsAtPre(ImmutableList<Term> localVarsAtPre) {
-        this.localVarsAtPre = localVarsAtPre;
-    }
-
-    public void setLocalVarsAtPost(ImmutableList<Term> localVarsAtPost) {
-        this.localVarsAtPost = localVarsAtPost;
-    }
-
-    public void setResultAtPre(Term contractResult) {
-        this.contractResultAtPre = contractResult;
-    }
-
-    public void setResultAtPost(Term resultAtPost) {
-        this.contractResultAtPost = resultAtPost;
-    }
-
-    public void setExceptionAtPre(Term exceptionVar) {
-        this.exceptionVarAtPre = exceptionVar;
-    }
-
-    public void setExceptionAtPost(Term exceptionAtPost) {
-        this.exceptionVarAtPost = exceptionAtPost;
-    }
-
-    public void setMbyAtPre(Term mby) {
-        this.mbyAtPre = mby;
-    }
 
     public Term buildContractApplPredTerm() {
-        ProofObligationVars appData = getProofObligationVars();
+        ProofObligationVars appData = poVars;
         Term contractApplPredTerm = getContractApplPred(appData);
         for (Term update : contextUpdates) {
             contractApplPredTerm = apply(update, contractApplPredTerm);
@@ -125,7 +61,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
 
     public Taclet buildTaclet() {
-        ProofObligationVars appData = getProofObligationVars();
+        ProofObligationVars appData = poVars;
         return genInfFlowContractApplTaclet(appData, services);
     }
 
@@ -139,19 +75,6 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
     abstract Term generateSchemaFind(ProofObligationVars schemaDataFind,
                                      Services services);
-
-
-    private ProofObligationVars getProofObligationVars() {
-        StateVars pre =
-                new StateVars(contractSelfAtPre, loopGuardAtPre, localVarsAtPre,
-                              contractResultAtPre, exceptionVarAtPre, heapAtPre,
-                              mbyAtPre);
-        StateVars post =
-                new StateVars(contractSelfAtPost, loopGuardAtPost, localVarsAtPost,
-                              contractResultAtPost, exceptionVarAtPost, heapAtPost);
-        assert pre.paddedTermList.size() == post.paddedTermList.size();
-        return new ProofObligationVars(pre, post);
-    }
 
 
     abstract Term getContractApplPred(ProofObligationVars appData);
@@ -225,7 +148,8 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
                               null);
 
         // return proof obligation schema variables
-        return new ProofObligationVars(pre, post);
+        return new ProofObligationVars(pre, post, poVars.exceptionParameter,
+                                       poVars.formalParams);
     }
 
 

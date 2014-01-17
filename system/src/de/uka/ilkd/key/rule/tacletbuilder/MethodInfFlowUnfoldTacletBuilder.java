@@ -18,7 +18,7 @@ import de.uka.ilkd.key.util.MiscTools;
  *
  * @author christoph
  */
-public class MethodInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfouldTacletBuilder {
+public class MethodInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacletBuilder {
 
     private InformationFlowContract contract;
 

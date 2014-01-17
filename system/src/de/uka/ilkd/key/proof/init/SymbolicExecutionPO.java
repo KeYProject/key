@@ -76,22 +76,12 @@ public class SymbolicExecutionPO extends AbstractOperationPO
                 POSnippetFactory.getBasicFactory(contract, symbExecVars,
                                                  initiatingGoal.proof().getServices());
 
-        // precondition
-        final Term freePre =
-                symbExecFactory.create(BasicPOSnippetFactory.Snippet.FREE_PRE);
-        final Term contractPre =
-                symbExecFactory.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
-        final Term pre = TB.and(freePre, contractPre);
-
-        // symbolic execution
+        // symbolic execution under precondition
         final Term symExec =
-                symbExecFactory.create(BasicPOSnippetFactory.Snippet.SYMBOLIC_EXEC);
-
-        // final symbolic execution term
-        final Term finalTerm = TB.not(TB.and(pre, symExec));
+                symbExecFactory.create(BasicPOSnippetFactory.Snippet.SYMBOLIC_EXEC_WITH_PRE);
 
         // register final term
-        assignPOTerms(finalTerm);
+        assignPOTerms(TB.not(symExec));
 
         // add class axioms
         final Proof initiatingProof = initiatingGoal.proof();

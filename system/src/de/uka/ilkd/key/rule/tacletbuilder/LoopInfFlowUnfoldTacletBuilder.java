@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
@@ -19,9 +20,10 @@ import de.uka.ilkd.key.util.MiscTools;
  *
  * @author christoph
  */
-public class LoopInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfouldTacletBuilder {
+public class LoopInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacletBuilder {
 
     private LoopInvariant loopInv;
+    private ExecutionContext executionContext;
 
 
     public LoopInfFlowUnfoldTacletBuilder(Services services) {
@@ -31,6 +33,11 @@ public class LoopInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfouldTaclet
 
     public void setLoopInv(LoopInvariant loopInv) {
         this.loopInv = loopInv;
+    }
+
+
+    public void setExecutionContext(ExecutionContext context) {
+        this.executionContext = context;
     }
 
 
@@ -47,6 +54,7 @@ public class LoopInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfouldTaclet
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(loopInv,
                                                    ifVars.c1, ifVars.c2,
+                                                   executionContext,
                                                    services);
         return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
     }

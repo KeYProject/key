@@ -18,7 +18,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
@@ -42,8 +41,6 @@ public interface LoopInvariant extends SpecificationElement {
      * Returns the contracted function symbol.
      */
     public IProgramMethod getTarget();
-
-    public ExecutionContext getExecutionContext();
 
     public boolean hasGuard();
 
@@ -118,7 +115,6 @@ public interface LoopInvariant extends SpecificationElement {
 
     public LoopInvariant create(LoopStatement loop,
                                 IProgramMethod pm,
-                                ExecutionContext innermostExecCont,
                                 Map<LocationVariable,Term> invariants,
                                 Map<LocationVariable,Term> modifies,
                                 Map<LocationVariable,
@@ -155,8 +151,6 @@ public interface LoopInvariant extends SpecificationElement {
     public LoopInvariant setLoop(LoopStatement loop);
 
     public LoopInvariant setTarget(IProgramMethod newPM);
-
-    public LoopInvariant setExecutionContext(ExecutionContext execCont);
 
     public LoopInvariant setGuard(Term guardTerm, Services services);
 
