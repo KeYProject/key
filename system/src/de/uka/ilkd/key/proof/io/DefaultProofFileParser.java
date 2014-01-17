@@ -293,6 +293,11 @@ public class DefaultProofFileParser implements IProofFileParser {
                reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
                    ", goal "+currGoal.node().serialNr()+
                    ", rule "+currTacletName+NOT_APPLICABLE,e);
+           } catch (RuntimeException e) {
+               skipBranch = 1;
+               reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
+                   ", goal "+currGoal.node().serialNr()+
+                   ", rule "+currTacletName+NOT_APPLICABLE,e);
            }
            break;
        case 'x' : //ifInst (for built in rules)
