@@ -20,22 +20,19 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.util.LRUCache;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
 
 /**
  * This class describes the relation between different clauses in a CNF.
  * If two clauses have the same existential quantifiable variable, we say
  * they are connected. And this property is transitive.
  */
-class ClausesGraph {
-
-    /**
-     * Map from  <code>Term</code>(allTerm) to <code>ClausesGraph</code> 
-     */
-    private final static Map<Term, ClausesGraph> graphCache = new LRUCache<Term, ClausesGraph> (1000);
-
+public class ClausesGraph {
     private final ImmutableSet<QuantifiableVariable> exVars;
     
     /**
@@ -45,11 +42,11 @@ class ClausesGraph {
     
     private final ImmutableSet<Term> clauses;
     
-    static ClausesGraph create(Term quantifiedFormula) {
-        ClausesGraph graph = graphCache.get ( quantifiedFormula );
+    static ClausesGraph create(Term quantifiedFormula, ServiceCaches caches) {
+        ClausesGraph graph = caches.getGraphCache().get ( quantifiedFormula );
         if ( graph == null ) {
             graph = new ClausesGraph ( quantifiedFormula );
-            graphCache.put ( quantifiedFormula, graph );
+            caches.getGraphCache().put ( quantifiedFormula, graph );
         }
         return graph;
     }

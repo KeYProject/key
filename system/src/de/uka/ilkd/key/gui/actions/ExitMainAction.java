@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ViewSettings;
@@ -43,6 +44,7 @@ public class ExitMainAction extends MainWindowAction {
    public ExitMainAction(MainWindow mainWindow) {
        super(mainWindow);
        setName("Exit");
+       setIcon(IconFactory.quit(16));
        setTooltip("Leave KeY.");
        setAcceleratorLetter(KeyEvent.VK_Q);
    }

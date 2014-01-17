@@ -15,6 +15,7 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -71,7 +72,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
         final ClauseCollector m2 = new ClauseCollector ();
         m2.collect ( rightTerm );
 
-        final boolean res = lessThan ( m1.getResult(), m2.getResult() );
+        final boolean res = lessThan ( m1.getResult(), m2.getResult(), goal.proof().getServices().getCaches() );
         
         focus = null;
         services = null;
@@ -82,7 +83,8 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
     /**
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
-    protected boolean lessThan(Term t1, Term t2) {
+    @Override
+    protected boolean lessThan(Term t1, Term t2, ServiceCaches caches) {
 
         final int t1Def = quanAnalyser.eliminableDefinition ( t1, focus );
         final int t2Def = quanAnalyser.eliminableDefinition ( t2, focus );
@@ -92,7 +94,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
 
         if ( t1.op () == Junctor.OR ) {
             if ( t2.op () == Junctor.OR ) {
-                return super.lessThan ( t1, t2 );
+                return super.lessThan ( t1, t2, caches );
             } else {
                 return false;
             }

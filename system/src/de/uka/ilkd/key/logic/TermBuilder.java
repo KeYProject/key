@@ -82,7 +82,7 @@ public class TermBuilder {
 
     private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
 
-    public static final TermBuilder DF = new TermBuilder();
+    public static final TermBuilder DF = new TermBuilder(); // TODO: Move instance into services (analog to TermFactory)
 
     private static final TermFactory tf = TermFactory.DEFAULT;
     private static final Term tt = TermFactory.DEFAULT.createTerm(Junctor.TRUE);

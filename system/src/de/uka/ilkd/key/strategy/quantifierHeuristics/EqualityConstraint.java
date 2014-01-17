@@ -723,7 +723,7 @@ public class EqualityConstraint implements Constraint {
         synchronized ( joinCacheMonitor ) {
             if ( joinCache.size () > 1000 ) {
                 joinCacheOld.clear ();
-                final HashMap<ECPair, Constraint> t = joinCacheOld;
+                final Map<ECPair, Constraint> t = joinCacheOld;
                 joinCacheOld = joinCache;
                 joinCache = t;
             }
@@ -939,9 +939,9 @@ public class EqualityConstraint implements Constraint {
     
     private static final Object joinCacheMonitor = new Object();
     
-    private static HashMap<ECPair, Constraint> joinCache = 
+    private static Map<ECPair, Constraint> joinCache = 
         new LinkedHashMap<ECPair, Constraint> ();
-    private static HashMap<ECPair, Constraint> joinCacheOld = 
+    private static Map<ECPair, Constraint> joinCacheOld = 
         new LinkedHashMap<ECPair, Constraint> ();
     
     private static final ECPair  ecPair0   = new ECPair ( null, null, 0 );

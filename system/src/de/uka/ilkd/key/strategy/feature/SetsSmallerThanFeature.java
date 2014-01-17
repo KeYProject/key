@@ -13,6 +13,7 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -51,12 +52,12 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
         final Term leftTerm = left.toTerm(app, pos, goal);
         final Term rightTerm = right.toTerm(app, pos, goal);
 
-        return origLessThan(leftTerm, rightTerm);
+        return origLessThan(leftTerm, rightTerm, goal.proof().getServices().getCaches());
     }
 
 
     protected boolean origLessThan(Term leftTerm,
-                                   Term rightTerm) {
+                                   Term rightTerm, ServiceCaches caches) {// TODO: Why is this method needed?
         final LiteralCollector m1 = new LiteralCollector();
         m1.collect(leftTerm);
         final ImmutableList<Term> literalsLeftTerm = m1.getResult();
@@ -68,7 +69,7 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
         if (literalsLeftTerm.size() > literalsRightTerm.size()) {
             return true;
         } else {
-            return super.lessThan(literalsLeftTerm, literalsRightTerm);
+            return super.lessThan(literalsLeftTerm, literalsRightTerm, caches);
         }
     }
 

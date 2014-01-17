@@ -82,6 +82,11 @@ options {
 	return excManager.createPositionedString(text, t);
     }
 
+    private PositionedString createPositionedString(final String text,
+	    final Position pos) {
+	return excManager.createPositionedString(text, pos);
+    }
+
 
     private void raiseError(String msg) throws SLTranslationException {
         throw excManager.createException(msg);
@@ -898,24 +903,35 @@ old_clause
 	throws SLTranslationException
 :
 	OLD mods=modifiers
-	type=IDENT
+	typeps=type
 	name=IDENT
 	init=INITIALISER
 	{ // modifiers are ignored, don't make any sense here
-	  result[0] = new PositionedString(type.getText(),type);
+	  result[0] = typeps;
 	  result[1] = new PositionedString(name.getText(),name);
 	  result[2] = new PositionedString(init.getText().substring(2),init);
     }
 ;
 
+type returns [PositionedString text = null;]
+@init {
+    StringBuffer sb = new StringBuffer();
+}
+@after {
+    text = new PositionedString(sb.toString(), identToken);
+}
+:
+    identToken=IDENT { sb.append(identToken.getText()); }
+    (t=EMPTYBRACKETS { sb.append(t.getText()); })*
+;
 
 field_or_method_declaration[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 :
-    type=IDENT 	name=IDENT 
-    ( (LPAREN) => methodDecl = method_declaration[mods, type, name] {result = methodDecl;}
+    typeps=type 	name=IDENT 
+    ( (LPAREN) => methodDecl = method_declaration[mods, typeps, name] {result = methodDecl;}
       |
-      fieldDecl = field_declaration[mods, type, name] {result = fieldDecl;}
+      fieldDecl = field_declaration[mods, typeps, name] {result = fieldDecl;}
     ) 
 ;
 
@@ -924,10 +940,10 @@ field_or_method_declaration[ImmutableList<String> mods]
 //field declarations
 //-----------------------------------------------------------------------------
 
-field_declaration[ImmutableList<String> mods, Token type, Token name]
+field_declaration[ImmutableList<String> mods, PositionedString type, Token name]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 @init {
-    StringBuffer sb = new StringBuffer(type.getText() + " " + name.getText());
+    StringBuffer sb = new StringBuffer(type.text + " " + name.getText());
     String s;
 }
 :
@@ -937,7 +953,7 @@ field_declaration[ImmutableList<String> mods, Token type, Token name]
 	|   semi=SEMICOLON    { sb.append(semi.getText()); }
     )
     {
-        PositionedString ps = createPositionedString(sb.toString(), type);
+        PositionedString ps = createPositionedString(sb.toString(), type.pos);
 	TextualJMLFieldDecl fd = new TextualJMLFieldDecl(mods, ps);
 	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(fd);
     }
@@ -949,10 +965,10 @@ field_declaration[ImmutableList<String> mods, Token type, Token name]
 //method declarations
 //-----------------------------------------------------------------------------
 
-method_declaration[ImmutableList<String> mods, Token type, Token name]
+method_declaration[ImmutableList<String> mods, PositionedString type, Token name]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 @init {
-    StringBuffer sb = new StringBuffer(type.getText() + " " + name.getText());
+    StringBuffer sb = new StringBuffer(type.text + " " + name.getText());
     StringBuffer sbDefinition = new StringBuffer();
     String s;
 }
@@ -964,7 +980,7 @@ method_declaration[ImmutableList<String> mods, Token type, Token name]
     )
     {
 	sb.append(";");
-        PositionedString ps = createPositionedString(sb.toString(), type);
+        PositionedString ps = createPositionedString(sb.toString(), type.pos);
         PositionedString psDefinition = null;
         if(sbDefinition.length() > 0) {
           String paramsString = params.trim();
@@ -989,7 +1005,7 @@ method_declaration[ImmutableList<String> mods, Token type, Token name]
           bodyString = bodyString.substring(bodyString.indexOf(" ") + 1);
           // TODO Other heaps? There is only one return statement.....
           psDefinition = createPositionedString("<heap> "+name.getText() +
-               paramsString + " == "+bodyString, type);
+               paramsString + " == "+bodyString, type.pos);
                
         }
 

@@ -649,7 +649,7 @@ public class TestUtilsUtil {
     */
    public static void sleep(int time) {
       try {
-         Thread.sleep(100);
+         Thread.sleep(time);
       }
       catch (InterruptedException e) {
          // Nothing to do.
