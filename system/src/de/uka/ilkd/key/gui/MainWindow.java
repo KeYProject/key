@@ -915,6 +915,8 @@ public final class MainWindow extends JFrame  {
 
     JCheckBoxMenuItem saveSMTFile;
 
+    @SuppressWarnings("unused")
+    // currently not used because we only have one specification language
     private JMenuItem setupSpeclangMenu() {
         JMenu result = new JMenu("Specification Parser");
         ButtonGroup group = new ButtonGroup();
