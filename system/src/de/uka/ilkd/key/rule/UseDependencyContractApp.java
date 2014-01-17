@@ -63,31 +63,31 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     	return super.complete() && step != null;
     }
 
-	private UseDependencyContractApp computeStep(Sequent seq, Services services) {
-		assert this.step == null;
-		final List<PosInOccurrence> steps = 
-				UseDependencyContractRule.
-				 getSteps(this.getHeapContext(), this.posInOccurrence(), seq, services);                
-		PosInOccurrence l_step = 
-				UseDependencyContractRule.findStepInIfInsts(steps, this, services);
-		assert l_step != null;/* 
+    private UseDependencyContractApp computeStep(Sequent seq, Services services) {
+        assert this.step == null;
+        final List<PosInOccurrence> steps = 
+            UseDependencyContractRule.
+            getSteps(this.getHeapContext(), this.posInOccurrence(), seq, services);                
+        PosInOccurrence l_step = 
+            UseDependencyContractRule.findStepInIfInsts(steps, this, services);
+        assert l_step != null;/* 
 				: "The strategy failed to properly "
 				+ "instantiate the base heap!\n"
 				+ "at: " + app.posInOccurrence().subTerm() + "\n"
 				+ "ifInsts: " + app.ifInsts() + "\n"
 				+ "steps: " + steps;*/
-		return setStep(l_step);
-	}
-	
-	
-	public PosInOccurrence step(Sequent seq, Services services) {
-			return step;
-	}
-	
-	public UseDependencyContractApp setStep(PosInOccurrence p_step) {
-	    assert this.step == null;
-		return new UseDependencyContractApp(rule(), 
-	    		posInOccurrence(), ifInsts(), instantiation, p_step);
+        return setStep(l_step);
+    }
+
+
+    public PosInOccurrence step(Sequent seq, Services services) {
+        return step;
+    }
+
+    public UseDependencyContractApp setStep(PosInOccurrence p_step) {
+        assert this.step == null;
+        return new UseDependencyContractApp(rule(), 
+                posInOccurrence(), ifInsts(), instantiation, p_step);
     }
 
 	@Override
@@ -121,7 +121,9 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     public UseDependencyContractApp tryToInstantiateContract(final Services services) {
         final Term focus = posInOccurrence().subTerm();
-        if (! (focus.op() instanceof IObserverFunction)) return this;
+        if (! (focus.op() instanceof IObserverFunction))
+            // TODO: find more appropriate exception
+            throw new RuntimeException("Dependency contract rule is not applicable to term "+focus);
         final IObserverFunction target = (IObserverFunction) focus.op();
 
         final Term selfTerm;
