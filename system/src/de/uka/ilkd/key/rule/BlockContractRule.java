@@ -52,7 +52,6 @@ import de.uka.ilkd.key.speclang.BlockContract.Variables;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.properties.Properties.Property;
 
 import java.util.*;
@@ -400,10 +399,7 @@ public class BlockContractRule implements BuiltInRule {
                                                instantiation.context,
                                                services);
 
-        Pair<SequentFormula, Term> seqPostPair =
-                buildBodyPreservesSequent(infFlowFactory, proof);
-        SequentFormula poFormula = seqPostPair.first;
-        Term post = seqPostPair.second;
+        final SequentFormula poFormula = buildBodyPreservesSequent(infFlowFactory, proof);
 
         // add proof obligation to goal
         infFlowGoal.addFormulaToSuccedent(poFormula, true);
@@ -592,7 +588,7 @@ public class BlockContractRule implements BuiltInRule {
         return NAME.toString();
     }
 
-    static Pair<SequentFormula, Term> buildBodyPreservesSequent(InfFlowPOSnippetFactory f, Proof proof) {
+    static SequentFormula buildBodyPreservesSequent(InfFlowPOSnippetFactory f, Proof proof) {
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
@@ -602,7 +598,7 @@ public class BlockContractRule implements BuiltInRule {
                                 SelfCompositionTermLabel.INSTANCE), post);
         proof.addLabeledIFSymbol(selfComposedExec);
 
-        return new Pair<SequentFormula, Term> (new SequentFormula(finalTerm), post);
+        return new SequentFormula(finalTerm);
     }
 
 

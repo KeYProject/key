@@ -177,7 +177,6 @@ public class TacletGenerator {
         pvs = pvs.append(self).append(paramVars);
         svs = svs.append(selfSV).append(paramSVs);
 
-        @SuppressWarnings("unchecked")
         final TermAndBoundVarPair schemaAxiom = createSchemaTerm(originalAxiom, pvs, svs);
 
         // create goal template
@@ -267,7 +266,6 @@ public class TacletGenerator {
         }
         pvs = pvs.append(self).append(paramVars);
         svs = svs.append(selfSV).append(paramSVs);
-        @SuppressWarnings("unchecked")
         final TermAndBoundVarPair schemaRepresents =
                 createSchemaTerm(originalRepresentsTerm, pvs, svs);
         assert schemaRepresents.term.op() instanceof Equality;
@@ -437,7 +435,6 @@ public class TacletGenerator {
                                                          Services services) {
         ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
         Map<Term, Term> replace = new LinkedHashMap<Term, Term>();
-        Term update = null;
         int i = 0;
         for(ProgramVariable heap : HeapContext.getModHeaps(services, false)) {
                 replace.put(TB.var(heap), TB.var(heapSVs.get(i++)));
@@ -509,6 +506,7 @@ public class TacletGenerator {
     }
 
 
+    @SuppressWarnings("unused")
     private TermAndBoundVarPair createSchemaTerm(Term term,
                                                  Pair<ProgramVariable, SchemaVariable>... varPairs) {
         ImmutableList<ProgramVariable> progVars =

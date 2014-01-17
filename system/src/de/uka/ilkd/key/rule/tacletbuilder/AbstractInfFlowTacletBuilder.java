@@ -16,11 +16,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.MiscTools;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -115,7 +112,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder.Serviced {
 
     class QuantifiableVaribaleVisitor implements Visitor {
 
-        private LinkedList<QuantifiableVariable> vars = new LinkedList();
+        private LinkedList<QuantifiableVariable> vars = new LinkedList<QuantifiableVariable>();
 
 
         @Override

@@ -53,6 +53,11 @@ import javax.swing.text.Highlighter;
 public abstract class SequentView extends JTextArea
         implements KeyListener, MouseMotionListener, MouseListener {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -7814263227303975886L;
+
     private final MainWindow mainWindow;
     
     /* 

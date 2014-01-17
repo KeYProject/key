@@ -69,6 +69,10 @@ import de.uka.ilkd.key.util.Pair;
 
 public final class ProofManagementDialog extends JDialog {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -2847924941372899828L;
     private static final ImageIcon keyIcon = IconFactory.keyHole(20, 20);
     private static final ImageIcon keyAlmostClosedIcon = IconFactory.keyHoleAlmostClosed(20, 20);
     private static final ImageIcon keyClosedIcon = IconFactory.keyHoleClosed(20, 20);
@@ -111,6 +115,11 @@ public final class ProofManagementDialog extends JDialog {
         //create proof list
         proofList = new JList();
         proofList.setCellRenderer(new DefaultListCellRenderer() {
+            /**
+             *
+             */
+            private static final long serialVersionUID = -7810888250050777877L;
+
             @Override
             public Component getListCellRendererComponent(JList list,
                     Object value, int index,

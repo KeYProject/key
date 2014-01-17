@@ -19,6 +19,11 @@ import recoder.java.declaration.Modifier;
 
 public class TwoState extends Modifier {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1408979308814683681L;
+
     public TwoState() {
     }
 

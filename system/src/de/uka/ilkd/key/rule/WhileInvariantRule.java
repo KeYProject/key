@@ -24,7 +24,6 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -236,7 +235,6 @@ public final class WhileInvariantRule implements BuiltInRule {
 	        innermostMethodFrame == null
 	        ? null
 	        : (ExecutionContext) innermostMethodFrame.getExecutionContext();
-	inv = inv.setExecutionContext(innermostExecutionContext);
 	services.getSpecificationRepository().addLoopInvariant(inv);
 
 	//cache and return result

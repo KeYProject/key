@@ -18,7 +18,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowListener;
 
-import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.GUIEvent;

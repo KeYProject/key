@@ -36,7 +36,6 @@ import javax.swing.border.TitledBorder;
  *
  * @author Kai Wallisch
  */
-@SuppressWarnings("serial")
 public final class MainFrame extends JScrollPane {
     
     private final MainWindow mainWindow;

@@ -14,17 +14,10 @@
 
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Visitor;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /** class builds RewriteTaclet objects.*/
 public class RewriteTacletBuilder extends FindTacletBuilder{
@@ -40,7 +33,7 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
      * rsp. <code>\add</code>. For efficiency no modalities are allowed above 
      * the <code>\find</code> position  </li>
      * <li> {@link RewriteTaclet#IN_SEQUENT_STATE} the <code>\find</code> part is 
-     * only allowed to match on formulas which are evaulated in the same state as 
+     * only allowed to match on formulas which are evaluated in the same state as
      * the sequent</li>
      *</ul>
      */

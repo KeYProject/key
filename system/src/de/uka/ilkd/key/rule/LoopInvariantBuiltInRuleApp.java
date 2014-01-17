@@ -206,11 +206,6 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         return rawInv.instantiate(newInvs, var);
     }
 
-    private LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio, LoopInvariant inv) {
-        this(rule, pio, null, inv, null);
-
-    }
-
     public boolean complete() {
         return inv != null && loop != null && invariantAvailable()
                 && (!variantRequired() || variantAvailable());
