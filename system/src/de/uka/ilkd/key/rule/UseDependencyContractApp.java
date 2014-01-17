@@ -100,59 +100,60 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     	return (UseDependencyContractRule) super.rule();
     }
 
-	public UseDependencyContractApp tryToInstantiate(Goal goal) {
-		if(heapContext == null){
-			heapContext = HeapContext.getModHeaps(goal.proof().getServices(), false);
+    public UseDependencyContractApp tryToInstantiate(Goal goal) {
+        if(heapContext == null){
+            heapContext = HeapContext.getModHeaps(goal.proof().getServices(), false);
         }
-		if (complete()) {
-    		return this;
-    	}
-    	UseDependencyContractApp app = this;
+        if (complete()) {
+            return this;
+        }
+        UseDependencyContractApp app = this;
 
-    	final Services services = goal.proof().getServices();
+        final Services services = goal.proof().getServices();
 
-		app = tryToInstantiateContract(services);		
-    	
-    	if (!app.complete() && app.isSufficientlyComplete()) {
-    		app = app.computeStep(goal.sequent(), services);
-    	}
-    	return app;
+        app = tryToInstantiateContract(services);		
+
+        if (!app.complete() && app.isSufficientlyComplete()) {
+            app = app.computeStep(goal.sequent(), services);
+        }
+        return app;
     }
 
-	public UseDependencyContractApp tryToInstantiateContract(final Services services) {
-	    final Term focus = posInOccurrence().subTerm();
-    	final IObserverFunction target = (IObserverFunction) focus.op();
-    
-    	final Term selfTerm;
-    	final KeYJavaType kjt;
-    
-    	if (target.isStatic()) {
-    		selfTerm = null;
-    		kjt = target.getContainerType();
-    	} else {
-    		if(getHeapContext() == null) {
-                 heapContext = HeapContext.getModHeaps(services, false);
-    	    }
-    		selfTerm = focus.sub(target.getStateCount() * target.getHeapCount(services));
-    		kjt = services.getJavaInfo().getKeYJavaType(
-    		        selfTerm.sort());
-    	}
-    	ImmutableSet<Contract> contracts = UseDependencyContractRule.getApplicableContracts(
-    	                services, kjt, target);
+    public UseDependencyContractApp tryToInstantiateContract(final Services services) {
+        final Term focus = posInOccurrence().subTerm();
+        if (! (focus.op() instanceof IObserverFunction)) return this;
+        final IObserverFunction target = (IObserverFunction) focus.op();
 
-    	if (contracts.size() > 0) {
-    		UseDependencyContractApp r = setContract(contracts.iterator().next());
-    		if(r.getHeapContext() == null) {
-    		     r.heapContext = HeapContext.getModHeaps(services, false);
-    		}
-    		return r;
-    	}
-	    return this;
+        final Term selfTerm;
+        final KeYJavaType kjt;
+
+        if (target.isStatic()) {
+            selfTerm = null;
+            kjt = target.getContainerType();
+        } else {
+            if(getHeapContext() == null) {
+                heapContext = HeapContext.getModHeaps(services, false);
+            }
+            selfTerm = focus.sub(target.getStateCount() * target.getHeapCount(services));
+            kjt = services.getJavaInfo().getKeYJavaType(
+                    selfTerm.sort());
+        }
+        ImmutableSet<Contract> contracts = UseDependencyContractRule.getApplicableContracts(
+                services, kjt, target);
+
+        if (contracts.size() > 0) {
+            UseDependencyContractApp r = setContract(contracts.iterator().next());
+            if(r.getHeapContext() == null) {
+                r.heapContext = HeapContext.getModHeaps(services, false);
+            }
+            return r;
+        }
+        return this;
     }
 
     @Override
     public List<LocationVariable> getHeapContext() {
-      return heapContext;
+        return heapContext;
     }
 
     @Override
