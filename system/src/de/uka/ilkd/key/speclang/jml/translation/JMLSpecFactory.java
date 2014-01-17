@@ -661,38 +661,38 @@ public class JMLSpecFactory {
 
 
     private Map<LocationVariable,Term> generatePostCondition(ProgramVariableCollection progVars,
-                                       ContractClauses clauses,
-                                       Behavior originalBehavior) {
+            ContractClauses clauses,
+            Behavior originalBehavior) {
         Map<LocationVariable,Term> result = new LinkedHashMap<LocationVariable,Term>();
         if(progVars.excVar == null) { // Model methods do not have exceptions
-        	for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-        		if(clauses.ensures.get(heap) != null) {
-        		   Term post = TB.convertToFormula(clauses.ensures.get(heap),services);
-        		   result.put(heap, post);
-        		}
+            for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                if(clauses.ensures.get(heap) != null) {
+                    Term post = TB.convertToFormula(clauses.ensures.get(heap),services);
+                    result.put(heap, post);
+                }
             }
         }else{
-          for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            if(clauses.ensures.get(heap) != null) {
-              Term excNull = TB.label(TB.equals(TB.var(progVars.excVar), TB.NULL(services)),
-                                      ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
-              Term post1 = (originalBehavior == Behavior.NORMAL_BEHAVIOR
-                        ? TB.convertToFormula(clauses.ensures.get(heap),services)
-                        : TB.imp(excNull, TB.convertToFormula(clauses.ensures.get(heap),services)));
-              Term post2 = (originalBehavior == Behavior.EXCEPTIONAL_BEHAVIOR
-                        ? TB.and(TB.convertToFormula(clauses.signals,services),
-                                 TB.convertToFormula(clauses.signalsOnly,services))
-                        : TB.imp(TB.not(excNull),
-                                 TB.and(TB.convertToFormula(clauses.signals,services),
-                                        TB.convertToFormula(clauses.signalsOnly,services))));
-              result.put(heap, heap == services.getTypeConverter().getHeapLDT().getHeap() ?
-                               TB.and(post1, post2) : post1);
-            }else{
-              if(clauses.assignables.get(heap) != null) {
-                result.put(heap, TB.tt());
-              }
+            for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                if(clauses.ensures.get(heap) != null) {
+                    Term excNull = TB.label(TB.equals(TB.var(progVars.excVar), TB.NULL(services)),
+                            ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
+                    Term post1 = (originalBehavior == Behavior.NORMAL_BEHAVIOR
+                            ? TB.convertToFormula(clauses.ensures.get(heap),services)
+                                    : TB.imp(excNull, TB.convertToFormula(clauses.ensures.get(heap),services)));
+                    Term post2 = (originalBehavior == Behavior.EXCEPTIONAL_BEHAVIOR
+                            ? TB.and(TB.convertToFormula(clauses.signals,services),
+                                    TB.convertToFormula(clauses.signalsOnly,services))
+                                    : TB.imp(TB.not(excNull),
+                                            TB.and(TB.convertToFormula(clauses.signals,services),
+                                                    TB.convertToFormula(clauses.signalsOnly,services))));
+                    result.put(heap, heap == services.getTypeConverter().getHeapLDT().getHeap() ?
+                            TB.and(post1, post2) : post1);
+                }else{
+                    if(clauses.assignables.get(heap) != null) {
+                        result.put(heap, TB.tt());
+                    }
+                }
             }
-          }
         }
         return result;
     }
@@ -751,18 +751,21 @@ public class JMLSpecFactory {
 
         // diverges
         if (clauses.diverges.equals(TB.ff())) {
+            // create diamond modality contract
             FunctionalOperationContract contract =
                     cf.func(name, pm, true, pres, clauses.measuredBy, posts, axioms,
                             clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else if (clauses.diverges.equals(TB.tt())) {
+            // create box modality contract
             FunctionalOperationContract contract =
                     cf.func(name, pm, false, pres, clauses.measuredBy, posts, axioms,
                             clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else {
+            // create two contracts for each diamond and box modality
             for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
               if(clauses.requires.get(heap) != null) {
                 pres.put(heap, TB.and(pres.get(heap),

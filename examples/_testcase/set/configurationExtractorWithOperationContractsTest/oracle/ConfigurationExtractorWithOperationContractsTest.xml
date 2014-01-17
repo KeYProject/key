@@ -2,25 +2,25 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="ConfigurationExtractorWithOperationContractsTest.compute(x,y);" pathCondition="true" pathConditionChanged="false">
       <statement name="x.value=2;" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="!x = null" pathCondition="!x = null" pathConditionChanged="true" branchCondition="!x = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <statement name="y.value=3;" pathCondition="!x = null" pathConditionChanged="false">
-               <branchCondition name="!y = null" pathCondition="!x = null &amp; !y = null" pathConditionChanged="true" branchCondition="!y = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <statement name="int add = sub(x,y);" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false">
+         <branchCondition name="not(equals(x,null))" pathCondition="not(equals(x,null))" pathConditionChanged="true" branchCondition="not(equals(x,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="y.value=3;" pathCondition="not(equals(x,null))" pathConditionChanged="false">
+               <branchCondition name="not(equals(y,null))" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="true" branchCondition="not(equals(y,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="int add = sub(x,y);" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false">
                      <operationContract name="result_0 = sub(x, y) catch(exc_2)
 pre: !x = null &amp; !y = null
 post: result_0 = javaAddInt(x.value, y.value) &amp; exc_2 = null
 mod: allLocs
-termination: diamond" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-                        <statement name="return add_1;" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of ConfigurationExtractorWithOperationContractsTest.compute(x,y);&gt;" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false" isReturnValueComputed="false">
-                              <termination name="&lt;end&gt;" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+termination: diamond" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+                        <statement name="return add_1;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false">
+                           <methodReturn name="&lt;return of ConfigurationExtractorWithOperationContractsTest.compute(x,y);&gt;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" isReturnValueComputed="false">
+                              <termination name="&lt;end&gt;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
                         </statement>
                      </operationContract>
                   </statement>
                </branchCondition>
-               <branchCondition name="y = null" pathCondition="!x = null &amp; y = null" pathConditionChanged="true" branchCondition="y = null" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <branchCondition name="equals(y,null)" pathCondition="and(not(equals(x,null)),equals(y,null))" pathConditionChanged="true" branchCondition="equals(y,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <operationContract name="self_0 = new NullPointerException() catch(exc_1)
 pre: true
 post: self_0.message = null
@@ -28,14 +28,14 @@ post: self_0.message = null
 &amp; self_0.&lt;inv&gt;
 &amp; exc_1 = null
 mod: {(self_0, message)} \cup {(self_0, cause)}
-termination: diamond" pathCondition="!x = null &amp; y = null" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-                     <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; y = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+termination: diamond" pathCondition="and(not(equals(x,null)),equals(y,null))" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+                     <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(not(equals(x,null)),equals(y,null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                      </termination>
                   </operationContract>
                </branchCondition>
             </statement>
          </branchCondition>
-         <branchCondition name="x = null" pathCondition="x = null" pathConditionChanged="true" branchCondition="x = null" mergedBranchCondition="false" isBranchConditionComputed="true">
+         <branchCondition name="equals(x,null)" pathCondition="equals(x,null)" pathConditionChanged="true" branchCondition="equals(x,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
             <operationContract name="self = new NullPointerException() catch(exc_0)
 pre: true
 post: self.message = null
@@ -43,8 +43,8 @@ post: self.message = null
 &amp; self.&lt;inv&gt;
 &amp; exc_0 = null
 mod: {(self, message)} \cup {(self, cause)}
-termination: diamond" pathCondition="x = null" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="x = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+termination: diamond" pathCondition="equals(x,null)" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(x,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                </termination>
             </operationContract>
          </branchCondition>

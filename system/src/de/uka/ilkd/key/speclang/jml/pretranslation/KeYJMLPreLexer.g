@@ -399,13 +399,49 @@ JMLSPECIALSYMBOL
 
 INTEGERLITERAL
     :
-        '0' | DECIMALINTEGERLITERAL
+        '0' | DECIMALINTEGERLITERAL | HEXINTEGERLITERAL | OCTALINTEGERLITERAL
     ;
 
 fragment
 DECIMALINTEGERLITERAL
     :
         NONZERODIGIT DIGITS? INTEGERTYPESUFFIX?
+    ;
+
+fragment
+HEXINTEGERLITERAL
+    :
+        HEXNUMERAL INTEGERTYPESUFFIX?
+    ;
+
+fragment
+HEXNUMERAL
+    :
+        ('0x' | '0X') HEXDIGIT HEXDIGIT*
+    ;
+
+fragment
+HEXDIGIT
+    :
+        DIGIT | 'a'..'f' | 'A'..'F'
+    ;
+
+fragment
+OCTALINTEGERLITERAL
+    :
+        OCTALNUMERAL INTEGERTYPESUFFIX?
+    ;
+
+fragment
+OCTALNUMERAL
+    :
+        '0' OCTALDIGIT OCTALDIGIT*
+    ;
+
+fragment
+OCTALDIGIT
+    :
+        '0'..'7'
     ;
 
 fragment

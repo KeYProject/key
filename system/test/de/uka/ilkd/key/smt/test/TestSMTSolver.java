@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 import junit.framework.Assert;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
@@ -119,7 +120,7 @@ public boolean checkForSupport() {
 public abstract class TestSMTSolver extends TestCommons {
     
 
-    private static HashMap<String,ProofAggregate> proofs = new HashMap<String,ProofAggregate>();
+    private static Map<String,ProofAggregate> proofs = new HashMap<String,ProofAggregate>();
    
     public static final String testFile = System.getProperty("key.home")
     + File.separator + "examples"

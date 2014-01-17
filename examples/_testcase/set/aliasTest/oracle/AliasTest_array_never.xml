@@ -6,24 +6,18 @@
             <statement name="array[1].value=3;" pathCondition="true" pathConditionChanged="false">
                <statement name="return w.value+array[0].value+array[1].value;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	9 {array[0] = w &amp; array[1] = array[0]}, 
-	7 {  !array[0] = w &amp; array[1] = array[0]
-| array[0] = w
-&amp; !array[1] = array[0]}, 
-	8 {!array[0] = w &amp; array[1] = w &amp; !array[1] = array[0]}, 
-	6 {!array[0] = w &amp; !array[1] = w &amp; !array[1] = array[0]}
+	Z(9(#)) {and(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#))))))}, 
+	Z(7(#)) {or(and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))),and(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#))))))))}, 
+	Z(8(#)) {and(and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w)),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))))}, 
+	Z(6(#)) {and(and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w))),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))))}
 as result of self.array(w,array);&gt;" isReturnValueComputed="true">
-                     <methodReturnValue name="9 {array[0] = w &amp; array[1] = array[0]}" returnValueString="9" hasCondition="true" conditionString="array[0] = w &amp; array[1] = array[0]">
+                     <methodReturnValue name="Z(9(#)) {and(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#))))))}" returnValueString="Z(9(#))" hasCondition="true" conditionString="and(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#))))))">
                      </methodReturnValue>
-                     <methodReturnValue name="7 {  !array[0] = w &amp; array[1] = array[0]
-| array[0] = w
-&amp; !array[1] = array[0]}" returnValueString="7" hasCondition="true" conditionString="  !array[0] = w &amp; array[1] = array[0]
-| array[0] = w
-&amp; !array[1] = array[0]">
+                     <methodReturnValue name="Z(7(#)) {or(and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))),and(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#))))))))}" returnValueString="Z(7(#))" hasCondition="true" conditionString="or(and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))),and(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#))))))))">
                      </methodReturnValue>
-                     <methodReturnValue name="8 {!array[0] = w &amp; array[1] = w &amp; !array[1] = array[0]}" returnValueString="8" hasCondition="true" conditionString="!array[0] = w &amp; array[1] = w &amp; !array[1] = array[0]">
+                     <methodReturnValue name="Z(8(#)) {and(and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w)),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))))}" returnValueString="Z(8(#))" hasCondition="true" conditionString="and(and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w)),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))))">
                      </methodReturnValue>
-                     <methodReturnValue name="6 {!array[0] = w &amp; !array[1] = w &amp; !array[1] = array[0]}" returnValueString="6" hasCondition="true" conditionString="!array[0] = w &amp; !array[1] = w &amp; !array[1] = array[0]">
+                     <methodReturnValue name="Z(6(#)) {and(and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w))),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))))}" returnValueString="Z(6(#))" hasCondition="true" conditionString="and(and(not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))),w)),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),w))),not(equals(AliasTest.IntWrapper::select(heap,array,arr(Z(1(#)))),AliasTest.IntWrapper::select(heap,array,arr(Z(0(#)))))))">
                      </methodReturnValue>
                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>

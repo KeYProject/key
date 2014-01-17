@@ -30,6 +30,7 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -58,8 +59,6 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
-import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
@@ -290,10 +289,11 @@ public class KeYMediator {
                                 }
                         });
         if (!proof.isDisposed()) {
-           proof.getServices().getCaches().getTermTacletAppIndexCache().clear();
+           ServiceCaches caches = proof.getServices().getCaches();
+           caches.getTermTacletAppIndexCache().clear();
+           caches.getBetaCandidates().clear(); // TODO: Is this required since the strategy is instantiated everytime again?
+           caches.getIfThenElseMalusCache().clear(); // TODO: Is this required since the strategy is instantiated everytime again?
         }
-        AbstractBetaFeature.clearCache();
-        IfThenElseMalusFeature.clearCache();
     }
 
 
@@ -561,14 +561,14 @@ public class KeYMediator {
      * changed
      * @param listener the KeYSelectionListener to add
      */
-    public synchronized void addKeYSelectionListener(KeYSelectionListener listener) {
+    public void addKeYSelectionListener(KeYSelectionListener listener) {
 	keySelectionModel.addKeYSelectionListener(listener);
     }
 
     /** removes a listener from the KeYSelectionModel
      * @param listener the KeYSelectionListener to be removed
      */
-    public synchronized void removeKeYSelectionListener(KeYSelectionListener listener) {
+    public void removeKeYSelectionListener(KeYSelectionListener listener) {
 	keySelectionModel.removeKeYSelectionListener(listener);
     }
 

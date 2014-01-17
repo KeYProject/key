@@ -1,84 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="ObjectArrayIndexReadAccess.compute(array);" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (array!=null) {if (array.length==1) {if (array[0].value==42) {return 42;     }else  {return        -300;     }   }else  {return      -200;   } }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="!array = null" pathCondition="!array = null" pathConditionChanged="true" branchCondition="!array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <branchStatement name="if (array.length==1) {if (array[0].value==42) {return 42;   }else  {return      -300;   } }else  {return    -200; }" pathCondition="!array = null" pathConditionChanged="false">
-               <branchCondition name="array.length &gt;= 0 -&gt; array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="true" branchCondition="array.length &gt;= 0 -&gt; array.length = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <branchStatement name="if (array[0].value==42) {return 42; }else  {return    -300; }" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false">
-                     <branchCondition name="!array[0] = null" pathCondition="   array.length &gt;= 0
--&gt; !array = null &amp; array.length = 1 &amp; !array[0] = null" pathConditionChanged="true" branchCondition="!array[0] = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <branchCondition name="array[0].value = 42" pathCondition="   array.length &gt;= 0
--&gt;   !array = null
-   &amp; array.length = 1
-   &amp; !array[0] = null
-   &amp; array[0].value = 42" pathConditionChanged="true" branchCondition="array[0].value = 42" mergedBranchCondition="false" isBranchConditionComputed="true">
-                           <statement name="return 42;" pathCondition="   array.length &gt;= 0
--&gt;   !array = null
-   &amp; array.length = 1
-   &amp; !array[0] = null
-   &amp; array[0].value = 42" pathConditionChanged="false">
-                              <methodReturn name="&lt;return of ObjectArrayIndexReadAccess.compute(array);&gt;" pathCondition="   array.length &gt;= 0
--&gt;   !array = null
-   &amp; array.length = 1
-   &amp; !array[0] = null
-   &amp; array[0].value = 42" pathConditionChanged="false" isReturnValueComputed="false">
-                                 <termination name="&lt;end&gt;" pathCondition="   array.length &gt;= 0
--&gt;   !array = null
-   &amp; array.length = 1
-   &amp; !array[0] = null
-   &amp; array[0].value = 42" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+      <branchStatement name="if (array!=null)" pathCondition="true" pathConditionChanged="false">
+         <branchCondition name="not(equals(array,null))" pathCondition="not(equals(array,null))" pathConditionChanged="true" branchCondition="not(equals(array,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchStatement name="if (array.length==1)" pathCondition="not(equals(array,null))" pathConditionChanged="false">
+               <branchCondition name="imp(geq(length(array),Z(0(#))),equals(length(array),Z(1(#))))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="true" branchCondition="imp(geq(length(array),Z(0(#))),equals(length(array),Z(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <branchStatement name="if (array[0].value==42)" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="false">
+                     <branchCondition name="not(equals(IntWrapper::select(heap,array,arr(Z(0(#)))),null))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),not(equals(IntWrapper::select(heap,array,arr(Z(0(#)))),null))))" pathConditionChanged="true" branchCondition="not(equals(IntWrapper::select(heap,array,arr(Z(0(#)))),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <branchCondition name="equals(int::select(heap,IntWrapper::select(heap,array,arr(Z(0(#)))),IntWrapper::$value),Z(2(4(#))))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),not(equals(IntWrapper::select(heap,array,arr(Z(0(#)))),null))),equals(int::select(heap,IntWrapper::select(heap,array,arr(Z(0(#)))),IntWrapper::$value),Z(2(4(#))))))" pathConditionChanged="true" branchCondition="equals(int::select(heap,IntWrapper::select(heap,array,arr(Z(0(#)))),IntWrapper::$value),Z(2(4(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <statement name="return 42;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),not(equals(IntWrapper::select(heap,array,arr(Z(0(#)))),null))),equals(int::select(heap,IntWrapper::select(heap,array,arr(Z(0(#)))),IntWrapper::$value),Z(2(4(#))))))" pathConditionChanged="false">
+                              <methodReturn name="&lt;return of ObjectArrayIndexReadAccess.compute(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),not(equals(IntWrapper::select(heap,array,arr(Z(0(#)))),null))),equals(int::select(heap,IntWrapper::select(heap,array,arr(Z(0(#)))),IntWrapper::$value),Z(2(4(#))))))" pathConditionChanged="false" isReturnValueComputed="false">
+                                 <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),not(equals(IntWrapper::select(heap,array,arr(Z(0(#)))),null))),equals(int::select(heap,IntWrapper::select(heap,array,arr(Z(0(#)))),IntWrapper::$value),Z(2(4(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>
                               </methodReturn>
                            </statement>
                         </branchCondition>
-                        <branchCondition name="!array[0].value = 42" pathCondition="   array.length &gt;= 0
--&gt;   !array = null
-   &amp; array.length = 1
-   &amp; !array[0] = null
-   &amp; !array[0].value = 42" pathConditionChanged="true" branchCondition="!array[0].value = 42" mergedBranchCondition="false" isBranchConditionComputed="true">
-                           <statement name="return -300;" pathCondition="   array.length &gt;= 0
--&gt;   !array = null
-   &amp; array.length = 1
-   &amp; !array[0] = null
-   &amp; !array[0].value = 42" pathConditionChanged="false">
-                              <methodReturn name="&lt;return of ObjectArrayIndexReadAccess.compute(array);&gt;" pathCondition="   array.length &gt;= 0
--&gt;   !array = null
-   &amp; array.length = 1
-   &amp; !array[0] = null
-   &amp; !array[0].value = 42" pathConditionChanged="false" isReturnValueComputed="false">
-                                 <termination name="&lt;end&gt;" pathCondition="   array.length &gt;= 0
--&gt;   !array = null
-   &amp; array.length = 1
-   &amp; !array[0] = null
-   &amp; !array[0].value = 42" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <branchCondition name="not(equals(int::select(heap,IntWrapper::select(heap,array,arr(Z(0(#)))),IntWrapper::$value),Z(2(4(#)))))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),not(equals(IntWrapper::select(heap,array,arr(Z(0(#)))),null))),not(equals(int::select(heap,IntWrapper::select(heap,array,arr(Z(0(#)))),IntWrapper::$value),Z(2(4(#)))))))" pathConditionChanged="true" branchCondition="not(equals(int::select(heap,IntWrapper::select(heap,array,arr(Z(0(#)))),IntWrapper::$value),Z(2(4(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <statement name="return -300;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),not(equals(IntWrapper::select(heap,array,arr(Z(0(#)))),null))),not(equals(int::select(heap,IntWrapper::select(heap,array,arr(Z(0(#)))),IntWrapper::$value),Z(2(4(#)))))))" pathConditionChanged="false">
+                              <methodReturn name="&lt;return of ObjectArrayIndexReadAccess.compute(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),not(equals(IntWrapper::select(heap,array,arr(Z(0(#)))),null))),not(equals(int::select(heap,IntWrapper::select(heap,array,arr(Z(0(#)))),IntWrapper::$value),Z(2(4(#)))))))" pathConditionChanged="false" isReturnValueComputed="false">
+                                 <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),not(equals(IntWrapper::select(heap,array,arr(Z(0(#)))),null))),not(equals(int::select(heap,IntWrapper::select(heap,array,arr(Z(0(#)))),IntWrapper::$value),Z(2(4(#)))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>
                               </methodReturn>
                            </statement>
                         </branchCondition>
                      </branchCondition>
-                     <branchCondition name="array[0] = null" pathCondition="   array.length &gt;= 0
--&gt; !array = null &amp; array.length = 1 &amp; array[0] = null" pathConditionChanged="true" branchCondition="array[0] = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="   array.length &gt;= 0
--&gt; !array = null &amp; array.length = 1 &amp; array[0] = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                     <branchCondition name="equals(IntWrapper::select(heap,array,arr(Z(0(#)))),null)" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),equals(IntWrapper::select(heap,array,arr(Z(0(#)))),null)))" pathConditionChanged="true" branchCondition="equals(IntWrapper::select(heap,array,arr(Z(0(#)))),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),equals(IntWrapper::select(heap,array,arr(Z(0(#)))),null)))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                         </termination>
                      </branchCondition>
                   </branchStatement>
                </branchCondition>
-               <branchCondition name="!array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="true" branchCondition="!array.length = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <statement name="return -200;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of ObjectArrayIndexReadAccess.compute(array);&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+               <branchCondition name="not(equals(length(array),Z(1(#))))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="true" branchCondition="not(equals(length(array),Z(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="return -200;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of ObjectArrayIndexReadAccess.compute(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
                </branchCondition>
             </branchStatement>
          </branchCondition>
-         <branchCondition name="array = null" pathCondition="array = null" pathConditionChanged="true" branchCondition="array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <statement name="return -100;" pathCondition="array = null" pathConditionChanged="false">
-               <methodReturn name="&lt;return of ObjectArrayIndexReadAccess.compute(array);&gt;" pathCondition="array = null" pathConditionChanged="false" isReturnValueComputed="false">
-                  <termination name="&lt;end&gt;" pathCondition="array = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+         <branchCondition name="equals(array,null)" pathCondition="equals(array,null)" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="return -100;" pathCondition="equals(array,null)" pathConditionChanged="false">
+               <methodReturn name="&lt;return of ObjectArrayIndexReadAccess.compute(array);&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" isReturnValueComputed="false">
+                  <termination name="&lt;end&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>

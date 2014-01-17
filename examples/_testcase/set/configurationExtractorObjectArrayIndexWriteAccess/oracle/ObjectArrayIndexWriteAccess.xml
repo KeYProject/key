@@ -1,54 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="ObjectArrayIndexWriteAccess.compute(array);" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (array!=null) {if (array.length==1) {     array[0]=new ObjectIntWrapper (42);return array[0].value;   }else  {return      -200;   } }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="!array = null" pathCondition="!array = null" pathConditionChanged="true" branchCondition="!array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <branchStatement name="if (array.length==1) {   array[0]=new ObjectIntWrapper (42);return array[0].value; }else  {return    -200; }" pathCondition="!array = null" pathConditionChanged="false">
-               <branchCondition name="array.length &gt;= 0 -&gt; array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="true" branchCondition="array.length &gt;= 0 -&gt; array.length = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <statement name="array[0]=new ObjectIntWrapper (42);" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false">
-                     <methodCall name="ObjectIntWrapper(var);" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false">
-                        <statement name="this.value=var;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of ObjectIntWrapper(var);&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false" isReturnValueComputed="false">
-                              <branchCondition name="   array.length &gt;= 0
--&gt;   arrayStoreValid(array, o_3)
-   &amp; !array = null
-   &amp; array.length &gt;= 1" pathCondition="   array.length &gt;= 0
--&gt;   arrayStoreValid(array, o_3)
-   &amp; !array = null
-   &amp; array.length = 1" pathConditionChanged="true" branchCondition="   array.length &gt;= 0
--&gt;   arrayStoreValid(array, o_3)
-   &amp; !array = null
-   &amp; array.length &gt;= 1" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                 <statement name="return array[0].value;" pathCondition="   array.length &gt;= 0
--&gt;   arrayStoreValid(array, o_3)
-   &amp; !array = null
-   &amp; array.length = 1" pathConditionChanged="false">
-                                    <methodReturn name="&lt;return of ObjectArrayIndexWriteAccess.compute(array);&gt;" pathCondition="   array.length &gt;= 0
--&gt;   arrayStoreValid(array, o_3)
-   &amp; !array = null
-   &amp; array.length = 1" pathConditionChanged="false" isReturnValueComputed="false">
-                                       <termination name="&lt;end&gt;" pathCondition="   array.length &gt;= 0
--&gt;   arrayStoreValid(array, o_3)
-   &amp; !array = null
-   &amp; array.length = 1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+      <branchStatement name="if (array!=null)" pathCondition="true" pathConditionChanged="false">
+         <branchCondition name="not(equals(array,null))" pathCondition="not(equals(array,null))" pathConditionChanged="true" branchCondition="not(equals(array,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchStatement name="if (array.length==1)" pathCondition="not(equals(array,null))" pathConditionChanged="false">
+               <branchCondition name="imp(geq(length(array),Z(0(#))),equals(length(array),Z(1(#))))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="true" branchCondition="imp(geq(length(array),Z(0(#))),equals(length(array),Z(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="array[0]=new ObjectIntWrapper (42);" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="false">
+                     <methodCall name="ObjectIntWrapper(var);" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="false">
+                        <statement name="this.value=var;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="false">
+                           <methodReturn name="&lt;return of ObjectIntWrapper(var);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="false" isReturnValueComputed="false">
+                              <branchCondition name="imp(geq(length(array),Z(0(#))),and(and(arrayStoreValid(array,o_3),not(equals(array,null))),geq(length(array),Z(1(#)))))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(arrayStoreValid(array,o_3),not(equals(array,null))),equals(length(array),Z(1(#)))))" pathConditionChanged="true" branchCondition="imp(geq(length(array),Z(0(#))),and(and(arrayStoreValid(array,o_3),not(equals(array,null))),geq(length(array),Z(1(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                 <statement name="return array[0].value;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(arrayStoreValid(array,o_3),not(equals(array,null))),equals(length(array),Z(1(#)))))" pathConditionChanged="false">
+                                    <methodReturn name="&lt;return of ObjectArrayIndexWriteAccess.compute(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(arrayStoreValid(array,o_3),not(equals(array,null))),equals(length(array),Z(1(#)))))" pathConditionChanged="false" isReturnValueComputed="false">
+                                       <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(arrayStoreValid(array,o_3),not(equals(array,null))),equals(length(array),Z(1(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                        </termination>
                                     </methodReturn>
                                  </statement>
                               </branchCondition>
-                              <branchCondition name="   array.length &gt;= 0
--&gt;   !arrayStoreValid(array, o_3)
-   &amp; !array = null
-   &amp; array.length &gt;= 1" pathCondition="   array.length &gt;= 0
--&gt;   !arrayStoreValid(array, o_3)
-   &amp; !array = null
-   &amp; array.length = 1" pathConditionChanged="true" branchCondition="   array.length &gt;= 0
--&gt;   !arrayStoreValid(array, o_3)
-   &amp; !array = null
-   &amp; array.length &gt;= 1" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                 <termination name="&lt;uncaught java.lang.ArrayStoreException&gt;" pathCondition="   array.length &gt;= 0
--&gt;   !arrayStoreValid(array, o_3)
-   &amp; !array = null
-   &amp; array.length = 1" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                              <branchCondition name="imp(geq(length(array),Z(0(#))),and(and(not(arrayStoreValid(array,o_3)),not(equals(array,null))),geq(length(array),Z(1(#)))))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(arrayStoreValid(array,o_3)),not(equals(array,null))),equals(length(array),Z(1(#)))))" pathConditionChanged="true" branchCondition="imp(geq(length(array),Z(0(#))),and(and(not(arrayStoreValid(array,o_3)),not(equals(array,null))),geq(length(array),Z(1(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                 <termination name="&lt;uncaught java.lang.ArrayStoreException&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(arrayStoreValid(array,o_3)),not(equals(array,null))),equals(length(array),Z(1(#)))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                                  </termination>
                               </branchCondition>
                            </methodReturn>
@@ -56,20 +26,20 @@
                      </methodCall>
                   </statement>
                </branchCondition>
-               <branchCondition name="!array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="true" branchCondition="!array.length = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <statement name="return -200;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of ObjectArrayIndexWriteAccess.compute(array);&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+               <branchCondition name="not(equals(length(array),Z(1(#))))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="true" branchCondition="not(equals(length(array),Z(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="return -200;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of ObjectArrayIndexWriteAccess.compute(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
                </branchCondition>
             </branchStatement>
          </branchCondition>
-         <branchCondition name="array = null" pathCondition="array = null" pathConditionChanged="true" branchCondition="array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <statement name="return -100;" pathCondition="array = null" pathConditionChanged="false">
-               <methodReturn name="&lt;return of ObjectArrayIndexWriteAccess.compute(array);&gt;" pathCondition="array = null" pathConditionChanged="false" isReturnValueComputed="false">
-                  <termination name="&lt;end&gt;" pathCondition="array = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+         <branchCondition name="equals(array,null)" pathCondition="equals(array,null)" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="return -100;" pathCondition="equals(array,null)" pathConditionChanged="false">
+               <methodReturn name="&lt;return of ObjectArrayIndexWriteAccess.compute(array);&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" isReturnValueComputed="false">
+                  <termination name="&lt;end&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>

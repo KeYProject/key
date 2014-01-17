@@ -347,19 +347,22 @@ public class BuilderTests extends AbstractResourceTest {
       assertTrue(proofFolder.exists());
       assertTrue(proofFile.exists() && metaFile.exists());
       
-      long proofFolderModStamp = proofFolder.getLocalTimeStamp();
-      long proofFileModStamp = proofFile.getLocalTimeStamp();
-      long metaFileModStamp = metaFile.getLocalTimeStamp();
+//      long proofFolderModStamp = proofFolder.getLocalTimeStamp();
+//      long proofFileModStamp = proofFile.getLocalTimeStamp();
+//      long metaFileModStamp = metaFile.getLocalTimeStamp();
       
       KeY4EclipseResourcesTestUtil.cleanBuild(project);
-
-      assertTrue(javaFile.exists());
-      assertTrue(proofFolder.exists());
-      assertTrue(proofFile.exists() && metaFile.exists());
       
-      assertTrue(proofFolder.getLocalTimeStamp() != proofFolderModStamp);
-      assertTrue(proofFile.getLocalTimeStamp() != proofFileModStamp);
-      assertTrue(metaFile.getLocalTimeStamp() != metaFileModStamp);
+      assertTrue(javaFile.exists());
+      assertTrue(!proofFolder.exists());
+      assertTrue(!proofFile.exists() && !metaFile.exists());
+      
+//      assertTrue(proofFolder.exists());
+//      assertTrue(proofFile.exists() && metaFile.exists());
+//      
+//      assertTrue(proofFolder.getLocalTimeStamp() != proofFolderModStamp);
+//      assertTrue(proofFile.getLocalTimeStamp() != proofFileModStamp);
+//      assertTrue(metaFile.getLocalTimeStamp() != metaFileModStamp);
    }
    
    

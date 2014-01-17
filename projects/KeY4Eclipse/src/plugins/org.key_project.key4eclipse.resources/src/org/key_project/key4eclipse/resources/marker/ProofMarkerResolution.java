@@ -38,17 +38,19 @@ public class ProofMarkerResolution implements IMarkerResolution2{
    
    /**
     * Initializes the global variables depending on the given {@link IMarker#getType()}.
-    * @param markerType - the given {@link IMarker#getType()}
+    * @param marker - the given {@link IMarker}
+    * @throws CoreException 
     */
-   public ProofMarkerResolution(String markerType, boolean openInKeY) {
-      this.openInKeY = openInKeY;
-      if(markerType.equals(MarkerManager.CLOSEDMARKER_ID)){
-         description = (openInKeY ? "Open proof in KeY" : "Open proof");
+   public ProofMarkerResolution(IMarker marker) throws CoreException {
+      IFile proofFile = getProofFile(marker);
+      String proofFileName = proofFile.getFullPath().lastSegment();
+      if(MarkerManager.CLOSEDMARKER_ID.equals(marker.getType())){
+         description = "Open proof: " + proofFileName;
       }
-      else if(markerType.equals(MarkerManager.NOTCLOSEDMARKER_ID)){
-         description = (openInKeY ? "Open proof in KeY to close it manually" : "Open proof to close it manually");
+      else if(MarkerManager.NOTCLOSEDMARKER_ID.equals(marker.getType())){
+         description = "Open proof to close it manually: " + proofFileName;
       }
-      this.label = (openInKeY ? "Open proof in KeY" : "Open proof");
+      this.label = "Open proof: " + proofFileName;
    }
    
    /**
@@ -75,7 +77,7 @@ public class ProofMarkerResolution implements IMarkerResolution2{
          }
       }
       catch (Exception e) {
-         LogUtil.getLogger().createErrorStatus(e); // TODO: You do nothing with the created status. I guess you mean LogUtil.getLogger().logError(e); which writes the exception into the eclipse log
+         LogUtil.getLogger().logError(e);
       }
    }
 

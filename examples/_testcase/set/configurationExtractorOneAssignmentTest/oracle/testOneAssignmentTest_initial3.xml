@@ -7,7 +7,7 @@
    <object xml:id="o1" name="self" type="OneAssignmentTest">
       <association name="y" programVariable="y" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </object>
-   <object xml:id="o2" name="self.y" type="OneAssignmentTestValueWrapper">
+   <object xml:id="o2" name="OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y)" type="OneAssignmentTestValueWrapper">
    </object>
    <object xml:id="o3" name="x" type="OneAssignmentTestValueWrapper">
    </object>

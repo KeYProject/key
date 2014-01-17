@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.test.Activator;
 import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
-import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
+import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.BundleUtil;
 
 public class HideMetaFilesTests extends AbstractResourceTest {
@@ -49,7 +49,7 @@ public class HideMetaFilesTests extends AbstractResourceTest {
       assertTrue(!metaFile0.isHidden() && !metaFile1.isHidden());
       
       KeYProjectProperties.setHideMetaFiles(project, true);
-      KeY4EclipseResourcesUtil.hideMetaFiles(project);
+      KeYResourcesUtil.hideMetaFiles(project);
 
       assertTrue(!javaFile.isHidden());
       assertTrue(!proofFolder.isHidden());
@@ -83,7 +83,7 @@ public class HideMetaFilesTests extends AbstractResourceTest {
       assertTrue(metaFile0.isHidden() && metaFile1.isHidden());
    
       KeYProjectProperties.setHideMetaFiles(project, false);
-      KeY4EclipseResourcesUtil.hideMetaFiles(project);
+      KeYResourcesUtil.hideMetaFiles(project);
    
       assertTrue(!javaFile.isHidden());
       assertTrue(!proofFolder.isHidden());

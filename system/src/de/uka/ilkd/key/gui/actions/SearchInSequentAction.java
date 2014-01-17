@@ -18,6 +18,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import java.awt.Toolkit;
 
@@ -32,6 +33,7 @@ public class SearchInSequentAction extends MainWindowAction {
     public SearchInSequentAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Search in sequent view");
+        setIcon(IconFactory.search(16));
         setTooltip("Search for strings in the current sequent.");
         // Key combination for this action: STRG+F.
         this.setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F,

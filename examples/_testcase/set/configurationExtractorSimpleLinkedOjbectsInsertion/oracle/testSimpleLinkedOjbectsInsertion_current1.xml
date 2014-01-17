@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <equivalenceClass representativeTerm="x.next">
-      <term term="x.next"/>
-      <term term="x.next.next"/>
+   <equivalenceClass representativeTerm="SimpleLinkedOjbectsInsertion::select(heap,x,SimpleLinkedOjbectsInsertion::$next)">
+      <term term="SimpleLinkedOjbectsInsertion::select(heap,x,SimpleLinkedOjbectsInsertion::$next)"/>
+      <term term="SimpleLinkedOjbectsInsertion::select(heap,SimpleLinkedOjbectsInsertion::select(heap,x,SimpleLinkedOjbectsInsertion::$next),SimpleLinkedOjbectsInsertion::$next)"/>
    </equivalenceClass>
    <state name="return x.value+x.next.value+x.next.next.value+x.next.next.next.value;">
       <association name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" target="o1"/>
    </state>
    <object xml:id="o1" name="x" type="SimpleLinkedOjbectsInsertion">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="1" type="int"/>
+      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="Z(1(#))" type="int"/>
       <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </object>
    <object xml:id="o2" name="s_5" type="SimpleLinkedOjbectsInsertion">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="4" type="int"/>
+      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="Z(4(#))" type="int"/>
       <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o3"/>
    </object>
-   <object xml:id="o3" name="x.next" type="SimpleLinkedOjbectsInsertion">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="3" type="int"/>
+   <object xml:id="o3" name="SimpleLinkedOjbectsInsertion::select(heap,x,SimpleLinkedOjbectsInsertion::$next)" type="SimpleLinkedOjbectsInsertion">
+      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="Z(3(#))" type="int"/>
       <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o3"/>
    </object>
 </model>

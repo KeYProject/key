@@ -66,9 +66,11 @@ import java.util.*;
  */
 public final class JMLSpecExtractor implements SpecExtractor {
 
+    private static final String THROWABLE = "java.lang.Throwable";
+    private static final String ERROR = "java.lang.Error";
     private static final String EXCEPTION = "java.lang.Exception";
     private static final String RUNTIME_EXCEPTION = "java.lang.RuntimeException";
-    private static final String SIGNALS_ONLY_RUNTIMEEXCEPTION = "signals_only "+RUNTIME_EXCEPTION+";";
+    private static final String DEFAULT_SIGNALS_ONLY = "signals_only "+ERROR+", "+RUNTIME_EXCEPTION+";";
     private final Services services;
     private final JMLSpecFactory jsf;
     private ImmutableSet<PositionedString> warnings
@@ -132,26 +134,26 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
 
 
+    // includes unchecked exceptions (instances of Error or RuntimeException)
+    // (see resolution to issue #1379)
     private String getDefaultSignalsOnly(IProgramMethod pm) {
         if(pm.getThrown() == null) {
-            return SIGNALS_ONLY_RUNTIMEEXCEPTION;
+            return DEFAULT_SIGNALS_ONLY;
         }
 
         ImmutableArray<TypeReference> exceptions = pm.getThrown().getExceptions();
 
         if(exceptions == null) {
-            return SIGNALS_ONLY_RUNTIMEEXCEPTION;
+            return DEFAULT_SIGNALS_ONLY;
         }
 
-        String exceptionsString = RUNTIME_EXCEPTION + ", ";
+        String exceptionsString = ERROR +", " + RUNTIME_EXCEPTION + ", ";
 
         for(int i = 0; i < exceptions.size(); i++) {
-            //only subtypes of java.lang.Exception are in the default
-            //signals-only
             if(services.getJavaInfo().isSubtype(
                     exceptions.get(i).getKeYJavaType(),
                     services.getJavaInfo()
-                            .getKeYJavaType(EXCEPTION))) {
+                            .getKeYJavaType(THROWABLE))) {
                 exceptionsString
                     += exceptions.get(i).getKeYJavaType().getFullName() + ", ";
             }
@@ -446,7 +448,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                                            .label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
                 if(specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR && !pm.isModel()) {
-                    specCase.addSignals(new PositionedString("signals (Exception e) "+invString)
+                    specCase.addSignals(new PositionedString("signals (Throwable e) "+invString)
                                                          .label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
             }

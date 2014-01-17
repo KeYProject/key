@@ -28,7 +28,7 @@
                </value>
             </variable>
             <variable name="a" arrayIndex="-1" isArrayIndex="false">
-               <value name="a {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               <value name="a {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <variable name="b" arrayIndex="-1" isArrayIndex="false">
@@ -45,7 +45,7 @@
                   </value>
                </variable>
                <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                  <value name="a {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <value name="a {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="b" arrayIndex="-1" isArrayIndex="false">
@@ -57,7 +57,7 @@
                   </value>
                </variable>
                <variable name="c" arrayIndex="-1" isArrayIndex="false">
-                  <value name="c {true}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <value name="c {true}" typeString="int" valueString="Z(4(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <statement name="c=a+b;" pathCondition="true" pathConditionChanged="false">
@@ -66,11 +66,11 @@
                      </value>
                   </variable>
                   <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                     <value name="a {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="a {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                     <value name="b {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="b {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="exc" arrayIndex="-1" isArrayIndex="false">
@@ -78,7 +78,7 @@
                      </value>
                   </variable>
                   <variable name="c" arrayIndex="-1" isArrayIndex="false">
-                     <value name="c {true}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="c {true}" typeString="int" valueString="Z(4(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <statement name="return a+b+c;" pathCondition="true" pathConditionChanged="false">
@@ -87,11 +87,11 @@
                         </value>
                      </variable>
                      <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                        <value name="a {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="a {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                        <value name="b {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="b {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
@@ -99,7 +99,7 @@
                         </value>
                      </variable>
                      <variable name="c" arrayIndex="-1" isArrayIndex="false">
-                        <value name="c {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="c {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
@@ -108,11 +108,11 @@
                            </value>
                         </variable>
                         <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                           <value name="a {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <value name="a {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                           <value name="b {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <value name="b {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <variable name="exc" arrayIndex="-1" isArrayIndex="false">

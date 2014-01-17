@@ -3,23 +3,23 @@
    <methodCall name="self.tryCatchFinally(input);" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <statement name="result_1=1/input;" pathCondition="true" pathConditionChanged="false">
-            <branchCondition name="input = 0" pathCondition="input = 0" pathConditionChanged="true" branchCondition="input = 0" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <statement name="result_1=2;" pathCondition="input = 0" pathConditionChanged="false">
-                  <statement name="result_1=result_1*2;" pathCondition="input = 0" pathConditionChanged="false">
-                     <statement name="return result_1;" pathCondition="input = 0" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of self.tryCatchFinally(input);&gt;" pathCondition="input = 0" pathConditionChanged="false" isReturnValueComputed="false">
-                           <termination name="&lt;end&gt;" pathCondition="input = 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+            <branchCondition name="equals(input,Z(0(#)))" pathCondition="equals(input,Z(0(#)))" pathConditionChanged="true" branchCondition="equals(input,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="result_1=2;" pathCondition="equals(input,Z(0(#)))" pathConditionChanged="false">
+                  <statement name="result_1=result_1*2;" pathCondition="equals(input,Z(0(#)))" pathConditionChanged="false">
+                     <statement name="return result_1;" pathCondition="equals(input,Z(0(#)))" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of self.tryCatchFinally(input);&gt;" pathCondition="equals(input,Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false">
+                           <termination name="&lt;end&gt;" pathCondition="equals(input,Z(0(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>
                   </statement>
                </statement>
             </branchCondition>
-            <branchCondition name="!input = 0" pathCondition="!input = 0" pathConditionChanged="true" branchCondition="!input = 0" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <statement name="result_1=result_1*2;" pathCondition="!input = 0" pathConditionChanged="false">
-                  <statement name="return result_1;" pathCondition="!input = 0" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of self.tryCatchFinally(input);&gt;" pathCondition="!input = 0" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="!input = 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+            <branchCondition name="not(equals(input,Z(0(#))))" pathCondition="not(equals(input,Z(0(#))))" pathConditionChanged="true" branchCondition="not(equals(input,Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="result_1=result_1*2;" pathCondition="not(equals(input,Z(0(#))))" pathConditionChanged="false">
+                  <statement name="return result_1;" pathCondition="not(equals(input,Z(0(#))))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of self.tryCatchFinally(input);&gt;" pathCondition="not(equals(input,Z(0(#))))" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="not(equals(input,Z(0(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

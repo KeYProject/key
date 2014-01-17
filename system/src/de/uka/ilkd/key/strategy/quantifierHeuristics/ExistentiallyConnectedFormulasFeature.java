@@ -44,7 +44,7 @@ public class ExistentiallyConnectedFormulasFeature extends
         assert pos != null : "Feature is only applicable to rules with find";
 
         final ClausesGraph graph =
-            ClausesGraph.create ( pos.constrainedFormula ().formula () );
+            ClausesGraph.create ( pos.constrainedFormula ().formula (), goal.proof().getServices().getCaches() );
 
         return graph.connected ( for0.toTerm ( app, pos, goal ),
                                  for1.toTerm ( app, pos, goal ) );

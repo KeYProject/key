@@ -75,7 +75,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
         final Proof proof = info.getProof();
         if (proof==null) {
             if (verbosity > SILENT) System.out.println("Proof loading failed");
-            return;
+            System.exit(1);
         }
         final int openGoals = proof.openGoals().size();
         final Object result2 = info.getResult();
@@ -107,7 +107,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                 }
                 System.exit(-1);
             }
-            if(batchMode.isLoadOnly() ||  openGoals==0) {
+            if(batchMode.isLoadOnly() || openGoals==0) {
                 if (verbosity > SILENT)
                 System.out.println("Number of open goals after loading: " +
                         openGoals);

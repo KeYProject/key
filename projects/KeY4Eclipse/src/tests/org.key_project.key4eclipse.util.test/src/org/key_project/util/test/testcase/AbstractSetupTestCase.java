@@ -1,11 +1,11 @@
 package org.key_project.util.test.testcase;
 
+import junit.framework.TestCase;
+
 import org.junit.After;
 import org.junit.Before;
 import org.key_project.util.eclipse.setup.SetupStartup;
 import org.key_project.util.test.util.TestUtilsUtil;
-
-import junit.framework.TestCase;
 
 /**
  * Provides the basic functionality for test cases which requires
