@@ -20,6 +20,7 @@ import de.uka.ilkd.key.speclang.BlockContract.Variables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import java.util.EnumMap;
 import java.util.List;
@@ -133,6 +134,7 @@ class BasicSnippetData {
     
     BasicSnippetData(LoopInvariant invariant,
                      ExecutionContext context,
+                     Term guardTerm,
                      Services services) {
         this.hasMby = false;
         this.tb = new TermBuilder.Serviced(services);
@@ -145,6 +147,24 @@ class BasicSnippetData {
         contractContents.put(Key.MODALITY, Modality.BOX);
         contractContents.put(Key.INF_FLOW_SPECS, invariant.getInfFlowSpecs(services));
 
+        // add guard term to information flow specs (neccessary for soundness)
+        // and add the modified specs to the table
+        ImmutableList<InfFlowSpec> infFlowSpecs =
+                invariant.getInfFlowSpecs(services);
+        ImmutableList<InfFlowSpec> modifedSpecs =
+                ImmutableSLList.<InfFlowSpec>nil();
+        for(InfFlowSpec infFlowSpec : infFlowSpecs) {
+            ImmutableList<Term> modifiedPreExps =
+                    infFlowSpec.preExpressions.append(guardTerm);
+            ImmutableList<Term> modifiedPostExps =
+                    infFlowSpec.postExpressions.append(guardTerm);
+            InfFlowSpec modifiedSpec =
+                    new InfFlowSpec(modifiedPreExps, modifiedPostExps,
+                                    infFlowSpec.newObjects);
+            modifedSpecs = modifedSpecs.append(modifiedSpec);
+        }
+        contractContents.put(Key.INF_FLOW_SPECS, modifedSpecs);
+
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         final ImmutableSet<ProgramVariable> localInVariables =
                 MiscTools.getLocalIns(invariant.getLoop(), services);
@@ -155,15 +175,9 @@ class BasicSnippetData {
         final ImmutableList<Term> localInsWithoutOutDuplicates =
                     MiscTools.filterOutDuplicates(localInTerms, localOutTerms);
         final ImmutableList<Term> localVarsTerms = localInsWithoutOutDuplicates.append(localOutTerms);
-        Term guard = invariant.hasGuard() ?
-                invariant.getGuard() : tb.var(InfFlowProofSymbols.searchPV("b", services));
-        if (!invariant.hasGuard()) {
-            invariant = invariant.setGuard(guard, services);
-            contractContents.put(Key.LOOP_INVARIANT, invariant);
-            contractContents.put(Key.INF_FLOW_SPECS, invariant.getInfFlowSpecs(services));
-        }
+
         origVars = new StateVars(invariant.getInternalSelfTerm(),
-                                 guard, localVarsTerms, heap);
+                                 guardTerm, localVarsTerms, heap);
     }
     
     

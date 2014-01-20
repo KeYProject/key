@@ -36,6 +36,8 @@ public class LoopInvExecutionPO extends AbstractOperationPO
 
     private final ProofObligationVars symbExecVars;
 
+    private final Term guardTerm;
+
     private final Goal initiatingGoal;
 
     private final ExecutionContext context;
@@ -55,8 +57,10 @@ public class LoopInvExecutionPO extends AbstractOperationPO
                               ProofObligationVars symbExecVars,
                               Goal initiatingGoal,
                               ExecutionContext context,
+                              Term guardTerm,
                               Services services) {
-        this(initConfig, loopInv, symbExecVars, initiatingGoal, context);
+        this(initConfig, loopInv, symbExecVars, initiatingGoal, context,
+             guardTerm);
         this.services = services;
     }
 
@@ -65,7 +69,8 @@ public class LoopInvExecutionPO extends AbstractOperationPO
                               LoopInvariant loopInv,
                               ProofObligationVars symbExecVars,
                               Goal initiatingGoal,
-                              ExecutionContext context) {
+                              ExecutionContext context,
+                              Term guardTerm) {
         super(initConfig,
               ContractFactory.generateContractName(loopInv.getName(),
                                                    loopInv.getKJT(),
@@ -78,6 +83,7 @@ public class LoopInvExecutionPO extends AbstractOperationPO
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;
         this.context = context;
+        this.guardTerm = guardTerm;
 
         // consistensy check
         assert preAndPostExpressionsEqual() :
@@ -101,7 +107,7 @@ public class LoopInvExecutionPO extends AbstractOperationPO
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
                 POSnippetFactory.getBasicFactory(loopInvariant, symbExecVars,
-                                                 context, services);
+                                                 context, guardTerm, services);
 
         // symbolic execution
         Term symExec =
@@ -143,6 +149,10 @@ public class LoopInvExecutionPO extends AbstractOperationPO
 
     public ExecutionContext getExecutionContext() {
         return context;
+    }
+
+    public Term getGuard() {
+        return guardTerm;
     }
 
     @Override

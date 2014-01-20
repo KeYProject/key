@@ -50,8 +50,9 @@ public class FinishAuxiliaryLoopComputationMacro extends
         if (!(poForProof instanceof LoopInvExecutionPO)) {
             return;
         }
+        final LoopInvExecutionPO loopInvExecPO = (LoopInvExecutionPO) poForProof;
 
-        final Goal initiatingGoal = ((LoopInvExecutionPO) poForProof).getInitiatingGoal();
+        final Goal initiatingGoal = loopInvExecPO.getInitiatingGoal();
         final Services services = initiatingGoal.proof().getServices();
 
         if (initiatingGoal.node().parent() == null) {
@@ -76,6 +77,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
         tacletBuilder.setExecutionContext(loopInvRuleApp.getExecutionContext());
         tacletBuilder.setInfFlowVars(ifVars);
         tacletBuilder.setReplacewith(result);
+        tacletBuilder.setGuard(loopInvExecPO.getGuard());
         final Taclet rwTaclet = tacletBuilder.buildTaclet();
         initiatingGoal.proof().addLabeledTotalTerm(result);
         initiatingGoal.proof().addLabeledIFSymbol(rwTaclet);

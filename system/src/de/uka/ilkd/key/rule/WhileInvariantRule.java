@@ -85,13 +85,12 @@ public final class WhileInvariantRule implements BuiltInRule {
     private static Instantiation lastInstantiation;
 
 
-    private static InfFlowData prepareSetUpOfInfFlowValidityGoal(
-                                                                 final AnonUpdateData anonUpdateData,
+    private static InfFlowData prepareSetUpOfInfFlowValidityGoal(final AnonUpdateData anonUpdateData,
                                                                  final LocationVariable guardVar,
                                                                  final Instantiation inst,
                                                                  LoopInvariant inv,
                                                                  Services services,
-                                                                 RuleApp ruleApp,
+                                                                 LoopInvariantBuiltInRuleApp ruleApp,
                                                                  final ImmutableSet<ProgramVariable> localIns,
                                                                  final ImmutableSet<ProgramVariable> localOuts,
                                                                  final Term anonUpdate,
@@ -100,10 +99,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term baseHeap = anonUpdateData.loopHeapAtPre;
         final Term guardTerm = TB.var(guardVar);
         final Term selfTerm = inst.selfTerm;
-        inv = inv.setGuard(guardTerm, services);
         services.getSpecificationRepository().addLoopInvariant(inv);
-        ((LoopInvariantBuiltInRuleApp) ruleApp).setLoopInvariant(inv);
-        instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);
+        ruleApp.setLoopInvariant(inv);
+        instantiate(ruleApp, services);
 
         // create heap_Before_LOOP
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
@@ -165,6 +163,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         ifInvariantBuilder.setExecutionContext(inst.innermostExecutionContext);
         ifInvariantBuilder.setContextUpdate(/*inst.u*/);
         ifInvariantBuilder.setProofObligationVars(instantiationVars);
+        ifInvariantBuilder.setGuard(guardTerm);
 
         final Term loopInvApplPredTerm =
                 ifInvariantBuilder.buildContractApplPredTerm();
@@ -466,7 +465,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     private static InfFlowData setUpInfFlowValidityGoal(Goal infFlowGoal,
-                                                        RuleApp ruleApp,
+                                                        LoopInvariantBuiltInRuleApp ruleApp,
                                                         final Instantiation inst,
                                                         final LocationVariable guardVar,
                                                         final JavaBlock guardJb,
@@ -494,15 +493,16 @@ public final class WhileInvariantRule implements BuiltInRule {
         // generate information flow proof obligation variables
         final IFProofObligationVars ifVars =
                 new IFProofObligationVars(infFlowData.symbExecVars, services);
-        ((LoopInvariantBuiltInRuleApp) ruleApp).setInformationFlowProofObligationVars(ifVars);
+        ruleApp.setInformationFlowProofObligationVars(ifVars);
 
         // set execution context
-        ((LoopInvariantBuiltInRuleApp) ruleApp).setExecutionContext(inst.innermostExecutionContext);
+        ruleApp.setExecutionContext(inst.innermostExecutionContext);
 
         // create proof obligation
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(inv, ifVars.c1, ifVars.c2,
                                                    inst.innermostExecutionContext,
+                                                   TB.var(guardVar),
                                                    services);
         final Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
@@ -557,11 +557,15 @@ public final class WhileInvariantRule implements BuiltInRule {
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
             throws RuleAbortException {
-   final Sequent applicationSequent = goal.sequent();
+        assert ruleApp instanceof LoopInvariantBuiltInRuleApp;
+        LoopInvariantBuiltInRuleApp loopRuleApp =
+                (LoopInvariantBuiltInRuleApp) ruleApp;
+
+        final Sequent applicationSequent = goal.sequent();
         final KeYJavaType booleanKJT = services.getTypeConverter().getBooleanType();
 
         //get instantiation
-        final Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);
+        final Instantiation inst = instantiate(loopRuleApp, services);
 
         final Map<LocationVariable,Term> atPres = inst.inv.getInternalAtPres();
         final List<LocationVariable> heapContext = ((IBuiltInRuleApp)ruleApp).getHeapContext();        
@@ -624,6 +628,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final ProgramElementName guardVarName = new ProgramElementName(TB.newName(services, "b"));
         final LocationVariable guardVar = new LocationVariable(guardVarName, booleanKJT);
         services.getNamespaces().programVariables().addSafely(guardVar);
+        loopRuleApp.setGuard(TB.var(guardVar));
         final VariableSpecification guardVarSpec =
                 new VariableSpecification(guardVar, inst.loop.getGuardExpression(), booleanKJT);
         final LocalVariableDeclaration guardVarDecl =
@@ -807,7 +812,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
             // set up information flow validity goal
             InfFlowData infFlowData =
-                    setUpInfFlowValidityGoal(bodyGoal, ruleApp, inst, guardVar,
+                    setUpInfFlowValidityGoal(bodyGoal, loopRuleApp, inst, guardVar,
                                              guardJb, localIns, localOuts,
                                              anonUpdateDatas, anonUpdate,
                                              services);

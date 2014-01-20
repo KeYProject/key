@@ -55,8 +55,9 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
     BasicPOSnippetFactoryImpl(LoopInvariant invariant,
                               ProofObligationVars poVars,
                               ExecutionContext context,
+                              Term guardTerm,
                               Services services) {
-        this.data = new BasicSnippetData(invariant, context, services);
+        this.data = new BasicSnippetData(invariant, context, guardTerm, services);
         this.poVars = poVars;
         registerFactoryMethods();
     }

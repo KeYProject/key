@@ -52,6 +52,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private final List<LocationVariable> heapContext;
     private IFProofObligationVars infFlowVars;
     private ExecutionContext executionContext;
+    private Term guard;
 
     public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pos) {
         this(rule, pos, null, null, null);
@@ -279,6 +280,10 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         this.infFlowVars = vars;
     }
 
+    public void setGuard(Term guard) {
+        this.guard = guard;
+    }
+
     public void setExecutionContext(ExecutionContext context) {
         this.executionContext = context;
     }
@@ -311,6 +316,10 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     public IFProofObligationVars getInformationFlowProofObligationVars() {
         return infFlowVars;
+    }
+
+    public Term getGuard() {
+        return guard;
     }
 
     public ExecutionContext getExecutionContext() {
