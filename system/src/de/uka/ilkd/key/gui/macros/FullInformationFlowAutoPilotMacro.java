@@ -38,15 +38,6 @@ public class FullInformationFlowAutoPilotMacro implements ProofMacro {
     }
 
     private ProofMacro createProofMacro() {
-        final ExhaustiveProofMacro exhaustiveAutoPilotMacro =
-                new ExhaustiveProofMacro() {
-                    @Override
-                    public String getName() { return "Anonymous Macro"; }
-                    @Override
-                    public String getDescription() { return "Anonymous Macro"; }
-                    @Override
-                    ProofMacro getProofMacro() { return new AuxiliaryComputationAutoPilotMacro(); }
-        };
         final SequentialProofMacro stateExpansionAndCloseMacro = new SequentialProofMacro() {
             @Override
             protected ProofMacro[] createProofMacroArray() {
@@ -77,7 +68,7 @@ public class FullInformationFlowAutoPilotMacro implements ProofMacro {
                     public String getDescription() { return "Anonymous Macro"; }
                     @Override
                     protected ProofMacro[] createProofMacroArray() {
-                        return new ProofMacro[] {exhaustiveAutoPilotMacro,
+                        return new ProofMacro[] {new AuxiliaryComputationAutoPilotMacro(),
                                                  finishMainCompMacro};}
         };
         return new DoWhileElseMacro(alternativesMacro, NUMBER_OF_TRY_STEPS);
