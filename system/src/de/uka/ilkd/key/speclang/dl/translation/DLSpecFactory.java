@@ -238,7 +238,7 @@ public final class DLSpecFactory {
     /**
      * Creates an operation contract from an implication formula of the form
      *  "pre -> {heapAtPre := heap}
-     *                [#catchAll(java.lang.Exception exc){m();}]post",
+     *                [#catchAll(java.lang.Throwable exc){m();}]post",
      * (where the update and/or the #catchAll may be omitted) and a modifies 
      * clause.
      */

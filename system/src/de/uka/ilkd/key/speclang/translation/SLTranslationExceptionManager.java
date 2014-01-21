@@ -82,6 +82,10 @@ public class SLTranslationExceptionManager {
         return new Position(absoluteLine, absoluteColumn); 
     }
     
+    private Position createAbsolutePosition(final Position pos) {
+	return this.createAbsolutePosition(pos.getLine(), pos.getColumn());
+    }
+
     
     //-------------------------------------------------------------------------
     //public interface
@@ -101,6 +105,22 @@ public class SLTranslationExceptionManager {
 	    org.antlr.runtime.Token t) {
 	return new PositionedString(text, fileName, createAbsolutePosition(
 		t.getLine(), t.getCharPositionInLine()));
+    }
+
+    /**
+     * Creates a string with position information from the given relative
+     * position.
+     * 
+     * @param text
+     *            the {@link String}
+     * @param pos
+     *            the {@link Position}
+     * @return <code>text</code> as {@link PositionedString} with absolute
+     *         position in the current file
+     */
+    public PositionedString createPositionedString(final String text,
+	    final Position pos) {
+	return new PositionedString(text, fileName, createAbsolutePosition(pos));
     }
     
     /**

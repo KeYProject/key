@@ -17,25 +17,26 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import de.uka.ilkd.key.util.LRUCache;
 
 public abstract class AbstractMonomialSmallerThanFeature
                                          extends SmallerThanFeature {
     
     private static final Name newSymRuleSetName = new Name ( "polySimp_newSmallSym" );
-    private static final LRUCache<Operator, Integer> introductionTimeCache = 
-        new LRUCache<Operator, Integer> ( 10000 );
     private final Function add, mul, Z;
 
     private Goal currentGoal = null;
@@ -46,12 +47,12 @@ public abstract class AbstractMonomialSmallerThanFeature
         this.Z = numbers.getNumberSymbol ();
     }
 
-    protected int introductionTime(Operator op) {
+    protected int introductionTime(Operator op, ServiceCaches caches) {
         if ( op == add || op == mul || op == Z ) return -1;
-        Integer res = introductionTimeCache.get ( op );
+        Integer res = caches.getIntroductionTimeCache().get ( op );
         if ( res == null ) {
             res = Integer.valueOf ( introductionTimeHelp ( op ) );
-            introductionTimeCache.put ( op, res );
+            caches.getIntroductionTimeCache().put ( op, res );
         }
         return res.intValue ();
     }

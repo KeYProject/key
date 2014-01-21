@@ -14,6 +14,7 @@
 
 package de.uka.ilkd.key.strategy.termfeature;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -37,11 +38,11 @@ public class ContainsExecutableCodeTermFeature extends BinaryTermFeature {
     public final static TermFeature PROGRAMS_OR_QUERIES =
         new ContainsExecutableCodeTermFeature ( true );
     
-    protected boolean filter(Term t) {
-        return containsExec ( t );
+    protected boolean filter(Term t, Services services) {
+        return containsExec ( t, services );
     }
 
-    private boolean containsExec(Term t) {
+    private boolean containsExec(Term t, Services services) {
         if ( t.isRigid () ) return false;
         //if ( t.isContainsJavaBlockRecursive() ) return true;
         
@@ -52,7 +53,7 @@ public class ContainsExecutableCodeTermFeature extends BinaryTermFeature {
         if ( considerQueries && op instanceof IProgramMethod ) return true;
         
         for ( int i = 0; i != op.arity (); ++i ) {
-            final boolean res = filter ( t.sub ( i ) );
+            final boolean res = filter ( t.sub ( i ), services );
             if ( res ) return true;
         }
 

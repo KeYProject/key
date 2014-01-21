@@ -263,7 +263,7 @@ public class MarkerTests extends AbstractResourceTest {
       
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
       assertTrue(markerList.size() == 1);
-      assertTrue(testMarker(markerList.get(0), MarkerManager.NOTCLOSEDMARKER_ID, 115, 118));
+      assertTrue(testMarker(markerList.get(0), MarkerManager.NOTCLOSEDMARKER_ID, 121, 124));
    }
    
    private void testNoDuplicatedMarker(IProject project) throws CoreException{
@@ -355,11 +355,11 @@ public class MarkerTests extends AbstractResourceTest {
       assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile) == 2);
       
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
-      if(testMarker(markerList.get(0), MarkerManager.CYCLEDETECTEDMARKER_ID, 293, 294)){
-         assertTrue(testMarker(markerList.get(1), MarkerManager.CYCLEDETECTEDMARKER_ID, 446, 447));
+      if(testMarker(markerList.get(0), MarkerManager.RECURSIONMARKER_ID, 285, 286)){
+         assertTrue(testMarker(markerList.get(1), MarkerManager.RECURSIONMARKER_ID, 438, 439));
       }
-      else if(testMarker(markerList.get(0), MarkerManager.CYCLEDETECTEDMARKER_ID, 446, 447)){
-         assertTrue(testMarker(markerList.get(1), MarkerManager.CYCLEDETECTEDMARKER_ID, 293, 294));
+      else if(testMarker(markerList.get(0), MarkerManager.RECURSIONMARKER_ID, 438, 439)){
+         assertTrue(testMarker(markerList.get(1), MarkerManager.RECURSIONMARKER_ID, 285, 286));
       }
       else{
          fail();

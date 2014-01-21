@@ -1,0 +1,95 @@
+\profile "Java Profile";
+
+\settings {
+"#Proof-Settings-Config-File
+#Mon Jan 20 21:07:59 CET 2014
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]RETREAT_MODE_OPTIONS_KEY=RETREAT_MODE_NONE
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=10000
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=JavaCard-JavaCard\\:on , bigint-bigint\\:on , programRules-programRules\\:Java , intRules-intRules\\:arithmeticSemanticsIgnoringOF , sequences-sequences\\:on , runtimeExceptions-runtimeExceptions\\:ban , integerSimplificationRules-integerSimplificationRules\\:full , Strings-Strings\\:on , reach-reach\\:on , assertions-assertions\\:on , initialisation-initialisation\\:disableStaticInitialisation , modelFields-modelFields\\:showSatisfiability , optimisedSelectRules-optimisedSelectRules\\:on , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]UseBuiltUniqueness=false
+[StrategyProperty]CLASS_AXIOM_PRIO=CLASS_AXIOM_HIGH
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+\proofObligation "#Proof Obligation Settings
+#Mon Jan 20 21:07:59 CET 2014
+name=bsum_induction_upper_concrete
+class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
+";
+
+\proof {
+(keyLog "0" (keyUser "mattze" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+
+(autoModeTime "135")
+
+(branch "dummy ID"
+(rule "bsum_induction_upper" (formula "1") (term "0") (userinteraction))
+(rule "apply_subst" (formula "1") (term "1,1,1"))
+(rule "polySimp_elimSub" (formula "1") (term "0,1,1,0"))
+(rule "mul_literals" (formula "1") (term "1,0,1,1,0"))
+(rule "polySimp_elimSub" (formula "1") (term "1,0,0"))
+(rule "mul_literals" (formula "1") (term "1,1,0,0"))
+(rule "polySimp_homoEq" (formula "1"))
+(rule "polySimp_mulComm0" (formula "1") (term "1,0"))
+(rule "inEqSimp_ltToLeq" (formula "1") (term "0,1,1,1,0"))
+(rule "polySimp_addComm0" (formula "1") (term "0,0"))
+(rule "polySimp_addComm1" (formula "1") (term "0,1,1,1,1,0"))
+(rule "add_literals" (formula "1") (term "0,0,1,1,1,1,0"))
+(rule "add_zero_left" (formula "1") (term "0,1,1,1,1,0"))
+(rule "polySimp_addComm1" (formula "1") (term "1,0,1,1,0"))
+(rule "add_literals" (formula "1") (term "0,1,0,1,1,0"))
+(rule "add_zero_left" (formula "1") (term "1,0,1,1,0"))
+(rule "polySimp_addComm0" (formula "1") (term "1,1,0"))
+(rule "polySimp_rightDist" (formula "1") (term "1,0"))
+(rule "polySimp_mulComm0" (formula "1") (term "0,1,0"))
+(rule "polySimp_rightDist" (formula "1") (term "1,0,0,0,0,0,1,0"))
+(rule "mul_literals" (formula "1") (term "0,1,0,0,0,0,0,1,0"))
+(rule "inEqSimp_commuteLeq" (formula "1") (term "0,0,0,0"))
+(rule "polySimp_addAssoc" (formula "1") (term "0,0,0,0,0,1,0"))
+(rule "add_literals" (formula "1") (term "0,0,0,0,0,0,1,0"))
+(rule "add_zero_left" (formula "1") (term "0,0,0,0,0,1,0"))
+(rule "polySimp_addComm0" (formula "1") (term "0,0,0,0,1,0"))
+(rule "polySimp_addAssoc" (formula "1") (term "0"))
+(rule "polySimp_addComm1" (formula "1") (term "0,0"))
+(rule "polySimp_pullOutFactor1b" (formula "1") (term "0"))
+(rule "add_literals" (formula "1") (term "1,1,0"))
+(rule "times_zero_1" (formula "1") (term "1,0"))
+(rule "add_zero_right" (formula "1") (term "0"))
+(rule "polySimp_sepNegMonomial" (formula "1"))
+(rule "polySimp_mulLiterals" (formula "1") (term "0"))
+(rule "polySimp_elimOne" (formula "1") (term "0"))
+(rule "inEqSimp_sepNegMonomial0" (formula "1") (term "0,0"))
+(rule "polySimp_mulLiterals" (formula "1") (term "0,0,0"))
+(rule "polySimp_elimOne" (formula "1") (term "0,0,0"))
+(builtin "One Step Simplification" (formula "1"))
+(rule "closeTrue" (formula "1"))
+)
+
+}

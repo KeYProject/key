@@ -14,8 +14,8 @@
 
 package de.uka.ilkd.key.java.abstraction;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
@@ -48,10 +48,10 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 public final class PrimitiveType implements Type {
 
     // must be first in file.
-    private static final HashMap<String,PrimitiveType> typeMap = 
+    private static final Map<String,PrimitiveType> typeMap = 
             new LinkedHashMap<String, PrimitiveType>(); 
     // must be first in file.
-    private static final HashMap<Name,PrimitiveType> ldtMap = 
+    private static final Map<Name,PrimitiveType> ldtMap = 
             new LinkedHashMap<Name, PrimitiveType>(); 
 
     public static final PrimitiveType JAVA_BYTE  =

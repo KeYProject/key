@@ -228,7 +228,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         //exception
         if(excVar != null) {
-            assert originalExcVar.sort().equals(excVar.sort());
+            assert originalExcVar.sort().equals(excVar.sort()) : "Incompatible sorts: "+originalExcVar.sort()+" and "+excVar.sort();
             result.put(originalExcVar, excVar);
         }
 

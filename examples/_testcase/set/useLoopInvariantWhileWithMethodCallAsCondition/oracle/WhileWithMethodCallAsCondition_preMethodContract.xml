@@ -16,10 +16,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
 pre: i &lt; 0 | !array = null &amp; i &gt;= 0
 post: (   i &lt; 0
    -&gt;   !exc_3 = null
-      &amp; (    java.lang.RuntimeException::instance(exc_3)
-           = TRUE
-         |   java.lang.RuntimeException::instance(exc_3)
-           = TRUE))
+      &amp; java.lang.Exception::instance(exc_3) = TRUE)
 &amp; (   !array = null &amp; i &gt;= 0
    -&gt;     result_3
         = \if (i &lt; array.length)
