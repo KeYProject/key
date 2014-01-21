@@ -68,6 +68,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
     private static PosInOccurrence letUserChooseStep(
     		List<LocationVariable> heapContext,
             List<PosInOccurrence> steps, boolean forced, Services services) {
+        assert heapContext != null;
 
         if (steps.size() == 0) {
             return null;
