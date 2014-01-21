@@ -56,6 +56,9 @@ public abstract class SequentView extends JTextArea
     private static final long serialVersionUID = -7474938556691063384L;
     private final MainWindow mainWindow;
 
+    protected static final Color INACTIVE_BACKGROUND_COLOR = 
+            new Color(UIManager.getColor("Panel.background").getRGB());
+
     /* 
      * The current line width. Static declaration for this prevents constructors from
      * using lineWidth 0.
@@ -102,7 +105,6 @@ public abstract class SequentView extends JTextArea
         configChangeListener = new ConfigChangeAdapter(this);
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
         setEditable(false);
-        setBackground(new Color(249, 249, 249));
         setFont();
         addKeyListener(this);
         addMouseMotionListener(this);

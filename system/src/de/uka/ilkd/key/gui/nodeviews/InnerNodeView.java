@@ -13,9 +13,16 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
+import java.awt.Insets;
 import java.util.Iterator;
 
+import javax.swing.JTextArea;
+import javax.swing.UIManager;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -49,12 +56,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
-import java.awt.Insets;
-import javax.swing.JTextArea;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.MatteBorder;
-import javax.swing.text.DefaultHighlighter;
 
 public class InnerNodeView extends SequentView {
 
@@ -71,6 +72,7 @@ public class InnerNodeView extends SequentView {
                         mediator.getNotationInfo(),
                         mediator.getServices()));
         setSelectionColor(new Color(10,180,50));
+        setBackground(INACTIVE_BACKGROUND_COLOR);
 
         tacletInfo = new JTextArea(getTacletDescription(mediator, node, filter));
         tacletInfo.setBackground(getBackground());
@@ -78,7 +80,7 @@ public class InnerNodeView extends SequentView {
                 new MatteBorder(3,0,0,0,Color.black),
                 new EmptyBorder(new Insets(4,0,0,0))));
 
-        updateUI();
+//        updateUI();
         printSequent();
     }
 
