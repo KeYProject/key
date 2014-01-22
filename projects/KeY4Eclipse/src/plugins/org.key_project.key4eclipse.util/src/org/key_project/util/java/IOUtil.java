@@ -14,6 +14,7 @@
 package org.key_project.util.java;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -605,5 +606,18 @@ public final class IOUtil {
        * @throws IOException Occurred Exception
        */
       public void visit(File file) throws IOException;
+   }
+   
+   /**
+    * Replaces all LineBreaks in the given InputStream with "\n".
+    * @param in - the given InputStream
+    * @return a new InputStream with with the replaced lineBreaks
+    * @throws IOException
+    */
+   public static InputStream fixLineBreaks(InputStream in) throws IOException{
+      String text = IOUtil.readFrom(in);
+      text = text.replace("\r\n", "\n");
+      text = text.replace("\r", "\n");
+      return new ByteArrayInputStream(text.getBytes());
    }
 }
