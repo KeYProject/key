@@ -17,7 +17,6 @@ import java.awt.Insets;
 import java.util.Iterator;
 
 import javax.swing.JTextArea;
-import javax.swing.UIManager;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;

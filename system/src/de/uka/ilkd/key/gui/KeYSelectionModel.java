@@ -230,6 +230,12 @@ public class KeYSelectionModel {
         Queue<Node> toVisit =
                 new LinkedList<Node>();
         
+        // bugfix:
+        // "old" may point to an abandoned Node; choose goal for root then
+        if(!proof.find(old)) {
+            old = proof.root();
+        }
+        
         toVisit.add(old);
         
         if(!old.isClosed()) {
