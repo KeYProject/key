@@ -804,19 +804,17 @@ public class KeYMediator {
     		(new ProofClosedNotificationEvent(e.getSource()));
     	}
 
-        @Override 
-        public void proofIsBeingPruned(final ProofTreeEvent e) {
+    	public void proofPruningInProcess(ProofTreeEvent e) {
     		pruningInProcess = true;
+    	}
+
+    	public void proofPruned(final ProofTreeEvent e) {
     		SwingUtilities.invokeLater(new Runnable() {
     			public void run () {
     				if (!e.getSource().find(getSelectedNode())) {
     					keySelectionModel.setSelectedNode(e.getNode());
     				}
     			}});
-        }
-
-        @Override
-        public void proofPruned(final ProofTreeEvent e) {
     		pruningInProcess = false;
     	}
 

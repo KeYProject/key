@@ -100,13 +100,11 @@ public class ProofMacroWorker extends SwingWorker implements InterruptListener {
     public void finished() {
         mediator.setInteractive(true);
         mediator.startInterface(true);
-        // select an open goal
-//        mediator.getSelectionModel().defaultSelection();
         mediator.removeInterruptedListener(this);
     }
 
     /* 
-     * If an interruption occurred, tell the Swingworker thread
+     * If an interruption occured, tell the Swingworker thread
      */
     @Override 
     public void interruptionPerformed() {
