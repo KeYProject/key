@@ -1010,13 +1010,29 @@ public final class SpecificationRepository {
     /**
      * Returns the PO that the passed proof is about, or null.
      */
-    public ContractPO getPOForProof(Proof proof) {
+    public ContractPO getContractPOForProof(Proof proof) {
 	for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry
 		: proofs.entrySet()) {
 	    ProofOblInput po = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();
             if(sop.contains(proof) && po instanceof ContractPO) {
                 return (ContractPO)po;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Returns the PO that the passed proof is about, or null.
+     */
+    public ProofOblInput getPOForProof(Proof proof) {
+	for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry
+		: proofs.entrySet()) {
+	    ProofOblInput po = entry.getKey();
+            ImmutableSet<Proof> sop = entry.getValue();
+            if(sop.contains(proof)) {
+                return po;
             }
         }
         return null;
@@ -1058,7 +1074,7 @@ public final class SpecificationRepository {
      * Returns the target that the passed proof is about, or null.
      */
     public IObserverFunction getTargetOfProof(Proof proof) {
-	final ContractPO po = getPOForProof(proof);
+	final ContractPO po = getContractPOForProof(proof);
 	return po == null ? null : po.getContract().getTarget();
     }
 

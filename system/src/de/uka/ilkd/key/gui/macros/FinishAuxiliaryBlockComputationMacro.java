@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -42,7 +43,7 @@ public class FinishAuxiliaryBlockComputationMacro
         if (services == null) {
             return false;
         }
-        final ContractPO poForProof =
+        final ProofOblInput poForProof =
                 services.getSpecificationRepository().getPOForProof(proof);
         return poForProof instanceof BlockExecutionPO;
     }
@@ -56,7 +57,7 @@ public class FinishAuxiliaryBlockComputationMacro
         if (proof == null) {
             return;
         }
-        final ContractPO poForProof =
+        final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getPOForProof(proof);
         if (!(poForProof instanceof BlockExecutionPO)) {
             return;

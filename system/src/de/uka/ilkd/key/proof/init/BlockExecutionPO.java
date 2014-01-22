@@ -31,10 +31,9 @@ import java.util.Properties;
  * @author christoph
  */
 public class BlockExecutionPO extends AbstractOperationPO
-        implements ContractPO, InfFlowRelatedPO {
+        implements InfFlowRelatedPO {
 
     private final BlockContract contract;
-    private final InformationFlowContract generatedIFContract;
     private final ProofObligationVars symbExecVars;
     private final Goal initiatingGoal;
     private final ExecutionContext context;
@@ -70,8 +69,6 @@ public class BlockExecutionPO extends AbstractOperationPO
                                                    contract.getTarget().getContainerType(),
                                                    contract.getBlock().getStartPosition().getLine()));
         this.contract = contract;
-        this.generatedIFContract =
-                new InformationFlowContractImpl(contract, services);
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;
         this.context = context;
@@ -97,12 +94,12 @@ public class BlockExecutionPO extends AbstractOperationPO
 
         // add class axioms
         final Proof initiatingProof = initiatingGoal.proof();
-        final AbstractOperationPO initiatingPO =
-                specRepos.getPOForProof(initiatingProof) != null ? // if proof is loaded
-                (AbstractOperationPO) specRepos.getPOForProof(initiatingProof)
-                : new SymbolicExecutionPO(initConfig, generatedIFContract,
-                                          symbExecVars, initiatingGoal);
-        taclets = initiatingPO.getInitialTaclets();
+        if (initiatingProof != null) {
+            // proof is not loaded
+            final AbstractOperationPO initiatingPO =
+                    (AbstractOperationPO) specRepos.getPOForProof(initiatingProof);
+            taclets = initiatingPO.getInitialTaclets();
+        }
     }
 
     @Override
@@ -115,22 +112,12 @@ public class BlockExecutionPO extends AbstractOperationPO
     }
 
 
-    @Override
-    public Term getMbyAtPre() {
-        if (contract.hasMby()) {
-            return symbExecVars.pre.mbyAtPre;
-        } else {
-            return null;
-        }
-    }
-
-
     /**
      * {@inheritDoc}
      */
     @Override
     protected String buildPOName(boolean transactionFlag) {
-        return getContract().getName();
+        return contract.getName();
     }
 
 
@@ -166,13 +153,7 @@ public class BlockExecutionPO extends AbstractOperationPO
      */
     @Override
     protected Modality getTerminationMarker() {
-        return getContract().getModality();
-    }
-
-
-    @Override
-    public InformationFlowContract getContract() {
-        return generatedIFContract;
+        return contract.getModality();
     }
 
 
@@ -184,6 +165,11 @@ public class BlockExecutionPO extends AbstractOperationPO
     public ExecutionContext getExecutionContext() {
         return context;
     }
+
+
+//    public IFProofObligationVars getIFProofObligationVars() {
+//        return if
+//    }
 
     /**
      * {@inheritDoc}

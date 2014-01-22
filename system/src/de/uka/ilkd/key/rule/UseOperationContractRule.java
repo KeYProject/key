@@ -25,7 +25,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
@@ -54,7 +53,6 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInProgram;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -71,7 +69,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.IFProofObligationVars;
+import de.uka.ilkd.key.proof.init.InfFlowRelatedPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -843,12 +841,19 @@ public final class UseOperationContractRule implements BuiltInRule {
 	}
 	final ContractPO po
 		= services.getSpecificationRepository()
-		          .getPOForProof(goal.proof());
-	final Term mbyOk;
-	if(po != null && po.getMbyAtPre() != null && mby != null ) {
-//    	mbyOk = TB.and(TB.leq(TB.zero(services), mby, services), 
-//    			       TB.lt(mby, po.getMbyAtPre(), services));
-	    mbyOk = TB.prec(mby, po.getMbyAtPre(), services);
+		          .getContractPOForProof(goal.proof());
+
+        final Term preMby = mby;
+//        if(isInfFlow(goal)) {
+//            InfFlowRelatedPO infFlowPO = (InfFlowRelatedPO)po;
+//            infFlowPO.get
+//        }
+
+        final Term mbyOk;
+	if(po != null && po.getMbyAtPre() != null && preMby != null ) {
+//    	mbyOk = TB.and(TB.leq(TB.zero(services), preMby, services),
+//    			       TB.lt(preMby, po.getMbyAtPre(), services));
+	    mbyOk = TB.prec(preMby, po.getMbyAtPre(), services);
 	} else {
 	    mbyOk = TB.tt();
 	}

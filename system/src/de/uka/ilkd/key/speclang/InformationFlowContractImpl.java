@@ -155,33 +155,6 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
 
-    public InformationFlowContractImpl(BlockContract bc, Services services) {
-
-        this(bc.getName(), null, bc.getKJT(), bc.getMethod(), bc.getTarget().getContainerType(),
-             bc.getModality(), bc.getPre(services), null, bc.getMod(services),
-             bc.hasModifiesClause(services.getTypeConverter().getHeapLDT().getHeap()),
-             bc.getVariablesAsTerms().self,
-             ImmutableSLList.<Term>nil(), bc.getVariablesAsTerms().result,
-             bc.getVariablesAsTerms().exception, TB.var(bc.getVariables()
-                     .combineRemembranceVariables().get(services.getTypeConverter()
-                             .getHeapLDT().getHeap())), null, bc.getInfFlowSpecs(),
-             false, bc.getBlock().getStartPosition().getLine());
-    }
-    
-    
-    public InformationFlowContractImpl(LoopInvariant li, Services services) {
-
-        this(li.getName(), null, li.getKJT(), li.getTarget(), li.getTarget().getContainerType(),
-             Modality.BOX, li.getInvariant(services), null, li.getModifies(),
-             (li.getModifies() != TB.strictlyNothing()), li.getInternalSelfTerm(),
-             ImmutableSLList.<Term>nil(), null,
-             TB.var(TB.excVar(services, li.getTarget(), true)),
-             li.getInternalAtPres().get(services.getTypeConverter().getHeapLDT().getHeap()),
-             null, li.getInfFlowSpecs(services), false, li.getLoop().getStartPosition().getLine());
-    }
-
-
-
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------    

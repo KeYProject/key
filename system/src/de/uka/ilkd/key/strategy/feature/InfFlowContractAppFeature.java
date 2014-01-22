@@ -22,8 +22,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
-import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
+import de.uka.ilkd.key.proof.init.LoopInvExecutionPO;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.PosTacletApp;
@@ -278,11 +279,12 @@ public class InfFlowContractAppFeature implements Feature {
 
 
     private boolean isInfFlowProof(Proof proof) {
-        ContractPO po =
+        ProofOblInput po =
                 proof.getServices().getSpecificationRepository().getPOForProof(proof);
         return po instanceof InfFlowContractPO ||
                po instanceof SymbolicExecutionPO ||
-               po instanceof BlockExecutionPO;
+               po instanceof BlockExecutionPO ||
+               po instanceof LoopInvExecutionPO;
     }
 
 

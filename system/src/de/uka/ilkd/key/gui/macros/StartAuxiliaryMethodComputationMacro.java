@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
@@ -55,7 +56,7 @@ public class StartAuxiliaryMethodComputationMacro implements ProofMacro {
         }
         Proof proof = mediator.getSelectedProof();
         Services services = proof.getServices();
-        ContractPO poForProof =
+        ProofOblInput poForProof =
                 services.getSpecificationRepository().getPOForProof(proof);
         if (!(poForProof instanceof InfFlowContractPO)) {
             return false;
@@ -82,7 +83,7 @@ public class StartAuxiliaryMethodComputationMacro implements ProofMacro {
         Services services = proof.getServices();
         InitConfig initConfig = proof.env().getInitConfig();
 
-        ContractPO poForProof = services.getSpecificationRepository().getPOForProof(proof);
+        ProofOblInput poForProof = services.getSpecificationRepository().getPOForProof(proof);
         if (!(poForProof instanceof InfFlowContractPO)) {
             return;
         }

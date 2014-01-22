@@ -14,7 +14,7 @@ import de.uka.ilkd.key.speclang.InformationFlowContract;
  * @author christoph
  */
 public interface InfFlowRelatedPO {
-    public InformationFlowContract getContract();
+//    public IFProofObligationVars getInfFlowVars();
 
     public InfFlowProofSymbols getIFSymbols();
 

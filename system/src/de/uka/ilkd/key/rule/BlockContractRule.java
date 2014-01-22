@@ -38,8 +38,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
-import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
@@ -213,7 +213,7 @@ public class BlockContractRule implements BuiltInRule {
 
         Services services = goal.proof().getServices();
         Proof proof = goal.proof();
-        ContractPO po = services.getSpecificationRepository().getPOForProof(proof);
+        ProofOblInput po = services.getSpecificationRepository().getPOForProof(proof);
         if (po instanceof SymbolicExecutionPO) {
             Goal initiatingGoal = ((SymbolicExecutionPO)po).getInitiatingGoal();
             return contractApplied(contract, initiatingGoal);

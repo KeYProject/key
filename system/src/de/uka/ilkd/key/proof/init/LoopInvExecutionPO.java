@@ -28,11 +28,9 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 public class LoopInvExecutionPO extends AbstractOperationPO
-        implements ContractPO, InfFlowRelatedPO {
+        implements InfFlowRelatedPO {
     
     private final LoopInvariant loopInvariant;
-
-    private final InformationFlowContract generatedIFContract;
 
     private final ProofObligationVars symbExecVars;
 
@@ -77,8 +75,6 @@ public class LoopInvExecutionPO extends AbstractOperationPO
                                                    loopInv.getTarget(),
                                                    loopInv.getTarget().getContainerType(),
                                                    loopInv.getLoop().getStartPosition().getLine()));
-        this.generatedIFContract =
-                new InformationFlowContractImpl(loopInv, services);
         this.loopInvariant = loopInv;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;
@@ -122,12 +118,12 @@ public class LoopInvExecutionPO extends AbstractOperationPO
 
         // add class axioms
         Proof initiatingProof = initiatingGoal.proof();
-        final AbstractOperationPO initiatingPO =
-                specRepos.getPOForProof(initiatingProof) != null ? // if proof is loaded
-                (AbstractOperationPO) specRepos.getPOForProof(initiatingProof)
-                : new SymbolicExecutionPO(initConfig, generatedIFContract,
-                                          symbExecVars, initiatingGoal);
-        taclets = initiatingPO.getInitialTaclets();
+        if (initiatingProof != null) {
+            // proof is not loaded
+            final AbstractOperationPO initiatingPO =
+                    (AbstractOperationPO) specRepos.getPOForProof(initiatingProof);
+            taclets = initiatingPO.getInitialTaclets();
+        }
     }
 
     @Override
@@ -178,7 +174,7 @@ public class LoopInvExecutionPO extends AbstractOperationPO
 
     @Override
     protected String buildPOName(boolean transactionFlag) {
-        return getContract().getName();
+        return loopInvariant.getName();
     }
 
     /**
@@ -188,21 +184,6 @@ public class LoopInvExecutionPO extends AbstractOperationPO
     public void fillSaveProperties(Properties properties) throws IOException {
         super.fillSaveProperties(properties);
         properties.setProperty("Non-interference contract", loopInvariant.getUniqueName());
-    }
-
-
-    @Override
-    public InformationFlowContract getContract() {
-        return generatedIFContract;
-    }
-
-    @Override
-    public Term getMbyAtPre() {
-                if (generatedIFContract.hasMby()) {
-            return symbExecVars.pre.mbyAtPre;
-        } else {
-            return null;
-        }
     }
 
 
