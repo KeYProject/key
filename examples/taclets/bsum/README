@@ -12,6 +12,23 @@ f_i0+nv <= f_i2 ->
 inst nv=f_i2-f_i0-1
 
 
+proof for bsum_add_concrete
+---------------------------
+
+using bsum_split with f_middle <- f_i1
+
+CUT über
+  bsum{int v_uSub1;}(f_i0, f_i1, f_t1(v_uSub1))
+= bsum{int v_uSub1;}(f_i0, f_i1, \if (v_uSub1 < f_i1)  \then (f_t1(v_uSub1))  \else (f_t2(v_uSub1)))
+
+CUT über
+  bsum{int v_uSub2;}(f_i1, f_i3, f_t2(v_uSub2))
+= bsum{int v_uSub1;}(f_i1, f_i3, \if (v_uSub1 < f_i1)  \then (f_t1(v_uSub1))  \else (f_t2(v_uSub1))),
+
+using equal_bsum_same_index
+
+
+
 proof for bsum_split
 --------------------
 (not yet finished)
