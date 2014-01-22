@@ -888,7 +888,11 @@ public final class LogicPrinter {
     }
 
     public void printLabels(Term t) throws IOException {
-        layouter.beginC().print("\u00ab"); //  ("<<");
+        notationInfo.getNotation(TermLabel.class).print(t, this);
+    }
+
+    void printLabels(Term t, String left, String right) throws IOException {
+        layouter.beginC().print(left);
         boolean afterFirst = false;
         for (TermLabel l : t.getLabels()) {
             if (afterFirst) {
@@ -909,9 +913,9 @@ public final class LogicPrinter {
                layouter.end().print(")");
             }
         }
-        layouter.end().print("\u00bb"); // (">>");
+        layouter.end().print(right);
     }
-
+    
     /**
      * Pretty-prints a set of terms.
      * @param terms the terms to be printed

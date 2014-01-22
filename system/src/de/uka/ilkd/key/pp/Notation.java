@@ -135,6 +135,21 @@ public abstract class Notation {
     }
     
 
+    public static final class LabelNotation extends Notation {
+        
+        private final String left;
+        private final String right;
+        
+        public LabelNotation(String beginLabel, String endLabel, int prio) {
+            super(prio);
+            left = beginLabel;
+            right = endLabel;
+        }
+        
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printLabels(t, left, right);
+        }
+    }
     
     /**
      * The standard concrete syntax for quantifiers.
