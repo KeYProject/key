@@ -69,7 +69,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.IFProofObligationVars;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowRelatedPO;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -839,29 +842,33 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    reachableState = TB.and(reachableState,
 		                    TB.reachableValue(services, arg, argKJT));
 	}
-	final ContractPO po
-		= services.getSpecificationRepository()
-		          .getContractPOForProof(goal.proof());
 
-        final Term preMby = mby;
-//        if(isInfFlow(goal)) {
-//            InfFlowRelatedPO infFlowPO = (InfFlowRelatedPO)po;
-//            infFlowPO.get
-//        }
+        Term finalPreTerm;
+        if(!isInfFlow(goal)) {
+            final ContractPO po
+                    = services.getSpecificationRepository()
+                              .getContractPOForProof(goal.proof());
 
-        final Term mbyOk;
-	if(po != null && po.getMbyAtPre() != null && preMby != null ) {
-//    	mbyOk = TB.and(TB.leq(TB.zero(services), preMby, services),
-//    			       TB.lt(preMby, po.getMbyAtPre(), services));
-	    mbyOk = TB.prec(preMby, po.getMbyAtPre(), services);
-	} else {
-	    mbyOk = TB.tt();
-	}
-        final Term finalPreTerm =
-                TB.applySequential(new Term[]{inst.u, atPreUpdates},
-        	                                   TB.and(new Term[]{pre,
-        	                                	   	     reachableState,
-        	                                	   	     mbyOk}));
+            final Term mbyOk;
+            if(po != null && po.getMbyAtPre() != null && mby != null ) {
+                mbyOk = TB.prec(mby, po.getMbyAtPre(), services);
+            } else {
+                mbyOk = TB.tt();
+            }
+            finalPreTerm =
+                    TB.applySequential(new Term[]{inst.u, atPreUpdates},
+                                       TB.and(new Term[]{pre,
+                                                         reachableState,
+                                                         mbyOk}));
+        } else {
+            // termination has already been shown in the functional proof,
+            // thus we do not need to show it again in information flow proofs.
+            finalPreTerm =
+                    TB.applySequential(new Term[]{inst.u, atPreUpdates},
+                                                  TB.and(new Term[]{pre,
+                                                                    reachableState}));
+        }
+
         preGoal.changeFormula(new SequentFormula(finalPreTerm),
                               ruleApp.posInOccurrence());
         if (TermLabelWorkerManagement.hasInstantiators(services)) {

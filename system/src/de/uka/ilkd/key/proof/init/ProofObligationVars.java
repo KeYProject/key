@@ -139,9 +139,6 @@ public class ProofObligationVars {
             register(formalParamVar, services);
             Term formalParam = TermBuilder.DF.var(formalParamVar);
             formalParamVars = formalParamVars.append(formalParam);
-// The following line raises a null pointer exception because getProof()
-// might return null
-//              tb.getServices().getProof().addIFSymbol(formalParamVar);
         }
         return formalParamVars;
     }

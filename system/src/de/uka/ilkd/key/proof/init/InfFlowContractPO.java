@@ -13,14 +13,10 @@ import de.uka.ilkd.key.logic.op.*;
 import static de.uka.ilkd.key.proof.init.AbstractPO.TB;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
-import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -54,8 +50,21 @@ public class InfFlowContractPO extends AbstractOperationPO
         final IProgramMethod pm = contract.getTarget();
         symbExecVars =
                 new ProofObligationVars(pm, contract.getKJT(), services);
+
         assert (symbExecVars.pre.self == null) == (pm.isStatic());
         ifVars = new IFProofObligationVars(symbExecVars, services);
+
+        // add new information flow symbols
+        // (by the way: why only formal parameters?)
+        for (Term formalParam : symbExecVars.formalParams) {
+            addIFSymbol(formalParam);
+        }
+        for (Term formalParam : ifVars.c1.formalParams) {
+            addIFSymbol(formalParam);
+        }
+        for (Term formalParam : ifVars.c2.formalParams) {
+            addIFSymbol(formalParam);
+        }
     }
 
     @Override
@@ -175,7 +184,7 @@ public class InfFlowContractPO extends AbstractOperationPO
     }
 
     @Override
-    public void addIFSymbol(Term t) {
+    public final void addIFSymbol(Term t) {
         assert t != null;
         infFlowSymbols.add(t);
     }

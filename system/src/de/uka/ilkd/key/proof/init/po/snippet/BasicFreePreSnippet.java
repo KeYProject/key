@@ -45,11 +45,10 @@ class BasicFreePreSnippet implements FactoryMethod {
         // - "inBounds(p_i)" for integer parameters
         Term paramsOK = f.create(BasicPOSnippetFactoryImpl.Snippet.PARAMS_OK);
 
-        // initial value of measured_by clause
-        final Term mbyAtPreDef = f.create(
-                BasicPOSnippetFactoryImpl.Snippet.MBY_AT_PRE_DEF);
+        // measured_by clause is checked in the functional proof and does not
+        // need to be checked again in information flow proofs
 
         return d.tb.and(wellFormed, eqHeapAndHeapAtPre, selfNotNull, selfCreated,
-                        selfExactType, paramsOK, mbyAtPreDef);
+                        selfExactType, paramsOK);
     }
 }
