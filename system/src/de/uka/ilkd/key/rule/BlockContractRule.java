@@ -254,7 +254,7 @@ public class BlockContractRule implements BuiltInRule {
         boolean isOriginalIF =
                 (goal.getStrategyInfo(ifProp) != null && goal.getStrategyInfo(ifProp));
         // For loaded proofs, InfFlowCheckInfo is not correct without the following
-        boolean isLoadedIF = stratProps.getProperty(ifStrat).equals(ifTrue);
+        boolean isLoadedIF = false; //stratProps.getProperty(ifStrat).equals(ifTrue);
         return isOriginalIF || isLoadedIF;
     }
 
