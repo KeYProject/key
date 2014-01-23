@@ -609,15 +609,20 @@ public final class IOUtil {
    }
    
    /**
-    * Replaces all LineBreaks in the given InputStream with "\n".
-    * @param in - the given InputStream
-    * @return a new InputStream with with the replaced lineBreaks
-    * @throws IOException
+    * Replaces all line breaks ({@code \r}, {@code \r\n}) in the given InputStream with {@code \n}.
+    * @param in The {@link InputStream} to replace line breaks in.
+    * @return A new {@link InputStream} with with the replaced line breaks.
+    * @throws IOException Occurred Exception.
     */
-   public static InputStream fixLineBreaks(InputStream in) throws IOException{
-      String text = IOUtil.readFrom(in);
-      text = text.replace("\r\n", "\n");
-      text = text.replace("\r", "\n");
-      return new ByteArrayInputStream(text.getBytes());
+   public static InputStream unifyLineBreaks(InputStream in) throws IOException {
+      if (in != null) {
+         String text = IOUtil.readFrom(in);
+         text = text.replace("\r\n", "\n");
+         text = text.replace("\r", "\n");
+         return new ByteArrayInputStream(text.getBytes());
+      }
+      else {
+         return null;
+      }
    }
 }

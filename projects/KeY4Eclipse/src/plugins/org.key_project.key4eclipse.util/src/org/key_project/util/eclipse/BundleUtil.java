@@ -13,13 +13,10 @@
 
 package org.key_project.util.eclipse;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Enumeration;
@@ -35,7 +32,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.key_project.util.Activator;
 import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.StringUtil;
 import org.osgi.framework.Bundle;
 
 /**
@@ -150,79 +146,7 @@ public final class BundleUtil {
    public static void extractFromBundleToWorkspace(String bundleId,
                                                    String pathInBundle,
                                                    IContainer target) throws CoreException {
-       // Make sure that all parameters are defined.
-       if (bundleId == null) {
-           throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "No plug-in ID defined."));
-       }
-       if (pathInBundle == null) {
-           throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "No path in plug-in defined."));
-       }
-       if (target == null) {
-           throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "No target is defined."));
-       }
-       // Get Bundle.
-       Bundle bundle = Platform.getBundle(bundleId);
-       if (bundle == null) {
-           throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Can't find plug-in with ID \"" + bundleId + "\"."));
-       }
-       // Search entries.
-       Enumeration<?> entries = bundle.findEntries(pathInBundle, "*", true);
-       if (entries != null) {
-           // Make sure that target exists
-           if (!target.exists()) {
-               if (target instanceof IFolder) {
-                   ((IFolder)target).create(true, true, null);
-               }
-               else if (target instanceof IProject) {
-                   IProject project = (IProject)target;
-                   project.create(null);
-                   if (!project.isOpen()) {
-                       project.open(null);
-                   }
-               }
-           }
-           // Extract entries
-           while (entries.hasMoreElements()) {
-              Object entry = entries.nextElement();
-              if (entry instanceof URL) {
-                 URL url = (URL)entry;
-                 String urlPath = url.getPath();
-                 int pathInBundleIndex = urlPath.indexOf(pathInBundle);
-                 String pathInTarget = urlPath.substring(pathInBundleIndex + pathInBundle.length());
-                 try {
-                    // Check if it is a file or folder by the content size.
-                    URLConnection connection = url.openConnection();
-                    if (connection.getContentLength() > 0) {
-                       InputStream in = connection.getInputStream();
-                       IFile file = target.getFile(new Path(pathInTarget));
-                       if (file.exists()) {
-                          file.setContents(in, true, true, null);
-                       }
-                       else {
-                          file.create(in, true, null);
-                       }
-                    }
-                    else {
-                       // Handle URL as folder (Happens in product execution)
-                       IFolder folder = target.getFolder(new Path(pathInTarget));
-                       if (!folder.exists()) {
-                          folder.create(true, true, null);
-                       }
-                    }
-                 }
-                 catch (IOException e) {
-                     // Handle URL as folder (This happens in IDE execution)
-                     IFolder folder = target.getFolder(new Path(pathInTarget));
-                     if (!folder.exists()) {
-                        folder.create(true, true, null);
-                     }
-                 }
-              }
-              else {
-                 throw new IllegalArgumentException("Unsupported bundle entry \"" + entry + "\".");
-              }
-           }
-       }
+      extractFromBundleToWorkspace(bundleId, pathInBundle, target, false);
    }
    
    /**
@@ -230,11 +154,13 @@ public final class BundleUtil {
     * @param bundleId The ID of the bundle to extract from.
     * @param pathInBundle The path in the bundle.
     * @param target The target in the workspace.
+    * @param unifyLineBreaks {@code true} line breaks are unified to {@code \n}, {@code false} original line breaks are kept.
     * @throws CoreException Occurred Exception.
     */
-   public static void extractFromBundleToWorkspaceAndFixLineBreaks(String bundleId,
+   public static void extractFromBundleToWorkspace(String bundleId,
                                                    String pathInBundle,
-                                                   IContainer target) throws CoreException {
+                                                   IContainer target,
+                                                   boolean unifyLineBreaks) throws CoreException {
        // Make sure that all parameters are defined.
        if (bundleId == null) {
            throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "No plug-in ID defined."));
@@ -281,10 +207,15 @@ public final class BundleUtil {
                        InputStream in = connection.getInputStream();
                        IFile file = target.getFile(new Path(pathInTarget));
                        if (file.exists()) {
-                          file.setContents(IOUtil.fixLineBreaks(in), true, true, null);
+                          file.setContents(unifyLineBreaks ? IOUtil.unifyLineBreaks(in) : in, 
+                                           true, 
+                                           true, 
+                                           null);
                        }
                        else {
-                          file.create(IOUtil.fixLineBreaks(in), true, null);
+                          file.create(unifyLineBreaks ? IOUtil.unifyLineBreaks(in) : in, 
+                                      true, 
+                                      null);
                        }
                     }
                     else {
@@ -309,7 +240,6 @@ public final class BundleUtil {
            }
        }
    }
-   
 
    /**
     * Opens an {@link InputStream} to the resource in the plug-in with the given ID.

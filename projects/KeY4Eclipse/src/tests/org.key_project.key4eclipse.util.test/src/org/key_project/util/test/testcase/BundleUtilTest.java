@@ -13,7 +13,6 @@
 
 package org.key_project.util.test.testcase;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -38,21 +37,6 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class BundleUtilTest extends TestCase {
-   /**
-    * {@link BundleUtil#fixLineBreaks(InputStream)}.
-    */
-   @Test
-   public void testFixLineBreaks() throws IOException {
-      doTestFixLineBreaks("A\nB\rC\n\nD\r\rE", "A\nB\nC\n\nD\n\nE");
-      doTestFixLineBreaks("A\r\nE", "A\nE");
-   }
-   
-   protected void doTestFixLineBreaks(String toTest, String expected) throws IOException {
-      ByteArrayInputStream in = new ByteArrayInputStream(toTest.getBytes());
-      InputStream converted = IOUtil.fixLineBreaks(in);
-      assertEquals(expected, IOUtil.readFrom(converted));
-   }
-   
    /**
     * Tests {@link BundleUtil#computeMD5(String, String)}.
     */
