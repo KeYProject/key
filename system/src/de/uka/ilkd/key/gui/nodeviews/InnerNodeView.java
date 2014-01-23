@@ -71,6 +71,7 @@ public class InnerNodeView extends SequentView {
                 mainWindow.getMediator().getServices(),
                 getVisibleTermLabels()));
         setSelectionColor(new Color(10, 180, 50));
+        setBackground(INACTIVE_BACKGROUND_COLOR);
 
         tacletInfo = new JTextArea(getTacletDescription(mainWindow.getMediator(), node, filter));
         tacletInfo.setBackground(getBackground());
@@ -78,7 +79,7 @@ public class InnerNodeView extends SequentView {
                 new MatteBorder(3, 0, 0, 0, Color.black),
                 new EmptyBorder(new Insets(4, 0, 0, 0))));
 
-        updateUI();
+//        updateUI();
         printSequent();
     }
 

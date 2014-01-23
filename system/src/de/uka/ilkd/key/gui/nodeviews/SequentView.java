@@ -43,6 +43,9 @@ import javax.swing.text.Highlighter;
  * Parent class of CurrentGoalView and InnerNodeView.
  */
 public abstract class SequentView extends JTextArea {
+    
+    protected static final Color INACTIVE_BACKGROUND_COLOR
+            = new Color(UIManager.getColor("Panel.background").getRGB());
 
     private final MainWindow mainWindow;
 
@@ -99,7 +102,6 @@ public abstract class SequentView extends JTextArea {
         configChangeListener = new ConfigChangeAdapter(this);
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
         setEditable(false);
-        setBackground(new Color(249, 249, 249));
         setFont();
 
         SequentViewInputListener sequentViewInputListener = new SequentViewInputListener(this);
