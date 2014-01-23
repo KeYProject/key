@@ -41,7 +41,6 @@ public final class PruneProofAction extends MainWindowAction {
      * 
      */
     private static final long serialVersionUID = 9133317783386913373L;
-    private boolean longName = false;
     
     /**
      * creates an undo action
@@ -52,7 +51,6 @@ public final class PruneProofAction extends MainWindowAction {
      */
     public PruneProofAction(MainWindow mainWindow, boolean longName) {
 	super(mainWindow);
-	this.longName = longName;
 	init();
 	pruneMode();
     }

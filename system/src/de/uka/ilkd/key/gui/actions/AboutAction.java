@@ -46,7 +46,7 @@ public class AboutAction extends MainWindowAction {
 	String aspects = mainWindow.compiledAspects();
 	JOptionPane pane = new JOptionPane(
 	        Main.COPYRIGHT.replace("and", "\n"+UnicodeHelper.emSpaces(8)+"and")
-	        + "\n\nWWW: <html><a href=\"http://key-project.org/\">http://key-project.org/</a></html>"
+	        + "\n\nWWW: http://key-project.org/"
 	        + "\n\nVersion " + Main.VERSION
 	        + ((aspects.length() == 0) ? "" : "\nCompiled with Aspects:\n"
 	                + aspects)
