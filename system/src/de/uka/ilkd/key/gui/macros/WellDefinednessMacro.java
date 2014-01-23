@@ -13,11 +13,6 @@
 
 package de.uka.ilkd.key.gui.macros;
 
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -61,12 +56,6 @@ public class WellDefinednessMacro extends StrategyProofMacro {
     protected Strategy createStrategy(KeYMediator mediator,
                                       PosInOccurrence posInOcc) {
         return new WellDefinednessStrategy();
-    }
-
-    @Override
-    public KeyStroke getKeyStroke () {
-        // FIXME: Does apparently not work for the moment.
-        return KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.SHIFT_DOWN_MASK);
     }
 
     @Override

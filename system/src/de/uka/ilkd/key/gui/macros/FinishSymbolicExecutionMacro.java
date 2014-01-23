@@ -13,11 +13,6 @@
 
 package de.uka.ilkd.key.gui.macros;
 
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -86,11 +81,6 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     protected Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
         return new FilterSymbexStrategy(
                 mediator.getInteractiveProver().getProof().getActiveStrategy());
-    }
-
-    @Override
-    public KeyStroke getKeyStroke () {
-	return KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.SHIFT_DOWN_MASK);
     }
 
     /**
