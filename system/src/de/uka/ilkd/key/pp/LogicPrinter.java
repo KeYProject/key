@@ -884,7 +884,7 @@ public class LogicPrinter {
     /*
      * Use this method to determine the Set of printed TermLabels. 
      * The class SequentViewLogicPrinter overrides this method.
-     * The default is to just print all TermLabels.
+     * The default is to print all TermLabels.
      */
     protected ImmutableArray<TermLabel> getVisibleTermLabels(Term t){
         return t.getLabels();
@@ -895,9 +895,16 @@ public class LogicPrinter {
     }
 
     void printLabels(Term t, String left, String right) throws IOException {
+        
+        ImmutableArray<TermLabel> termLabelList = getVisibleTermLabels(t);
+        if (termLabelList.isEmpty()) {
+            return;
+        }
+        
         layouter.beginC().print(left);
         boolean afterFirst = false;
-        for (TermLabel l : t.getLabels()) {
+        
+        for (TermLabel l : termLabelList) {
             if (afterFirst) {
                layouter.print(",").brk(1, 0);
             }
