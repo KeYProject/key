@@ -275,6 +275,11 @@ public class DefaultProofFileParser implements IProofFileParser {
                reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
                    ", goal "+currGoal.node().serialNr()+
                    ", rule "+currTacletName+NOT_APPLICABLE,e);
+           } catch (AssertionError e) {
+               skipBranch = 1;
+               reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
+                   ", goal "+currGoal.node().serialNr()+
+                   ", rule "+currTacletName+NOT_APPLICABLE,e);
            }
            break;
        case 'n' :
@@ -298,6 +303,11 @@ public class DefaultProofFileParser implements IProofFileParser {
                reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
                    ", goal "+currGoal.node().serialNr()+
                    ", rule "+currTacletName+NOT_APPLICABLE,e);
+           } catch (AssertionError e) {
+               skipBranch = 1;
+               reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
+                   ", goal "+currGoal.node().serialNr()+
+                   ", rule "+currTacletName+NOT_APPLICABLE,e);
            }
            break;
        case 'x' : //ifInst (for built in rules)
@@ -314,6 +324,11 @@ public class DefaultProofFileParser implements IProofFileParser {
                reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
                    ", goal "+currGoal.node().serialNr()+
                    ", rule "+currTacletName+NOT_APPLICABLE,e);
+           } catch (AssertionError e) {
+               skipBranch = 1;
+               reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
+                   ", goal "+currGoal.node().serialNr()+
+                   ", rule "+currTacletName+NOT_APPLICABLE,e);
            }
            break;
        }
@@ -322,7 +337,7 @@ public class DefaultProofFileParser implements IProofFileParser {
 
 
    
-   private void reportError(String string, Exception e) {       
+   private void reportError(String string, Throwable e) {       
        status = "Errors while reading the proof. Not all branches could be load successfully.";
        errors.add(new ProblemLoaderException(loader, string, e));
    }

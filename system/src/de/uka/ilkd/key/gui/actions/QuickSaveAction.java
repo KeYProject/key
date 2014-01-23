@@ -41,7 +41,7 @@ public final class QuickSaveAction extends MainWindowAction {
         setName("Quicksave");
 //        setIcon(IconFactory.saveFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Save current proof to a temporal location.");
-        setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F5,0));
+//        setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F5,0));
 
         mainWindow.getMediator().enableWhenProofLoaded(this);
     }

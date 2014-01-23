@@ -352,8 +352,9 @@ public class DefaultProblemLoader {
           if (errors != null &&
                   !errors.isEmpty()) {
               throw new ProblemLoaderException(this,
-                      "Proof could only be loaded partially. In summary " + errors.size() +
-                      " not loadable rule application(s) have been detected." +
+                      "Proof could only be loaded partially.\n" +
+                      "In summary " + errors.size() +
+                      " not loadable rule application(s) have been detected.\n" +
                       "The first one:\n"+errors.get(0).getMessage(), errors.get(0));
           }
       }

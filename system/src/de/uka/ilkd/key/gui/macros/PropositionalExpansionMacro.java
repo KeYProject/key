@@ -13,11 +13,11 @@
 
 package de.uka.ilkd.key.gui.macros;
 
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.util.Set;
 
 import javax.swing.KeyStroke;
+
+import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 
 /**
  * The macro PropositionalExpansionMacro apply rules to decompose propositional
@@ -54,6 +54,6 @@ public class PropositionalExpansionMacro extends AbstractPropositionalExpansionM
 
     @Override
     public KeyStroke getKeyStroke () {
-	return KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.SHIFT_DOWN_MASK);
+	return KeyStrokeManager.get(this);
     }
 }

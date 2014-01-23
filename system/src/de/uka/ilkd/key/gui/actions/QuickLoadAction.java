@@ -35,7 +35,7 @@ public class QuickLoadAction extends MainWindowAction {
         setName("Quickload");
 //        setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Load previously quicksaved file");
-        setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F6,0));
+//        setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F6,0));
     }
 
     public void actionPerformed(ActionEvent e) {

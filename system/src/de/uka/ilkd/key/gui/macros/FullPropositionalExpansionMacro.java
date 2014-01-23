@@ -13,11 +13,7 @@
 
 package de.uka.ilkd.key.gui.macros;
 
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.util.Set;
-
-import javax.swing.KeyStroke;
 
 /**
  * The macro FullPropositionalExpansionMacro apply rules to decompose
@@ -53,11 +49,5 @@ public class FullPropositionalExpansionMacro extends AbstractPropositionalExpans
     @Override
     protected Set<String> getAdmittedRuleNames() {
         return ADMITTED_RULES_SET;
-    }
-
-
-    @Override
-    public KeyStroke getKeyStroke () {
-	return KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_DOWN_MASK);
     }
 }
