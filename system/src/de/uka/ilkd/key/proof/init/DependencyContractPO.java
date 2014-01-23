@@ -248,7 +248,7 @@ public final class DependencyContractPO extends AbstractPO
 	                contract.getPre(heapLDT.getHeap(), selfVar, paramVars,
 	                                null, services));
 
-	assert heaps.size() == heapCount;
+	assert heaps.size() == heapCount * contract.getTarget().getStateCount();
 	//prepare target term
 	final Term[] subs
 	    = new Term[paramVars.size() + heaps.size() + (target.isStatic() ? 0 : 1)];
