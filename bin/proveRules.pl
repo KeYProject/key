@@ -39,6 +39,7 @@ use File::Find qw(finddepth);
 use File::Temp qw(tempfile);
 use POSIX qw(strftime);
 use File::Basename;
+use File::Glob qw(bsd_glob);
 use Cwd 'realpath';
 use Getopt::Long;
 
@@ -83,9 +84,10 @@ my @missing_proofs = ();
 my %proved_taclets = ();
 
 sub check_annotations {
-    print "Checking proved annotations ...\n";
+    print "Checking proved annotations in directory $path_to_rules...\n";
  
-    foreach my $ruleFile (<"$path_to_rules/*.key">) {
+    my @files = bsd_glob("$path_to_rules/*.key");
+    foreach my $ruleFile (@files) {
 	open IN, "$ruleFile" or die "cannot read $ruleFile";
 	my $tagFound = 0;
 	while(<IN>) {
@@ -133,7 +135,10 @@ sub grep_proof_files {
 	open IN, "<", $proofName or die "cannot read $proofName";;
 	while(<IN>) {
 	    $inPO=1 if /^\\proofObligation/;
-	    $proved_taclets{$1}=1 if $inPO && /^name=(.*)$/;
+            if($inPO && /^name=(.*)$/) {
+                print "  Found proof obligation for $1 in file $proofName\n";
+                $proved_taclets{$1}=1;
+            }
 	    $inPO=0 if /^";/;
 	}
     }

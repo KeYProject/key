@@ -36,7 +36,7 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 
 public final class AutoModeAction extends MainWindowAction {
 
-    private static final KeyStroke START_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK);
+    private static final KeyStroke START_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK);
     private static final KeyStroke STOP_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
     /**
      * 

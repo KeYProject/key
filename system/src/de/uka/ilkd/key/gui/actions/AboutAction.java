@@ -44,11 +44,13 @@ public class AboutAction extends MainWindowAction {
 
     public void showAbout() {
 	String aspects = mainWindow.compiledAspects();
-	JOptionPane pane = new JOptionPane(Main.COPYRIGHT.replace("and", "\n"+UnicodeHelper.emSpaces(8)+"and")
-	        + "\n\nWWW: http://key-project.org/\n\nVersion "
-	        + Main.VERSION
+	JOptionPane pane = new JOptionPane(
+	        Main.COPYRIGHT.replace("and", "\n"+UnicodeHelper.emSpaces(8)+"and")
+	        + "\n\nWWW: http://key-project.org/"
+	        + "\n\nVersion " + Main.VERSION
 	        + ((aspects.length() == 0) ? "" : "\nCompiled with Aspects:\n"
-	                + aspects), JOptionPane.INFORMATION_MESSAGE,
+	                + aspects)
+	                , JOptionPane.INFORMATION_MESSAGE,
 	        JOptionPane.DEFAULT_OPTION, IconFactory.keyLogo(108, 74));
 	JDialog dialog = pane.createDialog(mainWindow, "The KeY Project");
 	dialog.setVisible(true);

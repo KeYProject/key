@@ -52,7 +52,7 @@ public class ExecutionLoopInvariant extends AbstractExecutionStateNode<SourceEle
          boolean originalPrettySyntax = NotationInfo.PRETTY_SYNTAX;
          try {
             NotationInfo.PRETTY_SYNTAX = true;
-            return getLoopInvariant().getPlainText(getServices());
+            return getLoopInvariant().getPlainText(getServices()).trim();
          }
          finally {
             NotationInfo.PRETTY_SYNTAX = originalPrettySyntax;

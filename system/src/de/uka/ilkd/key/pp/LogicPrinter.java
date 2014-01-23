@@ -891,15 +891,13 @@ public class LogicPrinter {
     }
 
     public void printLabels(Term t) throws IOException {
-        ImmutableArray<TermLabel> termLabelList = getVisibleTermLabels(t);
-        
-        if (termLabelList.isEmpty()) {
-            return;
-        }
-        
-        layouter.beginC().print("\u00ab"); //  ("<<");
+        notationInfo.getNotation(TermLabel.class).print(t, this);
+    }
+
+    void printLabels(Term t, String left, String right) throws IOException {
+        layouter.beginC().print(left);
         boolean afterFirst = false;
-        for (TermLabel l : termLabelList) {
+        for (TermLabel l : t.getLabels()) {
             if (afterFirst) {
                layouter.print(",").brk(1, 0);
             }
@@ -918,9 +916,9 @@ public class LogicPrinter {
                layouter.end().print(")");
             }
         }
-        layouter.end().print("\u00bb"); // (">>");
+        layouter.end().print(right);
     }
-
+    
     /**
      * Pretty-prints a set of terms.
      * @param terms the terms to be printed
