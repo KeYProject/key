@@ -157,16 +157,22 @@ public class TermBuilder {
      * base name.
      */
     public String newName(Services services, String baseName) {
-    final Name savedName = services.getNameRecorder().getProposal();
-    if(savedName != null) {
-        return savedName.toString();
-    }
+        final Name savedName = services.getNameRecorder().getProposal();
+        if (savedName != null) {
+            // CS: bugfix -- saving name proposals.
+            // getProposal() removes the name proposal form the name recorder,
+            // but we need to have it again for saving. Therefore I appended
+            // the proposal at the and of the list again.
+            services.getNameRecorder().addProposal(savedName);
+
+            return savedName.toString();
+        }
 
         final NamespaceSet namespaces = services.getNamespaces();
 
         int i = 0;
         String result = baseName;
-        while(namespaces.lookup(new Name(result)) != null) {
+        while (namespaces.lookup(new Name(result)) != null) {
             result = baseName + "_" + i++;
         }
 
