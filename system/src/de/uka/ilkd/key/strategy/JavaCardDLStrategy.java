@@ -1553,14 +1553,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         bindRuleSet ( d, "polySimp_newSym",
            ifZero ( not ( isInstantiated ( "newSymDef" ) ),
-              SumFeature.createSum ( new Feature[] {
-                applyTF ( "newSymLeft", tf.atom ),
-                applyTF ( "newSymLeftCoeff", tf.atLeastTwoLiteral ),
-                applyTF ( "newSymRight", tf.polynomial ),
-                instantiate ( "newSymDef",
-                              MonomialColumnOp
-                              .create ( instOf ( "newSymLeftCoeff" ),
-                                        instOf ( "newSymRight" ) ) ) } ) ) );
+              SumFeature.createSum (applyTF ( "newSymLeft", tf.atom ),
+                      applyTF ( "newSymLeftCoeff", tf.atLeastTwoLiteral ),
+                      applyTF ( "newSymRight", tf.polynomial ),
+                      instantiate ( "newSymDef",
+                                    MonomialColumnOp
+                                    .create(instOf("newSymLeftCoeff"),
+                                            instOf("newSymRight")) )) ) );
 
                                 final TermBuffer divisor = new TermBuffer ();
         final TermBuffer dividend = new TermBuffer ();
@@ -1570,21 +1569,20 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
              applyTF ( "aePseudoTargetLeft", tf.monomial ),
              applyTF ( "aePseudoTargetRight", tf.polynomial ),
              ifZero (MatchedIfFeature.INSTANCE,
-               SumFeature.createSum ( new Feature[] {
-                  DiffFindAndIfFeature.INSTANCE,
-                  applyTF ( "aePseudoLeft", add ( tf.nonCoeffMonomial,
-                                                  not ( tf.atom ) ) ),
-                  applyTF ( "aePseudoLeftCoeff", tf.atLeastTwoLiteral ),
-                  applyTF ( "aePseudoRight", tf.polynomial ),
-                  MonomialsSmallerThanFeature.create ( instOf ( "aePseudoRight" ),
-                                                       instOf ( "aePseudoLeft" ),
-                                                       numbers ),
-                  let ( divisor, instOf ( "aePseudoLeft" ),
-                  let ( dividend, instOf ( "aePseudoTargetLeft" ),
-                  add ( ReducibleMonomialsFeature.createReducible ( dividend, divisor ),
-                        instantiate ( "aePseudoTargetFactor",
-                                      ReduceMonomialsProjection
-                                      .create ( dividend, divisor ) ) ) ) ) } ) ) ) );
+               SumFeature.createSum (DiffFindAndIfFeature.INSTANCE,
+                       applyTF ( "aePseudoLeft", add ( tf.nonCoeffMonomial,
+                                                       not ( tf.atom ) ) ),
+                       applyTF ( "aePseudoLeftCoeff", tf.atLeastTwoLiteral ),
+                       applyTF ( "aePseudoRight", tf.polynomial ),
+                       MonomialsSmallerThanFeature.create ( instOf ( "aePseudoRight" ),
+                                                            instOf ( "aePseudoLeft" ),
+                                                            numbers ),
+                       let ( divisor, instOf ( "aePseudoLeft" ),
+                       let ( dividend, instOf ( "aePseudoTargetLeft" ),
+                       add ( ReducibleMonomialsFeature.createReducible ( dividend, divisor ),
+                             instantiate ( "aePseudoTargetFactor",
+                                           ReduceMonomialsProjection
+                                           .create(dividend, divisor) ) ) ) )) ) ) );
     }
 
     private void setupNewSymApproval(RuleSetDispatchFeature d, IntegerLDT numbers) {
@@ -2061,14 +2059,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
              add ( applyTF ( intRel, tf.intRelation ),
                    forEach ( atom,
                              SubtermGenerator.leftTraverse ( sub ( intRel, 0 ), tf.mulF ),
-                      SumFeature.createSum ( new Feature[] {
-                        applyTF ( atom, add ( tf.atom, not ( tf.literal ) ) ),
-                        allowPosNegCaseDistinction ( atom ),
-                        instantiate ( "signCasesLeft", atom ),
-                        longConst ( IN_EQ_SIMP_NON_LIN_COST + 200 )
+                      SumFeature.createSum (applyTF ( atom, add ( tf.atom, not ( tf.literal ) ) ),
+                              allowPosNegCaseDistinction ( atom ),
+                              instantiate ( "signCasesLeft", atom ),
+                              longConst ( IN_EQ_SIMP_NON_LIN_COST + 200 )
 //			            ,
 //                      applyTF ( atom, rec ( any (), longTermConst ( 5 ) ) )
-                      } ) ) ) );
+                      ) ) ) );
         
         bindRuleSet ( d, "inEqSimp_signCases", posNegSplitting ); 
 

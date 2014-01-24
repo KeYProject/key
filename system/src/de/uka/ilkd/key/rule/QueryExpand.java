@@ -554,7 +554,7 @@ public class QueryExpand implements BuiltInRule {
         final int arity = term.arity();
         final Term newSubTerms[] = new Term[arity];
         boolean changedSubTerm = false;
-        int next = (Integer)(it.next());
+        int next = it.next();
         //System.out.print(next+", ");
         for(int i = 0; i < arity; i++) {
             Term subTerm = term.sub(i);

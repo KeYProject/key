@@ -852,9 +852,8 @@ public class BlockContractRule implements BuiltInRule {
         private StatementBlock finishTransactionIfModalityIsTransactional(final Statement statement)
         {
             if (instantiation.isTransactional()) {
-                return new StatementBlock(new Statement[]
-                        {statement, new TransactionStatement(
-                                de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH)});
+                return new StatementBlock(statement, new TransactionStatement(
+                        de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH));
             }
             else {
                 if (statement instanceof StatementBlock) {

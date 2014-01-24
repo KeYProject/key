@@ -536,8 +536,8 @@ public final class Goal  {
 	Node parent = node(); // has to be stored because the node
 	                      // of this goal will be replaced
         if (n>0) {
-	    Node newNode = null;
-	    Goal newGoal = null;
+	    Node newNode;
+	    Goal newGoal;
 
 	    for (int i=0;i<n;i++) {
 		if (i==0) { // first new goal is this one

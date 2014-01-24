@@ -427,8 +427,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
          }
       }
 
-      return TB.and(new Term[] { wellFormed != null ? wellFormed : TB.tt(), selfNotNull,
-                                 selfCreated, selfExactType, paramsOK, mbyAtPreDef });
+      return TB.and(wellFormed != null ? wellFormed : TB.tt(), selfNotNull,
+              selfCreated, selfExactType, paramsOK, mbyAtPreDef);
    }
 
    /**

@@ -1017,7 +1017,7 @@ public abstract class WellDefinednessCheck implements Contract {
 
     public final WellDefinednessCheck addRepresents(Term rep) {
         assert rep != null;
-        if (this.represents != null && rep != null) {
+        if (this.represents != null && rep != null) { // TODO: rep!=null test not necessary??
             this.represents = TB.andSC(this.represents, rep);
         } else {
             this.represents = rep;

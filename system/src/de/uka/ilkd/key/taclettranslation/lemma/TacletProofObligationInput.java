@@ -214,7 +214,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
             name = "axiomFile" + (axioms.size() + 1);
             axFile = properties.getProperty(name);
         }
-        this.axiomFiles = (String[]) axioms.toArray(new String[axioms.size()]);
+        this.axiomFiles = axioms.toArray(new String[axioms.size()]);
     }
 
     public void setLoadInfo(File tacletFile, File definitionFile,

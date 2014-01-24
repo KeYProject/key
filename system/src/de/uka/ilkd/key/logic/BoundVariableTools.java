@@ -270,10 +270,10 @@ public class BoundVariableTools {
                 variableRenaming.put ( ar1.get ( i ), newVar );
                 variableRenaming.put ( pv0, newVar );
                 variableRenaming.put ( pv1, newVar );
-                pv0 = pv1 = newVar;
+                res[i] = newVar;
+            } else {
+                res[i] = pv0;
             }
-            
-            res[i] = pv0;
         }
         
         return new ImmutableArray<QuantifiableVariable> ( res );

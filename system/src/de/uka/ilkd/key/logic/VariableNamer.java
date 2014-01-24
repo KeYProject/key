@@ -656,13 +656,12 @@ public abstract class VariableNamer implements InstantiationProposer {
 	}
 
         String proposal;
-	boolean found = false;
 	try {
 	    Iterator<TacletGoalTemplate> templs =
 	        app.taclet().goalTemplates().iterator();
             RewriteTacletGoalTemplate rwgt =null;
 	    String name = "";
-	    while (templs.hasNext() && !found) {
+	    while (templs.hasNext()) {
                 rwgt = (RewriteTacletGoalTemplate) templs.next();
 	        Term t = findProgramInTerm(rwgt.replaceWith());
 	        ContextStatementBlock c =

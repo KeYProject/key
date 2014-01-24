@@ -133,9 +133,7 @@ public abstract class SequentView extends JTextArea {
     }
 
     public void unregisterListener() {
-        if (configChangeListener != null) {
-            Config.DEFAULT.removeConfigChangeListener(configChangeListener);
-        }
+       Config.DEFAULT.removeConfigChangeListener(configChangeListener);
     }
 
     @Override
