@@ -81,11 +81,9 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
             if(topPos == null) {
         	//the formula does not exist anymore, bail out
         	return false;
-            } else if(topPos.constrainedFormula()
-        	            .equals(applicationPosition.constrainedFormula())) {
-        	return true;
             } else {
-        	return false;
+                return topPos.constrainedFormula()
+                    .equals(applicationPosition.constrainedFormula());
             }
 	}
     }

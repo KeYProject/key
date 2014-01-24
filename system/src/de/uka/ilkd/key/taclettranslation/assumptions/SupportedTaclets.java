@@ -313,9 +313,9 @@ public final class SupportedTaclets {
         public enum Category {
                 ALL_SUPPORTED, PROOF_DEPENDENT, PROOF_INDEPENDENT, BOOLEAN_RULES, INTEGER_RULES, CONSTANT_REPLACEMENT_RULES, TRANSLATION_JAVA_OPERATOR, CAST_OPERATOR, MISCELLANEOUS, EXACT_INSTANCE_RULES, ONLY_CREATED_OBJECTS_ARE_REFERENCED, ONLY_CREATED_OBJECTS_ARE_REFERENCED_NORMAL, ONLY_CREATED_OBJECTS_ARE_REFERENCED_ARRAY, SYTEM_INVARIANTS, NEXT_TO_CREATE, ARRAY_LENGTH, CLASS_INITIALISATION, NO_CATEGORY, LOC_SETS, LOC_SETS_AXIOMS, LOC_SETS_LEMATA, HEAP, HEAP_AXIOMS, HEAP_LEMATA, REACH, REACH_AXIOMS, REACH_LEMATA
 
-        };
+        }
 
-        /**
+    /**
          * This is the real interesting method of this class. Change this method
          * to change the range of supported taclets.
          * 
@@ -596,9 +596,9 @@ public final class SupportedTaclets {
 
                 public enum SelectionMode {
                         all, nothing, user
-                };
+                }
 
-                private String text;
+            private String text;
 
                 private SelectionMode mode = SelectionMode.nothing;
                 private int selectedChildCount = 0;

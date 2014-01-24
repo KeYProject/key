@@ -14,6 +14,7 @@
 
 package de.uka.ilkd.key.smt;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -43,9 +44,7 @@ public class SolverTypeCollection implements Iterable<SolverType> {
 	this.types.add(type);
 	this.name = name;
 	this.minUsableSolver = minUsableSolvers;
-	for (SolverType t : types) {
-	    this.types.add(t);
-	}
+	Collections.addAll(this.types, types);
     }
 
     public SolverTypeCollection(String[] solverNames) {

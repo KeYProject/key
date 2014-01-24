@@ -72,7 +72,7 @@ public final class QueryAxiom extends ClassAxiom {
 	assert target.getReturnType() != null;	
 	assert kjt != null;
 	this.name = name;
-	this.target = (IProgramMethod)target;	
+	this.target = target;
 	this.kjt = kjt;
     }
     

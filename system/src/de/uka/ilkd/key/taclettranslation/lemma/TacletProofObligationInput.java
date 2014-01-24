@@ -122,7 +122,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
             properties.setProperty("tacletFile", tacletFile);
         }
         if (definitionFile != null) {
-            properties.setProperty("definitionFile", definitionFile.toString());
+            properties.setProperty("definitionFile", definitionFile);
         }
         if (axiomFiles != null) {
             for (int i = 0; i < axiomFiles.length; i++) {

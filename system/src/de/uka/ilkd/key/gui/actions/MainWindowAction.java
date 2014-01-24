@@ -27,11 +27,6 @@ import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 public abstract class MainWindowAction extends AbstractAction {
 
     /**
-     * 
-     */
-    private static final long serialVersionUID = -957832573562266547L;
-
-    /**
      * This constant holds the typical key to be used for shortcuts
      * (usually {@link java.awt.Event#CTRL_MASK})
      */
@@ -46,39 +41,16 @@ public abstract class MainWindowAction extends AbstractAction {
         putValue(ACCELERATOR_KEY, KeyStrokeManager.get(this));
     }
 
-    protected MainWindowAction(MainWindow mainWindow, String name, String toolTip, Boolean selected) {
-        this(mainWindow);
-        if (name != null) {
-            setName(name);
-        }
-        if (toolTip != null) {
-            setTooltip(toolTip);
-        }
-        
-        if (selected != null) {
-            setSelected(selected);
-        }
-    }
-
-    protected MainWindowAction(MainWindow mainWindow, String name, String toolTip,
-            Boolean selected,
-            KeyStroke acceleratorKey, Icon icon) {
-        this(mainWindow, name, toolTip, selected);
-        if (acceleratorKey != null) {
-            setAcceleratorKey(acceleratorKey);
-        }
-
-        if (icon != null) {
-            setIcon(icon);
-        }
-    }
-
     protected KeYMediator getMediator() {
 	return mainWindow.getMediator();
     }
 
     protected void setName(String name) {
         putValue(NAME, name);
+    }
+    
+    protected String getName() {
+        return (String)getValue(NAME);
     }
 
     @Deprecated // add a line in gui.utils.KeyStrokeManager instead

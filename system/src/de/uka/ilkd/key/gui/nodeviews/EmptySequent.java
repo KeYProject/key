@@ -10,16 +10,13 @@
 // The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
 //
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
 /**
+ * Use this class in case no proof is loaded.
+ *
  * @author Kai Wallisch
  */
 public class EmptySequent extends SequentView {
@@ -37,6 +34,7 @@ public class EmptySequent extends SequentView {
     }
 
     @Override
-    public void printSequent() {}
-    
+    public void printSequent() {
+    }
+
 }

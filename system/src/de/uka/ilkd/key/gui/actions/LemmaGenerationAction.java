@@ -37,7 +37,8 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderLis
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public abstract class LemmaGenerationAction extends MainWindowAction {
-    public enum Mode {ProveUserDefinedTaclets,ProveKeYTaclets,ProveAndAddUserDefinedTaclets};    
+    public enum Mode {ProveUserDefinedTaclets,ProveKeYTaclets,ProveAndAddUserDefinedTaclets}
+
     private static final long serialVersionUID = 1L;
 
 

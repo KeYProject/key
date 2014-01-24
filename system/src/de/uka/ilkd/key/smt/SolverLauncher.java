@@ -14,10 +14,7 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Timer;
+import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -235,9 +232,7 @@ public class SolverLauncher implements SolverListener {
 	    SolverType[] solverTypes)  {
 
 	LinkedList<SolverType> types = new LinkedList<SolverType>();
-	for (SolverType type : solverTypes) {
-	    types.add(type);
-	}
+	Collections.addAll(types, solverTypes);
 	LinkedList<SMTProblem> problems = new LinkedList<SMTProblem>();
 	problems.add(problem);
 	launchIntern(types, problems, services);

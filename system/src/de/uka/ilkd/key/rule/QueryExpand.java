@@ -135,7 +135,6 @@ public class QueryExpand implements BuiltInRule {
      *        Otherwise it is a list of logical variables that can be instantiated (using the rules allLeft, exRight)
      *        and therefore the result of the query must be stored by function that depends on instVars (e.g. forall i; res(i)=query(i)).
      *        The list may be empty even if it not null.
-     * @param newGoal The new goal that results from this rule application. (requires to register new symbols)
      * @return The formula (!{U}<result=query();>result=res_query) & query()=res_query
      * @author Richard Bubel
      * @author gladisch
@@ -520,7 +519,7 @@ public class QueryExpand implements BuiltInRule {
     		}
     		//query.equals(other.query) && pathInTerm.size()<=other.pathInTerm.size()
     		for(int i=0;i<pathInTerm.size();i++){
-    			if(pathInTerm.get(i)!=other.pathInTerm.get(i)){
+    			if(pathInTerm.get(i).intValue()!=other.pathInTerm.get(i).intValue()){
     				//System.out.println("Same term but different paths");
     				return false;
     			}

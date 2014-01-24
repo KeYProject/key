@@ -120,47 +120,43 @@ public class WindowUserInterface extends AbstractUserInterface {
 
 	@Override
 	public void taskFinished(TaskFinishedInfo info) {
-		KeYMediator mediator = mainWindow.getMediator();
 		if (info.getSource() instanceof ApplyStrategy) {
 			resetStatus(this);
 			ApplyStrategy.ApplyStrategyInfo result = (ApplyStrategyInfo) info
 			        .getResult();
 
-			if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
-			    Proof proof = info.getProof();
-			    if (!proof.closed()) {
-			        Goal g = result.nonCloseableGoal();
-			        if (g == null) {
-			            g = proof.openGoals().head();
-			        }
-			        mediator.goalChosen(g);
-			        // iff Stop on non-closeable Goal is selected a little
-			        // popup is generated and proof is stopped
-			        AutoDismissDialog dialog = new AutoDismissDialog(
-			                "Couldn't close Goal Nr. " + g.node().serialNr()
-			                + " automatically");
-			        dialog.show();
-			    } else {
-			        mediator.getSelectionModel().defaultSelection();
-			    }
-			} else {
-			    mediator.getSelectionModel().defaultSelection();
+			Proof proof = info.getProof();
+			if (!proof.closed()) {
+				Goal g = result.nonCloseableGoal();
+				if (g == null) {
+					g = proof.openGoals().head();
+				}
+				mainWindow.getMediator().goalChosen(g);
+				if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
+					// iff Stop on non-closeable Goal is selected a little
+					// popup is generated and proof is stopped
+					AutoDismissDialog dialog = new AutoDismissDialog(
+					        "Couldn't close Goal Nr. " + g.node().serialNr()
+					                + " automatically");
+					dialog.show();
+				}
 			}
 			mainWindow.displayResults(info.toString());
 		} else if (info.getSource() instanceof ProblemLoader) {
 			if (info.getResult() != null) {
-				final KeYExceptionHandler exceptionHandler = 
-				        ((ProblemLoader) info.getSource()).getExceptionHandler();
+				final KeYExceptionHandler exceptionHandler = ((ProblemLoader) info
+				        .getSource()).getExceptionHandler();
 				ExceptionDialog.showDialog(
 				        mainWindow, exceptionHandler.getExceptions());
 				exceptionHandler.clear();
 			} else {
 				resetStatus(this);
-				mediator.getNotationInfo().refresh(mediator.getServices());
+				KeYMediator mediator = mainWindow.getMediator();
+				mediator.getNotationInfo().refresh(
+				        mediator.getServices());
 			}
 		} else {
 			resetStatus(this);
-			mediator.getSelectionModel().defaultSelection();
 			if (!info.toString().isEmpty()) {
 				mainWindow.displayResults(info.toString());
 			}

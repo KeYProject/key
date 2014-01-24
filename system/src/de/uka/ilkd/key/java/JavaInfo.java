@@ -855,7 +855,7 @@ public final class JavaInfo {
             Field field = field1;
             if (programName.equals(field.getProgramName())) {
                 return (ProgramVariable)
-                        ((FieldSpecification) field).getProgramVariable();
+                        field.getProgramVariable();
             }
         }
 	return null;
@@ -977,7 +977,7 @@ public final class JavaInfo {
 		if (f != null
 		        && (f.getName().equals(name) || f.getProgramName()
 		                .equals(name))) {
-		    return (ProgramVariable) ((VariableSpecification) f)
+		    return (ProgramVariable) f
 			    .getProgramVariable();
 		}
 	    }

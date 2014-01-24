@@ -136,8 +136,8 @@ class GeneralOptions extends TablePanel{
                         + "Example: /home/translations/%d_%t_%i_%s.txt"
                         + "\n\n"
                         + "Remark: After every restart of KeY this option "
-                        + "is deactivated.";;
-        private final static String infoProgressModeBox = "1. Option: The progress dialog remains open "
+                        + "is deactivated.";
+    private final static String infoProgressModeBox = "1. Option: The progress dialog remains open "
                         + "after executing the solvers so that the user "
                         + "can decide whether he wants to accept the results.\n"
                         + "\n"
@@ -148,11 +148,11 @@ class GeneralOptions extends TablePanel{
         		" it is checked whether the version of that solver is supported. If the version is not supported, a warning is" +
         		" presented in the progress dialog.";
 
-        private final static String infoMaxProcesses = "Maximal number or processes that are allowed to run concurrently.";;
-        private final static String infoTimeoutField = "Timeout for the external solvers in seconds. Fractions of a second are allowed.\n"
-                        + "Example: 6.5";;
+        private final static String infoMaxProcesses = "Maximal number or processes that are allowed to run concurrently.";
+    private final static String infoTimeoutField = "Timeout for the external solvers in seconds. Fractions of a second are allowed.\n"
+                        + "Example: 6.5";
 
-        public GeneralOptions(ProofIndependentSMTSettings settings) {
+    public GeneralOptions(ProofIndependentSMTSettings settings) {
                 super();
                 this.minWidthOfTitle = SwingUtilities.computeStringWidth(this.getFontMetrics(getFont()),"Concurrent ProcessesBLANK");
                 this.settings = settings;

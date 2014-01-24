@@ -58,12 +58,7 @@ public class DefaultGoalChooser implements IGoalChooser {
         if(p_proof==null && !(p_goals==null || p_goals.isEmpty())){
             throw new RuntimeException("A not existing proof has goals. This makes no sense.");
         }
-        if(p_goals==null||p_goals.isEmpty()){
-            //the idea of this case is to reset the object if a proof is abandoned. (To prevent memory leaks)
-            allGoalsSatisfiable = true;
-        }else{//this is the normal branch
-            allGoalsSatisfiable = false;
-        }
+        allGoalsSatisfiable = p_goals == null || p_goals.isEmpty();
         currentSubtreeRoot  = null;
         if(p_proof!=proof){
             if(proof!=null){

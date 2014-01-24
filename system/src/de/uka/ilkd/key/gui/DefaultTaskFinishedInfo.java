@@ -71,16 +71,16 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
             StringBuilder message = new StringBuilder();
             String timeString = (time/1000) + "." + ((time%1000)/100);
 
-            message.append("Strategy: Applied " + appliedRules + " rule");
+            message.append("Strategy: Applied ").append(appliedRules).append(" rule");
             if ( appliedRules != 1 ) {
                 message.append("s");
             }
-            message.append(" (" + timeString + " sec), ");
-            message.append(" closed " + closedGoals + " goal");
+            message.append(" (").append(timeString).append(" sec), ");
+            message.append(" closed ").append(closedGoals).append(" goal");
             if ( closedGoals != 1 ) {
                 message.append("s");             
             }
-            message.append(", " + proof.openGoals().size());
+            message.append(", ").append(proof.openGoals().size());
             message.append(" remaining");
             return message.toString();
         } else {

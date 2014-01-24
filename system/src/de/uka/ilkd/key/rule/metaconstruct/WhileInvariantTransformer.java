@@ -268,7 +268,7 @@ public final class WhileInvariantTransformer {
         Modality loopBodyModality = modality;
         final boolean transaction = (loopBodyModality == Modality.DIA_TRANSACTION || loopBodyModality == Modality.BOX_TRANSACTION);
         JavaBlock mainJavaBlock = JavaBlock.createJavaBlock(transaction ? 
-                                                            new StatementBlock(new Statement[]{resSta, new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH)}) : 
+                                                            new StatementBlock(resSta, new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH)) :
                                                             new StatementBlock(resSta));
         return TermBuilder.DF.prog(loopBodyModality, 
                                    mainJavaBlock, 

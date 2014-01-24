@@ -34,7 +34,7 @@ public interface SMTSolver {
 
     public enum ReasonOfInterruption {
 	User, Timeout, Exception, NoInterruption
-    };
+    }
 
     /**
      * A solver process can have differnt states. When a solver is created, it
@@ -44,7 +44,7 @@ public interface SMTSolver {
      */
     public enum SolverState {
 	Waiting, Running, Stopped
-    };
+    }
 
     /**
      * Returns the name of the solver.

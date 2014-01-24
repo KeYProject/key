@@ -29,7 +29,7 @@ public class MultiRenamingTable extends RenamingTable{
     }
 
     public SourceElement  getRenaming(SourceElement se){
-	return (SourceElement) hmap.get(se);
+	return hmap.get(se);
     }
 
     public Iterator<? extends SourceElement> getRenamingIterator(){

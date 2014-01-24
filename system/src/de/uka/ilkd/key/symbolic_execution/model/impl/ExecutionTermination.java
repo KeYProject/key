@@ -162,8 +162,8 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
                                                          IProgramVariable variable) {
       ImmutableArray<Term> result = null;
       if (term.op() instanceof ElementaryUpdate) {
-         ElementaryUpdate update = (ElementaryUpdate)term.op();;
-         if (JavaUtil.equals(variable, update.lhs())) {
+         ElementaryUpdate update = (ElementaryUpdate)term.op();
+          if (JavaUtil.equals(variable, update.lhs())) {
             result = term.subs();
          }
       }

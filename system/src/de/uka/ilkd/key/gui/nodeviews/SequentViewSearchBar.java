@@ -30,7 +30,7 @@ import javax.swing.JCheckBox;
  * Search bar implementing search function for SequentView.
  */
 
-public class SequentSearchBar extends SearchBar {
+public class SequentViewSearchBar extends SearchBar {
 
     private static final long serialVersionUID = 9102464983776181771L;
     public static final Color SEARCH_HIGHLIGHT_COLOR_1 =
@@ -38,12 +38,12 @@ public class SequentSearchBar extends SearchBar {
     public static final Color SEARCH_HIGHLIGHT_COLOR_2 =
             new Color(255, 140, 0, 100);
     
-    private List<Pair<Integer,Object>> searchResults;
+    private final List<Pair<Integer,Object>> searchResults;
     private int resultIteratorPos;
-    private boolean regExpSearch = false;
     private SequentView sequentView;
+    JCheckBox regExpCheckBox;
 
-    public SequentSearchBar(SequentView sequentView) {
+    public SequentViewSearchBar(SequentView sequentView) {
         this.sequentView = sequentView;
         searchResults = new ArrayList<Pair<Integer,Object>>();
     }
@@ -60,21 +60,20 @@ public class SequentSearchBar extends SearchBar {
     @Override
     public void createUI(){
         super.createUI();
-        JCheckBox checkBox = new JCheckBox("RegExp");
-            checkBox.addItemListener(new ItemListener() {
+        regExpCheckBox = new JCheckBox("RegExp", false);
+        regExpCheckBox.setName("toggleRegExpSearch");
+            regExpCheckBox.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
-                    regExpSearch = ((JCheckBox)e.getItemSelectable())
-                            .isSelected();
                     searchField.requestFocus();
                     search();
                 }
             });
-            checkBox.setSelected(regExpSearch);
-            checkBox.setToolTipText("Evaluate as regular expression");
-        add(checkBox);
+            regExpCheckBox.setToolTipText("Evaluate as regular expression");
+        add(regExpCheckBox);
     }
 
+    @Override
     public void searchNext() {
         if (!searchResults.isEmpty()) {
             resetExtraHighlight();
@@ -84,10 +83,11 @@ public class SequentSearchBar extends SearchBar {
         }
     }
 
+    @Override
     public void searchPrevious() {
         if (!searchResults.isEmpty()) {
             resetExtraHighlight();
-            resultIteratorPos++;
+            resultIteratorPos--;
             resultIteratorPos %= searchResults.size();
             setExtraHighlight(resultIteratorPos);
         }
@@ -108,6 +108,7 @@ public class SequentSearchBar extends SearchBar {
     /**
      * searches for the occurence of the specified string
      */
+    @Override
     public boolean search(String search) {
         clearSearchResults();
 
@@ -123,7 +124,7 @@ public class SequentSearchBar extends SearchBar {
             searchFlag = searchFlag | Pattern.CASE_INSENSITIVE
                     | Pattern.UNICODE_CASE;
         }
-        if (!regExpSearch) {
+        if (!regExpCheckBox.isSelected()) {
             // search for literal string instead of regExp
             searchFlag = searchFlag | Pattern.LITERAL;
         }
@@ -146,11 +147,7 @@ public class SequentSearchBar extends SearchBar {
                 sequentView.paintHighlight(new Range(foundAt, m.end()), highlight);
                 loopEnterd = true;
         }
-        if (loopEnterd) {
-            return true;
-        } else {
-            return false;
-        }
+        return loopEnterd;
     }
     
     private void setExtraHighlight(int resultIndex) {

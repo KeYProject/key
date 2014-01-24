@@ -64,8 +64,9 @@ public class ProgressDialog extends JDialog{
         private JProgressBar progressBar;
         private ClickableMessageBox statusMessages;
         private final ProgressDialogListener listener;
-        public enum Modus {stopModus,discardModus};
-        private Modus modus = Modus.stopModus;
+        public enum Modus {stopModus,discardModus}
+
+    private Modus modus = Modus.stopModus;
         private Box statusMessageBox;
 
 
