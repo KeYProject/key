@@ -90,7 +90,6 @@ import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
  * <code>solver.getException</code>.
  */
 
-@SuppressWarnings("ManualArrayToCollectionCopy")
 public class SolverLauncher implements SolverListener {
 
     /* ############### Public Interface #################### */

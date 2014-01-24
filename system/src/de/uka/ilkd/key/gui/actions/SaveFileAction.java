@@ -42,7 +42,6 @@ public final class SaveFileAction extends MainWindowAction {
         mainWindow.getMediator().enableWhenProofLoaded(this);
     }
     
-    @SuppressWarnings("RedundantStringToString")
     public void actionPerformed(ActionEvent e) {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");

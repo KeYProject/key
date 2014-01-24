@@ -327,8 +327,6 @@ public final class UseOperationContractRule implements BuiltInRule {
 	return new Triple<Term,Term,Term>(assumption, anonUpdate, anonHeap);
     }
 
-
-    @SuppressWarnings("RedundantArrayCreation")
     private static Term getFreePost(List<LocationVariable> heapContext, IProgramMethod pm,
 	    		     	    KeYJavaType kjt,
 	    		     	    Term resultTerm,
@@ -558,8 +556,6 @@ public final class UseOperationContractRule implements BuiltInRule {
         return false;
     }
 
-
-    @SuppressWarnings("RedundantArrayCreation")
     @Override
     public ImmutableList<Goal> apply(Goal goal,
 	    			     Services services,

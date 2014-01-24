@@ -28,7 +28,6 @@ import de.uka.ilkd.key.rule.inst.*;
  * The condition can only be fulfilled if the given field term is constant of
  * which the referred type is known.
  */
-@SuppressWarnings("RedundantIfStatement")
 public final class FieldTypeToSortCondition implements VariableCondition {
 
     private final SchemaVariable exprOrTypeSV;

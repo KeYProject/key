@@ -20,7 +20,6 @@ import java.util.Iterator;
  * This class implements ImmMap<S,T> and provides a
  * persistent Map. It is a simple implementation like lists
  */
-@SuppressWarnings("StringConcatenationInsideStringBufferAppend")
 public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 
     /**

@@ -26,7 +26,6 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
 
 //most Code are copyed from Logic.TestUpdateFactory
 
-@SuppressWarnings("ALL")
 public class TestTriggersSet extends TestCase {
 
 	private Proof proof;

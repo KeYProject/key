@@ -30,7 +30,6 @@ import de.uka.ilkd.key.util.Debug;
  * that is the instantiation of the first if-formula. If the rule application is
  * admissible, zero is returned.
  */
-@SuppressWarnings("RedundantIfStatement")
 public class CheckApplyEqFeature extends BinaryTacletAppFeature {
 
     public static final Feature INSTANCE = new CheckApplyEqFeature();

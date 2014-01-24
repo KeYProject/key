@@ -177,7 +177,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }    
     
     
-    @SuppressWarnings("RedundantArrayCreation")
     protected Feature setupGlobalF(Feature dispatcher, Proof p_proof) {//
         final Feature ifMatchedF = ifZero ( MatchedIfFeature.INSTANCE,
                                             longConst ( +1 ) );
@@ -989,7 +988,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
 
-    @SuppressWarnings("RedundantArrayCreation")
     private void setupSplitting(RuleSetDispatchFeature d) {
         final TermBuffer subFor = new TermBuffer ();
         final Feature noCutsAllowed =
@@ -997,13 +995,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                   not ( applyTF ( subFor, ff.cutAllowed ) ) );
         
         bindRuleSet ( d, "beta",
-          SumFeature.createSum ( new Feature [] {
+          SumFeature.createSum (
              noCutsAllowed,
              ifZero ( PurePosDPathFeature.INSTANCE, longConst ( -200 ) ),
              ScaleFeature.createScaled ( CountPosDPathFeature.INSTANCE, -3.0 ),
              ScaleFeature.createScaled ( CountMaxDPathFeature.INSTANCE, 10.0 ),
              longConst ( 20 )
-          } ) );
+           ) );
 
         
         bindRuleSet ( d, "split_cond",
@@ -1120,7 +1118,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
 
-    @SuppressWarnings("RedundantArrayCreation")
     private void setupFormulaNormalisation(RuleSetDispatchFeature d,
                                            IntegerLDT numbers,
                                            LocSetLDT locSetLDT,
@@ -1537,7 +1534,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     // give cost infinity to those incomplete rule applications that will
     // never be instantiated (so that these applications can be removed from
     // the queue and do not have to be considered again).
-    @SuppressWarnings("RedundantArrayCreation")
     private void setupPolySimpInstantiationWithoutRetry(RuleSetDispatchFeature d,
                                                         Proof p_proof) {
         final IntegerLDT numbers =
@@ -1670,7 +1666,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }    
 
     
-    @SuppressWarnings("RedundantArrayCreation")
     private void setupInEqSimp(RuleSetDispatchFeature d,
                                Proof p_proof,
                                IntegerLDT numbers) {
@@ -1682,11 +1677,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "inEqSimp_makeNonStrict", -80 );
 
         bindRuleSet ( d, "inEqSimp_commute",
-                      SumFeature.createSum ( new Feature[] {
+                      SumFeature.createSum (
                         applyTF ( "commRight", tf.monomial ),
                         applyTF ( "commLeft", tf.polynomial ),
                         monSmallerThan ( "commLeft", "commRight", numbers ),
-                        longConst ( -40 ) } ) );
+                        longConst ( -40 ) ) );
 
         // this is copied from "polySimp_homo"
         bindRuleSet ( d, "inEqSimp_homo",
@@ -1724,7 +1719,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
              applyTFNonStrict ( "esCoeff2", tf.nonNegLiteral ),
              applyTF ( "esRight2", tf.polynomial ),
              ifZero ( MatchedIfFeature.INSTANCE,
-                    SumFeature.createSum ( new Feature[] {
+                    SumFeature.createSum (
                       applyTFNonStrict ( "esCoeff1", tf.nonNegLiteral ),
                       applyTF ( "esRight1", tf.polynomial ),
                       not ( PolynomialValuesCmpFeature
@@ -1732,14 +1727,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                    instOf ( "esRight1" ),
                                    instOfNonStrict ( "esCoeff1" ),
                                    instOfNonStrict ( "esCoeff2" ) ))
-                    } ) ) } ) );
+                    ) ) } ) );
 
         // category "propagation"
 
         bindRuleSet ( d, "inEqSimp_contradInEqs",
            add ( applyTF ( "contradLeft", tf.monomial ),
                  ifZero ( MatchedIfFeature.INSTANCE,
-                   SumFeature.createSum ( new Feature[] {
+                   SumFeature.createSum (
                      DiffFindAndIfFeature.INSTANCE,
                      applyTF ( "contradRightSmaller", tf.polynomial ),
                      applyTF ( "contradRightBigger", tf.polynomial ),
@@ -1749,17 +1744,17 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                      .lt ( instOf ( "contradRightSmaller" ),
                            instOf ( "contradRightBigger" ),
                            instOfNonStrict ( "contradCoeffBigger" ),
-                           instOfNonStrict ( "contradCoeffSmaller" ) ) } ) ) ) );
+                           instOfNonStrict ( "contradCoeffSmaller" ) ) ) ) ) );
 
         bindRuleSet ( d, "inEqSimp_contradEqs",
            add ( applyTF ( "contradLeft", tf.monomial ),
                  ifZero ( MatchedIfFeature.INSTANCE,
-                   SumFeature.createSum ( new Feature[] {
+                   SumFeature.createSum (
                      applyTF ( "contradRightSmaller", tf.polynomial ),
                      applyTF ( "contradRightBigger", tf.polynomial ),
                      PolynomialValuesCmpFeature
                      .lt ( instOf ( "contradRightSmaller" ),
-                           instOf ( "contradRightBigger" ) ) } ) ),
+                           instOf ( "contradRightBigger" ) ) ) ),
                  longConst ( -60 ) ) );
 
         bindRuleSet ( d, "inEqSimp_strengthen", longConst ( -30 ) );
@@ -1767,7 +1762,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "inEqSimp_subsumption",
            add ( applyTF ( "subsumLeft", tf.monomial ),
                  ifZero ( MatchedIfFeature.INSTANCE,
-                   SumFeature.createSum ( new Feature[] {
+                   SumFeature.createSum (
                      DiffFindAndIfFeature.INSTANCE,
                      applyTF ( "subsumRightSmaller", tf.polynomial ),
                      applyTF ( "subsumRightBigger", tf.polynomial ),
@@ -1777,7 +1772,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                      .leq ( instOf ( "subsumRightSmaller" ),
                             instOf ( "subsumRightBigger" ),
                             instOfNonStrict ( "subsumCoeffBigger" ),
-                            instOfNonStrict ( "subsumCoeffSmaller" ) ) } ) ) ) );
+                            instOfNonStrict ( "subsumCoeffSmaller" ) ) ) ) ) );
 
         // category "handling of non-linear inequations"
         
@@ -1859,7 +1854,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     }
 
-    @SuppressWarnings("RedundantArrayCreation")
     private void setupMultiplyInequations(RuleSetDispatchFeature d,
                                           Feature notAllowedF) {
         final TermBuffer intRel = new TermBuffer ();
@@ -1900,30 +1894,30 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // perfect, because it is not possible to distinguish between the
         // re-cost-computation delay and the normal costs for a rule application
         bindRuleSet ( d, "inEqSimp_nonLin_multiply",
-           add ( applyTF ( "multLeft", tf.nonNegMonomial ),
-                 applyTF ( "multRight", tf.polynomial ),
-                 ifZero ( MatchedIfFeature.INSTANCE,
-                   SumFeature.createSum ( new Feature[] {
-                     applyTF ( "multFacLeft", tf.nonNegMonomial ),
-                     ifZero ( applyTF ( "multRight", tf.literal ),
-                              longConst ( -100 ) ),
-                     ifZero ( applyTF ( "multFacRight", tf.literal ),
-                              longConst ( -100 ),
-                              applyTF ( "multFacRight", tf.polynomial ) ),
+           add(applyTF("multLeft", tf.nonNegMonomial),
+                   applyTF("multRight", tf.polynomial),
+                   ifZero(MatchedIfFeature.INSTANCE,
+                           SumFeature.createSum(
+                                   applyTF("multFacLeft", tf.nonNegMonomial),
+                                   ifZero(applyTF("multRight", tf.literal),
+                                           longConst(-100)),
+                                   ifZero(applyTF("multFacRight", tf.literal),
+                                           longConst(-100),
+                                           applyTF("multFacRight", tf.polynomial)),
 /*                ifZero ( applyTF ( "multRight", tf.literal ),
                          longConst ( -100 ),
                          applyTF ( "multRight", tf.polynomial ) ),
                 ifZero ( applyTF ( "multFacRight", tf.literal ),
                          longConst ( -100 ),
                          applyTF ( "multFacRight", tf.polynomial ) ), */
-                     not ( TermSmallerThanFeature.create
-			   ( FocusProjection.create ( 0 ),
-			     AssumptionProjection.create ( 0 ) ) ),
-                     ifZero ( exactlyBounded,
-                              longConst ( 0 ),
-                              ifZero ( totallyBounded,
-                                       longConst ( 100 ),
-                                       notAllowedF ) ),
+                                   not(TermSmallerThanFeature.create
+                                           (FocusProjection.create(0),
+                                                   AssumptionProjection.create(0))),
+                                   ifZero(exactlyBounded,
+                                           longConst(0),
+                                           ifZero(totallyBounded,
+                                                   longConst(100),
+                                                   notAllowedF))
 /*                                       ifZero ( partiallyBounded,
                                                 longConst ( 400 ),
                                                 notAllowedF ) ) ), */
@@ -1931,8 +1925,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                      applyTF ( "multFacLeft", rec ( tf.mulF, longTermConst ( 20 ) ) ),
                      applyTF ( "multRight", rec ( tf.addF, longTermConst ( 4 ) ) ),
                      applyTF ( "multFacRight", rec ( tf.addF, longTermConst ( 4 ) ) ), */
-                   } ),
-                   notAllowedF ) ) );
+                           ),
+                           notAllowedF)) );
     }
     
     private void setupInEqSimpInstantiation(RuleSetDispatchFeature d,
@@ -1952,7 +1946,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     // give cost infinity to those incomplete rule applications that will
     // never be instantiated (so that these applications can be removed from
     // the queue and do not have to be considered again).
-    @SuppressWarnings("RedundantArrayCreation")
     private void setupInEqSimpInstantiationWithoutRetry(RuleSetDispatchFeature d,
                                                         Proof p_proof) {
         // category "direct inequations"
@@ -1976,7 +1969,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             ifZero ( MatchedIfFeature.INSTANCE,
               let ( divisor, instOf ( "divX" ),
               let ( dividend, instOf ( "divProd" ),
-              SumFeature.createSum ( new Feature[] {
+              SumFeature.createSum (
                 applyTF ( divisor, tf.nonCoeffMonomial ),
                 not ( eq ( dividend, divisor ) ),
                 applyTFNonStrict ( "divXBoundPos", tf.posLiteral ),
@@ -1984,14 +1977,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 ReducibleMonomialsFeature.createReducible ( dividend, divisor ),
                 instantiate ( "divY", ReduceMonomialsProjection
                                       .create ( dividend, divisor ) )
-              } ) ) ) )
+              ) ) ) )
           } ) );
 
         setupNonLinTermIsPosNeg ( d, "inEqSimp_nonLin_pos", true );
-        setupNonLinTermIsPosNeg ( d, "inEqSimp_nonLin_neg", false );
+        setupNonLinTermIsPosNeg(d, "inEqSimp_nonLin_neg", false);
     }
 
-    @SuppressWarnings("RedundantArrayCreation")
     private void setupNonLinTermIsPosNeg(RuleSetDispatchFeature d,
                                          String ruleSet,
                                          boolean pos) {
@@ -2008,7 +2000,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             ifZero ( MatchedIfFeature.INSTANCE,
               let ( divisor, instOf ( "divX" ),
               let ( dividend, instOf ( "divProd" ),
-              SumFeature.createSum ( new Feature[] {
+              SumFeature.createSum (
                 applyTF ( divisor, tf.nonCoeffMonomial ),
                 not ( applyTF ( dividend, eq ( divisor ) ) ),
                 applyTFNonStrict ( "divXBoundNonPos", tf.nonPosLiteral ),
@@ -2028,7 +2020,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                           eq ( quotient ),
                                                           tf.negLiteral ) ) ) ),
                             instantiate ( "divY", quotient ) ) )
-              } ) ) ) )
+              ) ) ) )
           } ) );
     }
 
@@ -2056,8 +2048,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             ) ) ) ) );
     }
 
-
-    @SuppressWarnings("RedundantArrayCreation")
     private void setupInEqCaseDistinctions(RuleSetDispatchFeature d,
                                            Proof p_proof) {
         final TermBuffer intRel = new TermBuffer ();
@@ -2084,7 +2074,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         final Feature strengthening =
             forEach ( intRel, SequentFormulasGenerator.antecedent (),
-              SumFeature.createSum ( new Feature[] {
+              SumFeature.createSum (
                     applyTF ( intRel, add ( or ( tf.geqF, tf.leqF ),
                                             sub ( tf.atom, tf.literal ) ) ),
                     instantiate ( "cutFormula",
@@ -2094,7 +2084,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 //		            ,
 //                  applyTF ( sub ( intRel, 0 ),
 //                            rec ( any (), longTermConst ( 5 ) ) )
-              } ) );
+              ) );
         
         final Feature rootInferences =
             forEach ( intRel, SequentFormulasGenerator.antecedent (),
@@ -2113,9 +2103,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private Feature isRootInferenceProducer(TermBuffer intRel) {
-        return applyTF ( intRel, add ( tf.intRelation,
-                                        sub ( tf.nonCoeffMonomial,
-                                              tf.literal ) ) );
+        return applyTF(intRel, add(tf.intRelation,
+                sub(tf.nonCoeffMonomial,
+                        tf.literal)));
     }
 
     private Feature allowPosNegCaseDistinction(TermBuffer atom) {
@@ -2244,7 +2234,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
     }
 
-    @SuppressWarnings("RedundantArrayCreation")
     private void setupDefOpsExpandMod(RuleSetDispatchFeature d, Services services) {
         final TermBuffer superTerm = new TermBuffer ();
         
@@ -2267,7 +2256,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
            ifZero ( add ( applyTF ( "divNum", tf.literal ),
                           applyTF ( "divDenom", tf.literal ) ),
                     longConst ( -4000 ),
-                    SumFeature.createSum ( new Feature[] {
+                    SumFeature.createSum (
                        applyTF ( "divNum", tf.polynomial ),
                        applyTF ( "divDenom", tf.polynomial ),
 		       ifZero ( isBelow ( ff.modalOperator, services ),
@@ -2278,7 +2267,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 						     tf.notContainsDivMod ) ),
 				     exSubsumedModulus ) ),
 		       longConst ( -3500 )
-                    } ) ) );
+                    ) ) );
     }
 
     private Feature isBelow(TermFeature t, Services services) {

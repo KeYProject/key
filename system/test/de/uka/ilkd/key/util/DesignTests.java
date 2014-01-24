@@ -31,8 +31,6 @@ import junit.framework.TestSuite;
  * This class tests, if design principles have been hurt. Therefore it
  * makes use of reflection.
  */
-
-@SuppressWarnings("StringConcatenationInsideStringBufferAppend")
 public class DesignTests extends TestCase {
 
     private static final File binaryPath = 

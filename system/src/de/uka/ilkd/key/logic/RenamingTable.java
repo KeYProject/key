@@ -27,7 +27,6 @@ public abstract class RenamingTable{
 
     public abstract Iterator<? extends SourceElement> getRenamingIterator();
 
-    @SuppressWarnings("ToArrayCallWithZeroLengthArrayArgument")
     public static RenamingTable getRenamingTable(HashMap<? extends SourceElement, ? extends SourceElement> hmap){
 	if (hmap.size()==0)return null;
 	if (hmap.size()==1){

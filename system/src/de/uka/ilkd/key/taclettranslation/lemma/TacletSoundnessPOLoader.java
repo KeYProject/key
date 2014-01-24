@@ -34,7 +34,6 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Taclet;
 
-@SuppressWarnings("ALL")
 public class TacletSoundnessPOLoader {
 
         private final boolean loadAsLemmata;
