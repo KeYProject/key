@@ -30,7 +30,7 @@ class AntecSuccPrefixChecker implements Checker {
 
         ANTECEDENT, SUCCEDENT
 
-    };
+    }
 
     // checks, whether the position in occurrence has antecedent polarity
     public static final AntecSuccPrefixChecker ANTE_POLARITY_CHECKER =

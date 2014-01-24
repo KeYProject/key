@@ -346,7 +346,7 @@ public class ContractFactory {
         //determine names
         StringBuffer nameSB = new StringBuffer(t.getName());
         for(FunctionalOperationContract other : others) {
-            nameSB.append(CONTRACT_COMBINATION_MARKER + other.getName());
+            nameSB.append(CONTRACT_COMBINATION_MARKER).append(other.getName());
         }
 
         for(FunctionalOperationContract contract : others) {

@@ -1364,7 +1364,7 @@ public class PrettyPrinter {
         printHeader(x);
         if (x.getName()!=null && 
                 "javax.realtime.MemoryArea::currentMemoryArea".
-                equals(x.getName().toString())){
+                equals(x.getName())){
             write("<currentMemoryArea>");
         } else {
             if (x.getReferencePrefix() != null) {     
@@ -2797,7 +2797,7 @@ public class PrettyPrinter {
     }
     
     protected void writeFullMethodSignature(IProgramMethod x) throws java.io.IOException {
-        write(x.getName().toString());
+        write(x.getName());
         write("(");
         boolean afterFirst = false;
         for (ParameterDeclaration pd : x.getParameters()) {

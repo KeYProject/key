@@ -177,7 +177,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }    
     
     
-    protected Feature setupGlobalF(Feature dispatcher, Proof p_proof) {//        
+    @SuppressWarnings("RedundantArrayCreation")
+    protected Feature setupGlobalF(Feature dispatcher, Proof p_proof) {//
         final Feature ifMatchedF = ifZero ( MatchedIfFeature.INSTANCE,
                                             longConst ( +1 ) );
         
@@ -258,22 +259,20 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         	= oneStepSimplificationFeature(longConst(-11000));
       //  final Feature smtF = smtFeature(inftyConst());
         
-        return SumFeature.createSum ( new Feature [] {
-              AutomatedRuleFeature.INSTANCE,
-              NonDuplicateAppFeature.INSTANCE,
+        return SumFeature.createSum (AutomatedRuleFeature.INSTANCE,
+                NonDuplicateAppFeature.INSTANCE,
 //              splitF,
-//              strengthenConstraints, 
-              AgeFeature.INSTANCE,
-              oneStepSimplificationF,
-             // smtF, 
-              methodSpecF, 
-              queryF,
-              depSpecF,
-              loopInvF,
-              blockFeature,
-              ifMatchedF,
-              dispatcher
-              });
+//              strengthenConstraints,
+                AgeFeature.INSTANCE,
+                oneStepSimplificationF,
+                // smtF,
+                methodSpecF,
+                queryF,
+                depSpecF,
+                loopInvF,
+                blockFeature,
+                ifMatchedF,
+                dispatcher);
     }
     
     private Feature loopInvFeature(Feature cost) {
@@ -990,6 +989,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
 
+    @SuppressWarnings("RedundantArrayCreation")
     private void setupSplitting(RuleSetDispatchFeature d) {
         final TermBuffer subFor = new TermBuffer ();
         final Feature noCutsAllowed =
@@ -1036,13 +1036,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                     longConst ( 1000 ) ),
                             // standard costs
                             longConst ( 10 )),
-                      SumFeature.createSum ( new Feature [] {
-                            applyTF ( "cutFormula",
-                                      ff.cutAllowedBelowQuantifier ),
-                            applyTF ( FocusFormulaProjection.INSTANCE,
-                                      ff.quantifiedClauseSet ),
-                            ifZero ( allowQuantifierSplitting (),
-                                     longConst ( 0 ), longConst ( 100 ) ) } ) ) } ) );
+                      SumFeature.createSum (
+                              applyTF ( "cutFormula",
+                                ff.cutAllowedBelowQuantifier ),
+                              applyTF ( FocusFormulaProjection.INSTANCE,
+                                        ff.quantifiedClauseSet ),
+                              ifZero ( allowQuantifierSplitting (),
+                                       longConst ( 0 ), longConst ( 100 ) )) ) } ) );
     }
 
     private void setupSplittingApproval(RuleSetDispatchFeature d) {
@@ -1120,6 +1120,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
 
+    @SuppressWarnings("RedundantArrayCreation")
     private void setupFormulaNormalisation(RuleSetDispatchFeature d,
                                            IntegerLDT numbers,
                                            LocSetLDT locSetLDT,
@@ -1173,14 +1174,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                 add ( ff.quantifiedClauseSet,
 				      not ( opSub ( Quantifier.ALL, ff.orF ) ),
                                       EliminableQuantifierTF.INSTANCE ) ),
-                      SumFeature.createSum ( new Feature[] {
-                           OnlyInScopeOfQuantifiersFeature.INSTANCE,
-                           SplittableQuantifiedFormulaFeature.INSTANCE,
-                           ifZero ( FocusInAntecFeature.INSTANCE,
-                                    applyTF ( FocusProjection.create ( 0 ),
-                                              sub ( ff.andF ) ),
-                                    applyTF ( FocusProjection.create ( 0 ),
-                                              sub ( ff.orF ) ) ) } ) ),
+                      SumFeature.createSum (
+                              OnlyInScopeOfQuantifiersFeature.INSTANCE,
+                              SplittableQuantifiedFormulaFeature.INSTANCE,
+                              ifZero ( FocusInAntecFeature.INSTANCE,
+                                       applyTF ( FocusProjection.create ( 0 ),
+                                                 sub ( ff.andF ) ),
+                                       applyTF ( FocusProjection.create ( 0 ),
+                                                 sub ( ff.orF ) ) )) ),
                  longConst ( -300 ) ) );
 
         bindRuleSet ( d, "swapQuantifiers",
@@ -1536,6 +1537,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     // give cost infinity to those incomplete rule applications that will
     // never be instantiated (so that these applications can be removed from
     // the queue and do not have to be considered again).
+    @SuppressWarnings("RedundantArrayCreation")
     private void setupPolySimpInstantiationWithoutRetry(RuleSetDispatchFeature d,
                                                         Proof p_proof) {
         final IntegerLDT numbers =
@@ -1563,8 +1565,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                               MonomialColumnOp
                               .create ( instOf ( "newSymLeftCoeff" ),
                                         instOf ( "newSymRight" ) ) ) } ) ) );
-        
-        final TermBuffer divisor = new TermBuffer ();
+
+                                final TermBuffer divisor = new TermBuffer ();
         final TermBuffer dividend = new TermBuffer ();
 
         bindRuleSet ( d, "polySimp_applyEqPseudo",
@@ -1668,6 +1670,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }    
 
     
+    @SuppressWarnings("RedundantArrayCreation")
     private void setupInEqSimp(RuleSetDispatchFeature d,
                                Proof p_proof,
                                IntegerLDT numbers) {
@@ -1856,6 +1859,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     }
 
+    @SuppressWarnings("RedundantArrayCreation")
     private void setupMultiplyInequations(RuleSetDispatchFeature d,
                                           Feature notAllowedF) {
         final TermBuffer intRel = new TermBuffer ();
@@ -1948,6 +1952,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     // give cost infinity to those incomplete rule applications that will
     // never be instantiated (so that these applications can be removed from
     // the queue and do not have to be considered again).
+    @SuppressWarnings("RedundantArrayCreation")
     private void setupInEqSimpInstantiationWithoutRetry(RuleSetDispatchFeature d,
                                                         Proof p_proof) {
         // category "direct inequations"
@@ -1986,6 +1991,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupNonLinTermIsPosNeg ( d, "inEqSimp_nonLin_neg", false );
     }
 
+    @SuppressWarnings("RedundantArrayCreation")
     private void setupNonLinTermIsPosNeg(RuleSetDispatchFeature d,
                                          String ruleSet,
                                          boolean pos) {
@@ -2051,6 +2057,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
 
+    @SuppressWarnings("RedundantArrayCreation")
     private void setupInEqCaseDistinctions(RuleSetDispatchFeature d,
                                            Proof p_proof) {
         final TermBuffer intRel = new TermBuffer ();
@@ -2237,6 +2244,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
     }
 
+    @SuppressWarnings("RedundantArrayCreation")
     private void setupDefOpsExpandMod(RuleSetDispatchFeature d, Services services) {
         final TermBuffer superTerm = new TermBuffer ();
         
@@ -2731,12 +2739,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
              "limit the number of inductive proofs." +
              "</html>";
        public static String TOOL_TIP_USER_OFF(int i) {return "Taclets of the rule set \"userTaclets" + i 
-             + "\" are not applied automatically";};
-       public static String TOOL_TIP_USER_LOW(int i) {return "Taclets of the rule set \"userTaclets" + i 
-             + "\" are applied automatically with low priority";};
-       public static String TOOL_TIP_USER_HIGH(int i) {return "Taclets of the rule set \"userTaclets" + i 
-             + "\" are applied automatically with high priority";};
-       
+             + "\" are not applied automatically";}
+
+        public static String TOOL_TIP_USER_LOW(int i) {return "Taclets of the rule set \"userTaclets" + i
+             + "\" are applied automatically with low priority";}
+
+        public static String TOOL_TIP_USER_HIGH(int i) {return "Taclets of the rule set \"userTaclets" + i
+             + "\" are applied automatically with high priority";}
+
         public Factory () {
         }
 

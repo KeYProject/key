@@ -419,7 +419,7 @@ public class DefaultProofFileParser implements IProofFileParser {
                    "@ " + pos);
            }
        }
-       ourApp = (IBuiltInRuleApp) ruleApps.iterator().next();
+       ourApp = ruleApps.iterator().next();
        builtinIfInsts = null;
        return ourApp;
    }

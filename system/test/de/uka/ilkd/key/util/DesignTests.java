@@ -32,6 +32,7 @@ import junit.framework.TestSuite;
  * makes use of reflection.
  */
 
+@SuppressWarnings("StringConcatenationInsideStringBufferAppend")
 public class DesignTests extends TestCase {
 
     private static final File binaryPath = 

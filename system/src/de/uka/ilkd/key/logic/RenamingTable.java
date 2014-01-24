@@ -16,6 +16,7 @@ package de.uka.ilkd.key.logic;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.SourceElement;
 
@@ -26,10 +27,12 @@ public abstract class RenamingTable{
 
     public abstract Iterator<? extends SourceElement> getRenamingIterator();
 
+    @SuppressWarnings("ToArrayCallWithZeroLengthArrayArgument")
     public static RenamingTable getRenamingTable(HashMap<? extends SourceElement, ? extends SourceElement> hmap){
 	if (hmap.size()==0)return null;
 	if (hmap.size()==1){
-	    SourceElement[] oldVar= hmap.keySet().toArray(new SourceElement[]{});
+        Set<? extends SourceElement> var = hmap.keySet();
+        SourceElement[] oldVar= var.toArray(new SourceElement[var.size()]);
 	    // XXX chosing entry 0 from a _set_ is quite arbitrarily, isnt it???
 	    SourceElement newVar= hmap.get(oldVar[0]);
 	    return new SingleRenamingTable(oldVar[0],newVar);

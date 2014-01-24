@@ -2144,9 +2144,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                         // add the function to the used ones
                                         this.addSpecialFunction(fun);
                                         // return the final translation
-                                        ArrayList<StringBuffer> list = new ArrayList<StringBuffer>();
-                                        list.add(arg1);
-                                        list.add(arg2);
 
                                         if (isComplexMultiplication(services,
                                                         term.sub(0),

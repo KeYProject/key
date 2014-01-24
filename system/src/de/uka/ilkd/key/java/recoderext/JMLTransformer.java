@@ -60,12 +60,12 @@ public final class JMLTransformer extends RecoderModelTransformer {
     private static final String JMR = "@*/";
 
     private static final ImmutableList<String> javaMods
-        = ImmutableSLList.<String>nil().prepend(new String[]{"abstract",
-                                                         "final", 
-                                                         "private", 
-                                                         "protected", 
-                                                         "public", 
-                                                         "static"});    
+        = ImmutableSLList.<String>nil().prepend("abstract",
+            "final",
+            "private",
+            "protected",
+            "public",
+            "static");
     
     private static ImmutableSet<PositionedString> warnings 
     	= DefaultImmutableSet.<PositionedString>nil();
@@ -218,13 +218,15 @@ public final class JMLTransformer extends RecoderModelTransformer {
     }
     
     
+    @SuppressWarnings("ToArrayCallWithZeroLengthArrayArgument")
     private Comment[] getCommentsAndSetParent(ProgramElement pe) {
         assert pe != null;
         if(pe.getComments() == null) {
             return new Comment[0];
         }
-        
-        Comment[] result = pe.getComments().toArray(new Comment[0]);
+
+        ASTList<Comment> var = pe.getComments();
+        Comment[] result = var.toArray(new Comment[var.size()]);
         for (Comment aResult : result) {
             aResult.setParent(pe);
         }
@@ -455,7 +457,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
     }
         
         
-    private void transformClasslevelComments(TypeDeclaration td, 
+    @SuppressWarnings("ToArrayCallWithZeroLengthArrayArgument")
+    private void transformClasslevelComments(TypeDeclaration td,
                                              String fileName) 
             throws SLTranslationException {
         //iterate over all pre-existing children
@@ -468,7 +471,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 comments = getCommentsAndSetParent(children[i]);
             } else if(td.getComments() != null) {
                 assert i > 0; //otherwise there wouldn't even be implicit fields
-                comments = td.getComments().toArray(new Comment[0]);
+                ASTList<Comment> var = td.getComments();
+                comments = var.toArray(new Comment[var.size()]);
                 for(Comment c : comments) {
                     c.setParent(children[i-1]);
                 }

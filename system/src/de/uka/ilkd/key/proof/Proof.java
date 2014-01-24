@@ -86,7 +86,7 @@ public class Proof implements Named {
      * attention: firing events makes use of array list's random access
      * nature
      */
-    private List<ProofTreeListener> listenerList = new ArrayList<ProofTreeListener>(10);
+    private final List<ProofTreeListener> listenerList = new ArrayList<ProofTreeListener>(10);
 
     /** list with the open goals of the proof */
     private ImmutableList<Goal> openGoals = ImmutableSLList.<Goal>nil();
@@ -135,7 +135,7 @@ public class Proof implements Named {
     private boolean disposed = false;
 
     /** list of rule app listeners */
-    private List<RuleAppListener> ruleAppListenerList = Collections.synchronizedList(new ArrayList<RuleAppListener>(10));
+    private final List<RuleAppListener> ruleAppListenerList = Collections.synchronizedList(new ArrayList<RuleAppListener>(10));
 
     /** constructs a new empty proof with name */
     private Proof(Name name, Services services, ProofSettings settings) {
@@ -257,7 +257,6 @@ public class Proof implements Named {
         setSettings(null);
         // set every reference (except the name) to null
         root = null;
-        listenerList = null;
         openGoals = null;
         problemHeader = null;
         services = null;
@@ -270,7 +269,6 @@ public class Proof implements Named {
         keyVersionLog = null;
         activeStrategy = null;
         settingsListener = null;
-        ruleAppListenerList = null;
         disposed = true;
     }
 

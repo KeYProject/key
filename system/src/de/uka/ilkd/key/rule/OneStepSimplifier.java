@@ -175,8 +175,8 @@ public final class OneStepSimplifier implements BuiltInRule,
 	if(proof != lastProof) {
 	    shutdownIndices();
 	    lastProof = proof;
-	    appsTakenOver = DefaultImmutableSet.<NoPosTacletApp>nil();;
-	    indices = new TacletIndex[ruleSets.size()];
+	    appsTakenOver = DefaultImmutableSet.<NoPosTacletApp>nil();
+        indices = new TacletIndex[ruleSets.size()];
 	    notSimplifiableCaches = (Map<Term,Term>[]) new LRUCache[indices.length];
 	    int i = 0;
 	    ImmutableList<String> done = ImmutableSLList.<String>nil();

@@ -42,9 +42,7 @@ public final class JavaUtil {
     */
    public static <T> void addAll(Collection<T> collection, T... elementsToAdd) {
       if (collection != null && elementsToAdd != null) {
-         for (T toAdd : elementsToAdd) {
-            collection.add(toAdd);
-         }
+          Collections.addAll(collection, elementsToAdd);
       }
    }
    

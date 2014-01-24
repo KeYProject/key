@@ -89,7 +89,7 @@ public class GoalList extends JList<Goal> {
 
         DisableSingleGoal() {
             if (getSelectedValue() instanceof Goal) {                
-                final Goal g = (Goal) getSelectedValue();
+                final Goal g = getSelectedValue();
                 putValue(NAME, g.isAutomatic() ? "Interactive Goal" : "Automatic Goal");
                 putValue(SHORT_DESCRIPTION,  g.isAutomatic() ? "No automatic rules " +
                 		"will be applied when goal is set to interactive." : 
@@ -140,7 +140,7 @@ public class GoalList extends JList<Goal> {
 
         DisableOtherGoals() {
             if (getSelectedValue() instanceof Goal) {                
-                final Goal g = (Goal) getSelectedValue();
+                final Goal g = getSelectedValue();
                 putValue(NAME, g.isAutomatic() ? "Set Other Goals Interactive" : "Set Other Goals Automatic");
                 putValue(SHORT_DESCRIPTION,  g.isAutomatic() ? "No automatic rules " +
                                 "will be applied on all other goals." : 
@@ -285,7 +285,7 @@ public class GoalList extends JList<Goal> {
 
     
     private void goalChosen() {
-	Goal goal = (Goal)getSelectedValue();
+	Goal goal = getSelectedValue();
 	if (goal != null) {
 	    mediator().goalChosen(goal);
 	}
@@ -647,7 +647,7 @@ public class GoalList extends JList<Goal> {
             int ind = delegatePosToMappingPos ( delegateBegin );
             
             for ( int i = delegateBegin; i < delegateEnd; ++i ) {
-                final Goal goal = (Goal)delegate.getElementAt ( i );
+                final Goal goal = delegate.getElementAt ( i );
                 if ( !isHiddenGoal ( goal ) )
                     entries.add ( ind++, Integer.valueOf ( i ) );
             }

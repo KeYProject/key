@@ -382,7 +382,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 		    					  .getJavaType());
             result += "_arr";
         } else {
-            String name = type.getName().toString();
+            String name = type.getName();
             name = MiscTools.filterAlphabetic(name);
             if (name.length() > 0) {
                 result = name.substring(0, 1).toLowerCase();

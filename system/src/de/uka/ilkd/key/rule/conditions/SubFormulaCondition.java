@@ -44,10 +44,10 @@ public class SubFormulaCondition extends VariableConditionAdapter {
     @Override
     public boolean check(SchemaVariable var, SVSubstitute instCandidate,
                          SVInstantiations instMap, Services services) {        
-        if (!(var instanceof FormulaSV) || (FormulaSV)var != this.a) {
+        if (!(var instanceof FormulaSV) || var != this.a) {
             return false;
         }
-        Term tInst = (Term) instMap.getInstantiation((FormulaSV)a);
+        Term tInst = (Term) instMap.getInstantiation(a);
         if (tInst.arity() == 0) {
             return negated;
         } else {

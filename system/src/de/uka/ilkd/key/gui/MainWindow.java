@@ -1219,7 +1219,7 @@ public final class MainWindow extends JFrame  {
         /** invoked when the strategy of a proof has been changed */
         @Override
         public synchronized void settingsChanged ( GUIEvent e ) {
-            if ( proof.getSettings().getStrategySettings() == (StrategySettings) e.getSource() ) {
+            if ( proof.getSettings().getStrategySettings() == e.getSource()) {
                 // updateAutoModeConfigButton();
             }
         }

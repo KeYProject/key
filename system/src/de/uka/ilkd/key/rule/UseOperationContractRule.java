@@ -328,6 +328,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
 
+    @SuppressWarnings("RedundantArrayCreation")
     private static Term getFreePost(List<LocationVariable> heapContext, IProgramMethod pm,
 	    		     	    KeYJavaType kjt,
 	    		     	    Term resultTerm,
@@ -354,10 +355,9 @@ public final class UseOperationContractRule implements BuiltInRule {
             		createdForm = TB.and(createdForm, cr);
             	}
             }
-            result = TB.and(new Term[]{
-        	      TB.not(TB.equals(selfTerm, TB.NULL(services))),
-                      createdForm,
-                      TB.exactInstance(services, kjt.getSort(), selfTerm)});
+            result = TB.and(TB.not(TB.equals(selfTerm, TB.NULL(services))),
+                    createdForm,
+                    TB.exactInstance(services, kjt.getSort(), selfTerm));
         } else if(resultTerm != null) {
             result = TB.reachableValue(services,
         	                       resultTerm,
@@ -559,6 +559,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
 
+    @SuppressWarnings("RedundantArrayCreation")
     @Override
     public ImmutableList<Goal> apply(Goal goal,
 	    			     Services services,
@@ -729,16 +730,16 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term postAssumption
         	= TB.applySequential(new Term[]{inst.u, atPreUpdates},
         		   	     TB.and(anonAssumption,
-        		   		    TB.apply(anonUpdate, TB.and(new Term[]{excNull,
-                          freePost,
-                          post}), null)));
+        		   		    TB.apply(anonUpdate, TB.and(excNull,
+                                    freePost,
+                                    post), null)));
         final Term excPostAssumption
         	= TB.applySequential(new Term[]{inst.u, atPreUpdates},
         		   TB.and(anonAssumption,
-                                  TB.apply(anonUpdate, TB.and(new Term[]{TB.not(excNull),
-                                  excCreated,
-                                  freeExcPost,
-                                  post}), null)));
+                                  TB.apply(anonUpdate, TB.and(TB.not(excNull),
+                                          excCreated,
+                                          freeExcPost,
+                                          post), null)));
 
         //create "Pre" branch
 	int i = 0;
@@ -761,9 +762,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 	}
         preGoal.changeFormula(new SequentFormula(
         			TB.applySequential(new Term[]{inst.u, atPreUpdates},
-        	                                   TB.and(new Term[]{pre,
-        	                                	   	     reachableState,
-        	                                	   	     mbyOk}))),
+        	                                   TB.and(pre,
+                                                       reachableState,
+                                                       mbyOk))),
                               ruleApp.posInOccurrence());
 
         TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, preGoal, null);

@@ -52,7 +52,7 @@ public class ExitMainAction extends MainWindowAction {
        @Override
        public void windowClosing(java.awt.event.WindowEvent e) {
            exitMain();
-       };
+       }
    };
 
    protected void exitMain() {

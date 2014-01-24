@@ -139,7 +139,7 @@ public class BlockContractRule implements BuiltInRule {
         for (BlockContract contract : collectedContracts) {
             if (!contractApplied(contract, goal)) {
                 result = result.add(contract);
-            };
+            }
         }
         return result;
     }
@@ -156,7 +156,7 @@ public class BlockContractRule implements BuiltInRule {
                         (BlockContractBuiltInRuleApp)app;
                 if (blockRuleApp.getBlock().equals(contract.getBlock())) {
                     return true;
-                };
+                }
             }
             selfOrParentNode = selfOrParentNode.parent();
         }

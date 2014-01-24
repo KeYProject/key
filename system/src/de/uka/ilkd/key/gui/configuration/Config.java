@@ -50,7 +50,7 @@ public class Config {
 	new ConfigChangeEvent(this);
 
     /** the listeners to this Config */
-    private List<ConfigChangeListener> listenerList = 
+    private final List<ConfigChangeListener> listenerList =
         new ArrayList<ConfigChangeListener>(5);
 
     private Config() {

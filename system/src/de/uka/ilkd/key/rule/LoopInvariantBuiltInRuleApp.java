@@ -137,7 +137,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 				        visited.getLabels());
 			    }
 			}
-		};
+		}
         final class ValuesTermReplacementVisitor extends DefaultVisitor {
             
             private Term result;
@@ -165,9 +165,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                             visited.boundVars(), visited.javaBlock(), visited.getLabels());
                 }
             }
-        };
-		
-		// replace index
+        }
+
+        // replace index
         Map<LocationVariable,Term> newInvs = new LinkedHashMap<LocationVariable,Term>(invs);
 		if (!skipIndex){
 		IndexTermReplacementVisitor v = new IndexTermReplacementVisitor();

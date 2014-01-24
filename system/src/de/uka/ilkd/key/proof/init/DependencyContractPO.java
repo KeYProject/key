@@ -143,12 +143,8 @@ public final class DependencyContractPO extends AbstractPO
             mbyAtPreDef = TB.measuredByEmpty(services);
         }        
              
-        return TB.and(new Term[]{wellFormedHeaps,
-        	       		 selfNotNull,
-        	       		 selfCreated,
-        	       		 selfExactType,
-        	       		 paramsOK,
-        	       		 mbyAtPreDef});        
+        return TB.and(wellFormedHeaps, selfNotNull, selfCreated,
+                selfExactType, paramsOK, mbyAtPreDef);
     }    
     
     

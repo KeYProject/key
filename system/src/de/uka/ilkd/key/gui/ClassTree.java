@@ -266,7 +266,7 @@ public class ClassTree extends JTree {
             sb.append("(");
         }
         for(KeYJavaType paramType : ov.getParamTypes()) {
-            sb.append(paramType.getSort().name() + ", ");
+            sb.append(paramType.getSort().name()).append(", ");
         }
         if(ov.getNumParams() > 0) {
             sb.setLength(sb.length() - 2);

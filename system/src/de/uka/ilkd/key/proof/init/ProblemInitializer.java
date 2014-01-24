@@ -285,7 +285,8 @@ public final class ProblemInitializer {
             if(searchPathList.find(javaPath) == null) {
                 searchPathList.add(javaPath);
             }
-            final String[] cus = getClasses(javaPath).toArray(new String[]{});
+        Vector<String> var = getClasses(javaPath);
+        final String[] cus = var.toArray(new String[var.size()]);
             r2k.readCompilationUnitsAsFiles(cus);
 	} else {
             reportStatus("Reading Java libraries");	    

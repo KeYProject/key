@@ -166,7 +166,7 @@ final class JMLTranslator {
             }
             return null;
         }
-    };
+    }
 
     public JMLTranslator(SLTranslationExceptionManager excManager, Services services) {
         this(excManager,null,services);

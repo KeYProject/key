@@ -50,7 +50,7 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
      * change the for-loop to a while loop with inits and updates.
      */
     public void performActionOnFor(For x) {
-        ExtList changeList = (ExtList) stack.peek();
+        ExtList changeList = stack.peek();
 
         if (replaceBreakWithNoLabel == 0) {
             // most outer for loop

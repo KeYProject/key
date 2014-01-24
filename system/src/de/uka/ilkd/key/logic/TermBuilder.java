@@ -1464,7 +1464,7 @@ public class TermBuilder {
 
     public Term arrayRange(Services services, Term o, Term lower, Term upper) {
         return func(services.getTypeConverter().getLocSetLDT().getArrayRange(),
-                    new Term[]{o, lower, upper});
+                o, lower, upper);
     }
 
 
@@ -1478,7 +1478,7 @@ public class TermBuilder {
         if(s.op() == ldt.getEmpty()) {
             return ff();
         } else {
-            return func(ldt.getElementOf(), new Term[]{o, f, s});
+            return func(ldt.getElementOf(), o, f, s);
         }
     }
 
@@ -1615,7 +1615,7 @@ public class TermBuilder {
     return func(services.getTypeConverter().getHeapLDT().getSelect(
             asSort,
             services),
-            new Term[]{h, o, f});
+            h, o, f);
     }
 
 
@@ -1832,7 +1832,7 @@ public class TermBuilder {
 
     public Term store(Services services, Term h, Term o, Term f, Term v) {
         return func(services.getTypeConverter().getHeapLDT().getStore(),
-                new Term[]{h, o, f, v});
+                h, o, f, v);
     }
 
 
@@ -1844,7 +1844,7 @@ public class TermBuilder {
 
     public Term anon(Services services, Term h1, Term s, Term h2) {
     return func(services.getTypeConverter().getHeapLDT().getAnon(),
-            new Term[]{h1, s, h2});
+            h1, s, h2);
     }
 
 
@@ -2010,7 +2010,7 @@ public class TermBuilder {
 
     public Term acc(Services services, Term h, Term s, Term o1, Term o2) {
     return func(services.getTypeConverter().getHeapLDT().getAcc(),
-            new Term[]{h, s, o1, o2});
+            h, s, o1, o2);
     }
 
 
@@ -2021,7 +2021,7 @@ public class TermBuilder {
                   Term o2,
                   Term n) {
     return func(services.getTypeConverter().getHeapLDT().getReach(),
-            new Term[]{h, s, o1, o2, n});
+            h, s, o1, o2, n);
     }
 
 
@@ -2067,7 +2067,7 @@ public class TermBuilder {
 
     public Term seqSub(Services services, Term s, Term from, Term to) {
     return func(services.getTypeConverter().getSeqLDT().getSeqSub(),
-            new Term[]{s, from, to});
+            s, from, to);
     }
 
 
