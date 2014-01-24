@@ -51,7 +51,7 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.util.Debug;
 
-public class GoalList extends JList {
+public class GoalList extends JList<Goal> {
     
     /**
      * 
@@ -385,7 +385,7 @@ public class GoalList extends JList {
     
     
 
-    private static class GoalListModel extends AbstractListModel {
+    private static class GoalListModel extends AbstractListModel<Goal> {
     
 	/**
          * 
@@ -481,7 +481,7 @@ public class GoalList extends JList {
 	    return goals.size();
 	}
 
-	public Object getElementAt(int i) {
+	public Goal getElementAt(int i) {
 	    return goals.get(i);
 	} 
 
@@ -564,7 +564,7 @@ public class GoalList extends JList {
      * goals. This is currently used to prevent the display of goals that appear
      * closed for the present user constraint.
      */
-    private class SelectingGoalListModel extends AbstractListModel {
+    private class SelectingGoalListModel extends AbstractListModel<Goal> {
         
         /**
          * 
@@ -595,7 +595,7 @@ public class GoalList extends JList {
             return entries.size();
         }
 
-        public Object getElementAt (int i) {
+        public Goal getElementAt (int i) {
             if ( i < 0 || i >= getSize () ) return null;
             return delegate.getElementAt ( getDelegateIndex ( i ) );
         }
@@ -801,7 +801,7 @@ public class GoalList extends JList {
 	}
 	
 	public Component getListCellRendererComponent
-	    (JList list,
+	    (JList<?> list,
 	     Object value,            // value to display
 	     int index,               // cell index
 	     boolean isSelected,      // is the cell selected
