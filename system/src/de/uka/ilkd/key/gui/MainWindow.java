@@ -1528,17 +1528,54 @@ public final class MainWindow extends JFrame  {
     	return unicodeToggleAction;
     }
 
+    /**
+     * Store the properties of the named components under {@code component} to
+     * the system preferences.
+     *
+     * This uses the {@link Preferences} class to access the system preferences.
+     * Preferences are not explicitly synchronised; this happens at application
+     * end using {@link #syncPreferences()}. All components which are in the
+     * component tree are queried.
+     *
+     * @see PreferenceSaver
+     *
+     * @param component
+     *            the non-null component whose preferences are to be saved
+     */
     public void savePreferences(Component component) {
+        prefSaver.save(component);
+    }
+
+    /**
+     * Load the properties of the named components under {@code component} from
+     * the system preferences.
+     *
+     * This uses the {@link Preferences} class to access the system preferences.
+     * All components which are in the component tree are queried.
+     *
+     * @see PreferenceSaver
+     *
+     * @param component
+     *            the non-null component whose preferences are to be set
+     */
+    public final void loadPreferences(Component component) {
+        prefSaver.load(component);
+    }
+
+    /**
+     * Synchronised the system properties with the background storage system.
+     *
+     * This is typically called at application termination.
+     *
+     * @see PreferenceSaver
+     */
+    public final void syncPreferences() {
         try {
-            prefSaver.save(component);
+            prefSaver.flush();
         } catch (BackingStoreException e) {
             // it is not tragic if the preferences cannot be stored.
             e.printStackTrace();
         }
-    }
-
-    public final void loadPreferences(Component component) {
-        prefSaver.load(component);
     }
 
     /**

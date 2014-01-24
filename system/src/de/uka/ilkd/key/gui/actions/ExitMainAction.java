@@ -86,6 +86,7 @@ public class ExitMainAction extends MainWindowAction {
 
         System.out.println("Have a nice day.");
         mainWindow.savePreferences(mainWindow);
+        mainWindow.syncPreferences();
         if (exitSystem) {
             // TODO: why -1 and not 0 ???
            System.exit(-1);

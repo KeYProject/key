@@ -85,8 +85,10 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	
         // layout dialog
 	layoutDialog();
-	mainWindow.loadPreferences(this);
-	pack();
+        pack();
+
+        // reload previously set GUI
+        mainWindow.loadPreferences(this);
 
 	setVisible(true);
     }

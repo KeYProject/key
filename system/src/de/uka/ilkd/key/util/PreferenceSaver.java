@@ -122,13 +122,11 @@ public class PreferenceSaver {
      * @throws BackingStoreException
      *             possibly thrown by {@link Preferences}.
      */
-    public void save(Component component) throws BackingStoreException {
+    public void save(Component component) {
         assert component != null;
 
         saveComponent(component);
         saveChildren(component);
-
-        prefs.flush();
     }
 
     private <C extends Component> void saveComponent(C component) {
@@ -141,7 +139,7 @@ public class PreferenceSaver {
         }
     }
 
-    private void saveChildren(Component component) throws BackingStoreException {
+    private void saveChildren(Component component) {
         if (component instanceof Container) {
             Component[] children = getChildren(component);
             if (children != null) {
@@ -311,6 +309,10 @@ public class PreferenceSaver {
             return AbstractButton.class;
         }
 
+    }
+
+    public void flush() throws BackingStoreException {
+        prefs.flush();
     }
     
 }
