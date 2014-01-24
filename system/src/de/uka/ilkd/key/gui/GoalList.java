@@ -51,7 +51,7 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.util.Debug;
 
-public class GoalList extends JList<Goal> {
+public class GoalList extends JList {
     
     /**
      * 
@@ -89,7 +89,7 @@ public class GoalList extends JList<Goal> {
 
         DisableSingleGoal() {
             if (getSelectedValue() instanceof Goal) {                
-                final Goal g = getSelectedValue();
+                final Goal g = (Goal) getSelectedValue();
                 putValue(NAME, g.isAutomatic() ? "Interactive Goal" : "Automatic Goal");
                 putValue(SHORT_DESCRIPTION,  g.isAutomatic() ? "No automatic rules " +
                 		"will be applied when goal is set to interactive." : 
@@ -140,7 +140,7 @@ public class GoalList extends JList<Goal> {
 
         DisableOtherGoals() {
             if (getSelectedValue() instanceof Goal) {                
-                final Goal g = getSelectedValue();
+                final Goal g = (Goal) getSelectedValue();
                 putValue(NAME, g.isAutomatic() ? "Set Other Goals Interactive" : "Set Other Goals Automatic");
                 putValue(SHORT_DESCRIPTION,  g.isAutomatic() ? "No automatic rules " +
                                 "will be applied on all other goals." : 
@@ -285,7 +285,7 @@ public class GoalList extends JList<Goal> {
 
     
     private void goalChosen() {
-	Goal goal = getSelectedValue();
+	Goal goal = (Goal) getSelectedValue();
 	if (goal != null) {
 	    mediator().goalChosen(goal);
 	}
@@ -385,7 +385,7 @@ public class GoalList extends JList<Goal> {
     
     
 
-    private static class GoalListModel extends AbstractListModel<Goal> {
+    private static class GoalListModel extends AbstractListModel {
     
 	/**
          * 
@@ -564,7 +564,7 @@ public class GoalList extends JList<Goal> {
      * goals. This is currently used to prevent the display of goals that appear
      * closed for the present user constraint.
      */
-    private class SelectingGoalListModel extends AbstractListModel<Goal> {
+    private class SelectingGoalListModel extends AbstractListModel {
         
         /**
          * 
@@ -801,7 +801,7 @@ public class GoalList extends JList<Goal> {
 	}
 	
 	public Component getListCellRendererComponent
-	    (JList<?> list,
+	    (JList list,
 	     Object value,            // value to display
 	     int index,               // cell index
 	     boolean isSelected,      // is the cell selected
