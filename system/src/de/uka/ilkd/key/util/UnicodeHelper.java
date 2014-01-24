@@ -105,6 +105,8 @@ public final class UnicodeHelper {
     public static final char ENSPACE = '\u2002';
     public static final char EMSPACE = '\u2003';
     public static final char ENDASH = '\u2013';
+    public static final char FLQQ = '\u00ab';
+    public static final char FRQQ = '\u00bb';
 
 
     /**

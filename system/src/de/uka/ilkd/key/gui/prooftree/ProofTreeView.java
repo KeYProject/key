@@ -84,11 +84,13 @@ import de.uka.ilkd.key.util.Debug;
 public class ProofTreeView extends JPanel {
 
     private static final long serialVersionUID = 3732875161168302809L;
-    private static final Color PASTEL_COLOR = new Color(255,255,204);
     private static final Color GRAY_COLOR = Color.DARK_GRAY;
     private static final Color BISQUE_COLOR = new Color(240,228,196);
-    private static final Color PALE_RED_COLOR = new Color(255,153,153);
-    private static final Color LIGHT_BLUE_COLOR = new Color(230,230,255);
+    private static final Color LIGHT_BLUE_COLOR = new Color(230,254,255);
+    private static final Color DARK_BLUE_COLOR = new Color(31,77,153);
+    private static final Color DARK_GREEN_COLOR = new Color(0,128,51);
+    private static final Color DARK_RED_COLOR = new Color(191,0,0);
+    private static final Color ORANGE_COLOR = new Color(255,140,0);
 
     /** the mediator is stored here */
     private KeYMediator mediator;
@@ -717,18 +719,18 @@ public class ProofTreeView extends JPanel {
 	    if (node.leaf()) {
 		Goal goal = proof.getGoal(node);
 		if ( goal == null || node.isClosed() ) {
-		    tree_cell.setForeground(Color.green);
+		    tree_cell.setForeground(DARK_GREEN_COLOR);
 		    tree_cell.setIcon(IconFactory.keyHoleClosed(20,20));
 		    ProofTreeView.this.setToolTipText("Closed Goal");
 		    tree_cell.setToolTipText("A closed goal");
 		} else {
 		    if ( !goal.isAutomatic() ) {
-		        tree_cell.setForeground(Color.orange);
+		        tree_cell.setForeground(ORANGE_COLOR);
 		        tree_cell.setIcon(IconFactory.keyHoleInteractive(20, 20));
 		        ProofTreeView.this.setToolTipText("Disabled Goal");
 		        tree_cell.setToolTipText("Interactive goal - no automatic rule application");
 		    } else {
-			tree_cell.setForeground(new Color(250, 90, 90));
+			tree_cell.setForeground(DARK_RED_COLOR);
 			tree_cell.setIcon(keyHole20x20);
 			ProofTreeView.this.setToolTipText("Open Goal");
 			tree_cell.setToolTipText("An open goal");
@@ -765,7 +767,7 @@ public class ProofTreeView extends JPanel {
 	    }
 
 	    if (node.getNodeInfo().getNotes() != null) {
-	        tree_cell.setBackgroundNonSelectionColor(Color.yellow);
+	        tree_cell.setBackgroundNonSelectionColor(ORANGE_COLOR);
 	    } else
             if (node.getNodeInfo().getActiveStatement() != null ) {
                 tree_cell.setBackgroundNonSelectionColor(LIGHT_BLUE_COLOR);
@@ -773,7 +775,7 @@ public class ProofTreeView extends JPanel {
             } else {
                 tree_cell.setBackgroundNonSelectionColor(Color.white);
             }
-	    if (sel) tree_cell.setBackground(Color.blue);
+	    if (sel) tree_cell.setBackground(DARK_BLUE_COLOR);
 
 	    tree_cell.setFont(tree.getFont());
 	    tree_cell.setText(nodeText);

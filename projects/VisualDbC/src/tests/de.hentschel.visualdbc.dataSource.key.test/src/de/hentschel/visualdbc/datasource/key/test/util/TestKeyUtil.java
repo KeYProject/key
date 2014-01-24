@@ -608,7 +608,7 @@ public final class TestKeyUtil {
                                                                "leq(amount, Z(0(#)))\n" +
                                                                "& java.lang.Object::<inv>(heap, self)", 
                                                                "!exc = null\n" +
-                                                               "& (  (   java.lang.Exception::instance(exc) = TRUE\n" +
+                                                               "& (  (   java.lang.Throwable::instance(exc) = TRUE\n" +
                                                                "      -> java.lang.Object::<inv>(heap, self))\n" +
                                                                "   &   java.lang.IllegalArgumentException::instance(exc)\n" +
                                                                "     = TRUE)", 

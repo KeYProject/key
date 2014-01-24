@@ -65,10 +65,14 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     private Goal goal;
 
     private JScrollPane tablePane;
+
+    private MainWindow mainWindow;
  
-    public TacletMatchCompletionDialog(JFrame parent, ApplyTacletDialogModel[] model,
+    public TacletMatchCompletionDialog(MainWindow parent, ApplyTacletDialogModel[] model,
 				       Goal goal, KeYMediator mediator) { 
-	super(parent, model, mediator);	
+	super(parent, model, mediator);
+	setName("tacletMatchDlg");
+	this.mainWindow = parent;
 	this.goal    = goal;
 	this.current = 0;
 	dataTable = new DataTable[model.length];
@@ -81,7 +85,10 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	
         // layout dialog
 	layoutDialog();
-	pack();
+        pack();
+
+        // reload previously set GUI
+        mainWindow.loadPreferences(this);
 
 	setVisible(true);
     }
@@ -161,34 +168,29 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	downPanel.add(createButtonPanel(new ButtonListener()));
 	
 	JSplitPane splitPaneBot = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                                   tacletPanel, downPanel) {
-            /**
-                                     * 
-                                     */
-                                    private static final long serialVersionUID = 2482567227427247871L;
-
-            public void setUI(javax.swing.plaf.SplitPaneUI ui) {
-                try{ super.setUI(ui); } catch(NullPointerException e)
-		    { Debug.out("Exception thrown by class TacletMatchCompletionDialog at setUI");}
-            }
-        }; // work around bug in 
-        // com.togethersoft.util.ui.plaf.metal.OIMetalSplitPaneUI
+	        tacletPanel, downPanel);
+	// work around bug in com.togethersoft.util.ui.plaf.metal.OIMetalSplitPaneUI
+//	{
+//	    public void setUI(javax.swing.plaf.SplitPaneUI ui) {
+//	        try{ super.setUI(ui); } catch(NullPointerException e)
+//	        { Debug.out("Exception thrown by class TacletMatchCompletionDialog at setUI");}
+//	    }
+//	};
 	splitPaneBot.setResizeWeight(1);
+	splitPaneBot.setName("tacletMatchDlg.splitBottom");
 
 	JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                                   createTacletDisplay(), splitPaneBot) {
-            /**
-                                     * 
-                                     */
-                                    private static final long serialVersionUID = -8853995169898290919L;
-
-            public void setUI(javax.swing.plaf.SplitPaneUI ui) {
-                try{ super.setUI(ui); } catch(NullPointerException e) 
-		    {Debug.out("Exception thrown by class TacletMatchCompletionDialog at setUI"); }
-            }
-        }; // work around bug in 
-        // com.togethersoft.util.ui.plaf.metal.OIMetalSplitPaneUI
-
+                                   createTacletDisplay(), splitPaneBot);
+//	{
+//
+//	    public void setUI(javax.swing.plaf.SplitPaneUI ui) {
+//	        try{ super.setUI(ui); } catch(NullPointerException e) 
+//	        {Debug.out("Exception thrown by class TacletMatchCompletionDialog at setUI"); }
+//	    }
+//	}; 
+        // work around bug in com.togethersoft.util.ui.plaf.metal.OIMetalSplitPaneUI
+	splitPane.setName("tacletMatchDlg.split");
+	
 	getContentPane().add(splitPane);
 	// add button listener
 	updateDataModel();
@@ -293,6 +295,17 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     }
 
 
+    /**
+     * save the preferences of this window prior to closing it.
+     */
+    @Override 
+    protected void closeDlg() {
+        if(mainWindow != null)
+            mainWindow.savePreferences(this);
+        super.closeDlg();
+    }
+
+
     class ButtonListener implements ActionListener {
        
        
@@ -382,7 +395,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	}
 
     }
-
+    
     private static class DataTable extends JTable 
 	implements ModelChangeListener {
 

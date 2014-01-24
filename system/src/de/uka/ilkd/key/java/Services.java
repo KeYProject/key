@@ -76,7 +76,6 @@ public class Services{
      */
     private KeYExceptionHandler exceptionHandler;
     
-
     /**
      * map of names to counters
      */

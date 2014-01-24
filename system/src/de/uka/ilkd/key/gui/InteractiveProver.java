@@ -552,7 +552,7 @@ public class InteractiveProver implements InterruptListener {
      * }. The thread itself unfreezes the UI when it is finished.
      * </p>
      */
-    private class AutoModeWorker extends SwingWorker {
+    private class AutoModeWorker extends SwingWorker3 {
 
         private ImmutableList<Goal> goals;
 

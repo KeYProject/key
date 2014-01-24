@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -67,39 +68,19 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
     private static PosInOccurrence letUserChooseStep(
     		List<LocationVariable> heapContext,
             List<PosInOccurrence> steps, boolean forced, Services services) {
+        assert heapContext != null;
 
-        // 2nd condition is a quickfix to avoid ClassCastExceptions (Michael Kirsten)
-        if (steps.size() == 0
-                || !(steps.get(0).subTerm().op() instanceof IObserverFunction)) {
+        if (steps.size() == 0) {
             return null;
         }
 
         // prepare array of possible base heaps
         final TermStringWrapper[] heaps = new TermStringWrapper[steps.size()];
-        int i = 0;
         final LogicPrinter lp = new LogicPrinter(null, new NotationInfo(),
                 services);
         lp.setLineWidth(120);
 
-        for (PosInOccurrence step : steps) {
-            final Term[] heapTerms = new Term[((IObserverFunction)
-                    step.subTerm().op()).getStateCount()*heapContext.size()];
-        	String prettyprint = "<html><tt>" + (heapTerms.length > 1 ? "[" : "");
-        	for(int j =0 ; j < heapTerms.length; j++) {
-              final Term heap = step.subTerm().sub(j);
-              heapTerms[j] = heap;
-              lp.reset();
-              try {
-                  lp.printTerm(heap);
-              } catch (IOException e) {
-                  throw new RuntimeException(e);
-              }
-              prettyprint += (j>0 ? ", " : "")
-                      + LogicPrinter.escapeHTML(lp.toString().trim(), true);
-        	}
-        	prettyprint += (heapTerms.length > 1 ? "]" : "")+"</tt></html>";
-            heaps[i++] = new TermStringWrapper(heapTerms, prettyprint);
-        }
+        extractHeaps(heapContext, steps, heaps, lp);
 
         final Term[] resultHeaps;
         if (!forced) {
@@ -134,6 +115,37 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
 
         assert false;
         return null;
+    }
+
+    private static void extractHeaps(List<LocationVariable> heapContext,
+            List<PosInOccurrence> steps, final TermStringWrapper[] heaps,
+            final LogicPrinter lp) {
+        int i = 0;
+        for (PosInOccurrence step : steps) {
+            Operator op = step.subTerm().op();
+            // necessary distinction (see bug #1232)
+            // subterm may either be an observer or a heap term already
+            int size = (op instanceof IObserverFunction)?
+                ((IObserverFunction)op).getStateCount()*heapContext.size(): 1;
+            final Term[] heapTerms = new Term[size];
+            String prettyprint = "<html><tt>" + (size > 1 ? "[" : "");
+            for(int j =0 ; j < size; j++) {
+                // TODO: there may still be work to do
+                // what if we have a heap term, where the base heap lies deeper?
+                final Term heap = step.subTerm().sub(j);
+                heapTerms[j] = heap;
+                lp.reset();
+                try {
+                    lp.printTerm(heap);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                prettyprint += (j>0 ? ", " : "")
+                + LogicPrinter.escapeHTML(lp.toString().trim(), true);
+            }
+            prettyprint += (size > 1 ? "]" : "")+"</tt></html>";
+            heaps[i++] = new TermStringWrapper(heapTerms, prettyprint);
+        }
     }
 
     private static final class TermStringWrapper {

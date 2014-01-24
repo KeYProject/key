@@ -22,6 +22,7 @@ import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -142,6 +143,7 @@ public final class NotationInfo {
     static final int PRIORITY_CAST = 120;
     static final int PRIORITY_ATOM = 130;
     static final int PRIORITY_BOTTOM = 140;
+    static final int PRIORITY_LABEL = 140; // TODO: find appropriate value
 
 
     public static boolean PRETTY_SYNTAX = true;
@@ -151,7 +153,6 @@ public final class NotationInfo {
      * are printed.
      */
     public static boolean UNICODE_ENABLED = false;
-        
     
     /** This maps operators and classes of operators to {@link
      * Notation}s.  The idea is that we first look whether the operator has
@@ -233,6 +234,7 @@ public final class NotationInfo {
 	tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
 	
 	tbl.put(Sort.CAST_NAME, new Notation.CastFunction("(",")",PRIORITY_CAST, PRIORITY_BOTTOM));
+	tbl.put(TermLabel.class, new Notation.LabelNotation("<<", ">>", PRIORITY_LABEL));
 	this.notationTable = tbl;
     }
         
@@ -330,6 +332,7 @@ public final class NotationInfo {
         tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation(" " + UnicodeHelper.IN + " "));
         tbl.put(setLDT.getSubset(), new Notation.Infix(""+UnicodeHelper.SUBSET, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
         tbl.put(services.getTypeConverter().getHeapLDT().getPrec(), new Notation.Infix(""+UnicodeHelper.PRECEDES, PRIORITY_ATOM,PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(TermLabel.class, new Notation.LabelNotation(""+UnicodeHelper.FLQQ, ""+UnicodeHelper.FRQQ, PRIORITY_LABEL));
         this.notationTable = tbl;
     }
 
@@ -358,11 +361,14 @@ public final class NotationInfo {
 	scm = am;
     }
 
+    Notation getNotation(Class<?> c) {
+        return notationTable.get(c);
+    }
     
     /** Get the Notation for a given Operator.  
      * If no notation is registered, a Function notation is returned.
      */
-    public Notation getNotation(Operator op, Services services) {
+    Notation getNotation(Operator op, Services services) {
         Notation result = notationTable.get(op);
         if(result != null) {
             return result;

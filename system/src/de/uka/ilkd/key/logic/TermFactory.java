@@ -39,7 +39,7 @@ public final class TermFactory {
     /** 
      * The only instance of TermFactory. 
      */
-    public static final TermFactory DEFAULT = new TermFactory();    
+    public static final TermFactory DEFAULT = new TermFactory(); // TODO: Move instance into services to avoid static cache
 
     private static final Map<Term, Term> cache 
     	= Collections.synchronizedMap(new LRUCache<Term, Term>(20000));

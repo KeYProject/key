@@ -69,12 +69,12 @@ mod: false" pathCondition="not(equals(array,null))" pathConditionChanged="false"
                                           </branchCondition>
                                           <branchCondition name="not(equals(i_0,Z(0(#))))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))))),not(equals(i_0,Z(0(#))))))" pathConditionChanged="true" branchCondition="not(equals(i_0,Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                                              <methodReturn name="&lt;return of ArrayAverage.average(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))))),not(equals(i_0,Z(0(#))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	quotient_1 {gt(sum_2_0,Z(neglit(1(#))))}, 
-	mul(quotient_0,Z(neglit(1(#)))) {lt(sum_2_0,Z(0(#)))}
+	quotient_2 {gt(sum_2_0,Z(neglit(1(#))))}, 
+	mul(quotient_3,Z(neglit(1(#)))) {lt(sum_2_0,Z(0(#)))}
 as result of ArrayAverage.average(array);&gt;" isReturnValueComputed="true">
-                                                <methodReturnValue name="quotient_1 {gt(sum_2_0,Z(neglit(1(#))))}" returnValueString="quotient_1" hasCondition="true" conditionString="gt(sum_2_0,Z(neglit(1(#))))">
+                                                <methodReturnValue name="quotient_2 {gt(sum_2_0,Z(neglit(1(#))))}" returnValueString="quotient_2" hasCondition="true" conditionString="gt(sum_2_0,Z(neglit(1(#))))">
                                                 </methodReturnValue>
-                                                <methodReturnValue name="mul(quotient_0,Z(neglit(1(#)))) {lt(sum_2_0,Z(0(#)))}" returnValueString="mul(quotient_0,Z(neglit(1(#))))" hasCondition="true" conditionString="lt(sum_2_0,Z(0(#)))">
+                                                <methodReturnValue name="mul(quotient_3,Z(neglit(1(#)))) {lt(sum_2_0,Z(0(#)))}" returnValueString="mul(quotient_3,Z(neglit(1(#))))" hasCondition="true" conditionString="lt(sum_2_0,Z(0(#)))">
                                                 </methodReturnValue>
                                                 <callStackEntry path="/0"/>
                                                 <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))))),not(equals(i_0,Z(0(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">

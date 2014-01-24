@@ -110,6 +110,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
+import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
@@ -122,6 +123,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -1086,7 +1089,8 @@ public final class SymbolicExecutionUtil {
                    !KeYTypeUtil.isLibraryClass(explicitConstructor.getContainerType());
          }
          else {
-            return !pm.isImplicit(); // Do not include implicit methods, but always constructors
+            return !pm.isImplicit() && // Do not include implicit methods, but always constructors
+                   !KeYTypeUtil.isLibraryClass(pm.getContainerType());
          }
       }
       else {
@@ -1203,7 +1207,19 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} represent node as operation contract, {@code false} represent node as something else. 
     */
    public static boolean isOperationContract(Node node, RuleApp ruleApp) {
-      return "Use Operation Contract".equals(MiscTools.getRuleDisplayName(ruleApp));
+      if (ruleApp instanceof AbstractContractRuleApp) {
+         Contract contract = ((AbstractContractRuleApp)ruleApp).getInstantiation();
+         if (contract instanceof OperationContract) {
+            IProgramMethod target = ((OperationContract)contract).getTarget();
+            return isNotImplicite(node.proof().getServices(), target);
+         }
+         else {
+            return false;
+         }
+      }
+      else {
+         return false;
+      }
    }
 
    /**

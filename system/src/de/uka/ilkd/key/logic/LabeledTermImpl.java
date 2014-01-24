@@ -68,7 +68,7 @@ class LabeledTermImpl extends TermImpl {
 
 	/**
 	 * returns true if the given label is attached
-	 * @param label the ITermLabel for which to look (must not be null)
+	 * @param label the TermLabel for which to look (must not be null)
 	 * @return true iff. the label is attached to this term
 	 */
 	@Override

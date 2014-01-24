@@ -194,6 +194,8 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
 
     public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {
         String tacletName = properties.getProperty(PROPERTY_NAME);
+        // This string is parsed by "proveRules.pl"
+        System.out.println("Proof obligation for taclet: " + tacletName);
         TacletProofObligationInput proofOblInput =
                 new TacletProofObligationInput(tacletName, initConfig);
         proofOblInput.setLoadInfo(properties);

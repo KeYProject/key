@@ -29,9 +29,9 @@ import javax.swing.border.TitledBorder;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -72,10 +72,12 @@ public abstract class ApplyTacletDialog extends JDialog {
     
 	mediator.requestModalAccess(this); 
 	addWindowListener(new WindowAdapter() {
+                @Override
 		public void windowClosed(WindowEvent e) {
 		    ApplyTacletDialog.this.closeDlg();		    
 		}
 
+                @Override
 		public void windowClosing(WindowEvent e) {
 		    ApplyTacletDialog.this.closeDlg();
 		}
@@ -121,13 +123,14 @@ public abstract class ApplyTacletDialog extends JDialog {
         
         Taclet taclet = model[0].taclet();
         StringBackend backend = new StringBackend(68);
-        StringBuffer tacletSB = new StringBuffer();
+        StringBuilder tacletSB = new StringBuilder();
         
         Writer w = new StringWriter();
         //WriterBackend backend = new WriterBackend(w, 68);
         
-        LogicPrinter tp = new LogicPrinter(new ProgramPrinter(w), 
-                new NotationInfo(), backend, mediator.getServices(), true);
+        SequentViewLogicPrinter tp = new SequentViewLogicPrinter(new ProgramPrinter(w), 
+                new NotationInfo(), backend, mediator.getServices(), true,
+                MainWindow.getInstance().getVisibleTermLabels());
         
 //        tp.printTaclet(taclet, model[0].tacletApp().instantiations(),
         tp.printTaclet(taclet, 

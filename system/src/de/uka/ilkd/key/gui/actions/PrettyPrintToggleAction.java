@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.JCheckBoxMenuItem;
 
@@ -32,7 +31,6 @@ public class PrettyPrintToggleAction extends MainWindowAction {
     public PrettyPrintToggleAction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("Use pretty syntax");
-	setAcceleratorLetter(KeyEvent.VK_P);
 	setTooltip("If ticked, infix notations are used.");
 	final boolean prettySyntax = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
 	NotationInfo.PRETTY_SYNTAX = prettySyntax;

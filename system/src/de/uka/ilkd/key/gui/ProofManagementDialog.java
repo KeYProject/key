@@ -407,7 +407,6 @@ public final class ProofManagementDialog extends JDialog {
            instance.selectKJTandTarget();
        }
 
-       startedProof = false;
        instance.updateGlobalStatus();
        
        // The selected elements have to be select before the dialog is made visible!
