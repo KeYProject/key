@@ -15,12 +15,8 @@ package de.uka.ilkd.key.gui;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-import java.util.Set;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -197,92 +193,105 @@ public class KeYSelectionModel {
     }
 
 
-    /**
-     * Selects the goal in the goal list that is closest to the currently
-     * selected node.
-     * 
-     * For a closed proof, it selects the root.
-     * 
-     * @see #nearestOpenGoalSelection(Node)
+    /** selectes the first goal in the goal list of proof if available
+     * if not it selectes a leaf of the proof tree
      */
     public void defaultSelection() {
-        nearestOpenGoalSelection(getSelectedNode());
+	Goal           g       = null;
+	Goal           firstG  = null;
+	Iterator<Goal> it      = new DefaultSelectionIterator ();
+
+	while ( g == null && it.hasNext () ) {
+	    g = it.next ();
+	    if ( firstG == null )
+		firstG = g;
+	}
+
+	/** Order of preference:
+	 * 1. Not yet closable goals
+	 * 2. Goals which are not closed for all metavariable
+	 * instantiations
+	 * 3. The first node of the tree
+	 */
+	if ( g != null )
+	    setSelectedGoal(g);
+	else {
+	    if ( firstG != null )
+		setSelectedGoal(firstG);
+	    else
+		setSelectedNode(proof.root().leavesIterator().next());
+	}
+	/*
+	if (selectedNode != null) {
+	    Iterator<Node> nodeIt = selectedNode.leavesIterator();
+	    while (nodeIt.hasNext()) {
+		g = proof.getGoal(nodeIt.next());
+		if (g != null) {
+		    break;
+		}
+	    }
+	}
+	if (g == null && !proof.openGoals().isEmpty() ) {
+	    g = proof.openGoals().iterator().next();
+	}
+	if (g != null) {
+	    setSelectedGoal(g);
+	} else {
+	    setSelectedNode(proof.root().leavesIterator().next());
+	}
+	*/
     }
 
     /**
-     * Selects the goal in the goal list that is closest to the node {@code old}.
-     * 
-     * For a closed proof, it selects the root.
-     * 
-     * The goal with the shortest distance to old is selected.
-     * 
-     * If there are goals under old, search is restricted to those.
-     * 
-     * @param old
-     *            the Node to start looking for open goals, not
-     *            <code>null</code>
+     * selects the first open goal below the given node <tt>old</tt>
+     * if no open goal is available node <tt>old</tt> is selected. In case
+     * that <tt>old</tt> has been removed from the proof the proof root is
+     * selected
+     * @param old the Node to start looking for open goals
      */
+    // XXX this method is never used
     public void nearestOpenGoalSelection(Node old) {
-        
-        Set<Node> visited = 
-                Collections.newSetFromMap(new IdentityHashMap<Node, Boolean>());
-        
-        Queue<Node> toVisit =
-                new LinkedList<Node>();
-        
-        // bugfix:
-        // "old" may point to an abandoned Node; choose goal for root then
-        if(!proof.find(old)) {
-            old = proof.root();
+        Node n = old;
+        while (n!=null && n.isClosed()) {
+            n = n.parent();
         }
-        
-        toVisit.add(old);
-        
-        if(!old.isClosed()) {
-            // prevent going up in the tree by marking the parent as visited
-            Node p = old.parent();
-            if(p != null) {
-                visited.add(p);
+        if (n == null) {
+            if (proof.find(old)) {
+                setSelectedNode(old);
+            } else {
+                setSelectedNode(proof.root());
             }
-        }
-
-        // Now add all reachable nodes. Since the list toVisit is a queue, the
-        // first found goal is the one with the shortest distance to old. This
-        // is essentially a breadth-first-search.
-
-        while(!toVisit.isEmpty()) {
-            Node n = toVisit.remove();
-            
-            Node p = n.parent();
-            if(p != null) {
-                toVisit.add(p);
+        } else {
+            final Goal g = getFirstOpenGoalBelow(n);
+            if (g == null || g.node() == null) {
+                setSelectedNode(proof.root());
+            } else {
+                setSelectedGoal(g);
             }
-
-            if(n.isClosed() || visited.contains(n)) {
-                continue;
-            }
-
-            int childCount = n.childrenCount();
-            if(childCount == 0) {
-                // it is indeed a goal -> set it
-                Goal goal = proof.getGoal(n);
-                assert goal != null : "There must be a goal for this node";
-                setSelectedGoal(goal);
-                return;
-            }
-
-            for (int i = 0; i < childCount; i++) {
-                toVisit.add(n.child(i));
-            }
-
-            visited.add(n);
-        }
-
-        // now no goal found
-        Node root = proof.root();
-        assert root.isClosed();
-        setSelectedNode(root);
+	}
     }
+
+    /**
+     * retrievs the first open goal below the given node, i.e. the goal
+     * containing the first leaf of the subtree starting at
+     *  <code>n</code> which is not already closed
+     *
+     * @param n the Node where to start from
+     * @return the goal containing the first leaf of the
+     * subtree starting at <code>n</code>, which is not already closed.
+     * <code>null</code> is returned if no such goal exists.
+     */
+    private Goal getFirstOpenGoalBelow(Node n) {
+        final Iterator<Node> it = n.leavesIterator();
+        while (it.hasNext()) {
+            final Node node =it.next();
+            if (!node.isClosed()) {
+               return proof.getGoal(node);
+            }
+        }
+        return null;
+    }
+
 
     public void addKeYSelectionListener(KeYSelectionListener listener) {
 	synchronized(listenerList) {
