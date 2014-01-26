@@ -50,8 +50,10 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
     private KeYMediator mediator;
     private Properties descriptions;
 
-    /** Listener for proof changes */
-    protected SelectionListener selectionListener = new SelectionListener();
+    /**
+     * Listener for proof changes
+     */
+    private final SelectionListener selectionListener = new SelectionListener();
 
     public RuleView() {
         super(VERTICAL_SPLIT);
@@ -61,6 +63,7 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
         setVisible(true);
     }
 
+    @Override
     public void valueChanged(TreeSelectionEvent e) {
         if (ruleTree.getLastSelectedPathComponent() != null) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) ruleTree
@@ -88,7 +91,9 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
         } else {
             final int parenIdx = displayName.lastIndexOf("(");
             if (parenIdx >= 0) // strip number of taclets
-                displayName = displayName.substring(0, parenIdx-1).intern();
+            {
+                displayName = displayName.substring(0, parenIdx - 1).intern();
+            }
             contentPane.setText(getRuleDescription(displayName));
         }
 
@@ -105,8 +110,8 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
     }
 
     private String toString(Taclet tac) {
-        LogicPrinter lp =
-                new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
+        LogicPrinter lp
+                = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
         lp.printTaclet(tac);
         return lp.toString();
     }
@@ -141,7 +146,7 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
         mediator.removeKeYSelectionListener(selectionListener);
     }
 
-    protected void layoutPane() {
+    protected final void layoutPane() {
         // initial placement of the divider
         setDividerLocation(300);
 
@@ -150,25 +155,25 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
 
         // this triggers storing the bar position
         setName("ruleViewPane");
-        {
-            ruleTree = new JTree(new String[] { "No proof loaded" });
-            JScrollPane jp = new JScrollPane(ruleTree);
-            setLeftComponent(jp);
-        }
-        {
-            contentPane = new JTextArea("", 15, 30);
-            contentPane.setEditable(false);
-            contentPane.setLineWrap(true);
-            contentPane.setWrapStyleWord(true);
-            contentScrollPane = new JScrollPane(contentPane);
-            setRightComponent(contentScrollPane);
-        }
+        ruleTree = new JTree(new String[]{"No proof loaded"});
+        JScrollPane jp = new JScrollPane(ruleTree);
+        setLeftComponent(jp);
+
+        contentPane = new JTextArea("", 15, 30);
+        contentPane.setEditable(false);
+        contentPane.setLineWrap(true);
+        contentPane.setWrapStyleWord(true);
+        contentScrollPane = new JScrollPane(contentPane);
+        setRightComponent(contentScrollPane);
 
     }
 
     private class SelectionListener implements KeYSelectionListener {
 
-        /** focused node has changed */
+        /**
+         * focused node has changed
+         */
+        @Override
         public void selectedNodeChanged(KeYSelectionEvent e) {
             ruleViewModel.setSelectedGoal(e.getSource().getSelectedGoal());
         }
@@ -176,8 +181,10 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
         /**
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
+        @Override
         public void selectedProofChanged(KeYSelectionEvent e) {
             Runnable action = new Runnable() {
+                @Override
                 public void run() {
                     if (mediator != null) {
                         if (mediator.getSelectedProof() != null) {
@@ -199,6 +206,7 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
 
         private static final long serialVersionUID = 6129388673386459052L;
 
+        @Override
         public Component getTreeCellRendererComponent(JTree tree,
                 Object value,
                 boolean sel,
@@ -212,8 +220,7 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
                 value = t.displayName();
             }
 
-            Component comp = super.getTreeCellRendererComponent
-                    (tree, value, sel, expanded, leaf, row, hasFocus);
+            Component comp = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
             return comp;
         }
@@ -223,7 +230,7 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
      * This methods returns the map which contains descriptions for the elements
      * in the tree. The elements are read from the resource with the name
      * DESC_RESOURCE.
-     * 
+     *
      * @return the descriptions read in from the config file
      */
     public Properties getDescriptions() {
