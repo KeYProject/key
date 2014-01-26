@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.util.GuiUtilities;
 import java.awt.Toolkit;
@@ -19,7 +18,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
     /**
      * the current proof tree
      */
-    private ProofTreeView proofTreeView;
+    private final ProofTreeView proofTreeView;
 
     public ProofTreeView getProofTreeView() {
         return proofTreeView;
@@ -28,25 +27,50 @@ public class MainWindowTabbedPane extends JTabbedPane {
     /**
      * the list of current open goals
      */
-    private JScrollPane openGoalsView;
+    private final JScrollPane openGoalsView;
 
     /**
      * the strategy selection view
      */
-    private StrategySelectionView strategySelectionView = null;
+    private final StrategySelectionView strategySelectionView;
 
     /**
      * the rule view
      */
-    private RuleView ruleView = null;
+    private final RuleView ruleView;
 
-    MainWindowTabbedPane() {
+    MainWindowTabbedPane(MainWindow mainWindow, KeYMediator mediator) {
+        
+        // set proofTreeView
+        proofTreeView = new ProofTreeView(mediator);
+        proofTreeView.setSize(proofTreeView.getPreferredSize());
+        proofTreeView.setVisible(true);
         addTab("Proof", null, proofTreeView,
                 "The current state of the proof as tree");
+
+        // set openGoalsView
+        openGoalsView = new JScrollPane();
+        GuiUtilities.paintEmptyViewComponent(openGoalsView, "Open Goals");
+        GoalList goalList = new GoalList(mediator);
+        // FIXME IS that needed?
+        goalList.setSize(goalList.getPreferredSize());
+        openGoalsView.setViewportView(goalList);
         addTab("Goals", null, openGoalsView,
                 "The currently open goals");
+
+        // set strategySelectionView
+        strategySelectionView = new StrategySelectionView(mainWindow);
+        if (mediator != null) {
+            strategySelectionView.setMediator(mediator);
+        }
         addTab("Proof Search Strategy", null, strategySelectionView,
                 "Select strategy for automated proof search");
+
+        // set ruleView
+        ruleView = new RuleView();
+        if (mediator != null) {
+            ruleView.setMediator(mediator);
+        }
         addTab("Rules", null, ruleView,
                 "All available rules");
 
@@ -69,38 +93,6 @@ public class MainWindowTabbedPane extends JTabbedPane {
         openGoalsView.setEnabled(b);
         strategySelectionView.setEnabled(b);
         ruleView.setEnabled(b);
-    }
-
-    protected void createViews(MainWindow mainWindow, KeYMediator mediator) {
-        openGoalsView = new JScrollPane();
-        GuiUtilities.paintEmptyViewComponent(openGoalsView, "Open Goals");
-
-        strategySelectionView = new StrategySelectionView(mainWindow);
-        if (mediator != null) {
-            strategySelectionView.setMediator(mediator);
-        }
-
-        ruleView = new RuleView();
-        if (mediator != null) {
-            ruleView.setMediator(mediator);
-        }
-
-        Config.DEFAULT.setDefaultFonts();
-    }
-
-    /**
-     * create the goal list, proof tree, proof list. Add to their respective
-     * containers.
-     */
-    protected void createProofElements(KeYMediator mediator) {
-        proofTreeView = new ProofTreeView(mediator);
-        proofTreeView.setSize(proofTreeView.getPreferredSize());
-        proofTreeView.setVisible(true);
-
-        GoalList goalList = new GoalList(mediator);
-        // FIXME IS that needed?
-        goalList.setSize(goalList.getPreferredSize());
-        openGoalsView.setViewportView(goalList);
     }
 
 }

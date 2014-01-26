@@ -100,6 +100,7 @@ import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
 import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
 import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
 import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
+import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
@@ -161,7 +162,7 @@ public final class MainWindow extends JFrame  {
     public static final int TOOLBAR_ICON_SIZE = 16;
 
     /** the tab bar at the left */
-    private MainWindowTabbedPane mainWindowTabbedPane;
+    private final MainWindowTabbedPane mainWindowTabbedPane;
 
     /** the first toolbar */
     private JToolBar controlToolBar;
@@ -179,9 +180,9 @@ public final class MainWindow extends JFrame  {
     private final EmptySequent emptySequent;
 
     /** contains a list of all proofs */
-    private JScrollPane proofListView;
+    private final JScrollPane proofListView;
 
-    private TaskTree proofList;
+    private final TaskTree proofList;
 
     /** the mediator is stored here */
     private final KeYMediator mediator;
@@ -280,7 +281,10 @@ public final class MainWindow extends JFrame  {
         emptySequent = new EmptySequent(this);
         sequentViewSearchBar = new SequentViewSearchBar(emptySequent);
         termLabelMenu = new TermLabelMenu(this);
+        proofListView = new JScrollPane();
+        mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator);
         mainFrame = new MainFrame(this, emptySequent);
+        proofList = new TaskTree(mediator);
         initNotification();
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);
@@ -411,15 +415,9 @@ public final class MainWindow extends JFrame  {
         loadUserDefinedTacletsForProvingAction = new LemmaGenerationAction.ProveUserDefinedTaclets(this);
         loadKeYTaclets            = new LemmaGenerationAction.ProveKeYTaclets(this);
         lemmaGenerationBatchModeAction    = new LemmaGenerationBatchModeAction(this);
-        unicodeToggleAction = new UnicodeToggleAction(this);
-
-	// create empty views
-	mainWindowTabbedPane.createViews(this, getMediator());
-        proofListView = new JScrollPane();
-
-	// create the contents of the views
-        proofList = new TaskTree(mediator);
-	mainWindowTabbedPane.createProofElements(getMediator());
+        unicodeToggleAction = new UnicodeToggleAction(this);        
+        
+        Config.DEFAULT.setDefaultFonts();
 
 	// create menubar
 	JMenuBar bar = createMenuBar();
@@ -437,9 +435,6 @@ public final class MainWindow extends JFrame  {
         // FIXME double entry?
         getContentPane().add(GuiUtilities.getClipBoardArea(), BorderLayout.PAGE_START);
         getContentPane().add(toolBarPanel, BorderLayout.PAGE_START);
-
-        // create tabbed pane
-        mainWindowTabbedPane = new MainWindowTabbedPane();
 
         proofListView.setPreferredSize(new java.awt.Dimension(350, 100));
         GuiUtilities.paintEmptyViewComponent(proofListView, "Proofs");
