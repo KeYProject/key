@@ -13,7 +13,7 @@
    </extension>
    <extension
          id="org.key_project.key4eclipse.resources.KeYProjectBuilder"
-         name="KeYProjectBuilder"
+         name="KeY Builder"
          point="org.eclipse.core.resources.builders">
       <builder>
          <run
