@@ -80,8 +80,8 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             IFile aFile = srcFolder.getFolder("a").getFile("SameName.java");
             IFile aSubFile = srcFolder.getFolder("a").getFolder("sub").getFile("SameName.java");
             IFile bFile = srcFolder.getFolder("b").getFile("SameName.java");
-            IFile cFile = project.getProject().getFolder("boot").getFolder("c").getFile("SameName.java");
-            IFile dFile = project.getProject().getFolder("specs").getFolder("d").getFile("SameName.java");
+            //IFile cFile = project.getProject().getFolder("boot").getFolder("c").getFile("SameName.java");
+            //IFile dFile = project.getProject().getFolder("specs").getFolder("d").getFile("SameName.java");
             List<IFile> expectedResources = new LinkedList<IFile>();
             expectedResources.add(mainFile);
             expectedResources.add(mainFile);
@@ -101,11 +101,11 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             expectedResources.add(bFile);
             expectedResources.add(bFile);
             expectedResources.add(mainFile);
-            expectedResources.add(cFile);
-            expectedResources.add(cFile);
-            expectedResources.add(cFile);
+            //expectedResources.add(cFile); // API files are not included in symbolic execution tree.
+            //expectedResources.add(cFile); // API files are not included in symbolic execution tree.
+            //expectedResources.add(cFile); // API files are not included in symbolic execution tree.
             expectedResources.add(mainFile);
-            expectedResources.add(dFile);
+            //expectedResources.add(dFile); // API files are not included in symbolic execution tree.
             expectedResources.add(mainFile);
             expectedResources.add(mainFile);
             // Configure method contract usage
