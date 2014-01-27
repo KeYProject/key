@@ -91,14 +91,11 @@ public final class ProofManagementDialog extends JDialog {
     private JButton startButton;
     private JButton cancelButton;
     private KeYMediator mediator;
-    private final MainWindow mainWindow;
-
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
     private ProofManagementDialog(MainWindow mainWindow, InitConfig initConfig) {
         super(mainWindow, "Proof Management", true);
-        this.mainWindow = mainWindow;
         this.initConfig = initConfig;
         this.services = initConfig.getServices();
         this.specRepos = initConfig.getServices().getSpecificationRepository();
@@ -474,7 +471,7 @@ public final class ProofManagementDialog extends JDialog {
         if (proof == null) {
             UserInterface ui = mediator.getUI();
             ProblemInitializer pi =
-                    new ProblemInitializer(ui, services, true, ui);
+                    new ProblemInitializer(ui, services, ui);
             try {
                 pi.startProver(initConfig, po, 0);
             } catch (ProofInputException exc) {

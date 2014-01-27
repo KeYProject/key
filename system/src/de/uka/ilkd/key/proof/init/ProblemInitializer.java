@@ -59,7 +59,6 @@ import de.uka.ilkd.key.proof.io.LDTInput;
 import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
-import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleConfig;
 import de.uka.ilkd.key.rule.Rule;
@@ -85,18 +84,16 @@ public final class ProblemInitializer {
     private final ProgressMonitor progMon;
     private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
     private final ProblemInitializerListener listener;
-    private final boolean registerProof;
     //-------------------------------------------------------------------------
     //constructors
     //------------------------------------------------------------------------- 
     
     public ProblemInitializer(ProgressMonitor mon,
-	                      Services services, boolean registerProof,
+	                      Services services,
 	                      ProblemInitializerListener listener) {
 	this.services = services;
 	this.progMon = mon;
 	this.listener = listener;
-	this.registerProof = registerProof;
     }
   
     
@@ -104,7 +101,6 @@ public final class ProblemInitializer {
         assert profile != null;
         this.progMon    = null;
         this.listener   = null;
-        this.registerProof = false;
         this.services   = new Services(profile);
     }
     
@@ -409,12 +405,6 @@ public final class ProblemInitializer {
 	//init ruleConfig
 	RuleConfig ruleConfig = new RuleConfig(initConfig.getActivatedChoices());
 	env.setRuleConfig(ruleConfig);
-	
-	//register the proof environment
-	//if(main != null) {
-	 if(registerProof){
-	    GlobalProofMgt.getInstance().registerProofEnvironment(env);
-	}
     	               	
 	return initConfig;
     }
