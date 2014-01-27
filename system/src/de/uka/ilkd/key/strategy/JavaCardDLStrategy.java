@@ -55,8 +55,8 @@ import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
 import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
 import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
-import de.uka.ilkd.key.strategy.feature.ContainsTermFeature;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
+import de.uka.ilkd.key.strategy.feature.ContainsTermFeature;
 import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
 import de.uka.ilkd.key.strategy.feature.CountPosDPathFeature;
 import de.uka.ilkd.key.strategy.feature.DependencyContractFeature;
@@ -110,12 +110,12 @@ import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.AnonHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.PrimitiveHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsNonRigidTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsSelectSkolemConstantTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
 import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
+import de.uka.ilkd.key.strategy.termfeature.PrimitiveHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.SimplifiedSelectTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
@@ -526,9 +526,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             longConst ( 100 ) ) );
         
         //class axioms
-        final String classAxiomPrio = strategyProperties.getProperty(StrategyProperties.CLASS_AXIOM_PRIO);
+        final String classAxiomPrio = strategyProperties.getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
         final Feature classAxiomDefaultCost = longConst(-150);
-        if (StrategyProperties.CLASS_AXIOM_HIGH.equals(classAxiomPrio))
+        if (StrategyProperties.CLASS_AXIOM_FREE.equals(classAxiomPrio))
             // default as before
             bindRuleSet ( d, "classAxiom", classAxiomDefaultCost );
         else if (StrategyProperties.CLASS_AXIOM_DELAYED.equals(classAxiomPrio))
@@ -2796,6 +2796,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                  new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_NON_SPLITTING, "No Splits", TOOL_TIP_QUANTIFIER_NO_SPLITS),
                  new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS, "No Splits with Progs", TOOL_TIP_QUANTIFIER_NO_SPLITS_WITH_PROGS),
                  new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_INSTANTIATE, "Free", TOOL_TIP_QUANTIFIER_FREE));
+           OneOfStrategyPropertyDefinition classAxiom = new OneOfStrategyPropertyDefinition(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY, 
+                 "Class axiom rule",
+                 new StrategyPropertyValueDefinition(StrategyProperties.CLASS_AXIOM_FREE, "Free", TOOL_TIP_CLASSAXIOM_FREE),
+                 new StrategyPropertyValueDefinition(StrategyProperties.CLASS_AXIOM_DELAYED, "Delayed", TOOL_TIP_CLASSAXIOM_DELAYED),
+                 new StrategyPropertyValueDefinition(StrategyProperties.CLASS_AXIOM_OFF, "Off", TOOL_TIP_CLASSAXIOM_OFF));
            OneOfStrategyPropertyDefinition autoInduction = new OneOfStrategyPropertyDefinition(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, 
                  "Auto Induction",
                  new StrategyPropertyValueDefinition(StrategyProperties.AUTO_INDUCTION_LEMMA_ON, "On", TOOL_TIP_AUTO_INDUCTION_ON),
@@ -2825,6 +2830,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                             queryTreatment,
                                             arithmeticTreatment,
                                             quantifierTreatment,
+                                            classAxiom,
                                             autoInduction,
                                             userOptions);
         }
