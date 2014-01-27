@@ -48,8 +48,8 @@ public final class SaveFileAction extends MainWindowAction {
             
             final String defaultName 
             	= MiscTools.toValidFileName(mainWindow.getMediator().getSelectedProof()
-            		                            .name()
-            		                            .toString()).toString();
+                    .name()
+                    .toString());
             
             boolean saved = jFC.showSaveDialog(mainWindow, defaultName + ".proof");
             if (saved) {

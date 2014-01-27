@@ -448,7 +448,7 @@ public final class SpecificationRepository {
                     new MethodWellDefinedness((FunctionalOperationContract) contract, services);
             registerContract(mwd);
         } else if (contract instanceof DependencyContract
-                && ((DependencyContract) contract).getOrigVars().atPres.isEmpty()
+                && contract.getOrigVars().atPres.isEmpty()
                 && targetMethod.getContainerType().equals(
                         services.getJavaInfo().getJavaLangObject())) {
             // Create or extend a well-definedness check for a class invariant
@@ -458,7 +458,7 @@ public final class SpecificationRepository {
             final String invName = "JML model class invariant in "
                     + targetKJT.getName();
             final ClassInvariant inv = new ClassInvariantImpl(invName, invName,
-                    targetKJT, ((DependencyContract) contract).getVisibility(),
+                    targetKJT, contract.getVisibility(),
                     TB.tt(), contract.getOrigVars().self);
             ClassWellDefinedness cwd =
                     new ClassWellDefinedness(inv, targetMethod, deps, mby, services);
@@ -472,7 +472,7 @@ public final class SpecificationRepository {
             }
             registerContract(cwd);
         } else if (contract instanceof DependencyContract
-                && ((DependencyContract) contract).getOrigVars().atPres.isEmpty()) {
+                && contract.getOrigVars().atPres.isEmpty()) {
             // Create or extend a well-definedness check for a model field
             MethodWellDefinedness mwd =
                     new MethodWellDefinedness((DependencyContract) contract, services);
@@ -1171,7 +1171,7 @@ public final class SpecificationRepository {
                     		        fop.getMby(selfVar, paramVars, services) : null;
                     		final ClassAxiom modelMethodContractAxiom
                     		= new ContractAxiom("Contract axiom for " + pm.getName()
-                    		                    + " in " + kjt.getName().toString(),
+                    		                    + " in " + kjt.getName(),
                     		                    pm, kjt, new Private(), preFromContract,
                     		                    postFromContract, mbyFromContract, atPreVars,
                     		                    selfVar, resultVar, paramVars);

@@ -55,7 +55,6 @@ public abstract class ApplyTacletDialog extends JDialog {
 
     protected ApplyTacletDialogModel[] model; 
     private JTextArea statusArea;
-    private JPanel statusPanel;
 
     public ApplyTacletDialog(Frame parent, ApplyTacletDialogModel[] model,
 			     KeYMediator mediator) { 
@@ -165,16 +164,16 @@ public abstract class ApplyTacletDialog extends JDialog {
     }
 
     protected JPanel createStatusPanel() {
-        statusPanel = new JPanel(new BorderLayout());
+        JPanel statusPanel = new JPanel(new BorderLayout());
 
         statusArea = new JTextArea();
 	statusArea.setEditable(false);
 
         statusPanel.add(
-	    new JScrollPane(statusArea,
-	        ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED), 
-	    BorderLayout.CENTER);
+                new JScrollPane(statusArea,
+                        ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED),
+                BorderLayout.CENTER);
         statusPanel.setBorder(new TitledBorder("Input validation result"));
         setStatus(model[current()].getStatusString());
         return statusPanel;

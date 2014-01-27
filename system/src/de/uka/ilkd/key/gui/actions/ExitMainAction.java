@@ -52,7 +52,7 @@ public class ExitMainAction extends MainWindowAction {
        @Override
        public void windowClosing(java.awt.event.WindowEvent e) {
            exitMain();
-       };
+       }
    };
 
    protected void exitMain() {
@@ -86,6 +86,7 @@ public class ExitMainAction extends MainWindowAction {
 
         System.out.println("Have a nice day.");
         mainWindow.savePreferences(mainWindow);
+        mainWindow.syncPreferences();
         if (exitSystem) {
             // TODO: why -1 and not 0 ???
            System.exit(-1);

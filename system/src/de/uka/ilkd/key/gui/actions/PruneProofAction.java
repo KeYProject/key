@@ -74,7 +74,7 @@ public final class PruneProofAction extends MainWindowAction {
                     
                     if (selGoal != null || selNode == null) {
                         setEnabled(false);
-                    } else if (selGoal == null) {
+                    } else {
                     	// pruning a tree only if the selected node has children
                         // and sub tree is not closed
 

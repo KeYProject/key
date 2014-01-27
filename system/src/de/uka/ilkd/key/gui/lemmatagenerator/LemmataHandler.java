@@ -77,7 +77,7 @@ public class LemmataHandler implements TacletFilter {
                 final ProblemInitializer problemInitializer = new ProblemInitializer(null,
                                 new Services(profile,
                                                 new KeYRecoderExcHandler()),
-                                false, new Listener());
+                                new Listener());
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(null,
                                                       new Listener(),

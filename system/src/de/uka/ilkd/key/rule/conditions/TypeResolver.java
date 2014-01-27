@@ -233,7 +233,7 @@ public abstract class TypeResolver {
         	result = ((IObserverFunction)op).getContainerType().getSort();
             } else if(op instanceof Function
         	      && ((Function)op).isUnique()
-        	      && ((Function)op).name().toString().contains("::")) {
+        	      && op.name().toString().contains("::")) {
         	//Heap
         	Function func = (Function) op;
         	String funcName = func.name().toString();

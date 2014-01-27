@@ -52,7 +52,7 @@ public class PositionedLabeledString extends PositionedString {
     }
 
     public PositionedLabeledString(String text, ImmutableArray<TermLabel> labels) {
-        this(text, (String)null, labels);
+        this(text, null, labels);
     }
 
     public PositionedLabeledString(String text, TermLabel label) {

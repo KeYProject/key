@@ -45,7 +45,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public class InitArrayCreation extends InitArray {
 
     private final SchemaVariable newObjectSV;
-    private String createArrayName = "<createArray>";
+    private final static String createArrayName = "<createArray>";
 
     public InitArrayCreation(SchemaVariable newObjectSV,
 			     ProgramElement newExpr) {	

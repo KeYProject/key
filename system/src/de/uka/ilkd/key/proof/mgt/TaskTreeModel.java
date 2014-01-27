@@ -62,7 +62,6 @@ public class TaskTreeModel extends DefaultTreeModel {
 	}
 	ProofEnvironment env = p.getProofEnv();
 	if (p.getParent().getChildCount()==1) { // remove env if p is single
-            GlobalProofMgt.getInstance().removeEnv(env);
             env = null;
 	    p = (TaskTreeNode) p.getParent();
 	}

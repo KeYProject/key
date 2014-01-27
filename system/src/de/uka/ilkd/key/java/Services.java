@@ -117,7 +117,7 @@ public class Services{
     
     // ONLY for tests
     public Services(Profile profile) {
-	this(profile, (KeYExceptionHandler) null);
+	this(profile, null);
     }    
     
 

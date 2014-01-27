@@ -56,10 +56,8 @@ public class AllowedCutPositionFeature extends BinaryFeature {
                 /* nothing */
             } else if ( negated && op == Junctor.IMP ) {
                 if ( child == 0 ) negated = !negated;
-            } else if ( op instanceof Quantifier ) {
-                return true;
             } else {
-                return false;
+                return op instanceof Quantifier;
             }
         }
         

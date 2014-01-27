@@ -68,7 +68,7 @@ public abstract class WellDefinednessCheck implements Contract {
     public static final String OP_EXC_TACLET = "wd_Exc_Operation";
 
     static enum Type {
-        CLASS_INVARIANT, OPERATION_CONTRACT, LOOP_INVARIANT, BLOCK_CONTRACT;
+        CLASS_INVARIANT, OPERATION_CONTRACT, LOOP_INVARIANT, BLOCK_CONTRACT
     }
 
     private final String name;
@@ -1017,7 +1017,7 @@ public abstract class WellDefinednessCheck implements Contract {
 
     public final WellDefinednessCheck addRepresents(Term rep) {
         assert rep != null;
-        if (this.represents != null && rep != null) {
+        if (this.represents != null && rep != null) { // TODO: rep!=null test not necessary??
             this.represents = TB.andSC(this.represents, rep);
         } else {
             this.represents = rep;

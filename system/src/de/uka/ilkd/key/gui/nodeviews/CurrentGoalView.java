@@ -43,7 +43,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 
     public static final Color ADDITIONAL_HIGHLIGHT_COLOR = new Color(0, 0, 0, 38);
 
-    public static final Color UPDATE_HIGHLIGHT_COLOR = new Color(0, 150, 130, 38);
+    private static final Color UPDATE_HIGHLIGHT_COLOR = new Color(0, 150, 130, 38);
 
     public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
 
@@ -53,11 +53,8 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     // the mouse/mouseMotion listener
     private final CurrentGoalViewListener listener;
 
-    // an object that detects opening and closing of an Taclet instantiation dialog
-    private final GUIListener guiListener;
-
     // enables this component to be a Drag Source
-    DragSource dragSource = null;
+    private DragSource dragSource = null;
 
     private static final Insets autoScrollSensitiveRegion = new Insets(20, 20, 20, 20);
     private final LinkedList<Object> updateHighlights;
@@ -65,7 +62,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     /**
      * creates a viewer for a sequent
      *
-     * @param mediator the KeYMediator allowing access to the current system
+     * @param mainWindow the MainWindow allowing access to the current system
      * status
      */
     public CurrentGoalView(MainWindow mainWindow) {
@@ -76,7 +73,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         setSelectionColor(getBackground());
         listener = new CurrentGoalViewListener(this, getMediator());
 
-        guiListener = new GUIListener() {
+        GUIListener guiListener = new GUIListener() {
             /**
              * invoked if a frame that wants modal access is opened
              */
@@ -142,7 +139,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      * updates all updateHighlights. Firstly removes all displayed ones and then
      * gets a new list of updates to highlight
      */
-    public void updateUpdateHighlights() {
+    void updateUpdateHighlights() {
         if (getLogicPrinter() == null) {
             return;
         }
@@ -188,7 +185,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     /**
      * sets the text being printed
      */
-    public synchronized void printSequentImmediately() {
+    synchronized void printSequentImmediately() {
         removeMouseListener(listener);
 
         setLineWidth(computeLineWidth());
@@ -226,7 +223,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     /**
      * makes the last caret position visible (if possible)
      */
-    public void restorePosition() {
+    void restorePosition() {
         int lastHighlightedCaretPosTmp = lastHighlightedCaretPos;
         if (!(lastHighlightedCaretPosTmp < 0 || getDocument() == null
                 || lastHighlightedCaretPosTmp > getDocument().getLength())) {

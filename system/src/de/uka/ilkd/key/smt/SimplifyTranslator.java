@@ -192,7 +192,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
          
            if (assumptions.size() > 0) {
                int start =0;
-               StringBuffer temp = new StringBuffer();
+               StringBuffer temp = new StringBuffer(); //TODO: temp is never used
                if(assump.length() ==0){
            	temp.append(assumptions.get(start));
            	start++;

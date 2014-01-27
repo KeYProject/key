@@ -12,6 +12,17 @@ import de.uka.ilkd.key.gui.macros.ProofMacro;
 
 /**
  * Manages keyboard shortcuts for proof macros and GUI actions.
+ * If possible, all keyboard shortcuts should be defined here and
+ * accessed through one of the <code>get()</code> methods.
+ * The general guidelines for adding new keyboard shortcuts are<ul>
+ * <li> they must not produce a printable character,
+ * <li> they must not interfere with shortcuts already defined by the
+ * window manager (this probably includes all combinations using the Windows key),
+ * <li> the <a href="http://en.wikipedia.org/wiki/Keyboard_shortcut#.22Sacred.22_keybindings">
+ * "sacred keybindings"</a> must not be touched,
+ * <li> the theme for strategy macros should be consistent
+ * (currently either F keys or CTRL + SHIFT + letter).
+ * </ul>
  * @author bruns
  *
  */
@@ -64,7 +75,6 @@ public final class KeyStrokeManager {
         }
 
         // default mappings
-        mapping.put(de.uka.ilkd.key.gui.actions.AboutAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_HELP,SHORTCUT_KEY_MASK));
         mapping.put(de.uka.ilkd.key.gui.actions.OpenExampleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_E,MULTI_KEY_MASK));
         mapping.put(de.uka.ilkd.key.gui.actions.EditMostRecentFileAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_E,SHORTCUT_KEY_MASK));
         mapping.put(de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_T,MULTI_KEY_MASK));

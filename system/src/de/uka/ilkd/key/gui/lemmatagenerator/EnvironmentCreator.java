@@ -48,7 +48,7 @@ public class EnvironmentCreator  {
 
                 ProblemInitializer pi = new ProblemInitializer(monitor, 
                                 new Services(profile, new KeYRecoderExcHandler()),
-                                false, listener );
+                                listener );
                
                 return pi.prepare(keyFile).getProofEnv();
         }

@@ -1000,7 +1000,7 @@ public class LogicPrinter {
             final String prettyFieldName 
             	= services.getTypeConverter()
                           .getHeapLDT()
-                          .getPrettyFieldName((Function)t.op());            
+                          .getPrettyFieldName(t.op());
             layouter.print(prettyFieldName);
         } 
         
@@ -1452,7 +1452,7 @@ public class LogicPrinter {
             final String prettyFieldName 
             	= services.getTypeConverter()
                           .getHeapLDT()
-                          .getPrettyFieldName((Function)t.op());
+                          .getPrettyFieldName(t.op());
             layouter.print(prettyFieldName);
 
             if(obs.getNumParams() > 0 || obs instanceof IProgramMethod) {
@@ -1481,7 +1481,7 @@ public class LogicPrinter {
 	startTerm(2);	 
 	layouter.print("{(").beginC(0);
 
-	markStartSub();	 
+        markStartSub();
 	printTerm(t.sub(0));
 	markEndSub();
 	

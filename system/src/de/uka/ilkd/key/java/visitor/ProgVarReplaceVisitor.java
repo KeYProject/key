@@ -157,7 +157,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
 
     public void performActionOnProgramVariable(ProgramVariable pv) {
-    ProgramElement newPV = (ProgramElement) replaceMap.get(pv);
+    ProgramElement newPV = replaceMap.get(pv);
     if (newPV!=null) {
         addChild(newPV);
         changed();
@@ -268,12 +268,12 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         if (variable != null) {
             if (replaceMap.containsKey(variable)) {
                 // TODO Can we really safely assume that replaceMap contains a program variable?
-                return (ProgramVariable) replaceMap.get(variable);
+                return replaceMap.get(variable);
             }
             else {
                 if (replaceallbynew) {
                     replaceMap.put(variable, copy(variable));
-                    return (ProgramVariable) replaceMap.get(variable);
+                    return replaceMap.get(variable);
                 }
                 else {
                     return variable;

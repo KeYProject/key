@@ -150,7 +150,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
           boolean makeNamesUnique = isMakeNamesUnique();
           final ImmutableList<ProgramVariable> paramVars = TB.paramVars(services, pm, makeNamesUnique);
           final ProgramVariable selfVar = TB.selfVar(services, pm, getCalleeKeYJavaType(), makeNamesUnique);
-          final IObserverFunction target = (IObserverFunction)javaInfo.getToplevelPM(getCalleeKeYJavaType(), pm);
+          final IObserverFunction target = javaInfo.getToplevelPM(getCalleeKeYJavaType(), pm);
           final ProgramVariable resultVar = TB.resultVar(services, pm, makeNamesUnique);
           final List<LocationVariable> modHeaps = HeapContext.getModHeaps(services, false);
           final Map<LocationVariable, LocationVariable> atPreVars = HeapContext.getBeforeAtPreVars(modHeaps, services, "AtPre");
@@ -329,7 +329,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
       } // for(boolean transactionFlag : transactionFlags)
       }
       // save in field
-      assignPOTerms(termPOs.toArray(new Term[0]));
+      assignPOTerms(termPOs.toArray(new Term[termPOs.size()]));
 
       // add axioms
       collectClassAxioms(getCalleeKeYJavaType());
@@ -427,8 +427,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
          }
       }
 
-      return TB.and(new Term[] { wellFormed != null ? wellFormed : TB.tt(), selfNotNull,
-                                 selfCreated, selfExactType, paramsOK, mbyAtPreDef });
+      return TB.and(wellFormed != null ? wellFormed : TB.tt(), selfNotNull,
+              selfCreated, selfExactType, paramsOK, mbyAtPreDef);
    }
 
    /**

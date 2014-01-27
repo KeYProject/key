@@ -54,7 +54,7 @@ public class StaticFieldCondition extends VariableConditionAdapter {
         final Term f = (Term)o;
         final Operator op = f.op();
         if (op instanceof Function) {
-            final String name = ((Function) op).name().toString();
+            final String name = op.name().toString();
 
             // check for normal attribute
             int endOfClassName = name.indexOf("::$");
