@@ -17,6 +17,7 @@ import java.io.File;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.key_project.key4eclipse.event.RefreshProofSaverListener;
 import org.key_project.key4eclipse.util.KeYExampleUtil;
 import org.osgi.framework.BundleContext;
 
@@ -25,6 +26,7 @@ import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -36,6 +38,11 @@ public class Activator extends AbstractUIPlugin {
 
     // The shared instance
     private static Activator plugin;
+    
+    /**
+     * The used {@link RefreshProofSaverListener}.
+     */
+    private static final RefreshProofSaverListener refreshListener = new RefreshProofSaverListener();
 
     /**
      * The constructor
@@ -73,6 +80,8 @@ public class Activator extends AbstractUIPlugin {
                                                   exampleDir);
         }
         Main.setExamplesDir(exampleDir);
+        // Make sure that when a proof is saved the workspace resources are updated
+        ProofSaver.addProofSaverListener(refreshListener);
     }
 
     /*
@@ -83,6 +92,7 @@ public class Activator extends AbstractUIPlugin {
      * )
      */
     public void stop(BundleContext context) throws Exception {
+       ProofSaver.removeProofSaverListener(refreshListener);
         plugin = null;
         super.stop(context);
         // Close main window of KeY to store settings
