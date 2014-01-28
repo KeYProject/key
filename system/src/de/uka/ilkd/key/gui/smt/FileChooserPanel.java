@@ -68,6 +68,12 @@ class FileChooserPanel extends JPanel{
                     setActivationMode(enabled);
             }
         }
+        
+        public FileChooserPanel(boolean withSelection,boolean enabled, String title,String defaultValue) {
+            this(withSelection,enabled,title);
+            this.getFolderField().setText(defaultValue);
+        }
+        
 
         /**
          * This method initializes saveToFileBox    
@@ -149,7 +155,7 @@ class FileChooserPanel extends JPanel{
                     if(chooser.showDialog(FileChooserPanel.this, "Choose folder") 
                         == JFileChooser.APPROVE_OPTION){
                         getFolderField().setText(chooser.getSelectedFile().getAbsolutePath()+
-                        "/%d_%t_%i_%s");
+                        "/output.smt"); // was: "/%d_%t_%i_%s"
                     }
                     }
                 });
