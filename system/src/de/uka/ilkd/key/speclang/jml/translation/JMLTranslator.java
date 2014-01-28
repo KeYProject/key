@@ -166,7 +166,7 @@ final class JMLTranslator {
             }
             return null;
         }
-    };
+    }
 
     public JMLTranslator(SLTranslationExceptionManager excManager, Services services) {
         this(excManager,null,services);
@@ -501,7 +501,7 @@ final class JMLTranslator {
                     throw new SLTranslationException(
                             "bounded sum must declare exactly one variable");
                 }
-                LogicVariable qv = (LogicVariable) declVars.head();
+                LogicVariable qv = declVars.head();
                 Term resultTerm = TB.bsum(qv, a.getTerm(), b.getTerm(), t.getTerm(), services);
                 warnings.add(new PositionedString("The keyword \\bsum is deprecated and will be removed in the future.\n" +
                 		"Please use the standard \\sum syntax."));
@@ -693,7 +693,7 @@ final class JMLTranslator {
                     throw new SLTranslationException(
                             "sequence definition must declare exactly one variable");
                 }
-                LogicVariable qv = (LogicVariable) declVars.head();
+                LogicVariable qv = declVars.head();
                 Term tt = t.getTerm();
                 if (tt.sort() == Sort.FORMULA) {
                     // bugfix (CS): t.getTerm() delivers a formula instead of a

@@ -984,7 +984,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	protected boolean canStandFor(ProgramElement pe,
 				      Services services) {	    
             if(pe instanceof MethodName) {                
-                return methodName == null ? true : pe.equals(methodName);
+                return methodName == null || pe.equals(methodName);
             }
             return false;
 	}

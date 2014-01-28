@@ -25,6 +25,7 @@ public class EmptySequent extends SequentView {
 
     public EmptySequent(MainWindow mainWindow) {
         super(mainWindow);
+        setBackground(INACTIVE_BACKGROUND_COLOR);
     }
 
     @Override

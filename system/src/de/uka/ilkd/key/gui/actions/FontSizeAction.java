@@ -35,7 +35,7 @@ public class FontSizeAction extends MainWindowAction implements ConfigChangeList
 
     public static enum Mode { LARGER, SMALLER }
 
-    private Mode mode;;
+    private Mode mode;
 
     public FontSizeAction(MainWindow mainWindow, Mode mode) {
 	super(mainWindow);

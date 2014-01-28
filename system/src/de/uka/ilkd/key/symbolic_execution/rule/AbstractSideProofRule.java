@@ -399,10 +399,10 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
          @Override
          public void visit(Term visited) {
             if (visited.op() instanceof Function) {
-               functions.add((Function)visited.op());
+               functions.add(visited.op());
             }
             else if (visited.op() instanceof IProgramVariable) {
-               progVars.add((IProgramVariable)visited.op());
+               progVars.add(visited.op());
             }
          }
       });

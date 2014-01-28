@@ -119,11 +119,10 @@ public class CreateTacletForTests extends TestCase {
 	//decls for nat
 	func_0=new Function(new Name("zero"),nat,new Sort[]{});
 	func_eq=new Function(new Name("="),Sort.FORMULA,
-				      new Sort[]{nat,nat});
-	func_plus=new Function(new Name("+"),nat,
-					new Sort[]{nat,nat});
-	func_min1=new Function(new Name("pred"),nat,new Sort[]{nat});
-	func_plus1=new Function(new Name("succ"),nat,new Sort[]{nat});
+            nat,nat);
+	func_plus=new Function(new Name("+"),nat,nat,nat);
+	func_min1=new Function(new Name("pred"),nat, nat);
+	func_plus1=new Function(new Name("succ"),nat, nat);
 
 	nss.functions().add(func_0);
 	nss.functions().add(func_eq);
@@ -309,7 +308,7 @@ public class CreateTacletForTests extends TestCase {
 	
 	
 	func_p=new Function(new Name("P"),Sort.FORMULA,
-				new Sort[]{sort1});
+            sort1);
 	nss.functions().add(func_p);
 
 	//nat problem:

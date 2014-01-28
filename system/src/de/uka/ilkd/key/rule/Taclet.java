@@ -330,8 +330,7 @@ public abstract class Taclet implements Rule, Named {
      * @param v the bound variable to be searched 
      */
     protected boolean varIsBound(SchemaVariable v) {
-        return (v instanceof QuantifiableVariable) 
-        ? getBoundVariables().contains((QuantifiableVariable)v) : false;
+        return (v instanceof QuantifiableVariable) && getBoundVariables().contains((QuantifiableVariable) v);
     }
 
  
@@ -547,7 +546,7 @@ public abstract class Taclet implements Rule, Named {
 	        // if intended to match concrete label, match against schema label
 	        // and use an appropriate variable condition
 	        if (l instanceof SchemaVariable) {
-	            SchemaVariable schemaLabel = (SchemaVariable) l;
+	            final SchemaVariable schemaLabel = (SchemaVariable) l;
 	            final MatchConditions cond =
 	                    schemaLabel.match(term, matchCond, services);
 	            if (cond == null) {

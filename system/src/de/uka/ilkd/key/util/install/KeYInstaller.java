@@ -281,7 +281,7 @@ public abstract class KeYInstaller {
         File targetDir = new File(keyHome(), "examples" + File.separatorChar + "firstTouch");
         Enumeration<JarEntry> en = jarFile.entries();
         while(en.hasMoreElements()) {
-            JarEntry entry = ((JarEntry)en.nextElement());
+            JarEntry entry = en.nextElement();
             File file = new File(targetDir, entry.getName());
             if (entry.isDirectory()) {
                 if (!file.exists()) {
@@ -355,7 +355,7 @@ public abstract class KeYInstaller {
 		l.add ( keyLib () + File.separatorChar + libs () [i] );
 	    }
 	}
-	return ( String [] ) l.toArray ( new String [l.size ()] );
+	return l.toArray ( new String [l.size ()] );
     }
 
 

@@ -79,7 +79,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /** 
      For internal reuse and synchronization.
      */
-    private static ProofJavaParser parser = new ProofJavaParser(System.in);
+    private static final ProofJavaParser parser = new ProofJavaParser(System.in);
 
     private static final Position ZERO_POSITION = new Position(0, 0);
 

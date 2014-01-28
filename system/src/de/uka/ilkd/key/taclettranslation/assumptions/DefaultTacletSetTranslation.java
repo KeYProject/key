@@ -84,10 +84,8 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
 
         private HashSet<SchemaVariable> usedFormulaSV = new LinkedHashSet<SchemaVariable>();
 
-        private boolean quitInstantiationFailuresWithException = false;
 
-        
-        private final SMTSettings settings;
+    private final SMTSettings settings;
 
         public DefaultTacletSetTranslation(Services services, SMTSettings settings) {
  
@@ -287,7 +285,7 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
                  * "sort: "+ sort +"\n"; instantiationFailures =
                  * instantiationFailures.append(s);
                  */
-                return quitInstantiationFailuresWithException;
+            return false;
         }
 
 }

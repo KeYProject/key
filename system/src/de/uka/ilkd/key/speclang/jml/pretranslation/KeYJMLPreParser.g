@@ -143,10 +143,11 @@ options {
       }
       for(Name heapName : validHeapNames) {
         t = t.trim();
-	String l = "<"+heapName+">";
-        if(t.startsWith(l)) {
+	    String l = "<"+heapName+">";
+	    String lsp = "< "+heapName+" >";
+        if(t.startsWith(l) || t.startsWith(lsp)) {
            p = l + p;
-           t = t.substring(l.length());
+           t = t.substring(t.startsWith(lsp) ? lsp.length() : l.length());
         }
         result = new PositionedString(t, result.fileName, result.pos);
       }

@@ -19,7 +19,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.SwingWorker3;
@@ -87,7 +86,7 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
       Throwable status = null;
       try {
          try {
-            status = load(true);
+            status = load();
          }
          catch (ExceptionHandlerException e) {
             // e.printStackTrace();

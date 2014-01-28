@@ -45,9 +45,9 @@ public class ConstantCondition extends VariableConditionAdapter {
                          SVInstantiations instMap,
                          Services services) {
         if ((!(var instanceof TermSV)
-                    || (TermSV)var != this.t)
+                    || var != this.t)
                 && (!(var instanceof FormulaSV)
-                        || (FormulaSV)var != this.t)) {
+                        || var != this.t)) {
             return true;
         }
         if (var instanceof TermSV) {

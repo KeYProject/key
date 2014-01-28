@@ -39,7 +39,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
 
         if (op instanceof SortDependingFunction) {
             SortDependingFunction sdf = (SortDependingFunction) op;
-            Sort sort = sdf.sort();
+            Sort sort = sdf.getSortDependingOn();
             Sort repSort = replaceSort(sort, services);
             if(sort != repSort) {
                 op = sdf.getInstanceFor(repSort, services);

@@ -44,9 +44,9 @@ public abstract class TablePanel extends JPanel{
        
         }
         
-        protected void updateOptions(){};
-        
-        protected final void createTable(){
+        protected void updateOptions(){}
+
+    protected final void createTable(){
                 createComponents();
                 finalizeAddingComponents();
         }

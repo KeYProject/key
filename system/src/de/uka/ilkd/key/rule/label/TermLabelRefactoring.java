@@ -87,6 +87,6 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
       /**
        * Refactor the whole sequent.
        */
-      SEQUENT;
+      SEQUENT
    }
 }

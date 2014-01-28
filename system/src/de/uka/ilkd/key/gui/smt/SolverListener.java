@@ -181,9 +181,8 @@ public class SolverListener implements SolverLauncherListener {
                 for (SMTProblem problem : smtProblems) {
                         if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
                         	IBuiltInRuleApp app =
-                        			( (RuleAppSMT)
-                        					(RuleAppSMT.rule.createApp( null ) )).
-                        					     setTitle( getTitle(problem) );
+                        			RuleAppSMT.rule.createApp( null ).
+                        					     setTitle(getTitle(problem));
                         	problem.getGoal().apply(app);
                         }
                 }
@@ -221,7 +220,7 @@ public class SolverListener implements SolverLauncherListener {
                 }
 
 
-                String names[] = new String[smtproblems.size()];
+                String names[] = new String[smtproblems.size()]; //never read
                 int x = 0,y=0;
                 for (SMTProblem problem : smtproblems) {
                         y = 0;

@@ -104,8 +104,7 @@ public class ParameterDeclaration extends VariableDeclaration {
 				boolean parentIsInterfaceDeclaration,
 				boolean parameterIsVarArg) {
         super(children,parentIsInterfaceDeclaration);
-	this.varSpec = new ImmutableArray<VariableSpecification>(new
-	    VariableSpecification[]{children.get(VariableSpecification.class)});      
+	this.varSpec = new ImmutableArray<VariableSpecification>(children.get(VariableSpecification.class));
 	this.varArgParameter = parameterIsVarArg;
     }
 

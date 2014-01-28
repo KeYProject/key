@@ -112,7 +112,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
 
         //active statement must be while loop
-        final While loop = (While) app.getLoopStatement();
+        final While loop = app.getLoopStatement();
 
         // try to get invariant from JML specification
         LoopInvariant inv = app.getInvariant(); 
@@ -249,7 +249,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                 applicationSequent, 
                 ruleApp.posInOccurrence(), 
                 inst.progPost, 
-                TB.and(new Term[]{invTerm, frameCondition, variantPO}), 
+                TB.and(invTerm, frameCondition, variantPO),
                 svInst, 
                 services);
         final Term guardTrueBody = TB.imp(TB.box(guardJb,guardTrueTerm), 

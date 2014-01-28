@@ -75,6 +75,7 @@ public class ReferenceLister {
     }
 
     private static void handleDir(File dir) throws ParserException, IOException {
+        assert dir.isDirectory();
         File[] files = dir.listFiles();
         for (File file : files) {
             if (file.isDirectory())

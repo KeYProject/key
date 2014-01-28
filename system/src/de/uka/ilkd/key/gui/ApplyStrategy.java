@@ -362,14 +362,14 @@ public class ApplyStrategy {
         public String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append("Apply Strategy Info:");
-            sb.append("\n Message: " + message);
-            sb.append("\n Error:" + isError());
+            sb.append("\n Message: ").append(message);
+            sb.append("\n Error:").append(isError());
             if (isError()) {
-                sb.append("\n "+error.getMessage());
+                sb.append("\n ").append(error.getMessage());
             }
-            sb.append("\n Applied Rules: "+appliedRuleAppsCount);
-            sb.append("\n Time: "+time);
-            sb.append("\n Closed Goals: "+nrClosedGoals);
+            sb.append("\n Applied Rules: ").append(appliedRuleAppsCount);
+            sb.append("\n Time: ").append(time);
+            sb.append("\n Closed Goals: ").append(nrClosedGoals);
             return sb.toString();
         }
 

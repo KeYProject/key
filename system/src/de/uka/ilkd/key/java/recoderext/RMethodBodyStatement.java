@@ -234,11 +234,8 @@ public class RMethodBodyStatement extends JavaStatement
             for (int i = 0, sz = arguments.size(); i<sz; i++) {                
                 final Expression e = arguments.get(i);
                 if (e == p) {
-                    final Expression exp = e;
-                    arguments.set(i, exp);
-                    if (exp != null) {
-                        exp.setExpressionContainer(this);
-                    }
+                    arguments.set(i, e);
+                    e.setExpressionContainer(this);
                     return true;
                 }                
             }

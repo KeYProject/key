@@ -1026,7 +1026,7 @@ public final class SymbolicExecutionUtil {
       Services services = node.proof().getServices();
       IExecutionContext context = JavaTools.getInnermostExecutionContext(jb, services);
       if (context instanceof ExecutionContext) {
-         ReferencePrefix prefix = ((ExecutionContext)context).getRuntimeInstance();
+         ReferencePrefix prefix = context.getRuntimeInstance();
          return prefix instanceof IProgramVariable ? (IProgramVariable)prefix : null;
       }
       else {
@@ -2346,7 +2346,7 @@ public final class SymbolicExecutionUtil {
             Term replaceTerm = (Term)goalTemplate.replaceWithExpressionAsObject();
             replaceTerm =
                     TermBuilder.DF.equals(replaceTerm,
-                                          ((PosTacletApp)app).posInOccurrence().subTerm());
+                                          app.posInOccurrence().subTerm());
             replaceTerm =
                     TermBuilder.DF.applyUpdatePairsSequential(app.instantiations().getUpdateContext(),
                                                               replaceTerm);

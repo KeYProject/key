@@ -125,10 +125,9 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
         private Term rebuildTerm(Term term) {
 
-                ImmutableArray<QuantifiableVariable> variables = new ImmutableArray<QuantifiableVariable>();
                 Term[] subTerms = new Term[term.arity()];
-                
-                variables = term.boundVars();
+
+            ImmutableArray<QuantifiableVariable> variables = term.boundVars();
                 for (int i = 0; i < term.arity(); i++) {
                      
                         subTerms[i] = rebuildTerm(term.sub(i));

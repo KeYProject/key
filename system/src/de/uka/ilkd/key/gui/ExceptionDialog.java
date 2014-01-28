@@ -66,8 +66,7 @@ public class ExceptionDialog extends JDialog {
      * 
      */
     private static final long serialVersionUID = -4532724315711726522L;
-    private JScrollPane listScroll, stScroll;    
-    private boolean withList = false;
+    private JScrollPane stScroll;
     private JTextArea stTextArea;
     
     public static void showDialog(Window parent, Throwable exception) {
@@ -232,7 +231,7 @@ public class ExceptionDialog extends JDialog {
     
     private void setStackTraceText(Throwable exc) {
         StringWriter sw = new StringWriter();
-        sw.append("(" + exc.getClass() + ")\n");
+        sw.append("(").append(exc.getClass().toString()).append(")\n");
         PrintWriter pw = new PrintWriter(sw);
         exc.printStackTrace(pw);
         stTextArea.setText(sw.toString());
@@ -298,12 +297,12 @@ public class ExceptionDialog extends JDialog {
     }
     
     private void init(List<Throwable> excList) {
-        withList = (excList.size() > 1);
+        boolean withList = (excList.size() > 1);
         
         Container cp = getContentPane();
         cp.setLayout(new GridBagLayout());
-        
-        listScroll = createJListScroll(excList);
+
+        JScrollPane listScroll = createJListScroll(excList);
         
         if(withList) {
             cp.add(listScroll, new GridBagConstraints(0, 0, 1, 1, 1., 1.,

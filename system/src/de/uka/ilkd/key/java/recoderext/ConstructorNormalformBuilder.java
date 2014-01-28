@@ -407,7 +407,7 @@ public class ConstructorNormalformBuilder
                     services.getCrossReferenceSourceInfo().getConstructor(n));
             constr = constr.deepClone();
             SuperConstructorReference sr = new SuperConstructorReference(
-                    n.getArguments()!=null ? (ASTList<Expression>) n.getArguments().deepClone() : 
+                    n.getArguments()!=null ? n.getArguments().deepClone() :
                         new ASTArrayList<Expression>(0));
             constr.setBody(new StatementBlock(new ASTArrayList<Statement>(sr)));
             constr.makeAllParentRolesValid();
