@@ -189,9 +189,7 @@ public final class MainWindow extends JFrame  {
 
     /** listener to global proof events */
     private final MainProofListener proofListener;
-
-    /** listener to gui events */
-    private final MainGUIListener guiListener;
+    
     private final RecentFileMenu recentFileMenu;
 
     public boolean frozen = false;
@@ -269,7 +267,6 @@ public final class MainWindow extends JFrame  {
         setIconImage(IconFactory.keyLogo());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         proofListener = new MainProofListener();
-        guiListener = new MainGUIListener();
         userInterface = new WindowUserInterface(this);
         mediator = getMainWindowMediator(userInterface);
         currentGoalView = new CurrentGoalView(this);
@@ -345,7 +342,7 @@ public final class MainWindow extends JFrame  {
         KeYMediator result = new KeYMediator(userInterface, true);
         result.addKeYSelectionListener(proofListener);
         result.addAutoModeListener(proofListener);
-        result.addGUIListener(guiListener);
+        result.addGUIListener(new MainGUIListener());
         return result;
     }
 
@@ -1245,7 +1242,6 @@ public final class MainWindow extends JFrame  {
                     e.isPopupTrigger()));
         }
     }
-
 
     private final class DPEnableControl implements KeYSelectionListener{
 
