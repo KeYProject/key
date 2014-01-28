@@ -1122,7 +1122,7 @@ public final class MainWindow extends JFrame  {
      * This has been partly taken from the GlassPaneDemo of the Java Tutorial
      */
     private static class BlockingGlassPane extends JComponent {
-        GlassPaneListener listener;
+        private final GlassPaneListener listener;
 
         public BlockingGlassPane(Container contentPane) {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
@@ -1274,18 +1274,19 @@ public final class MainWindow extends JFrame  {
 
 
     /**
-     * This action is responsible for the invocation of an SMT solver
-     * For example the toolbar button is paramtrized with an instance of this action
+     * This action is responsible for the invocation of an SMT solver For
+     * example the toolbar button is paramtrized with an instance of this action
      */
     private final class SMTInvokeAction extends AbstractAction {
-	SolverTypeCollection solverUnion;
 
-	public SMTInvokeAction(SolverTypeCollection solverUnion) {
-	    this.solverUnion = solverUnion;
-	    if (solverUnion != SolverTypeCollection.EMPTY_COLLECTION) {
-		putValue(SHORT_DESCRIPTION, "Invokes " + solverUnion.toString());
-	    }
-	}
+        SolverTypeCollection solverUnion;
+
+        public SMTInvokeAction(SolverTypeCollection solverUnion) {
+            this.solverUnion = solverUnion;
+            if (solverUnion != SolverTypeCollection.EMPTY_COLLECTION) {
+                putValue(SHORT_DESCRIPTION, "Invokes " + solverUnion.toString());
+            }
+        }
 
         @Override
         public boolean isEnabled() {
@@ -1297,49 +1298,48 @@ public final class MainWindow extends JFrame  {
         }
 
         @Override
-	public void actionPerformed(ActionEvent e) {
-	    if (!mediator.ensureProofLoaded() || solverUnion ==SolverTypeCollection.EMPTY_COLLECTION){
-            MainWindow.this.popupWarning("No proof loaded or no solvers selected.", "Oops...");
-	    	return;
-	    }
-	    final Proof proof = mediator.getSelectedProof();
+        public void actionPerformed(ActionEvent e) {
+            if (!mediator.ensureProofLoaded() || solverUnion == SolverTypeCollection.EMPTY_COLLECTION) {
+                MainWindow.this.popupWarning("No proof loaded or no solvers selected.", "Oops...");
+                return;
+            }
+            final Proof proof = mediator.getSelectedProof();
 
-	    Thread thread = new Thread(new Runnable() {
-	        @Override
-	        public void run() {
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
 
+                    SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
+                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), proof);
+                    SolverLauncher launcher = new SolverLauncher(settings);
+                    launcher.addListener(new SolverListener(settings));
+                    launcher.launch(solverUnion.getTypes(),
+                            SMTProblem.createSMTProblems(proof),
+                            proof.getServices());
 
-	            SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
-	                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),proof);
-	            SolverLauncher launcher = new SolverLauncher(settings);
-	            launcher.addListener(new SolverListener(settings));
-	            launcher.launch(solverUnion.getTypes(),
-			            SMTProblem.createSMTProblems(proof),
-			            proof.getServices());
+                }
+            }, "SMTRunner");
+            thread.start();
 
-	        }
-	    },"SMTRunner");
-	    thread.start();
-
-	}
+        }
 
         @Override
-	public String toString(){
-	    return solverUnion.toString();
-	}
+        public String toString() {
+            return solverUnion.toString();
+        }
 
-	@Override
-	public boolean equals(Object obj) {
-	    if(!(obj instanceof SMTInvokeAction)){
-		return false;
-	    }
-	    return this.solverUnion.equals(((SMTInvokeAction)obj).solverUnion);
-	}
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof SMTInvokeAction)) {
+                return false;
+            }
+            return this.solverUnion.equals(((SMTInvokeAction) obj).solverUnion);
+        }
 
-    @Override
-    public int hashCode() {
-        return solverUnion.hashCode() * 7;
-    }
+        @Override
+        public int hashCode() {
+            return solverUnion.hashCode() * 7;
+        }
 
     }
 
