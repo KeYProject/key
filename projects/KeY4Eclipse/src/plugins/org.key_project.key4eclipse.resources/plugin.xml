@@ -35,6 +35,9 @@
       <super
             type="org.eclipse.core.resources.problemmarker">
       </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
       <persistent
             value="true">
       </persistent>
@@ -45,6 +48,9 @@
          point="org.eclipse.core.resources.markers">
       <super
             type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
       </super>
       <persistent
             value="true">
@@ -68,6 +74,9 @@
       <super
             type="org.eclipse.core.resources.problemmarker">
       </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
       <persistent
             value="true">
       </persistent>
@@ -85,6 +94,45 @@
             class="org.key_project.key4eclipse.resources.marker.ProofMarkerResolutionGenerator"
             markerType="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker">
       </markerResolutionGenerator>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerSeverity="0"
+            markerType="org.key_project.key4eclipse.resources.ui.marker.proofClosedMarker"
+            name="org.key_project.key4eclipse.resources.ui.marker.proofClosedMarkerAnnotationType"
+            super="org.eclipse.ui.workbench.texteditor.info">
+      </type>
+      <type
+            markerSeverity="1"
+            markerType="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker"
+            name="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarkerAnnotationType"
+            super="org.eclipse.ui.workbench.texteditor.info">
+      </type>
+      <type
+            markerSeverity="2"
+            markerType="org.key_project.key4eclipse.resources.ui.marker.cycleDetectedMarker"
+            name="org.key_project.key4eclipse.resources.ui.marker.cycleDetectedMarkerAnnotationType"
+            super="org.eclipse.ui.workbench.texteditor.error">
+      </type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="org.key_project.key4eclipse.resources.ui.marker.proofClosedMarkerAnnotationType"
+            icon="icons/keyinfo12x14.png"
+            includeOnPreferencePage="true">
+      </specification>
+      <specification
+            annotationType="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarkerAnnotationType"
+            icon="icons/keywarning12x14.png"
+            includeOnPreferencePage="true">
+      </specification>
+      <specification
+            annotationType="org.key_project.key4eclipse.resources.ui.marker.cycleDetectedMarkerAnnotationType"
+            icon="icons/keyerror12x14.png"
+            includeOnPreferencePage="true">
+      </specification>
    </extension>
 
 </plugin>
