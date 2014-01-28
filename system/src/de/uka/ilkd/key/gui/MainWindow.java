@@ -150,9 +150,9 @@ public final class MainWindow extends JFrame  {
         this.proofManagementDialog = proofManagementDialog;
     }
 
-    // Search bar for Sequent Views.
+    /** Search bar for Sequent Views. */
     public final SequentViewSearchBar sequentViewSearchBar;
-    
+
     /**
      * The maximum number of recent files displayed.
      */
@@ -246,7 +246,8 @@ public final class MainWindow extends JFrame  {
     /** for locking of threads waiting for the prover to exit */
     public final Object monitor = new Object();
 
-    private NotificationManager notificationManager;
+    private final NotificationManager notificationManager;
+    
     private final PreferenceSaver prefSaver =
         new PreferenceSaver(Preferences.userNodeForPackage(MainWindow.class));
 
@@ -285,7 +286,7 @@ public final class MainWindow extends JFrame  {
         mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator);
         mainFrame = new MainFrame(this, emptySequent);
         proofList = new TaskTree(mediator);
-        initNotification();
+        notificationManager = new NotificationManager(mediator, this);
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);
         ToolTipManager.sharedInstance().setDismissDelay(30000);
@@ -338,10 +339,6 @@ public final class MainWindow extends JFrame  {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void initNotification() {
-    	notificationManager = new NotificationManager(mediator, this);
     }
 
     /**
