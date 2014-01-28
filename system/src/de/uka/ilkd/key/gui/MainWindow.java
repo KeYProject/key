@@ -102,7 +102,6 @@ import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
 import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
-import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
@@ -153,11 +152,6 @@ public final class MainWindow extends JFrame  {
     /** Search bar for Sequent Views. */
     public final SequentViewSearchBar sequentViewSearchBar;
 
-    /**
-     * The maximum number of recent files displayed.
-     */
-    private static final int MAX_RECENT_FILES = 8;
-
     /** size of the tool bar icons */
     public static final int TOOLBAR_ICON_SIZE = 16;
 
@@ -198,7 +192,7 @@ public final class MainWindow extends JFrame  {
 
     /** listener to gui events */
     private final MainGUIListener guiListener;
-    private RecentFileMenu recentFiles;
+    private final RecentFileMenu recentFileMenu;
 
     public boolean frozen = false;
 
@@ -287,6 +281,7 @@ public final class MainWindow extends JFrame  {
         mainFrame = new MainFrame(this, emptySequent);
         proofList = new TaskTree(mediator);
         notificationManager = new NotificationManager(mediator, this);
+        recentFileMenu = new RecentFileMenu(mediator);
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);
         ToolTipManager.sharedInstance().setDismissDelay(30000);
@@ -378,16 +373,6 @@ public final class MainWindow extends JFrame  {
 
         // default size
         setSize(1000, 750);
-
-        // FIXME FIXME
-        recentFiles = new RecentFileMenu(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                mediator.getUI().loadProblem(new File(recentFiles.getAbsolutePath((JMenuItem) e.getSource())));
-            }
-        }, MAX_RECENT_FILES, null);
-        recentFiles.load(PathConfig.getRecentFileStorage());
-
 
         // FIXME do this NOT in layout of GUI
         // minimize interaction
@@ -672,7 +657,7 @@ public final class MainWindow extends JFrame  {
         submenu.add(loadKeYTaclets);
         submenu.add(lemmaGenerationBatchModeAction);
         fileMenu.addSeparator();
-        fileMenu.add(recentFiles.getMenu());
+        fileMenu.add(recentFileMenu.getMenu());
         fileMenu.addSeparator();
         fileMenu.add(exitMainAction);
         return fileMenu;
@@ -1409,7 +1394,7 @@ public final class MainWindow extends JFrame  {
     }
 
     public RecentFileMenu getRecentFiles() {
-	return recentFiles;
+	return recentFileMenu;
     }
 
     public UserInterface getUserInterface() {
@@ -1474,7 +1459,7 @@ public final class MainWindow extends JFrame  {
     }
 
     protected void addRecentFile(String absolutePath) {
-        recentFiles.addRecentFile(absolutePath);
+        recentFileMenu.addRecentFile(absolutePath);
     }
 
     public void openExamples() {
