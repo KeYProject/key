@@ -34,7 +34,7 @@ public class SeqSub extends ADTPrefixConstruct {
     }
     
     public SeqSub(ADTPrefixConstruct seq, RangeExpression range){
-        this((Expression) seq, (Expression) range.getChildAt(0), (Expression) range.getChildAt(1));
+        this(seq, (Expression) range.getChildAt(0), (Expression) range.getChildAt(1));
     }
 
 

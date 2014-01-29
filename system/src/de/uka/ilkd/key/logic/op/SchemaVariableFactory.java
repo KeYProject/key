@@ -14,7 +14,6 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.strategy.termfeature.IsSelectSkolemConstantTermFeature;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -110,5 +109,12 @@ public class SchemaVariableFactory {
      */
     public static SkolemTermSV createSkolemTermSV(Name name, Sort s) {
 	return new SkolemTermSV(name, s);
+    }
+    
+    /**
+     * creates a LabelSchemaVariable
+     */
+    public static TermLabelSV createTermLabelSV(Name name) {
+        return new TermLabelSV(name);
     }
 }

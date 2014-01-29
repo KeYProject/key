@@ -23,8 +23,8 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -96,8 +96,8 @@ public class IfChoiceModel extends DefaultComboBoxModel {
     /** creates a new Termparser that parses the given string
      * @param s the String to parse 
      */
-    private KeYParser stringParser(String s) {
-	return new KeYParser(ParserMode.TERM,new KeYLexer(new StringReader(s),services.getExceptionHandler()),
+    private KeYParserF stringParser(String s) {
+	return new KeYParserF(ParserMode.TERM,new KeYLexerF(s,services.getExceptionHandler()),
 			      "", 
 			      new Recoder2KeY(services,
 					      nss),			      
@@ -111,7 +111,7 @@ public class IfChoiceModel extends DefaultComboBoxModel {
      * @return the term encoded in 's' 
      */
     public Term parseFormula(String s) throws antlr.ANTLRException {
-	KeYParser p = stringParser(s);
+	KeYParserF p = stringParser(s);
 	return p.formula();
     }
 

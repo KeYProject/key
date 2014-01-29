@@ -84,7 +84,7 @@ public class PreferenceSaver {
     }
 
     /** do the storing/loading from this object */
-    private Preferences prefs;
+    private final Preferences prefs;
 
     /**
      * Create a new instance allowing to store and load UI properties from the
@@ -122,13 +122,11 @@ public class PreferenceSaver {
      * @throws BackingStoreException
      *             possibly thrown by {@link Preferences}.
      */
-    public void save(Component component) throws BackingStoreException {
+    public void save(Component component) {
         assert component != null;
 
         saveComponent(component);
         saveChildren(component);
-
-        prefs.flush();
     }
 
     private <C extends Component> void saveComponent(C component) {
@@ -141,7 +139,7 @@ public class PreferenceSaver {
         }
     }
 
-    private void saveChildren(Component component) throws BackingStoreException {
+    private void saveChildren(Component component) {
         if (component instanceof Container) {
             Component[] children = getChildren(component);
             if (children != null) {
@@ -288,22 +286,22 @@ public class PreferenceSaver {
 
     private static class AbstractButtonSaver implements Saver<AbstractButton> {
 
+        private static String getButtonId(AbstractButton component) {
+            return component.getClass().getSimpleName() + "." + component.getName() + ".selected";
+        }
+
         @Override
         public void load(AbstractButton component, Preferences prefs) {
-            String name = component.getName();
-            assert name != null;
-            
-            boolean selected = prefs.getBoolean(name + ".AbstractButtonSelected", component.isSelected());
+            assert component.getName() != null;
+            boolean selected = prefs.getBoolean(getButtonId(component), component.isSelected());
             component.setSelected(selected);
         }
 
         @Override
         public void save(AbstractButton component, Preferences prefs) {
-            String name = component.getName();
-            assert name != null;
-
+            assert component.getName() != null;
             boolean selected = component.isSelected();
-            prefs.putBoolean(name + ".AbstractButtonSelected", selected);
+            prefs.putBoolean(getButtonId(component), selected);
         }
 
         @Override
@@ -311,6 +309,10 @@ public class PreferenceSaver {
             return AbstractButton.class;
         }
 
+    }
+
+    public void flush() throws BackingStoreException {
+        prefs.flush();
     }
     
 }

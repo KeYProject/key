@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <equivalenceClass representativeTerm="null">
-      <term term="current.parent"/>
+      <term term="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$parent)"/>
       <term term="null"/>
    </equivalenceClass>
    <state name="return current;">
@@ -9,16 +9,16 @@
       <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o4"/>
    </state>
    <object xml:id="o1" name="current" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node">
-      <value name="height" programVariable="height" isArrayIndex="false" arrayIndex="-1" value="0" type="int"/>
+      <value name="height" programVariable="height" isArrayIndex="false" arrayIndex="-1" value="Z(0(#))" type="int"/>
       <association name="right" programVariable="right" isArrayIndex="false" arrayIndex="-1" target="o2"/>
       <association name="parent" programVariable="parent" isArrayIndex="false" arrayIndex="-1" target="o3"/>
    </object>
-   <object xml:id="o2" name="current.right.left" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node">
+   <object xml:id="o2" name="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right),algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$left)" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node">
       <association name="parent" programVariable="parent" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </object>
-   <object xml:id="o3" name="current.right" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node">
+   <object xml:id="o3" name="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right)" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node">
       <value name="parent" programVariable="parent" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
-      <value name="height" programVariable="height" isArrayIndex="false" arrayIndex="-1" value="0" type="int"/>
+      <value name="height" programVariable="height" isArrayIndex="false" arrayIndex="-1" value="Z(0(#))" type="int"/>
       <association name="left" programVariable="left" isArrayIndex="false" arrayIndex="-1" target="o1"/>
    </object>
    <object xml:id="o4" name="self" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass">

@@ -59,6 +59,7 @@ public class SimpleIntQuery {
 	  @
 	  @ exceptional_behavior
 	  @ requires value == null;
+     @ signals_only NullPointerException;
 	  @ signals (NullPointerException) true;
 	  @*/
 	public static void exceptionTest(/*@ nullable @*/ String value) throws NullPointerException {

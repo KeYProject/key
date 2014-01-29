@@ -47,7 +47,7 @@ class Printer {
     private Backend back;
 
     /** stack to remember value of <code>pos</code> in nested blocks */
-    private ArrayList marginStack = new ArrayList(10);
+    private ArrayList<Integer> marginStack = new ArrayList<Integer>(10);
 
 
     /** Create a printer.  It will write its output to <code>writer</code>.
@@ -158,7 +158,7 @@ class Printer {
     /** return the topmost element of the space stack without popping it. */
     private int top() {
 	try {
-	    return ((Integer)marginStack.get(marginStack.size()-1)).intValue();
+	    return marginStack.get(marginStack.size()-1).intValue();
 	} catch (IndexOutOfBoundsException e) {
 	    throw new UnbalancedBlocksException();
 	}

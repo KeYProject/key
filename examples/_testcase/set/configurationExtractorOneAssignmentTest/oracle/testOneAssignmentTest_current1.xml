@@ -2,7 +2,7 @@
 <model>
    <equivalenceClass representativeTerm="null">
       <term term="x"/>
-      <term term="self.y"/>
+      <term term="OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y)"/>
       <term term="null"/>
    </equivalenceClass>
    <state name="return this.first.value+this.second.value+tempX.value+tempY.value;">

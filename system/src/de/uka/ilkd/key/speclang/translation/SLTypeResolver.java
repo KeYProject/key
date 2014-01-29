@@ -45,7 +45,6 @@ public final class SLTypeResolver extends SLExpressionResolver {
                                    throws SLTranslationException {
         try {
             KeYJavaType type = javaInfo.getTypeByClassName(name, specInClass);
-                        
             if(type == null) {
                 throw new SLTranslationException("Type "+name+" not found.");
             }

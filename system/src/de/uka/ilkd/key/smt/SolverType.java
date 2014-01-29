@@ -133,13 +133,13 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
                 public String getDefaultSolverCommand() {
                     return "z3";
-                };
+                }
 
-                public String getDefaultSolverParameters() {
+            public String getDefaultSolverParameters() {
                     return "-in -smt2";
-                };
+                }
 
-                @Override
+            @Override
                 public SMTSolver createSolver(SMTProblem problem,
                                 SolverListener listener, Services services) {
                         return new SMTSolverImplementation(problem, listener,
@@ -153,9 +153,9 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
                 public String getVersionParameter() {
                 	return "-version";
-                };
+                }
 
-                @Override
+            @Override
                 public String getRawVersion () {
                     final String tmp = super.getRawVersion();
                     if (tmp==null) return null;
@@ -164,16 +164,17 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
                 public String[] getSupportedVersions() {
                 	return new String[] {"version 3.2","version 4.1","version 4.3.0","version 4.3.1"};
-                };
+                }
 
-                public String[] getDelimiters() {
+            public String[] getDelimiters() {
                 	return new String [] {"\n","\r"};
-                };
+                }
 
-                public boolean supportsIfThenElse() {
+            public boolean supportsIfThenElse() {
                         return true;
-                };
-                @Override
+                }
+
+            @Override
                 public SMTTranslator createTranslator(Services services) {
                         return new SmtLib2Translator(services,
                                         new Configuration(false,false));
@@ -268,9 +269,9 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
                 public String getDefaultSolverCommand() {
                     return "cvc3";
-                };
+                }
 
-                private boolean useNewVersion () {
+            private boolean useNewVersion () {
                     final String solverVersion = getRawVersion();
                     return "version 2.4.1".equals(solverVersion);
                 }
@@ -297,17 +298,17 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                         return new String[]{"\n","\r"};
                     else
                         return new String [] {"CVC>","C>"};
-                };
+                }
 
-                public String[] getSupportedVersions() {
+            public String[] getSupportedVersions() {
                 	return new String[] {"version 2.2", "version 2.4.1"};
-                };
+                }
 
-                public String getVersionParameter() {
+            public String getVersionParameter() {
                 	return "-version";
-                };
+                }
 
-                @Override
+            @Override
                 public SMTTranslator createTranslator(Services services) {
                     final Configuration conf = new Configuration(false, true);
 //                    if (useNewParameterSchema())
@@ -318,9 +319,9 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
                 public boolean supportsIfThenElse() {
                         return true;
-                };
+                }
 
-                @Override
+            @Override
                 public String getInfo() {
                         return null;
                 }
@@ -384,9 +385,9 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
                 public String[] getDelimiters() {
                 	return new String [] {"\n","\r"};
-                };
+                }
 
-                @Override
+            @Override
                 public String getDefaultSolverParameters() {
                          return "-i -e -smt";
                 }
@@ -394,13 +395,13 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
                 public String getVersionParameter() {
                 	return "--version";
-                };
+                }
 
-                public String[] getSupportedVersions() {
+            public String[] getSupportedVersions() {
                 	return new String [] {"1.0.34"};
-                };
+                }
 
-                @Override
+            @Override
                 public String getInfo() {
                         return "Use the newest release of version 1.x instead of version 2. Yices 2 does not support the "
                                         + "required logic AUFLIA.";
@@ -408,11 +409,10 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
                 public boolean supportsIfThenElse() {
                         return true;
-                };
+                }
 
 
-
-				@Override
+            @Override
 				public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
 					SolverCommunication sc = pipe.getSession();
 					message = message.replaceAll("\n","");
@@ -432,7 +432,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
 				public String modifyProblem(String problem) {
 					return problem += "\n\n check\n";
-				};
+				}
 
         };
 
@@ -462,13 +462,13 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
                 public String getDefaultSolverCommand() {
                     return "simplify";
-                };
+                }
 
-                public String[] getSupportedVersions() {
+            public String[] getSupportedVersions() {
                 	return new String []{"version 1.5.4"};
-                };
+                }
 
-                @Override
+            @Override
                 public String getRawVersion () {
                     final String tmp = super.getRawVersion();
                     if (tmp==null) return null;
@@ -477,29 +477,29 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
                 public String[] getDelimiters() {
                 	return new String [] {">"};
-                };
+                }
 
-                public String getDefaultSolverParameters() {
+            public String getDefaultSolverParameters() {
                     return "-print";
-                };
+                }
 
 
-                public String getVersionParameter() {
+            public String getVersionParameter() {
                 	return "-version";
-                };
+                }
 
 
-                @Override
+            @Override
                 public String getInfo() {
                         return "Simplify only supports integers within the interval [-2147483646,2147483646]=[-2^31+2,2^31-2].";
                 }
 
                 public boolean supportsIfThenElse() {
                         return false;
-                };
+                }
 
 
-				@Override
+            @Override
 				public void messageIncoming(Pipe<SolverCommunication> pipe,String message, int type) {
 					SolverCommunication sc = pipe.getSession();
 					sc.addMessage(message);

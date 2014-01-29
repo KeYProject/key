@@ -4,6 +4,6 @@
       <association name="array" programVariable="array" isArrayIndex="false" arrayIndex="-1" target="o1"/>
    </state>
    <object xml:id="o1" name="array" type="ObjectIntWrapper[]">
-      <value name="length" programVariable="length" isArrayIndex="false" arrayIndex="-1" value="1" type="int"/>
+      <value name="length" programVariable="length" isArrayIndex="false" arrayIndex="-1" value="Z(1(#))" type="int"/>
    </object>
 </model>

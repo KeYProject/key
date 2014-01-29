@@ -18,6 +18,8 @@ import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 public class MethodSignatureSVWrapper extends MethodSignature implements SVWrapper {
+
+    private static final long serialVersionUID = -4381850332826267659L;
     private SchemaVariable method; 
     
     public MethodSignatureSVWrapper(SchemaVariable l) {

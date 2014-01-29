@@ -19,7 +19,6 @@ import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
-import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -121,7 +120,7 @@ public class TestJMLPreTranslator extends TestCase {
     
     public void testFailure() {
         try {
-            parseMethodSpec("/*@ normal_behaviour  @ signals ohoh;" + "  @*/");
+            parseMethodSpec("/*@ normal_behaviour \n @ signals ohoh;" + "  @*/");
             assertTrue(false);
         } catch (SLTranslationException e) {
             //fine

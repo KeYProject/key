@@ -2,7 +2,7 @@
 <model>
    <equivalenceClass representativeTerm="self">
       <term term="self"/>
-      <term term="self.next"/>
+      <term term="InstanceCreationTest::select(heap,self,InstanceCreationTest::$next)"/>
    </equivalenceClass>
    <state name="return InstanceCreationTest.classWrapper.value+this.instanceWrapper.value+this.next.instanceWrapper.value+localWrapper.value;">
       <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
@@ -14,15 +14,15 @@
       <association name="instanceWrapper" programVariable="instanceWrapper" isArrayIndex="false" arrayIndex="-1" target="o3"/>
    </object>
    <object xml:id="o2" name="i_17" type="InstanceCreationTestWrapper">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="4" type="int"/>
+      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="Z(4(#))" type="int"/>
    </object>
    <object xml:id="o3" name="i_14" type="InstanceCreationTestWrapper">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="3" type="int"/>
+      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="Z(3(#))" type="int"/>
    </object>
    <object xml:id="o4" name="i_7" type="InstanceCreationTestWrapper">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="2" type="int"/>
+      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="Z(2(#))" type="int"/>
    </object>
    <object xml:id="o5" name="i_2" type="InstanceCreationTestWrapper">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="1" type="int"/>
+      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="Z(1(#))" type="int"/>
    </object>
 </model>

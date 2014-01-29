@@ -28,12 +28,10 @@ import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -57,7 +55,6 @@ public abstract class ApplyTacletDialog extends JDialog {
 
     protected ApplyTacletDialogModel[] model; 
     private JTextArea statusArea;
-    private JPanel statusPanel;
 
     public ApplyTacletDialog(Frame parent, ApplyTacletDialogModel[] model,
 			     KeYMediator mediator) { 
@@ -74,10 +71,12 @@ public abstract class ApplyTacletDialog extends JDialog {
     
 	mediator.requestModalAccess(this); 
 	addWindowListener(new WindowAdapter() {
+                @Override
 		public void windowClosed(WindowEvent e) {
 		    ApplyTacletDialog.this.closeDlg();		    
 		}
 
+                @Override
 		public void windowClosing(WindowEvent e) {
 		    ApplyTacletDialog.this.closeDlg();
 		}
@@ -123,14 +122,14 @@ public abstract class ApplyTacletDialog extends JDialog {
         
         Taclet taclet = model[0].taclet();
         StringBackend backend = new StringBackend(68);
-        StringBuffer tacletSB = new StringBuffer();
+        StringBuilder tacletSB = new StringBuilder();
         
         Writer w = new StringWriter();
         //WriterBackend backend = new WriterBackend(w, 68);
         
-        LogicPrinter tp = new LogicPrinter(new ProgramPrinter(w), 
+        SequentViewLogicPrinter tp = new SequentViewLogicPrinter(new ProgramPrinter(w), 
                 new NotationInfo(), backend, mediator.getServices(), true,
-                SequentView.getTermLabelPreferences());
+                MainWindow.getInstance().getVisibleTermLabels());
         
 //        tp.printTaclet(taclet, model[0].tacletApp().instantiations(),
         tp.printTaclet(taclet, 
@@ -165,16 +164,16 @@ public abstract class ApplyTacletDialog extends JDialog {
     }
 
     protected JPanel createStatusPanel() {
-        statusPanel = new JPanel(new BorderLayout());
+        JPanel statusPanel = new JPanel(new BorderLayout());
 
         statusArea = new JTextArea();
 	statusArea.setEditable(false);
 
         statusPanel.add(
-	    new JScrollPane(statusArea,
-	        ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED), 
-	    BorderLayout.CENTER);
+                new JScrollPane(statusArea,
+                        ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED),
+                BorderLayout.CENTER);
         statusPanel.setBorder(new TitledBorder("Input validation result"));
         setStatus(model[current()].getStatusString());
         return statusPanel;

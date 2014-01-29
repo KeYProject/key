@@ -48,6 +48,28 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class IOUtilTest extends TestCase {
    /**
+    * {@link IOUtil#unifyLineBreaks(InputStream)}.
+    */
+   @Test
+   public void testUnifyLineBreaks() throws IOException {
+      doTestUnifyLineBreaks(null, null);
+      doTestUnifyLineBreaks("A\nB\rC\n\nD\r\rE", "A\nB\nC\n\nD\n\nE");
+      doTestUnifyLineBreaks("A\r\nE", "A\nE");
+   }
+   
+   /**
+    * Performs a test step of {@link #testUnifyLineBreaks()}.
+    * @param toTest The {@link String} to test.
+    * @param expected The expected result.
+    * @throws IOException Occurred Exception.
+    */
+   protected void doTestUnifyLineBreaks(String toTest, String expected) throws IOException {
+      ByteArrayInputStream in = toTest != null ? new ByteArrayInputStream(toTest.getBytes()) : null;
+      InputStream converted = IOUtil.unifyLineBreaks(in);
+      assertEquals(expected, IOUtil.readFrom(converted));
+   }
+   
+   /**
     * Tests {@link IOUtil#computeMD5(File)}.
     */
    @Test
@@ -78,7 +100,7 @@ public class IOUtilTest extends TestCase {
          file.delete();
       }
    }
-   
+
    /**
     * Tests {@link IOUtil#computeMD5(InputStream)}.
     */
@@ -98,7 +120,7 @@ public class IOUtilTest extends TestCase {
       assertEquals("b10a8db164e0754105b7a99be72e3fe5", IOUtil.computeMD5(in));
       assertTrue(in.isClosed());
    }
-      
+
    /**
     * {@link InputStream} with a fixed text.
     * @author Martin Hentschel
@@ -134,7 +156,7 @@ public class IOUtilTest extends TestCase {
          return closed;
       }
    }
-   
+
    /**
     * Tests {@link IOUtil#visit(File, org.key_project.util.java.IOUtil.IFileVisitor)}.
     */

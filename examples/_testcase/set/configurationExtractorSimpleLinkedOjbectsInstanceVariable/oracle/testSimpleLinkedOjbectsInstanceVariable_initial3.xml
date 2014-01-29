@@ -2,8 +2,8 @@
 <model>
    <equivalenceClass representativeTerm="self">
       <term term="self"/>
-      <term term="self.next"/>
-      <term term="self.next.next"/>
+      <term term="SimpleLinkedOjbectsInstanceVariable::select(heap,self,SimpleLinkedOjbectsInstanceVariable::$next)"/>
+      <term term="SimpleLinkedOjbectsInstanceVariable::select(heap,SimpleLinkedOjbectsInstanceVariable::select(heap,self,SimpleLinkedOjbectsInstanceVariable::$next),SimpleLinkedOjbectsInstanceVariable::$next)"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return this.value+this.next.value+this.next.next.value;">
       <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>

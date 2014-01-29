@@ -14,11 +14,9 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
@@ -41,7 +39,6 @@ public final class QuickSaveAction extends MainWindowAction {
         setName("Quicksave");
 //        setIcon(IconFactory.saveFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Save current proof to a temporal location.");
-        setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F5,0));
 
         mainWindow.getMediator().enableWhenProofLoaded(this);
     }

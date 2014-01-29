@@ -28,7 +28,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 /**
- *  This variable condition checks if an instantiation is an array. 
+ *  This variable condition checks if an instantiation is an array.
  *  
  *  @author mulbrich
  *  @since 2006-12-03
@@ -39,7 +39,7 @@ public final class ArrayTypeCondition extends VariableConditionAdapter {
     private final boolean negated;
 
     /**
-     * creates an instance of this condition checking if an instanciation of a schema variable is an array or not
+     * creates an instance of this condition checking if an instantiation of a schema variable is an array or not
      * @param var the SchemaVariable to be checked
      * @param negated if the result is to be negated upon finding
      */

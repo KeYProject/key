@@ -141,11 +141,18 @@ class Queens {
       @*/        
     public static /*@pure nullable@*/ int[] nQueens(int n) {
 	int[] board = new int[n];
+	// FIXME the development of model methods implmentation revealed
+	// that this problem is very sensitive to quantifier instantiation
+	// mischaps, see bug #1370. Changing the if statement into ? : seems
+	// to solve the problem. 
+	/*
 	if(search(0, board)) {
 	    return board;
-	} else {
+	}else{
 	    return null;
 	}
+	*/
+	return search(0, board) ? board : null;
     }
     
     

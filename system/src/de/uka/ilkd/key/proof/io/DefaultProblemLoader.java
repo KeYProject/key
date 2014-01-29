@@ -35,7 +35,6 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -109,7 +108,8 @@ public class DefaultProblemLoader {
     * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
     * @param mediator The {@link KeYMediator} to use.
     */
-   public DefaultProblemLoader(File file, List<File> classPath, File bootClassPath, Profile profileOfNewProofs, KeYMediator mediator) {
+   public DefaultProblemLoader(File file, List<File> classPath, File bootClassPath,
+                               Profile profileOfNewProofs, KeYMediator mediator) {
       assert mediator != null;
       this.file = file;
       this.classPath = classPath;
@@ -124,32 +124,37 @@ public class DefaultProblemLoader {
    /**
     * Executes the loading process and tries to instantiate a proof
     * and to re-apply rules on it if possible.
-    * @param registerProof Register loaded {@link Proof} in {@link GlobalProofMgt}?
+    * @throws ProofInputException Occurred Exception.
+    * @throws IOException Occurred Exception.
     */
-   public ProblemLoaderException load(boolean registerProof) throws ProblemLoaderException {
-      try {
-         // Read environment
-      boolean oneStepSimplifier = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
-      ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
-         envInput = createEnvInput();
-         problemInitializer = createProblemInitializer(registerProof);
-         initConfig = createInitConfig();
-         // Read proof obligation settings
-         LoadedPOContainer poContainer = createProofObligationContainer();
-         try {
-            if (poContainer == null) {
-               return selectProofObligation();
-            }
-            // Create proof and apply rules again if possible
-            proof = createProof(poContainer);
-            if (proof != null) {
-               replayProof(proof);
-            }
-            // this message is propagated to the top level in console mode
-            return null; // Everything fine
+   public ProblemLoaderException load() throws ProblemLoaderException {
+       try {
+           // Read environment
+           boolean oneStepSimplifier =
+                   ProofIndependentSettings.DEFAULT_INSTANCE
+                           .getGeneralSettings().oneStepSimplification();
+           ProofIndependentSettings.DEFAULT_INSTANCE
+                           .getGeneralSettings().setOneStepSimplification(true);
+           envInput = createEnvInput();
+           problemInitializer = createProblemInitializer();
+           initConfig = createInitConfig();
+           // Read proof obligation settings
+           LoadedPOContainer poContainer = createProofObligationContainer();
+           try {
+               if (poContainer == null) {
+                   return selectProofObligation();
+               }
+               // Create proof and apply rules again if possible
+               proof = createProof(poContainer);
+               if (proof != null) {
+                   replayProof(proof);
+               }
+               // this message is propagated to the top level in console mode
+               return null; // Everything fine
          }
          finally {
-    	  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(oneStepSimplifier);
+             ProofIndependentSettings.DEFAULT_INSTANCE
+                         .getGeneralSettings().setOneStepSimplification(oneStepSimplifier);
             getMediator().resetNrGoalsClosedByHeuristics();
             if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
                ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
@@ -159,11 +164,8 @@ public class DefaultProblemLoader {
       catch (ProblemLoaderException e) {
           throw(e);
       }
-      catch (IOException e) {
-         throw new ProblemLoaderException(this, e);
-      }
-      catch (ProofInputException e) {
-         throw new ProblemLoaderException(this, e);
+      catch (Exception e) { // TODO give more specific exception message
+          throw new ProblemLoaderException(this, e);
       }
    }
 
@@ -213,14 +215,13 @@ public class DefaultProblemLoader {
 
    /**
     * Instantiates the {@link ProblemInitializer} to use.
-    * @param registerProof Register loaded {@link Proof} in {@link GlobalProofMgt}?
+    * @param registerProof Register loaded {@link Proof}
     * @return The {@link ProblemInitializer} to use.
     */
-   protected ProblemInitializer createProblemInitializer(boolean registerProof) {
+   protected ProblemInitializer createProblemInitializer() {
       UserInterface ui = mediator.getUI();
       return new ProblemInitializer(ui,
                                     new Services(envInput.getProfile(), mediator.getExceptionHandler()),
-                                    registerProof,
                                     ui);
    }
 
@@ -348,8 +349,9 @@ public class DefaultProblemLoader {
           if (errors != null &&
                   !errors.isEmpty()) {
               throw new ProblemLoaderException(this,
-                      "Proof could only be loaded partially. In summary " + errors.size() +
-                      " not loadable rule application(s) have been detected." +
+                      "Proof could only be loaded partially.\n" +
+                      "In summary " + errors.size() +
+                      " not loadable rule application(s) have been detected.\n" +
                       "The first one:\n"+errors.get(0).getMessage(), errors.get(0));
           }
       }

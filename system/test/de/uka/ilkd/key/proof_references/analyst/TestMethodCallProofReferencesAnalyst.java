@@ -46,7 +46,7 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
    public void testMethodCall() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/methodCall/MethodCall.java", 
-                            "methodCall.MethodCall", 
+                            "methodCall.MethodCall",
                             "caller", 
                             false,
                             new MethodCallProofReferencesAnalyst(),
@@ -59,7 +59,7 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
    public void testMethodCallSuper() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/methodCallSuper/MethodCallSuper.java", 
-                            "methodCallSuper.MethodCallSuper", 
+                            "methodCallSuper.MethodCallSuper",
                             "caller", 
                             false,
                             new MethodCallProofReferencesAnalyst(),
@@ -71,8 +71,8 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
     */
    public void testMethodCallWithAssignment() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
-                            "examples/_testcase/proofReferences/methodCallWithAssignment/MethodCall.java", 
-                            "methodCallWithAssignment.MethodCall", 
+                            "examples/_testcase/proofReferences/methodCallWithAssignment/MethodCall.java",
+                            "methodCallWithAssignment.MethodCall",
                             "caller", 
                             false,
                             new MethodCallProofReferencesAnalyst(),
@@ -84,8 +84,8 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
     */
    public void testMethodCallWithAssignmentSuper() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
-                            "examples/_testcase/proofReferences/methodCallWithAssignmentSuper/MethodCallWithAssignmentSuper.java", 
-                            "methodCallWithAssignmentSuper.MethodCallWithAssignmentSuper", 
+                            "examples/_testcase/proofReferences/methodCallWithAssignmentSuper/MethodCallWithAssignmentSuper.java",
+                            "methodCallWithAssignmentSuper.MethodCallWithAssignmentSuper",
                             "caller", 
                             false,
                             new MethodCallProofReferencesAnalyst(),
@@ -98,7 +98,7 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
    public void testMethodCallWithAssignmentWithinClass() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/methodCallWithAssignmentWithinClass/MethodCallWithAssignmentWithinClass.java", 
-                            "methodCallWithAssignmentWithinClass.MethodCallWithAssignmentWithinClass", 
+                            "methodCallWithAssignmentWithinClass.MethodCallWithAssignmentWithinClass",
                             "caller", 
                             false,
                             new MethodCallProofReferencesAnalyst(),
@@ -111,7 +111,7 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
    public void testMethodCallWithinClass() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/methodCallWithinClass/MethodCallWithinClass.java", 
-                            "methodCallWithinClass.MethodCallWithinClass", 
+                            "methodCallWithinClass.MethodCallWithinClass",
                             "caller", 
                             false,
                             new MethodCallProofReferencesAnalyst(),
@@ -124,7 +124,7 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
    public void testStaticMethodCall() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/staticMethodCall/StaticMethodCall.java", 
-                            "staticMethodCall.StaticMethodCall", 
+                            "staticMethodCall.StaticMethodCall",
                             "caller", 
                             false,
                             new MethodCallProofReferencesAnalyst(),
@@ -137,8 +137,8 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
    public void testStaticMethodCallStaticViaTypereference() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/staticMethodCallStaticViaTypereference/StaticMethodCallStaticViaTypereference.java", 
-                            "staticMethodCallStaticViaTypereference.StaticMethodCallStaticViaTypereference", 
-                            "caller", 
+                            "staticMethodCallStaticViaTypereference.StaticMethodCallStaticViaTypereference",
+                            "caller",
                             false,
                             new MethodCallProofReferencesAnalyst(),
                             new ExpectedProofReferences(IProofReference.CALL_METHOD, "staticMethodCallStaticViaTypereference.StaticClass::callMe"));
@@ -150,7 +150,7 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
    public void testStaticMethodCallStaticWithAssignmentViaTypereference() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/staticMethodCallStaticWithAssignmentViaTypereference/StaticMethodCallStaticWithAssignmentViaTypereference.java", 
-                            "staticMethodCallStaticWithAssignmentViaTypereference.StaticMethodCallStaticWithAssignmentViaTypereference", 
+                            "staticMethodCallStaticWithAssignmentViaTypereference.StaticMethodCallStaticWithAssignmentViaTypereference",
                             "caller", 
                             false,
                             new MethodCallProofReferencesAnalyst(),

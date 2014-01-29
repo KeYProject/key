@@ -20,6 +20,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
 import org.key_project.key4eclipse.resources.test.Activator;
@@ -95,9 +96,19 @@ public class ProofMetaFileContentExceptionTests extends AbstractResourceTest {
       long proofFileModStamp = proofFile.getLocalTimeStamp();
       long metaFileModStamp = metaFile.getLocalTimeStamp();
       
+      metaFile.refreshLocal(IResource.DEPTH_ZERO, null);
+      ResourceAttributes resAttr = metaFile.getResourceAttributes();
+      resAttr.setReadOnly(false);
+      metaFile.setResourceAttributes(resAttr);
+      
       InputStream is = BundleUtil.openInputStream(Activator.PLUGIN_ID, newContentPathInBundle);
       metaFile.setContents(is, IResource.FORCE, null);
       is.close();
+      
+      metaFile.refreshLocal(IResource.DEPTH_ZERO, null);
+      resAttr = metaFile.getResourceAttributes();
+      resAttr.setReadOnly(true);
+      metaFile.setResourceAttributes(resAttr);
       
       assertTrue(metaFile.getLocalTimeStamp() != metaFileModStamp);
       metaFileModStamp = metaFile.getLocalTimeStamp();

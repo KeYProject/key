@@ -18,11 +18,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowListener;
 
-import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ViewSettings;
@@ -43,14 +43,16 @@ public class ExitMainAction extends MainWindowAction {
    public ExitMainAction(MainWindow mainWindow) {
        super(mainWindow);
        setName("Exit");
+       setIcon(IconFactory.quit(16));
        setTooltip("Leave KeY.");
        setAcceleratorLetter(KeyEvent.VK_Q);
    }
 
    public final WindowListener windowListener = new WindowAdapter() {
+       @Override
        public void windowClosing(java.awt.event.WindowEvent e) {
            exitMain();
-       };
+       }
    };
 
    protected void exitMain() {
@@ -83,7 +85,8 @@ public class ExitMainAction extends MainWindowAction {
         getMediator().fireShutDown(new GUIEvent(this));
 
         System.out.println("Have a nice day.");
-        mainWindow.savePreferences();
+        mainWindow.savePreferences(mainWindow);
+        mainWindow.syncPreferences();
         if (exitSystem) {
             // TODO: why -1 and not 0 ???
            System.exit(-1);

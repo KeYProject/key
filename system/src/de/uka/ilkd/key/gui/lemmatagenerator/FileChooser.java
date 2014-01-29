@@ -346,7 +346,7 @@ public class FileChooser extends JPanel{
                                            getLemmataFileChooser().getChosenFile()){
                                                 getDefinitionFileChooser().setChosenFile(file);
                                         }
-                                };
+                                }
                         };
                         
                 }

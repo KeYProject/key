@@ -70,7 +70,7 @@ public class ProofObligationCreator {
           
                 }
                 UserDefinedSymbols symbolsForAxioms = analyzeTaclets(axioms,initConfig.namespaces());
-                
+
                 symbolsForAxioms.addSymbolsToNamespaces(initConfig.namespaces());
                 
                 for (Taclet taclet : taclets) {
@@ -155,7 +155,7 @@ public class ProofObligationCreator {
                 
                 collectUserDefinedSymbols(formula, userDefinedSymbols);
                 userDefinedSymbols.replaceGenericByProxySorts();
-                
+
                 // In the new saving scheme, no header needs to stored
                 // this is encoded in the properties of the TacletProofObligationInput.
                 // (MU 2013-08)

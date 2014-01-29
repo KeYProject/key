@@ -37,6 +37,7 @@ import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -65,9 +66,11 @@ import java.util.*;
  */
 public final class JMLSpecExtractor implements SpecExtractor {
 
+    private static final String THROWABLE = "java.lang.Throwable";
+    private static final String ERROR = "java.lang.Error";
     private static final String EXCEPTION = "java.lang.Exception";
     private static final String RUNTIME_EXCEPTION = "java.lang.RuntimeException";
-    private static final String SIGNALS_ONLY_RUNTIMEEXCEPTION = "signals_only "+RUNTIME_EXCEPTION+";";
+    private static final String DEFAULT_SIGNALS_ONLY = "signals_only "+ERROR+", "+RUNTIME_EXCEPTION+";";
     private final Services services;
     private final JMLSpecFactory jsf;
     private ImmutableSet<PositionedString> warnings
@@ -131,26 +134,26 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
 
 
+    // includes unchecked exceptions (instances of Error or RuntimeException)
+    // (see resolution to issue #1379)
     private String getDefaultSignalsOnly(IProgramMethod pm) {
         if(pm.getThrown() == null) {
-            return SIGNALS_ONLY_RUNTIMEEXCEPTION;
+            return DEFAULT_SIGNALS_ONLY;
         }
 
         ImmutableArray<TypeReference> exceptions = pm.getThrown().getExceptions();
 
         if(exceptions == null) {
-            return SIGNALS_ONLY_RUNTIMEEXCEPTION;
+            return DEFAULT_SIGNALS_ONLY;
         }
 
-        String exceptionsString = RUNTIME_EXCEPTION + ", ";
+        String exceptionsString = ERROR +", " + RUNTIME_EXCEPTION + ", ";
 
         for(int i = 0; i < exceptions.size(); i++) {
-            //only subtypes of java.lang.Exception are in the default
-            //signals-only
             if(services.getJavaInfo().isSubtype(
                     exceptions.get(i).getKeYJavaType(),
                     services.getJavaInfo()
-                            .getKeYJavaType(EXCEPTION))) {
+                            .getKeYJavaType(THROWABLE))) {
                 exceptionsString
                     += exceptions.get(i).getKeYJavaType().getFullName() + ", ";
             }
@@ -178,29 +181,31 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * @param pos the Position where to place this implicit specification
      * @return set of formulas specifying non-nullity for field/variables
      */
-    public static ImmutableSet<PositionedString> createNonNullPositionedString(String varName, KeYJavaType kjt,
-	    boolean isImplicitVar, String fileName, Position pos, Services services) {
-	ImmutableSet<PositionedString> result = DefaultImmutableSet.<PositionedString>nil();
-	final Type varType  = kjt.getJavaType();
+    public static ImmutableSet<PositionedString>
+                        createNonNullPositionedString(String varName,KeYJavaType kjt,
+                                                      boolean isImplicitVar, String fileName,
+                                                      Position pos, Services services) {
+        ImmutableSet<PositionedString> result = DefaultImmutableSet.<PositionedString>nil();
+        final Type varType  = kjt.getJavaType();
 
-	final TypeConverter typeConverter = services.getTypeConverter();
-    if (typeConverter.isReferenceType(varType) && !isImplicitVar) {
-
-	    PositionedString ps
-	    = new PositionedString(varName + " != null", fileName, pos);
-	    result = result.add(ps);
-	    if (varType instanceof ArrayType &&
-		    typeConverter.
-		    isReferenceType(((ArrayType)varType).getBaseType().getKeYJavaType())) {
-		final PositionedString arrayElementsNonNull
-		= new PositionedString("(\\forall int i; 0 <= i && i < " + varName + ".length;"
-			+ varName + "[i]" + " != null)",
-			fileName,
-			pos);
-		result = result.add(arrayElementsNonNull);
-	    }
-	}
-	return result;
+        final TypeConverter typeConverter = services.getTypeConverter();
+        if (typeConverter.isReferenceType(varType) && !isImplicitVar) {
+            if (varType instanceof ArrayType &&
+                    typeConverter.
+                    isReferenceType(((ArrayType)varType).getBaseType().getKeYJavaType())) {
+                final PositionedString arrayElementsNonNull
+                = new PositionedString("(\\forall int i; 0 <= i && i < " + varName + ".length;"
+                                              + varName + "[i]" + " != null)",
+                                              fileName,
+                                              pos).label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
+                result = result.add(arrayElementsNonNull);
+            }
+            PositionedString ps
+            = new PositionedString(varName + " != null", fileName, pos)
+                                .label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
+            result = result.add(ps);
+        }
+        return result;
     }
 
 
@@ -252,11 +257,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 	    createNonNullPositionedString(field.getProgramName(),
                 		    field.getProgramVariable().getKeYJavaType(),
                 		    field instanceof ImplicitFieldSpecification,
-                		    fileName, member.getEndPosition(),services);
+                                    fileName, member.getEndPosition(), services);
                 	for(PositionedString classInv : nonNullInvs) {
-                	    result = result.add(jsf.createJMLClassInvariant(kjt,
-                		    					    visibility, isStatic,
-                		            				    classInv));
+                            result = result.add(
+                                    jsf.createJMLClassInvariant(
+                                            kjt, visibility, isStatic,
+                                            classInv.label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)));
                 	}
                     }
                 }
@@ -325,7 +331,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         		result = result.add(ax);
         	    } else {
         	        // DO NOTHING
-        	        // There may be ohter kinds of JML constructs which are not specifications.
+                        // There may be other kinds of JML constructs which are not specifications.
         	    }
         	} catch (SLWarningException e) {
         	    warnings = warnings.add(e.getWarning());
@@ -346,11 +352,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
     /**
      * Extracts method specifications (i.e., contracts) from Java+JML input.
      * @param pm method to extract for
-     * @param addInvariant whether to add <i>static</i> invarants to pre- and post-conditions
+     * @param addInvariant whether to add <i>static</i> invariants to pre- and post-conditions
      */
     @Override
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm, boolean addInvariant)
-    throws SLTranslationException {
+    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm,
+                                                                 boolean addInvariant)
+                  throws SLTranslationException {
         ImmutableSet<SpecificationElement> result
         = DefaultImmutableSet.<SpecificationElement>nil();
 
@@ -399,7 +406,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
               TextualJMLConstruct[] t = new TextualJMLConstruct[constructsArray.length+1];
               startPos++;
               System.arraycopy(constructsArray, 0, t, 0, startPos);
-              System.arraycopy(constructsArray, startPos, t, startPos+1, constructsArray.length - startPos);
+              System.arraycopy(constructsArray, startPos, t, startPos+1,
+                               constructsArray.length - startPos);
               t[startPos] = modelSpec;
               constructsArray = t;
             }
@@ -428,16 +436,20 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 // for a static method translate \inv once again, otherwise use the internal symbol
                 final String invString = pm.isStatic()? "\\inv": "<inv>";
                 if(!pm.isConstructor()) {
-                    specCase.addRequires(new PositionedString(invString));
+                    specCase.addRequires(new PositionedString(invString)
+                                 .label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 } else if (addInvariant) {
                     // add static invariant to constructor's precondition
-                    specCase.addRequires(new PositionedString(""+pm.getName()+".\\inv"));
+                    specCase.addRequires(new PositionedString(""+pm.getName()+".\\inv")
+                                                .label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
                 if(specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
-                    specCase.addEnsures(new PositionedString("ensures "+invString));
+                    specCase.addEnsures(new PositionedString("ensures "+invString)
+                                           .label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
                 if(specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR && !pm.isModel()) {
-                    specCase.addSignals(new PositionedString("signals (Exception e) "+invString));
+                    specCase.addSignals(new PositionedString("signals (Throwable e) "+invString)
+                                                         .label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
             }
 
@@ -450,10 +462,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     final ImmutableSet<PositionedString> nonNullParams =
                         createNonNullPositionedString(paramDecl.getName(),
                                 paramDecl.getProgramVariable().getKeYJavaType(),
-                                false,
-                                fileName, pm.getStartPosition(),services);
+                                false, fileName, pm.getStartPosition(), services);
                     for (PositionedString nonNull : nonNullParams) {
-                        specCase.addRequires(nonNull);
+                        specCase.addRequires(nonNull.label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                     }
                 }
             }
@@ -465,10 +476,11 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     !JMLInfoExtractor.resultIsNullable(pm) &&
                     specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                 final ImmutableSet<PositionedString> resultNonNull =
-                    createNonNullPositionedString("\\result", resultType, false,
-                            fileName, pm.getStartPosition(),services);
+                    createNonNullPositionedString("\\result", resultType,
+                            false, fileName, pm.getStartPosition(), services);
                 for (PositionedString nonNull : resultNonNull) {
-                    specCase.addEnsures(nonNull.prepend("ensures "));
+                    specCase.addEnsures(
+                            nonNull.prepend("ensures ").label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
             }
 
@@ -476,8 +488,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             if(specCase.getSignalsOnly().isEmpty()
                     && specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR
                     && !pm.isModel()) {
-                specCase.addSignalsOnly(
-                        new PositionedString(getDefaultSignalsOnly(pm)));
+                specCase.addSignalsOnly(new PositionedString(getDefaultSignalsOnly(pm)));
             }
 
             //translate contract

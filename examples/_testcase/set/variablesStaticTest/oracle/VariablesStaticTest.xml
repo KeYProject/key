@@ -24,7 +24,7 @@
                </value>
             </variable>
             <variable name="VariablesStaticTest::z" arrayIndex="-1" isArrayIndex="false">
-               <value name="VariablesStaticTest::z {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               <value name="VariablesStaticTest::z {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <statement name="StaticFields.b=8;" pathCondition="true" pathConditionChanged="false">
@@ -37,11 +37,11 @@
                   </value>
                </variable>
                <variable name="StaticFields::a" arrayIndex="-1" isArrayIndex="false">
-                  <value name="StaticFields::a {true}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <value name="StaticFields::a {true}" typeString="int" valueString="Z(4(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="VariablesStaticTest::z" arrayIndex="-1" isArrayIndex="false">
-                  <value name="VariablesStaticTest::z {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <value name="VariablesStaticTest::z {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <statement name="return VariablesStaticTest.z+StaticFields.a+StaticFields.b;" pathCondition="true" pathConditionChanged="false">
@@ -54,15 +54,15 @@
                      </value>
                   </variable>
                   <variable name="StaticFields::b" arrayIndex="-1" isArrayIndex="false">
-                     <value name="StaticFields::b {true}" typeString="int" valueString="8" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="StaticFields::b {true}" typeString="int" valueString="Z(8(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="StaticFields::a" arrayIndex="-1" isArrayIndex="false">
-                     <value name="StaticFields::a {true}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="StaticFields::a {true}" typeString="int" valueString="Z(4(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="VariablesStaticTest::z" arrayIndex="-1" isArrayIndex="false">
-                     <value name="VariablesStaticTest::z {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="VariablesStaticTest::z {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
@@ -75,15 +75,15 @@
                         </value>
                      </variable>
                      <variable name="StaticFields::b" arrayIndex="-1" isArrayIndex="false">
-                        <value name="StaticFields::b {true}" typeString="int" valueString="8" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="StaticFields::b {true}" typeString="int" valueString="Z(8(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="StaticFields::a" arrayIndex="-1" isArrayIndex="false">
-                        <value name="StaticFields::a {true}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="StaticFields::a {true}" typeString="int" valueString="Z(4(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="VariablesStaticTest::z" arrayIndex="-1" isArrayIndex="false">
-                        <value name="VariablesStaticTest::z {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="VariablesStaticTest::z {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">

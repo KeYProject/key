@@ -13,13 +13,11 @@
 
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
-import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -39,7 +37,6 @@ public class OneStepSimplificationToggleAction extends MainWindowAction {
         super(mainWindow);
         setName("One Step Simplification");
         putValue(MNEMONIC_KEY, KeyEvent.VK_O);
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control shift S"));
         putValue(SHORT_DESCRIPTION, "Toggle the aggregation of simplification rules." +
         		" Faster if on, more transparent if off.");
         

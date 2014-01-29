@@ -152,7 +152,7 @@ class TacletMenu extends JMenu {
     }
 
 
-    /** creates the menu by adding all submenus and items */
+    /** creates the menu by adding all sub-menus and items */
     private void createTacletMenu(ImmutableList<TacletApp> find,
 				  ImmutableList<TacletApp> noFind,
 				  ImmutableList<BuiltInRule> builtInList,
@@ -489,7 +489,7 @@ class TacletMenu extends JMenu {
 	            .startFocussedAutoMode ( pos.getPosInOccurrence (),
 	                                     mediator.getSelectedGoal () );
 	    } else {
-	    	// TODO: change to switch statement once development switches to Java7
+		// TODO: change to switch statement once development switches to Java7
 		if (((JMenuItem)e.getSource()).getText()
 		    .startsWith(COPY_TO_CLIPBOARD)){
                     GuiUtilities.copyHighlightToClipboard(sequentView, pos);

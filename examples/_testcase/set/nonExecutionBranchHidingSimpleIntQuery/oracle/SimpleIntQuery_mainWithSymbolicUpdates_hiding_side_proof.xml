@@ -6,16 +6,16 @@
             <operationContract name="result_0 = magic(x) catch(exc_0)
 pre: true
 post: result_0 = subMagic(x) &amp; exc_0 = null
-mod: {}
+mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of SimpleIntQuery.mainWithSymbolicUpdates(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	42 {x &gt;  -12}, 
-	-4711 {x &lt; -11}
+	Z(2(4(#))) {gt(x,Z(neglit(2(1(#)))))}, 
+	Z(neglit(1(1(7(4(#)))))) {lt(x,Z(neglit(1(1(#)))))}
 as result of SimpleIntQuery.mainWithSymbolicUpdates(x);&gt;" isReturnValueComputed="true">
-                     <methodReturnValue name="42 {x &gt;  -12}" returnValueString="42" hasCondition="true" conditionString="x &gt;  -12">
+                     <methodReturnValue name="Z(2(4(#))) {gt(x,Z(neglit(2(1(#)))))}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="gt(x,Z(neglit(2(1(#)))))">
                      </methodReturnValue>
-                     <methodReturnValue name="-4711 {x &lt; -11}" returnValueString="-4711" hasCondition="true" conditionString="x &lt; -11">
+                     <methodReturnValue name="Z(neglit(1(1(7(4(#)))))) {lt(x,Z(neglit(1(1(#)))))}" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="true" conditionString="lt(x,Z(neglit(1(1(#)))))">
                      </methodReturnValue>
                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>

@@ -15,7 +15,6 @@ package de.uka.ilkd.key.gui.smt;
 
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Properties;
 
@@ -71,9 +70,9 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configurat
         private ProofDependentSMTSettings(){
  
                 supportedTaclets =  SupportedTaclets.REFERENCE;
-        };
+        }
 
-        private ProofDependentSMTSettings(ProofDependentSMTSettings data) {            
+    private ProofDependentSMTSettings(ProofDependentSMTSettings data) {
                 copy(data);                
         }
         

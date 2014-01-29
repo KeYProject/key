@@ -9,7 +9,7 @@
          <variable name="self" arrayIndex="-1" isArrayIndex="false">
             <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                  <value name="value {true}" typeString="int" valueString="self.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <value name="value {true}" typeString="int" valueString="int::select(heap,self,MethodCallReturnTests::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
             </value>
@@ -23,7 +23,7 @@
             <variable name="self" arrayIndex="-1" isArrayIndex="false">
                <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                     <value name="value {true}" typeString="int" valueString="self.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="value {true}" typeString="int" valueString="int::select(heap,self,MethodCallReturnTests::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </value>
@@ -37,7 +37,7 @@
                <variable name="self" arrayIndex="-1" isArrayIndex="false">
                   <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                        <value name="value {true}" typeString="int" valueString="self.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="value {true}" typeString="int" valueString="int::select(heap,self,MethodCallReturnTests::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
@@ -52,7 +52,7 @@
                   <variable name="self" arrayIndex="-1" isArrayIndex="false">
                      <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                           <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <value name="value {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
@@ -67,7 +67,7 @@
                      <variable name="self" arrayIndex="-1" isArrayIndex="false">
                         <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                              <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <value name="value {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
@@ -81,7 +81,7 @@
                         <variable name="self" arrayIndex="-1" isArrayIndex="false">
                            <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 <value name="value {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
@@ -95,7 +95,7 @@
                            <variable name="self" arrayIndex="-1" isArrayIndex="false">
                               <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    <value name="value {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
@@ -110,7 +110,7 @@
                               <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                  <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       <value name="value {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                  </value>
@@ -125,7 +125,7 @@
                                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                     <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                          <value name="value {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                     </value>
@@ -140,7 +140,7 @@
                                     <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                        <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                           <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                             <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                             <value name="value {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                              </value>
                                           </variable>
                                        </value>
@@ -154,7 +154,7 @@
                                        <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                           <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                              <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                <value name="value {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                 </value>
                                              </variable>
                                           </value>
@@ -168,7 +168,7 @@
                                           <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                              <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                 <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                   <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                   <value name="value {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                    </value>
                                                 </variable>
                                              </value>
@@ -183,7 +183,7 @@
                                              <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                 <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                    <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                      <value name="value {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                      <value name="value {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                       </value>
                                                    </variable>
                                                 </value>
@@ -194,13 +194,13 @@
                                              </variable>
                                              <callStackEntry path="/0"/>
                                              <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                             <methodReturn name="&lt;return of self.valueReturn();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 2 as result of self.valueReturn();&gt;" isReturnValueComputed="true">
-                                                <methodReturnValue name="2" returnValueString="2" hasCondition="false">
+                                             <methodReturn name="&lt;return of self.valueReturn();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(#)) as result of self.valueReturn();&gt;" isReturnValueComputed="true">
+                                                <methodReturnValue name="Z(2(#))" returnValueString="Z(2(#))" hasCondition="false">
                                                 </methodReturnValue>
                                                 <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                    <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                       <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                         <value name="value {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                         <value name="value {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                          </value>
                                                       </variable>
                                                    </value>
@@ -210,7 +210,7 @@
                                                    </value>
                                                 </variable>
                                                 <variable name="x_8" arrayIndex="-1" isArrayIndex="false">
-                                                   <value name="x_8 {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                   <value name="x_8 {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                    </value>
                                                 </variable>
                                                 <callStackEntry path="/0"/>
@@ -219,7 +219,7 @@
                                                    <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                       <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                          <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                            <value name="value {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                            <value name="value {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                             </value>
                                                          </variable>
                                                       </value>
@@ -233,7 +233,7 @@
                                                       <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                          <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                             <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                               <value name="value {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                               <value name="value {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                </value>
                                                             </variable>
                                                          </value>
@@ -247,7 +247,7 @@
                                                          <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                             <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                                <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                                  <value name="value {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                  <value name="value {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                   </value>
                                                                </variable>
                                                             </value>
@@ -262,7 +262,7 @@
                                                             <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                                <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                                   <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                                     <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                     <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                      </value>
                                                                   </variable>
                                                                </value>
@@ -273,13 +273,13 @@
                                                             </variable>
                                                             <callStackEntry path="/0"/>
                                                             <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                            <methodReturn name="&lt;return of self.valueReturn();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 3 as result of self.valueReturn();&gt;" isReturnValueComputed="true">
-                                                               <methodReturnValue name="3" returnValueString="3" hasCondition="false">
+                                                            <methodReturn name="&lt;return of self.valueReturn();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(3(#)) as result of self.valueReturn();&gt;" isReturnValueComputed="true">
+                                                               <methodReturnValue name="Z(3(#))" returnValueString="Z(3(#))" hasCondition="false">
                                                                </methodReturnValue>
                                                                <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                                   <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                                      <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                                        <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                        <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                         </value>
                                                                      </variable>
                                                                   </value>
@@ -289,7 +289,7 @@
                                                                   </value>
                                                                </variable>
                                                                <variable name="x_9" arrayIndex="-1" isArrayIndex="false">
-                                                                  <value name="x_9 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                  <value name="x_9 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                   </value>
                                                                </variable>
                                                                <callStackEntry path="/0"/>
@@ -298,7 +298,7 @@
                                                                   <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                                      <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                                         <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                                           <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                           <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                            </value>
                                                                         </variable>
                                                                      </value>
@@ -308,7 +308,7 @@
                                                                      </value>
                                                                   </variable>
                                                                   <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                     <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                     <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                      </value>
                                                                   </variable>
                                                                   <callStackEntry path="/0"/>
@@ -316,7 +316,7 @@
                                                                      <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                                         <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                                            <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                                              <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                              <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                               </value>
                                                                            </variable>
                                                                         </value>
@@ -326,7 +326,7 @@
                                                                         </value>
                                                                      </variable>
                                                                      <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                        <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                        <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                         </value>
                                                                      </variable>
                                                                      <callStackEntry path="/0"/>
@@ -336,7 +336,7 @@
                                                                            </value>
                                                                         </variable>
                                                                         <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                           <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                           <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                            </value>
                                                                         </variable>
                                                                         <callStackEntry path="/0"/>
@@ -347,11 +347,11 @@
                                                                               </value>
                                                                            </variable>
                                                                            <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                              <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                              <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                               </value>
                                                                            </variable>
                                                                            <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
-                                                                              <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                              <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                               </value>
                                                                            </variable>
                                                                            <callStackEntry path="/0"/>
@@ -360,7 +360,7 @@
                                                                               <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                                                  <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                                                     <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                                                       <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                       <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                        </value>
                                                                                     </variable>
                                                                                  </value>
@@ -370,11 +370,11 @@
                                                                                  </value>
                                                                               </variable>
                                                                               <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                                 <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                 <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                  </value>
                                                                               </variable>
                                                                               <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
-                                                                                 <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                 <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                  </value>
                                                                               </variable>
                                                                               <callStackEntry path="/0"/>
@@ -382,7 +382,7 @@
                                                                                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                                                     <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                                                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                                                          <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                          <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                           </value>
                                                                                        </variable>
                                                                                     </value>
@@ -392,11 +392,11 @@
                                                                                     </value>
                                                                                  </variable>
                                                                                  <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                                    <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                    <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                     </value>
                                                                                  </variable>
                                                                                  <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
-                                                                                    <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                    <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                     </value>
                                                                                  </variable>
                                                                                  <callStackEntry path="/0"/>
@@ -406,11 +406,11 @@
                                                                                        </value>
                                                                                     </variable>
                                                                                     <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                                       <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                       <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                        </value>
                                                                                     </variable>
                                                                                     <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
-                                                                                       <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                       <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                        </value>
                                                                                     </variable>
                                                                                     <callStackEntry path="/0"/>
@@ -421,11 +421,11 @@
                                                                                           </value>
                                                                                        </variable>
                                                                                        <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                                          <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                          <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                           </value>
                                                                                        </variable>
                                                                                        <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
-                                                                                          <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                          <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                           </value>
                                                                                        </variable>
                                                                                        <callStackEntry path="/0"/>
@@ -436,11 +436,11 @@
                                                                                              </value>
                                                                                           </variable>
                                                                                           <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                                             <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                             <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                              </value>
                                                                                           </variable>
                                                                                           <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
-                                                                                             <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                             <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                              </value>
                                                                                           </variable>
                                                                                           <callStackEntry path="/0"/>
@@ -449,7 +449,7 @@
                                                                                              <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                                                                 <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                                                                    <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                                                                      <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                      <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                       </value>
                                                                                                    </variable>
                                                                                                 </value>
@@ -459,11 +459,11 @@
                                                                                                 </value>
                                                                                              </variable>
                                                                                              <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                                                <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                 </value>
                                                                                              </variable>
                                                                                              <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
-                                                                                                <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                 </value>
                                                                                              </variable>
                                                                                              <callStackEntry path="/0"/>
@@ -471,7 +471,7 @@
                                                                                                 <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                                                                    <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                                                                       <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                                                                         <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                         <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                          </value>
                                                                                                       </variable>
                                                                                                    </value>
@@ -481,11 +481,11 @@
                                                                                                    </value>
                                                                                                 </variable>
                                                                                                 <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                                                   <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                   <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                    </value>
                                                                                                 </variable>
                                                                                                 <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
-                                                                                                   <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                   <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                    </value>
                                                                                                 </variable>
                                                                                                 <callStackEntry path="/0"/>
@@ -495,11 +495,11 @@
                                                                                                       </value>
                                                                                                    </variable>
                                                                                                    <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                                                      <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                      <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                       </value>
                                                                                                    </variable>
                                                                                                    <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
-                                                                                                      <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                      <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                       </value>
                                                                                                    </variable>
                                                                                                    <callStackEntry path="/0"/>
@@ -510,32 +510,32 @@
                                                                                                          </value>
                                                                                                       </variable>
                                                                                                       <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                                                         <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                         <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                          </value>
                                                                                                       </variable>
                                                                                                       <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
-                                                                                                         <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                         <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                          </value>
                                                                                                       </variable>
                                                                                                       <callStackEntry path="/0"/>
                                                                                                       <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                                      <methodReturn name="&lt;return of MethodCallReturnTests.valueReturnStatic();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 2 as result of MethodCallReturnTests.valueReturnStatic();&gt;" isReturnValueComputed="true">
-                                                                                                         <methodReturnValue name="2" returnValueString="2" hasCondition="false">
+                                                                                                      <methodReturn name="&lt;return of MethodCallReturnTests.valueReturnStatic();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(#)) as result of MethodCallReturnTests.valueReturnStatic();&gt;" isReturnValueComputed="true">
+                                                                                                         <methodReturnValue name="Z(2(#))" returnValueString="Z(2(#))" hasCondition="false">
                                                                                                          </methodReturnValue>
                                                                                                          <variable name="exc" arrayIndex="-1" isArrayIndex="false">
                                                                                                             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                             </value>
                                                                                                          </variable>
                                                                                                          <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                                                            <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                            <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                             </value>
                                                                                                          </variable>
                                                                                                          <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
-                                                                                                            <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                            <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                             </value>
                                                                                                          </variable>
                                                                                                          <variable name="x_22" arrayIndex="-1" isArrayIndex="false">
-                                                                                                            <value name="x_22 {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                            <value name="x_22 {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                             </value>
                                                                                                          </variable>
                                                                                                          <callStackEntry path="/0"/>
@@ -544,7 +544,7 @@
                                                                                                             <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                                                                                <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                                                                                   <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                                                                                     <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                     <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                      </value>
                                                                                                                   </variable>
                                                                                                                </value>
@@ -554,11 +554,11 @@
                                                                                                                </value>
                                                                                                             </variable>
                                                                                                             <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                                                               <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                               <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                </value>
                                                                                                             </variable>
                                                                                                             <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
-                                                                                                               <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                               <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                </value>
                                                                                                             </variable>
                                                                                                             <callStackEntry path="/0"/>
@@ -566,7 +566,7 @@
                                                                                                                <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                                                                                   <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                                                                                      <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                                                                                        <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                        <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                         </value>
                                                                                                                      </variable>
                                                                                                                   </value>
@@ -576,11 +576,11 @@
                                                                                                                   </value>
                                                                                                                </variable>
                                                                                                                <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                                                                  <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                  <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                   </value>
                                                                                                                </variable>
                                                                                                                <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
-                                                                                                                  <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                  <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                   </value>
                                                                                                                </variable>
                                                                                                                <callStackEntry path="/0"/>
@@ -590,11 +590,11 @@
                                                                                                                      </value>
                                                                                                                   </variable>
                                                                                                                   <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                                                                     <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                     <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                      </value>
                                                                                                                   </variable>
                                                                                                                   <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
-                                                                                                                     <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                     <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                      </value>
                                                                                                                   </variable>
                                                                                                                   <callStackEntry path="/0"/>
@@ -605,32 +605,32 @@
                                                                                                                         </value>
                                                                                                                      </variable>
                                                                                                                      <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                                                                        <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                        <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                         </value>
                                                                                                                      </variable>
                                                                                                                      <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
-                                                                                                                        <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                        <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                         </value>
                                                                                                                      </variable>
                                                                                                                      <callStackEntry path="/0"/>
                                                                                                                      <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                                                     <methodReturn name="&lt;return of MethodCallReturnTests.valueReturnStatic();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 3 as result of MethodCallReturnTests.valueReturnStatic();&gt;" isReturnValueComputed="true">
-                                                                                                                        <methodReturnValue name="3" returnValueString="3" hasCondition="false">
+                                                                                                                     <methodReturn name="&lt;return of MethodCallReturnTests.valueReturnStatic();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(3(#)) as result of MethodCallReturnTests.valueReturnStatic();&gt;" isReturnValueComputed="true">
+                                                                                                                        <methodReturnValue name="Z(3(#))" returnValueString="Z(3(#))" hasCondition="false">
                                                                                                                         </methodReturnValue>
                                                                                                                         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
                                                                                                                            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                            </value>
                                                                                                                         </variable>
                                                                                                                         <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                                                                           <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                           <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                            </value>
                                                                                                                         </variable>
                                                                                                                         <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
-                                                                                                                           <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                           <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                            </value>
                                                                                                                         </variable>
                                                                                                                         <variable name="x_23" arrayIndex="-1" isArrayIndex="false">
-                                                                                                                           <value name="x_23 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                           <value name="x_23 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                            </value>
                                                                                                                         </variable>
                                                                                                                         <callStackEntry path="/0"/>
@@ -639,7 +639,7 @@
                                                                                                                            <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                                                                                               <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                                                                                                  <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                                                                                                    <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                                    <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                                     </value>
                                                                                                                                  </variable>
                                                                                                                               </value>
@@ -649,25 +649,25 @@
                                                                                                                               </value>
                                                                                                                            </variable>
                                                                                                                            <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
-                                                                                                                              <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                              <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                               </value>
                                                                                                                            </variable>
                                                                                                                            <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
-                                                                                                                              <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                              <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                               </value>
                                                                                                                            </variable>
                                                                                                                            <variable name="returnedValue2" arrayIndex="-1" isArrayIndex="false">
-                                                                                                                              <value name="returnedValue2 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                              <value name="returnedValue2 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                               </value>
                                                                                                                            </variable>
                                                                                                                            <callStackEntry path="/0"/>
-                                                                                                                           <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 6 as result of self.main();&gt;" isReturnValueComputed="true">
-                                                                                                                              <methodReturnValue name="6" returnValueString="6" hasCondition="false">
+                                                                                                                           <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(6(#)) as result of self.main();&gt;" isReturnValueComputed="true">
+                                                                                                                              <methodReturnValue name="Z(6(#))" returnValueString="Z(6(#))" hasCondition="false">
                                                                                                                               </methodReturnValue>
                                                                                                                               <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                                                                                                  <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                                                                                                     <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                                                                                                       <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                                       <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                                        </value>
                                                                                                                                     </variable>
                                                                                                                                  </value>
@@ -677,7 +677,7 @@
                                                                                                                                  </value>
                                                                                                                               </variable>
                                                                                                                               <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
-                                                                                                                                 <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                                 <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                                  </value>
                                                                                                                               </variable>
                                                                                                                               <callStackEntry path="/0"/>

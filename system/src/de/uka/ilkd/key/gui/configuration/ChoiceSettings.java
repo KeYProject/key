@@ -102,7 +102,7 @@ public class ChoiceSettings implements Settings, Cloneable {
 	while(it.hasNext()){
 	    c=(Choice)it.next();
 	    if(c2C.containsKey(c.category())){
-		soc=c2C.get(c.category().toString());
+		soc=c2C.get(c.category());
 		soc.add(c.name().toString());
 		c2C.put(c.category(),soc);
 	    }else{
@@ -181,8 +181,7 @@ public class ChoiceSettings implements Settings, Cloneable {
 	    if (choiceSequence.length() > 0) {
 	        choiceSequence += " , ";
 	    }
-	    choiceSequence += entry.getKey().toString()+"-"+
-		entry.getValue().toString();
+	    choiceSequence += entry.getKey() + "-" + entry.getValue();
 	}
 	props.setProperty(DEFAULTCHOICES_KEY, choiceSequence);
     }

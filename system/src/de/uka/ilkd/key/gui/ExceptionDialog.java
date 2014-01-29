@@ -46,6 +46,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import de.uka.ilkd.key.parser.KeYSemanticException;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.parser.proofjava.ParseException;
@@ -65,8 +66,7 @@ public class ExceptionDialog extends JDialog {
      * 
      */
     private static final long serialVersionUID = -4532724315711726522L;
-    private JScrollPane listScroll, stScroll;    
-    private boolean withList = false;
+    private JScrollPane stScroll;
     private JTextArea stTextArea;
     
     public static void showDialog(Window parent, Throwable exception) {
@@ -89,14 +89,26 @@ public class ExceptionDialog extends JDialog {
     // result may be null
     private Location getLocation(Throwable exc) {
         assert exc != null;
-        
+
 	Location location = null;
-	
+
 	if  (exc instanceof antlr.RecognitionException) { 
 	    location = new Location(((antlr.RecognitionException)exc).getFilename(),
 				    ((antlr.RecognitionException) exc).getLine(),
 				    ((antlr.RecognitionException) exc).getColumn());
-	} else if (exc instanceof ParserException) {
+        }
+        if  (exc instanceof org.antlr.runtime.RecognitionException) {
+            // ANTLR 3 - Recognition Exception.
+            String filename = "";
+            if(exc instanceof KeYSemanticException) {
+                filename = ((KeYSemanticException)exc).getFilename();
+            }
+
+            org.antlr.runtime.RecognitionException recEx =
+                    (org.antlr.runtime.RecognitionException) exc;
+            location = new Location(filename, recEx.line, recEx.charPositionInLine);
+        }
+	else if (exc instanceof ParserException) {
 	    location = ((ParserException) exc).getLocation();
 	} else if (exc instanceof ParseException) {
 	    ParseException pexc = (ParseException)exc;
@@ -113,11 +125,11 @@ public class ExceptionDialog extends JDialog {
 			       ((SVInstantiationExceptionWithPosition)exc).getRow(),
 	         	       ((SVInstantiationExceptionWithPosition)exc).getColumn());
 	} 
-	
+
 	if (location == null && exc.getCause() != null) {
 	    location = getLocation(exc.getCause());
 	}
-	
+
 	return location;
     }
 
@@ -219,7 +231,7 @@ public class ExceptionDialog extends JDialog {
     
     private void setStackTraceText(Throwable exc) {
         StringWriter sw = new StringWriter();
-        sw.append("(" + exc.getClass() + ")\n");
+        sw.append("(").append(exc.getClass().toString()).append(")\n");
         PrintWriter pw = new PrintWriter(sw);
         exc.printStackTrace(pw);
         stTextArea.setText(sw.toString());
@@ -285,12 +297,12 @@ public class ExceptionDialog extends JDialog {
     }
     
     private void init(List<Throwable> excList) {
-        withList = (excList.size() > 1);
+        boolean withList = (excList.size() > 1);
         
         Container cp = getContentPane();
         cp.setLayout(new GridBagLayout());
-        
-        listScroll = createJListScroll(excList);
+
+        JScrollPane listScroll = createJListScroll(excList);
         
         if(withList) {
             cp.add(listScroll, new GridBagConstraints(0, 0, 1, 1, 1., 1.,

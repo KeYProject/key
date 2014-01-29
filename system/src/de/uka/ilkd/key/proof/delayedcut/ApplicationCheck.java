@@ -21,7 +21,6 @@ import java.util.TreeSet;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Node.NodeIterator;
 
@@ -106,7 +105,7 @@ public interface ApplicationCheck {
 			}
 
 			StringBuffer buf = new StringBuffer(newSymbols.size()==1 ?INFORMATION1 : INFORMATION2);
-			buf.append(node.serialNr()+": ");
+			buf.append(node.serialNr()).append(": ");
 			for(String name : newSymbols){
 				buf.append(name);
 				buf.append(", ");

@@ -37,24 +37,24 @@ public final class Junctor extends AbstractSortedOperator {
     public static final Junctor FALSE = new Junctor(new Name("false"),0);
     
     /** 
-     * the ususal 'and' operator '/\' (be A, B formulae then 'A /\ B'
+     * the usual 'and' operator '/\' (be A, B formulae then 'A /\ B'
      * is true if and only if A is true and B is true 
      */
     public static final Junctor AND = new Junctor(new Name("and"),2);
     
     /** 
-     * the ususal 'or' operator '\/' (be A, B formulae then 'A \/ B'
+     * the usual 'or' operator '\/' (be A, B formulae then 'A \/ B'
      * is true if and only if A is true or B is true 
      */
     public static final Junctor OR = new Junctor(new Name("or"),2);
     
     /** 
-     * the ususal 'negation' operator '-' 
+     * the usual 'negation' operator '-'
      */
     public static final Junctor NOT = new Junctor(new Name("not"), 1);
 
     /**
-     * the ususal 'implication' operator '->' (be A, B formulae then
+     * the usual 'implication' operator '->' (be A, B formulae then
      * 'A -> B' is true if and only if A is false or B is true 
      */
     public static final Junctor IMP = new Junctor(new Name("imp"),2);

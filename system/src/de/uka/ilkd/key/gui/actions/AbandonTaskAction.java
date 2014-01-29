@@ -17,8 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.gui.IconFactory;
 
 public final class AbandonTaskAction extends MainWindowAction {
 
@@ -30,6 +29,7 @@ public final class AbandonTaskAction extends MainWindowAction {
     public AbandonTaskAction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("Abandon");
+        setIcon(IconFactory.abandon(16));
 	setAcceleratorLetter(KeyEvent.VK_W);
 	setTooltip("Drop current proof.");
 

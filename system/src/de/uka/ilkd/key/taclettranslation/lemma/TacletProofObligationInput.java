@@ -122,7 +122,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
             properties.setProperty("tacletFile", tacletFile);
         }
         if (definitionFile != null) {
-            properties.setProperty("definitionFile", definitionFile.toString());
+            properties.setProperty("definitionFile", definitionFile);
         }
         if (axiomFiles != null) {
             for (int i = 0; i < axiomFiles.length; i++) {
@@ -194,6 +194,8 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
 
     public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {
         String tacletName = properties.getProperty(PROPERTY_NAME);
+        // This string is parsed by "proveRules.pl"
+        System.out.println("Proof obligation for taclet: " + tacletName);
         TacletProofObligationInput proofOblInput =
                 new TacletProofObligationInput(tacletName, initConfig);
         proofOblInput.setLoadInfo(properties);
@@ -212,7 +214,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
             name = "axiomFile" + (axioms.size() + 1);
             axFile = properties.getProperty(name);
         }
-        this.axiomFiles = (String[]) axioms.toArray(new String[axioms.size()]);
+        this.axiomFiles = axioms.toArray(new String[axioms.size()]);
     }
 
     public void setLoadInfo(File tacletFile, File definitionFile,

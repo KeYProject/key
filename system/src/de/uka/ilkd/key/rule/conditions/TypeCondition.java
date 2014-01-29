@@ -66,20 +66,20 @@ public final class TypeCondition extends VariableConditionAdapter {
 			 SVSubstitute candidate, 
 			 SVInstantiations svInst,
 			 Services services) {
-        
+
         if (!resolver.isComplete(p_var, candidate, svInst, services)) {
             // instantiation not yet complete
             return true;
         }
         final Sort s = resolver.resolveSort(p_var, candidate, svInst, services);
-        
+
         Sort objectSort = services.getJavaInfo().objectSort();
-        
+
         boolean isProxySort = s instanceof ProxySort;
         if(!isProxySort) {
             // for normal sorts this is ...
-            if (isReference) {        
-                return (s.extendsTrans(objectSort) 
+            if (isReference) {
+                return (s.extendsTrans(objectSort)
                         && !(nonNull && s instanceof NullSort));
             } else {
                 return !(s.extendsTrans(objectSort));

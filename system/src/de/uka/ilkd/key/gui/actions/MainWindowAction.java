@@ -22,13 +22,9 @@ import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 
 public abstract class MainWindowAction extends AbstractAction {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -957832573562266547L;
 
     /**
      * This constant holds the typical key to be used for shortcuts
@@ -42,6 +38,7 @@ public abstract class MainWindowAction extends AbstractAction {
     protected MainWindowAction(MainWindow mainWindow) {
 	assert mainWindow != null;
 	this.mainWindow = mainWindow;
+        putValue(ACCELERATOR_KEY, KeyStrokeManager.get(this));
     }
 
     protected KeYMediator getMediator() {
@@ -56,10 +53,12 @@ public abstract class MainWindowAction extends AbstractAction {
         return (String)getValue(NAME);
     }
 
+    @Deprecated // add a line in gui.utils.KeyStrokeManager instead
     protected void setAcceleratorLetter(int letter) {
         setAcceleratorKey(KeyStroke.getKeyStroke(letter, SHORTCUT_KEY_MASK));
     }
 
+    @Deprecated // add a line in gui.utils.KeyStrokeManager instead
     protected void setAcceleratorKey(KeyStroke keyStroke) {
         putValue(ACCELERATOR_KEY, keyStroke);
     }

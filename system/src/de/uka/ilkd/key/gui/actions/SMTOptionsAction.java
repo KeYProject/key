@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
@@ -43,6 +44,7 @@ public class SMTOptionsAction extends MainWindowAction {
 public SMTOptionsAction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("SMT Solvers...");
+        setIcon(IconFactory.toolbox(16));
     }
 
     @Override

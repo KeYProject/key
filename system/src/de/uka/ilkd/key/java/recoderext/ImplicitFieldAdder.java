@@ -165,7 +165,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	if(td instanceof ClassDeclaration && 
 	        (td.getName()==null || 
 	                ((ClassDeclaration) td).getStatementContainer() !=null ||
-	                ((ClassDeclaration) td).getContainingClassType()!=null) &&
+	                td.getContainingClassType()!=null) &&
 	                (containingMethod(td)==null || !containingMethod(td).isStatic()) &&
 	                !td.isStatic()){
 	    ClassDeclaration container = containingClass(td);

@@ -14,18 +14,16 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
+import de.uka.ilkd.key.gui.MainWindow;
 import java.io.StringWriter;
-import java.io.Writer;
 
 import javax.swing.JMenuItem;
 
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.pp.WriterBackend;
 
 /** 
@@ -49,15 +47,15 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
             TacletApp connectedTo, NotationInfo notationInfo) {
         super(connectedTo.taclet().displayName());
         this.connectedTo = connectedTo;	    	    
-        StringBuffer taclet_sb = new StringBuffer();
+        StringBuilder taclet_sb = new StringBuilder();
         StringWriter w = new StringWriter();
         
         WriterBackend backend = new WriterBackend(w, 68);
-        LogicPrinter tp = new LogicPrinter(new ProgramPrinter(w,
+        SequentViewLogicPrinter tp = new SequentViewLogicPrinter(new ProgramPrinter(w,
                 connectedTo.instantiations()),
                 notationInfo, backend, null,
                 true,
-                SequentView.getTermLabelPreferences());
+                MainWindow.getInstance().getVisibleTermLabels());
         tp.printTaclet(connectedTo.taclet(), 
         	       connectedTo.instantiations(),
         	       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
@@ -101,7 +99,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
      * @param sb The StringBuffer with forbidden HTML characters
      * @return A new StringBuffer with the masked characters.
      */
-    protected StringBuffer ascii2html(StringBuffer sb) {
+    protected final StringBuffer ascii2html(StringBuffer sb) {
         StringBuffer nsb = new StringBuffer();
         StringBuffer asb = removeEmptyLines(sb);
         int sbl = asb.length();
@@ -146,6 +144,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.gui.TacletMenuItem#connectedTo()
      */
+    @Override
     public TacletApp connectedTo() {
         return connectedTo;
     }

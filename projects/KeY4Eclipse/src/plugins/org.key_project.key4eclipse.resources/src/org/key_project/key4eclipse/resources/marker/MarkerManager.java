@@ -24,8 +24,6 @@ import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.util.java.StringUtil;
 
-import de.uka.ilkd.key.proof.Proof;
-
 /**
  * Provides methods to create and delete all KeY{@link IMarker}.
  * @author Stefan Käsdorf
@@ -35,7 +33,7 @@ public class MarkerManager {
    public final static String CLOSEDMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.proofClosedMarker";
    public final static String NOTCLOSEDMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker";
    public final static String PROBLEMLOADEREXCEPTIONMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.problemLoaderExceptionMarker";
-   public final static String CYCLEDETECTEDMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.cycleDetectedMarker";
+   public final static String RECURSIONMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.cycleDetectedMarker";
    
    
    /**
@@ -49,11 +47,10 @@ public class MarkerManager {
          curMarker.delete();
       }
       SourceLocation scl = pe.getSourceLocation();
-      Proof proof = pe.getProof();
       IFile javaFile = pe.getJavaFile();
       IFile proofFile = pe.getProofFile();
       if(scl != null){
-         if (proof != null && proof.closed()) {
+         if (pe.getProofClosed()) {
             IMarker marker = javaFile.createMarker(CLOSEDMARKER_ID);
             if (marker.exists()) {
                marker.setAttribute(IMarker.MESSAGE, "Proof closed: " + proofFile.getFullPath());
@@ -82,17 +79,17 @@ public class MarkerManager {
    
    
    /**
-    * Creates the {@link MarkerManager#CYCLEDETECTEDMARKER_ID} for the given {@ink ProofElement}.
+    * Creates the {@link MarkerManager#RECURSIONMARKER_ID} for the given {@ink ProofElement}.
     * @param pe - the {@link ProofElement} to use
     * @throws CoreException
     */
-   public void setCycleDetectedMarker(LinkedList<ProofElement> cycle) throws CoreException{
+   public void setRecursionMarker(LinkedList<ProofElement> cycle) throws CoreException{
       ProofElement pe = cycle.get(0);
       IMarker  curMarker = getOldProofMarkerForPe(pe);
       if(curMarker != null){
          curMarker.delete();
       }
-      IMarker marker = pe.getJavaFile().createMarker(CYCLEDETECTEDMARKER_ID);
+      IMarker marker = pe.getJavaFile().createMarker(RECURSIONMARKER_ID);
       if (marker.exists()) {
          marker.setAttribute(IMarker.MESSAGE, generateCycleDetectedMarkerMessage(cycle));
          marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
@@ -187,7 +184,7 @@ public class MarkerManager {
       markerList.addAll(markerArrayToList(res.findMarkers(CLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE)));
       markerList.addAll(markerArrayToList(res.findMarkers(NOTCLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE)));
       markerList.addAll(markerArrayToList(res.findMarkers(PROBLEMLOADEREXCEPTIONMARKER_ID, true, IResource.DEPTH_INFINITE)));
-      markerList.addAll(markerArrayToList(res.findMarkers(CYCLEDETECTEDMARKER_ID, true, IResource.DEPTH_INFINITE)));
+      markerList.addAll(markerArrayToList(res.findMarkers(RECURSIONMARKER_ID, true, IResource.DEPTH_INFINITE)));
       return markerList;
    }
    
@@ -203,7 +200,7 @@ public class MarkerManager {
    public LinkedList<IMarker> getKeYMarkerByType(IResource res, int depth, String... types) throws CoreException{
       LinkedList<IMarker> markerList = new LinkedList<IMarker>();
       for(String type : types){
-         if(CLOSEDMARKER_ID.equals(type) || NOTCLOSEDMARKER_ID.equals(type) || PROBLEMLOADEREXCEPTIONMARKER_ID.equals(type) || CYCLEDETECTEDMARKER_ID.equals(type)){
+         if(CLOSEDMARKER_ID.equals(type) || NOTCLOSEDMARKER_ID.equals(type) || PROBLEMLOADEREXCEPTIONMARKER_ID.equals(type) || RECURSIONMARKER_ID.equals(type)){
             markerList.addAll(markerArrayToList(res.findMarkers(type, true, depth)));
          }
       }
@@ -235,7 +232,7 @@ public class MarkerManager {
       res.deleteMarkers(CLOSEDMARKER_ID, true, depth);
       res.deleteMarkers(NOTCLOSEDMARKER_ID, true, depth);
       res.deleteMarkers(PROBLEMLOADEREXCEPTIONMARKER_ID, true, depth);
-      res.deleteMarkers(CYCLEDETECTEDMARKER_ID, true, depth);
+      res.deleteMarkers(RECURSIONMARKER_ID, true, depth);
    }
    
    
@@ -253,8 +250,8 @@ public class MarkerManager {
          res.deleteMarkers(NOTCLOSEDMARKER_ID, true, depth);
       } else if(PROBLEMLOADEREXCEPTIONMARKER_ID.equals(type)){
          res.deleteMarkers(PROBLEMLOADEREXCEPTIONMARKER_ID, true, depth);
-      } else if(CYCLEDETECTEDMARKER_ID.equals(type)){
-         res.deleteMarkers(CYCLEDETECTEDMARKER_ID, true, depth);
+      } else if(RECURSIONMARKER_ID.equals(type)){
+         res.deleteMarkers(RECURSIONMARKER_ID, true, depth);
       }
    }
 }

@@ -18,7 +18,7 @@ public class IndexOf {
 		}
 		return i; // return index
 	}
-	
+
 	public static interface Comperator {
 		/*@ normal_behavior
 		  @ requires true;
