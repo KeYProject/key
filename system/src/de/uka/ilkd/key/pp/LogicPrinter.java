@@ -72,11 +72,11 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
-
 
 /**
  * The front end for the Sequent pretty-printer.  It prints a sequent
@@ -668,7 +668,7 @@ public class LogicPrinter {
 	    } else if (o instanceof ProgramElement) {
 		printProgramElement((ProgramElement)o);
 	    } else {		
-		Debug.log4jWarn("Unknown instantiation type of " + o + 
+                Debug.log4jWarn("Unknown instantiation type of " + o +
 			        "; class is " + o.getClass().getName(),
 			        LogicPrinter.class.getName());
 		printConstant(sv.name().toString());
@@ -1079,7 +1079,7 @@ public class LogicPrinter {
                 layouter.print(" || ");
             } else {
                 layouter.beginC(0);
-                layouter.mark(MARK_START_UPDATE);
+                mark(MarkType.MARK_START_UPDATE);
                 layouter.print("{"); // ("\u27E6");
             }
 
@@ -1099,7 +1099,7 @@ public class LogicPrinter {
 
             if(closingBrace) {
                 layouter.end();
-                layouter.mark(MARK_END_UPDATE);
+                mark(MarkType.MARK_END_UPDATE);
                 layouter.print("}"); //("\u27e7");
             }
 
@@ -1134,7 +1134,7 @@ public class LogicPrinter {
                 layouter.print(" || ");
             } else {
                 layouter.beginC(0);
-                layouter.mark(MARK_START_UPDATE);
+                mark(MarkType.MARK_START_UPDATE);
                 layouter.print("{"); // ("\u27E6");
             }
 
@@ -1148,7 +1148,7 @@ public class LogicPrinter {
 
             if(closingBrace) {
                 layouter.end();
-                layouter.mark(MARK_END_UPDATE);
+                mark(MarkType.MARK_END_UPDATE);
                 layouter.print("}"); //("\u27e7");
             }
 
@@ -1180,7 +1180,7 @@ public class LogicPrinter {
                 layouter.print(" || ");
             } else {
                 layouter.beginC(0);
-                layouter.mark(MARK_START_UPDATE);
+                mark(MarkType.MARK_START_UPDATE);
                 layouter.print("{"); // ("\u27E6");
             }
 
@@ -1201,7 +1201,7 @@ public class LogicPrinter {
             if(closingBrace) {
                 layouter.end();
                 layouter.print("}"); //("\u27e7");
-                layouter.mark(MARK_END_UPDATE);
+                mark(MarkType.MARK_END_UPDATE);
             }
 
         } else {
@@ -1234,7 +1234,7 @@ public class LogicPrinter {
                 layouter.print(" || ");
             } else {
                 layouter.beginC(0);
-                layouter.mark(MARK_START_UPDATE);
+                mark(MarkType.MARK_START_UPDATE);
                 layouter.print("{"); // ("\u27E6");
             }
 
@@ -1298,7 +1298,7 @@ public class LogicPrinter {
 
             if(closingBrace) {
                 layouter.print("}"); //("\u27e7");
-                layouter.mark(MARK_END_UPDATE);
+                mark(MarkType.MARK_END_UPDATE);
                 layouter.end();
             }
 
@@ -1311,72 +1311,61 @@ public class LogicPrinter {
         assert t.boundVars().isEmpty();            
         assert t.arity() == 3;	
 	final HeapLDT heapLDT = services == null 
-			        ? null 
-			        : services.getTypeConverter().getHeapLDT();
-        if(NotationInfo.PRETTY_SYNTAX
-            && heapLDT != null
-            && t.sub(0).op().sort(t.subs()).equals(
-               services.getNamespaces().sorts().lookup(new Name("Heap")))) {
+                ? null : services.getTypeConverter().getHeapLDT();
+
+        if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
+
             startTerm(3);
             
             final Term objectTerm = t.sub(1);
             final Term fieldTerm  = t.sub(2);
                 
-            final boolean printHeap = t.sub(0).op() != heapLDT.getHeap();
-            if (printHeap) {
-                markStartSub();
-                printTerm(t.sub(0));
-                markEndSub();
-                layouter.print("[");
-            } else {
-                markStartSub();
-            //heap not printed
-            markEndSub();
-            }
-
-            if(objectTerm.equals(services.getTermBuilder().NULL())
+             if(objectTerm.equals(services.getTermBuilder().NULL())
                 && fieldTerm.op() instanceof Function
                 && ((Function)fieldTerm.op()).isUnique()) {
-        	String className 
-        		= heapLDT.getClassName((Function)fieldTerm.op());
+                // static field access
+                String className = heapLDT.getClassName((Function)fieldTerm.op());
         	
         	if(className == null) {
-        	    markStartSub();
+                    // if the class name cannot be determined, print "null"
+                    markStartSub(1);
         	    printTerm(objectTerm);
         	    markEndSub();
         	} else {
-        	    markStartSub();
-        	    //"null" not printed
+                    markStartSub(1);
+                    // "null" not printed, print className (which is not a subterm)
         	    markEndSub();
         	    printClassName(className);
         	}
         	
         	layouter.print(".");
         	
-                markStartSub();
-                startTerm(0);                    
+                markStartSub(2);
+                // is this right at all? // startTerm(0);
                 printTerm(fieldTerm);
                 markEndSub();                    
+
             } else if(fieldTerm.arity() == 0) {
-        	markStartSub();
+                // field constant, skolemised field, field variable, ...
+                markStartSub(1);
                 printTerm(objectTerm);
                 markEndSub();
         	
                 layouter.print(".");
                 
-                markStartSub();
-                startTerm(0);                    
+                markStartSub(2);
+                // is this right at all? // startTerm(0);
                 printTerm(fieldTerm);
                 markEndSub();                    
             } else if(fieldTerm.op() == heapLDT.getArr()) {
-        	markStartSub();
+                markStartSub(1);
                 printTerm(objectTerm);
                 markEndSub();
         	
                 layouter.print("[");
                 
                 markStartSub();
-                startTerm(1);
+                startTerm(2);
                 markStartSub();
                 printTerm(fieldTerm.sub(0));
                 markEndSub();
@@ -1386,9 +1375,19 @@ public class LogicPrinter {
             } else {
         	printFunctionTerm(t.op().name().toString(), t);
             }	
+
+            final boolean printHeap = t.sub(0).op() != heapLDT.getHeap();
             if (printHeap) {
-                layouter.print("]");
+                layouter.print(" in ");
+                markStartSub(0);
+                printTerm(t.sub(0));
+                markEndSub();
+            } else {
+                markStartSub(0);
+                // heap not printed
+                markEndSub();
             }
+
         } else {
             printFunctionTerm(t.op().name().toString(), t);
         }
@@ -1662,7 +1661,7 @@ public class LogicPrinter {
                                             int ass3) throws IOException {
 	assert t.op() instanceof UpdateApplication && t.arity() == 2;
 		
-	mark(MARK_START_UPDATE);
+        mark(MarkType.MARK_START_UPDATE);
         layouter.beginC(2).print(l);
         startTerm(t.arity());
         
@@ -1671,7 +1670,7 @@ public class LogicPrinter {
         markEndSub();        
         
         layouter.print(r);
-        mark(MARK_END_UPDATE);
+        mark(MarkType.MARK_END_UPDATE);
         layouter.brk(0);
         
         maybeParens(t.sub(1), ass3);
@@ -1931,9 +1930,9 @@ public class LogicPrinter {
         String end = s.substring(iEnd);
         layouter.beginC(0);
         printVerbatim(start);
-        mark(MARK_START_FIRST_STMT);
+        mark(MarkType.MARK_START_FIRST_STMT);
         printVerbatim(firstStmt);
-        mark(MARK_END_FIRST_STMT);
+        mark(MarkType.MARK_END_FIRST_STMT);
         printVerbatim(end);
         layouter.end();
     }
@@ -2005,7 +2004,7 @@ public class LogicPrinter {
             }
         }
 
-        mark(MARK_MODPOSTBL);
+        mark(MarkType.MARK_MODPOSTBL);
         startTerm(phi.arity());
         layouter.print(left);
         printJavaBlock(jb);
@@ -2061,11 +2060,15 @@ public class LogicPrinter {
         return new StringBuffer(((PosTableStringBackend)backend).getString()).append("\n");
     }
 
-    protected Layouter mark(Object o) {
+    protected Layouter mark(MarkType type) {
+        return mark(type, -1);
+    }
+
+    protected Layouter mark(MarkType type, int parameter) {
         if (pure) {
                 return null;
         } else {
-                return layouter.mark(o);
+                return layouter.mark(new Pair<MarkType, Integer>(type, parameter));
         }
     }
     
@@ -2154,25 +2157,29 @@ public class LogicPrinter {
         return instantiations;
     }
 
+    private static enum MarkType {
+        /** Mark the beginning of a term */
+        MARK_START_TERM,
     /** Mark the start of a subterm.  Needed for PositionTable construction.*/
-    private static final Object MARK_START_SUB = new Object();
+        MARK_START_SUB,
     /** Mark the end of a subterm.  Needed for PositionTable construction.*/
-    private static final Object MARK_END_SUB = new Object();
+        MARK_END_SUB,
     /** Mark the start of the first executable statement.
      * Needed for PositionTable construction.*/
-    private static final Object MARK_START_FIRST_STMT = new Object();
+        MARK_START_FIRST_STMT,
     /** Mark the end of the first executable statement.
      * Needed for PositionTable construction.*/
-    private static final Object MARK_END_FIRST_STMT = new Object();
+        MARK_END_FIRST_STMT,
     /** Mark the need for a ModalityPositionTable.  The next
      * startTerm mark will construct a ModalityPositionTable
      * instead of the usual PositionTable.
      * Needed for PositionTable construction.*/
-    private static final Object MARK_MODPOSTBL = new Object();
+        MARK_MODPOSTBL,
     /** Mark the start of an update.*/
-    private static final Object MARK_START_UPDATE = new Object();
+        MARK_START_UPDATE,
     /** Mark the end of an update.*/
-    private static final Object MARK_END_UPDATE = new Object();
+        MARK_END_UPDATE,
+    }
 
     private boolean createPositionTable = true;
 
@@ -2187,7 +2194,16 @@ public class LogicPrinter {
      */
     protected void markStartSub() {
         if (createPositionTable) {
-            mark(MARK_START_SUB);
+            mark(MarkType.MARK_START_SUB);
+        }
+    }
+
+    /**
+     * TODO
+     */
+    protected void markStartSub(int subterm) {
+        if (createPositionTable) {
+            mark(MarkType.MARK_START_SUB, subterm);
         }
     }
 
@@ -2201,7 +2217,7 @@ public class LogicPrinter {
      */
     protected void markEndSub() {
         if (createPositionTable) {
-            mark(MARK_END_SUB);
+            mark(MarkType.MARK_END_SUB);
         }
     }
 
@@ -2215,7 +2231,7 @@ public class LogicPrinter {
      */
     protected void startTerm(int size) {
         if (createPositionTable) {
-            mark(Integer.valueOf(size));
+            mark(MarkType.MARK_START_TERM, size);
         }
     }
 
@@ -2410,6 +2426,15 @@ public class LogicPrinter {
         @Override
         public void mark(Object o) {
 
+            assert o instanceof Pair : "corrupt mark object " + o;
+            Pair<?,?> pair = (Pair<?,?>)o;
+
+            assert pair.first instanceof MarkType : "corrupt mark object " + o;
+            MarkType markType = (MarkType) pair.first;
+
+            assert pair.second instanceof Integer : "corrupt mark object " + o;
+            int parameter = (Integer) pair.second;
+
             // IMPLEMENTATION NOTE
             //
             // This if-cascade is really ugly.  In paricular the part
@@ -2423,39 +2448,67 @@ public class LogicPrinter {
             // objects for each startTerm call to wrap the arity.
             //
             // I (MG) prefer it this way.
-            if ( o==MARK_START_SUB ) {
+            //
+            // MU refactored this using enums which makes it a littl eless ugly
+            // and more flexible.
+            switch(markType) {
+            case MARK_START_SUB:
+                if(parameter == -1) {
+                    // no parameter means subterms in normal order
                 posTbl.setStart(count()-pos);
+                } else {
+                    // parameter means a particular subterm has been chosen
+                    posTbl.setStart(parameter, count()-pos);
+                }
                 stack.push(new StackEntry(posTbl, pos));
                 pos=count();
-            } else if ( o==MARK_END_SUB ) {
+                break;
+
+            case MARK_END_SUB:
                 StackEntry se=stack.peek();
                 stack.pop();
                 pos=se.pos();
                 se.posTbl().setEnd(count()-pos, posTbl);
                 posTbl=se.posTbl();
-            } else if ( o==MARK_MODPOSTBL ) {
+                break;
+
+            case MARK_MODPOSTBL:
                 need_modPosTable = true;
-            } else if ( o instanceof Integer ) {
+                break;
+
+            case MARK_START_TERM:
                 // This is sent by startTerm
-                int rows = ((Integer)o).intValue();
+                int rows = parameter;
                 if (need_modPosTable) {
                     posTbl = new ModalityPositionTable(rows);
                 } else {
                     posTbl = new PositionTable(rows);
                 }
                 need_modPosTable = false;
-            } else if ( o==MARK_START_FIRST_STMT ) {
+                break;
+
+            case MARK_START_FIRST_STMT:
                 firstStmtStart = count()-pos;
-            } else if ( o==MARK_END_FIRST_STMT ) {
+                break;
+
+            case MARK_END_FIRST_STMT:
                 firstStmtRange = new Range(firstStmtStart,
                                            count()-pos);
                 ((ModalityPositionTable)posTbl)
                     .setFirstStatementRange(firstStmtRange);
-            } else if ( o==MARK_START_UPDATE ) {
+                break;
+
+            case MARK_START_UPDATE:
         	updateStarts.push(count());
-            } else if ( o==MARK_END_UPDATE ) {
+                break;
+
+            case MARK_END_UPDATE:
         	int updateStart = updateStarts.pop();
                 initPosTbl.addUpdateRange(new Range(updateStart, count()));
+                break;
+
+            default:
+                System.err.println("Unexpected LogicPrinter mark: " + markType);
             }
         }
     }
