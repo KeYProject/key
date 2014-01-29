@@ -160,7 +160,12 @@ public class ProofTreeLabelProvider extends LabelProvider {
             return KeYImages.getImage(KeYImages.NODE_PROVED);
          }
          else {
-            return KeYImages.getImage(KeYImages.NODE);
+            if (node.getNodeInfo().getInteractiveRuleApplication()) {
+               return KeYImages.getImage(KeYImages.NODE_INTERACTIVE);
+            }
+            else {
+               return KeYImages.getImage(KeYImages.NODE);
+            }
          }
       }
       else if (element instanceof BranchFolder){
