@@ -154,6 +154,8 @@ public final class NotationInfo {
      */
     public static boolean UNICODE_ENABLED = false;
     
+    public static boolean HIDE_PACKAGE_PREFIX = false;
+    
     /** This maps operators and classes of operators to {@link
      * Notation}s.  The idea is that we first look whether the operator has
      * a Notation registered.  Otherwise, we see if there is one for the

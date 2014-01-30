@@ -1105,6 +1105,10 @@ public class LogicPrinter {
             printFunctionTerm(t.op().name().toString(), t);
         }
     }
+    
+    public void printClassName (String className) throws IOException {
+        layouter.print(className);
+    }
 
     public void printCreate(Term t, boolean closingBrace) throws IOException {
         assert t.boundVars().isEmpty();
@@ -1246,7 +1250,7 @@ public class LogicPrinter {
                     markStartSub();
                     // "null" not printed
                     markEndSub();
-                    layouter.print(className);
+                    printClassName(className);
                 }
 
                 layouter.print(".");
@@ -1342,7 +1346,7 @@ public class LogicPrinter {
         	    markStartSub();
         	    //"null" not printed
         	    markEndSub();
-        	    layouter.print(className);
+        	    printClassName(className);
         	}
         	
         	layouter.print(".");
