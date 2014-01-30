@@ -1393,18 +1393,14 @@ public class LogicPrinter {
     }
     
     
-    public void printLength(Term t) throws IOException {
-	final HeapLDT heapLDT = services == null 
-        			? null 
-        			: services.getTypeConverter().getHeapLDT();
-	if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
-	    assert t.op() == heapLDT.getLength();
+    public void printPostfix(Term t, String postfix) throws IOException {
+	if(NotationInfo.PRETTY_SYNTAX) {
 	    startTerm(t.arity());
 	    
 	    markStartSub();
 	    printTerm(t.sub(0));
 	    markEndSub();
-	    layouter.print(".length");
+	    layouter.print(postfix);
 	} else {
 	    printFunctionTerm(t.op().name().toString(), t);            
 	}	

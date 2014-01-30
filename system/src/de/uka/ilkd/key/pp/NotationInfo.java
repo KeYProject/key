@@ -280,7 +280,7 @@ public final class NotationInfo {
 	tbl.put(heapLDT.getMemset(), new Notation.MemsetNotation());
 	tbl.put(IObserverFunction.class, new Notation.ObserverNotation());
 	tbl.put(IProgramMethod.class, new Notation.ObserverNotation());
-	tbl.put(heapLDT.getLength(), new Notation.LengthNotation());
+	tbl.put(heapLDT.getLength(), new Notation.Postfix(".length"));
 	
 	//set operators
 	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
@@ -289,7 +289,8 @@ public final class NotationInfo {
 	tbl.put(setLDT.getIntersect(), new Notation.Infix("\\cap", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
 	tbl.put(setLDT.getSetMinus(), new Notation.Infix("\\setMinus", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
 	tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation());
-    tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(setLDT.getAllFields(), new Notation.Postfix(".*"));
 	
 	//string operators
 	final CharListLDT charListLDT 
