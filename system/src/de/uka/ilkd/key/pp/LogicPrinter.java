@@ -1749,7 +1749,8 @@ public class LogicPrinter {
                     TermFactory.DEFAULT.createTerm(v);
                 if (mode != QuantifiableVariablePrintMode.WITH_OUT_DECLARATION) {
                     // do not print declarations in taclets...
-                    layouter.print(v.sort().name().toString() + " ");
+                    printClassName(v.sort().name().toString());
+                    layouter.print(" ");
                 }
                 if(notationInfo.getAbbrevMap().containsTerm(t)) {
                     layouter.print (notationInfo.getAbbrevMap().getAbbrev(t));

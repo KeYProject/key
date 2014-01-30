@@ -65,9 +65,10 @@ public class SequentViewLogicPrinter extends LogicPrinter {
     
     @Override
     public void printClassName (String className) throws IOException {
-        final String simpleName = NotationInfo.HIDE_PACKAGE_PREFIX?
-                className.substring(className.lastIndexOf('.')+1)
-                : className;
-        super.printClassName(simpleName);
+        final boolean hidePP = NotationInfo.PRETTY_SYNTAX && NotationInfo.HIDE_PACKAGE_PREFIX;
+        if (hidePP) {
+            className = className.substring(className.lastIndexOf('.')+1);
+        }
+        super.printClassName(className);
     }
 }
