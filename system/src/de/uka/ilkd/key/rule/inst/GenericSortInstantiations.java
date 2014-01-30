@@ -205,7 +205,7 @@ public final class GenericSortInstantiations {
 	if ( p_s instanceof GenericSort ) {
 	    p_s = getInstantiation ( (GenericSort)p_s );
 	    if ( p_s == null ) {
-		throw GenericSortException.UNINSTANTIATED_GENERIC_SORT;
+                throw new GenericSortException("Generic sort is not yet instantiated", null);
             }
 	}
 
