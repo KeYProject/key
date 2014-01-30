@@ -45,8 +45,8 @@ public abstract class TablePanel extends JPanel{
         }
         
         protected void updateOptions(){}
-
-    protected final void createTable(){
+        
+        protected final void createTable(){
                 createComponents();
                 finalizeAddingComponents();
         }
@@ -115,7 +115,7 @@ public abstract class TablePanel extends JPanel{
         
         protected FileChooserPanel addFileChooserPanel(String title, String file, String info,
                         boolean selected,boolean enabled, ActionListener changeListener){
-              FileChooserPanel fileChooserPanel =  new FileChooserPanel(selected,enabled,title);
+              FileChooserPanel fileChooserPanel =  new FileChooserPanel(selected,enabled,title,file);
               fileChooserPanel.addActionListener(changeListener);
               setMaximumHeight(fileChooserPanel, fileChooserPanel.getPreferredSize().height);
               addComponent(info,fileChooserPanel);

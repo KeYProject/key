@@ -55,8 +55,8 @@ import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
 import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
 import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
-import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
 import de.uka.ilkd.key.strategy.feature.ContainsTermFeature;
+import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
 import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
 import de.uka.ilkd.key.strategy.feature.CountPosDPathFeature;
 import de.uka.ilkd.key.strategy.feature.DependencyContractFeature;
@@ -110,12 +110,12 @@ import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.AnonHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.PrimitiveHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsNonRigidTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsSelectSkolemConstantTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
 import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
-import de.uka.ilkd.key.strategy.termfeature.PrimitiveHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.SimplifiedSelectTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
@@ -177,7 +177,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }    
     
     
-    protected Feature setupGlobalF(Feature dispatcher, Proof p_proof) {//
+    protected Feature setupGlobalF(Feature dispatcher, Proof p_proof) {//        
         final Feature ifMatchedF = ifZero ( MatchedIfFeature.INSTANCE,
                                             longConst ( +1 ) );
         
@@ -259,18 +259,18 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
       //  final Feature smtF = smtFeature(inftyConst());
         
         return SumFeature.createSum (AutomatedRuleFeature.INSTANCE,
-                NonDuplicateAppFeature.INSTANCE,
+              NonDuplicateAppFeature.INSTANCE,
 //              splitF,
-//              strengthenConstraints,
-                AgeFeature.INSTANCE,
-                oneStepSimplificationF,
-                // smtF,
-                methodSpecF,
-                queryF,
-                depSpecF,
-                loopInvF,
-                blockFeature,
-                ifMatchedF,
+//              strengthenConstraints, 
+              AgeFeature.INSTANCE,
+              oneStepSimplificationF,
+             // smtF, 
+              methodSpecF, 
+              queryF,
+              depSpecF,
+              loopInvF,
+              blockFeature,
+              ifMatchedF,
                 dispatcher);
     }
     
@@ -334,7 +334,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 services.getTypeConverter().getLocSetLDT();
             
         final RuleSetDispatchFeature d = RuleSetDispatchFeature.create ();
-            
+           
+        bindRuleSet ( d, "semantics_blasting", inftyConst () );
+        
         bindRuleSet ( d, "closure", -15000 );
         bindRuleSet ( d, "alpha", -7000 );
         bindRuleSet ( d, "delta", -6000 );
@@ -1035,11 +1037,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             // standard costs
                             longConst ( 10 )),
                       SumFeature.createSum (
-                              applyTF ( "cutFormula",
-                                ff.cutAllowedBelowQuantifier ),
-                              applyTF ( FocusFormulaProjection.INSTANCE,
-                                        ff.quantifiedClauseSet ),
-                              ifZero ( allowQuantifierSplitting (),
+                            applyTF ( "cutFormula",
+                                      ff.cutAllowedBelowQuantifier ),
+                            applyTF ( FocusFormulaProjection.INSTANCE,
+                                      ff.quantifiedClauseSet ),
+                            ifZero ( allowQuantifierSplitting (),
                                        longConst ( 0 ), longConst ( 100 ) )) ) } ) );
     }
 
@@ -1172,12 +1174,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 				      not ( opSub ( Quantifier.ALL, ff.orF ) ),
                                       EliminableQuantifierTF.INSTANCE ) ),
                       SumFeature.createSum (
-                              OnlyInScopeOfQuantifiersFeature.INSTANCE,
-                              SplittableQuantifiedFormulaFeature.INSTANCE,
-                              ifZero ( FocusInAntecFeature.INSTANCE,
-                                       applyTF ( FocusProjection.create ( 0 ),
-                                                 sub ( ff.andF ) ),
-                                       applyTF ( FocusProjection.create ( 0 ),
+                           OnlyInScopeOfQuantifiersFeature.INSTANCE,
+                           SplittableQuantifiedFormulaFeature.INSTANCE,
+                           ifZero ( FocusInAntecFeature.INSTANCE,
+                                    applyTF ( FocusProjection.create ( 0 ),
+                                              sub ( ff.andF ) ),
+                                    applyTF ( FocusProjection.create ( 0 ),
                                                  sub ( ff.orF ) ) )) ),
                  longConst ( -300 ) ) );
 
@@ -1554,14 +1556,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "polySimp_newSym",
            ifZero ( not ( isInstantiated ( "newSymDef" ) ),
               SumFeature.createSum (applyTF ( "newSymLeft", tf.atom ),
-                      applyTF ( "newSymLeftCoeff", tf.atLeastTwoLiteral ),
-                      applyTF ( "newSymRight", tf.polynomial ),
-                      instantiate ( "newSymDef",
-                                    MonomialColumnOp
-                                    .create(instOf("newSymLeftCoeff"),
+                applyTF ( "newSymLeftCoeff", tf.atLeastTwoLiteral ),
+                applyTF ( "newSymRight", tf.polynomial ),
+                instantiate ( "newSymDef",
+                              MonomialColumnOp
+                              .create ( instOf ( "newSymLeftCoeff" ),
                                             instOf("newSymRight")) )) ) );
-
-                                final TermBuffer divisor = new TermBuffer ();
+        
+        final TermBuffer divisor = new TermBuffer ();
         final TermBuffer dividend = new TermBuffer ();
 
         bindRuleSet ( d, "polySimp_applyEqPseudo",
@@ -1570,18 +1572,18 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
              applyTF ( "aePseudoTargetRight", tf.polynomial ),
              ifZero (MatchedIfFeature.INSTANCE,
                SumFeature.createSum (DiffFindAndIfFeature.INSTANCE,
-                       applyTF ( "aePseudoLeft", add ( tf.nonCoeffMonomial,
-                                                       not ( tf.atom ) ) ),
-                       applyTF ( "aePseudoLeftCoeff", tf.atLeastTwoLiteral ),
-                       applyTF ( "aePseudoRight", tf.polynomial ),
-                       MonomialsSmallerThanFeature.create ( instOf ( "aePseudoRight" ),
-                                                            instOf ( "aePseudoLeft" ),
-                                                            numbers ),
-                       let ( divisor, instOf ( "aePseudoLeft" ),
-                       let ( dividend, instOf ( "aePseudoTargetLeft" ),
-                       add ( ReducibleMonomialsFeature.createReducible ( dividend, divisor ),
-                             instantiate ( "aePseudoTargetFactor",
-                                           ReduceMonomialsProjection
+                  applyTF ( "aePseudoLeft", add ( tf.nonCoeffMonomial,
+                                                  not ( tf.atom ) ) ),
+                  applyTF ( "aePseudoLeftCoeff", tf.atLeastTwoLiteral ),
+                  applyTF ( "aePseudoRight", tf.polynomial ),
+                  MonomialsSmallerThanFeature.create ( instOf ( "aePseudoRight" ),
+                                                       instOf ( "aePseudoLeft" ),
+                                                       numbers ),
+                  let ( divisor, instOf ( "aePseudoLeft" ),
+                  let ( dividend, instOf ( "aePseudoTargetLeft" ),
+                  add ( ReducibleMonomialsFeature.createReducible ( dividend, divisor ),
+                        instantiate ( "aePseudoTargetFactor",
+                                      ReduceMonomialsProjection
                                            .create(dividend, divisor) ) ) ) )) ) ) );
     }
 

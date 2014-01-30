@@ -70,6 +70,7 @@ import javax.swing.event.MouseInputAdapter;
 import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
 import de.uka.ilkd.key.gui.actions.AboutAction;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
+import de.uka.ilkd.key.gui.actions.CounterExampleAction;
 import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.FontSizeAction;
@@ -538,6 +539,8 @@ public final class MainWindow extends JFrame  {
         ComplexButton comp = createSMTComponent();
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
+        toolBar.addSeparator();        
+        toolBar.add(new CounterExampleAction(this));
         toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this, false));
