@@ -1056,65 +1056,13 @@ public class LogicPrinter {
         }
     }
 
-    public void printMemset(Term t, boolean closingBrace) throws IOException {
-        assert t.boundVars().isEmpty();
-        assert t.arity() == 3;
-
-        final HeapLDT heapLDT = services == null
-                ? null
-                : services.getTypeConverter().getHeapLDT();
-
-        if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
-            startTerm(t.arity());
-            final Term heapTerm = t.sub(0);
-            final Term locset = t.sub(1);
-            final Term value = t.sub(2);
-
-            markStartSub();
-            boolean hasEmbedded = printEmbeddedHeapTerm(heapTerm);
-            markEndSub();
-
-            if(hasEmbedded) {
-                layouter.brk(0);
-                layouter.print(" || ");
-            } else {
-                layouter.beginC(0);
-                mark(MarkType.MARK_START_UPDATE);
-                layouter.print("{"); // ("\u27E6");
-            }
-
-            layouter.print("Memset(");
-
-            markStartSub();
-            printTerm(locset);
-            markEndSub();
-
-            layouter.print(",");
-
-            markStartSub();
-            printTerm(value);
-            markEndSub();
-
-            layouter.print(")");
-
-            if(closingBrace) {
-                layouter.end();
-                mark(MarkType.MARK_END_UPDATE);
-                layouter.print("}"); //("\u27e7");
-            }
-
-        } else {
-            printFunctionTerm(t.op().name().toString(), t);
-        }
-    }
-    
-    public void printClassName (String className) throws IOException {
+ public void printClassName (String className) throws IOException {
         layouter.print(className);
     }
 
-    public void printCreate(Term t, boolean closingBrace) throws IOException {
+    public void printHeapConstructor(Term t, boolean closingBrace) throws IOException {
         assert t.boundVars().isEmpty();
-        assert t.arity() == 2;
+
 
         final HeapLDT heapLDT = services == null
                 ? null
@@ -1123,7 +1071,9 @@ public class LogicPrinter {
         if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
             startTerm(t.arity());
             final Term heapTerm = t.sub(0);
-            final Term object = t.sub(1);
+            final String opName = t.op().name().toString();
+
+            assert heapTerm.sort() == heapLDT.targetSort();
 
             markStartSub();
             boolean hasEmbedded = printEmbeddedHeapTerm(heapTerm);
@@ -1131,77 +1081,26 @@ public class LogicPrinter {
 
             if(hasEmbedded) {
                 layouter.brk(0);
-                layouter.print(" || ");
             } else {
                 layouter.beginC(0);
-                mark(MarkType.MARK_START_UPDATE);
-                layouter.print("{"); // ("\u27E6");
             }
 
-            layouter.print("Create(");
+            layouter.print("[" + opName + "(");
 
             markStartSub();
-            printTerm(object);
-            markEndSub();
+            for(int i = 1; i < t.arity(); i++) {
+                if(i > 1) {
+                    layouter.print(", ");
+                }
+                markStartSub();
+                printTerm(t.sub(i));
+                markEndSub();
+            }
 
-            layouter.print(")");
+            layouter.print(")]");
 
             if(closingBrace) {
                 layouter.end();
-                mark(MarkType.MARK_END_UPDATE);
-                layouter.print("}"); //("\u27e7");
-            }
-
-        } else {
-            printFunctionTerm(t.op().name().toString(), t);
-        }
-    }
-
-    public void printAnon(Term t, boolean closingBrace) throws IOException {
-        assert t.boundVars().isEmpty();
-        assert t.arity() == 3;
-
-        final HeapLDT heapLDT = services == null
-                ? null
-                : services.getTypeConverter().getHeapLDT();
-
-        if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
-            startTerm(t.arity());
-            final Term heapTerm = t.sub(0);
-            final Term locset = t.sub(1);
-            final Term otherHeapTerm  = t.sub(2);
-
-            markStartSub();
-            boolean hasEmbedded = printEmbeddedHeapTerm(heapTerm);
-            markEndSub();
-
-            if(hasEmbedded) {
-                layouter.brk(0);
-                layouter.print(" || ");
-            } else {
-                layouter.beginC(0);
-                mark(MarkType.MARK_START_UPDATE);
-                layouter.print("{"); // ("\u27E6");
-            }
-
-            layouter.print("anon(");
-
-            markStartSub();
-            printTerm(locset);
-            markEndSub();
-
-            layouter.print(", ");
-
-            markStartSub();
-            printTerm(otherHeapTerm);
-            markEndSub();
-
-            layouter.print(")");
-
-            if(closingBrace) {
-                layouter.end();
-                layouter.print("}"); //("\u27e7");
-                mark(MarkType.MARK_END_UPDATE);
             }
 
         } else {
@@ -1231,12 +1130,11 @@ public class LogicPrinter {
 
             if(hasEmbedded) {
                 layouter.brk(0);
-                layouter.print(" || ");
             } else {
                 layouter.beginC(0);
-                mark(MarkType.MARK_START_UPDATE);
-                layouter.print("{"); // ("\u27E6");
             }
+
+            layouter.print("[");
 
             if(objectTerm.equals(services.getTermBuilder().NULL())
                     && fieldTerm.op() instanceof Function
@@ -1296,9 +1194,9 @@ public class LogicPrinter {
             printTerm(valueTerm);
             markEndSub();
 
+            layouter.print("]");
+
             if(closingBrace) {
-                layouter.print("}"); //("\u27e7");
-                mark(MarkType.MARK_END_UPDATE);
                 layouter.end();
             }
 

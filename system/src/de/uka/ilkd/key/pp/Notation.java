@@ -379,54 +379,20 @@ public abstract class Notation {
     /**
      * The standard concrete syntax for anon.
      */
-    public static final class AnonNotation extends HeapNotation {
-        public AnonNotation() {
+    public static final class HeapConstructorNotation extends HeapNotation {
+        public HeapConstructorNotation() {
             super(140);
         }
 
         public void print(Term t, LogicPrinter sp) throws IOException {
-            sp.printAnon(t, true);
+            sp.printHeapConstructor(t, true);
         }
 
         public void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException {
-            sp.printAnon(t, false);
+            sp.printHeapConstructor(t, false);
         }
     }
 
-    /**
-     * The standard concrete syntax for Create.
-     */
-    public static final class CreateNotation extends HeapNotation {
-        public CreateNotation() {
-            super(140);
-        }
-
-        public void print(Term t, LogicPrinter sp) throws IOException {
-            sp.printCreate(t, true);
-        }
-
-        public void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException {
-            sp.printCreate(t, false);
-        }
-    }
-
-    /**
-     * The standard concrete syntax for memset.
-     */
-    public static final class MemsetNotation extends HeapNotation {
-        public MemsetNotation() {
-            super(140);
-        }
-
-        public void print(Term t, LogicPrinter sp) throws IOException {
-            sp.printMemset(t, true);
-        }
-
-        public void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException {
-            sp.printMemset(t, false);
-        }
-    }
-    
     /**
      * The standard concrete syntax for length.
      */

@@ -272,9 +272,9 @@ public final class NotationInfo {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
 	tbl.put(heapLDT.getStore(), new Notation.StoreNotation());
-	tbl.put(heapLDT.getAnon(), new Notation.AnonNotation());
-	tbl.put(heapLDT.getCreate(), new Notation.CreateNotation());
-	tbl.put(heapLDT.getMemset(), new Notation.MemsetNotation());
+        tbl.put(heapLDT.getAnon(), new Notation.HeapConstructorNotation());
+        tbl.put(heapLDT.getCreate(), new Notation.HeapConstructorNotation());
+        tbl.put(heapLDT.getMemset(), new Notation.HeapConstructorNotation());
 	tbl.put(IObserverFunction.class, new Notation.ObserverNotation());
 	tbl.put(IProgramMethod.class, new Notation.ObserverNotation());
 	tbl.put(heapLDT.getLength(), new Notation.Postfix(".length"));
