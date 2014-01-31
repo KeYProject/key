@@ -20,6 +20,8 @@ lexer grammar KeYJMLPreLexer;
     import de.uka.ilkd.key.util.Debug;
 }
 
+@annotateclass{ @SuppressWarnings("all") } 
+
 @members {
     private final Stack<String> paraphrase = new Stack<String>();
 

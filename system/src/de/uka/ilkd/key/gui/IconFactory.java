@@ -14,14 +14,20 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.Image;
+import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.MetalIconFactory.FolderIcon16;
 import javax.swing.plaf.metal.MetalIconFactory.TreeControlIcon;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -267,7 +273,7 @@ public class IconFactory {
     }
 
 
-    private static class KeYFolderIcon extends FolderIcon16 {
+    public static class KeYFolderIcon extends FolderIcon16 {
 
         private static final long serialVersionUID = 5120051888984645985L;
         private static final Icon closedIcon   = new KeYFolderIcon(Color.green.darker());
@@ -289,7 +295,7 @@ public class IconFactory {
         }
 
         public void paintIcon(Component c, Graphics g, int x, int y) {
-            GraphicsConfiguration gc = c.getGraphicsConfiguration();
+            GraphicsConfiguration gc = c != null ? c.getGraphicsConfiguration() : null;
             Image image;
             if (gc != null) {
                 image = gc.createCompatibleImage(getIconWidth(), 
@@ -415,5 +421,4 @@ public class IconFactory {
                     }
         }
     }
-
 }

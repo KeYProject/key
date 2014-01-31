@@ -23,6 +23,10 @@ import javax.swing.JMenu;
  */
 public class TermLabelMenu extends JMenu {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private final Map<Name, TermLabelCheckBox> checkBoxMap;
     private final MainWindow mainWindow;
     private final VisibleTermLabels visibleTermLabels;
@@ -30,7 +34,7 @@ public class TermLabelMenu extends JMenu {
 
     public TermLabelMenu(final MainWindow mainWindow) {
 
-        setText("Term Labels");
+        setText("Hide Term Labels");
         setToolTipText("Configure term label visibility.");
         checkBoxMap = new TreeMap<Name, TermLabelCheckBox>();
         this.mainWindow = mainWindow;

@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.Reader;
 
 import antlr.RecognitionException;
-import antlr.TokenStreamException;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;

@@ -5,6 +5,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.util.pp.Backend;
+
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -51,7 +53,7 @@ public class SequentViewLogicPrinter extends LogicPrinter {
     @Override
     protected ImmutableArray<TermLabel> getVisibleTermLabels(Term t) {
 
-        List<TermLabel> termLabelList = new LinkedList();
+        List<TermLabel> termLabelList = new LinkedList<TermLabel>();
         for (TermLabel label : t.getLabels()) {
             if (visibleTermLabels.contains(label)) {
                 termLabelList.add(label);
@@ -60,5 +62,13 @@ public class SequentViewLogicPrinter extends LogicPrinter {
 
         return new ImmutableArray<TermLabel>(termLabelList);
     }
-
+    
+    @Override
+    public void printClassName (String className) throws IOException {
+        final boolean hidePP = NotationInfo.PRETTY_SYNTAX && NotationInfo.HIDE_PACKAGE_PREFIX;
+        if (hidePP) {
+            className = className.substring(className.lastIndexOf('.')+1);
+        }
+        super.printClassName(className);
+    }
 }
