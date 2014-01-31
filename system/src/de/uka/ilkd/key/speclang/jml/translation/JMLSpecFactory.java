@@ -97,7 +97,7 @@ public class JMLSpecFactory {
         public Map<LocationVariable,Term> requires = new LinkedHashMap<LocationVariable,Term>();
         public Term measuredBy;
         public Map<LocationVariable,Term> assignables = new LinkedHashMap<LocationVariable,Term>();
-        public Map<ProgramVariable,Term> accessibles = new LinkedHashMap<ProgramVariable,Term>();;
+        public Map<ProgramVariable,Term> accessibles = new LinkedHashMap<ProgramVariable,Term>();
         public Map<LocationVariable,Term> ensures = new LinkedHashMap<LocationVariable,Term>();
         public Map<LocationVariable,Term> axioms = new LinkedHashMap<LocationVariable,Term>();
         public Term signals;

@@ -43,9 +43,6 @@ public class GeneralSettings implements Settings, Cloneable {
     /** minimize interaction is on by default */
     private boolean tacletFilter = true;
 
-    /** suggestive var names are off by default */
-    private boolean suggestiveVarNames = false;
-
     /** is drag and drop instantiation direction sensitive */
     private boolean dndDirectionSensitive = true;
     
@@ -68,12 +65,6 @@ public class GeneralSettings implements Settings, Cloneable {
     public boolean tacletFilter() {
 	return tacletFilter;
     }
-
-    
-    public boolean suggestiveVarNames() {
-	return suggestiveVarNames;
-    }
-    
 
     public boolean isDndDirectionSensitive() {        
         return dndDirectionSensitive;

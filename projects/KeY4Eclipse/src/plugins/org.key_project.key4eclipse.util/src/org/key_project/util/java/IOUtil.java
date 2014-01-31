@@ -14,6 +14,7 @@
 package org.key_project.util.java;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -605,5 +606,23 @@ public final class IOUtil {
        * @throws IOException Occurred Exception
        */
       public void visit(File file) throws IOException;
+   }
+   
+   /**
+    * Replaces all line breaks ({@code \r}, {@code \r\n}) in the given InputStream with {@code \n}.
+    * @param in The {@link InputStream} to replace line breaks in.
+    * @return A new {@link InputStream} with with the replaced line breaks.
+    * @throws IOException Occurred Exception.
+    */
+   public static InputStream unifyLineBreaks(InputStream in) throws IOException {
+      if (in != null) {
+         String text = IOUtil.readFrom(in);
+         text = text.replace("\r\n", "\n");
+         text = text.replace("\r", "\n");
+         return new ByteArrayInputStream(text.getBytes());
+      }
+      else {
+         return null;
+      }
    }
 }

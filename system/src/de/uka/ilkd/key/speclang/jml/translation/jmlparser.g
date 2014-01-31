@@ -1285,7 +1285,9 @@ primaryexpr returns [SLExpression result=null] throws SLTranslationException
             if(selfVar == null) {
             	raiseError("Cannot access \"this\" in a static context!");
             }
-            result = new SLExpression(TB.var(selfVar), selfVar.getKeYJavaType());
+            try {
+                result = new SLExpression(TB.var(selfVar), selfVar.getKeYJavaType());
+            } catch (Throwable e) { raiseError(e.getMessage()); }
         }
     |   new_expr
     |   array_initializer

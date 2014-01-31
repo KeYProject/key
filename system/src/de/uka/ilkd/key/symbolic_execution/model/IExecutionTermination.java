@@ -90,6 +90,6 @@ public interface IExecutionTermination extends IExecutionNode {
       /**
        * Partial termination of a loop body.
        */
-      LOOP_BODY;
+      LOOP_BODY
    }
 }

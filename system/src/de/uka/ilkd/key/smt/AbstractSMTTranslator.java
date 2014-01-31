@@ -522,8 +522,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 LinkedList<SortWrapper> list = sh.getSorts();
                 for (SortWrapper swChild : list) {
                         for (SortWrapper swParent : swChild.getParents()) {
-                                StringBuffer form = new StringBuffer();
-
+                                StringBuffer form;
                                 if (swChild.getSort() == nullOp.sort()
                                                 && settings.instantiateNullAssumption()) {
                                         form = buildInstantiatedHierarchyPredicate(
@@ -545,7 +544,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         private StringBuffer buildGeneralHierarchyPredicate(SortWrapper child,
                         SortWrapper parent) {
-                StringBuffer form = new StringBuffer();
 
                 StringBuffer var = this.translateLogicalVar(new StringBuffer(
                                 "tvar2"));
@@ -556,7 +554,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 StringBuffer rightForm = this.translatePredicate(
                                 parent.getPredicateName(), varlist);
 
-                form = this.translateLogicalImply(leftForm, rightForm);
+                StringBuffer form = this.translateLogicalImply(leftForm, rightForm);
                 if (this.isMultiSorted()) {
                         form = this.translateLogicalAll(var, this.standardSort,
                                         form);
@@ -575,10 +573,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 ArrayList<StringBuffer> varlist = new ArrayList<StringBuffer>();
                 varlist.add(constant);
 
-                form = this.translatePredicate(parent.getPredicateName(),
-                                varlist);
-
-                return form;
+                return this.translatePredicate(parent.getPredicateName(), varlist);
         }
 
         /**
@@ -1081,8 +1076,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         private StringBuffer getNameForIntegerConstant(Services services,
                         long integer) {
-                String val = Long.toString(integer);
-                val = integer < 0 ? "negative_value" : "positive_value";
+                String val = integer < 0 ? "negative_value" : "positive_value";
                 return new StringBuffer(TermBuilder.DF.newName(services, "i")
                                 + "_" + val);
 
@@ -1709,7 +1703,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 ArrayList<StringBuffer> createdVariables = new ArrayList<StringBuffer>();
                 ArrayList<Sort> sorts = new ArrayList<Sort>();
 
-                StringBuffer result = new StringBuffer();
                 for (int i = 0; i < functions.length; i++) {
                         FunctionWrapper fw = functions[i];
                         ArrayList<StringBuffer> vars = createGenericVariables(
@@ -1721,7 +1714,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         createdVariables.addAll(vars);
                 }
 
-                result = translateObjectEqual(functionTranslation[0],
+                StringBuffer result = translateObjectEqual(functionTranslation[0],
                                 functionTranslation[1]);
                 result = translateLogicalNot(result);
 
@@ -2144,9 +2137,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                         // add the function to the used ones
                                         this.addSpecialFunction(fun);
                                         // return the final translation
-                                        ArrayList<StringBuffer> list = new ArrayList<StringBuffer>();
-                                        list.add(arg1);
-                                        list.add(arg2);
 
                                         if (isComplexMultiplication(services,
                                                         term.sub(0),

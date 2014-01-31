@@ -105,7 +105,7 @@ public interface ApplicationCheck {
 			}
 
 			StringBuffer buf = new StringBuffer(newSymbols.size()==1 ?INFORMATION1 : INFORMATION2);
-			buf.append(node.serialNr()+": ");
+			buf.append(node.serialNr()).append(": ");
 			for(String name : newSymbols){
 				buf.append(name);
 				buf.append(", ");

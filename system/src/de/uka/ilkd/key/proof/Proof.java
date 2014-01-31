@@ -257,7 +257,6 @@ public class Proof implements Named {
         setSettings(null);
         // set every reference (except the name) to null
         root = null;
-        listenerList = null;
         openGoals = null;
         problemHeader = null;
         services = null;
@@ -270,8 +269,9 @@ public class Proof implements Named {
         keyVersionLog = null;
         activeStrategy = null;
         settingsListener = null;
-        ruleAppListenerList = null;
         disposed = true;
+        ruleAppListenerList = null;
+        listenerList = null;
     }
 
 

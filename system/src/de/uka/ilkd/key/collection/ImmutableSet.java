@@ -33,7 +33,8 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
     ImmutableSet<T> intersect(ImmutableSet<T> set);
 
     /** @return Iterator<T> of the set */
-    Iterator<T> iterator() ;
+    @Override
+    Iterator<T> iterator();
 
     /** @return true iff obj in set */
     boolean contains(T obj);
@@ -52,6 +53,7 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
 
     /** @return true iff the this set is subset of o and vice versa.
      */
+    @Override
     boolean equals(Object o);
 
     /** adds an element, barfs if the element is already present

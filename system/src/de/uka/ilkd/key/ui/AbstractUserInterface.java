@@ -29,7 +29,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 public abstract class AbstractUserInterface implements UserInterface {
@@ -58,7 +57,7 @@ public abstract class AbstractUserInterface implements UserInterface {
        try {
           getMediator().stopInterface(true);
           loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile, getMediator());
-          loader.load(isRegisterProofs());
+          loader.load();
           return loader;
        }
        catch (ProblemLoaderException e) {
@@ -71,12 +70,6 @@ public abstract class AbstractUserInterface implements UserInterface {
           getMediator().startInterface(true);
        }
     }
-    
-    /**
-     * Checks if loaded {@link Proof}s are registered in the {@link GlobalProofMgt}.
-     * @return {@code true} register, {@code false} do not register.
-     */
-    protected abstract boolean isRegisterProofs();
 
    /**
      * {@inheritDoc}

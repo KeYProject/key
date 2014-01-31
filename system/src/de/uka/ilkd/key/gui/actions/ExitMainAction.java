@@ -18,7 +18,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowListener;
 
-import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.GUIEvent;
@@ -50,9 +49,10 @@ public class ExitMainAction extends MainWindowAction {
    }
 
    public final WindowListener windowListener = new WindowAdapter() {
+       @Override
        public void windowClosing(java.awt.event.WindowEvent e) {
            exitMain();
-       };
+       }
    };
 
    protected void exitMain() {
@@ -85,7 +85,8 @@ public class ExitMainAction extends MainWindowAction {
         getMediator().fireShutDown(new GUIEvent(this));
 
         System.out.println("Have a nice day.");
-        mainWindow.savePreferences();
+        mainWindow.savePreferences(mainWindow);
+        mainWindow.syncPreferences();
         if (exitSystem) {
             // TODO: why -1 and not 0 ???
            System.exit(-1);

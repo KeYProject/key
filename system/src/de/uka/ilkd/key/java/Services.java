@@ -76,7 +76,6 @@ public class Services{
      */
     private KeYExceptionHandler exceptionHandler;
     
-
     /**
      * map of names to counters
      */
@@ -118,7 +117,7 @@ public class Services{
     
     // ONLY for tests
     public Services(Profile profile) {
-	this(profile, (KeYExceptionHandler) null);
+	this(profile, null);
     }    
     
 

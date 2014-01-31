@@ -162,7 +162,6 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
    
    /**
     * Returns the default {@link StrategyProperties} of symbolic execution. 
-    * @param splittingRulesAllowed Allow splitting rules?
     * @param quantifierInstantiationWithSplitting Instantiate quantifiers?
     * @param methodTreatmentContract Use method contracts or inline method bodies otherwise?
     * @param loopTreatmentInvariant Use loop invariants or unrole loops otherwise?
@@ -170,13 +169,36 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     * @param aliasChecks Do alias checks?
     * @return The default {@link StrategyProperties} for symbolic execution.
     */
-   public static StrategyProperties getSymbolicExecutionStrategyProperties(boolean splittingRulesAllowed,
-                                                                           boolean quantifierInstantiationWithSplitting,
+   public static StrategyProperties getSymbolicExecutionStrategyProperties(boolean quantifierInstantiationWithSplitting,
                                                                            boolean methodTreatmentContract, 
                                                                            boolean loopTreatmentInvariant,
                                                                            boolean nonExecutionBranchHidingSideProofs,
                                                                            boolean aliasChecks) {
       StrategyProperties sp = new StrategyProperties();
+      setDefaultStrategyProperties(sp, 
+                                   quantifierInstantiationWithSplitting, 
+                                   methodTreatmentContract, 
+                                   loopTreatmentInvariant, 
+                                   nonExecutionBranchHidingSideProofs, 
+                                   aliasChecks);
+      return sp;
+   }
+   
+   /**
+    * Sets the default settings for symbolic execution on the given {@link StrategyProperties}.
+    * @param sp The {@link StrategyProperties} to modify.
+    * @param quantifierInstantiationWithSplitting Instantiate quantifiers?
+    * @param methodTreatmentContract Use method contracts or inline method bodies otherwise?
+    * @param loopTreatmentInvariant Use loop invariants or unrole loops otherwise?
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
+    * @param aliasChecks Do alias checks?
+    */
+   public static void setDefaultStrategyProperties(StrategyProperties sp, 
+                                                   boolean quantifierInstantiationWithSplitting,
+                                                   boolean methodTreatmentContract, 
+                                                   boolean loopTreatmentInvariant,
+                                                   boolean nonExecutionBranchHidingSideProofs,
+                                                   boolean aliasChecks) {
       sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentInvariant ? StrategyProperties.LOOP_INVARIANT : StrategyProperties.LOOP_EXPAND);
       sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_EXPAND);
       sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, methodTreatmentContract ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
@@ -188,10 +210,10 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
       sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_DELAYED);
       sp.setProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, StrategyProperties.RETREAT_MODE_NONE);
       sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
+      sp.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY, StrategyProperties.CLASS_AXIOM_FREE);
       sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, quantifierInstantiationWithSplitting ? StrategyProperties.QUANTIFIERS_INSTANTIATE : StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
       sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, aliasChecks ? StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY : StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
       sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, nonExecutionBranchHidingSideProofs ? StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF : StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
-      return sp;
    }
 
    /**

@@ -310,7 +310,7 @@ public abstract class AbstractBetaFeature implements Feature {
     public static class TermInfo {
         
         enum Candidate {
-            CAND_NEVER, CAND_LEFT, CAND_RIGHT, CAND_BOTH;
+            CAND_NEVER, CAND_LEFT, CAND_RIGHT, CAND_BOTH
         }
 
         /** formula is positive (not negated) */

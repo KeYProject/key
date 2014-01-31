@@ -66,9 +66,6 @@ public class InteractiveProver implements InterruptListener {
      */
     private ImmutableList<AutoModeListener> listenerList = ImmutableSLList.nil();
 
-    /** listens to the current selected proof and node */
-    private KeYSelectionListener selListener;
-
     /** the mediator */
     private KeYMediator mediator;
 
@@ -81,9 +78,9 @@ public class InteractiveProver implements InterruptListener {
     /** creates a new interactive prover object
      */
     public InteractiveProver(KeYMediator mediator) {
-        selListener = new InteractiveProverKeYSelectionListener();
+        /* listens to the current selected proof and node */
         this.mediator = mediator;
-        mediator.addKeYSelectionListener(selListener);
+        mediator.addKeYSelectionListener(new InteractiveProverKeYSelectionListener());
 
         mediator.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);//XXX
 
@@ -552,7 +549,7 @@ public class InteractiveProver implements InterruptListener {
      * }. The thread itself unfreezes the UI when it is finished.
      * </p>
      */
-    private class AutoModeWorker extends SwingWorker {
+    private class AutoModeWorker extends SwingWorker3 {
 
         private ImmutableList<Goal> goals;
 

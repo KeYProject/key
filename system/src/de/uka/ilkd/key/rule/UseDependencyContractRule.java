@@ -594,8 +594,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    } else {
 	       mbyOk = TB.tt();
 	    }
-        final Term cutFormula
-        	= TB.and(new Term[]{freePre, pre, disjoint, mbyOk});
+        final Term cutFormula = TB.and(freePre, pre, disjoint, mbyOk);
 
 
         //create "Post" branch

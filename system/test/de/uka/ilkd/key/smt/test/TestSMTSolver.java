@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 
 import junit.framework.Assert;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
@@ -35,6 +34,9 @@ import de.uka.ilkd.key.smt.SolverType;
 class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 
 
+	public long getGlobalBound(){
+		return 0;
+	}
 
     @Override
     public int getMaxConcurrentProcesses() {
@@ -59,7 +61,7 @@ class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 
     @Override
     public long getTimeout() {
-	return 5000;
+	return 300000;
     }
 
     @Override
@@ -114,13 +116,38 @@ public boolean checkForSupport() {
 	return false;
 }
 
+@Override
+public long getIntBound() {
+	return 3;
+}
+
+@Override
+public long getHeapBound() {
+	return 3;
+}
+
+@Override
+public long getSeqBound() {
+	return 3;
+}
+
+@Override
+public long getObjectBound() {
+	return 3;
+}
+
+@Override
+public long getLocSetBound() {
+	return 3;
+}
+
     
 }
 
 public abstract class TestSMTSolver extends TestCommons {
     
 
-    private static Map<String,ProofAggregate> proofs = new HashMap<String,ProofAggregate>();
+    private static HashMap<String,ProofAggregate> proofs = new HashMap<String,ProofAggregate>();
    
     public static final String testFile = System.getProperty("key.home")
     + File.separator + "examples"

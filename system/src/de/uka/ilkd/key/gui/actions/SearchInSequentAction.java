@@ -43,10 +43,10 @@ public class SearchInSequentAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        SequentView view = mainWindow.sequentSearchBar.getSequentView();
+        SequentView view = mainWindow.sequentViewSearchBar.getSequentView();
         String searchString = view.getHighlightedText();
-        mainWindow.sequentSearchBar.searchField.setText(searchString);
-        mainWindow.sequentSearchBar.setVisible(true);
-        mainWindow.sequentSearchBar.search();
+        mainWindow.sequentViewSearchBar.searchField.setText(searchString);
+        mainWindow.sequentViewSearchBar.setVisible(true);
+        mainWindow.sequentViewSearchBar.search();
     }
 }

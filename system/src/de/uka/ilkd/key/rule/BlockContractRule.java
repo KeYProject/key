@@ -139,7 +139,7 @@ public class BlockContractRule implements BuiltInRule {
         for (BlockContract contract : collectedContracts) {
             if (!contractApplied(contract, goal)) {
                 result = result.add(contract);
-            };
+            }
         }
         return result;
     }
@@ -156,7 +156,7 @@ public class BlockContractRule implements BuiltInRule {
                         (BlockContractBuiltInRuleApp)app;
                 if (blockRuleApp.getBlock().equals(contract.getBlock())) {
                     return true;
-                };
+                }
             }
             selfOrParentNode = selfOrParentNode.parent();
         }
@@ -852,9 +852,8 @@ public class BlockContractRule implements BuiltInRule {
         private StatementBlock finishTransactionIfModalityIsTransactional(final Statement statement)
         {
             if (instantiation.isTransactional()) {
-                return new StatementBlock(new Statement[]
-                        {statement, new TransactionStatement(
-                                de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH)});
+                return new StatementBlock(statement, new TransactionStatement(
+                        de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH));
             }
             else {
                 if (statement instanceof StatementBlock) {

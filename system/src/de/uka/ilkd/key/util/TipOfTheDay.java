@@ -11,7 +11,7 @@ public final class TipOfTheDay {
 	"Use the command line option '--experimental' to activate experimental features.",
 	"Pressing ALT when moving the cursor over a term shows some more information.",
         "Some rules are not available to the user when One-Step-Simplification is turned on.",
-        "You can search for node numbers or rule names in the proof tree view (press ALT+CTRL+F).",
+        "You can search for node numbers or rule names in the proof tree view (press CTRL+SHIFT+F).",
         "Install an SMT solver to help KeY solve problems; CVC3, Simplify, Yices, and Z3 are supported.",
         "In the right-click menu you can abbreviate terms."
     };

@@ -272,7 +272,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    public ProblemInitializer createProblemInitializer(Profile profile) {
       ProblemInitializer pi = new ProblemInitializer(this,
             new Services(profile, mediator.getExceptionHandler()),
-            false,
             this);
       return pi;
    }
@@ -424,11 +423,4 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        pcs.firePropertyChange(propertyName, oldValue, newValue);
    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected boolean isRegisterProofs() {
-      return false;
-   }
 }

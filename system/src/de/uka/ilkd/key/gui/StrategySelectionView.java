@@ -508,7 +508,7 @@ public final class StrategySelectionView extends JPanel {
         ++yCoord;
 
         classAxiomHigh = newButton(
-                "Free", StrategyProperties.CLASS_AXIOM_HIGH, true, false);
+                "Free", StrategyProperties.CLASS_AXIOM_FREE, true, false);
         classAxiomHigh.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_CLASSAXIOM_FREE);
         classAxiomGroup.add(classAxiomHigh);
         addJavaDLOption (classAxiomHigh, javaDLOptionsLayout, 2, yCoord, 2 );        
@@ -941,8 +941,8 @@ public final class StrategySelectionView extends JPanel {
             JRadioButton bStopModeActive = getStrategyOptionButton(stopmodeOptions, 
                     StrategyProperties.STOPMODE_OPTIONS_KEY);
             bStopModeActive.setSelected(true);    
-            String classAxiomOptions = p.getProperty(StrategyProperties.CLASS_AXIOM_PRIO);
-            JRadioButton bClassAxiomOptions = getStrategyOptionButton(classAxiomOptions, StrategyProperties.CLASS_AXIOM_PRIO);
+            String classAxiomOptions = p.getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
+            JRadioButton bClassAxiomOptions = getStrategyOptionButton(classAxiomOptions, StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
             bClassAxiomOptions.setSelected(true);
             String autoInductionOptions = p.getProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY); 
             JRadioButton bAutoInductionOptions = getStrategyOptionButton(autoInductionOptions, 
@@ -1048,7 +1048,7 @@ public final class StrategySelectionView extends JPanel {
                        quantifierGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.STOPMODE_OPTIONS_KEY, 
                        stopModeGroup.getSelection().getActionCommand());
-        p.setProperty( StrategyProperties.CLASS_AXIOM_PRIO,
+        p.setProperty( StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
                         classAxiomGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, 
                        autoInductionGroup.getSelection().getActionCommand());

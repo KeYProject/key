@@ -243,7 +243,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     /** 
      For internal reuse and synchronization.
      */
-    private static SchemaJavaParser parser = new SchemaJavaParser(System.in);
+    private static final SchemaJavaParser parser = new SchemaJavaParser(System.in);
 
     private static final Position ZERO_POSITION = new Position(0, 0);
 
