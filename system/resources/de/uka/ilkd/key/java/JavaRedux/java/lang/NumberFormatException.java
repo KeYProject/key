@@ -6,6 +6,6 @@ package java.lang;
 public class NumberFormatException extends java.lang.IllegalArgumentException
 {
 
-   public NumberFormatException() {}
+   public NumberFormatException() { super(); }
    public NumberFormatException(java.lang.String arg0) { super(arg0); }
 }
