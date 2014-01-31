@@ -22,6 +22,7 @@ java.lang.LinkageError
 java.lang.NegativeArraySizeException
 java.lang.NoClassDefFoundError
 java.lang.NullPointerException
+java.lang.Number
 java.lang.NumberFormatException
 java.lang.VirtualMachineError
 java.lang.OutOfMemoryError
