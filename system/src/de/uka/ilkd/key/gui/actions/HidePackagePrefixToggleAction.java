@@ -21,30 +21,24 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.pp.NotationInfo;
 
-public class PrettyPrintToggleAction extends MainWindowAction {
+public final class HidePackagePrefixToggleAction extends MainWindowAction {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 8633254204256247698L;
+    private static final long serialVersionUID = 3184733794964047845L;
 
-    public PrettyPrintToggleAction(MainWindow mainWindow) {
+    public HidePackagePrefixToggleAction(MainWindow mainWindow) {
 	super(mainWindow);
-	setName("Use pretty syntax");
-	setTooltip("If ticked, infix notations are used.");
-	final boolean prettySyntax = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
-	NotationInfo.PRETTY_SYNTAX = prettySyntax;
-	setSelected(prettySyntax);
-	//setSelected(NotationInfo.PRETTY_SYNTAX);
+	setName("Hide Package Prefix");
+	setTooltip("If ticked, class names are written without package prefixes.");
+	final boolean hidePackage = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().hidePackagePrefix();
+	NotationInfo.HIDE_PACKAGE_PREFIX = hidePackage;
+	setSelected(hidePackage);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         boolean selected = ((JCheckBoxMenuItem) e.getSource()).isSelected();
-        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(selected);
-	NotationInfo.PRETTY_SYNTAX = selected;
-	mainWindow.getUnicodeToggleAction().setEnabled(selected);
-	mainWindow.getHidePackagePrefixToggleAction().setEnabled(selected);
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHidePackagePrefix(selected);
+	NotationInfo.HIDE_PACKAGE_PREFIX = selected;
 	mainWindow.makePrettyView();
     }
 

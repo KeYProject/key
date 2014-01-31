@@ -75,6 +75,7 @@ import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.FontSizeAction;
 import de.uka.ilkd.key.gui.actions.GoalBackAction;
+import de.uka.ilkd.key.gui.actions.HidePackagePrefixToggleAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
 import de.uka.ilkd.key.gui.actions.LicenseAction;
@@ -277,6 +278,8 @@ public final class MainWindow extends JFrame  {
     private ExitMainAction exitMainAction;
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
+    private HidePackagePrefixToggleAction hidePackagePrefixToggleAction =
+        new HidePackagePrefixToggleAction(this);
     
     private final TermLabelMenu termLabelMenu;
     
@@ -794,6 +797,8 @@ public final class MainWindow extends JFrame  {
         
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
         view.add(new JCheckBoxMenuItem(unicodeToggleAction));
+        view.add(termLabelMenu);
+        view.add(new JCheckBoxMenuItem(hidePackagePrefixToggleAction));
 
         view.addSeparator();
         {
@@ -805,10 +810,7 @@ public final class MainWindow extends JFrame  {
         view.add(new ToolTipOptionsAction(this));
 
         view.add(new ProofDiffFrame.Action(this));
-        
-        view.addSeparator();
-        view.add(termLabelMenu);
-        
+                
         return view;
     }
 
@@ -1529,6 +1531,10 @@ public final class MainWindow extends JFrame  {
 
     public Action getUnicodeToggleAction() {
     	return unicodeToggleAction;
+    }
+    
+    public Action getHidePackagePrefixToggleAction() {
+        return hidePackagePrefixToggleAction;
     }
 
     /**

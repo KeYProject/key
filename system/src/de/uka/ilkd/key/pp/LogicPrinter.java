@@ -1105,6 +1105,10 @@ public class LogicPrinter {
             printFunctionTerm(t.op().name().toString(), t);
         }
     }
+    
+    public void printClassName (String className) throws IOException {
+        layouter.print(className);
+    }
 
     public void printCreate(Term t, boolean closingBrace) throws IOException {
         assert t.boundVars().isEmpty();
@@ -1246,7 +1250,7 @@ public class LogicPrinter {
                     markStartSub();
                     // "null" not printed
                     markEndSub();
-                    layouter.print(className);
+                    printClassName(className);
                 }
 
                 layouter.print(".");
@@ -1342,7 +1346,7 @@ public class LogicPrinter {
         	    markStartSub();
         	    //"null" not printed
         	    markEndSub();
-        	    layouter.print(className);
+        	    printClassName(className);
         	}
         	
         	layouter.print(".");
@@ -1389,18 +1393,14 @@ public class LogicPrinter {
     }
     
     
-    public void printLength(Term t) throws IOException {
-	final HeapLDT heapLDT = services == null 
-        			? null 
-        			: services.getTypeConverter().getHeapLDT();
-	if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
-	    assert t.op() == heapLDT.getLength();
+    public void printPostfix(Term t, String postfix) throws IOException {
+	if(NotationInfo.PRETTY_SYNTAX) {
 	    startTerm(t.arity());
 	    
 	    markStartSub();
 	    printTerm(t.sub(0));
 	    markEndSub();
-	    layouter.print(".length");
+	    layouter.print(postfix);
 	} else {
 	    printFunctionTerm(t.op().name().toString(), t);            
 	}	
@@ -1745,7 +1745,8 @@ public class LogicPrinter {
                     TermFactory.DEFAULT.createTerm(v);
                 if (mode != QuantifiableVariablePrintMode.WITH_OUT_DECLARATION) {
                     // do not print declarations in taclets...
-                    layouter.print(v.sort().name().toString() + " ");
+                    printClassName(v.sort().name().toString());
+                    layouter.print(" ");
                 }
                 if(notationInfo.getAbbrevMap().containsTerm(t)) {
                     layouter.print (notationInfo.getAbbrevMap().getAbbrev(t));
