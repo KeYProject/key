@@ -15,4 +15,4 @@ removed. This is why the some fields, methods or inheritances have not been
 included in these files.
 
 The following command line arguments where used:
-   -expand -hide classes.txt rt.jar
+   -expand -hide JAVALANG.TXT rt.jar
