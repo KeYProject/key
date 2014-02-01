@@ -141,9 +141,19 @@ public class MarkerManager {
    public IMarker getOldProofMarkerForPe(ProofElement pe) throws CoreException{
       LinkedList<IMarker> markerList = getAllkeYMarkerForScl(pe.getJavaFile(), pe.getSourceLocation());
       for(IMarker marker : markerList){
-         if(CLOSEDMARKER_ID.equals(marker.getType()) || NOTCLOSEDMARKER_ID.equals(marker.getType())){
-            String message = marker.getAttribute(IMarker.MESSAGE, "");
-            if(message.equals("Proof closed: " + pe.getProofFile().getFullPath()) || message.equals("Proof not closed: " + pe.getProofFile().getFullPath())){
+         String message = marker.getAttribute(IMarker.MESSAGE, "");
+         if(CLOSEDMARKER_ID.equals(marker.getType())){
+            if(message.equals("Proof closed: " + pe.getProofFile().getFullPath())){
+               return marker;
+            }
+         }
+         else if(NOTCLOSEDMARKER_ID.equals(marker.getType())){
+            if(message.equals("Proof not closed: " + pe.getProofFile().getFullPath())){
+               return marker;
+            }
+         }
+         else if(RECURSIONMARKER_ID.equals(marker.getType())){
+            if(message.startsWith("Cycle detected:" + StringUtil.NEW_LINE + pe.getProofFile().getFullPath())){
                return marker;
             }
          }

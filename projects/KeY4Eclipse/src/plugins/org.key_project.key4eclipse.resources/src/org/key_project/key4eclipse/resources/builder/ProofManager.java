@@ -156,7 +156,7 @@ public class ProofManager {
       
       this.changedJavaFiles = changedJavaFiles;
       markerManager.deleteKeYMarker(project, IResource.DEPTH_ZERO);
-      markerManager.deleteKeYMarkerByType(project, MarkerManager.RECURSIONMARKER_ID, IResource.DEPTH_INFINITE);
+//      markerManager.deleteKeYMarkerByType(project, MarkerManager.RECURSIONMARKER_ID, IResource.DEPTH_INFINITE);
       //set up monitor
       monitor.beginTask("Build all proofs", proofElements.size());
       initThreads(proofElements, changedJavaFiles, monitor);
@@ -924,8 +924,12 @@ public class ProofManager {
                   processProof(pe);
                }
                else{
+                  IMarker marker = markerManager.getOldProofMarkerForPe(pe);
                   IFile metaFile = getProofMetaFile(pe.getProofFile());
-                  if(metaFile.exists()){
+                  if(marker == null){
+                     processProof(pe);
+                  }
+                  else if(metaFile.exists()){
                      try{
                         ProofMetaFileReader pmfr = new ProofMetaFileReader(metaFile);
                         LinkedList<IType> javaTypes = collectAllJavaITypes();
