@@ -42,7 +42,7 @@ public class IconExporter extends TestCase {
    @Test
    public void testExportImage() throws Exception {
       // Common UI
-      ImageData hole17Image = ImageUtil.convertToImageData(ImageUtil.toBufferedImage(IconFactory.keyHole(17, 17), -3, -2));
+      ImageData hole17Image = ImageUtil.convertToImageData(ImageUtil.toBufferedImage(IconFactory.keyHole(17, 17), -5, -2));
       Image decProofFileImage = new Image(Display.getDefault(), BundleUtil.openInputStream(Activator.PLUGIN_ID, "icons/DEC_PROOF_FILE.png"));
       //Image decKeYFileImage = new Image(Display.getDefault(), BundleUtil.openInputStream(Activator.PLUGIN_ID, "icons/DEC_KEY_FILE.png"));
       decorateImages(new IconToDecorate(hole17Image, decProofFileImage, 16, 16, 0, 0, "projects/KeY4Eclipse/src/plugins/org.key_project.key4eclipse.common.ui/icons/prooffile16.png")
