@@ -35,7 +35,7 @@
             contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
             default="true"
             extensions="proof, key"
-            icon="icons/logo16.gif"
+            icon="icons/prooffile16.png"
             id="org.key_project.keyide.ui.editor"
             name="KeY Editor">
       </editor>

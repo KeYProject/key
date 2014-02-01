@@ -36,11 +36,19 @@ import de.uka.ilkd.key.gui.IconFactory;
  * </p>
  * @author Martin Hentschel
  */
-public class IconExporter extends TestCase{
-   private static final String PREFIX = "D:/Forschung/GIT/KeY_Master/";
+public class IconExporter extends TestCase {
+   private static final String PREFIX = "D:/Forschung/GIT/KeY/";
    
    @Test
    public void testExportImage() throws Exception {
+      // Common UI
+      ImageData hole17Image = ImageUtil.convertToImageData(ImageUtil.toBufferedImage(IconFactory.keyHole(17, 17), -3, -2));
+      Image decProofFileImage = new Image(Display.getDefault(), BundleUtil.openInputStream(Activator.PLUGIN_ID, "icons/DEC_PROOF_FILE.png"));
+      //Image decKeYFileImage = new Image(Display.getDefault(), BundleUtil.openInputStream(Activator.PLUGIN_ID, "icons/DEC_KEY_FILE.png"));
+      decorateImages(new IconToDecorate(hole17Image, decProofFileImage, 16, 16, 0, 0, "projects/KeY4Eclipse/src/plugins/org.key_project.key4eclipse.common.ui/icons/prooffile16.png")
+                     //, new IconToDecorate(hole17Image, decKeYFileImage, 16, 16, 0, 0, "projects/KeY4Eclipse/src/plugins/org.key_project.key4eclipse.common.ui/icons/keyfile16.png")
+                     );
+      
       // KeY Resources
       ImageData baseImage = ImageUtil.convertToImageData(ImageUtil.toBufferedImage(IconFactory.keyHole(16, 16), -1, -1));
       
@@ -49,6 +57,10 @@ public class IconExporter extends TestCase{
       decorateImages(new IconToDecorate(baseImage, infoImage, 12, 14, -3, -2, "projects/KeY4Eclipse/src/plugins/org.key_project.key4eclipse.resources/icons/keyinfo12x14.png"),
                      new IconToDecorate(baseImage, PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEC_FIELD_WARNING), 12, 14, -3, -2, "projects/KeY4Eclipse/src/plugins/org.key_project.key4eclipse.resources/icons/keywarning12x14.png"),
                      new IconToDecorate(baseImage, PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEC_FIELD_ERROR), 12, 14, -3, -2, "projects/KeY4Eclipse/src/plugins/org.key_project.key4eclipse.resources/icons/keyerror12x14.png"));
+
+      // KeY Resources UI
+      Image decProofMetaFileImage = new Image(Display.getDefault(), BundleUtil.openInputStream(Activator.PLUGIN_ID, "icons/DEC_PROOF_META_FILE.png"));
+      decorateImages(new IconToDecorate(hole17Image, decProofMetaFileImage, 16, 16, 0, 0, "projects/KeY4Eclipse/src/plugins/org.key_project.key4eclipse.resources.ui/icons/proofmetafile16.png"));
       
       // KeY IDE
       treatIconsToExport(new IconToExpoert(IconFactory.keyHole(16, 16), -1, -1, "projects/KeYIDE/src/plugins/org.key_project.keyide.ui/icons/ekey-mono16.png"),
@@ -57,7 +69,7 @@ public class IconExporter extends TestCase{
                          new IconToExpoert(IconFactory.keyHoleClosed(16, 16), -1, -1, "projects/KeYIDE/src/plugins/org.key_project.keyide.ui/icons/keyproved16.png"),
                          new IconToExpoert(IconFactory.interactiveAppLogo(16), "projects/KeYIDE/src/plugins/org.key_project.keyide.ui/icons/interactiveAppLogo16.png"),
                          new IconToExpoert(IconFactory.pruneLogo(16), "projects/KeYIDE/src/plugins/org.key_project.keyide.ui/icons/prune16.png"));
-      
+      decorateImages(new IconToDecorate(hole17Image, decProofFileImage, 16, 16, 0, 0, "projects/KeYIDE/src/plugins/org.key_project.keyide.ui/icons/prooffile16.png"));
    }
    
    private void decorateImages(IconToDecorate... tasks) {
@@ -81,6 +93,7 @@ public class IconExporter extends TestCase{
          ImageLoader imageLoader = new ImageLoader();
          imageLoader.data = new ImageData[] {resultData};
          imageLoader.save(PREFIX + task.getTarget(), SWT.IMAGE_PNG);
+         System.out.println("Saved: " + PREFIX + task.getTarget());
       }
    }
    
