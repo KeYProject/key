@@ -23,4 +23,9 @@ public class MultipleRecursion {
       if (i>=0) a();
       i--;
    }
+   //@ public normal_behavior requires i>=0 && i<=2; ensures true;
+   public void c() {
+      if (i>=0) a();
+      i--;
+   }
 }

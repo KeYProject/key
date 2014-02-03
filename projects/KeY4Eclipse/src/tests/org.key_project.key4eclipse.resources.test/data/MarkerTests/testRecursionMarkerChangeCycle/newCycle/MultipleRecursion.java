@@ -20,6 +20,11 @@ public class MultipleRecursion {
    }
    //@ public normal_behavior requires i>=0 && i<=2; ensures true;
    public void b() {
+      if (i>=0) c();
+      i--;
+   }
+   //@ public normal_behavior requires i>=0 && i<=2; ensures true;
+   public void c() {
       if (i>=0) a();
       i--;
    }
