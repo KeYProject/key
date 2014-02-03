@@ -93,10 +93,10 @@ public abstract class AbstractMap implements MapInterface {
 
     /*@ public normal_behaviour
      @ requires !\dl_inDomain(map, key);
-     @ assignable footprint;
      @ ensures map == \dl_mapUpdate(\old(map), key, value);
      @ ensures \result == null;
      @ ensures \fresh(entries, entries[entries.length - 1]);
+     @ assignable footprint;
      @*/
     abstract /*@nullable*/ Object putNotInDomain(Object key, Object value);
 
