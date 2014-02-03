@@ -40,12 +40,15 @@ import javax.swing.event.DocumentListener;
 public abstract class SearchBar extends JPanel {
 
     public JTextField searchField = new JTextField(20);
-    private JButton prev = new JButton("\u2190");
-    private JButton next = new JButton("\u2192");
-    private JButton close = new JButton("\u00d7");
+    private JButton prev;
+    private JButton next;
+    private JButton close;
     private final Color ALLERT_COLOR = new Color(255, 178, 178);
 
     public SearchBar() {
+        prev = new JButton(IconFactory.previous(16));
+        next = new JButton(IconFactory.next(16));
+        close = new JButton(IconFactory.stop(16));
 
         // Initialize the Actionlisteners here:
 

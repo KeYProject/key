@@ -87,6 +87,10 @@ public class IconFactory {
     private static Image plus = getImage("images/toolbar/plus.png");
     private static Image minus = getImage("images/toolbar/minus.png");
 
+    private static Image next = getImage("images/toolbar/go-next.png");
+    private static Image previous = getImage("images/toolbar/go-previous.png");
+    private static Image stop = getImage("images/toolbar/stop.png");
+
     private static Image interactiveAppLogo = 
         getImage("images/interactiveAppLogo.png");
 
@@ -154,6 +158,20 @@ public class IconFactory {
     public static ImageIcon minus(int x) {
         return scaleIcon(minus,x,x);
     }
+
+    public static ImageIcon next(int x) {
+        return scaleIcon(next,x,x);
+    }
+
+    public static ImageIcon previous(int x) {
+        return scaleIcon(previous,x,x);
+    }
+
+
+    public static ImageIcon stop(int x) {
+        return scaleIcon(stop,x,x);
+    }
+
 
     public static ImageIcon keyHole(int x, int y) {
 	return scaleIcon(keyHole,x,y);
