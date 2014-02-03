@@ -26,8 +26,8 @@ public final class Integer implements java.lang.Comparable
    public short shortValue();
    public int intValue();
    public long longValue();
-   public float floatValue();
-   public double doubleValue();
+//   public float floatValue();
+//   public double doubleValue();
    public static java.lang.Integer getInteger(java.lang.String arg0);
    public static java.lang.Integer getInteger(java.lang.String arg0, int arg1);
    public static java.lang.Integer getInteger(java.lang.String arg0, java.lang.Integer arg1);
