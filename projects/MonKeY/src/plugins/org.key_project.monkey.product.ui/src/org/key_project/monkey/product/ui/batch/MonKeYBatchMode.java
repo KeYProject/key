@@ -133,6 +133,7 @@ public class MonKeYBatchMode {
       System.out.println("Starting verification round " + round + " of " + parameters.getNumberOfRounds());
       boolean showMainWindow = !parameters.isMainWindowOff();
       File bootClassPath = !StringUtil.isTrimmedEmpty(parameters.getBootClassPath()) ? new File(parameters.getBootClassPath()) : null;
+      int maxRuleApplications = parameters.getMaxRuleApplications();
       boolean expandMethods = !parameters.isMethodTreatmentContract();
       boolean useDependencyContracts = !parameters.isDependencyContractsOff();
       boolean useQuery = !parameters.isQueryTreatmentOff();
@@ -171,7 +172,7 @@ public class MonKeYBatchMode {
          // Do the proofs
          for (MonKeYProof proof : proofs) {
             System.out.println("Starting proof \"" + proof.getTypeName() + "#" + proof.getTargetName() + "\"");
-            proof.startProof(expandMethods, useDependencyContracts, useQuery, useDefOps, stopAtUnclosable);
+            proof.startProof(maxRuleApplications, expandMethods, useDependencyContracts, useQuery, useDefOps, stopAtUnclosable);
             System.out.println("Proof \"" + proof.getTypeName() + "#" + proof.getTargetName() + "\" finished with result " + proof.getResult() + " \" in " + proof.getTime() + " milliseconds");
          }
          // Save the proofs

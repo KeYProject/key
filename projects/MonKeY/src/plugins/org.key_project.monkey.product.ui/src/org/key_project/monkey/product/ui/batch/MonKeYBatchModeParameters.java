@@ -90,6 +90,11 @@ public class MonKeYBatchModeParameters {
    public static final String PARAM_LOAD_PREFIX = "-load";
    
    /**
+    * Parameter for {@link #maxRuleApplications}.
+    */
+   public static final String PARAM_MAX_RULES = "-maxRules";
+   
+   /**
     * Show help?
     */
    private boolean showHelp;
@@ -138,6 +143,11 @@ public class MonKeYBatchModeParameters {
     * Output path.
     */
    private String outputPath;
+   
+   /**
+    * The maximal number of rule applications;
+    */
+   private int maxRuleApplications = 10000;
    
    /**
     * Source locations.
@@ -208,6 +218,14 @@ public class MonKeYBatchModeParameters {
     */
    public boolean isStopAtUnclosable() {
       return stopAtUnclosable;
+   }
+
+   /**
+    * Returns the maximal number of rule applications.
+    * @return The maximal number of rule applications.
+    */
+   public int getMaxRuleApplications() {
+      return maxRuleApplications;
    }
 
    /**
@@ -367,6 +385,9 @@ public class MonKeYBatchModeParameters {
                   result.dummyLoadOff = true;
                   previousParam = null;
                }
+               else if (PARAM_MAX_RULES.equals(param)) {
+                  previousParam = param;
+               }
                else if (PARAM_BOOT_CLASS_PATH.equals(param)) {
                   previousParam = param;
                }
@@ -384,7 +405,19 @@ public class MonKeYBatchModeParameters {
                }
             }
             else {
-               if (PARAM_BOOT_CLASS_PATH.equals(previousParam)) {
+               if (PARAM_MAX_RULES.equals(previousParam)) {
+                  try {
+                     result.maxRuleApplications = Integer.parseInt(param);
+                  }
+                  catch (NumberFormatException e) {
+                     throw new IllegalArgumentException("Max. Rule Applications (" + param + ") is not an integer number.");
+                  }
+                  if (result.maxRuleApplications < 0) {
+                     throw new IllegalArgumentException("Max. Rule Applications (" + result.maxRuleApplications + ") can not be negative.");
+                  }
+                  previousParam = null;
+               }
+               else if (PARAM_BOOT_CLASS_PATH.equals(previousParam)) {
                   result.bootClassPath = param;
                   previousParam = null;
                }

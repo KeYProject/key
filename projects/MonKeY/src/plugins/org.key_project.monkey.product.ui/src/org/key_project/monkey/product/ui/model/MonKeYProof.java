@@ -214,7 +214,8 @@ public class MonKeYProof extends Bean {
      * Starts the proof in KeY and tries to fulfill it automatically.
      * @throws Exception Occurred Exception.
      */
-    public void startProof(final boolean expandMethods,
+    public void startProof(final int maxRuleApplications,
+                           final boolean expandMethods,
                            final boolean useDependencyContracts,
                            final boolean useQuery,
                            final boolean useDefOps,
@@ -274,7 +275,9 @@ public class MonKeYProof extends Bean {
                    sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, stopAtUnclosable ? StrategyProperties.STOPMODE_NONCLOSE : StrategyProperties.STOPMODE_DEFAULT);
                    proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
                    // Make sure that the new options are used
+                   ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(maxRuleApplications);
                    ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);
+                   proof.getSettings().getStrategySettings().setMaxSteps(maxRuleApplications);
                    proof.setActiveStrategy(environment.getMediator().getProfile().getDefaultStrategyFactory().create(proof, sp));
                 }
              });
