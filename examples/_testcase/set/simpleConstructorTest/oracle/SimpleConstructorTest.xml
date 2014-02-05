@@ -13,8 +13,8 @@
                   <callStackEntry path="/0/0/0"/>
                   <statement name="return obj.x;" pathCondition="true" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
-                     <methodReturn name="&lt;return of SimpleConstructorTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of SimpleConstructorTest.main();&gt;" isReturnValueComputed="true">
-                        <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                     <methodReturn name="&lt;return of SimpleConstructorTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of SimpleConstructorTest.main();&gt;" isReturnValueComputed="true">
+                        <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                         </methodReturnValue>
                         <callStackEntry path="/0"/>
                         <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">

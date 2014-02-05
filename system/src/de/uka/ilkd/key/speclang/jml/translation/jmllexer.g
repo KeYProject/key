@@ -54,6 +54,7 @@ tokens {
     SECURE_FOR      = "secure_for";
     SIGNALS         = "signals";
     SIGNALS_ONLY    = "signals_only";
+    DECREASES       = "decreases";
 
     NULLABLE        = "nullable";
     NON_NULL        = "non_null";
@@ -82,7 +83,6 @@ EVERYTHING : "\\everything";
 FRESH : "\\fresh";
 FREE : "\\free";
 GEQ : ">=";
-GT : ">";
 IMPLIES : "==>";
 IMPLIESBACKWARD : "<==";
 IN_IMMORTAL_MEMORY : "\\inImmortalMemory"; //KeY extension, not official JML
@@ -174,7 +174,7 @@ SEQCONCAT : "\\seq_concat";
 SEQSUB : "\\seq_sub";
 SEQREVERSE : "\\seq_reverse";
 SEQREPLACE : "\\seq_put";
-INDEXOF : "\\indexOf";
+INDEXOF : "\\seq_indexOf";
 SEQDEF : "\\seq_def";
 
 
@@ -188,24 +188,25 @@ EQV_ANTIV: "<==>" | "<=!=>";
 EQ_NEQ : "==" | "!=";
 
 
-LT_DISPATCH
-     :
-     ('<' (LETTER)+ '>') => IMPLICIT_IDENT {$setType(IDENT);}
-    |
-     LT {$setType(LT);}
-    ;
-
+protected GT : ">";
 protected LT : "<";
-
 
 protected IMPLICIT_IDENT
 options {
   paraphrase = "an implicit identifier (letters only)";
 }
 :
-  '<' (LETTER)+ '>'
+  LT (LETTER)+ GT
 ;
 
+LT_IMPLICIT_GT_DISPATCH
+    :
+      LT (LETTER)+ GT {$setType(IDENT);}
+    |
+      LT {$setType(LT);}
+    |
+      GT {$setType(GT);}
+    ;
 
 LPAREN
 options {

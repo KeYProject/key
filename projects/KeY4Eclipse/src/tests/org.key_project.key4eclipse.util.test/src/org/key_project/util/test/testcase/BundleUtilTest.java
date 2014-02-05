@@ -38,6 +38,47 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class BundleUtilTest extends TestCase {
    /**
+    * Tests {@link BundleUtil#computeMD5(String, String)}.
+    */
+   @Test
+   public void testComputeMD5() throws IOException {
+      // Test null plugin
+      try {
+         BundleUtil.computeMD5(null, "data/HelloWorld.txt");
+         fail("Should not be possible.");
+      }
+      catch (IOException e) {
+         assertEquals("No plug-in defined.", e.getMessage());
+      }
+      // Test null file
+      try {
+         BundleUtil.computeMD5(Activator.PLUGIN_ID, null);
+         fail("Should not be possible.");
+      }
+      catch (IOException e) {
+         assertEquals("No path in plug-in \"org.key_project.util.test\" defined.", e.getMessage());
+      }
+      // Test not existing bundle
+      try {
+         BundleUtil.computeMD5("NOT_EXISTING_BUNDLE", "data/HelloWorld.txt");
+         fail("Should not be possible.");
+      }
+      catch (IOException e) {
+         assertEquals("Can't find plug-in \"NOT_EXISTING_BUNDLE\".", e.getMessage());
+      }
+      // Test not existing file
+      try {
+         BundleUtil.computeMD5(Activator.PLUGIN_ID, "data/NOT_EXISTING_FILE.txt");
+         fail("Should not be possible.");
+      }
+      catch (IOException e) {
+         assertEquals("Can't find resource \"data/NOT_EXISTING_FILE.txt\" in plug-in \"org.key_project.util.test\".", e.getMessage());
+      }
+      // Test content
+      assertEquals("b10a8db164e0754105b7a99be72e3fe5", BundleUtil.computeMD5(Activator.PLUGIN_ID, "data/HelloWorld.txt"));
+   }
+
+   /**
     * Tests {@link BundleUtil#extractFromBundleToFilesystem(String, String, java.io.File)}
     */
    @Test

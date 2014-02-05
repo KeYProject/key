@@ -127,6 +127,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         return kjts;
     }
     
+    // TODO : move GUI stuff somewhere else
     
     private void showWarningDialog(ImmutableSet<PositionedString> warnings) {
         if(!MainWindow.visible) {
@@ -150,7 +151,8 @@ public final class SLEnvInput extends AbstractEnvInput {
         //scrollable warning list
         JScrollPane scrollpane = new JScrollPane();
         scrollpane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        JList list = new JList(warnings.toArray(new PositionedString[warnings.size()]));
+        JList list =
+                new JList(warnings.toArray(new PositionedString[warnings.size()]));
         list.setBorder(BorderFactory.createLoweredBevelBorder());
         scrollpane.setViewportView(list);
         pane.add(scrollpane, BorderLayout.CENTER);
@@ -201,11 +203,9 @@ public final class SLEnvInput extends AbstractEnvInput {
                 RuleSource rs = null;
                 
                 //external or internal path?
-                if(filePath.startsWith("/")) {
-                    File file = new File(filePath);
-                    if(file.exists()) {
+                File file = new File(filePath);
+                if(file.isFile()) {
                 	rs = RuleSource.initRuleFile(file);
-                    }
                 } else {
                     URL url = KeYResourceManager.getManager().getResourceFile(
                 				Recoder2KeY.class, 
@@ -261,9 +261,9 @@ public final class SLEnvInput extends AbstractEnvInput {
             = initConfig.getServices().getJavaInfo();
         final SpecificationRepository specRepos 
             = initConfig.getServices().getSpecificationRepository();
-        
+
         //read DL library specs before any other specs
-        createDLLibrarySpecs();        
+        createDLLibrarySpecs();
        
         //sort types alphabetically (necessary for deterministic names)
         final Set<KeYJavaType> allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
@@ -276,12 +276,12 @@ public final class SLEnvInput extends AbstractEnvInput {
         	  || kjt.getJavaType() instanceof InterfaceDeclaration)) {
         	continue;
             }
-            
+
             //class invariants, represents clauses, ...
             final ImmutableSet<SpecificationElement> classSpecs 
             	= specExtractor.extractClassSpecs(kjt);
             specRepos.addSpecs(classSpecs);
-            
+
             // Check whether a static invariant is present.
             // Later, we will only add static invariants to contracts per default if
             // there is an explicit static invariant present.
@@ -292,7 +292,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                     break;
                 }
             }
-            
+
             //contracts, loop invariants
             final ImmutableList<IProgramMethod> pms 
                 = javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
@@ -301,7 +301,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         	final ImmutableSet<SpecificationElement> methodSpecs
         	    = specExtractor.extractMethodSpecs(pm,staticInvPresent);
         	specRepos.addSpecs(methodSpecs);
-                
+
                 //loop invariants
                 final JavaASTCollector collector 
                     = new JavaASTCollector(pm.getBody(), LoopStatement.class);
@@ -311,30 +311,34 @@ public final class SLEnvInput extends AbstractEnvInput {
                 	    			pm, 
                         			(LoopStatement) loop);
                     if(inv != null) {
-                        specRepos.addLoopInvariant(inv);
+                        specRepos.addLoopInvariant(inv.setTarget(kjt, pm));
                     }
                 }
-                
+
                 //block contracts
-                final JavaASTCollector blockCollector = new JavaASTCollector(pm.getBody(), StatementBlock.class);
+                final JavaASTCollector blockCollector =
+                        new JavaASTCollector(pm.getBody(), StatementBlock.class);
                 blockCollector.start();
                 for (ProgramElement block : blockCollector.getNodes()) {
-                    final ImmutableSet<BlockContract> blockContracts = specExtractor.extractBlockContracts(pm, (StatementBlock) block);
+                    final ImmutableSet<BlockContract> blockContracts =
+                            specExtractor.extractBlockContracts(pm, (StatementBlock) block);
                     for (BlockContract specification : blockContracts) {
                     	specRepos.addBlockContract(specification);
                     }
                 }
 
-                final JavaASTCollector labeledCollector = new JavaASTCollector(pm.getBody(), LabeledStatement.class);
+                final JavaASTCollector labeledCollector =
+                        new JavaASTCollector(pm.getBody(), LabeledStatement.class);
                 labeledCollector.start();
                 for (ProgramElement labeled : labeledCollector.getNodes()) {
-                    final ImmutableSet<BlockContract> blockContracts = specExtractor.extractBlockContracts(pm, (LabeledStatement) labeled);
+                    final ImmutableSet<BlockContract> blockContracts =
+                            specExtractor.extractBlockContracts(pm, (LabeledStatement) labeled);
                     for (BlockContract specification : blockContracts) {
                         specRepos.addBlockContract(specification);
                     }
                 }
             }
-            
+
             //constructor contracts
             final ImmutableList<IProgramMethod> constructors 
             	= javaInfo.getConstructors(kjt);
@@ -344,11 +348,12 @@ public final class SLEnvInput extends AbstractEnvInput {
 			= specExtractor.extractMethodSpecs(constructor, staticInvPresent);
         	specRepos.addSpecs(constructorSpecs);
             }
+            specRepos.addRepresentsTermToWdChecksForModelFields(kjt);
         }
 
         //add initially clauses to constructor contracts
         specRepos.createContractsFromInitiallyClauses();
-        
+
         //show warnings to user
         ImmutableSet<PositionedString> warnings = specExtractor.getWarnings();
         if(warnings != null && warnings.size() > 0) {

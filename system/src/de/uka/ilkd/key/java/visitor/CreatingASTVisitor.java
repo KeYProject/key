@@ -31,7 +31,6 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.ExtList;
 
 /**

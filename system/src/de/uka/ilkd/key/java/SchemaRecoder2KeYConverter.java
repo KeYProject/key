@@ -245,8 +245,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      */
     public MethodBodyStatement convert(
             de.uka.ilkd.key.java.recoderext.RMethodBodyStatement l) {
-        final IProgramVariable resVar = (IProgramVariable) (l.getResultVar() == null ? null
-                : l.getResultVar().getSV());
+        final IProgramVariable resVar = l.getResultVar() == null ? null
+                : (IProgramVariable)l.getResultVar().getSV();
 
         final TypeReference tr;
         if (l.getBodySource() instanceof TypeSVWrapper) {

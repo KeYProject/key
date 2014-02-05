@@ -121,7 +121,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
       // Extract results and conditions from side proof
       Map<Term, Set<Term>> conditionsAndResultsMap = new LinkedHashMap<Term, Set<Term>>();
       for (Goal resultGoal : info.getProof().openGoals()) {
-         if (resultGoal.getRuleAppManager().peekNext() != null) {
+         if (SymbolicExecutionUtil.hasApplicableRules(resultGoal)) {
             throw new IllegalStateException("Side roof contains goal with automatic applicable rules.");
          }
          Sequent sequent = resultGoal.sequent();
@@ -399,10 +399,10 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
          @Override
          public void visit(Term visited) {
             if (visited.op() instanceof Function) {
-               functions.add((Function)visited.op());
+               functions.add(visited.op());
             }
             else if (visited.op() instanceof IProgramVariable) {
-               progVars.add((IProgramVariable)visited.op());
+               progVars.add(visited.op());
             }
          }
       });

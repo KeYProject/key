@@ -25,7 +25,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public interface TermTransformer extends SortedOperator {
 
     /**
-     * initiates term transformation of <tt>term</tt>. Not eth etop level operator of 
+     * initiates term transformation of <tt>term</tt>. Note the top level operator of
      * of parameter <tt>term</tt> has to be <em>this</em> term transformer.
      */
     Term transform(Term term, SVInstantiations svInst, Services services);

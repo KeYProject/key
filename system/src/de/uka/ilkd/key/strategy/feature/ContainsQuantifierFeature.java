@@ -14,6 +14,7 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.RuleAppCost;
@@ -31,8 +32,9 @@ public class ContainsQuantifierFeature extends AbstractBetaFeature {
 
     private ContainsQuantifierFeature () {}
     
-    protected RuleAppCost doComputation (PosInOccurrence pos, Term findTerm) {
-        return containsQuantifier ( findTerm )
+    @Override
+    protected RuleAppCost doComputation (PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
+        return containsQuantifier ( findTerm, caches )
                      ? BinaryFeature.ZERO_COST
                      : BinaryFeature.TOP_COST;
     }

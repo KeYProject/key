@@ -19,9 +19,12 @@ import java.util.Iterator;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /** This class represents a sequent. A sequent consists of an
@@ -283,10 +286,10 @@ public class Sequent implements Iterable<SequentFormula> {
 	    && succedent.equals(o1.succedent());
     }
 
-    public int formulaNumberInSequent(boolean inAntec, 
+    public int formulaNumberInSequent(boolean inAntec,
                                       SequentFormula cfma) {
-        int n = inAntec ? 0 : antecedent.size();       
-        final Iterator<SequentFormula> formIter = 
+        int n = inAntec ? 0 : antecedent.size();
+        final Iterator<SequentFormula> formIter =
             inAntec ? antecedent.iterator() : succedent.iterator();
         while (formIter.hasNext()) {
             n++;
@@ -299,50 +302,50 @@ public class Sequent implements Iterable<SequentFormula> {
     public SequentFormula getFormulabyNr(int formulaNumber) {
         if (formulaNumber <= 0 || formulaNumber>size()) {
             throw new RuntimeException("No formula nr. "+
-                    formulaNumber+" in seq. "+this);             
-        }         
+                    formulaNumber+" in seq. "+this);
+        }
         if (formulaNumber<=antecedent.size()) {
             return antecedent.get(formulaNumber - 1);
-        }         
-        return succedent.get((formulaNumber-1)-antecedent.size());                 
+        }
+        return succedent.get((formulaNumber-1)-antecedent.size());
     }
 
     /** returns the semisequent in which the SequentFormula described
-     * by PosInOccurrence p lies 
+     * by PosInOccurrence p lies
      */
     private Semisequent getSemisequent(PosInOccurrence p) {
-	return p.isInAntec() ? antecedent() : succedent();	
+	return p.isInAntec() ? antecedent() : succedent();
     }
-    
+
     public int hashCode () {
         return antecedent.hashCode () * 17 + succedent.hashCode ();
     }
-    
-    
+
+
     /** returns iterator about all ConstrainedFormulae of the sequent
-     * @return iterator about all ConstrainedFormulae of the sequent 
+     * @return iterator about all ConstrainedFormulae of the sequent
      */
     public Iterator<SequentFormula> iterator() {
 	return new SequentIterator( antecedent(), succedent() );
     }
-    
-    
+
+
     public boolean numberInAntec(int formulaNumber) {
        return formulaNumber <= antecedent.size();
     }
-    
+
     public void prettyprint(de.uka.ilkd.key.pp.LogicPrinter printer) {
 	printer.printSequent(this);
     }
-  
+
     public void prettyprint(de.uka.ilkd.key.pp.LogicPrinter printer, SequentPrintFilter filter) {
 	printer.printSequent(this, true);
     }
 
- 
+
     public StringBuffer prettyprint(Services services) {
-	de.uka.ilkd.key.pp.LogicPrinter lp = (new de.uka.ilkd.key.pp.LogicPrinter 
-					       (new de.uka.ilkd.key.pp.ProgramPrinter(null), 
+	de.uka.ilkd.key.pp.LogicPrinter lp = (new de.uka.ilkd.key.pp.LogicPrinter
+					       (new de.uka.ilkd.key.pp.ProgramPrinter(null),
 						new NotationInfo(),
 						services));
 	lp.printSequent(this);
@@ -350,23 +353,23 @@ public class Sequent implements Iterable<SequentFormula> {
     }
 
     /** removes the formula at position p (NOTICE:Sequent determines
-     * index using identity (==) not equality.) 
-     * @param p a PosInOccurrence that describes position in the sequent 
+     * index using identity (==) not equality.)
+     * @param p a PosInOccurrence that describes position in the sequent
      * @return a SequentChangeInfo which contains the new sequent and
-     * information which formulas have been added or removed 
+     * information which formulas have been added or removed
      */
-    public SequentChangeInfo removeFormula(PosInOccurrence p) { 
-	final Semisequent seq = getSemisequent(p);       
+    public SequentChangeInfo removeFormula(PosInOccurrence p) {
+	final Semisequent seq = getSemisequent(p);
 
-	final SemisequentChangeInfo semiCI = 
+	final SemisequentChangeInfo semiCI =
 	    seq.remove(seq.indexOf(p.constrainedFormula()));
 
 	final SequentChangeInfo sci = SequentChangeInfo.createSequentChangeInfo
 	    (p.isInAntec(), semiCI, composeSequent(p, semiCI.semisequent()), this);
 
-	return sci; 
+	return sci;
     }
-    
+
     public int size () {
         return antecedent ().size () + succedent ().size ();
     }
@@ -443,5 +446,36 @@ public class Sequent implements Iterable<SequentFormula> {
         public void remove() {
             throw new UnsupportedOperationException();
         }
-    }    
+    }
+    
+    /*
+     * Returns names of TermLabels, that occur in term or one of its subterms.
+     */
+    private static Set<Name> getLabelsForTermRecursively(Term term) {
+        Set<Name> result = new HashSet();
+
+        if (term.hasLabels()) {
+            for (TermLabel label : term.getLabels()) {
+                result.add(label.name());
+            }
+        }
+
+        for (Term subTerm : term.subs()) {
+            result.addAll(getLabelsForTermRecursively(subTerm));
+        }
+
+        return result;
+    }
+
+    /*
+     * Returns names of TermLabels, that occur in this sequent.
+     */
+    public Set<Name> getOccuringTermLabels() {
+        Set<Name> result = new HashSet();
+        Iterator<SequentFormula> iterator = iterator();
+        while (iterator.hasNext()) {
+            result.addAll(getLabelsForTermRecursively(iterator.next().formula()));
+        }
+        return result;
+    }
 }

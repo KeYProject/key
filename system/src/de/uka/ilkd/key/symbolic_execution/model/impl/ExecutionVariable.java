@@ -32,8 +32,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
@@ -48,27 +48,27 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
    /**
     * The parent {@link IExecutionStateNode} which provides this {@link ExecutionVariable}.
     */
-   private IExecutionStateNode<?> parentNode;
+   private final IExecutionStateNode<?> parentNode;
    
    /**
     * The represented {@link IProgramVariable} which value is shown.
     */
-   private IProgramVariable programVariable;
+   private final IProgramVariable programVariable;
    
    /**
     * The parent {@link ExecutionValue} or {@code null} if not available.
     */
-   private ExecutionValue parentValue;
+   private final ExecutionValue parentValue;
    
    /**
     * The index in the parent array.
     */
-   private int arrayIndex;
+   private final int arrayIndex;
    
    /**
     * The {@link ExecutionValue} from which the array length was computed.
     */
-   private ExecutionValue lengthValue;
+   private final ExecutionValue lengthValue;
 
    /**
     * The possible values of this {@link IExecutionValue}.
@@ -87,6 +87,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
    
    /**
     * Constructor for a "normal" child value.
+    * @param settings The {@link ITreeSettings} to use.
     * @param parentNode The parent {@link IExecutionStateNode} which provides this {@link ExecutionVariable}.
     * @param parentValue The parent {@link ExecutionValue} or {@code null} if not available.
     * @param programVariable The represented {@link IProgramVariable} which value is shown.
@@ -94,12 +95,13 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
    public ExecutionVariable(IExecutionStateNode<?> parentNode,
                             ExecutionValue parentValue, 
                             IProgramVariable programVariable) {
-      super(parentNode.getMediator(), parentNode.getProofNode());
+      super(parentNode.getSettings(), parentNode.getMediator(), parentNode.getProofNode());
       assert programVariable != null;
       this.parentNode = parentNode;
       this.parentValue = parentValue;
       this.programVariable = programVariable;
       this.arrayIndex = -1;
+      this.lengthValue = null;
    }
 
    /**
@@ -113,7 +115,8 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
                             ExecutionValue parentValue, 
                             int arrayIndex,
                             ExecutionValue lengthValue) {
-      super(parentNode.getMediator(), parentNode.getProofNode());
+      super(parentNode.getSettings(), parentNode.getMediator(), parentNode.getProofNode());
+      this.programVariable = null;
       this.parentNode = parentNode;
       this.parentValue = parentValue;
       this.arrayIndex = arrayIndex;
@@ -181,16 +184,14 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          for (Entry<Term, List<Goal>> valueEntry : valueMap.entrySet()) {
             Term value = valueEntry.getKey();
             // Format return vale
-            StringBuffer sb = ProofSaver.printTerm(value, getServices(), true);
-            String valueString = sb.toString();
+            String valueString = formatTerm(value);
             // Determine type
             String typeString = value.sort().toString();
             // Compute value condition
             Term condition = computeValueCondition(valueEntry.getValue());
             String conditionString = null;
             if (condition != null) {
-               StringBuffer conditionSB = ProofSaver.printTerm(condition, getServices(), true);
-               conditionString = conditionSB.toString();
+               conditionString = formatTerm(condition);
             }
             // Update result
             result.add(new ExecutionValue(getMediator(),
@@ -209,8 +210,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
             Term condition = computeValueCondition(unknownValues);
             String conditionString = null;
             if (condition != null) {
-               StringBuffer conditionSB = ProofSaver.printTerm(condition, getServices(), true);
-               conditionString = conditionSB.toString();
+               conditionString = formatTerm(condition);
             }
             // Update result
             result.add(new ExecutionValue(getMediator(),
@@ -284,11 +284,12 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          List<Term> pathConditions = new LinkedList<Term>();
          Proof proof = null;
          for (Goal valueGoal : valueGoals) {
-            pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(), false));
+            pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(), false, false));
             proof = valueGoal.node().proof();
          }
          Term comboundPathCondition = TermBuilder.DF.or(pathConditions);
          comboundPathCondition = SymbolicExecutionUtil.simplify(proof, comboundPathCondition);
+         comboundPathCondition = SymbolicExecutionUtil.improveReadability(comboundPathCondition, proof.getServices());
          return comboundPathCondition;
       }
       else {

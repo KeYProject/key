@@ -8,8 +8,8 @@ post: self.value = 42 &amp; self.&lt;inv&gt; &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return w.value;" pathCondition="true" pathConditionChanged="false">
-               <methodReturn name="&lt;return of StaticContractTest.mainConstructor();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of StaticContractTest.mainConstructor();&gt;" isReturnValueComputed="true">
-                  <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+               <methodReturn name="&lt;return of StaticContractTest.mainConstructor();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of StaticContractTest.mainConstructor();&gt;" isReturnValueComputed="true">
+                  <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                   </methodReturnValue>
                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>

@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <equivalenceClass representativeTerm="null">
-      <term term="x"/>
-      <term term="self.y"/>
-      <term term="null"/>
-   </equivalenceClass>
    <state name="One Step Simplification resulting in return this.first.value+this.second.value+tempX.value+tempY.value;">
-      <value name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
       <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" target="o3"/>
    </state>
    <object xml:id="o1" name="self" type="OneAssignmentTest">
-      <value name="y" programVariable="y" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
+      <association name="y" programVariable="y" isArrayIndex="false" arrayIndex="-1" target="o2"/>
+   </object>
+   <object xml:id="o2" name="OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y)" type="OneAssignmentTestValueWrapper">
+   </object>
+   <object xml:id="o3" name="x" type="OneAssignmentTestValueWrapper">
    </object>
 </model>

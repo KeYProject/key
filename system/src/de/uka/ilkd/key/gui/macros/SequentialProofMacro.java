@@ -20,6 +20,7 @@ import java.util.List;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Node;
 
@@ -106,5 +107,10 @@ public abstract class SequentialProofMacro implements ProofMacro {
             assert proofMacros.length > 0;
         }
         return Collections.unmodifiableList(Arrays.asList(proofMacros));
+    }
+
+    @Override
+    public javax.swing.KeyStroke getKeyStroke() {
+	return KeyStrokeManager.get(this);
     }
 }

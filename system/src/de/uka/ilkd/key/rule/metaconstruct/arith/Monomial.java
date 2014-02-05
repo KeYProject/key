@@ -22,11 +22,12 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.LexPathOrdering;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.LRUCache;
 
 /**
  * Class for analysing and modifying monomial expressions over the integers
@@ -41,17 +42,14 @@ public class Monomial {
         this.coefficient = coefficient;
     }
     
-    private static final LRUCache<Term, Monomial> monomialCache = 
-        new LRUCache<Term, Monomial> ( 2000 );
-    
     public static final Monomial ONE = new Monomial ( ImmutableSLList.<Term>nil(),
                                                       BigInteger.ONE );
     
     public static Monomial create(Term monoTerm, Services services) {
-        Monomial res = monomialCache.get ( monoTerm );
+        Monomial res = services.getCaches().getMonomialCache().get ( monoTerm );
         if ( res == null ) {
             res = createHelp ( monoTerm, services );
-            monomialCache.put ( monoTerm, res );
+            services.getCaches().getMonomialCache().put ( monoTerm, res );
         }
         return res;
     }

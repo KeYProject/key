@@ -28,6 +28,7 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStart;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStart;
+import de.uka.ilkd.key.symbolic_execution.model.impl.TreeSettings;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 
@@ -162,7 +163,8 @@ public class TestExecutionNodePreorderIterator extends TestCase {
       Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
       Node root = appendRoot(proof);
       // Create execution test model
-      ExecutionStart executionRoot = new ExecutionStart(mediator, root);
+      TreeSettings settings = new TreeSettings(false, false);
+      ExecutionStart executionRoot = new ExecutionStart(settings, mediator, root);
       // Test tree
       assertRoot(executionRoot, createExpectedNodes("<start>"));
    }

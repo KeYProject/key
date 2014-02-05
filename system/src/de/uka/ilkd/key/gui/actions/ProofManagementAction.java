@@ -18,6 +18,7 @@ import java.awt.event.KeyEvent;
 
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
@@ -36,6 +37,7 @@ public final class ProofManagementAction extends MainWindowAction {
 	super(mainWindow);
 	setName("Proof Management");
 	setTooltip("Browse contracts and possible proof targets");
+        setIcon(IconFactory.proofMgt(16));
 	setAcceleratorLetter(KeyEvent.VK_M);
 
 	setEnabled(enabled());

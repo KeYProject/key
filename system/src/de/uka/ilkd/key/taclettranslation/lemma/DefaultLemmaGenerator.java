@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -40,7 +41,6 @@ import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
@@ -147,7 +147,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * @param services
          * @return instantiation of the schema variable <code>var</code>.
          */
-        private Term getInstantiation(Taclet owner, SchemaVariable var,
+        protected final Term getInstantiation(Taclet owner, SchemaVariable var,
                         Services services) {
                 Term instantiation = mapping.get(var);
                 if (instantiation == null) {
@@ -218,8 +218,8 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         private Term createInstantiation(Taclet owner, VariableSV sv,
                         Services services) {
                 Name name = createUniqueName(services, "v_"+sv.name().toString());
-                LogicVariable variable = new LogicVariable(name,
-                                sv.sort());
+                Sort sort = replaceSort(sv.sort(), services);
+                LogicVariable variable = new LogicVariable(name, sort);
                 return TermFactory.DEFAULT.createTerm(variable);
         }
 
@@ -255,11 +255,11 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 ImmutableSet<SchemaVariable> prefix = owner.getPrefix(sv)
                                 .prefix();
 
-                Sort[] argSorts = computeArgSorts(prefix);
+                Sort[] argSorts = computeArgSorts(prefix, services);
                 Term[] args = computeArgs(owner, prefix, services);
                 Name name = createUniqueName(services, "f_"+sv.name().toString());
 
-                Function function = new Function(name, sv.sort(), argSorts);
+                Function function = new Function(name, replaceSort(sv.sort(), services), argSorts);
                 return TermBuilder.DF.func(function, args);
         }
 
@@ -267,11 +267,11 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 return new Name(TermBuilder.DF.newName(services, baseName));
         }
 
-        private Sort[] computeArgSorts(ImmutableSet<SchemaVariable> svSet) {
+        private Sort[] computeArgSorts(ImmutableSet<SchemaVariable> svSet, Services services) {
                 Sort[] argSorts = new Sort[svSet.size()];
                 int i = 0;
                 for (SchemaVariable sv : svSet) {
-                        argSorts[i] = sv.sort();
+                        argSorts[i] = replaceSort(sv.sort(), services);
                         i++;
                 }
                 return argSorts;
@@ -316,12 +316,43 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                         i++;
                 }
 
+                Operator newOp = replaceOp(term.op(), services);
+
                 return TermFactory.DEFAULT
-                                .createTerm(term.op(),
+                                .createTerm(newOp,
                                                 newSubs,
                                                 new ImmutableArray<QuantifiableVariable>(
                                                                 qvars), term
                                                                 .javaBlock());
         }
 
+        /**
+         * Sometimes operators must be replaced during lemma generation.
+         * Override this method to accomplish this in a subclass.
+         *
+         * <p>
+         * By default, this method returns the argument <tt>op</tt>.
+         *
+         * @param op the operator to be replaced, not <code>null</code>
+         * @param services A services object for lookups
+         * @return the replacement operator, not <code>null</code>
+         */
+        protected Operator replaceOp(Operator op, Services services) {
+            return op;
+        }
+
+        /**
+         * Sometimes sorts must be replaced during lemma generation.
+         * Override this method to accomplish this in a subclass.
+         *
+         * <p>
+         * By default, this method returns the argument <tt>sort</tt>.
+         *
+         * @param sort the sort to be replaced, not <code>null</code>
+         * @param services A services object for lookups
+         * @return the replacement sort, not <code>null</code>
+         */
+        protected Sort replaceSort(Sort sort, Services services) {
+            return sort;
+        }
 }

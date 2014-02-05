@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 
 
 /**
@@ -55,4 +56,9 @@ public interface ClassInvariant extends SpecificationElement {
      * passed KeYJavaType.
      */    
     public ClassInvariant setKJT(KeYJavaType kjt);
+
+    /**
+     * Returns the original Self Variable to replace it easier.
+     */
+    public OriginalVariables getOrigVars();
 }

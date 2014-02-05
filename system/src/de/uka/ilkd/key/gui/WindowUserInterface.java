@@ -236,7 +236,6 @@ public class WindowUserInterface extends AbstractUserInterface {
 	    if (mainWindow.getMediator().autoMode()) {
 	        return super.completeBuiltInRuleApp(app, goal, forced);
 	    }
-
 	    IBuiltInRuleApp result = app;
 	    for (InteractiveRuleApplicationCompletion compl : completions ) {
 	        if (compl.canComplete(app)) {
@@ -251,7 +250,6 @@ public class WindowUserInterface extends AbstractUserInterface {
 	public ProblemInitializer createProblemInitializer(Profile profile) {
 	    ProblemInitializer pi = new ProblemInitializer(this,
 	            new Services(profile, mainWindow.getMediator().getExceptionHandler()),
-	            true,
 	            this);
 	    return pi;
 	}
@@ -310,13 +308,5 @@ public class WindowUserInterface extends AbstractUserInterface {
            Runtime r = Runtime.getRuntime();
            r.gc();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean isRegisterProofs() {
-       return true;
     }
 }

@@ -35,7 +35,7 @@
             contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
             default="true"
             extensions="proof, key"
-            icon="icons/logo16.gif"
+            icon="icons/prooffile16.png"
             id="org.key_project.keyide.ui.editor"
             name="KeY Editor">
       </editor>
@@ -71,19 +71,19 @@
          point="org.eclipse.ui.commandImages">
       <image
             commandId="org.key_project.keyide.ui.commands.startAutoModeCommand"
-            icon="icons/start.gif">
+            icon="icons/nav_go.gif">
       </image>
       <image
             commandId="org.key_project.keyide.ui.commands.stopAutoModeCommand"
-            icon="icons/stop.gif">
+            icon="icons/terminatedlaunch_obj.gif">
       </image>
       <image
             commandId="org.key_project.keyide.ui.commands.pruneProof"
-            icon="icons/prune.png">
+            icon="icons/prune16.png">
       </image>
       <image
             commandId="org.key_project.keyide.ui.commands.applyrule"
-            icon="icons/interactiveAppLogo.gif">
+            icon="icons/interactiveAppLogo16.png">
       </image>
    </extension>
    <extension
@@ -177,7 +177,7 @@
                id="org.key_project.keyide.ui.toolbar">
                  <command
                        commandId="org.key_project.keyide.ui.commands.startAutoModeCommand"
-                       icon="icons/start.gif"
+                       icon="icons/nav_go.gif"
                        id="org.key_project.keyide.ui.commands.startAutoModeCommand"
                        label="Start Auto Mode"
                        tooltip="Start Auto Mode">
@@ -193,7 +193,7 @@
                 </command>
                  <command
                        commandId="org.key_project.keyide.ui.commands.stopAutoModeCommand"
-                       icon="icons/stop.gif"
+                       icon="icons/terminatedlaunch_obj.gif"
                        id="org.key_project.keyide.ui.commands.stopAutoModeCommand"
                        label="Stop Auto Mode"
                        style="push">
@@ -214,7 +214,7 @@
             locationURI="popup:org.key_project.keyide.ui.view.outline.popup?after=additions">
          <command
                commandId="org.key_project.keyide.ui.commands.pruneProof"
-               icon="icons/prune.png"
+               icon="icons/prune16.png"
                label="Prune Proof"
                style="push">
             <visibleWhen
@@ -301,7 +301,7 @@
       <view
             category="org.key_project.keyide.ui.view.category"
             class="org.key_project.keyide.ui.views.StrategySettingsView"
-            icon="icons/releng_gears.gif"
+            icon="icons/debugtt_obj.gif"
             id="org.key_project.keyide.ui.view.StrategySettings"
             name="Strategy Settings"
             restorable="true">

@@ -4,11 +4,11 @@
       <association name="array" programVariable="array" isArrayIndex="false" arrayIndex="-1" target="o1"/>
    </state>
    <object xml:id="o1" name="array" type="int[][]">
-      <value name="length" programVariable="length" isArrayIndex="false" arrayIndex="-1" value="1" type="int"/>
+      <value name="length" programVariable="length" isArrayIndex="false" arrayIndex="-1" value="Z(1(#))" type="int"/>
       <association name="[0]" isArrayIndex="true" arrayIndex="0" target="o2"/>
    </object>
-   <object xml:id="o2" name="array[0]" type="int[]">
-      <value name="length" programVariable="length" isArrayIndex="false" arrayIndex="-1" value="1" type="int"/>
-      <value name="[0]" isArrayIndex="true" arrayIndex="0" value="5" type="int"/>
+   <object xml:id="o2" name="int[]::select(heap,array,arr(Z(0(#))))" type="int[]">
+      <value name="length" programVariable="length" isArrayIndex="false" arrayIndex="-1" value="Z(1(#))" type="int"/>
+      <value name="[0]" isArrayIndex="true" arrayIndex="0" value="Z(5(#))" type="int"/>
    </object>
 </model>

@@ -19,6 +19,7 @@ import java.util.ServiceLoader;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -94,6 +95,10 @@ public class ProofMacroMenu extends JMenu {
 
         JMenuItem menuItem = new JMenuItem(macro.getName());
         menuItem.setToolTipText(macro.getDescription());
+        final KeyStroke macroKey = macro.getKeyStroke();
+        if (macroKey != null && posInOcc == null) { // currently only for global macro applications
+            menuItem.setAccelerator(macroKey);
+        }
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

@@ -16,6 +16,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -41,13 +42,13 @@ public class SeqContainsExecutableCodeFeature extends BinaryFeature {
         new SeqContainsExecutableCodeFeature ( true );
 
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return containsExec ( goal.sequent ().succedent ().iterator () )
-            || containsExec ( goal.sequent ().antecedent().iterator () );
+        return containsExec ( goal.sequent ().succedent ().iterator (), goal.proof().getServices() )
+            || containsExec ( goal.sequent ().antecedent().iterator (), goal.proof().getServices() );
     }
 
-    private boolean containsExec(Iterator<SequentFormula> it) {
+    private boolean containsExec(Iterator<SequentFormula> it, Services services) {
         while ( it.hasNext () ) {
-            if ( tf.compute ( it.next ().formula () ).equals (
+            if ( tf.compute ( it.next ().formula (), services ).equals (
                  BinaryTermFeature.ZERO_COST ) )
                 return true;
         }

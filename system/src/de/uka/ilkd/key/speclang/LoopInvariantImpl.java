@@ -17,16 +17,22 @@ package de.uka.ilkd.key.speclang;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
+import de.uka.ilkd.key.pp.LogicPrinter;
 
 /**
  * Standard implementation of the LoopInvariant interface.
@@ -34,12 +40,13 @@ import de.uka.ilkd.key.proof.OpReplacer;
 public final class LoopInvariantImpl implements LoopInvariant {
         
     private final LoopStatement loop;
+    private final IProgramMethod pm;
+    private final KeYJavaType kjt;
     private final Map<LocationVariable,Term> originalInvariants;
     private final Map<LocationVariable,Term> originalModifies;
     private final Term originalVariant;
     private final Term originalSelfTerm;
     private final Map<LocationVariable,Term> originalAtPres;
-    
     
     //-------------------------------------------------------------------------
     //constructors
@@ -55,6 +62,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
      * @param heapAtPre the term used for the at pre heap
      */
     public LoopInvariantImpl(LoopStatement loop,
+                             IProgramMethod pm,
+                             KeYJavaType kjt,
                              Map<LocationVariable,Term> invariants,
                              Map<LocationVariable,Term> modifies,  
                              Term variant, 
@@ -64,10 +73,12 @@ public final class LoopInvariantImpl implements LoopInvariant {
         //assert modifies != null;
         //assert heapAtPre != null;
         this.loop                       = loop;
+        this.pm                         = pm;
+        this.kjt                        = kjt;
         this.originalInvariants         = invariants == null ? new LinkedHashMap<LocationVariable,Term>() : invariants;
         this.originalVariant            = variant;
         this.originalModifies           = modifies == null ? new LinkedHashMap<LocationVariable,Term>() : modifies;
-        this.originalSelfTerm           = selfTerm;   
+        this.originalSelfTerm           = selfTerm;
         this.originalAtPres             = atPres == null ? new LinkedHashMap<LocationVariable,Term>() : atPres;
     }
 
@@ -84,15 +95,12 @@ public final class LoopInvariantImpl implements LoopInvariant {
     /**
      * Creates an empty, default loop invariant for the passed loop.
      */
-    public LoopInvariantImpl(LoopStatement loop, 
+    public LoopInvariantImpl(LoopStatement loop,
+                             IProgramMethod pm,
+                             KeYJavaType kjt,
 	    		     Term selfTerm, 
 	    		     Map<LocationVariable,Term> atPres) {
-        this(loop, 
-             null, 
-             null,
-             null,
-             selfTerm,
-             atPres);
+        this(loop, pm, kjt, null, null, null, selfTerm, atPres);
     }
     
     
@@ -223,6 +231,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public LoopInvariant setLoop(LoopStatement loop) {
         return new LoopInvariantImpl(loop,
+                                     pm,
+                                     kjt,
                                      originalInvariants,
                                      originalModifies,
                                      originalVariant,
@@ -244,10 +254,12 @@ public final class LoopInvariantImpl implements LoopInvariant {
         for(LocationVariable heap : invariants.keySet()) {
            newInvariants.put(heap, or.replace(invariants.get(heap)));
         }
-        return new LoopInvariantImpl(loop, 
+        return new LoopInvariantImpl(loop,
+                                     pm,
+                                     kjt,
                                      newInvariants,
-                                     originalModifies, 
-                                     originalVariant, 
+                                     originalModifies,
+                                     originalVariant,
                                      originalSelfTerm,
                                      originalAtPres);
     }
@@ -312,10 +324,14 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
 
+    public IProgramMethod getTarget() {
+        return this.pm;
+    }
+
+
     @Override
     public KeYJavaType getKJT() {
-	assert false;
-	return null;
+	return this.kjt;
     }
 
 
@@ -329,5 +345,36 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public VisibilityModifier getVisibility() {
 	assert false;
 	return null;
+    }
+
+
+    public LoopInvariant setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
+        assert newPM instanceof IProgramMethod;
+        return new LoopInvariantImpl(loop, (IProgramMethod)newPM, newKJT,
+                                     originalInvariants, originalModifies,
+                                     originalVariant, originalSelfTerm,
+                                     originalAtPres);
+    }
+
+
+    @Override
+    public OriginalVariables getOrigVars() {
+        Map<LocationVariable, ProgramVariable> atPreVars =
+                new LinkedHashMap<LocationVariable, ProgramVariable>();
+        for (LocationVariable h: originalAtPres.keySet()) {
+            atPreVars.put(h, (ProgramVariable)originalAtPres.get(h).op());
+        }
+        final ProgramVariable self;
+        if(this.originalSelfTerm != null
+                && this.originalSelfTerm.op() instanceof ProgramVariable) {
+            self = (ProgramVariable)this.originalSelfTerm.op();
+        } else if (this.originalSelfTerm != null) {
+            self = new LocationVariable(
+                    new ProgramElementName(originalSelfTerm.op().toString()), kjt);
+        } else {
+            self = null;
+        }
+        return new OriginalVariables(self, null, null, atPreVars,
+                                     ImmutableSLList.<ProgramVariable>nil());
     }
 }

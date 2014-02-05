@@ -37,7 +37,8 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderLis
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public abstract class LemmaGenerationAction extends MainWindowAction {
-    public enum Mode {ProveUserDefinedTaclets,ProveKeYTaclets,ProveAndAddUserDefinedTaclets};    
+    public enum Mode {ProveUserDefinedTaclets,ProveKeYTaclets,ProveAndAddUserDefinedTaclets}
+
     private static final long serialVersionUID = 1L;
 
 
@@ -191,7 +192,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 final ProblemInitializer problemInitializer = new ProblemInitializer(mainWindow.getUserInterface(),
                                 new Services(profile,
                                                 new KeYRecoderExcHandler()),
-                                false, mainWindow.getUserInterface());
+                                mainWindow.getUserInterface());
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(mainWindow.getUserInterface(),
                                                       mainWindow.getUserInterface(),
@@ -269,7 +270,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 final ProblemInitializer problemInitializer = new ProblemInitializer(mainWindow.getUserInterface(),
                                 new Services(proof.getServices().getProfile(),
                                                 new KeYRecoderExcHandler()),
-                                false, mainWindow.getUserInterface());
+                                mainWindow.getUserInterface());
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(mainWindow.getUserInterface(),
                                                       mainWindow.getUserInterface(),

@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

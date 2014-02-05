@@ -28,7 +28,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicAssociation;
  * @author Martin Hentschel
  * @see SymbolicAssociation
  */
-public interface ISymbolicAssociation {
+public interface ISymbolicAssociation extends ISymbolicElement {
    /**
     * Returns a human readable name.
     * @return A human readable name.

@@ -17,7 +17,6 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -267,7 +266,7 @@ public class ClassTree extends JTree {
             sb.append("(");
         }
         for(KeYJavaType paramType : ov.getParamTypes()) {
-            sb.append(paramType.getSort().name() + ", ");
+            sb.append(paramType.getSort().name()).append(", ");
         }
         if(ov.getNumParams() > 0) {
             sb.setLength(sb.length() - 2);

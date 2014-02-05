@@ -8,35 +8,38 @@ post: (   x &gt;= 0 &amp; y &lt; 0
    -&gt; result_0 = subFirst(x, y) &amp; exc_0 = null)
 &amp; (   !(x &gt;= 0 &amp; y &lt; 0)
    -&gt; result_0 = subSecond(x, y) &amp; exc_0 = null)
-mod: {}
+mod: \if (true)  \then (empty)  \else (allLocs)
+\cap \if (!(x &gt;= 0 &amp; y &lt; 0))
+         \then (empty)
+         \else (allLocs)
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-            <branchCondition name="!x &gt;= 0" pathCondition="!x &gt;= 0" pathConditionChanged="true" branchCondition="!x &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <statement name="return magicValue;" pathCondition="!x &gt;= 0" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of ComplexPrecondition.main(x,y);&gt;" pathCondition="!x &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -4711 as result of ComplexPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
-                     <methodReturnValue name="-4711" returnValueString="-4711" hasCondition="false">
+            <branchCondition name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="return magicValue;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of ComplexPrecondition.main(x,y);&gt;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of ComplexPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
+                     <methodReturnValue name="Z(neglit(1(1(7(4(#))))))" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="false">
                      </methodReturnValue>
-                     <termination name="&lt;end&gt;" pathCondition="!x &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                     <termination name="&lt;end&gt;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>
             </branchCondition>
-            <branchCondition name="!x &lt;= -1" pathCondition="!x &lt;= -1" pathConditionChanged="true" branchCondition="!x &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <branchCondition name="!y &gt;= 0" pathCondition="x &gt;= 0 &amp; y &lt;= -1" pathConditionChanged="true" branchCondition="!y &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <statement name="return magicValue;" pathCondition="x &gt;= 0 &amp; y &lt;= -1" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of ComplexPrecondition.main(x,y);&gt;" pathCondition="x &gt;= 0 &amp; y &lt;= -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of ComplexPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
-                        <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+            <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <branchCondition name="lt(y,Z(0(#)))" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="lt(y,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="return magicValue;" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of ComplexPrecondition.main(x,y);&gt;" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of ComplexPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
+                        <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                         </methodReturnValue>
-                        <termination name="&lt;end&gt;" pathCondition="x &gt;= 0 &amp; y &lt;= -1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <termination name="&lt;end&gt;" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
                </branchCondition>
-               <branchCondition name="!y &lt;= -1" pathCondition="x &gt;= 0 &amp; y &gt;= 0" pathConditionChanged="true" branchCondition="!y &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <statement name="return magicValue;" pathCondition="x &gt;= 0 &amp; y &gt;= 0" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of ComplexPrecondition.main(x,y);&gt;" pathCondition="x &gt;= 0 &amp; y &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -4711 as result of ComplexPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
-                        <methodReturnValue name="-4711" returnValueString="-4711" hasCondition="false">
+               <branchCondition name="gt(y,Z(neglit(1(#))))" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="true" branchCondition="gt(y,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="return magicValue;" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of ComplexPrecondition.main(x,y);&gt;" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of ComplexPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
+                        <methodReturnValue name="Z(neglit(1(1(7(4(#))))))" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="false">
                         </methodReturnValue>
-                        <termination name="&lt;end&gt;" pathCondition="x &gt;= 0 &amp; y &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <termination name="&lt;end&gt;" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

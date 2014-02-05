@@ -2,34 +2,34 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="IdenticalTermsDuringProof.mid(x,y,z);" pathCondition="true" pathConditionChanged="false">
       <statement name="int mid = z;" pathCondition="true" pathConditionChanged="false">
-         <branchStatement name="if (y&lt;z) {if (x&lt;=y) {     mid=y;   } }else  {   mid=y; }" pathCondition="true" pathConditionChanged="false">
-            <branchCondition name="!z &lt;= y" pathCondition="!z &lt;= y" pathConditionChanged="true" branchCondition="!z &lt;= y" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <branchStatement name="if (x&lt;=y) {   mid=y; }" pathCondition="!z &lt;= y" pathConditionChanged="false">
-                  <branchCondition name="!y &lt;= -1 + x" pathCondition="y &gt;= x &amp; z &gt;= 1 + y" pathConditionChanged="true" branchCondition="!y &lt;= -1 + x" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <statement name="mid=y;" pathCondition="y &gt;= x &amp; z &gt;= 1 + y" pathConditionChanged="false">
-                        <statement name="return mid;" pathCondition="y &gt;= x &amp; z &gt;= 1 + y" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of IdenticalTermsDuringProof.mid(x,y,z);&gt;" pathCondition="y &gt;= x &amp; z &gt;= 1 + y" pathConditionChanged="false" isReturnValueComputed="false">
-                              <termination name="&lt;end&gt;" pathCondition="y &gt;= x &amp; z &gt;= 1 + y" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+         <branchStatement name="if (y&lt;z)" pathCondition="true" pathConditionChanged="false">
+            <branchCondition name="gt(z,y)" pathCondition="gt(z,y)" pathConditionChanged="true" branchCondition="gt(z,y)" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <branchStatement name="if (x&lt;=y)" pathCondition="gt(z,y)" pathConditionChanged="false">
+                  <branchCondition name="geq(y,x)" pathCondition="and(geq(y,x),gt(z,y))" pathConditionChanged="true" branchCondition="geq(y,x)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <statement name="mid=y;" pathCondition="and(geq(y,x),gt(z,y))" pathConditionChanged="false">
+                        <statement name="return mid;" pathCondition="and(geq(y,x),gt(z,y))" pathConditionChanged="false">
+                           <methodReturn name="&lt;return of IdenticalTermsDuringProof.mid(x,y,z);&gt;" pathCondition="and(geq(y,x),gt(z,y))" pathConditionChanged="false" isReturnValueComputed="false">
+                              <termination name="&lt;end&gt;" pathCondition="and(geq(y,x),gt(z,y))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
                         </statement>
                      </statement>
                   </branchCondition>
-                  <branchCondition name="!y &gt;= x" pathCondition="y &lt;= -1 + x &amp; z &gt;= 1 + y" pathConditionChanged="true" branchCondition="!y &gt;= x" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <statement name="return mid;" pathCondition="y &lt;= -1 + x &amp; z &gt;= 1 + y" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of IdenticalTermsDuringProof.mid(x,y,z);&gt;" pathCondition="y &lt;= -1 + x &amp; z &gt;= 1 + y" pathConditionChanged="false" isReturnValueComputed="false">
-                           <termination name="&lt;end&gt;" pathCondition="y &lt;= -1 + x &amp; z &gt;= 1 + y" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  <branchCondition name="lt(y,x)" pathCondition="and(lt(y,x),gt(z,y))" pathConditionChanged="true" branchCondition="lt(y,x)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <statement name="return mid;" pathCondition="and(lt(y,x),gt(z,y))" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of IdenticalTermsDuringProof.mid(x,y,z);&gt;" pathCondition="and(lt(y,x),gt(z,y))" pathConditionChanged="false" isReturnValueComputed="false">
+                           <termination name="&lt;end&gt;" pathCondition="and(lt(y,x),gt(z,y))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>
                   </branchCondition>
                </branchStatement>
             </branchCondition>
-            <branchCondition name="!z &gt;= 1 + y" pathCondition="!z &gt;= 1 + y" pathConditionChanged="true" branchCondition="!z &gt;= 1 + y" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <statement name="mid=y;" pathCondition="!z &gt;= 1 + y" pathConditionChanged="false">
-                  <statement name="return mid;" pathCondition="!z &gt;= 1 + y" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of IdenticalTermsDuringProof.mid(x,y,z);&gt;" pathCondition="!z &gt;= 1 + y" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="!z &gt;= 1 + y" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+            <branchCondition name="leq(z,y)" pathCondition="leq(z,y)" pathConditionChanged="true" branchCondition="leq(z,y)" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="mid=y;" pathCondition="leq(z,y)" pathConditionChanged="false">
+                  <statement name="return mid;" pathCondition="leq(z,y)" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of IdenticalTermsDuringProof.mid(x,y,z);&gt;" pathCondition="leq(z,y)" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="leq(z,y)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

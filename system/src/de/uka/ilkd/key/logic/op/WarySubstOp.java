@@ -26,16 +26,16 @@ public final class WarySubstOp extends SubstOp {
      * without replacing x with a non-rigid A below modalities */
     public static final SubstOp SUBST = new WarySubstOp(new Name("subst"));
 
-    
+
     private WarySubstOp(Name name) {
 	super(name);
     }
-    
-    
+
+
     @Override
     public Term apply ( Term term ) {
 	QuantifiableVariable v=term.varsBoundHere(1).get(0);
 	WaryClashFreeSubst cfSubst = new WaryClashFreeSubst(v, term.sub(0));
-	return cfSubst.apply(term.sub(1));	
-    }        
+	return cfSubst.apply(term.sub(1));
+    }
 }

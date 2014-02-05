@@ -16,7 +16,7 @@ package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -25,31 +25,31 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * Default implementation of {@link ISymbolicAssociation}.
  * @author Martin Hentschel
  */
-public class SymbolicAssociation implements ISymbolicAssociation {
+public class SymbolicAssociation extends AbstractElement implements ISymbolicAssociation {
    /**
     * The {@link Services} to use.
     */
-   private Services services;
+   private final Services services;
 
    /**
     * The array index.
     */
-   private int arrayIndex;
+   private final int arrayIndex;
    
    /**
     * The {@link IProgramVariable}.
     */
-   private IProgramVariable programVariable;
+   private final IProgramVariable programVariable;
    
    /**
     * The target {@link ISymbolicObject}.
     */
-   private ISymbolicObject target;
+   private final ISymbolicObject target;
    
    /**
     * The optional condition under which this association is valid.
     */
-   private Term condition;
+   private final Term condition;
    
    /**
     * Constructor.
@@ -57,11 +57,18 @@ public class SymbolicAssociation implements ISymbolicAssociation {
     * @param arrayIndex The array index.
     * @param target The target {@link ISymbolicObject}.
     * @param condition The optional condition under which this association is valid.
+    * @param settings The {@link IModelSettings} to use.
     */
-   public SymbolicAssociation(Services services, int arrayIndex, ISymbolicObject target, Term condition) {
+   public SymbolicAssociation(Services services, 
+                              int arrayIndex, 
+                              ISymbolicObject target, 
+                              Term condition,
+                              IModelSettings settings) {
+      super(settings);
       assert services != null;
       assert target != null;
       this.services = services;
+      this.programVariable = null;
       this.arrayIndex = arrayIndex;
       this.target = target;
       this.condition = condition;
@@ -73,8 +80,14 @@ public class SymbolicAssociation implements ISymbolicAssociation {
     * @param programVariable The {@link IProgramVariable}.
     * @param target The target {@link ISymbolicObject}.
     * @param condition The optional condition under which this association is valid.
+    * @param settings The {@link IModelSettings} to use.
     */
-   public SymbolicAssociation(Services services, IProgramVariable programVariable, ISymbolicObject target, Term condition) {
+   public SymbolicAssociation(Services services, 
+                              IProgramVariable programVariable, 
+                              ISymbolicObject target, 
+                              Term condition,
+                              IModelSettings settings) {
+      super(settings);
       assert services != null;
       assert programVariable != null;
       assert target != null;
@@ -168,12 +181,6 @@ public class SymbolicAssociation implements ISymbolicAssociation {
     */
    @Override
    public String getConditionString() {
-      if (condition != null) {
-         StringBuffer sb = ProofSaver.printTerm(condition, services, true);
-         return sb.toString();
-      }
-      else {
-         return null;
-      }
+      return condition != null ? formatTerm(condition, services) : null;
    }
 }

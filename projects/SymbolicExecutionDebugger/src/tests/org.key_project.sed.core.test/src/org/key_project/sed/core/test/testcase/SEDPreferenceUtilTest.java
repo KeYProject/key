@@ -13,8 +13,6 @@
 
 package org.key_project.sed.core.test.testcase;
 
-import junit.framework.TestCase;
-
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.Test;
 import org.key_project.sed.core.test.testcase.swtbot.SWTBotDebugViewHierarchyTest;

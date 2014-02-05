@@ -43,11 +43,7 @@
                <variable name="self" arrayIndex="-1" isArrayIndex="false">
                   <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                        <value name="next {  !u_3 = self &amp; self.next = null
-| !u_3 = self
-&amp; !self.next = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  !u_3 = self &amp; self.next = null
-| !u_3 = self
-&amp; !self.next = null">
+                        <value name="next {or(and(not(equals(u_3,self)),equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null)),and(not(equals(u_3,self)),not(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(and(not(equals(u_3,self)),equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null)),and(not(equals(u_3,self)),not(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null))))">
                         </value>
                      </variable>
                      <variable name="previous" arrayIndex="-1" isArrayIndex="false">
@@ -95,7 +91,7 @@
                            <variable name="next" arrayIndex="-1" isArrayIndex="false">
                               <value name="next {true}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="next {!u_3 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_3 = self">
+                                    <value name="next {not(equals(u_3,self))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(u_3,self))">
                                     </value>
                                  </variable>
                                  <variable name="previous" arrayIndex="-1" isArrayIndex="false">
@@ -118,9 +114,9 @@
                         <variable name="self" arrayIndex="-1" isArrayIndex="false">
                            <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="next {!u_9 = self}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="!u_9 = self">
+                                 <value name="next {not(equals(u_9,self))}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(u_9,self))">
                                     <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="next {!u_3 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_3 = self">
+                                       <value name="next {not(equals(u_3,self))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(u_3,self))">
                                        </value>
                                     </variable>
                                     <variable name="previous" arrayIndex="-1" isArrayIndex="false">
@@ -142,7 +138,7 @@
                         <variable name="u_5" arrayIndex="-1" isArrayIndex="false">
                            <value name="u_5 {true}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="next {!u_3 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_3 = self">
+                                 <value name="next {not(equals(u_3,self))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(u_3,self))">
                                  </value>
                               </variable>
                               <variable name="previous" arrayIndex="-1" isArrayIndex="false">
@@ -183,7 +179,7 @@
                            <variable name="u_5" arrayIndex="-1" isArrayIndex="false">
                               <value name="u_5 {true}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="next {!u_3 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_3 = self">
+                                    <value name="next {not(equals(u_3,self))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(u_3,self))">
                                     </value>
                                  </variable>
                                  <variable name="previous" arrayIndex="-1" isArrayIndex="false">
@@ -196,15 +192,15 @@
                               <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                  <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="next {!u_3 = self &amp; !u_9 = self}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="!u_3 = self &amp; !u_9 = self">
+                                       <value name="next {and(not(equals(u_3,self)),not(equals(u_9,self)))}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(u_3,self)),not(equals(u_9,self)))">
                                           <variable name="next" arrayIndex="-1" isArrayIndex="false">
                                              <value name="next {true}" typeString="endless.UnknownTest" valueString="u_9" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                 <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                                                   <value name="next {!u_3 = self &amp; !u_9 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_3 = self &amp; !u_9 = self">
+                                                   <value name="next {and(not(equals(u_3,self)),not(equals(u_9,self)))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(u_3,self)),not(equals(u_9,self)))">
                                                    </value>
                                                 </variable>
                                                 <variable name="previous" arrayIndex="-1" isArrayIndex="false">
-                                                   <value name="previous {!u_3 = self &amp; !u_9 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_3 = self &amp; !u_9 = self">
+                                                   <value name="previous {and(not(equals(u_3,self)),not(equals(u_9,self)))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(u_3,self)),not(equals(u_9,self)))">
                                                    </value>
                                                 </variable>
                                              </value>
@@ -229,15 +225,15 @@
                                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                     <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                        <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="next {!u_3 = self &amp; !u_9 = self}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="!u_3 = self &amp; !u_9 = self">
+                                          <value name="next {and(not(equals(u_3,self)),not(equals(u_9,self)))}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(u_3,self)),not(equals(u_9,self)))">
                                              <variable name="next" arrayIndex="-1" isArrayIndex="false">
                                                 <value name="next {true}" typeString="endless.UnknownTest" valueString="u_9" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                    <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                                                      <value name="next {!u_3 = self &amp; !u_9 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_3 = self &amp; !u_9 = self">
+                                                      <value name="next {and(not(equals(u_3,self)),not(equals(u_9,self)))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(u_3,self)),not(equals(u_9,self)))">
                                                       </value>
                                                    </variable>
                                                    <variable name="previous" arrayIndex="-1" isArrayIndex="false">
-                                                      <value name="previous {!u_3 = self &amp; !u_9 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_3 = self &amp; !u_9 = self">
+                                                      <value name="previous {and(not(equals(u_3,self)),not(equals(u_9,self)))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(u_3,self)),not(equals(u_9,self)))">
                                                       </value>
                                                    </variable>
                                                 </value>

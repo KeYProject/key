@@ -17,10 +17,14 @@ package de.uka.ilkd.key.speclang;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 
 
 /**
@@ -103,4 +107,14 @@ public interface LoopInvariant extends SpecificationElement {
      */
     public String getPlainText(Services services);
 
+    public IProgramMethod getTarget();
+
+    public KeYJavaType getKJT();
+
+    public LoopInvariant setTarget(KeYJavaType newKJT, IObserverFunction newPM);
+
+    /**
+     * Returns the original Self Variable to replace it easier.
+     */
+    public OriginalVariables getOrigVars();
 }

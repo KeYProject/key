@@ -28,6 +28,7 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -160,7 +161,7 @@ public abstract class AbstractChoicePreferencePage extends PreferencePage implem
          explanationGroup.setText("Explanation");
          explanationGroup.setLayout(new FillLayout());
          explanationGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
-         Text explanationText = new Text(explanationGroup, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+         Text explanationText = new Text(explanationGroup, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.WRAP);
          explanationText.setEditable(false);
          String explanation = ChoiceSelector.getExplanation(category);
          SWTUtil.setText(explanationText, StringUtil.trim(explanation));
@@ -168,6 +169,14 @@ public abstract class AbstractChoicePreferencePage extends PreferencePage implem
       return rootComposite;
    }
    
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected Point doComputeSize() {
+      return new Point(0, 0);
+   }
+
    /**
     * Computes the categories to show.
     * @param category2DefaultChoice The category to setting mapping.

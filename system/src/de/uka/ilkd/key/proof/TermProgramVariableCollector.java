@@ -21,7 +21,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
 public class TermProgramVariableCollector extends DefaultVisitor {

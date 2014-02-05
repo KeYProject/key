@@ -47,7 +47,6 @@ import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.util.LinkedHashMap;
 

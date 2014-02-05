@@ -53,8 +53,7 @@ public abstract class InheritanceSpecification
      */
 
     public InheritanceSpecification(TypeReference supertype) {
-	this.supertypes = new ImmutableArray<TypeReference>
-	    (new TypeReference[]{supertype});
+	this.supertypes = new ImmutableArray<TypeReference>(supertype);
     }
 
     /**

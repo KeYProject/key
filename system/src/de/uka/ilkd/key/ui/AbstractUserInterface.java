@@ -29,7 +29,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 public abstract class AbstractUserInterface implements UserInterface {
@@ -44,9 +43,7 @@ public abstract class AbstractUserInterface implements UserInterface {
 
     @Override
 	public  IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
-		if (app instanceof IBuiltInRuleApp) {
-			app = ((IBuiltInRuleApp)app).tryToInstantiate(goal);
-		}
+	app = forced? app.forceInstantiate(goal): app.tryToInstantiate(goal);
 		// cannot complete that app
 		return app.complete() ? app : null;
 	}
@@ -60,7 +57,7 @@ public abstract class AbstractUserInterface implements UserInterface {
        try {
           getMediator().stopInterface(true);
           loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile, getMediator());
-          loader.load(isRegisterProofs());
+          loader.load();
           return loader;
        }
        catch (ProblemLoaderException e) {
@@ -73,12 +70,6 @@ public abstract class AbstractUserInterface implements UserInterface {
           getMediator().startInterface(true);
        }
     }
-    
-    /**
-     * Checks if loaded {@link Proof}s are registered in the {@link GlobalProofMgt}.
-     * @return {@code true} register, {@code false} do not register.
-     */
-    protected abstract boolean isRegisterProofs();
 
    /**
      * {@inheritDoc}

@@ -2,13 +2,10 @@
 <model>
    <equivalenceClass representativeTerm="current">
       <term term="current"/>
-      <term term="current.right"/>
+      <term term="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right)"/>
    </equivalenceClass>
    <equivalenceClass representativeTerm="null">
-      <term term="\if (current.right.left = current)
-    \then (current.right.left)
-    \else (current.parent)"/>
-      <term term="current.parent"/>
+      <term term="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$parent)"/>
       <term term="null"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return current;">
@@ -20,7 +17,7 @@
       <association name="right" programVariable="right" isArrayIndex="false" arrayIndex="-1" target="o1"/>
       <association name="left" programVariable="left" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </object>
-   <object xml:id="o2" name="current.left" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node">
+   <object xml:id="o2" name="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$left)" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node">
    </object>
    <object xml:id="o3" name="self" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass">
    </object>

@@ -41,7 +41,6 @@ public final class PruneProofAction extends MainWindowAction {
      * 
      */
     private static final long serialVersionUID = 9133317783386913373L;
-    private boolean longName = false;
     
     /**
      * creates an undo action
@@ -52,7 +51,6 @@ public final class PruneProofAction extends MainWindowAction {
      */
     public PruneProofAction(MainWindow mainWindow, boolean longName) {
 	super(mainWindow);
-	this.longName = longName;
 	init();
 	pruneMode();
     }
@@ -76,7 +74,7 @@ public final class PruneProofAction extends MainWindowAction {
                     
                     if (selGoal != null || selNode == null) {
                         setEnabled(false);
-                    } else if (selGoal == null) {
+                    } else {
                     	// pruning a tree only if the selected node has children
                         // and sub tree is not closed
 

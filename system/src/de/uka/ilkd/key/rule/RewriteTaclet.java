@@ -39,11 +39,11 @@ public final class RewriteTaclet extends FindTaclet {
     /** does not pose state restrictions on valid matchings */
     public static final int NONE = 0;
 
-    /** all taclet consituents must appear in the same state 
+    /** all taclet constituents must appear in the same state
      * (and not below a modality (for efficiency reasons)) */
     public static final int SAME_UPDATE_LEVEL = 1;
 
-    /** all taclet consituents must be in the same state 
+    /** all taclet constituents must be in the same state
      * as the sequent */
     public static final int IN_SEQUENT_STATE = 2;
     
@@ -66,19 +66,18 @@ public final class RewriteTaclet extends FindTaclet {
      * "wellformed(h) <-> wellformed(h2) ==>" has NO succedent polarity.
      */
     public static final int SUCCEDENT_POLARITY = 8;
-
     
     /**
      * encodes restrictions on the state where a rewrite taclet is applicable
-     * If the value is equal to 
-     * <ul> 
+     * If the value is equal to
+     * <ul>
      * <li> {@link RewriteTaclet#NONE} no state restrictions are posed</li>
-     * <li> {@link RewriteTaclet#SAME_UPDATE_LEVEL} then <code>\assumes</code> 
+     * <li> {@link RewriteTaclet#SAME_UPDATE_LEVEL} then <code>\assumes</code>
      * must match on a formula within the same state as <code>\find</code>
-     * rsp. <code>\add</code>. For efficiency no modalities are allowed above 
+     * rsp. <code>\add</code>. For efficiency no modalities are allowed above
      * the <code>\find</code> position  </li>
-     * <li> {@link RewriteTaclet#IN_SEQUENT_STATE} the <code>\find</code> part is 
-     * only allowed to match on formulas which are evaulated in the same state as 
+     * <li> {@link RewriteTaclet#IN_SEQUENT_STATE} the <code>\find</code> part is
+     * only allowed to match on formulas which are evaluated in the same state as
      * the sequent</li>
      *</ul>
      */
@@ -159,108 +158,118 @@ public final class RewriteTaclet extends FindTaclet {
      * <code>null</code>, if program modalities appear above
      * <code>p_pos</code>
      */
-    public MatchConditions checkPrefix
-	( PosInOccurrence p_pos,
-	  MatchConditions p_mc,
-	  Services        p_services ) {
-	if ( getApplicationRestriction() == NONE)  
-	    return p_mc;
-        
-    int polarity = p_pos.isInAntec() ? -1 : 1;  // init polarity
+    public MatchConditions checkPrefix(PosInOccurrence p_pos,
+                                       MatchConditions p_mc,
+                                       Services        p_services) {
+	int polarity = p_pos.isInAntec() ? -1 : 1;  // init polarity
 	SVInstantiations svi = p_mc.getInstantiations ();
-	if ( p_pos.posInTerm () != null ) {
-	    PIOPathIterator it = p_pos.iterator ();
-	    Operator        op;
+	// this is assumed to hold
+	assert p_pos.posInTerm () != null;
 
-	    while ( it.next () != -1 ) {
-            final Term t = it.getSubTerm ();
-            op = t.op ();
-
-            if ( op instanceof UpdateApplication &&
-                it.getChild () == UpdateApplication.targetPos()) {		    
-                if ( (getApplicationRestriction() & IN_SEQUENT_STATE) != 0 || veto(t) ) {
-                return null;
-                } else {
-                Term update = UpdateApplication.getUpdate(t);
-                svi = svi.addUpdate(update, t.getLabels());
-                }
-
-            } else if (op instanceof Modality || op instanceof ModalOperatorSV) {
-                return null;
-            }
-
-            // compute polarity
-                                                                                // toggle polarity if find term is subterm of
-            if ((op == Junctor.NOT) ||                                          //   not
-                (op == Junctor.IMP && it.getChild() == 0)) {                    //   left hand side of implication
-                polarity = polarity * -1;
-                                                                                // do not change polarity if find term is subterm of
-            } else if ((op == Junctor.AND) ||                                   //   and
-                       (op == Junctor.OR) ||                                    //   or
-                       (op == Junctor.IMP && it.getChild() != 0) ||             //   right hand side of implication
-                       (op == IfThenElse.IF_THEN_ELSE && it.getChild() != 0)) { //   then or else part of if-then-else
-                // do nothing
-            } else {                                                            // find term has no polarity in any other case
-                polarity = 0;
-            }
+	PIOPathIterator it = p_pos.iterator ();
+	Operator        op;
+	while ( it.next () != -1 ) {
+	    final Term t = it.getSubTerm ();
+	    op = t.op ();
+	    if (op instanceof Transformer) {
+	        return null;
+	    } else  if (op instanceof UpdateApplication &&
+	            it.getChild () == UpdateApplication.targetPos() &&
+	            getApplicationRestriction() != NONE) {
+	        if ( (getApplicationRestriction() & IN_SEQUENT_STATE) != 0 || veto(t) ) {
+	            return null;
+	        } else {
+	            Term update = UpdateApplication.getUpdate(t);
+	            svi = svi.addUpdate(update, t.getLabels());
+	        }
+	    } else if (getApplicationRestriction() != NONE &&
+	            (op instanceof Modality || op instanceof ModalOperatorSV)) {
+	        return null;
 	    }
+	    polarity = polarity(op, it, polarity);
 	}
-    if (((getApplicationRestriction() & ANTECEDENT_POLARITY) != 0 && polarity != -1) ||
-        ((getApplicationRestriction() & SUCCEDENT_POLARITY) != 0 && polarity != 1)) {
-        return null;
+	if (getApplicationRestriction() == NONE)
+            return p_mc;
+	if (((getApplicationRestriction() & ANTECEDENT_POLARITY) != 0 && polarity != -1) ||
+	        ((getApplicationRestriction() & SUCCEDENT_POLARITY) != 0 && polarity != 1)) {
+	    return null;
+	}
+	return p_mc.setInstantiations ( svi );
     }
 
-	return p_mc.setInstantiations ( svi );
+    /**
+     * Compute polarity
+     */
+    private int polarity(final Operator op, final PIOPathIterator it, int polarity) {
+                                                                // toggle polarity if find term is
+                                                                // subterm of
+        if ((op == Junctor.NOT) ||                              //   not
+                (op == Junctor.IMP && it.getChild() == 0)) {    //   left hand side of implication
+            polarity = polarity * -1;
+                                                                // do not change polarity if find term
+                                                                // is subterm of
+        } else if ((op == Junctor.AND) ||                       //   and
+                (op == Junctor.OR) ||                           //   or
+                (op == Junctor.IMP && it.getChild() != 0) ||    //   right hand side of implication
+                (op == IfThenElse.IF_THEN_ELSE &&
+                    it.getChild() != 0)) {                      //   then or else part of if-then-else
+            // do nothing
+        } else {                                                // find term has no polarity in any
+                                                                // other case
+            polarity = 0;
+        }
+        return polarity;
     }
 
     /**
      * does the work for applyReplacewith (wraps recursion) 
      */
-    private Term replace(Term term, 
+    private Term replace(Term term,
                          Term with,
                          PosInOccurrence posOfFind,
                          IntIterator it,
-                         Services services, 
-                         MatchConditions mc, 
+                         Services services,
+                         MatchConditions mc,
                          Sort maxSort) {
-	if (it.hasNext()) {	    
+	if (it.hasNext()) {
 	    int sub = it.next();
-	    
+
 	    final Term[] subs = new Term[term.arity()];
-	    
+
 	    for (int i=0, arity = term.arity(); i<arity; i++) {
-		
+
                 if (i!=sub) {
 		    subs[i] = term.sub(i);
-		} else {                    
+		} else {
                     final Sort newMaxSort = TermHelper.getMaxSort(term, i, services);
-		    subs[i] = replace(term.sub(i), 
-			    	      with, 
+		    subs[i] = replace(term.sub(i),
+				      with,
 			    	      posOfFind,
-			    	      it, 
-			    	      services, 
-			    	      mc, 
+				      it,
+				      services,
+				      mc,
 			    	      newMaxSort);
 		}
-	    }	    	    	    	    	    
- 	    
-	    return TermFactory.DEFAULT.createTerm(term.op(), 
-	            				  subs, 
-	            				  term.boundVars(), 
-	            				  term.javaBlock(),
-	            				  term.getLabels());
-	} 
-                                      
-	with = syntacticalReplace(with, services, mc, posOfFind);   
+	    }
 
-               
+	    return TermFactory.DEFAULT.createTerm(term.op(),
+                                                  subs,
+                                                  term.boundVars(),
+                                                  term.javaBlock(),
+	            				  term.getLabels());
+	}
+
+	with = syntacticalReplace(with, services, mc, posOfFind);
+	//with = TermBuilder.DF.label(with, term.getLabels());
+	// FIXME: Labeling should be done by somehow using {@link label.ITermLabelWorker}
+
 	if(!with.sort().extendsTrans(maxSort)) {
 	    with = TermBuilder.DF.cast(services, maxSort, with);
 	}
-        
+
 	return with;
     }
-    
+
 
     private SequentFormula applyReplacewithHelper(
 	    				RewriteTacletGoalTemplate gt, 
@@ -271,13 +280,13 @@ public final class RewriteTaclet extends FindTaclet {
 	IntIterator it = posOfFind.posInTerm().iterator();
 	Term rwTemplate=gt.replaceWith();
 
-	Term formula = replace(term, 
-		       	       rwTemplate, 
-		       	       posOfFind,
-		       	       it, 
-		       	       services, 
-		       	       matchCond, 
-		       	       term.sort());
+	Term formula = replace(term,
+	                       rwTemplate,
+	                       posOfFind,
+	                       it,
+	                       services,
+	                       matchCond,
+	                       term.sort());
 	if(term == formula) {
 	    return posOfFind.constrainedFormula();
 	} else {
@@ -294,9 +303,9 @@ public final class RewriteTaclet extends FindTaclet {
 	assert app.complete();
 	RewriteTacletGoalTemplate gt 
 		= (RewriteTacletGoalTemplate) goalTemplates().head();
-	return applyReplacewithHelper(gt, 
-				      app.posInOccurrence(), 
-				      services, 
+	return applyReplacewithHelper(gt,
+				      app.posInOccurrence(),
+				      services,
 				      app.matchConditions());
     }
 
@@ -316,11 +325,11 @@ public final class RewriteTaclet extends FindTaclet {
 				    Services           services,
 				    MatchConditions    matchCond) {
 	if ( gt instanceof RewriteTacletGoalTemplate ) {
-            SequentFormula cf 
-            	= applyReplacewithHelper((RewriteTacletGoalTemplate)gt, 
-        	    			         posOfFind, 
-        	    			         services, 
-        	    			         matchCond);
+            SequentFormula cf
+                = applyReplacewithHelper((RewriteTacletGoalTemplate)gt,
+                                         posOfFind,
+                                         services,
+                                         matchCond);
 
             goal.changeFormula ( cf, posOfFind );
 	} else {
