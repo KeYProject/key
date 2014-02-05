@@ -194,7 +194,8 @@ public class MonKeYProof extends Bean {
     public void startProof(final boolean expandMethods,
                            final boolean useDependencyContracts,
                            final boolean useQuery,
-                           final boolean useDefOps) throws Exception {
+                           final boolean useDefOps,
+                           final boolean stopAtUnclosable) throws Exception {
        // Start auto mode only if proof is not already closed.
        if (!MonKeYProofResult.CLOSED.equals(getResult())) {
           // Check if the proof is still valid
@@ -247,6 +248,7 @@ public class MonKeYProof extends Bean {
                    sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, useDependencyContracts ? StrategyProperties.DEP_ON : StrategyProperties.DEP_OFF);
                    sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, useQuery ? StrategyProperties.QUERY_ON : StrategyProperties.QUERY_OFF);
                    sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, useDefOps ? StrategyProperties.NON_LIN_ARITH_DEF_OPS : StrategyProperties.NON_LIN_ARITH_NONE);
+                   sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, stopAtUnclosable ? StrategyProperties.STOPMODE_NONCLOSE : StrategyProperties.STOPMODE_DEFAULT);
                    proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
                    // Make sure that the new options are used
                    ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);

@@ -60,6 +60,11 @@ public class MonKeYBatchModeParameters {
    public static final String PARAM_ARITHMETIC_TREATMENT_BASE = "-atbase";
    
    /**
+    * Parameter for {@link #stopAtUnclosable}.
+    */
+   public static final String PARAM_STOP_AT_UNCLOSABLE = "-stopAtUnclosable";
+   
+   /**
     * Parameter for {@link #bootClassPath}.
     */
    public static final String PARAM_BOOT_CLASS_PATH = "-bc";
@@ -113,6 +118,11 @@ public class MonKeYBatchModeParameters {
     * Use arithmetic treatment base instead of defOps?
     */
    private boolean arithmeticTreatmentBase;
+   
+   /**
+    * Stop at unclosable?
+    */
+   private boolean stopAtUnclosable;
    
    /**
     * Do not load the first location twice to filter out API parsing time. 
@@ -192,6 +202,14 @@ public class MonKeYBatchModeParameters {
       return arithmeticTreatmentBase;
    }
    
+   /**
+    * Checks if proof search stops at first unclosable goal.
+    * @return Stop at first unclosable goal?
+    */
+   public boolean isStopAtUnclosable() {
+      return stopAtUnclosable;
+   }
+
    /**
     * Returns the boot class path to use or {@code null} to use default boot class path.
     * @return The boot class path to use or {@code null} to use default boot class path.
@@ -339,6 +357,10 @@ public class MonKeYBatchModeParameters {
                }
                else if (PARAM_ARITHMETIC_TREATMENT_BASE.equals(param)) {
                   result.arithmeticTreatmentBase = true;
+                  previousParam = null;
+               }
+               else if (PARAM_STOP_AT_UNCLOSABLE.equals(param)) {
+                  result.stopAtUnclosable = true;
                   previousParam = null;
                }
                else if (PARAM_DUMMY_LOAD_OFF.equals(param)) {

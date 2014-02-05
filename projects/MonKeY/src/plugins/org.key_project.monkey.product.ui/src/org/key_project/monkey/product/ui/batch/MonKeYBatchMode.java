@@ -136,6 +136,7 @@ public class MonKeYBatchMode {
       boolean useDependencyContracts = !parameters.isDependencyContractsOff();
       boolean useQuery = !parameters.isQueryTreatmentOff();
       boolean useDefOps = !parameters.isArithmeticTreatmentBase();
+      boolean stopAtUnclosable = parameters.isStopAtUnclosable();
       int i = 1; // location index
       for (String location : parameters.getLocations()) {
          System.out.println("Loading location \"" + location + "\".");
@@ -169,7 +170,7 @@ public class MonKeYBatchMode {
          // Do the proofs
          for (MonKeYProof proof : proofs) {
             System.out.println("Starting proof \"" + proof.getTypeName() + "#" + proof.getTargetName() + "\"");
-            proof.startProof(expandMethods, useDependencyContracts, useQuery, useDefOps);
+            proof.startProof(expandMethods, useDependencyContracts, useQuery, useDefOps, stopAtUnclosable);
             System.out.println("Proof \"" + proof.getTypeName() + "#" + proof.getTargetName() + "\" finished with result " + proof.getResult() + " \" in " + proof.getTime() + " milliseconds");
          }
          // Save the proofs
@@ -583,6 +584,7 @@ public class MonKeYBatchMode {
       System.out.print(" [" + MonKeYBatchModeParameters.PARAM_DEPENDENCY_CONTRACTS_OFF + "]");
       System.out.print(" [" + MonKeYBatchModeParameters.PARAM_QUERY_TREATMENT_OFF + "]");
       System.out.print(" [" + MonKeYBatchModeParameters.PARAM_ARITHMETIC_TREATMENT_BASE + "]");
+      System.out.print(" [" + MonKeYBatchModeParameters.PARAM_STOP_AT_UNCLOSABLE + "]");
       System.out.print(" [" + MonKeYBatchModeParameters.PARAM_BOOT_CLASS_PATH + " <bootClassPath>]");
       System.out.print(" [" + MonKeYBatchModeParameters.PARAM_LOAD_PREFIX + "<indexInListOfLocations> <bootClassPath>]");
       System.out.print(" " + MonKeYBatchModeParameters.PARAM_OUTPUT_PATH + " " + "<outputPath>");
@@ -597,6 +599,7 @@ public class MonKeYBatchMode {
       System.out.println("\t" + MonKeYBatchModeParameters.PARAM_DEPENDENCY_CONTRACTS_OFF + " If defined, dependency contracts Off is used instead of On.");
       System.out.println("\t" + MonKeYBatchModeParameters.PARAM_QUERY_TREATMENT_OFF + " If defined, query treatment Off is used instead of On.");
       System.out.println("\t" + MonKeYBatchModeParameters.PARAM_ARITHMETIC_TREATMENT_BASE + " If defined, arithmetic treatment Base is used instead of DefOps.");
+      System.out.println("\t" + MonKeYBatchModeParameters.PARAM_STOP_AT_UNCLOSABLE + " If defined, auto mode stops at first unclosable goal.");
       System.out.println("\t" + MonKeYBatchModeParameters.PARAM_BOOT_CLASS_PATH + " An optional boot class path which is used for all source locations.");
       System.out.println("\t" + MonKeYBatchModeParameters.PARAM_OUTPUT_PATH + " The output directory in state proof results are written. In the defined directory is a sub directory with the current time created. It contains for each round one sub directory. For each source location is a CSV file with the proof results and a properties file with the accumulated results created. The main directory contains also CSV files with the accumulated results over all rounds and his averages.");
       System.out.println("\t" + MonKeYBatchModeParameters.PARAM_LOAD_PREFIX + "<indexInListOfLocations> The directory which provides proof files to load for the location defined at index <indexInListOfLocations> starting with 1. Load directory for first location is defined via \"" + MonKeYBatchModeParameters.PARAM_LOAD_PREFIX + "1 D:\\Temp\\ProofFilesForLocation1\".");

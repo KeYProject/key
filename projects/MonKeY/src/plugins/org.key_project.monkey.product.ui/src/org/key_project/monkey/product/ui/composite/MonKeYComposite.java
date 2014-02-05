@@ -117,6 +117,11 @@ public class MonKeYComposite extends Composite implements IProofProvider {
     public static final String MEMENTO_KEY_USE_DEF_OPS = "useDefOps";
 
     /**
+     * Key to store the use stop at option in an {@link IMemento}.
+     */
+    public static final String MEMENTO_KEY_STOP_AT = "stopAt";
+
+    /**
      * Key to store the proof directory value in an {@link IMemento}.
      */
     public static final String MEMENTO_KEY_PROOF_DIRECTORY = "proofDirectory";
@@ -227,6 +232,16 @@ public class MonKeYComposite extends Composite implements IProofProvider {
     private Button arithmeticTreatmentDefOpsButton;
     
     /**
+     * Defines the proof search strategy option "Stop at" with option "Default".
+     */
+    private Button stopAtDefaultButton;
+    
+    /**
+     * Defines the proof search strategy option "Stop at" with option "Unclosable".
+     */
+    private Button stopAtUnclosableButton;
+    
+    /**
      * Label for {@link #loadTimeText}.
      */
     private Label loadLabel;
@@ -308,7 +323,7 @@ public class MonKeYComposite extends Composite implements IProofProvider {
         // Proof search strategy
         Composite proofSearchStrategyOptionComposite = new Composite(proofGroup, SWT.NONE);
         proofSearchStrategyOptionComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        proofSearchStrategyOptionComposite.setLayout(new GridLayout(4, true));
+        proofSearchStrategyOptionComposite.setLayout(new GridLayout(5, true));
         Group methodTreatmentGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
         methodTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         methodTreatmentGroup.setLayout(new GridLayout(2, false));
@@ -345,6 +360,15 @@ public class MonKeYComposite extends Composite implements IProofProvider {
         arithmeticTreatmentDefOpsButton = new Button(arithmeticTreatmentGroup, SWT.RADIO);
         arithmeticTreatmentDefOpsButton.setText("DefO&ps");
         arithmeticTreatmentDefOpsButton.setSelection(true);
+        Group stopAtGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
+        stopAtGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        stopAtGroup.setLayout(new GridLayout(2, false));
+        stopAtGroup.setText("Stop at");
+        stopAtDefaultButton = new Button(stopAtGroup, SWT.RADIO);
+        stopAtDefaultButton.setText("&Default");
+        stopAtUnclosableButton = new Button(stopAtGroup, SWT.RADIO);
+        stopAtUnclosableButton.setText("&Unclosable");
+        stopAtUnclosableButton.setSelection(true);
         // Proof viewer
         Composite proofViewerComposite = new Composite(proofGroup, SWT.NONE);
         proofViewerComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -648,6 +672,8 @@ public class MonKeYComposite extends Composite implements IProofProvider {
           queryTreatmentOffButton.setEnabled(enabled);
           arithmeticTreatmentBaseButton.setEnabled(enabled);
           arithmeticTreatmentDefOpsButton.setEnabled(enabled);
+          stopAtDefaultButton.setEnabled(enabled);
+          stopAtUnclosableButton.setEnabled(enabled);
        }
     }
 
@@ -664,6 +690,7 @@ public class MonKeYComposite extends Composite implements IProofProvider {
             final boolean useDependencyContracts = dependencyContractsOnButton.getSelection();
             final boolean useQuery = queryTreatmentOnButton.getSelection();
             final boolean useDefOps = arithmeticTreatmentDefOpsButton.getSelection();
+            final boolean stopAtUnclosable = stopAtUnclosableButton.getSelection();
             new AbstractKeYMainWindowJob("Proving") {
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
@@ -673,7 +700,7 @@ public class MonKeYComposite extends Composite implements IProofProvider {
                         for (Object obj : selectedProofs) {
                             SWTUtil.checkCanceled(monitor);
                             if (obj instanceof MonKeYProof) {
-                                ((MonKeYProof)obj).startProof(expandMethods, useDependencyContracts, useQuery, useDefOps);
+                                ((MonKeYProof)obj).startProof(expandMethods, useDependencyContracts, useQuery, useDefOps, stopAtUnclosable);
                                 getDisplay().syncExec(new Runnable() {
                                  @Override
                                  public void run() {
@@ -952,9 +979,12 @@ public class MonKeYComposite extends Composite implements IProofProvider {
             Boolean useQuery = memento.getBoolean(MEMENTO_KEY_USE_QUERY);
             queryTreatmentOnButton.setSelection(useQuery == null || useQuery.booleanValue());
             queryTreatmentOffButton.setSelection(useQuery != null && !useQuery.booleanValue());
-            Boolean useDefOpy = memento.getBoolean(MEMENTO_KEY_USE_DEF_OPS);
-            arithmeticTreatmentBaseButton.setSelection(useDefOpy != null && !useDefOpy.booleanValue());
-            arithmeticTreatmentDefOpsButton.setSelection(useDefOpy == null || useDefOpy.booleanValue());
+            Boolean useDefOps = memento.getBoolean(MEMENTO_KEY_USE_DEF_OPS);
+            arithmeticTreatmentBaseButton.setSelection(useDefOps != null && !useDefOps.booleanValue());
+            arithmeticTreatmentDefOpsButton.setSelection(useDefOps == null || useDefOps.booleanValue());
+            Boolean stopAt = memento.getBoolean(MEMENTO_KEY_STOP_AT);
+            stopAtDefaultButton.setSelection(stopAt != null && !stopAt.booleanValue());
+            stopAtUnclosableButton.setSelection(stopAt == null || stopAt.booleanValue());
             proofDirectory = memento.getString(MEMENTO_KEY_PROOF_DIRECTORY);
         }
     }
@@ -972,6 +1002,7 @@ public class MonKeYComposite extends Composite implements IProofProvider {
             memento.putBoolean(MEMENTO_KEY_USE_DEPENDENCY_CONTRACTS, dependencyContractsOnButton.getSelection());
             memento.putBoolean(MEMENTO_KEY_USE_QUERY, queryTreatmentOnButton.getSelection());
             memento.putBoolean(MEMENTO_KEY_USE_DEF_OPS, arithmeticTreatmentDefOpsButton.getSelection());
+            memento.putBoolean(MEMENTO_KEY_STOP_AT, stopAtUnclosableButton.getSelection());
             memento.putString(MEMENTO_KEY_PROOF_DIRECTORY, proofDirectory);
         }
     }
