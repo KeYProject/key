@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.Assert;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.monkey.product.ui.application.MonKeYApplication;
 import org.key_project.monkey.product.ui.model.MonKeYProof;
+import org.key_project.monkey.product.ui.model.MonKeYProofResult;
 import org.key_project.monkey.product.ui.util.MonKeYUtil;
 import org.key_project.monkey.product.ui.util.MonKeYUtil.MonKeYProofSums;
 import org.key_project.util.eclipse.ApplicationUtil;
@@ -364,6 +365,10 @@ public class MonKeYBatchMode {
       sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
       sb.append("Time (milliseconds)");
       sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
+      sb.append("Goal with applicable rules");
+      sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
+      sb.append("Goal without applicable rules");
+      sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
       sb.append(StringUtil.NEW_LINE);
       for (MonKeYProof proof : proofs) {
          sb.append(location);
@@ -385,6 +390,10 @@ public class MonKeYBatchMode {
          sb.append(proof.getBranches());
          sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
          sb.append(proof.getTime());
+         sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
+         sb.append(proof.hasResult() & !MonKeYProofResult.CLOSED.equals(proof.getResult()) ? MonKeYUtil.toString(proof.isHasGoalWithApplicableRules()) : StringUtil.EMPTY_STRING);
+         sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
+         sb.append(proof.hasResult() & !MonKeYProofResult.CLOSED.equals(proof.getResult()) ? MonKeYUtil.toString(proof.isHasGoalWithoutApplicableRules()) : StringUtil.EMPTY_STRING);
          sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
          sb.append(StringUtil.NEW_LINE);
       }

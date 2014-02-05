@@ -190,6 +190,16 @@ public class MonKeYComposite extends Composite implements IProofProvider {
      * {@link TableViewerColumn} of {@link #proofViewer} which shows the time.
      */
     private TableViewerColumn proofTimeColumn;
+
+    /**
+     * {@link TableViewerColumn} of {@link #proofViewer} which shows the flag {@link MonKeYProof#isHasGoalWithApplicableRules()}.
+     */
+    private TableViewerColumn hasGoalWithApplicableRulesColumn;
+
+    /**
+     * {@link TableViewerColumn} of {@link #proofViewer} which shows the flag {@link MonKeYProof#isHasGoalWithoutApplicableRules()}.
+     */
+    private TableViewerColumn hasGoalWithoutApplicableRulesColumn;
     
     /**
      * Defines the proof search strategy option "Method Treatment" with option "Contract".
@@ -365,7 +375,7 @@ public class MonKeYComposite extends Composite implements IProofProvider {
         stopAtGroup.setLayout(new GridLayout(2, false));
         stopAtGroup.setText("Stop at");
         stopAtDefaultButton = new Button(stopAtGroup, SWT.RADIO);
-        stopAtDefaultButton.setText("&Default");
+        stopAtDefaultButton.setText("Def&ault");
         stopAtUnclosableButton = new Button(stopAtGroup, SWT.RADIO);
         stopAtUnclosableButton.setText("&Unclosable");
         stopAtUnclosableButton.setSelection(true);
@@ -408,6 +418,14 @@ public class MonKeYComposite extends Composite implements IProofProvider {
         proofTimeColumn.getColumn().setText("Time (milliseconds)");
         proofTimeColumn.getColumn().setMoveable(true);
         proofViewerLayout.setColumnData(proofTimeColumn.getColumn(), new ColumnWeightData(5));
+        hasGoalWithApplicableRulesColumn = new TableViewerColumn(proofViewer, style);
+        hasGoalWithApplicableRulesColumn.getColumn().setText("Goal with applicable rules");
+        hasGoalWithApplicableRulesColumn.getColumn().setMoveable(true);
+        proofViewerLayout.setColumnData(hasGoalWithApplicableRulesColumn.getColumn(), new ColumnWeightData(2));
+        hasGoalWithoutApplicableRulesColumn = new TableViewerColumn(proofViewer, style);
+        hasGoalWithoutApplicableRulesColumn.getColumn().setText("Goal without applicable rules");
+        hasGoalWithoutApplicableRulesColumn.getColumn().setMoveable(true);
+        proofViewerLayout.setColumnData(hasGoalWithoutApplicableRulesColumn.getColumn(), new ColumnWeightData(2));
         
         SWTUtil.makeTableColumnsSortable(proofViewer);
         proofViewer.setContentProvider(ArrayContentProvider.getInstance());

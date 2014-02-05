@@ -273,4 +273,13 @@ public final class MonKeYUtil {
          return reusedProofsCount;
       }
    }
+
+   /**
+    * Converts the given value into a human readable {@link String}.
+    * @param value The value to convert.
+    * @return The human readable representation of the value.
+    */
+   public static String toString(boolean value) {
+     return value ? "Yes" : "No";
+   }
 }
