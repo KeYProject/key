@@ -14,8 +14,9 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -26,7 +27,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public final class Modality extends AbstractSortedOperator {
 
-    private static final HashMap<String, Modality> nameMap 
+    private static final Map<String, Modality> nameMap 
     	= new LinkedHashMap<String, Modality>(10);
     
     /** 

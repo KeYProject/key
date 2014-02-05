@@ -8,16 +8,19 @@ post: (   heapBefore_magic_0[xPre(x)] = TRUE &amp; y &lt; 0
    -&gt; result_0 = subFirst(x, y) &amp; exc_0 = null)
 &amp; (   !(heapBefore_magic_0[xPre(x)] = TRUE &amp; y &lt; 0)
    -&gt; result_0 = subSecond(x, y) &amp; exc_0 = null)
-mod: {}
+mod: \if (true)  \then (empty)  \else (allLocs)
+\cap \if (!(xPre(x) = TRUE &amp; y &lt; 0))
+         \then (empty)
+         \else (allLocs)
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
                <methodReturn name="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	-4711 {x &gt;= 0 &amp; y &gt;= 0 | x &lt;= -1 &amp; y &gt;= 0 | x &lt;= -1 &amp; y &lt;= -1}, 
-	42 {x &gt;= 0 &amp; y &lt;= -1}
+	Z(2(4(#))) {and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),leq(y,Z(neglit(1(#)))))}, 
+	Z(neglit(1(1(7(4(#)))))) {not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))}
 as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
-                  <methodReturnValue name="-4711 {x &gt;= 0 &amp; y &gt;= 0 | x &lt;= -1 &amp; y &gt;= 0 | x &lt;= -1 &amp; y &lt;= -1}" returnValueString="-4711" hasCondition="true" conditionString="x &gt;= 0 &amp; y &gt;= 0 | x &lt;= -1 &amp; y &gt;= 0 | x &lt;= -1 &amp; y &lt;= -1">
+                  <methodReturnValue name="Z(2(4(#))) {and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),leq(y,Z(neglit(1(#)))))}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),leq(y,Z(neglit(1(#)))))">
                   </methodReturnValue>
-                  <methodReturnValue name="42 {x &gt;= 0 &amp; y &lt;= -1}" returnValueString="42" hasCondition="true" conditionString="x &gt;= 0 &amp; y &lt;= -1">
+                  <methodReturnValue name="Z(neglit(1(1(7(4(#)))))) {not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))}" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="true" conditionString="not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))">
                   </methodReturnValue>
                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>

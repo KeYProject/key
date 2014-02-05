@@ -19,7 +19,7 @@ package de.uka.ilkd.key.logic;
  * SequentFormula and a PosInTerm determine an object of this 
  * class exactly. 
  */
-public class PosInOccurrence {
+public final class PosInOccurrence {
 
     public static PosInOccurrence findInSequent(Sequent seq, 
                                                 int formulaNumber, 
@@ -33,7 +33,7 @@ public class PosInOccurrence {
      */
     private final SequentFormula cfma;
 
-    // saves 8 bytes (due to allignment issues) per instance if we use a 
+    // saves 8 bytes (due to alignment issues) per instance if we use a
     // short here instead of an int
     private final short hashCode;
     
@@ -50,9 +50,10 @@ public class PosInOccurrence {
      */
     private Term subTermCache = null;
 
-    public PosInOccurrence(SequentFormula cfma, 
-            PosInTerm posInTerm,
-            boolean inAntec) {	
+    public PosInOccurrence(SequentFormula cfma,
+                           PosInTerm posInTerm,
+                           boolean inAntec) {
+        assert posInTerm != null;
 	this.inAntec=inAntec;
 	this.cfma=cfma;	
 	this.posInTerm=posInTerm;	
@@ -61,7 +62,15 @@ public class PosInOccurrence {
        
     
     private int computeHash () {
-        return constrainedFormula().hashCode() * 13 + posInTerm().hashCode();	
+        if (constrainedFormula() != null && posInTerm() != null) {
+            return constrainedFormula().hashCode() * 13 + posInTerm().hashCode();
+        } else if (constrainedFormula() != null) {
+            return constrainedFormula().hashCode() * 13;
+        } else if (posInTerm() != null) {
+            return posInTerm().hashCode();
+        } else {
+            return 0;
+        }
     }
     
     
@@ -176,7 +185,7 @@ public class PosInOccurrence {
     /**
      * The usage of this method is strongly discouraged, use 
      * {@link PosInOccurrence#iterator} instead.     
-     * describes the exact occurence of the refered term inside 
+     * describes the exact occurrence of the referred term inside
      * {@link SequentFormula#formula()} 
      * @returns the position in the formula of the SequentFormula of
      * this PosInOccurrence. 
@@ -196,6 +205,7 @@ public class PosInOccurrence {
      *         It is not tested whether this position exists within <code>p_newFormula</code>
      */
     public PosInOccurrence replaceConstrainedFormula (SequentFormula p_newFormula) {
+        assert p_newFormula != null;
         final PIOPathIterator it = iterator ();
         Term newTerm = p_newFormula.formula ();
         PosInTerm newPosInTerm = PosInTerm.TOP_LEVEL;

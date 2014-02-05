@@ -39,7 +39,7 @@ class Instantiation {
 
     private final static TermBuilder tb = TermBuilder.DF;
 
-    /** universally quatifiable variable bound in<code>allTerm</code> */
+    /** universally quantifiable variable bound in<code>allTerm</code> */
     private final QuantifiableVariable firstVar;
 
     private final Term matrix;
@@ -57,16 +57,13 @@ class Instantiation {
     /** the <code>TriggersSet</code> of this <code>allTerm</code> */
     private final TriggersSet triggersSet;
 
-    /** Terms bound in every formula on <code>goal</code> */
-    private final ImmutableSet<Term> matchedTerms;
-
     private Instantiation(Term allterm, Sequent seq, Services services) {
 	firstVar = allterm.varsBoundHere(0).get(0);
 	matrix = TriggerUtils.discardQuantifiers(allterm);
-	matchedTerms = sequentToTerms(seq);
+	/* Terms bound in every formula on <code>goal</code> */
 	triggersSet = TriggersSet.create(allterm, services);
 	assumedLiterals = initAssertLiterals(seq);
-	addInstances(matchedTerms, services);
+	addInstances(sequentToTerms(seq), services);
     }
 
     private static Term lastQuantifiedFormula = null;

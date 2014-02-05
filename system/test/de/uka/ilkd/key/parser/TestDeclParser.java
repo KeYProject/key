@@ -15,7 +15,6 @@
 package de.uka.ilkd.key.parser;
 
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
@@ -31,10 +30,11 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.AmbigiousDeclException;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 
@@ -53,7 +53,7 @@ public class TestDeclParser extends TestCase {
 	nss = serv.getNamespaces();
 	
 	String sorts = "\\sorts{boolean;int;LocSet;}";
-	KeYParser basicSortsParser = new KeYParser(ParserMode.DECLARATION, new KeYLexer(new StringReader(sorts),null),
+	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(sorts,null),
 			      "No file. Call of parser from logic/TestClashFreeSubst.java",
 			      serv, nss);
 	try {
@@ -66,15 +66,15 @@ public class TestDeclParser extends TestCase {
 	r2k.parseSpecialClasses();
     }
 
-    private KeYParser stringParser(String s) {
-	return new KeYParser(ParserMode.DECLARATION, new KeYLexer(new StringReader(s),null),
+    private KeYParserF stringParser(String s) {
+	return new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s,null),
 			      "No file. Call of parser from parser/TestDeclParser.java",
 			      serv, nss);
     }
 
     public void parseDecls(String s) {
 	try {
-	    KeYParser p = stringParser(s);
+	    KeYParserF p = stringParser(s);
 	    p.decls();
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
@@ -112,13 +112,34 @@ public class TestDeclParser extends TestCase {
 	return gs;
     }
 
-
     protected Sort checkSort ( Named p_n ) {
 	assertTrue ( "Sort does not exist", p_n != null );
 	assertTrue ( "Sort does not have type Sort, but " + p_n.getClass(),
 		     p_n instanceof Sort );
 
 	return (Sort)p_n;
+    }
+
+    public void testProxySortDecl() {
+        nss = new NamespaceSet ();
+        parseDecls("\\sorts { A; B; \\proxy P; \\proxy Q \\extends A,B; \\proxy R \\extends Q; }");
+
+        Sort P = (Sort) nss.sorts().lookup(new Name("P"));
+        assertTrue(P instanceof ProxySort);
+        assertEquals("P", P.name().toString());
+        assertEquals(DefaultImmutableSet.nil().add(Sort.ANY), P.extendsSorts());
+
+        Sort A = (Sort) nss.sorts().lookup(new Name("A"));
+        Sort B = (Sort) nss.sorts().lookup(new Name("B"));
+        Sort Q = (Sort) nss.sorts().lookup(new Name("Q"));
+        assertTrue(Q instanceof ProxySort);
+        assertEquals("Q", Q.name().toString());
+        assertEquals(DefaultImmutableSet.nil().add(A).add(B), Q.extendsSorts());
+
+        Sort R = (Sort) nss.sorts().lookup(new Name("R"));
+        assertTrue(P instanceof ProxySort);
+        assertEquals("R", R.name().toString());
+        assertEquals(DefaultImmutableSet.nil().add(Q), R.extendsSorts());
     }
 
 
@@ -195,7 +216,7 @@ public class TestDeclParser extends TestCase {
 	nss = new NamespaceSet ();
 	String str = "\\sorts { \\generic G; \\generic H \\oneof {G}; }";
 	try {
-	    KeYParser p = stringParser(str);
+	    KeYParserF p = stringParser(str);
 	    p.decls();
 
 	    fail ( "Expected an GenericSortException" );
@@ -436,14 +457,10 @@ public class TestDeclParser extends TestCase {
 		 "  \\formula b;\n" +
 		 "}\n").decls();
 	  fail("Parsed in ambigious declaration");
-	} catch (AmbigiousDeclException ade) {
-	    // everything ok  
 	} catch(RuntimeException e){
 	    if(!(e.getCause() instanceof AmbigiousDeclException)){
 		fail("Unexpected excpetion. Testcase failed." +e);
 	    }
-	}catch(antlr.TokenStreamException tse) {
-	    fail("Unexpected excpetion. Testcase failed." + tse);
 	} catch(antlr.RecognitionException re) {
 	    fail("Unexpected excpetion. Testcase failed." + re);
 	} 

@@ -5,20 +5,20 @@
          <operationContract name="result_0 = magic(x) catch(exc_0)
 pre: &lt;$inv&gt; &amp; !x = null
 post: result_0 = subMagic(x) &amp; &lt;$inv&gt; &amp; exc_0 = null
-mod: {}
+mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of SimpleObjectQuery.main(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	res_subMagic_0 {x = null}, 
-	42 {!x = null &amp; SimpleObjectQuery.INSTANCE = x}, 
-	-4711 {!x = null &amp; !SimpleObjectQuery.INSTANCE = x}
+	res_subMagic_0 {equals(x,null)}, 
+	Z(2(4(#))) {and(not(equals(x,null)),equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x))}, 
+	Z(neglit(1(1(7(4(#)))))) {and(not(equals(x,null)),not(equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x)))}
 as result of SimpleObjectQuery.main(x);&gt;" isReturnValueComputed="true">
-                     <methodReturnValue name="res_subMagic_0 {x = null}" returnValueString="res_subMagic_0" hasCondition="true" conditionString="x = null">
+                     <methodReturnValue name="res_subMagic_0 {equals(x,null)}" returnValueString="res_subMagic_0" hasCondition="true" conditionString="equals(x,null)">
                      </methodReturnValue>
-                     <methodReturnValue name="42 {!x = null &amp; SimpleObjectQuery.INSTANCE = x}" returnValueString="42" hasCondition="true" conditionString="!x = null &amp; SimpleObjectQuery.INSTANCE = x">
+                     <methodReturnValue name="Z(2(4(#))) {and(not(equals(x,null)),equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x))}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="and(not(equals(x,null)),equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x))">
                      </methodReturnValue>
-                     <methodReturnValue name="-4711 {!x = null &amp; !SimpleObjectQuery.INSTANCE = x}" returnValueString="-4711" hasCondition="true" conditionString="!x = null &amp; !SimpleObjectQuery.INSTANCE = x">
+                     <methodReturnValue name="Z(neglit(1(1(7(4(#)))))) {and(not(equals(x,null)),not(equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x)))}" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="true" conditionString="and(not(equals(x,null)),not(equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x)))">
                      </methodReturnValue>
                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>

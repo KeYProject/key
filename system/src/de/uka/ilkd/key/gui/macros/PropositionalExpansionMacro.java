@@ -15,6 +15,10 @@ package de.uka.ilkd.key.gui.macros;
 
 import java.util.Set;
 
+import javax.swing.KeyStroke;
+
+import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
+
 /**
  * The macro PropositionalExpansionMacro apply rules to decompose propositional
  * toplevel formulas; but does not split the goal.
@@ -37,7 +41,8 @@ public class PropositionalExpansionMacro extends AbstractPropositionalExpansionM
     }
 
     private static final String[] ADMITTED_RULES = {
-        "andLeft", "orRight", "impRight", "notLeft", "notRight", "close"
+        "andLeft", "orRight", "impRight", "notLeft", "notRight", "close",
+        "closeTrue", "closeFalse", "true_left", "false_right"
     };
 
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
@@ -47,4 +52,8 @@ public class PropositionalExpansionMacro extends AbstractPropositionalExpansionM
         return ADMITTED_RULES_SET;
     }
 
+    @Override
+    public KeyStroke getKeyStroke () {
+	return KeyStrokeManager.get(this);
+    }
 }

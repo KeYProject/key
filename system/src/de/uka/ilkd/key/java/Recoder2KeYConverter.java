@@ -404,7 +404,7 @@ public class Recoder2KeYConverter {
 
         Object result = null;
         try {
-            result = m.invoke(this, new Object[] { pe });
+            result = m.invoke(this, pe);
         } catch (IllegalAccessException iae) {
             Debug.out("recoder2key: cannot access method ", iae);
             throw new ConvertException("recoder2key: cannot access method", iae);
@@ -650,8 +650,7 @@ public class Recoder2KeYConverter {
         final Class<? extends recoder.java.JavaProgramElement> class_ = pe.getClass();
 
         try {
-            result = (ProgramElement) getKeYClassConstructor(class_)
-            .newInstance(new Object[] { parameter });
+            result = (ProgramElement) getKeYClassConstructor(class_).newInstance(parameter);
             return result;
         } catch (Exception e) {
             final String className = class_.toString().substring(6);

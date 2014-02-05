@@ -20,7 +20,6 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -91,6 +90,7 @@ public final class HeapLDT extends LDT {
     private final Map<Sort,Function> wellFormed;    
     private final Function acc;
     private final Function reach;
+    private final Function prec;
     
     //heap pv
     private ImmutableList<LocationVariable> heaps;
@@ -124,6 +124,7 @@ public final class HeapLDT extends LDT {
         nullFunc          = addFunction(services, "null");
         acc               = addFunction(services, "acc");
         reach             = addFunction(services, "reach");
+        prec		  = addFunction(services, "prec");
         heaps = ImmutableSLList.<LocationVariable>nil()
         		 .append((LocationVariable) progVars.lookup(BASE_HEAP_NAME))
         		 .append((LocationVariable) progVars.lookup(SAVED_HEAP_NAME));
@@ -300,6 +301,10 @@ public final class HeapLDT extends LDT {
 	return reach;
     }
     
+    public Function getPrec() {
+	return prec;
+    }
+
     
     public LocationVariable getHeap() {
 	return heaps.head();

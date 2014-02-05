@@ -15,7 +15,6 @@ package de.uka.ilkd.key.gui.macros;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -51,7 +50,6 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
 
     private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("notHumanReadable");
-
 
     @Override
     public String getName() {
@@ -107,16 +105,20 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
      * Checks if a rule is marked as not suited for interaction.
      */
     private static boolean isNonHumanInteractionTagged(Rule rule) {
+        return isInRuleSet(rule, NON_HUMAN_INTERACTION_RULESET);
+    }
+
+    private static boolean isInRuleSet(Rule rule, Name ruleSetName) {
         if (rule instanceof Taclet) {
             Taclet taclet = (Taclet) rule;
             for (RuleSet rs : taclet.getRuleSets()) {
-                if (NON_HUMAN_INTERACTION_RULESET.equals(rs.name())) 
+                if (ruleSetName.equals(rs.name())) 
                     return true;
             }
         }
         return false;
     }
-
+    
     private static class AutoPilotStrategy implements Strategy {
 
         private static final Name NAME = new Name("Autopilot filter strategy");
@@ -167,11 +169,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
             if(ADMITTED_RULES_SET.contains(name)) {
                 return LongRuleAppCost.ZERO_COST;
             }
-
-            if(name.startsWith("Class_invariant_axiom_for")) {
-                return LongRuleAppCost.ZERO_COST;
-            }
-
+            
             // apply OSS to <inv>() calls.
             if(rule instanceof OneStepSimplifier) {
                 Term target = pio.subTerm();

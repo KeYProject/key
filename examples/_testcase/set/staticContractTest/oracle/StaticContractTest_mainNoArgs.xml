@@ -7,8 +7,8 @@ pre: true
 post: result_0 = 42 &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-            <methodReturn name="&lt;return of StaticContractTest.mainNoArgs();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of StaticContractTest.mainNoArgs();&gt;" isReturnValueComputed="true">
-               <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+            <methodReturn name="&lt;return of StaticContractTest.mainNoArgs();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of StaticContractTest.mainNoArgs();&gt;" isReturnValueComputed="true">
+               <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                </methodReturnValue>
                <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                </termination>

@@ -124,10 +124,10 @@ public class MethodCall extends ProgramTransformer {
 
     private KeYJavaType getStaticPrefixType(ReferencePrefix refPrefix, Services services) {
 	if (refPrefix==null || refPrefix instanceof ThisReference && 
-	        ((ThisReference) refPrefix).getReferencePrefix()==null){ 
+	        refPrefix.getReferencePrefix()==null){
 	    return execContext.getTypeReference().getKeYJavaType();
 	} else if(refPrefix instanceof ThisReference){
-	    return ((TypeReference) ((ThisReference) refPrefix).getReferencePrefix()).getKeYJavaType();
+	    return ((TypeReference) refPrefix.getReferencePrefix()).getKeYJavaType();
 	    //((ProgramVariable) services.getTypeConverter().convertToLogicElement(refPrefix).op()).getKeYJavaType();
 	}else if (refPrefix instanceof TypeRef) {
 	    KeYJavaType t = ((TypeRef)refPrefix).getKeYJavaType();

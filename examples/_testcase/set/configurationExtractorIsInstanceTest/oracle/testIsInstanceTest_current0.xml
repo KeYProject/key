@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <equivalenceClass representativeTerm="null">
-      <term term="IsInstanceTest.A"/>
       <term term="obj"/>
+      <term term="IsInstanceTest::select(heap,null,IsInstanceTest::$A)"/>
       <term term="null"/>
    </equivalenceClass>
    <state name="return 1;">

@@ -311,4 +311,15 @@ public class ResourceUtil {
          throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
       }
    }
+   
+   /**
+    * Computes the MD5 Sum for the given {@link IFile} content.
+    * @param iFile - the {@link IFile} to use
+    * @return the MD5 Sum as {@link String}
+    * @throws CoreException 
+    * @throws IOException 
+    */
+   public static String computeContentMD5(IFile iFile) throws IOException, CoreException{
+      return IOUtil.computeMD5(iFile.getContents());
+   }
 }

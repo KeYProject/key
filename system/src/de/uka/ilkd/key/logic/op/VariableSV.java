@@ -56,7 +56,7 @@ public final class VariableSV extends AbstractSV implements QuantifiableVariable
         	= (Term)mc.getInstantiations().getInstantiation(this);
         if(foundMapping == null) {
             return addInstantiation(substTerm, mc, services);
-        } else if (((QuantifiableVariable)foundMapping.op()) == substTerm.op()) {
+        } else if (foundMapping.op() == substTerm.op()) {
             return mc;
         } else {
             Debug.out("FAILED. Already instantiated with different variable.");

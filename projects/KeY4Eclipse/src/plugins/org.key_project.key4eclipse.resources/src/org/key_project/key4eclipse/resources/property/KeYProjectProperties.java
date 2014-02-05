@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.QualifiedName;
 public final class KeYProjectProperties {
    
    public static final QualifiedName PROP_ENABLE_BUILD_PROOFS = new QualifiedName("org.key_project.key4eclipse.resources", "buildProofs");
-   public static final QualifiedName PROP_ENALBLE_BUILD_PROOFS_EFFICIENT = new QualifiedName("org.key_project.key4eclipse.resources", "enableEfficientProofManagement");
+   public static final QualifiedName PROP_ENALBLE_BUILD_REQUIRED_PROOFS_ONLY = new QualifiedName("org.key_project.key4eclipse.resources", "buildRequiredProofsOnly");
    public static final QualifiedName PROP_ENABLE_MULTITHREADING = new QualifiedName("org.key_project.key4eclipse.resources", "enableMultiThreading");
    public static final QualifiedName PROP_NUMBER_OF_THREADS = new QualifiedName("org.key_project.key4eclipse.resources", "numberOfThreads");
    public static final QualifiedName PROP_AUTO_DELETE_PROOFFILES = new QualifiedName("org.key_project.key4eclipse.resources", "autoDeleteProofFiles");
@@ -51,9 +51,9 @@ public final class KeYProjectProperties {
    }
    
    
-   public static boolean isEnableBuildProofsEfficient(IProject project) throws CoreException {
+   public static boolean isEnableBuildRequiredProofsOnly(IProject project) throws CoreException {
       if (project != null) {
-         String value = project.getPersistentProperty(PROP_ENALBLE_BUILD_PROOFS_EFFICIENT);
+         String value = project.getPersistentProperty(PROP_ENALBLE_BUILD_REQUIRED_PROOFS_ONLY);
          if(value == null){
             return true;
          }
@@ -66,7 +66,7 @@ public final class KeYProjectProperties {
    
    public static void setEnableBuildProofsEfficient(IProject project,  boolean enabled) throws CoreException {
       if (project != null) {
-         project.setPersistentProperty(PROP_ENALBLE_BUILD_PROOFS_EFFICIENT, enabled + "");
+         project.setPersistentProperty(PROP_ENALBLE_BUILD_REQUIRED_PROOFS_ONLY, enabled + "");
       }
    }
    
@@ -103,7 +103,7 @@ public final class KeYProjectProperties {
          }
       }
       else {
-         return -1;
+         return 0;
       }
    }
    

@@ -13,19 +13,20 @@
 
 package de.uka.ilkd.key.gui.macros;
 
+import javax.swing.KeyStroke;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left
@@ -158,6 +159,11 @@ public class TryCloseMacro implements ProofMacro {
             fireStop(listener, proof, time, appliedRules, goalsClosed);
         }
 
+    }
+
+    @Override
+    public KeyStroke getKeyStroke () {
+	return KeyStrokeManager.get(this);
     }
 
     private void fireStop(ProverTaskListener listener, Proof proof, long time, 

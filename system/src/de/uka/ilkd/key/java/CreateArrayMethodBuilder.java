@@ -34,7 +34,6 @@ import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.speclang.HeapContext;
 
 /**
  * This class creates the <code>&lt;createArray&gt;</code> method for array

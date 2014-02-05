@@ -38,7 +38,10 @@ public class FullPropositionalExpansionMacro extends AbstractPropositionalExpans
 
     private static final String[] ADMITTED_RULES = {
         "andLeft", "orRight", "impRight", "notLeft", "notRight", "close",
-        "andRight", "orLeft", "impLeft"
+        "andRight", "orLeft", "impLeft",
+        "closeTrue", "closeFalse", "true_left", "false_right",
+//        "ifthenelse_split", "ifthenelse_split_for",
+        "equivLeft", "equivRight"
     };
 
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
@@ -47,5 +50,4 @@ public class FullPropositionalExpansionMacro extends AbstractPropositionalExpans
     protected Set<String> getAdmittedRuleNames() {
         return ADMITTED_RULES_SET;
     }
-
 }

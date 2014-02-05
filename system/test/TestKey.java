@@ -32,6 +32,7 @@ public class TestKey extends TestSuite {
 
     static Class<? extends TestCase>[] logicModelTests = new Class[] {
 	de.uka.ilkd.key.logic.TestTermFactory.class,
+   de.uka.ilkd.key.logic.TestTermLabelManager.class,
     de.uka.ilkd.key.logic.TestTermBuilder.class,
 	de.uka.ilkd.key.logic.TestTerm.class,
 	de.uka.ilkd.key.logic.TestNamespace.class,
@@ -46,6 +47,7 @@ public class TestKey extends TestSuite {
 
     static Class<? extends TestCase>[] parserTests = new Class[] {
 	de.uka.ilkd.key.parser.TestDeclParser.class,
+	de.uka.ilkd.key.parser.TestParallelParsing.class,
 	de.uka.ilkd.key.parser.TestTermParser.class,
 	de.uka.ilkd.key.parser.TestTacletParser.class,
     };
@@ -68,7 +70,8 @@ public class TestKey extends TestSuite {
 	de.uka.ilkd.key.proof.TestProofTree.class,
 	de.uka.ilkd.key.proof.TestGoal.class,
 	de.uka.ilkd.key.proof.TestTermTacletAppIndex.class,
-	de.uka.ilkd.key.taclettranslation.TestTacletTranslator.class
+	de.uka.ilkd.key.taclettranslation.TestTacletTranslator.class,
+	de.uka.ilkd.key.taclettranslation.lemma.TestGenericRemovingLemmaGenerator.class
     };
 
 
@@ -154,12 +157,12 @@ public class TestKey extends TestSuite {
 	suite.addTest(createSuite(ruleTests, "Testing Rule Engine"));
 	suite.addTest(createSuite(proofConstructionTests, "Testing Proof Construction"));
 	suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
-        suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
-        suite.addTest(createSuite(smtTests, "Testing SMT backend"));
+	suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
+	suite.addTest(createSuite(smtTests, "Testing SMT backend"));
 	suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
-   suite.addTest(createSuite(proofReferencesTests, "Testing Proof References"));
+	suite.addTest(createSuite(proofReferencesTests, "Testing Proof References"));
 	suite.addTest(createSuite(new Class[]{de.uka.ilkd.key.util.DesignTests.class}, "Test Design Constraints"));
-        
+
 	return suite;
     }
 

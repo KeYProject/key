@@ -17,6 +17,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -74,7 +75,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         final LiteralCollector m2 = new LiteralCollector ();
         m2.collect ( rightTerm );
 
-        final boolean res = lessThan ( m1.getResult(), m2.getResult() );
+        final boolean res = lessThan ( m1.getResult(), m2.getResult(), p_services.getCaches() );
         
         services = null;
         focus = null;
@@ -85,7 +86,8 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     /**
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
-    protected boolean lessThan(Term t1, Term t2) {
+    @Override
+    protected boolean lessThan(Term t1, Term t2, ServiceCaches caches) {
 
         final int t1Def = quanAnalyser.eliminableDefinition ( t1, focus );
         final int t2Def = quanAnalyser.eliminableDefinition ( t2, focus );
@@ -129,7 +131,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
             if ( isBinaryIntRelation ( t1 ) ) return false;
         }
         
-        return super.lessThan ( t1, t2 );
+        return super.lessThan ( t1, t2, caches );
     }
 
     private int comparePolynomials(Term t1, Term t2) {

@@ -17,9 +17,11 @@ package de.uka.ilkd.key.util;
  * Contains commonly (at least in the context of KeY) used Unicode symbols.
  * The names for the constants mostly derive from the common names in LaTeX,
  * such as the bottom symbol is noted as "BOT".
- * Some symbols are however refered to by their common name within KeY,
+ * Some symbols are however referred to by their common name within KeY,
  * such as the equivalence arrow (aka. left-right arrow) is named "EQV".
  * In doubt, it is not a bad idea to give several names.
+ * See <a href="http://www.fileformat.info/info/unicode/category/Sm/list.htm">
+ * this list</a> for more symbols.
  * @author bruns
  *
  */
@@ -95,6 +97,7 @@ public final class UnicodeHelper {
     public static final char BOT = '\u22A5';
     public static final char TURNSTILE = '\u22A6';
     public static final char MODELS = '\u22A7';
+    public static final char PRECEDES = '\u227A';
 
 
     // non-logic symbols
@@ -102,6 +105,8 @@ public final class UnicodeHelper {
     public static final char ENSPACE = '\u2002';
     public static final char EMSPACE = '\u2003';
     public static final char ENDASH = '\u2013';
+    public static final char FLQQ = '\u00ab';
+    public static final char FRQQ = '\u00bb';
 
 
     /**

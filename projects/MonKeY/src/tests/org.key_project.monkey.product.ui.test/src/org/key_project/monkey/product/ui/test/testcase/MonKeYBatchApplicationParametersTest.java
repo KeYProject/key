@@ -46,7 +46,7 @@ public class MonKeYBatchApplicationParametersTest extends TestCase {
          Map<Integer, String> expectedLoadLocations = new HashMap<Integer, String>();
          expectedLoadLocations.put(Integer.valueOf(1), "Location1");
          expectedLoadLocations.put(Integer.valueOf(3), "Location3");
-         assertParameters(parameters, true, false, false, false, false, false, false, false, null, outDir.toString(), CollectionUtil.toList(path.toString()), 1, expectedLoadLocations);
+         assertParameters(parameters, true, false, false, false, false, false, false, false, false, null, outDir.toString(), CollectionUtil.toList(path.toString()), 1, 10000, expectedLoadLocations);
       }
       finally {
          IOUtil.delete(outDir);
@@ -66,15 +66,15 @@ public class MonKeYBatchApplicationParametersTest extends TestCase {
          // Test valid combination and valid rounds
          String[] array = {MonKeYBatchModeParameters.PARAM_ROUNDS, "42", MonKeYBatchModeParameters.PARAM_OUTPUT_PATH, outDir.toString(), path.toString()};
          MonKeYBatchModeParameters parameters = MonKeYBatchModeParameters.analyze(array);
-         assertParameters(parameters, true, false, false, false, false, false, false, false, null, outDir.toString(), CollectionUtil.toList(path.toString()), 42, null);
+         assertParameters(parameters, true, false, false, false, false, false, false, false, false, null, outDir.toString(), CollectionUtil.toList(path.toString()), 42, 10000, null);
          // Test valid combination and invalid rounds (negative)
          array = new String[] {MonKeYBatchModeParameters.PARAM_ROUNDS, "-5", MonKeYBatchModeParameters.PARAM_OUTPUT_PATH, outDir.toString(), path.toString()};
          parameters = MonKeYBatchModeParameters.analyze(array);
-         assertParameters(parameters, false, false, false, false, false, false, false, false, null, outDir.toString(), CollectionUtil.toList(path.toString()), -5, null);
+         assertParameters(parameters, false, false, false, false, false, false, false, false, false, null, outDir.toString(), CollectionUtil.toList(path.toString()), -5, 10000, null);
          // Test valid combination and invalid rounds (no number)
          array = new String[] {MonKeYBatchModeParameters.PARAM_ROUNDS, "asdf", MonKeYBatchModeParameters.PARAM_OUTPUT_PATH, outDir.toString(), path.toString()};
          parameters = MonKeYBatchModeParameters.analyze(array);
-         assertParameters(parameters, false, false, false, false, false, false, false, false, null, outDir.toString(), CollectionUtil.toList(path.toString()), 1, null);
+         assertParameters(parameters, false, false, false, false, false, false, false, false, false, null, outDir.toString(), CollectionUtil.toList(path.toString()), 1, 10000, null);
       }
       finally {
          IOUtil.delete(outDir);
@@ -95,15 +95,15 @@ public class MonKeYBatchApplicationParametersTest extends TestCase {
          // Test valid combination, no boot class path
          String[] array = {MonKeYBatchModeParameters.PARAM_OUTPUT_PATH, outDir.toString(), path.toString()};
          MonKeYBatchModeParameters parameters = MonKeYBatchModeParameters.analyze(array);
-         assertParameters(parameters, true, false, false, false, false, false, false, false, null, outDir.toString(), CollectionUtil.toList(path.toString()), 1, null);
+         assertParameters(parameters, true, false, false, false, false, false, false, false, false, null, outDir.toString(), CollectionUtil.toList(path.toString()), 1, 10000, null);
          // Test valid combination, existing boot class path
          array = new String[] {MonKeYBatchModeParameters.PARAM_BOOT_CLASS_PATH, boot.toString(), MonKeYBatchModeParameters.PARAM_OUTPUT_PATH, outDir.toString(), path.toString()};
          parameters = MonKeYBatchModeParameters.analyze(array);
-         assertParameters(parameters, true, false, false, false, false, false, false, false, boot.toString(), outDir.toString(), CollectionUtil.toList(path.toString()), 1, null);
+         assertParameters(parameters, true, false, false, false, false, false, false, false, false, boot.toString(), outDir.toString(), CollectionUtil.toList(path.toString()), 1, 10000, null);
          // Test invalid combination, not existing boot class path
          array = new String[] {MonKeYBatchModeParameters.PARAM_BOOT_CLASS_PATH, boot.toString() + "INVALID", MonKeYBatchModeParameters.PARAM_OUTPUT_PATH, outDir.toString(), path.toString()};
          parameters = MonKeYBatchModeParameters.analyze(array);
-         assertParameters(parameters, false, false, false, false, false, false, false, false, boot.toString() + "INVALID", outDir.toString(), CollectionUtil.toList(path.toString()), 1, null);
+         assertParameters(parameters, false, false, false, false, false, false, false, false, false, boot.toString() + "INVALID", outDir.toString(), CollectionUtil.toList(path.toString()), 1, 10000, null);
       }
       finally {
          IOUtil.delete(outDir);
@@ -126,23 +126,23 @@ public class MonKeYBatchApplicationParametersTest extends TestCase {
          // Test one location
          String[] array = {MonKeYBatchModeParameters.PARAM_OUTPUT_PATH, outDir.toString(), path1.toString()};
          MonKeYBatchModeParameters parameters = MonKeYBatchModeParameters.analyze(array);
-         assertParameters(parameters, true, false, false, false, false, false, false, false, null, outDir.toString(), CollectionUtil.toList(path1.toString()), 1, null);
+         assertParameters(parameters, true, false, false, false, false, false, false, false, false, null, outDir.toString(), CollectionUtil.toList(path1.toString()), 1, 10000, null);
          // Test two locations
          array = new String[] {path1.toString(), MonKeYBatchModeParameters.PARAM_OUTPUT_PATH, outDir.toString(), path2.toString()};
          parameters = MonKeYBatchModeParameters.analyze(array);
-         assertParameters(parameters, true, false, false, false, false, false, false, false, null, outDir.toString(), CollectionUtil.toList(path1.toString(), path2.toString()), 1, null);
+         assertParameters(parameters, true, false, false, false, false, false, false, false, false, null, outDir.toString(), CollectionUtil.toList(path1.toString(), path2.toString()), 1, 10000, null);
          // Test three locations
          array = new String[] {path1.toString(), path2.toString(), path3.toString(), MonKeYBatchModeParameters.PARAM_OUTPUT_PATH, outDir.toString()};
          parameters = MonKeYBatchModeParameters.analyze(array);
-         assertParameters(parameters, true, false, false, false, false, false, false, false, null, outDir.toString(), CollectionUtil.toList(path1.toString(), path2.toString(), path3.toString()), 1, null);
+         assertParameters(parameters, true, false, false, false, false, false, false, false, false, null, outDir.toString(), CollectionUtil.toList(path1.toString(), path2.toString(), path3.toString()), 1, 10000, null);
          // Test not existing output path
          array = new String[] {MonKeYBatchModeParameters.PARAM_OUTPUT_PATH, outDir.toString() + "INVALID", path1.toString()};
          parameters = MonKeYBatchModeParameters.analyze(array);
-         assertParameters(parameters, false, false, false, false, false, false, false, false, null, outDir.toString() + "INVALID", CollectionUtil.toList(path1.toString()), 1, null);
+         assertParameters(parameters, false, false, false, false, false, false, false, false, false, null, outDir.toString() + "INVALID", CollectionUtil.toList(path1.toString()), 1, 10000, null);
          // Test not existing location
          array = new String[] {path1.toString(), path2.toString() + "INVALID", path3.toString(), MonKeYBatchModeParameters.PARAM_OUTPUT_PATH, outDir.toString()};
          parameters = MonKeYBatchModeParameters.analyze(array);
-         assertParameters(parameters, false, false, false, false, false, false, false, false, null, outDir.toString(), CollectionUtil.toList(path1.toString(), path2.toString() + "INVALID", path3.toString()), 1, null);
+         assertParameters(parameters, false, false, false, false, false, false, false, false, false, null, outDir.toString(), CollectionUtil.toList(path1.toString(), path2.toString() + "INVALID", path3.toString()), 1, 10000, null);
       }
       finally {
          IOUtil.delete(outDir);
@@ -160,15 +160,15 @@ public class MonKeYBatchApplicationParametersTest extends TestCase {
       // Test one location
       String[] array = {"path1"};
       MonKeYBatchModeParameters parameters = MonKeYBatchModeParameters.analyze(array);
-      assertParameters(parameters, false, false, false, false, false, false, false, false, null, null, CollectionUtil.toList("path1"), 1, null);
+      assertParameters(parameters, false, false, false, false, false, false, false, false, false, null, null, CollectionUtil.toList("path1"), 1, 10000, null);
       // Test two locations
       array = new String[] {"path1", "path2"};
       parameters = MonKeYBatchModeParameters.analyze(array);
-      assertParameters(parameters, false, false, false, false, false, false, false, false, null, null, CollectionUtil.toList("path1", "path2"), 1, null);
+      assertParameters(parameters, false, false, false, false, false, false, false, false, false, null, null, CollectionUtil.toList("path1", "path2"), 1, 10000, null);
       // Test three locations
       array = new String[] {"path1", "path2", "path3"};
       parameters = MonKeYBatchModeParameters.analyze(array);
-      assertParameters(parameters, false, false, false, false, false, false, false, false, null, null, CollectionUtil.toList("path1", "path2", "path3"), 1, null);
+      assertParameters(parameters, false, false, false, false, false, false, false, false, false, null, null, CollectionUtil.toList("path1", "path2", "path3"), 1, 10000, null);
    }
    
    /**
@@ -179,11 +179,11 @@ public class MonKeYBatchApplicationParametersTest extends TestCase {
       // Test valid parameter pair
       String[] array = {MonKeYBatchModeParameters.PARAM_OUTPUT_PATH, "path"};
       MonKeYBatchModeParameters parameters = MonKeYBatchModeParameters.analyze(array);
-      assertParameters(parameters, false, false, false, false, false, false, false, false, null, "path", null, 1, null);
+      assertParameters(parameters, false, false, false, false, false, false, false, false, false, null, "path", null, 1, 10000, null);
       // Test missing path definition
       array = new String[] {MonKeYBatchModeParameters.PARAM_OUTPUT_PATH};
       parameters = MonKeYBatchModeParameters.analyze(array);
-      assertParameters(parameters, false, false, false, false, false, false, false, false, null, null, null, 1, null);
+      assertParameters(parameters, false, false, false, false, false, false, false, false, false, null, null, null, 1, 10000, null);
    }
    
    /**
@@ -194,11 +194,42 @@ public class MonKeYBatchApplicationParametersTest extends TestCase {
       // Test valid parameter pair
       String[] array = {MonKeYBatchModeParameters.PARAM_ROUNDS, "42"};
       MonKeYBatchModeParameters parameters = MonKeYBatchModeParameters.analyze(array);
-      assertParameters(parameters, false, false, false, false, false, false, false, false, null, null, null, 42, null);
+      assertParameters(parameters, false, false, false, false, false, false, false, false, false, null, null, null, 42, 10000, null);
       // Test missing path definition
       array = new String[] {MonKeYBatchModeParameters.PARAM_ROUNDS};
       parameters = MonKeYBatchModeParameters.analyze(array);
-      assertParameters(parameters, false, false, false, false, false, false, false, false, null, null, null, 1, null);
+      assertParameters(parameters, false, false, false, false, false, false, false, false, false, null, null, null, 1, 10000, null);
+   }
+   
+   /**
+    * Tests {@link MonKeYBatchModeParameters#analyze(String[])}, 
+    * in particular the max rule application option.
+    */
+   public void testAnalyse_maxRuleApplications() {
+      // Test valid parameter pair
+      String[] array = {MonKeYBatchModeParameters.PARAM_MAX_RULES, "4711"};
+      MonKeYBatchModeParameters parameters = MonKeYBatchModeParameters.analyze(array);
+      assertParameters(parameters, false, false, false, false, false, false, false, false, false, null, null, null, 1, 4711, null);
+      // Test missing max rule applications
+      array = new String[] {MonKeYBatchModeParameters.PARAM_MAX_RULES};
+      parameters = MonKeYBatchModeParameters.analyze(array);
+      assertParameters(parameters, false, false, false, false, false, false, false, false, false, null, null, null, 1, 10000, null);
+      // Test invalid value
+      try {
+         array =  new String[] {MonKeYBatchModeParameters.PARAM_MAX_RULES, "Invalid"};
+         parameters = MonKeYBatchModeParameters.analyze(array);
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Max. Rule Applications (Invalid) is not an integer number.", e.getMessage());
+      }
+      // Test negative value
+      try {
+         array =  new String[] {MonKeYBatchModeParameters.PARAM_MAX_RULES, "-666"};
+         parameters = MonKeYBatchModeParameters.analyze(array);
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Max. Rule Applications (-666) can not be negative.", e.getMessage());
+      }
    }
    
    /**
@@ -209,11 +240,11 @@ public class MonKeYBatchApplicationParametersTest extends TestCase {
       // Test valid parameter pair
       String[] array = {MonKeYBatchModeParameters.PARAM_BOOT_CLASS_PATH, "path"};
       MonKeYBatchModeParameters parameters = MonKeYBatchModeParameters.analyze(array);
-      assertParameters(parameters, false, false, false, false, false, false, false, false, "path", null, null, 1, null);
+      assertParameters(parameters, false, false, false, false, false, false, false, false, false, "path", null, null, 1, 10000, null);
       // Test missing path definition
       array = new String[] {MonKeYBatchModeParameters.PARAM_BOOT_CLASS_PATH};
       parameters = MonKeYBatchModeParameters.analyze(array);
-      assertParameters(parameters, false, false, false, false, false, false, false, false, null, null, null, 1, null);
+      assertParameters(parameters, false, false, false, false, false, false, false, false, false, null, null, null, 1, 10000, null);
    }
    
    /**
@@ -223,7 +254,7 @@ public class MonKeYBatchApplicationParametersTest extends TestCase {
    public void testAnalyse_dummyLoad() {
       String[] array = {MonKeYBatchModeParameters.PARAM_DUMMY_LOAD_OFF};
       MonKeYBatchModeParameters parameters = MonKeYBatchModeParameters.analyze(array);
-      assertParameters(parameters, false, false, false, false, false, false, false, true, null, null, null, 1, null);
+      assertParameters(parameters, false, false, false, false, false, false, false, true, false, null, null, null, 1, 10000, null);
    }
    
    /**
@@ -233,7 +264,7 @@ public class MonKeYBatchApplicationParametersTest extends TestCase {
    public void testAnalyse_mainWindow() {
       String[] array = {MonKeYBatchModeParameters.PARAM_MAIN_WINDOW_OFF};
       MonKeYBatchModeParameters parameters = MonKeYBatchModeParameters.analyze(array);
-      assertParameters(parameters, false, false, false, false, false, false, true, false, null, null, null, 1, null);
+      assertParameters(parameters, false, false, false, false, false, false, true, false, false, null, null, null, 1, 10000, null);
    }
    
    /**
@@ -243,7 +274,7 @@ public class MonKeYBatchApplicationParametersTest extends TestCase {
    public void testAnalyse_queryTreatment() {
       String[] array = {MonKeYBatchModeParameters.PARAM_QUERY_TREATMENT_OFF};
       MonKeYBatchModeParameters parameters = MonKeYBatchModeParameters.analyze(array);
-      assertParameters(parameters, false, false, false, false, false, true, false, false, null, null, null, 1, null);
+      assertParameters(parameters, false, false, false, false, false, true, false, false, false, null, null, null, 1, 10000, null);
    }
    
    /**
@@ -253,7 +284,7 @@ public class MonKeYBatchApplicationParametersTest extends TestCase {
    public void testAnalyse_methodTreatment() {
       String[] array = {MonKeYBatchModeParameters.PARAM_METHOD_TREATMENT_CONTRACT};
       MonKeYBatchModeParameters parameters = MonKeYBatchModeParameters.analyze(array);
-      assertParameters(parameters, false, false, false, false, true, false, false, false, null, null, null, 1, null);
+      assertParameters(parameters, false, false, false, false, true, false, false, false, false, null, null, null, 1, 10000, null);
    }
    
    /**
@@ -263,7 +294,7 @@ public class MonKeYBatchApplicationParametersTest extends TestCase {
    public void testAnalyse_dependencyContracts() {
       String[] array = {MonKeYBatchModeParameters.PARAM_DEPENDENCY_CONTRACTS_OFF};
       MonKeYBatchModeParameters parameters = MonKeYBatchModeParameters.analyze(array);
-      assertParameters(parameters, false, false, false, true, false, false, false, false, null, null, null, 1, null);
+      assertParameters(parameters, false, false, false, true, false, false, false, false, false, null, null, null, 1, 10000, null);
    }
    
    /**
@@ -273,7 +304,17 @@ public class MonKeYBatchApplicationParametersTest extends TestCase {
    public void testAnalyse_arithmeticTreatment() {
       String[] array = {MonKeYBatchModeParameters.PARAM_ARITHMETIC_TREATMENT_BASE};
       MonKeYBatchModeParameters parameters = MonKeYBatchModeParameters.analyze(array);
-      assertParameters(parameters, false, false, true, false, false, false, false, false, null, null, null, 1, null);
+      assertParameters(parameters, false, false, true, false, false, false, false, false, false, null, null, null, 1, 10000, null);
+   }
+   
+   /**
+    * Tests {@link MonKeYBatchModeParameters#analyze(String[])}, 
+    * in particular the stop at unclosable option.
+    */
+   public void testAnalyse_stopAtUnclosable() {
+      String[] array = {MonKeYBatchModeParameters.PARAM_STOP_AT_UNCLOSABLE};
+      MonKeYBatchModeParameters parameters = MonKeYBatchModeParameters.analyze(array);
+      assertParameters(parameters, false, false, false, false, false, false, false, false, true, null, null, null, 1, 10000, null);
    }
    
    /**
@@ -283,7 +324,7 @@ public class MonKeYBatchApplicationParametersTest extends TestCase {
    public void testAnalyse_Help() {
       String[] array = {MonKeYBatchModeParameters.PARAM_SHOW_HELP};
       MonKeYBatchModeParameters parameters = MonKeYBatchModeParameters.analyze(array);
-      assertParameters(parameters, true, true, false, false, false, false, false, false, null, null, null, 1, null);
+      assertParameters(parameters, true, true, false, false, false, false, false, false, false, null, null, null, 1, 10000, null);
    }
    
    /**
@@ -293,7 +334,7 @@ public class MonKeYBatchApplicationParametersTest extends TestCase {
    public void testAnalyse_Empty() {
       String[] array = {};
       MonKeYBatchModeParameters parameters = MonKeYBatchModeParameters.analyze(array);
-      assertParameters(parameters, true, true, false, false, false, false, false, false, null, null, null, 1, null);
+      assertParameters(parameters, true, true, false, false, false, false, false, false, false, null, null, null, 1, 10000, null);
    }
    
    /**
@@ -307,10 +348,12 @@ public class MonKeYBatchApplicationParametersTest extends TestCase {
     * @param expectedQueryTreatmentOff The expected parameter value.
     * @param expectedMainWindowOff The expected parameter value.
     * @param expectedDummyLoadOff The expected parameter value.
+    * @param expectedStopAtUnclosable The expected parameter value.
     * @param expectedBootClassPath The expected parameter value.
     * @param expectedOutputPath The expected parameter value.
     * @param expectedLocations The expected parameter value.
     * @param expectedNumberOfRounds The expected parameter value.
+    * @param expectedMaxRuleApplications The expected maximal rule applications value.
     */
    protected static void assertParameters(MonKeYBatchModeParameters current,
                                           boolean expectedValid,
@@ -321,20 +364,24 @@ public class MonKeYBatchApplicationParametersTest extends TestCase {
                                           boolean expectedQueryTreatmentOff,
                                           boolean expectedMainWindowOff,
                                           boolean expectedDummyLoadOff,
+                                          boolean expectedStopAtUnclosable,
                                           String expectedBootClassPath,
                                           String expectedOutputPath,
                                           List<String> expectedLocations,
-                                          int expectedNumberOfRounds,
+                                          int expectedNumberOfRounds, 
+                                          int expectedMaxRuleApplications, 
                                           Map<Integer, String> expectedLoadLocations) {
       assertEquals(expectedArithmeticTreatmentBase, current.isArithmeticTreatmentBase());
       assertEquals(expectedDependencyContractsOff, current.isDependencyContractsOff());
       assertEquals(expectedMainWindowOff, current.isMainWindowOff());
       assertEquals(expectedMethodTreatmentContract, current.isMethodTreatmentContract());
+      assertEquals(expectedStopAtUnclosable, current.isStopAtUnclosable());
       assertEquals(expectedQueryTreatmentOff, current.isQueryTreatmentOff());
       assertEquals(expectedShowHelp, current.isShowHelp());
       assertEquals(expectedDummyLoadOff, current.isDummyLoadOff());
       assertEquals(expectedBootClassPath, current.getBootClassPath());
       assertEquals(expectedOutputPath, current.getOutputPath());
+      assertEquals(expectedMaxRuleApplications, current.getMaxRuleApplications());
       assertNotNull(current.getLocations());
       if (expectedLocations != null) {
          assertEquals(expectedLocations, current.getLocations());

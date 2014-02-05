@@ -38,6 +38,7 @@ public class WhileWithMethodCallAsCondition {
 	  @
 	  @ public exceptional_behavior
 	  @ requires i < 0;
+	  @ signals_only Exception;
 	  @ signals (RuntimeException myExc) true;
 	  @*/
 	public static boolean goOnNice(/*@ nullable @*/ int[] array, int i) throws RuntimeException {

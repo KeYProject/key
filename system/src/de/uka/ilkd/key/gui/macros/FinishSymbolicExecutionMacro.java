@@ -23,16 +23,13 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 /**
  * The macro FinishSymbolicExecutionMacro continues automatic rule application
  * until there is no more modality on the sequent.
  *
- * This is done by implementing a delegationg {@link Strategy} which assigns to
+ * This is done by implementing a delegation {@link Strategy} which assigns to
  * any rule application infinite costs if there is no modality on the sequent.
  *
  * @author mattias ulbrich

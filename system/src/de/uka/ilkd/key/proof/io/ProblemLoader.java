@@ -19,10 +19,9 @@ import java.util.List;
 
 import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.SwingWorker;
+import de.uka.ilkd.key.gui.SwingWorker3;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -31,13 +30,13 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 /**
  * This class extends the functionality of the {@link DefaultProblemLoader}.
- * It allows to do the loading process as {@link SwingWorker} {@link Thread}
+ * It allows to do the loading process as {@link SwingWorker3} {@link Thread}
  * and it opens the proof obligation browser it is not possible to instantiate
  * a proof configured by the opened file.
  * @author Martin Hentschel
  */
 public final class ProblemLoader extends DefaultProblemLoader implements Runnable {
-   private SwingWorker worker;
+   private SwingWorker3 worker;
    private ProverTaskListener ptl;
 
    public ProblemLoader(File file, List<File> classPath, File bootClassPath, Profile profileOfNewProofs, KeYMediator mediator) {
@@ -55,7 +54,7 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
        * is called even if the worker is interrupted because we catch the
        * InterruptedException in doWork().
        */
-      worker = new SwingWorker() {
+      worker = new SwingWorker3() {
          private long time;
 
          @Override
@@ -87,7 +86,7 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
       Throwable status = null;
       try {
          try {
-            status = load(true);
+            status = load();
          }
          catch (ExceptionHandlerException e) {
             // e.printStackTrace();

@@ -5,17 +5,15 @@
          <operationContract name="result_0 = obj.magic(123) catch(exc_0)
 pre: obj.&lt;inv&gt;
 post: !exc_0 = null
-&amp; (  (   java.lang.Exception::instance(exc_0) = TRUE
+&amp; (  (   java.lang.Throwable::instance(exc_0) = TRUE
       -&gt; obj.&lt;inv&gt;)
-   &amp; (    java.lang.RuntimeException::instance(exc_0)
-        = TRUE
-      | java.lang.Exception::instance(exc_0) = TRUE))
+   &amp; java.lang.Exception::instance(exc_0) = TRUE)
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
-            <branchCondition name="!obj = null" pathCondition="!obj = null" pathConditionChanged="true" branchCondition="!obj = null" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (magic)">
-               <statement name="return -1;" pathCondition="!obj = null" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj);&gt;" pathCondition="!obj = null" pathConditionChanged="false" isReturnValueComputed="false">
-                     <termination name="&lt;end&gt;" pathCondition="!obj = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+            <branchCondition name="not(equals(obj,null))" pathCondition="not(equals(obj,null))" pathConditionChanged="true" branchCondition="not(equals(obj,null))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (magic)">
+               <statement name="return -1;" pathCondition="not(equals(obj,null))" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj);&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" isReturnValueComputed="false">
+                     <termination name="&lt;end&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>

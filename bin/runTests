@@ -182,6 +182,7 @@ fi
 $JAVA $JAVA_OPTIONS $keysysprops \
 -ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx2048m \
 -Dkey.home="$KEY_HOME" \
+-Djava.awt.headless=true \
 -classpath "$keyclasspath" junit.textui.TestRunner $testcase 
 
 

@@ -15,12 +15,16 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -28,7 +32,9 @@ import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -184,6 +190,21 @@ public class UserDefinedSymbols {
         }
 
 
+        public void replaceGenericByProxySorts() {
+            Set<Named> result = new HashSet<Named>();
+            for (Named sort : usedExtraSorts) {
+                if (sort instanceof GenericSort) {
+                    GenericSort genSort = (GenericSort) sort;
+                    ProxySort proxySort = new ProxySort(genSort.name(), genSort.extendsSorts());
+                    result.add(proxySort);
+                } else {
+                    result.add(sort);
+                }
+            }
+
+            usedExtraSorts.clear();
+            usedExtraSorts.addAll(result);
+        }
 
 
         public String createHeader(Services services) {
@@ -247,6 +268,14 @@ public class UserDefinedSymbols {
                
         }
         
+        public Map<Name, Sort> getExtraSorts() {
+            Map<Name, Sort> result = new HashMap<Name, Sort>();
+            for (Named sort : usedExtraSorts) {
+                result.put(sort.name(), (Sort) sort);
+            }
+            return result;
+        }
+
         private void createHeaderForSorts(StringBuffer result){
                 LinkedList<Named> sorts  = new LinkedList<Named>();              
                 getAllSorts(sorts);

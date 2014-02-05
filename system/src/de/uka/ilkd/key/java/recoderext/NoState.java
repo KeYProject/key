@@ -20,6 +20,8 @@ import recoder.java.declaration.Modifier;
 
 public class NoState extends Modifier {
 
+    private static final long serialVersionUID = 2717863742463891263L;
+
     public NoState() {
     }
 

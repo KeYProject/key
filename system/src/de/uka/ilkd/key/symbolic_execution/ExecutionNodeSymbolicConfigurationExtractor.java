@@ -25,14 +25,14 @@ public class ExecutionNodeSymbolicConfigurationExtractor extends SymbolicConfigu
    /**
     * The {@link IExecutionNode} to extract configurations from.
     */
-   private IExecutionNode executionNode;
+   private final IExecutionNode executionNode;
 
    /**
     * Constructor.
     * @param executionNode The {@link IExecutionNode} to extract configurations from.
     */
    public ExecutionNodeSymbolicConfigurationExtractor(IExecutionNode executionNode) {
-      super(executionNode.getProofNode());
+      super(executionNode.getProofNode(), executionNode.getSettings().isUsePrettyPrinting());
       this.executionNode = executionNode;
    }
 

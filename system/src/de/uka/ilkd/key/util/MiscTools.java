@@ -233,8 +233,10 @@ public final class MiscTools {
      * The resulting filename always uses UNIX directory delimiters.
      */
     public static String makeFilenameRelative(String origFilename, String toFilename){
-        String[] a = disectFilename(origFilename).toArray(new String[0]);
-        String[] b = disectFilename(toFilename).toArray(new String[0]);
+        final List<String> origFileNameSections = disectFilename(origFilename);
+        String[] a = origFileNameSections.toArray(new String[origFileNameSections.size()]);
+        final List<String> destinationFilenameSections = disectFilename(toFilename);
+        String[] b = destinationFilenameSections.toArray(new String[destinationFilenameSections.size()]);
 
         // check for Windows paths
         if (File.separatorChar == '\\' &&

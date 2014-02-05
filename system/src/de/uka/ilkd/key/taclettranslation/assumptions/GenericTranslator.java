@@ -42,9 +42,7 @@ import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 
 class GenericTranslator {
 
-        // only for testing.
-        private boolean appendGenericTerm = false;
-        // private HashSet<GenericSort> usedGenericSorts;
+    // private HashSet<GenericSort> usedGenericSorts;
         private VariablePool pool;
         private Services services;
         private ArrayList<TranslationListener> listener = new ArrayList<TranslationListener>();
@@ -83,9 +81,6 @@ class GenericTranslator {
                         for (Term gt : list) {
                                 result.add(AssumptionGenerator.quantifyTerm(gt));
 
-                        }
-                        if (appendGenericTerm) {
-                                result.add(term);
                         }
                 }
 

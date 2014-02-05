@@ -60,6 +60,11 @@ public class MonKeYBatchModeParameters {
    public static final String PARAM_ARITHMETIC_TREATMENT_BASE = "-atbase";
    
    /**
+    * Parameter for {@link #stopAtUnclosable}.
+    */
+   public static final String PARAM_STOP_AT_UNCLOSABLE = "-stopAtUnclosable";
+   
+   /**
     * Parameter for {@link #bootClassPath}.
     */
    public static final String PARAM_BOOT_CLASS_PATH = "-bc";
@@ -83,6 +88,11 @@ public class MonKeYBatchModeParameters {
     * Parameter for {@link #getLocationLoadDirectory(int)}.
     */
    public static final String PARAM_LOAD_PREFIX = "-load";
+   
+   /**
+    * Parameter for {@link #maxRuleApplications}.
+    */
+   public static final String PARAM_MAX_RULES = "-maxRules";
    
    /**
     * Show help?
@@ -115,6 +125,11 @@ public class MonKeYBatchModeParameters {
    private boolean arithmeticTreatmentBase;
    
    /**
+    * Stop at unclosable?
+    */
+   private boolean stopAtUnclosable;
+   
+   /**
     * Do not load the first location twice to filter out API parsing time. 
     */
    private boolean dummyLoadOff;
@@ -128,6 +143,11 @@ public class MonKeYBatchModeParameters {
     * Output path.
     */
    private String outputPath;
+   
+   /**
+    * The maximal number of rule applications;
+    */
+   private int maxRuleApplications = 10000;
    
    /**
     * Source locations.
@@ -192,6 +212,22 @@ public class MonKeYBatchModeParameters {
       return arithmeticTreatmentBase;
    }
    
+   /**
+    * Checks if proof search stops at first unclosable goal.
+    * @return Stop at first unclosable goal?
+    */
+   public boolean isStopAtUnclosable() {
+      return stopAtUnclosable;
+   }
+
+   /**
+    * Returns the maximal number of rule applications.
+    * @return The maximal number of rule applications.
+    */
+   public int getMaxRuleApplications() {
+      return maxRuleApplications;
+   }
+
    /**
     * Returns the boot class path to use or {@code null} to use default boot class path.
     * @return The boot class path to use or {@code null} to use default boot class path.
@@ -341,9 +377,16 @@ public class MonKeYBatchModeParameters {
                   result.arithmeticTreatmentBase = true;
                   previousParam = null;
                }
+               else if (PARAM_STOP_AT_UNCLOSABLE.equals(param)) {
+                  result.stopAtUnclosable = true;
+                  previousParam = null;
+               }
                else if (PARAM_DUMMY_LOAD_OFF.equals(param)) {
                   result.dummyLoadOff = true;
                   previousParam = null;
+               }
+               else if (PARAM_MAX_RULES.equals(param)) {
+                  previousParam = param;
                }
                else if (PARAM_BOOT_CLASS_PATH.equals(param)) {
                   previousParam = param;
@@ -362,7 +405,19 @@ public class MonKeYBatchModeParameters {
                }
             }
             else {
-               if (PARAM_BOOT_CLASS_PATH.equals(previousParam)) {
+               if (PARAM_MAX_RULES.equals(previousParam)) {
+                  try {
+                     result.maxRuleApplications = Integer.parseInt(param);
+                  }
+                  catch (NumberFormatException e) {
+                     throw new IllegalArgumentException("Max. Rule Applications (" + param + ") is not an integer number.");
+                  }
+                  if (result.maxRuleApplications < 0) {
+                     throw new IllegalArgumentException("Max. Rule Applications (" + result.maxRuleApplications + ") can not be negative.");
+                  }
+                  previousParam = null;
+               }
+               else if (PARAM_BOOT_CLASS_PATH.equals(previousParam)) {
                   result.bootClassPath = param;
                   previousParam = null;
                }

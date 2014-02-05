@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_fb1a1833-5459-4176-82e2-bdf5f1b4536b" name="switchCase(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_b94ddec9-fd14-486a-8317-e41d923060f7" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_95f43dbc-7a26-4e0a-82c9-6d6089e25c51" name="self.switchCase(x);" pathCondition="true" lineNumber="-1" charStart="45" charEnd="55">
+            <sedStatement xml:id="_5912a1f3-d863-4c36-9084-0a762d1a8b21" name="int a;" pathCondition="true" lineNumber="-1" charStart="68" charEnd="74">
+               <sedBranchStatement xml:id="_aea68994-1a12-4ed3-9088-eeb330013e10" name="switch (x)" pathCondition="true" lineNumber="-1" charStart="78" charEnd="280">
+                  <sedBranchCondition xml:id="_d304a7fe-1ac1-468f-b88d-c785c100d2fe" name="equals(x,Z(0(#)))" pathCondition="equals(x,Z(0(#)))">
+                     <sedStatement xml:id="_7d5ed557-3f7d-4576-891e-7314a9cf89df" name="a=1;" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="106" charEnd="112">
+                        <sedStatement xml:id="_5ce9731f-b02d-4c1d-aab9-54061aa43444" name="return a;" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="284" charEnd="293">
+                           <sedMethodReturn xml:id="_62ced707-2823-4b8b-911a-f5d23427f204" name="&lt;return of self.switchCase(x);&gt;" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="45" charEnd="55">
+                              <sedTermination xml:id="_c22f2db7-528a-4201-b1ef-114af22024c0" name="&lt;end&gt;" pathCondition="equals(x,Z(0(#)))" verified="true">
+                              </sedTermination>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedStatement>
+                  </sedBranchCondition>
+                  <sedBranchCondition xml:id="_85f146a9-c70e-4ed4-8cc5-fad4b0b27c42" name="not(equals(x,Z(0(#))))" pathCondition="not(equals(x,Z(0(#))))">
+                     <sedBranchCondition xml:id="_c449d3af-57e0-4e3e-a81d-e355e690927e" name="equals(x,Z(1(#)))" pathCondition="equals(x,Z(1(#)))">
+                        <sedStatement xml:id="_c04aaee6-c7e6-4ee3-8fc7-a2ae10ab72e5" name="a=-1;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="165" charEnd="172">
+                           <sedStatement xml:id="_7efaf45e-7207-43e2-a8f4-a07d9277636c" name="a=x*x;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="188" charEnd="198">
+                              <sedStatement xml:id="_5a5c41d3-0418-4bf0-aa1d-8dad64728ee2" name="return a;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="284" charEnd="293">
+                                 <sedMethodReturn xml:id="_d017febb-5b59-4181-8b30-c42463d2cf5b" name="&lt;return of self.switchCase(x);&gt;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="45" charEnd="55">
+                                    <sedTermination xml:id="_e1e4b0be-65e9-4f66-8017-6fda0e116faa" name="&lt;end&gt;" pathCondition="equals(x,Z(1(#)))" verified="true">
+                                    </sedTermination>
+                                 </sedMethodReturn>
+                              </sedStatement>
+                           </sedStatement>
+                        </sedStatement>
+                     </sedBranchCondition>
+                     <sedBranchCondition xml:id="_d21f0c18-a3c4-4124-8162-e469c7b73aca" name="not(equals(x,Z(1(#))))" pathCondition="and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#)))))">
+                        <sedBranchCondition xml:id="_349ffd73-880d-4b81-80a0-d6f83840c51b" name="equals(x,Z(2(#)))" pathCondition="equals(x,Z(2(#)))">
+                           <sedStatement xml:id="_7bb03237-8459-4e2f-8548-13671287ebd8" name="a=-1;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="165" charEnd="172">
+                              <sedStatement xml:id="_73311a08-3a1c-4bc1-b847-28901a16a0e9" name="a=x*x;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="188" charEnd="198">
+                                 <sedStatement xml:id="_133246d7-c186-428f-a4fc-a80bf85c7f9d" name="return a;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="284" charEnd="293">
+                                    <sedMethodReturn xml:id="_84bd74c8-97e5-400f-8068-d82ef7e0ca66" name="&lt;return of self.switchCase(x);&gt;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="45" charEnd="55">
+                                       <sedTermination xml:id="_aa4f5208-cd30-47a3-a510-0e84797cd000" name="&lt;end&gt;" pathCondition="equals(x,Z(2(#)))" verified="true">
+                                       </sedTermination>
+                                    </sedMethodReturn>
+                                 </sedStatement>
+                              </sedStatement>
+                           </sedStatement>
+                        </sedBranchCondition>
+                        <sedBranchCondition xml:id="_df0078fc-b60c-4fb9-8c79-bb99cebcc1d4" name="not(equals(x,Z(2(#))))" pathCondition="and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#)))))">
+                           <sedBranchCondition xml:id="_d0be921c-18d4-4b81-aed1-99dc6e4e65ae" name="equals(x,Z(3(#)))" pathCondition="equals(x,Z(3(#)))">
+                              <sedStatement xml:id="_b024422f-2788-4918-b594-b63875e0c657" name="a=x*x;" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="188" charEnd="198">
+                                 <sedStatement xml:id="_016c48da-bd68-45c0-be65-e604ee87f000" name="return a;" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="284" charEnd="293">
+                                    <sedMethodReturn xml:id="_7cdd49e9-85c4-4709-bf81-5cc192aebb4d" name="&lt;return of self.switchCase(x);&gt;" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="45" charEnd="55">
+                                       <sedTermination xml:id="_2ad222e0-18ad-49e5-94e9-50e6e07aa01c" name="&lt;end&gt;" pathCondition="equals(x,Z(3(#)))" verified="true">
+                                       </sedTermination>
+                                    </sedMethodReturn>
+                                 </sedStatement>
+                              </sedStatement>
+                           </sedBranchCondition>
+                           <sedBranchCondition xml:id="_10d1f25d-f3d8-434d-aaf1-58e3e77e0b1a" name="not(equals(x,Z(3(#))))" pathCondition="and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#)))))">
+                              <sedBranchCondition xml:id="_6da4ea07-c689-45ea-ab90-e0c4d97c3dc1" name="equals(x,Z(4(#)))" pathCondition="equals(x,Z(4(#)))">
+                                 <sedStatement xml:id="_6bb8784a-a66c-48e2-8660-ccd3b9da8860" name="return 42;" pathCondition="equals(x,Z(4(#)))" lineNumber="-1" charStart="242" charEnd="252">
+                                    <sedMethodReturn xml:id="_5e455145-d969-46c6-a5ee-69e8d999838c" name="&lt;return of self.switchCase(x);&gt;" pathCondition="equals(x,Z(4(#)))" lineNumber="-1" charStart="45" charEnd="55">
+                                       <sedTermination xml:id="_4ff27d16-2181-4e83-a47f-2211f58740f5" name="&lt;end&gt;" pathCondition="equals(x,Z(4(#)))" verified="true">
+                                       </sedTermination>
+                                    </sedMethodReturn>
+                                 </sedStatement>
+                              </sedBranchCondition>
+                              <sedBranchCondition xml:id="_1395fdc7-fcf6-491c-b582-6ba030326404" name="not(equals(x,Z(4(#))))" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))">
+                                 <sedStatement xml:id="_a1028227-735a-4e42-87c1-0b51fc5df24b" name="a=x;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="269" charEnd="275">
+                                    <sedStatement xml:id="_b8cd4545-1ddf-4be3-bd3b-a1bb7f6d2924" name="return a;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="284" charEnd="293">
+                                       <sedMethodReturn xml:id="_e143d875-3ae8-4763-af50-b0e9485a7faf" name="&lt;return of self.switchCase(x);&gt;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="45" charEnd="55">
+                                          <sedTermination xml:id="_2806e579-76af-4987-9c70-a3bb94058247" name="&lt;end&gt;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" verified="true">
+                                          </sedTermination>
+                                       </sedMethodReturn>
+                                    </sedStatement>
+                                 </sedStatement>
+                              </sedBranchCondition>
+                           </sedBranchCondition>
+                        </sedBranchCondition>
+                     </sedBranchCondition>
+                  </sedBranchCondition>
+               </sedBranchStatement>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

@@ -255,7 +255,7 @@ public abstract class TacletBuilder {
 
 
 
-    /** Add an additional generic condition on the instatiation of
+    /** Add an additional generic condition on the instantiation of
      * schema variables. */
     public void addVariableCondition(VariableCondition vc) {
 	variableConditions = variableConditions.append(vc);

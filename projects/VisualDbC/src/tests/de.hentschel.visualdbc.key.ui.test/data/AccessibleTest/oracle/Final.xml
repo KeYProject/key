@@ -5,7 +5,7 @@
   </proofs>
   <types xsi:type="dbcmodel:DbcClass" name="test.B" visibility="default">
     <axioms name="Class invariant axiom for test.B" definition="equiv(java.lang.Object::&lt;inv>(heap,self),java.lang.Object::&lt;inv>(heap,test.AccessibleTest::select(heap,self,test.B::$c)))">
-      <axiomContracts name="test.B[java.lang.Object::&lt;inv>()].JML accessible clause.0" pre="[heap] self.&lt;inv>" dep="[heap] allFields(self) \cup allFields(self.c)"/>
+      <axiomContracts name="test.B[java.lang.Object::&lt;inv>()].JML accessible clause.0" pre="[heap] self.&lt;inv>" dep="[heap] self.* \cup self.c.*"/>
     </axioms>
   </types>
 </dbcmodel:DbcModel>

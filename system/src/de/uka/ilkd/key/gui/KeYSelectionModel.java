@@ -35,7 +35,7 @@ public class KeYSelectionModel {
     /** the current displayed node */
     private Node selectedNode;
     /** the listeners to this model */
-    private List<KeYSelectionListener> listenerList;
+    private final List<KeYSelectionListener> listenerList;
     /** cached selected node event */
     private KeYSelectionEvent selectionEvent =
 	new KeYSelectionEvent(this);

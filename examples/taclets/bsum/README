@@ -1,0 +1,45 @@
+This file contains comments on the proofs for taclets in bsum.key
+
+proof for bsum_induction_lower
+------------------------------
+
+int_induction over
+
+f_i0+nv <= f_i2 ->
+  bsum{int v_uSub;}(f_i0, f_i0+nv+1, f_t(v_uSub)) 
+= bsum{int v_uSub;}(f_i0 + 1, f_i0+nv+1, f_t(v_uSub)) + {\subst int v_uSub;f_i0}f_t(v_uSub)
+
+inst nv=f_i2-f_i0-1
+
+
+proof for bsum_add_concrete
+---------------------------
+
+using bsum_split with f_middle <- f_i1
+
+CUT über
+  bsum{int v_uSub1;}(f_i0, f_i1, f_t1(v_uSub1))
+= bsum{int v_uSub1;}(f_i0, f_i1, \if (v_uSub1 < f_i1)  \then (f_t1(v_uSub1))  \else (f_t2(v_uSub1)))
+
+CUT über
+  bsum{int v_uSub2;}(f_i1, f_i3, f_t2(v_uSub2))
+= bsum{int v_uSub1;}(f_i1, f_i3, \if (v_uSub1 < f_i1)  \then (f_t1(v_uSub1))  \else (f_t2(v_uSub1))),
+
+using equal_bsum_same_index
+
+
+
+proof for bsum_split
+--------------------
+(not yet finished)
+
+needs induction over lower
+
+induction over
+
+f_low+nv <= f_high ->
+  bsum{int v_uSub;}(f_low, f_high, f_t(v_uSub))
+= bsum{int v_uSub;}(f_low, f_low+nv, f_t(v_uSub)) + bsum{int v_uSub;}(f_low+nv, f_high, f_t(v_uSub))
+
+inst nv=fmiddle-flow
+

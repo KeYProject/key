@@ -34,6 +34,9 @@ import de.uka.ilkd.key.smt.SolverType;
 class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 
 
+	public long getGlobalBound(){
+		return 0;
+	}
 
     @Override
     public int getMaxConcurrentProcesses() {
@@ -58,7 +61,7 @@ class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 
     @Override
     public long getTimeout() {
-	return 5000;
+	return 300000;
     }
 
     @Override
@@ -111,6 +114,31 @@ public String getLogic() {
 @Override
 public boolean checkForSupport() {
 	return false;
+}
+
+@Override
+public long getIntBound() {
+	return 3;
+}
+
+@Override
+public long getHeapBound() {
+	return 3;
+}
+
+@Override
+public long getSeqBound() {
+	return 3;
+}
+
+@Override
+public long getObjectBound() {
+	return 3;
+}
+
+@Override
+public long getLocSetBound() {
+	return 3;
 }
 
     
