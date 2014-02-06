@@ -31,7 +31,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
-import de.uka.ilkd.key.gui.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
@@ -592,46 +591,6 @@ public class ApplyStrategy {
         return result;
     }
 
-    /**
-     * RETREAT MODE WILL BE REMOVED SOON. Its functionality can be found
-     * in {@link TryCloseMacro} now.
-     */
-    @Deprecated
-    public ApplyStrategyInfo startRetreat(Proof proof,
-                                          ImmutableList<Goal> goals,
-                                          int maxSteps,
-                                          long timeout,
-                                          boolean stopAtFirstNonCloseableGoal) {
-        assert proof != null;
-        assert !goals.isEmpty();
-
-        ApplyStrategyInfo result = null;
-        for (Goal g : goals) {
-            ImmutableList<Goal> gList = ImmutableSLList.<Goal>nil().prepend(g);
-            Node n = g.node();
-
-            this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal;
-
-            ProofTreeListener treeListener =
-                    prepareStrategy(proof, gList, maxSteps, timeout);
-            ApplyStrategyInfo subResult = executeStrategy(treeListener);
-            /* This is the iterative case, where proofs are done separately on multiple branches,
-             * sequentially though. So each gets accumulated with the one done before. After the
-             * accumulation, the method finishStrategy should be called.
-             */
-            result = joinStrategyInfos(result, subResult);
-
-            Proof automaticProof = result.getProof();
-            if (!n.isClosed()) {
-                automaticProof.pruneProof(n);
-            }
-            if (result.isError() || cancelled) {
-                break;
-            }
-        }
-        finishStrategy(result);
-        return result;
-    }
 
     private ProofTreeListener prepareStrategy(Proof proof, ImmutableList<Goal> goals, int maxSteps,
             long timeout) {
