@@ -603,40 +603,13 @@ public final class Goal  {
             removeLastAppliedRuleApp();
     }
 
-    public ImmutableList<Goal> apply( RuleApp p_ruleApp ) {
+    public ImmutableList<Goal> apply(final RuleApp ruleApp ) {
 
         final Proof proof = proof();
 
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);
         addGoalListener(journal);
-
-        final RuleApp ruleApp = p_ruleApp;
-        if(ruleApp instanceof TacletApp) {
-            TacletApp tacletApp = (TacletApp)ruleApp;
-            tacletApp.registerSkolemConstants(proof.getServices());
-            Taclet t = tacletApp.taclet();
-
-            // bugfix #1336, see bugtracker
-            if (t instanceof RewriteTaclet) {
-                RewriteTaclet rwt = (RewriteTaclet) t;
-                ImmutableList<UpdateLabelPair> oldUpdCtx = 
-                        tacletApp.matchConditions().getInstantiations().getUpdateContext();
-                MatchConditions newConditions = rwt.checkPrefix(ruleApp.posInOccurrence(), 
-                        MatchConditions.EMPTY_MATCHCONDITIONS, proof.getServices());
-                if(newConditions == null) {
-                    throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " 
-                            + ruleApp);
-                }
-                ImmutableList<UpdateLabelPair> newUpdCtx =
-                        newConditions.getInstantiations().getUpdateContext();
-                if(!oldUpdCtx.equals(newUpdCtx)) {
-                    System.err.println("old context: " + oldUpdCtx);
-                    System.err.println("new context: " + oldUpdCtx);
-                    throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " 
-                                + ruleApp);
-                }
-            }
-        }
+      
 
         final Node n = node;
 
@@ -657,7 +630,7 @@ public final class Goal  {
         }
         }
 
-        final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(p_ruleApp);
+        final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(ruleApp);
 
         if ( goalList != null )
             proof.fireRuleApplied( new ProofEvent ( proof, ruleAppInfo ) );

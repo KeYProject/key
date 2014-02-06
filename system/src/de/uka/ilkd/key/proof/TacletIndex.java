@@ -241,7 +241,7 @@ public final class TacletIndex  {
      * @param tacletAppList the NoPosTacletApps to be removed
      */
     public void removeTaclets(ImmutableSet<NoPosTacletApp> tacletAppList) {
-	for(NoPosTacletApp tacletApp : tacletAppList) {
+	for(final NoPosTacletApp tacletApp : tacletAppList) {
 	    remove(tacletApp);
 	}
     }

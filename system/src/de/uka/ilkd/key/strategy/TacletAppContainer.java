@@ -318,15 +318,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
         if ( !app.complete() )
             app = app.tryToInstantiate ( services );
-
-        Taclet taclet = app == null ? null : app.taclet();
-        if (taclet instanceof RewriteTaclet) {
-            RewriteTaclet rwTaclet = (RewriteTaclet) taclet;
-            MatchConditions check = 
-                    rwTaclet.checkPrefix(pio, MatchConditions.EMPTY_MATCHCONDITIONS, services);
-            if (check == null) return null;
-        }
-        
+        else if (!app.isExecutable(services)) {
+            return null;
+        }        
         return app;
     }
 
