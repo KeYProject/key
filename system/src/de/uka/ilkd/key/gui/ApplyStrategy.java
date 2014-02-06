@@ -565,23 +565,13 @@ public class ApplyStrategy {
                 .getActiveStrategyProperties().getProperty(
                         StrategyProperties.STOPMODE_OPTIONS_KEY)
                         .equals(StrategyProperties.STOPMODE_NONCLOSE);
-
-        boolean retreatMode = proof.getSettings().getStrategySettings()
-                .getActiveStrategyProperties().getProperty(
-                        StrategyProperties.RETREAT_MODE_OPTIONS_KEY)
-                        .equals(StrategyProperties.RETREAT_MODE_RETREAT);
-
-        if(retreatMode) {
-            return startRetreat(proof, goals, maxSteps, timeout, stopAtFirstNonCloseableGoal);
-        } else {
-            return start(proof, goals, maxSteps, timeout, stopAtFirstNonCloseableGoal);
-        }
+        return start(proof, goals, maxSteps, timeout, stopAtFirstNonCloseableGoal);
     }
 
     /**
      * This entry point to the proof may provide inconsistent data. The
      * properties within the proof may differ to the explicit data. This is
-     * disencouraged.
+     * discouraged.
      *
      * @return
      *
