@@ -82,6 +82,7 @@ public class RecentFileMenu {
         if (p != null) load(p);
 
 	menu.setEnabled(menu.getItemCount()!=0);
+        menu.setIcon(IconFactory.recentFiles(16));
 
     }
 
@@ -218,7 +219,7 @@ public class RecentFileMenu {
             propStream = new FileInputStream(filename);
             Properties p = new Properties();
             p.load(propStream);
-            Enumeration e = p.propertyNames();
+            Enumeration<?> e = p.propertyNames();
             while (e.hasMoreElements()) {
                 String s = (String) e.nextElement();
                 if (s.indexOf("RecentFile") != -1)

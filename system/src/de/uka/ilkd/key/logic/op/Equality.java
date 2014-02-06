@@ -29,15 +29,15 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public final class Equality extends AbstractSortedOperator {
 
     /** 
-     * the ususal 'equality' operator '=' 
+     * the usual 'equality' operator '='
      */
     public static final Equality EQUALS = new Equality(new Name("equals"), 
 	    					       Sort.ANY);
     
     /** 
-     * the ususal 'equivalence' operator '<->' (be A, B formulae then       
+     * the usual 'equivalence' operator '<->' (be A, B formulae then
      * 'A <->  B' is true if and only if A and B have the same truth
-     * value 
+     * value
      */ 
     public static final Equality EQV = new Equality(new Name("equiv"),
         					    Sort.FORMULA);

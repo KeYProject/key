@@ -66,9 +66,6 @@ public class InteractiveProver implements InterruptListener {
      */
     private ImmutableList<AutoModeListener> listenerList = ImmutableSLList.nil();
 
-    /** listens to the current selected proof and node */
-    private KeYSelectionListener selListener;
-
     /** the mediator */
     private KeYMediator mediator;
 
@@ -81,9 +78,9 @@ public class InteractiveProver implements InterruptListener {
     /** creates a new interactive prover object
      */
     public InteractiveProver(KeYMediator mediator) {
-        selListener = new InteractiveProverKeYSelectionListener();
+        /* listens to the current selected proof and node */
         this.mediator = mediator;
-        mediator.addKeYSelectionListener(selListener);
+        mediator.addKeYSelectionListener(new InteractiveProverKeYSelectionListener());
 
         mediator.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);//XXX
 
@@ -483,11 +480,11 @@ public class InteractiveProver implements InterruptListener {
      * the contained TacletApps
      */
     private ImmutableList<TacletApp> filterTaclet(
-        ImmutableList<NoPosTacletApp> tacletInstances, PosInSequent pos) {
+            ImmutableList<NoPosTacletApp> tacletInstances, PosInSequent pos) {
         java.util.HashSet<Taclet> applicableRules = new java.util.HashSet<Taclet>();
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
         for (NoPosTacletApp app : tacletInstances) {
-            if (mediator().stupidMode()) {
+            if (mediator().minimizeInteraction()) {
                 ImmutableList<TacletApp> ifCandidates =
                         app.findIfFormulaInstantiations(
                                 mediator().getSelectedGoal().sequent(),
@@ -502,7 +499,7 @@ public class InteractiveProver implements InterruptListener {
                         IfFormulaInstSeq ifis = (IfFormulaInstSeq) ifs.head();
                         if (ifis.toPosInOccurrence().equals(
                             pos.getPosInOccurrence().topLevel())) {
-                            continue; // skipp app if find and if same formula
+                            continue; // skip app if find and if same formula
                         }
                     }
                 }
@@ -552,7 +549,7 @@ public class InteractiveProver implements InterruptListener {
      * }. The thread itself unfreezes the UI when it is finished.
      * </p>
      */
-    private class AutoModeWorker extends SwingWorker {
+    private class AutoModeWorker extends SwingWorker3 {
 
         private ImmutableList<Goal> goals;
 
@@ -569,21 +566,7 @@ public class InteractiveProver implements InterruptListener {
                     .getActiveStrategyProperties().getProperty(
                             StrategyProperties.STOPMODE_OPTIONS_KEY)
                             .equals(StrategyProperties.STOPMODE_NONCLOSE);
-            boolean retreatMode = proof.getSettings().getStrategySettings()
-            .getActiveStrategyProperties().getProperty(
-                    StrategyProperties.RETREAT_MODE_OPTIONS_KEY)
-                    .equals(StrategyProperties.RETREAT_MODE_RETREAT);
-            /**
-             * In retreatMode, the proof on the node of each previous
-             * goal is pruned, unless it was closed in the automatic proof.
-             * Other than in standard mode, in retreatMode this is done for
-             * each goal (sequentially), even if we get stuck in a goal before.
-             */
-            if(retreatMode) {
-                return applyStrategy.startRetreat ( proof, goals, mediator ().getMaxAutomaticSteps(),
-                        getTimeout(), stopMode );
-            } else
-                return applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(),
+            return applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(),
                         getTimeout(), stopMode );
         }
 

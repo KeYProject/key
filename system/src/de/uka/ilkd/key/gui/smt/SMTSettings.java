@@ -208,6 +208,31 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 			return piSettings.checkForSupport;
 		}
 
+		@Override
+		public long getIntBound() {
+			return piSettings.intBound;
+		}
+
+		@Override
+		public long getHeapBound() {
+			return piSettings.heapBound;
+		}
+
+		@Override
+		public long getSeqBound() {
+			return piSettings.seqBound;
+		}
+
+		@Override
+		public long getObjectBound() {
+			return piSettings.objectBound;
+		}
+
+		@Override
+		public long getLocSetBound() {
+			return piSettings.locsetBound;
+		}
+
         
 
         

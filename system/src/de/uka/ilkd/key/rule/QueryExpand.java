@@ -57,6 +57,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -134,7 +135,6 @@ public class QueryExpand implements BuiltInRule {
      *        Otherwise it is a list of logical variables that can be instantiated (using the rules allLeft, exRight)
      *        and therefore the result of the query must be stored by function that depends on instVars (e.g. forall i; res(i)=query(i)).
      *        The list may be empty even if it not null.
-     * @param newGoal The new goal that results from this rule application. (requires to register new symbols)
      * @return The formula (!{U}<result=query();>result=res_query) & query()=res_query
      * @author Richard Bubel
      * @author gladisch
@@ -519,7 +519,7 @@ public class QueryExpand implements BuiltInRule {
     		}
     		//query.equals(other.query) && pathInTerm.size()<=other.pathInTerm.size()
     		for(int i=0;i<pathInTerm.size();i++){
-    			if(pathInTerm.get(i)!=other.pathInTerm.get(i)){
+    			if(pathInTerm.get(i).intValue()!=other.pathInTerm.get(i).intValue()){
     				//System.out.println("Same term but different paths");
     				return false;
     			}
@@ -554,7 +554,7 @@ public class QueryExpand implements BuiltInRule {
         final int arity = term.arity();
         final Term newSubTerms[] = new Term[arity];
         boolean changedSubTerm = false;
-        int next = (Integer)(it.next());
+        int next = it.next();
         //System.out.print(next+", ");
         for(int i = 0; i < arity; i++) {
             Term subTerm = term.sub(i);
@@ -614,15 +614,22 @@ public class QueryExpand implements BuiltInRule {
      * for <code>QueryExpandCost</cost>.
      */
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        if (pio!=null && pio.subTerm().op() instanceof IProgramMethod && pio.subTerm().freeVars().isEmpty()) {
+        if (pio != null
+                && pio.subTerm().op() instanceof IProgramMethod
+                && pio.subTerm().freeVars().isEmpty()) {
             final Term pmTerm = pio.subTerm();
             IProgramMethod pm = (IProgramMethod) pmTerm.op();
             if(pm.isModel()) {
               return false;
             }
+            // abort if inside of transformer
+            if (Transformer.inTransformer(pio)) {
+                return false;
+            }
             final Sort nullSort = goal.proof().getJavaInfo().nullSort();
-            if (pm.isStatic() || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort()) &&
-                    !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
+            if (pm.isStatic()
+                    || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort())
+                            && !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
                 PIOPathIterator it = pio.iterator();
                 while ( it.next() != -1 ) {
                     Term focus = it.getSubTerm();

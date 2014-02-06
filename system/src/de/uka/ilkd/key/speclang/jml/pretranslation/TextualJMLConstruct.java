@@ -72,7 +72,11 @@ public abstract class TextualJMLConstruct {
             }
           }
         }
-        ps = new PositionedString(t, ps.fileName, ps.pos);
+        if (ps.hasLabels()) {
+            ps = new PositionedString(t, ps.fileName, ps.pos).label(ps.getLabels());
+        } else {
+            ps = new PositionedString(t, ps.fileName, ps.pos);
+        }
         for(String h : hs) {
            ImmutableList<PositionedString> l = item.get(h);
            l = l.append(ps);

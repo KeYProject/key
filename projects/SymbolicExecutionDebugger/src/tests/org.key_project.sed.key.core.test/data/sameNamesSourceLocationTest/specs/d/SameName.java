@@ -1,7 +1,8 @@
 package d;
 
 public class SameName {
-	/*@ requires true;
+	/*@ normal_behavior
+	  @ requires true;
 	  @ ensures \result == 42123;
 	  @*/
 	public static int d() {

@@ -28,8 +28,8 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.rule.*;
@@ -476,8 +476,8 @@ public class TestTacletPopup {
 	Term t_test1=null;
 	try{
 	    StringReader fr = new StringReader(test1);
-	    KeYParser parser=
-		new KeYParser(ParserMode.PROBLEM, new KeYLexer(fr,null));
+	    KeYParserF parser=
+		new KeYParserF(ParserMode.PROBLEM, new KeYLexerF(fr,null));
 	    t_test1=parser.problem();
 	} catch (Exception e) {
 	    System.err.println("Parser Error or Input Error");

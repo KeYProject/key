@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <state name="return 42;">
-      <value name="a" programVariable="a" isArrayIndex="false" arrayIndex="-1" value="1" type="int"/>
-      <value name="IntegerConditionTest::y" programVariable="IntegerConditionTest::y" isArrayIndex="false" arrayIndex="-1" value="3" type="int"/>
+      <value name="a" programVariable="a" isArrayIndex="false" arrayIndex="-1" value="Z(1(#))" type="int"/>
+      <value name="IntegerConditionTest::y" programVariable="IntegerConditionTest::y" isArrayIndex="false" arrayIndex="-1" value="Z(3(#))" type="int"/>
       <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
    </state>
    <object xml:id="o1" name="self" type="IntegerConditionTest">
-      <value name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" value="1" type="int"/>
+      <value name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" value="Z(1(#))" type="int"/>
    </object>
 </model>

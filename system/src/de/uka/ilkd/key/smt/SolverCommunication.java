@@ -41,10 +41,10 @@ public class SolverCommunication {
 	/**
 	 * The message type depends on the channel which was used for sending the message.
 	 */
-	public enum MessageType {Input,Output,Error};
-	
-	
-	public static class Message{
+	public enum MessageType {Input,Output,Error}
+
+
+    public static class Message{
 		private final String content;
 		private final MessageType type;
 	

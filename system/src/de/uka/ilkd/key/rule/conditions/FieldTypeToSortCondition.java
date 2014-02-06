@@ -67,7 +67,7 @@ public final class FieldTypeToSortCondition implements VariableCondition {
         if (svSubst instanceof Term) {
             Operator op = ((Term) svSubst).op();
             if (op instanceof Function) {
-                String name = ((Function) op).name().toString();
+                String name = op.name().toString();
                 
                 String className;
                 String attributeName;

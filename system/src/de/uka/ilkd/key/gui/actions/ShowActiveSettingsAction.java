@@ -20,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 
 /**
@@ -36,6 +37,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
     public ShowActiveSettingsAction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("Show All Active Settings...");
+        setIcon(IconFactory.properties(16));
     }
 
     @Override

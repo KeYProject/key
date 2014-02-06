@@ -95,7 +95,6 @@ public class OneStepProofMacro extends StrategyProofMacro {
 
     }
 
-
     @Override
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
         return true;

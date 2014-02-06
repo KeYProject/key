@@ -184,6 +184,9 @@ public final class Main {
             UserInterface userInterface = createUserInterface();
             preProcessInput(userInterface);
             loadCommandLineFile(userInterface);
+        } catch (ExceptionInInitializerError e) {
+            System.err.println("D'oh! It seems that KeY was not built properly!");
+            System.exit(777);
         } catch (CommandLineException e) {
             printHeader(); // exception before verbosity option could be read
             if (Debug.ENABLE_DEBUG) {
@@ -412,14 +415,16 @@ public final class Main {
                 @Override
                 public void uncaughtException(Thread t, Throwable e) {
                     if (verbosity > Verbosity.SILENT) {
-                        System.out.println("Auto mode was terminated by an exception:");
-                        if (Debug.ENABLE_DEBUG) e.printStackTrace();
+                        System.out.println("Auto mode was terminated by an exception:"+e.getClass().toString().substring(5));
+                        if (verbosity >= Verbosity.DEBUG) e.printStackTrace();
                         final String msg = e.getMessage();
                         if (msg!=null) System.out.println(msg);
                     }
                     System.exit(-1);
                 }
             });
+            if (fileNameOnStartUp == null)
+                printUsageAndExit(true, "Error: No file to load from.", -4);
             BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
 
             ui = new ConsoleUserInterface(batch, true, verbosity);

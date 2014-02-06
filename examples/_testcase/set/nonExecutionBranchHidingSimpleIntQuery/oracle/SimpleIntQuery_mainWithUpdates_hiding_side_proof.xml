@@ -6,11 +6,11 @@
             <operationContract name="result_0 = magic(x) catch(exc_0)
 pre: true
 post: result_0 = subMagic(x) &amp; exc_0 = null
-mod: {}
+mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of SimpleIntQuery.mainWithUpdates(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of SimpleIntQuery.mainWithUpdates(x);&gt;" isReturnValueComputed="true">
-                     <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                  <methodReturn name="&lt;return of SimpleIntQuery.mainWithUpdates(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of SimpleIntQuery.mainWithUpdates(x);&gt;" isReturnValueComputed="true">
+                     <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                      </methodReturnValue>
                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>

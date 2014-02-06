@@ -9,37 +9,25 @@
          <variable name="self" arrayIndex="-1" isArrayIndex="false">
             <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                  <value name="a {true}" typeString="int" valueString="self.a" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <value name="a {true}" typeString="int" valueString="int::select(heap,self,VariablesInstanceVariableTest::$a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                  <value name="b {true}" typeString="int" valueString="self.b" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <value name="b {true}" typeString="int" valueString="int::select(heap,self,VariablesInstanceVariableTest::$b)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                  <value name="wrapper {  param = null &amp; self.wrapper = null
-| param = null
-&amp; !self.wrapper = null
-| !param = null
-&amp; self.wrapper = null
-| !param = null
-&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
-| param = null
-&amp; !self.wrapper = null
-| !param = null
-&amp; self.wrapper = null
-| !param = null
-&amp; !self.wrapper = null">
+                  <value name="wrapper {or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))">
                   </value>
                </variable>
             </value>
          </variable>
          <variable name="param" arrayIndex="-1" isArrayIndex="false">
-            <value name="param {param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null">
+            <value name="param {equals(param,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(param,null)">
             </value>
-            <value name="param {!param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null">
+            <value name="param {not(equals(param,null))}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(param,null))">
                <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                  <value name="value {true}" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <value name="value {true}" typeString="int" valueString="int::select(heap,param,IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
             </value>
@@ -52,37 +40,25 @@
             <variable name="self" arrayIndex="-1" isArrayIndex="false">
                <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                     <value name="a {true}" typeString="int" valueString="self.a" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="a {true}" typeString="int" valueString="int::select(heap,self,VariablesInstanceVariableTest::$a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                     <value name="b {true}" typeString="int" valueString="self.b" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="b {true}" typeString="int" valueString="int::select(heap,self,VariablesInstanceVariableTest::$b)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                     <value name="wrapper {  param = null &amp; self.wrapper = null
-| param = null
-&amp; !self.wrapper = null
-| !param = null
-&amp; self.wrapper = null
-| !param = null
-&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
-| param = null
-&amp; !self.wrapper = null
-| !param = null
-&amp; self.wrapper = null
-| !param = null
-&amp; !self.wrapper = null">
+                     <value name="wrapper {or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))">
                      </value>
                   </variable>
                </value>
             </variable>
             <variable name="param" arrayIndex="-1" isArrayIndex="false">
-               <value name="param {param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null">
+               <value name="param {equals(param,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(param,null)">
                </value>
-               <value name="param {!param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null">
+               <value name="param {not(equals(param,null))}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(param,null))">
                   <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                     <value name="value {true}" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="value {true}" typeString="int" valueString="int::select(heap,param,IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </value>
@@ -92,44 +68,32 @@
                </value>
             </variable>
             <variable name="x" arrayIndex="-1" isArrayIndex="false">
-               <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <statement name="this.b=3;" pathCondition="true" pathConditionChanged="false">
                <variable name="self" arrayIndex="-1" isArrayIndex="false">
                   <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                        <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="a {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                        <value name="b {true}" typeString="int" valueString="self.b" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="b {true}" typeString="int" valueString="int::select(heap,self,VariablesInstanceVariableTest::$b)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                        <value name="wrapper {  param = null &amp; self.wrapper = null
-| param = null
-&amp; !self.wrapper = null
-| !param = null
-&amp; self.wrapper = null
-| !param = null
-&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
-| param = null
-&amp; !self.wrapper = null
-| !param = null
-&amp; self.wrapper = null
-| !param = null
-&amp; !self.wrapper = null">
+                        <value name="wrapper {or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))">
                         </value>
                      </variable>
                   </value>
                </variable>
                <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                  <value name="param {param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null">
+                  <value name="param {equals(param,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(param,null)">
                   </value>
-                  <value name="param {!param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null">
+                  <value name="param {not(equals(param,null))}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(param,null))">
                      <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                        <value name="value {true}" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="value {true}" typeString="int" valueString="int::select(heap,param,IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
@@ -139,44 +103,32 @@
                   </value>
                </variable>
                <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                  <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <statement name="param=new IntWrapper ();" pathCondition="true" pathConditionChanged="false">
                   <variable name="self" arrayIndex="-1" isArrayIndex="false">
                      <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                           <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <value name="a {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                           <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <value name="b {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                           <value name="wrapper {  param = null &amp; self.wrapper = null
-| param = null
-&amp; !self.wrapper = null
-| !param = null
-&amp; self.wrapper = null
-| !param = null
-&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
-| param = null
-&amp; !self.wrapper = null
-| !param = null
-&amp; self.wrapper = null
-| !param = null
-&amp; !self.wrapper = null">
+                           <value name="wrapper {or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))">
                            </value>
                         </variable>
                      </value>
                   </variable>
                   <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                     <value name="param {param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null">
+                     <value name="param {equals(param,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(param,null)">
                      </value>
-                     <value name="param {!param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null">
+                     <value name="param {not(equals(param,null))}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(param,null))">
                         <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                           <value name="value {true}" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <value name="value {true}" typeString="int" valueString="int::select(heap,param,IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
@@ -186,44 +138,32 @@
                      </value>
                   </variable>
                   <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                     <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <methodCall name="IntWrapper();" pathCondition="true" pathConditionChanged="false">
                      <variable name="self" arrayIndex="-1" isArrayIndex="false">
                         <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                              <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <value name="a {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                            <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                              <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <value name="b {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                            <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                              <value name="wrapper {  param = null &amp; self.wrapper = null
-| param = null
-&amp; !self.wrapper = null
-| !param = null
-&amp; self.wrapper = null
-| !param = null
-&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
-| param = null
-&amp; !self.wrapper = null
-| !param = null
-&amp; self.wrapper = null
-| !param = null
-&amp; !self.wrapper = null">
+                              <value name="wrapper {or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))">
                               </value>
                            </variable>
                         </value>
                      </variable>
                      <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                        <value name="param {param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null">
+                        <value name="param {equals(param,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(param,null)">
                         </value>
-                        <value name="param {!param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null">
+                        <value name="param {not(equals(param,null))}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(param,null))">
                            <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                              <value name="value {!param = i_2}" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false" conditionString="!param = i_2">
+                              <value name="value {not(equals(param,i_2))}" typeString="int" valueString="int::select(heap,param,IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(param,i_2))">
                               </value>
                            </variable>
                         </value>
@@ -233,13 +173,13 @@
                         </value>
                      </variable>
                      <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                        <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="i" arrayIndex="-1" isArrayIndex="false">
                         <value name="i {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                              <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <value name="value {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
@@ -248,7 +188,7 @@
                         <variable name="i" arrayIndex="-1" isArrayIndex="false">
                            <value name="i {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 <value name="value {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
@@ -258,34 +198,22 @@
                            </value>
                         </variable>
                         <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                           <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <statement name="param.value=1;" pathCondition="true" pathConditionChanged="false">
                            <variable name="self" arrayIndex="-1" isArrayIndex="false">
                               <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    <value name="a {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                                  <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    <value name="b {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                                  <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="wrapper {  param = null &amp; self.wrapper = null
-| param = null
-&amp; !self.wrapper = null
-| !param = null
-&amp; self.wrapper = null
-| !param = null
-&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
-| param = null
-&amp; !self.wrapper = null
-| !param = null
-&amp; self.wrapper = null
-| !param = null
-&amp; !self.wrapper = null">
+                                    <value name="wrapper {or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))">
                                     </value>
                                  </variable>
                               </value>
@@ -293,7 +221,7 @@
                            <variable name="param" arrayIndex="-1" isArrayIndex="false">
                               <value name="param {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    <value name="value {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
@@ -303,34 +231,22 @@
                               </value>
                            </variable>
                            <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                              <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                            <statement name="this.wrapper=new IntWrapper ();" pathCondition="true" pathConditionChanged="false">
                               <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                  <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       <value name="a {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                     <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       <value name="b {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                     <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="wrapper {  param = null &amp; self.wrapper = null
-| param = null
-&amp; !self.wrapper = null
-| !param = null
-&amp; self.wrapper = null
-| !param = null
-&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
-| param = null
-&amp; !self.wrapper = null
-| !param = null
-&amp; self.wrapper = null
-| !param = null
-&amp; !self.wrapper = null">
+                                       <value name="wrapper {or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))">
                                        </value>
                                     </variable>
                                  </value>
@@ -338,7 +254,7 @@
                               <variable name="param" arrayIndex="-1" isArrayIndex="false">
                                  <value name="param {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       <value name="value {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                  </value>
@@ -348,34 +264,22 @@
                                  </value>
                               </variable>
                               <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                               <methodCall name="IntWrapper();" pathCondition="true" pathConditionChanged="false">
                                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                     <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                        <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                          <value name="a {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                        <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                          <value name="b {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                        <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="wrapper {  param = null &amp; self.wrapper = null
-| param = null
-&amp; !self.wrapper = null
-| !param = null
-&amp; self.wrapper = null
-| !param = null
-&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
-| param = null
-&amp; !self.wrapper = null
-| !param = null
-&amp; self.wrapper = null
-| !param = null
-&amp; !self.wrapper = null">
+                                          <value name="wrapper {or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))">
                                           </value>
                                        </variable>
                                     </value>
@@ -383,7 +287,7 @@
                                  <variable name="param" arrayIndex="-1" isArrayIndex="false">
                                     <value name="param {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                          <value name="value {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                     </value>
@@ -393,13 +297,13 @@
                                     </value>
                                  </variable>
                                  <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                                  <variable name="i_4" arrayIndex="-1" isArrayIndex="false">
                                     <value name="i_4 {true}" typeString="IntWrapper" valueString="i_6" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                          <value name="value {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                     </value>
@@ -408,7 +312,7 @@
                                     <variable name="i_4" arrayIndex="-1" isArrayIndex="false">
                                        <value name="i_4 {true}" typeString="IntWrapper" valueString="i_6" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                           <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                             <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                             <value name="value {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                              </value>
                                           </variable>
                                        </value>
@@ -418,13 +322,13 @@
                                        </value>
                                     </variable>
                                     <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                     <variable name="param" arrayIndex="-1" isArrayIndex="false">
                                        <value name="param {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                           <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                             <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                             <value name="value {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                              </value>
                                           </variable>
                                        </value>
@@ -433,17 +337,17 @@
                                        <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                           <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                              <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                                                <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                <value name="a {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                 </value>
                                              </variable>
                                              <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                                                <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                <value name="b {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                 </value>
                                              </variable>
                                              <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
                                                 <value name="wrapper {true}" typeString="IntWrapper" valueString="i_6" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                    <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                      <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                      <value name="value {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                       </value>
                                                    </variable>
                                                 </value>
@@ -453,7 +357,7 @@
                                        <variable name="param" arrayIndex="-1" isArrayIndex="false">
                                           <value name="param {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                              <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                <value name="value {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                 </value>
                                              </variable>
                                           </value>
@@ -463,24 +367,24 @@
                                           </value>
                                        </variable>
                                        <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                          <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                        <statement name="return this.a+this.b+x+this.wrapper.value+param.value;" pathCondition="true" pathConditionChanged="false">
                                           <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                              <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                 <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                                                   <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                   <value name="a {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                    </value>
                                                 </variable>
                                                 <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                                                   <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                   <value name="b {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                    </value>
                                                 </variable>
                                                 <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
                                                    <value name="wrapper {true}" typeString="IntWrapper" valueString="i_6" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                       <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                         <value name="value {true}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                         <value name="value {true}" typeString="int" valueString="Z(4(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                          </value>
                                                       </variable>
                                                    </value>
@@ -490,7 +394,7 @@
                                           <variable name="param" arrayIndex="-1" isArrayIndex="false">
                                              <value name="param {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                 <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                   <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                   <value name="value {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                    </value>
                                                 </variable>
                                              </value>
@@ -500,24 +404,24 @@
                                              </value>
                                           </variable>
                                           <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                                             <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                             <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                              </value>
                                           </variable>
                                           <methodReturn name="&lt;return of self.main(param);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                              <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                 <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                    <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                                                      <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                      <value name="a {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                       </value>
                                                    </variable>
                                                    <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                                                      <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                      <value name="b {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                       </value>
                                                    </variable>
                                                    <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
                                                       <value name="wrapper {true}" typeString="IntWrapper" valueString="i_6" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                          <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                            <value name="value {true}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                            <value name="value {true}" typeString="int" valueString="Z(4(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                             </value>
                                                          </variable>
                                                       </value>
@@ -527,7 +431,7 @@
                                              <variable name="param" arrayIndex="-1" isArrayIndex="false">
                                                 <value name="param {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                    <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                      <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                      <value name="value {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                       </value>
                                                    </variable>
                                                 </value>

@@ -19,19 +19,13 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
@@ -83,11 +77,13 @@ import de.uka.ilkd.key.util.Debug;
 public class ProofTreeView extends JPanel {
 
     private static final long serialVersionUID = 3732875161168302809L;
-    private static final Color PASTEL_COLOR = new Color(255,255,204);
     private static final Color GRAY_COLOR = Color.DARK_GRAY;
     private static final Color BISQUE_COLOR = new Color(240,228,196);
-    private static final Color PALE_RED_COLOR = new Color(255,153,153);
-    private static final Color LIGHT_BLUE_COLOR = new Color(230,230,255);
+    private static final Color LIGHT_BLUE_COLOR = new Color(230,254,255);
+    private static final Color DARK_BLUE_COLOR = new Color(31,77,153);
+    private static final Color DARK_GREEN_COLOR = new Color(0,128,51);
+    private static final Color DARK_RED_COLOR = new Color(191,0,0);
+    private static final Color ORANGE_COLOR = new Color(255,140,0);
 
     /** the mediator is stored here */
     private KeYMediator mediator;
@@ -162,8 +158,8 @@ public class ProofTreeView extends JPanel {
 
         delegateView.setUI(new CacheLessMetalTreeUI());
 
-        delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.CTRL_MASK));
-        delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ActionEvent.CTRL_MASK));
+        delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_MASK));
+        delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_MASK));
 
 
 	delegateView.setInvokesStopCellEditing(true);
@@ -716,18 +712,18 @@ public class ProofTreeView extends JPanel {
 	    if (node.leaf()) {
 		Goal goal = proof.getGoal(node);
 		if ( goal == null || node.isClosed() ) {
-		    tree_cell.setForeground(Color.green);
+		    tree_cell.setForeground(DARK_GREEN_COLOR);
 		    tree_cell.setIcon(IconFactory.keyHoleClosed(20,20));
 		    ProofTreeView.this.setToolTipText("Closed Goal");
 		    tree_cell.setToolTipText("A closed goal");
 		} else {
 		    if ( !goal.isAutomatic() ) {
-		        tree_cell.setForeground(Color.orange);
+		        tree_cell.setForeground(ORANGE_COLOR);
 		        tree_cell.setIcon(IconFactory.keyHoleInteractive(20, 20));
 		        ProofTreeView.this.setToolTipText("Disabled Goal");
 		        tree_cell.setToolTipText("Interactive goal - no automatic rule application");
 		    } else {
-			tree_cell.setForeground(new Color(250, 90, 90));
+			tree_cell.setForeground(DARK_RED_COLOR);
 			tree_cell.setIcon(keyHole20x20);
 			ProofTreeView.this.setToolTipText("Open Goal");
 			tree_cell.setToolTipText("An open goal");
@@ -764,7 +760,7 @@ public class ProofTreeView extends JPanel {
 	    }
 
 	    if (node.getNodeInfo().getNotes() != null) {
-	        tree_cell.setBackgroundNonSelectionColor(Color.yellow);
+	        tree_cell.setBackgroundNonSelectionColor(ORANGE_COLOR);
 	    } else
             if (node.getNodeInfo().getActiveStatement() != null ) {
                 tree_cell.setBackgroundNonSelectionColor(LIGHT_BLUE_COLOR);
@@ -772,7 +768,7 @@ public class ProofTreeView extends JPanel {
             } else {
                 tree_cell.setBackgroundNonSelectionColor(Color.white);
             }
-	    if (sel) tree_cell.setBackground(Color.blue);
+	    if (sel) tree_cell.setBackground(DARK_BLUE_COLOR);
 
 	    tree_cell.setFont(tree.getFont());
 	    tree_cell.setText(nodeText);
@@ -784,30 +780,27 @@ public class ProofTreeView extends JPanel {
     class ProofTreePopupMenu extends JPopupMenu
 	implements ActionListener, ItemListener {
 
+        private static final int ICON_SIZE = 16;
         private static final long serialVersionUID = -8905927848074190941L;
-    private JMenuItem expandAll   = new JMenuItem("Expand All");
+        private JMenuItem expandAll   = new JMenuItem("Expand All", IconFactory.plus(ICON_SIZE));
 	private JMenuItem expandAllBelow   = new JMenuItem("Expand All Below");
 	private JMenuItem expandGoals = new JMenuItem("Expand Goals Only");
 	private JMenuItem expandGoalsBelow =
 		new JMenuItem("Expand Goals Only Below");
-	private JMenuItem collapseAll = new JMenuItem("Collapse All");
+	private JMenuItem collapseAll = new JMenuItem("Collapse All", IconFactory.minus(ICON_SIZE));
 	private JMenuItem collapseOtherBranches =
 		new JMenuItem("Collapse Other Branches");
 	private JMenuItem collapseBelow = new JMenuItem("Collapse Below");
-	private JMenuItem prevSibling = new JMenuItem("Previous Sibling");
-	private JMenuItem nextSibling = new JMenuItem("Next Sibling");
-	private JCheckBoxMenuItem hideIntermediate =
-		new JCheckBoxMenuItem("Hide Intermediate Proofsteps");
-	    private JCheckBoxMenuItem hideAutomode =
-	            new JCheckBoxMenuItem("Hide Non-interactive Proofsteps");
-	private JCheckBoxMenuItem hideClosedSubtrees =
-		new JCheckBoxMenuItem("Hide Closed Subtrees");
+	private JMenuItem prevSibling = new JMenuItem("Previous Sibling", IconFactory.previous(ICON_SIZE));
+	private JMenuItem nextSibling = new JMenuItem("Next Sibling", IconFactory.next(ICON_SIZE));
+	private Map<JCheckBoxMenuItem, ProofTreeViewFilter> filters =
+		new LinkedHashMap<JCheckBoxMenuItem, ProofTreeViewFilter> (); // TODO: change to radio button ?
 	private JMenuItem notes = new JMenuItem("Edit Notes");
-	private JMenuItem search = new JMenuItem("Search");
+	private JMenuItem search = new JMenuItem("Search", IconFactory.search2(ICON_SIZE));
 	private JMenuItem prune    = new JMenuItem("Prune Proof");
 	private JMenuItem delayedCut = new JMenuItem("Delayed Cut");
 	private JMenuItem runStrategy = new JMenuItem("Apply Strategy",
-	    IconFactory.autoModeStartLogo(10));
+	    IconFactory.autoModeStartLogo(ICON_SIZE));
 
 	private TreePath path;
 	private TreePath branch;
@@ -845,7 +838,7 @@ public class ProofTreeView extends JPanel {
 	    this.add(prune);
 	    if (branch != path) {
 		prune.addActionListener(this);
-		prune.setIcon(IconFactory.pruneLogo(16));
+		prune.setIcon(IconFactory.pruneLogo(ICON_SIZE));
 		prune.setEnabled(false);
 		if (proof != null) {
 		    if (proof.isGoal(invokedNode) ||
@@ -871,7 +864,7 @@ public class ProofTreeView extends JPanel {
 	    // modifying the node
         this.add(new JSeparator());
         this.add(notes);
-        notes.setIcon(IconFactory.editFile(20));
+        notes.setIcon(IconFactory.editFile(ICON_SIZE));
         notes.addActionListener(this);
 
 	    // modifying the view
@@ -896,19 +889,15 @@ public class ProofTreeView extends JPanel {
 	    prevSibling.addActionListener(this);
 	    this.add(nextSibling);
 	    nextSibling.addActionListener(this);
-            this.add(new JSeparator());
-	    this.add(hideIntermediate);
-	    hideIntermediate.setSelected(delegateModel
-	        .isHidingIntermediateProofsteps());
-	    hideIntermediate.addItemListener(this);
-        this.add(hideAutomode);
-        hideAutomode.setSelected(delegateModel
-            .isHidingAutomodeProofsteps());
-        hideAutomode.addItemListener(this);
-	    this.add(hideClosedSubtrees);
-	    hideClosedSubtrees.setSelected(delegateModel
-	        .hideClosedSubtrees());
-	    hideClosedSubtrees.addItemListener(this);
+
+	    this.add(new JSeparator());
+        for (ProofTreeViewFilter filter: ProofTreeViewFilter.ALL) {
+            final JCheckBoxMenuItem m = new JCheckBoxMenuItem(filter.name());
+            filters.put(m, filter);
+            this.add(m);
+            m.setSelected(filter.isActive());
+            m.addItemListener(this);
+        }
 	    this.add(search);
 	    search.addActionListener(this);
 	    this.add(new JSeparator());
@@ -931,139 +920,151 @@ public class ProofTreeView extends JPanel {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	       if (e.getSource() == delayedCut) {
-	           delegateModel.setAttentive(false);
-	           if(mediator().processDelayedCut(invokedNode)){
-	               delegateModel.updateTree ( null );
-	           }
-	           delegateModel.setAttentive(true);
-	           makeNodeVisible(mediator.getSelectedNode());
-	           }else
-	    if (e.getSource() == prune) {
-		delegateModel.setAttentive(false);
-		mediator().setBack(invokedNode);
-		delegateModel.updateTree ( null );
-		delegateModel.setAttentive(true);
-		makeNodeVisible(mediator.getSelectedNode());
-	    } else if (e.getSource() == runStrategy) {
-		runStrategyOnNode();
-	    } else if (e.getSource() == expandAll) {
-		ExpansionState.expandAll(delegateView);
-            } else if (e.getSource() == expandAllBelow) {
-		ExpansionState.expandAll(delegateView, branch);
-            } else if (e.getSource() == expandGoals) {
-                for (final Goal g : proof.openGoals()) {
-                    makeNodeExpanded ( g.node () );
-                }
-		collapseClosedNodes ();
-		// do not show selected node if it is not on the path to an
-		// open goal, but do expand root
-		// makeNodeVisible(mediator.getSelectedNode());
-                delegateView.expandRow(0);
-            } else if (e.getSource() == expandGoalsBelow) {
+		if (e.getSource() == delayedCut) {
+			delegateModel.setAttentive(false);
+			if(mediator().processDelayedCut(invokedNode)){
+				delegateModel.updateTree ( null );
+			}
+			delegateModel.setAttentive(true);
+			makeNodeVisible(mediator.getSelectedNode());
+		}else
+			if (e.getSource() == prune) {
+				delegateModel.setAttentive(false);
+				mediator().setBack(invokedNode);
+				delegateModel.updateTree ( null );
+				delegateModel.setAttentive(true);
+				makeNodeVisible(mediator.getSelectedNode());
+			} else if (e.getSource() == runStrategy) {
+				runStrategyOnNode();
+			} else if (e.getSource() == expandAll) {
+				ExpansionState.expandAll(delegateView);
+			} else if (e.getSource() == expandAllBelow) {
+				ExpansionState.expandAll(delegateView, branch);
+			} else if (e.getSource() == expandGoals) {
+				for (final Goal g : proof.openGoals()) {
+					makeNodeExpanded ( g.node () );
+				}
+				collapseClosedNodes ();
+				// do not show selected node if it is not on the path to an
+				// open goal, but do expand root
+				// makeNodeVisible(mediator.getSelectedNode());
+				delegateView.expandRow(0);
+			} else if (e.getSource() == expandGoalsBelow) {
+				expandGoalsBelow();
+			} else if (e.getSource() == collapseAll) {
+				ExpansionState.collapseAll(delegateView);
+				delegateView.expandRow(0);
+			} else if (e.getSource() == collapseOtherBranches) {
+				collapseOthers(branch);
+			} else if (e.getSource() == collapseBelow) {
+				collapseBelow();
+			} else if (e.getSource() == prevSibling) {
+				Object node = branch.getLastPathComponent();
+				TreeNode parent = ((GUIAbstractTreeNode) node).getParent();
+				if (parent == null) {
+					return;
+				}
+				Object sibling = delegateModel.getChild(parent, delegateModel
+						.getIndexOfChild(parent, node) - 1);
+				if (!(sibling != null && sibling instanceof GUIBranchNode)) {
+					int index = delegateModel
+					.getIndexOfChild(parent, node);
+					for (int i = parent.getChildCount(); i > index; i--) {
+						sibling = delegateModel.getChild(parent, i);
+						if (sibling != null && sibling instanceof
+								GUIBranchNode) {
+							break;
+						}
+					}
+				}
+				if (sibling != null && sibling instanceof GUIBranchNode) {
+					selectBranchNode((GUIBranchNode)sibling);
+				}
+			} else if (e.getSource() == nextSibling) {
+				Object node = branch.getLastPathComponent();
+				TreeNode parent = ((GUIAbstractTreeNode) node).getParent();
+				if (parent == null) {
+					return;
+				}
+				Object sibling = delegateModel.getChild(parent, delegateModel
+						.getIndexOfChild(parent, node) + 1);
+				if (!(sibling != null && sibling instanceof GUIBranchNode)) {
+					int index = delegateModel.getIndexOfChild(parent, node);
+					for (int i = 0; i < index; i++) {
+						sibling = delegateModel.getChild(parent, i);
+						if (sibling != null && sibling instanceof
+								GUIBranchNode) {
+							break;
+						}
+					}
+				}
+				if (sibling != null && sibling instanceof GUIBranchNode) {
+					selectBranchNode((GUIBranchNode)sibling);
+				}
+			} else if (e.getSource() == search) {
+				showSearchPanel();
+			} else if (e.getSource() == notes) {
+				openNotes();
+			}
+	}
+
+	private void openNotes() {
+		// display a dialog to attach text to the node
+		final Icon editIcon = IconFactory.editFile(20);
+		final String origNotes = invokedNode.getNodeInfo().getNotes();
+		final String newNotes = (String)JOptionPane.showInputDialog(
+				this,null,
+				"Annotate this proof node",
+				JOptionPane.PLAIN_MESSAGE,
+				editIcon,
+				null,
+				origNotes);
+		if (newNotes != null) {
+			if (newNotes.length()==0)
+				invokedNode.getNodeInfo().setNotes(null);
+			else invokedNode.getNodeInfo().setNotes(newNotes);
+		}
+	}
+
+	private void collapseBelow() {
+		Object node = branch.getLastPathComponent();
+
+		for (int count = delegateModel.getChildCount(node), i = 0;
+		i < count; i++)
+		{
+			Object child = delegateModel.getChild(node, i);
+
+			if (!delegateModel.isLeaf(child))
+				ExpansionState.collapseAll(delegateView,
+						branch.pathByAddingChild(child));
+		}
+	}
+
+	private void expandGoalsBelow() {
 		Object tmpNode = branch.getLastPathComponent();
 		if (branch == path) {
 			ExpansionState.collapseAll(delegateView, branch);
 		} else {
 			for ( int count = delegateModel.getChildCount(tmpNode),
-				i = 0; i < count; i++ ) {
-			    Object child = delegateModel.getChild(tmpNode, i);
-			    if ( !delegateModel.isLeaf ( child ) )
-				ExpansionState.collapseAll(delegateView, branch
-					.pathByAddingChild(child));
+					i = 0; i < count; i++ ) {
+				Object child = delegateModel.getChild(tmpNode, i);
+				if ( !delegateModel.isLeaf ( child ) )
+					ExpansionState.collapseAll(delegateView, branch
+							.pathByAddingChild(child));
 			}
 		}
 		Iterator<Goal> it = proof.openGoals ().iterator ();
 		Node n;
 		while ( it.hasNext () ) {
-		    n = it.next ().node ();
-		    GUIAbstractTreeNode node = delegateModel.getProofTreeNode(n);
-		    if (node==null) break;
-		    TreeNode[] obs=node.getPath();
-		    TreePath tp = new TreePath(obs);
-		    if (branch.isDescendant(tp)) {
-			delegateView.makeVisible(tp);
-		    }
-		}
-            } else if (e.getSource() == collapseAll) {
-		ExpansionState.collapseAll(delegateView);
-                delegateView.expandRow(0);
-            } else if (e.getSource() == collapseOtherBranches) {
-		collapseOthers(branch);
-            } else if (e.getSource() == collapseBelow) {
-                Object node = branch.getLastPathComponent();
-
-                for (int count = delegateModel.getChildCount(node), i = 0;
-                    i < count; i++)
-                {
-                    Object child = delegateModel.getChild(node, i);
-
-                    if (!delegateModel.isLeaf(child))
-                        ExpansionState.collapseAll(delegateView,
-                            branch.pathByAddingChild(child));
-                }
-            } else if (e.getSource() == prevSibling) {
-		Object node = branch.getLastPathComponent();
-		TreeNode parent = ((GUIAbstractTreeNode) node).getParent();
-		if (parent == null) {
-			return;
-		}
-		Object sibling = delegateModel.getChild(parent, delegateModel
-			.getIndexOfChild(parent, node) - 1);
-		if (!(sibling != null && sibling instanceof GUIBranchNode)) {
-			int index = delegateModel
-				.getIndexOfChild(parent, node);
-			for (int i = parent.getChildCount(); i > index; i--) {
-				sibling = delegateModel.getChild(parent, i);
-				if (sibling != null && sibling instanceof
-					 GUIBranchNode) {
-				    break;
-				}
+			n = it.next ().node ();
+			GUIAbstractTreeNode node = delegateModel.getProofTreeNode(n);
+			if (node==null) break;
+			TreeNode[] obs=node.getPath();
+			TreePath tp = new TreePath(obs);
+			if (branch.isDescendant(tp)) {
+				delegateView.makeVisible(tp);
 			}
 		}
-		if (sibling != null && sibling instanceof GUIBranchNode) {
-			selectBranchNode((GUIBranchNode)sibling);
-		}
-            } else if (e.getSource() == nextSibling) {
-		Object node = branch.getLastPathComponent();
-		TreeNode parent = ((GUIAbstractTreeNode) node).getParent();
-		if (parent == null) {
-			return;
-		}
-		Object sibling = delegateModel.getChild(parent, delegateModel
-			.getIndexOfChild(parent, node) + 1);
-		if (!(sibling != null && sibling instanceof GUIBranchNode)) {
-			int index = delegateModel.getIndexOfChild(parent, node);
-			for (int i = 0; i < index; i++) {
-				sibling = delegateModel.getChild(parent, i);
-				if (sibling != null && sibling instanceof
-					 GUIBranchNode) {
-				    break;
-				}
-			}
-		}
-		if (sibling != null && sibling instanceof GUIBranchNode) {
-			selectBranchNode((GUIBranchNode)sibling);
-		}
-            } else if (e.getSource() == search) {
-		showSearchPanel();
-            } else if (e.getSource() == notes) {
-                // display a dialog to attach text to the node
-                final Icon editIcon = IconFactory.editFile(20);
-                final String origNotes = invokedNode.getNodeInfo().getNotes();
-                final String newNotes = (String)JOptionPane.showInputDialog(
-                                    this,null,
-                                    "Annotate this proof node",
-                                    JOptionPane.PLAIN_MESSAGE,
-                                    editIcon,
-                                    null,
-                                    origNotes);
-                if (newNotes != null) {
-                    if (newNotes.length()==0)
-                        invokedNode.getNodeInfo().setNotes(null);
-                    else invokedNode.getNodeInfo().setNotes(newNotes);
-                }
-            }
 	}
 
 	/**
@@ -1136,83 +1137,76 @@ public class ProofTreeView extends JPanel {
 
 	}
 
-        public void itemStateChanged(ItemEvent e) {
-            final boolean selected = e.getStateChange()
-                == ItemEvent.SELECTED;
-            if (e.getSource() == hideIntermediate) {
-                delegateModel.hideIntermediateProofsteps(selected);
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		final boolean selected = e.getStateChange() == ItemEvent.SELECTED;
+		final Object source = e.getSource();
+		final ProofTreeViewFilter filter = filters.get(source);
+		if (filter==null) return;
 
-                // implies hide non-interactive steps
-                hideAutomode.setEnabled(!selected);
+		if (!filter.global()) {
+			delegateModel.setFilter(filter, selected);
 
-                if (branch == path) {
-                    if (delegateModel.getRoot() instanceof GUIBranchNode) {
-                        TreeNode node = ((GUIAbstractTreeNode)delegateModel
-                            .getRoot()).findBranch(invokedNode);
-                        if (node instanceof GUIBranchNode) {
-                            selectBranchNode((GUIBranchNode)node);
-                        }
-                    }
-                } else {
-                    delegateView.scrollPathToVisible(path);
-                    delegateView.setSelectionPath(path);
-                }
-            }
-            if (e.getSource() == hideAutomode) {
-                delegateModel.setHideAutomodeProofsteps(selected);
-                if (branch == path) {
-                    if (delegateModel.getRoot() instanceof GUIBranchNode) {
-                        TreeNode node = ((GUIAbstractTreeNode)delegateModel
-                            .getRoot()).findBranch(invokedNode);
-                        if (node instanceof GUIBranchNode) {
-                            selectBranchNode((GUIBranchNode)node);
-                        }
-                    }
-                } else {
-                    delegateView.scrollPathToVisible(path);
-                    delegateView.setSelectionPath(path);
-                }
-            }
-            if (e.getSource() == hideClosedSubtrees) {
-                delegateModel.setHideClosedSubtrees(selected);
-                if (branch == path) {
-                    if (e.getStateChange() != ItemEvent.SELECTED) {
-                        if (delegateModel.getRoot() instanceof GUIBranchNode) {
-                            TreeNode node = ((GUIAbstractTreeNode)delegateModel
-                                .getRoot()).findBranch(invokedNode);
-                            if (node instanceof GUIBranchNode) {
-                                selectBranchNode((GUIBranchNode)node);
-                            }
-                        }
-                    } else {
-                        if (invokedNode.parent() == null || delegateModel
-                                .getProofTreeNode(invokedNode.parent())
-                                .findChild(invokedNode.parent()) == null) {
-                            // it's still a branch
-                            if (delegateModel.getRoot() instanceof GUIBranchNode) {
-                                TreeNode node = ((GUIAbstractTreeNode)delegateModel
-                                    .getRoot()).findBranch(invokedNode);
-                                if (node instanceof GUIBranchNode) {
-                                    selectBranchNode((GUIBranchNode)node);
-                                }
-                            }
-                        } else {
-                            TreePath tp = new TreePath(delegateModel.getProofTreeNode(
-                                invokedNode).getPath());
-                            delegateView.scrollPathToVisible(tp);
-                            delegateView.setSelectionPath(tp);
-                        }
-                    }
-                } else {
-                    TreePath tp = new TreePath(delegateModel.getProofTreeNode(
-                        invokedNode).getPath());
-                    delegateView.scrollPathToVisible(tp);
-                    delegateView.setSelectionPath(tp);
-                }
-            }
-        }
+			// enable / disable others
+			// TODO: change to radio button and remove this
+			for (JCheckBoxMenuItem item: filters.keySet()) {
+				if (item != source && !filters.get(item).global()) {
+					item.setEnabled(!selected);
+				}
+			}
 
- 	}
+			if (branch == path) {
+				if (delegateModel.getRoot() instanceof GUIBranchNode) {
+					TreeNode node = ((GUIAbstractTreeNode)delegateModel
+							.getRoot()).findBranch(invokedNode);
+					if (node instanceof GUIBranchNode) {
+						selectBranchNode((GUIBranchNode)node);
+					}
+				}
+			} else {
+				delegateView.scrollPathToVisible(path);
+				delegateView.setSelectionPath(path);
+			}
+		} else {
+			delegateModel.setFilter(filter, selected);
+			if (branch == path) {
+				if (e.getStateChange() != ItemEvent.SELECTED) {
+					if (delegateModel.getRoot() instanceof GUIBranchNode) {
+						TreeNode node = ((GUIAbstractTreeNode)delegateModel
+								.getRoot()).findBranch(invokedNode);
+						if (node instanceof GUIBranchNode) {
+							selectBranchNode((GUIBranchNode)node);
+						}
+					}
+				} else {
+					if (invokedNode.parent() == null || delegateModel
+							.getProofTreeNode(invokedNode.parent())
+							.findChild(invokedNode.parent()) == null) {
+						// it's still a branch
+						if (delegateModel.getRoot() instanceof GUIBranchNode) {
+							TreeNode node = ((GUIAbstractTreeNode)delegateModel
+									.getRoot()).findBranch(invokedNode);
+							if (node instanceof GUIBranchNode) {
+								selectBranchNode((GUIBranchNode)node);
+							}
+						}
+					} else {
+						TreePath tp = new TreePath(delegateModel.getProofTreeNode(
+								invokedNode).getPath());
+						delegateView.scrollPathToVisible(tp);
+						delegateView.setSelectionPath(tp);
+					}
+				}
+			} else {
+				TreePath tp = new TreePath(delegateModel.getProofTreeNode(
+						invokedNode).getPath());
+				delegateView.scrollPathToVisible(tp);
+				delegateView.setSelectionPath(tp);
+			}
+		}
+	}
+
+    }
 
     // to prevent memory leaks
     private static class CacheLessMetalTreeUI extends MetalTreeUI{

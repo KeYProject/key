@@ -15,7 +15,6 @@
 package de.uka.ilkd.key.parser;
 
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
@@ -23,7 +22,6 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.label.LoopBodyTermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
@@ -39,7 +37,6 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.DefaultExceptionHandler;
@@ -154,10 +151,10 @@ public class TestTermParser extends TestCase {
     }
     
 
-    private KeYParser stringDeclParser(String s) {
+    private KeYParserF stringDeclParser(String s) {
         // fills namespaces 
         new Recoder2KeY(TacletForTests.services (), nss).parseSpecialClasses();
-	return new KeYParser(ParserMode.DECLARATION,new KeYLexer(new StringReader(s),null),
+	return new KeYParserF(ParserMode.DECLARATION,new KeYLexerF(s,null),
 			      "No file. Call of parser from parser/TestTermParser.java",
 			      serv, nss);
     }
@@ -178,9 +175,9 @@ public class TestTermParser extends TestCase {
 	try {	  
 	    new Recoder2KeY(TacletForTests.services (), 
 	                    nss).parseSpecialClasses();	   
-	    return new KeYParser
+	    return new KeYParserF
 		(ParserMode.PROBLEM, 
-	         new KeYLexer(new StringReader(s),null),
+	         new KeYLexerF(s,null),
 		 "No file. Call of parser from parser/TestTermParser.java",
 		 new ParserConfig(serv, nss),
 		 new ParserConfig(serv, nss),
@@ -190,13 +187,13 @@ public class TestTermParser extends TestCase {
 	    PrintWriter pw = new PrintWriter(sw);
 	    e.printStackTrace(pw);
 	    throw new RuntimeException("Exc while Parsing:\n" + sw );
-	}	
+	}
     }
 
-    private KeYParser stringTermParser(String s) {
-	return new KeYParser
+    private KeYParserF stringTermParser(String s) {
+	return new KeYParserF
 	    (ParserMode.TERM, 
-	     new KeYLexer(new StringReader(s), new DefaultExceptionHandler()), 
+	     new KeYLexerF(s, new DefaultExceptionHandler()),
 	     "No file. Call of parser from parser/TestTermParser.java",
 	     r2k,
 	     serv, 
@@ -596,12 +593,21 @@ public class TestTermParser extends TestCase {
                 parseTerm("((int)3)+2"));
      }
     
-    public void testParseTermsWithLabels() {
-        Term t = parseTerm("(3 + 2)<<" + LoopBodyTermLabel.NAME + ">>");
-        assertTrue(t.hasLabels());
-        t = parseTerm("3 + 2<<" + LoopBodyTermLabel.NAME + ">>");
-        assertFalse(t.hasLabels());
-        assertTrue(t.sub(1).hasLabels());
-    }
-    
+//    public void testParseTermsWithLabels() {
+//        // First register the labels ...
+//        TermLabels.registerSymbolicExecutionTermLabels(serv.getProfile().getTermLabelManager());
+//
+//        Term t = parseTerm("(3 + 2)<<" + SimpleTermLabel.LOOP_BODY_LABEL_NAME + ">>");
+//        assertTrue(t.hasLabels());
+//        t = parseTerm("3 + 2<<" + SimpleTermLabel.LOOP_BODY_LABEL_NAME + ">>");
+//        assertFalse(t.hasLabels());
+//        assertTrue(t.sub(1).hasLabels());
+//
+//        try {
+//            t = parseTerm("(3 + 2)<<unknownLabel>>");
+//            fail("Term " + t + " should not have been parsed");
+//        } catch(Exception ex) {
+//            // expected
+//        }
+//    }
 }

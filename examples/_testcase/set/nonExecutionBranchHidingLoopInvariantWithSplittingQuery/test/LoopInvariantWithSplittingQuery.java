@@ -12,10 +12,7 @@ public class LoopInvariantWithSplittingQuery {
 	}
 
 	private static int magic(int x) {
-		if (x == 0) {
-			return 0;
-		}
-		else if (x >= 0) {
+		if (x >= 0) {
 			return x;
 		}
 		else {

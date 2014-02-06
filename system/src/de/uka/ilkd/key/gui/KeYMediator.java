@@ -30,6 +30,7 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -44,7 +45,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
@@ -59,8 +59,6 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
-import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
@@ -95,7 +93,7 @@ public class KeYMediator {
 
     private KeYExceptionHandler defaultExceptionHandler;
 
-    private boolean stupidMode; // minimize user interaction
+    private boolean minimizeInteraction; // minimize user interaction
 
     private TacletFilter filterForInteractiveProving;
     
@@ -105,7 +103,7 @@ public class KeYMediator {
      * than the {@link Proof} before.
      */
     private OneStepSimplifier currentOneStepSimplifier;
-    
+
     /**
      * An optional used {@link AutoSaver}.
      */
@@ -114,12 +112,12 @@ public class KeYMediator {
 
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
-    */
+     */
     public KeYMediator(UserInterface ui, boolean useAutoSaver) {
 	this.ui             = ui;
-   if (useAutoSaver) {
-      autoSaver = new AutoSaver();
-   }
+	if (useAutoSaver) {
+		autoSaver = new AutoSaver();
+	}
 
 	notationInfo        = new NotationInfo();
 	proofListener       = new KeYMediatorProofListener();
@@ -219,12 +217,12 @@ public class KeYMediator {
     }
 
     /** simplified user interface? */
-    public boolean stupidMode() {
-       return stupidMode;
+    public boolean minimizeInteraction() {
+       return minimizeInteraction;
     }
 
-    public void setStupidMode(boolean b) {
-       stupidMode = b;
+    public void setMinimizeInteraction(boolean b) {
+       minimizeInteraction = b;
     }
 
     public boolean ensureProofLoaded() {
@@ -291,10 +289,11 @@ public class KeYMediator {
                                 }
                         });
         if (!proof.isDisposed()) {
-           proof.getServices().getCaches().getTermTacletAppIndexCache().clear();
+           ServiceCaches caches = proof.getServices().getCaches();
+           caches.getTermTacletAppIndexCache().clear();
+           caches.getBetaCandidates().clear(); // TODO: Is this required since the strategy is instantiated everytime again?
+           caches.getIfThenElseMalusCache().clear(); // TODO: Is this required since the strategy is instantiated everytime again?
         }
-        AbstractBetaFeature.clearCache();
-        IfThenElseMalusFeature.clearCache();
     }
 
 
@@ -431,7 +430,7 @@ public class KeYMediator {
 	    TacletApp firstApp = it.next();
             boolean ifSeqInteraction =
                !firstApp.taclet().ifSequent().isEmpty() ;
-            if (stupidMode && !firstApp.complete()) {
+            if (minimizeInteraction && !firstApp.complete()) {
                 ImmutableList<TacletApp> ifSeqCandidates =
                     firstApp.findIfFormulaInstantiations(goal.sequent(),
 		        getServices());
@@ -443,7 +442,6 @@ public class KeYMediator {
                 TacletApp tmpApp =
                     firstApp.tryToInstantiate(getServices());
                 if (tmpApp != null) firstApp = tmpApp;
-
 
             }
 	    if (ifSeqInteraction || !firstApp.complete()) {
@@ -563,14 +561,14 @@ public class KeYMediator {
      * changed
      * @param listener the KeYSelectionListener to add
      */
-    public synchronized void addKeYSelectionListener(KeYSelectionListener listener) {
+    public void addKeYSelectionListener(KeYSelectionListener listener) {
 	keySelectionModel.addKeYSelectionListener(listener);
     }
 
     /** removes a listener from the KeYSelectionModel
      * @param listener the KeYSelectionListener to be removed
      */
-    public synchronized void removeKeYSelectionListener(KeYSelectionListener listener) {
+    public void removeKeYSelectionListener(KeYSelectionListener listener) {
 	keySelectionModel.removeKeYSelectionListener(listener);
     }
 

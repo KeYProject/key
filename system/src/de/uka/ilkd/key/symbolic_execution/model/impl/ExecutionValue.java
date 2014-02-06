@@ -43,42 +43,42 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
    /**
     * The parent {@link IExecutionVariable} which provides this {@link IExecutionValue}.
     */
-   private ExecutionVariable variable;
+   private final ExecutionVariable variable;
    
    /**
     * Is the value unknown?
     */
-   private boolean valueUnknown;
+   private final boolean valueUnknown;
    
    /**
     * The value.
     */
-   private Term value;
+   private final Term value;
    
    /**
     * The value as human readable {@link String}.
     */
-   private String valueString;
+   private final String valueString;
    
    /**
     * The type of the value.
     */
-   private String typeString;
+   private final String typeString;
+
+   /**
+    * The condition under which the variable has this value.
+    */
+   private final Term condition;
+
+   /**
+    * The condition under which the variable has this value as human readable {@link String}.
+    */
+   private final String conditionString;
 
    /**
     * The child {@link IExecutionVariable}s.
     */
    private ExecutionVariable[] childVariables;
-
-   /**
-    * The condition under which the variable has this value.
-    */
-   private Term condition;
-
-   /**
-    * The condition under which the variable has this value as human readable {@link String}.
-    */
-   private String conditionString;
 
    /**
     * Constructor.
@@ -100,8 +100,7 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
                          String typeString,
                          Term condition,
                          String conditionString) {
-      super(mediator, proofNode);
-      assert variable != null;
+      super(variable.getSettings(), mediator, proofNode);
       this.variable = variable;
       this.valueUnknown = valueUnknown;
       this.value = value;

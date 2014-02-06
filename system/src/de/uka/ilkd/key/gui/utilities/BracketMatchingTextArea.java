@@ -18,8 +18,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
 
-import javax.swing.JFrame;
-import javax.swing.JTextArea;
+import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.plaf.TextUI;
@@ -322,7 +321,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
         f.getContentPane().add(new BracketMatchingTextArea("nothing", 10, 10));
         f.setSize(200, 200);
         f.setVisible(true);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
     /**

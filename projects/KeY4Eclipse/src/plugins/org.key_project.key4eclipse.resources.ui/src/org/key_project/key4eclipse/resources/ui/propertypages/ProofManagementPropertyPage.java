@@ -31,13 +31,13 @@ import org.eclipse.swt.widgets.Text;
 import org.key_project.key4eclipse.common.ui.property.AbstractProjectPropertyPage;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
-import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
+import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 
 public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    
    private Button enableBuildProofsButton;
 
-   private Button enableBuildProofsEfficentButton;
+   private Button enableBuildRequiredProofsOnlyButton;
    
    private Spinner setNumberOfThreadsSpinner;
    
@@ -58,10 +58,10 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       public void widgetSelected(SelectionEvent e) {
          boolean isSelected = enableBuildProofsButton.getSelection();
          if(isSelected){
-            enableBuildProofsEfficentButton.setEnabled(true);
+            enableBuildRequiredProofsOnlyButton.setEnabled(true);
          }
          else{
-            enableBuildProofsEfficentButton.setEnabled(false);
+            enableBuildRequiredProofsOnlyButton.setEnabled(false);
          }
          
       }
@@ -114,9 +114,9 @@ private SelectionListener enableMultiThreadingButtonSelectionListener = new Sele
       enableBuildProofsButton.addSelectionListener(buildProofButtonSelectionListener);
       setSelectionForBuildProofsButton();
       
-      enableBuildProofsEfficentButton = new Button(builderSettingsComposite, SWT.CHECK);
-      enableBuildProofsEfficentButton.setText("Build proof efficient");
-      setSelectionForEnableBuildProofsEfficientButton();
+      enableBuildRequiredProofsOnlyButton = new Button(builderSettingsComposite, SWT.CHECK);
+      enableBuildRequiredProofsOnlyButton.setText("Build required proofs only");
+      setSelectionForEnableBuildRequiredProofsOnlyButton();
       setEnabledForBuildProofsEfficientButton();
       
       
@@ -186,21 +186,21 @@ private SelectionListener enableMultiThreadingButtonSelectionListener = new Sele
    /**
     * Sets the selection for the EnableEfficientProofManagementButton CheckBox.
     */
-   private void setSelectionForEnableBuildProofsEfficientButton(){
+   private void setSelectionForEnableBuildRequiredProofsOnlyButton(){
       try {
          IProject project = getProject();
-         enableBuildProofsEfficentButton.setSelection(KeYProjectProperties.isEnableBuildProofsEfficient(project));
+         enableBuildRequiredProofsOnlyButton.setSelection(KeYProjectProperties.isEnableBuildRequiredProofsOnly(project));
       }
       catch (CoreException e) {
          LogUtil.getLogger().logError(e);
          LogUtil.getLogger().openErrorDialog(getShell(), e);
-         enableBuildProofsEfficentButton.setEnabled(false);
+         enableBuildRequiredProofsOnlyButton.setEnabled(false);
       }
    }
    
    
    private void setEnabledForBuildProofsEfficientButton(){
-      enableBuildProofsEfficentButton.setEnabled(enableBuildProofsButton.getSelection());
+      enableBuildRequiredProofsOnlyButton.setEnabled(enableBuildProofsButton.getSelection());
    }
    
    
@@ -287,12 +287,12 @@ private SelectionListener enableMultiThreadingButtonSelectionListener = new Sele
       try {
          IProject project = getProject();
          KeYProjectProperties.setEnableBuildProofs(project, enableBuildProofsButton.getSelection());
-         KeYProjectProperties.setEnableBuildProofsEfficient(project, enableBuildProofsEfficentButton.getSelection());
+         KeYProjectProperties.setEnableBuildProofsEfficient(project, enableBuildRequiredProofsOnlyButton.getSelection());
          KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreadingButton.getSelection());
          KeYProjectProperties.setNumberOfThreads(project, String.valueOf(setNumberOfThreadsSpinner.getSelection()));
          KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection());
          KeYProjectProperties.setHideMetaFiles(project, hideMefaFiles.getSelection());
-         KeY4EclipseResourcesUtil.hideMetaFiles(project);
+         KeYResourcesUtil.hideMetaFiles(project);
          return super.performOk();
       }
       catch (CoreException e) {
@@ -309,7 +309,7 @@ private SelectionListener enableMultiThreadingButtonSelectionListener = new Sele
    @Override
    protected void performDefaults() {
       enableBuildProofsButton.setSelection(true);
-      enableBuildProofsEfficentButton.setSelection(true);
+      enableBuildRequiredProofsOnlyButton.setSelection(true);
       enableMultiThreadingButton.setSelection(true);
       setNumberOfThreadsSpinner.setSelection(2);
       autoDeleteProofFilesButton.setSelection(true);

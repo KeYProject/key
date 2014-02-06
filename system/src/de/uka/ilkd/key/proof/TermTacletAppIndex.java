@@ -166,7 +166,7 @@ public class TermTacletAppIndex {
                                      ITermTacletAppIndexCache indexCache) {
         ImmutableList<TermTacletAppIndex> result = ImmutableSLList.<TermTacletAppIndex>nil();
         final Term localTerm = pos.subTerm ();
-    
+
         int i = localTerm.arity();
 
         while ( i-- != 0 )
@@ -222,7 +222,7 @@ public class TermTacletAppIndex {
                                                  TacletIndex     tacletIndex,
                                                  NewRuleListener listener,
                                                  RuleFilter      filter,
-                                                 ITermTacletAppIndexCache indexCache) {     
+                                                 ITermTacletAppIndexCache indexCache) {
         final Term localTerm = pos.subTerm ();
 
         final TermTacletAppIndex cached = indexCache.getIndexForTerm ( localTerm );
@@ -230,10 +230,10 @@ public class TermTacletAppIndex {
             cached.reportTacletApps ( pos, listener );
             return cached;
         }
-        
+
         final ImmutableList<NoPosTacletApp> localApps = getFindTaclet ( pos, filter,
-                                                               services,
-                                                               tacletIndex );
+                                                                        services,
+                                                                        tacletIndex );
 
         final ImmutableList<TermTacletAppIndex> subIndices =
             createSubIndices ( pos, services, tacletIndex,
@@ -637,10 +637,9 @@ public class TermTacletAppIndex {
                                    NewRuleListener listener ) {
         fireRulesAdded ( listener, localTacletApps, pos );
         
-        final Iterator<TermTacletAppIndex> it = subtermIndices.iterator ();
         int subterm = 0;
-        while ( it.hasNext () ) {
-            it.next ().reportTacletApps ( pos.down ( subterm ),
+        for (final TermTacletAppIndex appIndex : subtermIndices) {
+            appIndex.reportTacletApps ( pos.down ( subterm ),
                                           listener );
             ++subterm;
         }
@@ -680,7 +679,9 @@ public class TermTacletAppIndex {
                                        ImmutableList<NoPosTacletApp> taclets,
                                        PosInOccurrence pos) {
 
-        for (NoPosTacletApp taclet : taclets) listener.ruleAdded(taclet, pos);
+        for (NoPosTacletApp taclet : taclets) {
+            listener.ruleAdded(taclet, pos);
+        }
     }
 
 
@@ -691,11 +692,10 @@ public class TermTacletAppIndex {
                                                ImmutableList<NoPosTacletApp> taclets) {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 
-        while ( !taclets.isEmpty() ) {
-            final NoPosTacletApp app = taclets.head ();
-            taclets = taclets.tail ();
-            if ( p_filter.filter ( app.taclet () ) )
-            result = result.prepend ( app );
+        for (final NoPosTacletApp app :  taclets) {
+            if ( p_filter.filter ( app.taclet () ) ) {
+                result = result.prepend ( app );
+            }
         }
 
         return result;

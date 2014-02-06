@@ -3,23 +3,23 @@
    <methodCall name="self.compute();" pathCondition="true" pathConditionChanged="false">
       <statement name="ArrayInstanceCreationTest.classArray=new int[]{1 };" pathCondition="true" pathConditionChanged="false">
          <statement name="this.instanceArray=new int[]{2 };" pathCondition="true" pathConditionChanged="false">
-            <branchStatement name="if (this.next!=null) {   this.next.instanceArray=new int[]{3 };  int[] localArray = {4,5 };return    localArray[0]+localArray[1]; }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
-               <branchCondition name="!self.next = null" pathCondition="!self.next = null" pathConditionChanged="true" branchCondition="!self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <statement name="this.next.instanceArray=new int[]{3 };" pathCondition="!self.next = null" pathConditionChanged="false">
-                     <statement name="int[] localArray = {4,5 };" pathCondition="!self.next = null" pathConditionChanged="false">
-                        <statement name="return localArray[0]+localArray[1];" pathCondition="!self.next = null" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="!self.next = null" pathConditionChanged="false" isReturnValueComputed="false">
-                              <termination name="&lt;end&gt;" pathCondition="!self.next = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+            <branchStatement name="if (this.next!=null)" pathCondition="true" pathConditionChanged="false">
+               <branchCondition name="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" pathCondition="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" pathConditionChanged="true" branchCondition="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="this.next.instanceArray=new int[]{3 };" pathCondition="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" pathConditionChanged="false">
+                     <statement name="int[] localArray = {4,5 };" pathCondition="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" pathConditionChanged="false">
+                        <statement name="return localArray[0]+localArray[1];" pathCondition="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" pathConditionChanged="false">
+                           <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" pathConditionChanged="false" isReturnValueComputed="false">
+                              <termination name="&lt;end&gt;" pathCondition="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
                         </statement>
                      </statement>
                   </statement>
                </branchCondition>
-               <branchCondition name="self.next = null" pathCondition="self.next = null" pathConditionChanged="true" branchCondition="self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <statement name="return -100;" pathCondition="self.next = null" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="self.next = null" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="self.next = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+               <branchCondition name="equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null)" pathCondition="equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null)" pathConditionChanged="true" branchCondition="equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="return -100;" pathCondition="equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null)" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null)" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

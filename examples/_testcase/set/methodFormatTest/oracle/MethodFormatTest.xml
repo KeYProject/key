@@ -16,29 +16,29 @@
                                           <statement name="return g();" pathCondition="true" pathConditionChanged="false">
                                              <methodCall name="MethodFormatTest.g();" pathCondition="true" pathConditionChanged="false">
                                                 <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
-                                                   <methodReturn name="&lt;return of MethodFormatTest.g();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of MethodFormatTest.g();&gt;" isReturnValueComputed="true">
-                                                      <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                                                   <methodReturn name="&lt;return of MethodFormatTest.g();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.g();&gt;" isReturnValueComputed="true">
+                                                      <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                       </methodReturnValue>
-                                                      <methodReturn name="&lt;return of MethodFormatTest.f();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of MethodFormatTest.f();&gt;" isReturnValueComputed="true">
-                                                         <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                                                      <methodReturn name="&lt;return of MethodFormatTest.f();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.f();&gt;" isReturnValueComputed="true">
+                                                         <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                          </methodReturnValue>
-                                                         <methodReturn name="&lt;return of MethodFormatTest.e();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of MethodFormatTest.e();&gt;" isReturnValueComputed="true">
-                                                            <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                                                         <methodReturn name="&lt;return of MethodFormatTest.e();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.e();&gt;" isReturnValueComputed="true">
+                                                            <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                             </methodReturnValue>
-                                                            <methodReturn name="&lt;return of MethodFormatTest.d();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of MethodFormatTest.d();&gt;" isReturnValueComputed="true">
-                                                               <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                                                            <methodReturn name="&lt;return of MethodFormatTest.d();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.d();&gt;" isReturnValueComputed="true">
+                                                               <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                                </methodReturnValue>
-                                                               <methodReturn name="&lt;return of MethodFormatTest.c();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of MethodFormatTest.c();&gt;" isReturnValueComputed="true">
-                                                                  <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                                                               <methodReturn name="&lt;return of MethodFormatTest.c();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.c();&gt;" isReturnValueComputed="true">
+                                                                  <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                                   </methodReturnValue>
-                                                                  <methodReturn name="&lt;return of MethodFormatTest.b();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of MethodFormatTest.b();&gt;" isReturnValueComputed="true">
-                                                                     <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                                                                  <methodReturn name="&lt;return of MethodFormatTest.b();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.b();&gt;" isReturnValueComputed="true">
+                                                                     <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                                      </methodReturnValue>
-                                                                     <methodReturn name="&lt;return of MethodFormatTest.a();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of MethodFormatTest.a();&gt;" isReturnValueComputed="true">
-                                                                        <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                                                                     <methodReturn name="&lt;return of MethodFormatTest.a();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.a();&gt;" isReturnValueComputed="true">
+                                                                        <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                                         </methodReturnValue>
-                                                                        <methodReturn name="&lt;return of MethodFormatTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of MethodFormatTest.main();&gt;" isReturnValueComputed="true">
-                                                                           <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                                                                        <methodReturn name="&lt;return of MethodFormatTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.main();&gt;" isReturnValueComputed="true">
+                                                                           <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                                            </methodReturnValue>
                                                                            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                            </termination>

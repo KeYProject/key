@@ -73,6 +73,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 
@@ -754,6 +755,14 @@ public class ExecutionNodeReader {
       @Override
       public boolean isDisposed() {
          return false;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ITreeSettings getSettings() {
+         return null;
       }
    }
    

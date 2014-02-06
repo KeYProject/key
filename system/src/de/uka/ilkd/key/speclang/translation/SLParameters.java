@@ -53,4 +53,10 @@ public final class SLParameters {
         }        
         return result;
     }
+
+    public String toString() {
+        return parameters == null ? "" : parameters.toString();
+    }
+
+
 }

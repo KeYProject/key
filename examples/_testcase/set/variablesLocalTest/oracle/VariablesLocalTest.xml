@@ -24,7 +24,7 @@
                </value>
             </variable>
             <variable name="a" arrayIndex="-1" isArrayIndex="false">
-               <value name="a {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               <value name="a {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <statement name="int sum = sum(a,b);" pathCondition="true" pathConditionChanged="false">
@@ -37,11 +37,11 @@
                   </value>
                </variable>
                <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                  <value name="a {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <value name="a {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                  <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <value name="b {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <methodCall name="self.sum(a_1,b_1);" pathCondition="true" pathConditionChanged="false">
@@ -54,11 +54,11 @@
                      </value>
                   </variable>
                   <variable name="a_1" arrayIndex="-1" isArrayIndex="false">
-                     <value name="a_1 {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="a_1 {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="b_1" arrayIndex="-1" isArrayIndex="false">
-                     <value name="b_1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="b_1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <statement name="int result = a_1+b_1;" pathCondition="true" pathConditionChanged="false">
@@ -67,11 +67,11 @@
                         </value>
                      </variable>
                      <variable name="a_1" arrayIndex="-1" isArrayIndex="false">
-                        <value name="a_1 {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="a_1 {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="b_1" arrayIndex="-1" isArrayIndex="false">
-                        <value name="b_1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="b_1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
@@ -96,7 +96,7 @@
                            </value>
                         </variable>
                         <variable name="result_1" arrayIndex="-1" isArrayIndex="false">
-                           <value name="result_1 {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <value name="result_1 {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <methodReturn name="&lt;return of self.sum(a_1,b_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
@@ -117,10 +117,10 @@
                               </value>
                            </variable>
                            <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                              <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <statement name="return sum;" pathCondition="true" pathConditionChanged="false">
+                           <statement name="return sum_1;" pathCondition="true" pathConditionChanged="false">
                               <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                  <value name="self {true}" typeString="VariablesLocalTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  </value>
@@ -129,8 +129,8 @@
                                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
-                              <variable name="sum" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="sum {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <variable name="sum_1" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="sum_1 {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                               <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">

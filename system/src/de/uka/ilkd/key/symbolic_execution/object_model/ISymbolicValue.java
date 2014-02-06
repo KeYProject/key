@@ -29,7 +29,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicValue;
  * @author Martin Hentschel
  * @see SymbolicValue
  */
-public interface ISymbolicValue {
+public interface ISymbolicValue extends ISymbolicElement {
    /**
     * Returns a human readable name.
     * @return A human readable name.

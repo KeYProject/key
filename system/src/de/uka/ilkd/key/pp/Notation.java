@@ -135,6 +135,21 @@ public abstract class Notation {
     }
     
 
+    public static final class LabelNotation extends Notation {
+        
+        private final String left;
+        private final String right;
+        
+        public LabelNotation(String beginLabel, String endLabel, int prio) {
+            super(prio);
+            left = beginLabel;
+            right = endLabel;
+        }
+        
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printLabels(t, left, right);
+        }
+    }
     
     /**
      * The standard concrete syntax for quantifiers.
@@ -336,17 +351,96 @@ public abstract class Notation {
 	}
     }
     
+    public static abstract class HeapNotation extends Notation {
+        protected HeapNotation(int priority) {
+            super(priority);
+        }
+
+        public abstract void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException;
+    }
+
+    /**
+     * The standard concrete syntax for store.
+     */
+    public static final class StoreNotation extends HeapNotation {
+        public StoreNotation() {
+            super(140);
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printStore(t, true);
+        }
+
+        public void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException {
+            sp.printStore(t, false);
+        }
+    }
+
+    /**
+     * The standard concrete syntax for anon.
+     */
+    public static final class AnonNotation extends HeapNotation {
+        public AnonNotation() {
+            super(140);
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printAnon(t, true);
+        }
+
+        public void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException {
+            sp.printAnon(t, false);
+        }
+    }
+
+    /**
+     * The standard concrete syntax for Create.
+     */
+    public static final class CreateNotation extends HeapNotation {
+        public CreateNotation() {
+            super(140);
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printCreate(t, true);
+        }
+
+        public void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException {
+            sp.printCreate(t, false);
+        }
+    }
+
+    /**
+     * The standard concrete syntax for memset.
+     */
+    public static final class MemsetNotation extends HeapNotation {
+        public MemsetNotation() {
+            super(140);
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printMemset(t, true);
+        }
+
+        public void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException {
+            sp.printMemset(t, false);
+        }
+    }
     
     /**
      * The standard concrete syntax for length.
      */
-    public static final class LengthNotation extends Notation {
-	public LengthNotation() {
+    public static final class Postfix extends Notation {
+        
+        private final String postfix;
+        
+	public Postfix(String postfix) {
 	    super(130);
+	    this.postfix = postfix;
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printLength(t);
+	    sp.printPostfix(t,postfix);
 	}
     }       
     
@@ -450,7 +544,8 @@ public abstract class Notation {
     
     public static final class SchemaVariableNotation extends VariableNotation {
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@SuppressWarnings("unchecked")
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    // logger.debug("SSV: " + t+ " [" + t.op() + "]");
 	    Debug.assertTrue(t.op() instanceof SchemaVariable);
 	    Object o = sp.getInstantiations().getInstantiation(
@@ -468,7 +563,6 @@ public abstract class Notation {
 		    // logger.debug("Instantiation of " + t+ " [" + t.op() +
                         // "]" + " known.");
 		    if (o instanceof ImmutableList) {
-            @SuppressWarnings("unchecked")
             final Iterator<Object> it = ((ImmutableList<Object>) o)
 				.iterator();
 			sp.getLayouter().print("{");
@@ -580,7 +674,7 @@ public abstract class Notation {
 		return null;
 	    }
 
-	    return ("'" + Character.valueOf(charVal)).toString() + "'";
+	    return ("'" + Character.valueOf(charVal)) + "'";
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {

@@ -8,76 +8,29 @@
             <loopInvariant name="
 invariant: i &gt;= 0
 &amp; (  i &lt;= array.length
-   &amp; result_1 = bsum{int j;}(0, i, array[j]));
+   &amp;   result_1
+     = javaCastInt(bsum{int j;}(0, i, array[j])));
 variant: javaSubInt(array.length, i)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="false">
                <callStackEntry path="/0"/>
-               <branchCondition name="   array.length &gt;= 0
--&gt;   i_0 &gt;= 0
-   &amp; array.length &gt;= 1 + i
-   &amp; array.length &gt;= i_0
-   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathCondition="   array.length &gt;= 0
--&gt;   i_0 &gt;= 0
-   &amp; array.length &gt;= 1 + i
-   &amp; array.length &gt;= i_0
-   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="true" branchCondition="   array.length &gt;= 0
--&gt;   i_0 &gt;= 0
-   &amp; array.length &gt;= 1 + i
-   &amp; array.length &gt;= i_0
-   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+               <branchCondition name="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),gt(length(array),i)),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),gt(length(array),i)),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="true" branchCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),gt(length(array),i)),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <callStackEntry path="/0"/>
-                  <statement name="result_1+=array[i];" pathCondition="   array.length &gt;= 0
--&gt;   i_0 &gt;= 0
-   &amp; array.length &gt;= 1 + i
-   &amp; array.length &gt;= i_0
-   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="false">
+                  <statement name="result_1+=array[i];" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),gt(length(array),i)),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
-                     <statement name="i++;" pathCondition="   array.length &gt;= 0
--&gt;   i_0 &gt;= 0
-   &amp; array.length &gt;= 1 + i
-   &amp; array.length &gt;= i_0
-   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="false">
+                     <statement name="i++;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),gt(length(array),i)),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false">
                         <callStackEntry path="/0"/>
-                        <termination name="&lt;loop body end&gt;" pathCondition="   array.length &gt;= 0
--&gt;   i_0 &gt;= 0
-   &amp; array.length &gt;= 1 + i
-   &amp; array.length &gt;= i_0
-   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
+                        <termination name="&lt;loop body end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),gt(length(array),i)),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
                         </termination>
                      </statement>
                   </statement>
                </branchCondition>
-               <branchCondition name="   array.length &gt;= 0
--&gt;   i_0 &gt;= 0
-   &amp; array.length &lt;= i
-   &amp; array.length &gt;= i_0
-   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathCondition="   array.length &gt;= 0
--&gt;   i_0 &gt;= 0
-   &amp; array.length &lt;= i
-   &amp; array.length &gt;= i_0
-   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="true" branchCondition="   array.length &gt;= 0
--&gt;   i_0 &gt;= 0
-   &amp; array.length &lt;= i
-   &amp; array.length &gt;= i_0
-   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+               <branchCondition name="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),leq(length(array),i)),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),leq(length(array),i)),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="true" branchCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),leq(length(array),i)),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                   <callStackEntry path="/0"/>
-                  <statement name="return result_1;" pathCondition="   array.length &gt;= 0
--&gt;   i_0 &gt;= 0
-   &amp; array.length &lt;= i
-   &amp; array.length &gt;= i_0
-   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="false">
+                  <statement name="return result_1;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),leq(length(array),i)),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
-                     <methodReturn name="&lt;return of ArraySumWhileInitiallyInvalid.sum(array);&gt;" pathCondition="   array.length &gt;= 0
--&gt;   i_0 &gt;= 0
-   &amp; array.length &lt;= i
-   &amp; array.length &gt;= i_0
-   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of ArraySumWhileInitiallyInvalid.sum(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),leq(length(array),i)),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false" isReturnValueComputed="false">
                         <callStackEntry path="/0"/>
-                        <termination name="&lt;end&gt;" pathCondition="   array.length &gt;= 0
--&gt;   i_0 &gt;= 0
-   &amp; array.length &lt;= i
-   &amp; array.length &gt;= i_0
-   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),leq(length(array),i)),geq(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

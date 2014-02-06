@@ -6,20 +6,20 @@
             <statement name="this.first=x;" pathCondition="true" pathConditionChanged="false">
                <statement name="this.second=this.y;" pathCondition="true" pathConditionChanged="false">
                   <statement name="return this.first.value+this.second.value+tempX.value+tempY.value;" pathCondition="true" pathConditionChanged="false">
-                     <branchCondition name="!x = null" pathCondition="!x = null" pathConditionChanged="true" branchCondition="!x = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <branchCondition name="!self.y = null" pathCondition="!x = null &amp; !self.y = null" pathConditionChanged="true" branchCondition="!self.y = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                           <methodReturn name="&lt;return of self.compute(x);&gt;" pathCondition="!x = null &amp; !self.y = null" pathConditionChanged="false" isReturnValueComputed="false">
-                              <termination name="&lt;end&gt;" pathCondition="!x = null &amp; !self.y = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                     <branchCondition name="not(equals(x,null))" pathCondition="not(equals(x,null))" pathConditionChanged="true" branchCondition="not(equals(x,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <branchCondition name="not(equals(OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y),null))" pathCondition="and(not(equals(x,null)),not(equals(OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y),null)))" pathConditionChanged="true" branchCondition="not(equals(OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <methodReturn name="&lt;return of self.compute(x);&gt;" pathCondition="and(not(equals(x,null)),not(equals(OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y),null)))" pathConditionChanged="false" isReturnValueComputed="false">
+                              <termination name="&lt;end&gt;" pathCondition="and(not(equals(x,null)),not(equals(OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y),null)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
                         </branchCondition>
-                        <branchCondition name="self.y = null" pathCondition="!x = null &amp; self.y = null" pathConditionChanged="true" branchCondition="self.y = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                           <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; self.y = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                        <branchCondition name="equals(OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y),null)" pathCondition="and(not(equals(x,null)),equals(OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y),null))" pathConditionChanged="true" branchCondition="equals(OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(not(equals(x,null)),equals(OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y),null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                            </termination>
                         </branchCondition>
                      </branchCondition>
-                     <branchCondition name="x = null" pathCondition="x = null" pathConditionChanged="true" branchCondition="x = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="x = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                     <branchCondition name="equals(x,null)" pathCondition="equals(x,null)" pathConditionChanged="true" branchCondition="equals(x,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(x,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                         </termination>
                      </branchCondition>
                   </statement>

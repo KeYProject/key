@@ -13,19 +13,20 @@
 
 package de.uka.ilkd.key.gui.macros;
 
+import javax.swing.KeyStroke;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left
@@ -100,6 +101,10 @@ public class TryCloseMacro implements ProofMacro {
         // create the rule application engine
         final ApplyStrategy applyStrategy = 
                 new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
+        
+        // quick fix to bug #1356, along with the commented out lines below
+        // this reenables "classical" progress bar
+        applyStrategy.addProverTaskObserver(mediator.getUI());
 
         final Proof proof = mediator.getInteractiveProver().getProof();
 
@@ -122,7 +127,7 @@ public class TryCloseMacro implements ProofMacro {
         int goalsDone = 0;
         long time = 0;
         int appliedRules = 0;
-        fireStart(listener, goalsTotal);
+//        fireStart(listener, goalsTotal);
 
         //
         // start actual autoprove
@@ -149,15 +154,20 @@ public class TryCloseMacro implements ProofMacro {
                     throw new InterruptedException();
                 }
                 
-                fireProgress(listener, goalsDone);
+//                fireProgress(listener, goalsDone);
             }
         } finally {
             // reset the old number of steps
             mediator.setMaxAutomaticSteps(oldNumberOfSteps);
             // inform the listener
-            fireStop(listener, proof, time, appliedRules, goalsClosed);
+//            fireStop(listener, proof, time, appliedRules, goalsClosed);
         }
 
+    }
+
+    @Override
+    public KeyStroke getKeyStroke () {
+	return KeyStrokeManager.get(this);
     }
 
     private void fireStop(ProverTaskListener listener, Proof proof, long time, 

@@ -281,8 +281,9 @@ class ItemChooser<T> extends JPanel {
 }
 
 class SelectionPanel<T> extends JPanel{
-        static enum Side  {LEFT,RIGHT};
-        private static final long serialVersionUID = 1L;
+        static enum Side  {LEFT,RIGHT}
+
+    private static final long serialVersionUID = 1L;
         private JTextField textField;
         private JTable list;
         private JScrollPane scrollPane;

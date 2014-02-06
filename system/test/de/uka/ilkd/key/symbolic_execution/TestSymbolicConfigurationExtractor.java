@@ -51,7 +51,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //             ".xml",
 //             null);
 //   }
-   
+
 //   public void testSimpleLinkedOjbectsWithAdditionalInstancesPreCondition() throws Exception {
 //      doTest("examples/_testcase/set/configurationExtractorSimpleLinkedOjbectsWithAdditionalInstances/test/SimpleLinkedOjbectsWithAdditionalInstances.java",
 //             "SimpleLinkedOjbectsWithAdditionalInstances",
@@ -64,6 +64,25 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //             "x != null & x.next != null & x.next.next != null & a != null & a.x == 42 & b != null");
 //   }
 
+   /**
+    * Tests "configurationExtractorInstanceCreationTest" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testInstanceCreationTest_OnReturnNode() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorInstanceCreationTest/test/InstanceCreationTest.java",
+             "InstanceCreationTest",
+             "examples/_testcase/set/configurationExtractorInstanceCreationTest/oracle/",
+             "InstanceCreationTest.xml",
+             "testInstanceCreationTest_onReturnNode_initial",
+             ".xml",
+             "testInstanceCreationTest_onReturnNode_current",
+             ".xml",
+             null,
+             5,
+             2,
+             false,
+             false);
+   }
 
    /**
     * Tests "configurationExtractorWithOperationContractsTest" without precondition.
@@ -90,7 +109,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
     */
    public void testAssociationSourceIsNotRepresentativeTermOfEquivalenceClass() throws Exception {
       doTest("examples/_testcase/set/configurationExtractorAssociationSourceIsNotRepresentativeTermOfEquivalenceClass/test/AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.java",
-             "AssociationSourceIsNotRepresentativeTermOfEquivalenceClass",
+             "algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass",
              "examples/_testcase/set/configurationExtractorAssociationSourceIsNotRepresentativeTermOfEquivalenceClass/oracle/",
              "AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.xml",
              "testAssociationSourceIsNotRepresentativeTermOfEquivalenceClass_initial",
@@ -567,15 +586,59 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
                          int numberOfReturnNodeInMostLeftBranch,
                          int expectedNumberOfConfigurations,
                          boolean useOperationContracts) throws Exception {
+      doTest(javaPathInkeyRepDirectory,
+             containerTypeName,
+             oraclePathInBaseDir,
+             symbolicExecutionOracleFileName,
+             initialStatesOraclePrefix,
+             initialStatesOracleFileExtension,
+             currentStatesOraclePrefix,
+             currentStatesOracleFileExtension,
+             precondition,
+             numberOfReturnNodeInMostLeftBranch,
+             expectedNumberOfConfigurations,
+             useOperationContracts,
+             true);
+   }
+
+   /**
+    * Executes the test steps.
+    * @param javaPathInkeyRepDirectory The path to the Java file.
+    * @param containerTypeName The class name.
+    * @param oraclePathInBaseDir The path to the oracle directory.
+    * @param symbolicExecutionOracleFileName File name of the symbolic execution oracle file.
+    * @param initialStatesOraclePrefix Prefix for initial configuration oracles.
+    * @param initialStatesOracleFileExtension Initial configuration oracle file extension.
+    * @param currentStatesOraclePrefix Prefix for current configuration oracles.
+    * @param currentStatesOracleFileExtension Current configuration oracle file extension.
+    * @param precondition An optional precondition.
+    * @param useOperationContracts Use operation contracts?
+    * @throws Exception Occurred Exception.
+    */
+   protected void doTest(String javaPathInkeyRepDirectory,
+                         String containerTypeName,
+                         String oraclePathInBaseDir,
+                         String symbolicExecutionOracleFileName,
+                         String initialStatesOraclePrefix,
+                         String initialStatesOracleFileExtension,
+                         String currentStatesOraclePrefix,
+                         String currentStatesOracleFileExtension,
+                         String precondition,
+                         int numberOfReturnNodeInMostLeftBranch,
+                         int expectedNumberOfConfigurations,
+                         boolean useOperationContracts,
+                         boolean onReturnStatementNode) throws Exception {
       HashMap<String, String> originalTacletOptions = null;
       SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = null;
+      boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
          // Define test settings
          final String methodFullName = "compute";
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, useOperationContracts, false, false, false);
+         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, useOperationContracts, false, false, false, false);
+         setOneStepSimplificationEnabled(null, true);
          // Resume
          resume(env.getUi(), env.getBuilder(), oraclePathInBaseDir + symbolicExecutionOracleFileName, keyRepDirectory);
          // Find most left method return node
@@ -588,18 +651,25 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
             }
          }
          assertTrue(returnNode instanceof IExecutionMethodReturn);
-         // Get the return statement which is returned in returnNode
-         IExecutionNode returnStatement = returnNode.getParent();
-         while (!(returnStatement instanceof IExecutionStatement)) {
-            if (returnStatement instanceof IExecutionStatement) {
-               foundReturnStatement++;
+         IExecutionNode nodeToTest;
+         if (onReturnStatementNode) {
+            // Get the return statement which is returned in returnNode
+            IExecutionNode returnStatement = returnNode.getParent();
+            while (!(returnStatement instanceof IExecutionStatement)) {
+               if (returnStatement instanceof IExecutionStatement) {
+                  foundReturnStatement++;
+               }
+               returnStatement = returnStatement.getParent();
             }
-            returnStatement = returnStatement.getParent();
+            assertNotNull(returnStatement);
+            assertTrue(returnStatement.getName().startsWith("return"));
+            nodeToTest = returnStatement;
          }
-         assertNotNull(returnStatement);
-         assertTrue(returnStatement.getName().startsWith("return"));
+         else {
+            nodeToTest = returnNode;
+         }
          // Extract possible heaps
-         SymbolicConfigurationExtractor extractor = new SymbolicConfigurationExtractor(returnStatement.getProofNode());
+         SymbolicConfigurationExtractor extractor = new SymbolicConfigurationExtractor(nodeToTest.getProofNode(), false);
          extractor.analyse();
          // Test the initial configurations (first time with lazy computation)
          List<ISymbolicConfiguration> initialConfigurationsFirstTime = new ArrayList<ISymbolicConfiguration>(extractor.getConfigurationsCount());
@@ -642,7 +712,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
          }
       }
       finally {
-         // Restore taclet options
+         // Restore original options
+         setOneStepSimplificationEnabled(null, originalOneStepSimplification);
          restoreTacletOptions(originalTacletOptions);
          if (env != null) {
             env.dispose();

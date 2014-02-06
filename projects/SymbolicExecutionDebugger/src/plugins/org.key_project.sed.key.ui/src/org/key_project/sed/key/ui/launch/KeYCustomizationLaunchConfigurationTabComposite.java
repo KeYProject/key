@@ -56,6 +56,11 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
    private Button mergeBranchConditionsButton;
    
    /**
+    * Defines to use pretty printing or not..
+    */
+   private Button usePrettyPrintingButton;
+   
+   /**
     * Constructor.
     * @param parent The parent {@link Composite}.
     * @param style The style.
@@ -102,6 +107,14 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
             updateLaunchConfigurationDialog();
          }
       });
+      usePrettyPrintingButton = widgetFactory.createButton(symbolicExecutionTreeGroup, "Use &pretty printing", SWT.CHECK);
+      usePrettyPrintingButton.setEnabled(isEditable());
+      usePrettyPrintingButton.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateLaunchConfigurationDialog();
+         }
+      });
       // KeY
       Group keyGroup = widgetFactory.createGroup(composite, "KeY");
       keyGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -134,6 +147,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
          showVariablesOfSelectedDebugNodeButton.setSelection(KeySEDUtil.isShowVariablesOfSelectedDebugNode(configuration));
          showKeYMainWindowButton.setSelection(KeySEDUtil.isShowKeYMainWindow(configuration));
          mergeBranchConditionsButton.setSelection(KeySEDUtil.isMergeBranchConditions(configuration));
+         usePrettyPrintingButton.setSelection(KeySEDUtil.isUsePrettyPrinting(configuration));
       } 
       catch (CoreException e) {
          LogUtil.getLogger().logError(e);
@@ -149,6 +163,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       showVariablesOfSelectedDebugNodeButton.setSelection(launchSettings.isShowVariablesOfSelectedDebugNode());
       showKeYMainWindowButton.setSelection(launchSettings.isShowKeYMainWindow());
       mergeBranchConditionsButton.setSelection(launchSettings.isMergeBranchConditions());
+      usePrettyPrintingButton.setSelection(launchSettings.isUsePrettyPrinting());
    }
 
    /**
@@ -160,5 +175,6 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, showVariablesOfSelectedDebugNodeButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindowButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditionsButton.getSelection());
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrintingButton.getSelection());
    }
 }

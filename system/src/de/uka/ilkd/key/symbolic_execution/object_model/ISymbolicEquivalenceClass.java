@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.Term;
  * the same {@link ISymbolicObject} in an {@link ISymbolicConfiguration}.
  * @author Martin Hentschel
  */
-public interface ISymbolicEquivalenceClass {
+public interface ISymbolicEquivalenceClass extends ISymbolicElement {
    /**
     * Returns the terms which represents the same {@link ISymbolicObject}.
     * @return The terms which represents the same {@link ISymbolicObject}.

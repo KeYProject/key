@@ -39,7 +39,7 @@ import de.uka.ilkd.key.util.Pair;
  * that the invariants of the objects of a particular class imply a particular
  * formula. These axioms are logically weaker than the full definitions of <inv>
  * expressed as RepresentsAxioms, but they may have higher visibility, making
- * them available in proofs where the corresponing full definition is not.
+ * them available in proofs where the corresponding full definition is not.
  */
 public final class PartialInvAxiom extends ClassAxiom {
     

@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.rule.FindTaclet;
@@ -68,7 +69,7 @@ public class TermTacletAppIndexCacheSet {
      * in this set (e.g., for different prefixes of quantified variables)
      */
     private final static int MAX_CACHE_ENTRIES = 100;
-    
+
     /**
      * dummy cache that is not caching at all, and from which no other cache is
      * reachable
@@ -230,7 +231,7 @@ public class TermTacletAppIndexCacheSet {
      */
     private boolean isAcceptedOperator(Operator op) {
         return op instanceof IfThenElse
-               || op instanceof Function
+               || (op instanceof Function && !(op instanceof Transformer))
                || op instanceof Junctor
                || op instanceof Equality
                || op instanceof Quantifier
@@ -241,7 +242,7 @@ public class TermTacletAppIndexCacheSet {
     ////////////////////////////////////////////////////////////////////////////
     
     private class TopLevelCache extends PrefixTermTacletAppIndexCacheImpl {
-        public TopLevelCache(ImmutableList<QuantifiableVariable> prefix, Map<CacheKey, TermTacletAppIndex> cache) {
+        protected TopLevelCache(ImmutableList<QuantifiableVariable> prefix, Map<CacheKey, TermTacletAppIndex> cache) {
             super ( prefix, cache );
         }
 
@@ -292,7 +293,7 @@ public class TermTacletAppIndexCacheSet {
     ////////////////////////////////////////////////////////////////////////////
     
     private class BelowProgCache extends PrefixTermTacletAppIndexCacheImpl {
-        public BelowProgCache(ImmutableList<QuantifiableVariable> prefix, Map<CacheKey, TermTacletAppIndex> cache) {
+        protected BelowProgCache(ImmutableList<QuantifiableVariable> prefix, Map<CacheKey, TermTacletAppIndex> cache) {
             super ( prefix, cache );
         }
 

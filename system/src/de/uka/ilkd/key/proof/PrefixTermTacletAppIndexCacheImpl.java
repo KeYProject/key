@@ -91,7 +91,7 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
     
     private final CacheKey queryCacheKey = new CacheKey ( this, null );
     
-    public static class CacheKey {
+    public final static class CacheKey {
         private final PrefixTermTacletAppIndexCacheImpl parent;
         public Term analysedTerm;
 

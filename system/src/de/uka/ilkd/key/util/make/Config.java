@@ -21,10 +21,15 @@
 
 package de.uka.ilkd.key.util.make;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public class Config {
@@ -46,7 +51,7 @@ public class Config {
     public static final String SIMPLIFY_PATH_KEY = "[SimplifyPath]";
 
     
-    static HashMap<String,StringBuffer> map = new LinkedHashMap<String,StringBuffer>();
+    static Map<String,StringBuffer> map = new LinkedHashMap<String,StringBuffer>();
 
     /** loads a resource and returns its URL 
      * @param cl the Class used to determine the resource 
@@ -94,8 +99,7 @@ public class Config {
     }
     
     private static int readIdentifier(FileReader fr) {
-	StringBuffer identifier = new StringBuffer();	
-	identifier = readUntil(fr,'[');
+	StringBuffer identifier = readUntil(fr,'[');
 	if (identifier.length()==0) return -1;
 	if (identifier.length()==0) {
 	    throw new RuntimeException("IDENTIFIER EXPECTED.");
@@ -103,11 +107,8 @@ public class Config {
 	StringBuffer path = new StringBuffer();
 	path = readUntil(fr,']');
 
-	StringBuffer result = map.get(identifier.toString());
 	if (map.get(identifier.toString()) == null) {
 	    map.put(identifier.toString(), path);
-	} else {
-	    result.append(File.pathSeparator+path);
 	}
 	return 0;
     }

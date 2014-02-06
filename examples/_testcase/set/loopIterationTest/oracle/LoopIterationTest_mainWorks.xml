@@ -2,7 +2,7 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.mainWorks();" pathCondition="true" pathConditionChanged="false">
       <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
-         <loopStatement name="while ( i&lt;3 ) {   i++; }" pathCondition="true" pathConditionChanged="false">
+         <loopStatement name="while ( i&lt;3 )" pathCondition="true" pathConditionChanged="false">
             <loopCondition name="i&lt;3" pathCondition="true" pathConditionChanged="false">
                <statement name="i++;" pathCondition="true" pathConditionChanged="false">
                   <loopCondition name="i&lt;3" pathCondition="true" pathConditionChanged="false">

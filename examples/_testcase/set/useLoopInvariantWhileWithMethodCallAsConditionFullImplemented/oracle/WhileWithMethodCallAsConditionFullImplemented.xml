@@ -7,88 +7,17 @@
 invariant: i &gt;= 0 &amp; (i &lt;= array.length &amp; result_1 = i);
 variant: javaSubInt(array.length, i)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
-               <branchCondition name="!(    i_0 &gt;= 1
-    &amp; array.length &gt;= 0
-    &amp; array.length &lt;= -1 + i_0
-  | i_0 &lt;= -1
-  &amp; array.length &gt;= 0
-  &amp; array.length &gt;= i_0
-  | !(     i_0 &gt;= 0
-         &amp; array.length &gt;= 0
-         &amp; array.length &gt;= i_0
-      -&gt; result_1_0 = i_0))" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; result_1_0 = i_0)))" pathConditionChanged="true" branchCondition="!(    i_0 &gt;= 1
-    &amp; array.length &gt;= 0
-    &amp; array.length &lt;= -1 + i_0
-  | i_0 &lt;= -1
-  &amp; array.length &gt;= 0
-  &amp; array.length &gt;= i_0
-  | !(     i_0 &gt;= 0
-         &amp; array.length &gt;= 0
-         &amp; array.length &gt;= i_0
-      -&gt; result_1_0 = i_0))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
-                  <branchCondition name="!array = null" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt; result_1_0 = i_0))
-   &amp; !array = null" pathConditionChanged="true" branchCondition="!array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <methodCall name="WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_4,i_4);" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt; result_1_0 = i_0))
-   &amp; !array = null" pathConditionChanged="false">
-                        <branchStatement name="if (i_4&lt;0) {throw new RuntimeException (); }else  {return    i_4&lt;array_4.length; }" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt; result_1_0 = i_0))
-   &amp; !array = null" pathConditionChanged="false">
-                           <statement name="return i_4&lt;array_4.length;" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt; result_1_0 = i_0))
-   &amp; !array = null" pathConditionChanged="false">
-                              <methodReturn name="&lt;return of WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_4,i_4);&gt;" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt; result_1_0 = i_0))
-   &amp; !array = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return TRUE as result of WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_4,i_4);&gt;" isReturnValueComputed="true">
+               <branchCondition name="not(or(or(or(or(and(and(geq(i_0,Z(1(#))),geq(length(array),Z(0(#)))),lt(length(array),i_0)),and(and(leq(i_0,Z(neglit(1(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0))),not(imp(and(and(geq(i_0,Z(0(#))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(and(equals(array,null),geq(i,Z(0(#)))),equals(result_1_0,i_0)),geq(i_0,Z(0(#)))),geq(length(null),Z(0(#)))),geq(length(null),i_0)),wellFormed(heap)))),not(imp(and(and(and(and(and(and(leq(length(array),i),geq(i,Z(0(#)))),equals(result_1_0,i_0)),geq(i_0,Z(0(#)))),leq(i_0,i)),geq(length(array),Z(0(#)))),geq(length(array),i_0)),equals(array,null)))))" pathCondition="not(and(and(geq(length(array),Z(0(#))),geq(length(null),Z(0(#)))),or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),geq(length(null),i_0)),equals(array,null)),wellFormed(heap)))),not(imp(and(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),leq(i_0,i)),equals(result_1_0,i_0)),leq(length(array),i)),geq(length(array),i_0)),equals(array,null))))))" pathConditionChanged="true" branchCondition="not(or(or(or(or(and(and(geq(i_0,Z(1(#))),geq(length(array),Z(0(#)))),lt(length(array),i_0)),and(and(leq(i_0,Z(neglit(1(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0))),not(imp(and(and(geq(i_0,Z(0(#))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(and(equals(array,null),geq(i,Z(0(#)))),equals(result_1_0,i_0)),geq(i_0,Z(0(#)))),geq(length(null),Z(0(#)))),geq(length(null),i_0)),wellFormed(heap)))),not(imp(and(and(and(and(and(and(leq(length(array),i),geq(i,Z(0(#)))),equals(result_1_0,i_0)),geq(i_0,Z(0(#)))),leq(i_0,i)),geq(length(array),Z(0(#)))),geq(length(array),i_0)),equals(array,null)))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                  <branchCondition name="not(equals(array,null))" pathCondition="imp(and(geq(length(null),Z(0(#))),geq(length(array),Z(0(#)))),and(not(or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),geq(length(null),i_0)),equals(array,null)),wellFormed(heap)))),not(imp(and(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),leq(i_0,i)),equals(result_1_0,i_0)),leq(length(array),i)),geq(length(array),i_0)),equals(array,null))))),not(equals(array,null))))" pathConditionChanged="true" branchCondition="not(equals(array,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <methodCall name="WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_4,i_4);" pathCondition="imp(and(geq(length(null),Z(0(#))),geq(length(array),Z(0(#)))),and(not(or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),geq(length(null),i_0)),equals(array,null)),wellFormed(heap)))),not(imp(and(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),leq(i_0,i)),equals(result_1_0,i_0)),leq(length(array),i)),geq(length(array),i_0)),equals(array,null))))),not(equals(array,null))))" pathConditionChanged="false">
+                        <branchStatement name="if (i_4&lt;0)" pathCondition="imp(and(geq(length(null),Z(0(#))),geq(length(array),Z(0(#)))),and(not(or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),geq(length(null),i_0)),equals(array,null)),wellFormed(heap)))),not(imp(and(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),leq(i_0,i)),equals(result_1_0,i_0)),leq(length(array),i)),geq(length(array),i_0)),equals(array,null))))),not(equals(array,null))))" pathConditionChanged="false">
+                           <statement name="return i_4&lt;array_4.length;" pathCondition="imp(and(geq(length(null),Z(0(#))),geq(length(array),Z(0(#)))),and(not(or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),geq(length(null),i_0)),equals(array,null)),wellFormed(heap)))),not(imp(and(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),leq(i_0,i)),equals(result_1_0,i_0)),leq(length(array),i)),geq(length(array),i_0)),equals(array,null))))),not(equals(array,null))))" pathConditionChanged="false">
+                              <methodReturn name="&lt;return of WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_4,i_4);&gt;" pathCondition="imp(and(geq(length(null),Z(0(#))),geq(length(array),Z(0(#)))),and(not(or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),geq(length(null),i_0)),equals(array,null)),wellFormed(heap)))),not(imp(and(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),leq(i_0,i)),equals(result_1_0,i_0)),leq(length(array),i)),geq(length(array),i_0)),equals(array,null))))),not(equals(array,null))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return TRUE as result of WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_4,i_4);&gt;" isReturnValueComputed="true">
                                  <methodReturnValue name="TRUE" returnValueString="TRUE" hasCondition="false">
                                  </methodReturnValue>
-                                 <statement name="result_1++;" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt; result_1_0 = i_0))
-   &amp; !array = null" pathConditionChanged="false">
-                                    <statement name="i++;" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt; result_1_0 = i_0))
-   &amp; !array = null" pathConditionChanged="false">
-                                       <termination name="&lt;loop body end&gt;" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt; result_1_0 = i_0))
-   &amp; !array = null" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
+                                 <statement name="result_1++;" pathCondition="imp(and(geq(length(null),Z(0(#))),geq(length(array),Z(0(#)))),and(not(or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),geq(length(null),i_0)),equals(array,null)),wellFormed(heap)))),not(imp(and(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),leq(i_0,i)),equals(result_1_0,i_0)),leq(length(array),i)),geq(length(array),i_0)),equals(array,null))))),not(equals(array,null))))" pathConditionChanged="false">
+                                    <statement name="i++;" pathCondition="imp(and(geq(length(null),Z(0(#))),geq(length(array),Z(0(#)))),and(not(or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),geq(length(null),i_0)),equals(array,null)),wellFormed(heap)))),not(imp(and(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),leq(i_0,i)),equals(result_1_0,i_0)),leq(length(array),i)),geq(length(array),i_0)),equals(array,null))))),not(equals(array,null))))" pathConditionChanged="false">
+                                       <termination name="&lt;loop body end&gt;" pathCondition="imp(and(geq(length(null),Z(0(#))),geq(length(array),Z(0(#)))),and(not(or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),geq(length(null),i_0)),equals(array,null)),wellFormed(heap)))),not(imp(and(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),leq(i_0,i)),equals(result_1_0,i_0)),leq(length(array),i)),geq(length(array),i_0)),equals(array,null))))),not(equals(array,null))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
                                        </termination>
                                     </statement>
                                  </statement>
@@ -97,91 +26,23 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                         </branchStatement>
                      </methodCall>
                   </branchCondition>
-                  <branchCondition name="array = null" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt; result_1_0 = i_0))
-   &amp; array = null" pathConditionChanged="true" branchCondition="array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <methodCall name="WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_3,i_3);" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt; result_1_0 = i_0))
-   &amp; array = null" pathConditionChanged="false">
-                        <branchStatement name="if (i_3&lt;0) {throw new RuntimeException (); }else  {return    i_3&lt;array_3.length; }" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt; result_1_0 = i_0))
-   &amp; array = null" pathConditionChanged="false">
-                           <statement name="return i_3&lt;array_3.length;" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt; result_1_0 = i_0))
-   &amp; array = null" pathConditionChanged="false">
-                              <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="   array.length &gt;= 0
--&gt;   !(    !i_0 = 0
-         &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-         &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
-       | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt; result_1_0 = i_0))
-   &amp; array = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                  <branchCondition name="equals(array,null)" pathCondition="imp(and(geq(length(array),Z(0(#))),geq(length(null),Z(0(#)))),and(not(or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),geq(length(null),i_0)),equals(array,null)),wellFormed(heap)))),not(imp(and(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),leq(i_0,i)),equals(result_1_0,i_0)),leq(length(array),i)),geq(length(array),i_0)),equals(array,null))))),equals(array,null)))" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <methodCall name="WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_3,i_3);" pathCondition="imp(and(geq(length(array),Z(0(#))),geq(length(null),Z(0(#)))),and(not(or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),geq(length(null),i_0)),equals(array,null)),wellFormed(heap)))),not(imp(and(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),leq(i_0,i)),equals(result_1_0,i_0)),leq(length(array),i)),geq(length(array),i_0)),equals(array,null))))),equals(array,null)))" pathConditionChanged="false">
+                        <branchStatement name="if (i_3&lt;0)" pathCondition="imp(and(geq(length(array),Z(0(#))),geq(length(null),Z(0(#)))),and(not(or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),geq(length(null),i_0)),equals(array,null)),wellFormed(heap)))),not(imp(and(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),leq(i_0,i)),equals(result_1_0,i_0)),leq(length(array),i)),geq(length(array),i_0)),equals(array,null))))),equals(array,null)))" pathConditionChanged="false">
+                           <statement name="return i_3&lt;array_3.length;" pathCondition="imp(and(geq(length(array),Z(0(#))),geq(length(null),Z(0(#)))),and(not(or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),geq(length(null),i_0)),equals(array,null)),wellFormed(heap)))),not(imp(and(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),leq(i_0,i)),equals(result_1_0,i_0)),leq(length(array),i)),geq(length(array),i_0)),equals(array,null))))),equals(array,null)))" pathConditionChanged="false">
+                              <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="imp(and(geq(length(array),Z(0(#))),geq(length(null),Z(0(#)))),and(not(or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),geq(length(null),i_0)),equals(array,null)),wellFormed(heap)))),not(imp(and(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),leq(i_0,i)),equals(result_1_0,i_0)),leq(length(array),i)),geq(length(array),i_0)),equals(array,null))))),equals(array,null)))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                               </termination>
                            </statement>
                         </branchStatement>
                      </methodCall>
                   </branchCondition>
                </branchCondition>
-               <branchCondition name="!(    i_0 &gt;= 1
-    &amp; array.length &gt;= 0
-    &amp; array.length &lt;= -1 + i_0
-  | i_0 &lt;= -1
-  &amp; array.length &gt;= 0
-  &amp; array.length &gt;= i_0
-  | !(     i_0 &gt;= 0
-         &amp; array.length &gt;= 0
-         &amp; array.length &gt;= i_0
-      -&gt; result_1_0 = i_0))" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; result_1_0 = i_0)))" pathConditionChanged="true" branchCondition="!(    i_0 &gt;= 1
-    &amp; array.length &gt;= 0
-    &amp; array.length &lt;= -1 + i_0
-  | i_0 &lt;= -1
-  &amp; array.length &gt;= 0
-  &amp; array.length &gt;= i_0
-  | !(     i_0 &gt;= 0
-         &amp; array.length &gt;= 0
-         &amp; array.length &gt;= i_0
-      -&gt; result_1_0 = i_0))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
-                  <statement name="return result_1;" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; result_1_0 = i_0)))" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of WhileWithMethodCallAsConditionFullImplemented.size(array);&gt;" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; result_1_0 = i_0)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return i_0 as result of WhileWithMethodCallAsConditionFullImplemented.size(array);&gt;" isReturnValueComputed="true">
+               <branchCondition name="not(or(or(or(or(and(and(geq(i_0,Z(1(#))),geq(length(array),Z(0(#)))),lt(length(array),i_0)),and(and(leq(i_0,Z(neglit(1(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0))),not(imp(and(and(geq(i_0,Z(0(#))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(and(equals(array,null),geq(i,Z(0(#)))),equals(result_1_0,i_0)),geq(i_0,Z(0(#)))),geq(length(null),Z(0(#)))),geq(length(null),i_0)),wellFormed(heap)))),not(imp(and(and(and(and(and(gt(length(array),i),geq(i,Z(0(#)))),equals(result_1_0,i_0)),geq(i_0,Z(0(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),equals(array,null)))))" pathCondition="not(and(and(geq(length(array),Z(0(#))),geq(length(null),Z(0(#)))),or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),geq(length(null),i_0)),equals(array,null)),wellFormed(heap)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),gt(length(array),i)),geq(length(array),i_0)),equals(array,null))))))" pathConditionChanged="true" branchCondition="not(or(or(or(or(and(and(geq(i_0,Z(1(#))),geq(length(array),Z(0(#)))),lt(length(array),i_0)),and(and(leq(i_0,Z(neglit(1(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0))),not(imp(and(and(geq(i_0,Z(0(#))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(and(equals(array,null),geq(i,Z(0(#)))),equals(result_1_0,i_0)),geq(i_0,Z(0(#)))),geq(length(null),Z(0(#)))),geq(length(null),i_0)),wellFormed(heap)))),not(imp(and(and(and(and(and(gt(length(array),i),geq(i,Z(0(#)))),equals(result_1_0,i_0)),geq(i_0,Z(0(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),equals(array,null)))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                  <statement name="return result_1;" pathCondition="not(and(and(geq(length(array),Z(0(#))),geq(length(null),Z(0(#)))),or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),geq(length(null),i_0)),equals(array,null)),wellFormed(heap)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),gt(length(array),i)),geq(length(array),i_0)),equals(array,null))))))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of WhileWithMethodCallAsConditionFullImplemented.size(array);&gt;" pathCondition="not(and(and(geq(length(array),Z(0(#))),geq(length(null),Z(0(#)))),or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),geq(length(null),i_0)),equals(array,null)),wellFormed(heap)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),gt(length(array),i)),geq(length(array),i_0)),equals(array,null))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return i_0 as result of WhileWithMethodCallAsConditionFullImplemented.size(array);&gt;" isReturnValueComputed="true">
                         <methodReturnValue name="i_0" returnValueString="i_0" hasCondition="false">
                         </methodReturnValue>
-                        <termination name="&lt;end&gt;" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; result_1_0 = i_0)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <termination name="&lt;end&gt;" pathCondition="not(and(and(geq(length(array),Z(0(#))),geq(length(null),Z(0(#)))),or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),geq(length(null),i_0)),equals(array,null)),wellFormed(heap)))),not(imp(and(and(and(and(geq(i,Z(0(#))),geq(i_0,Z(0(#)))),equals(result_1_0,i_0)),gt(length(array),i)),geq(length(array),i_0)),equals(array,null))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

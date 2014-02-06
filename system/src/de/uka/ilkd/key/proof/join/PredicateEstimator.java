@@ -21,8 +21,8 @@ import java.util.TreeSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -146,8 +146,8 @@ class StdPredicateEstimator implements PredicateEstimator{
     
     private Term translate(String estimation, Services services){
             try {
-            KeYParser parser =
-                    new KeYParser (ParserMode.TERM, new KeYLexer ( new StringReader ( estimation ),
+            KeYParserF parser =
+                    new KeYParserF (ParserMode.TERM, new KeYLexerF ( estimation,
                                      services.getExceptionHandler() ), "",
                                      services,   // should not be needed
                                      services.getNamespaces() );

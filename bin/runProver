@@ -100,6 +100,7 @@ list_help(){
   echo "  --J-option: pass option to the JVM following the -J option convention of javac\n"
   echo "Debugging:\n"
   echo "  --K-keydebug: turn debugging on"
+  echo "  --K-headless: use awt headless mode"
   echo "  --K-debugclassloader: switch the Debugclassloadflag on to load classes for debugging"
   echo "  --K-debugprefix <debugclass>: send debug output of debugclass to stadard out"
   echo "  --K-remotedebug [wait] <port>: turn remote debugging on;"
@@ -137,6 +138,11 @@ while [ $# -ne 0 ]; do
 # 	    set ${1#--} #removes the minus from the option, s.t. it can be passed to key as option
 	    list_help
 	    exit;;
+
+        --K-headless) 
+            keysysprops="${keysysprops}-Djava.awt.headless=true "
+            shift
+            continue;;
 
         --K-keydebug) 
             keysysprops="${keysysprops}-DKeyDebugFlag=on "
@@ -198,10 +204,6 @@ while [ $# -ne 0 ]; do
 	    shift
 	    continue;;
 	    
-	--splash)
-	    JAVA_OPTIONS="${JAVA_OPTIONS} -splash:$KEY_HOME/system/resources/de/uka/ilkd/key/gui/images/key-color.gif" 
-	    shift
-	    continue;;
 
          # key options beginning with a minus or filenames  
          *) break;;
@@ -236,4 +238,5 @@ $JAVA $JAVA_OPTIONS $keysysprops \
 -Dkey.simplify.logdir="$KEY_SIMPLIFY_LOG_DIR" \
 -Dkey.ics.logdir="$KEY_ICS_LOG_DIR" \
 -Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler \
+-splash:"$KEY_HOME/system/resources/de/uka/ilkd/key/gui/images/key22.gif" \
 -classpath "$keyclasspath" de.uka.ilkd.key.gui.Main "$@"

@@ -3,7 +3,7 @@
    <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="int[] array = new int[3];" pathCondition="true" pathConditionChanged="false">
          <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
-            <loopStatement name="for (int element : array) {   result_1++; }" pathCondition="true" pathConditionChanged="false">
+            <loopStatement name="for (int element : array)" pathCondition="true" pathConditionChanged="false">
                <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
                   <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
                      <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">

@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.proof.delayedcut;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -212,7 +211,7 @@ public class DelayedCutProcessor implements Runnable {
                 cut.isDecisionPredicateInAntecendet());
         
         ImmutableList<Goal> result= apply(getHideTacletName(cut), goal, pio);
-          cut.setHideApp(result.head().node().getLocalIntroducedRules().iterator().next());
+        cut.setHideApp(result.head().node().getLocalIntroducedRules().iterator().next());
         return result;
     }
     

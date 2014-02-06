@@ -30,9 +30,11 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletInstantiationsTableModel;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.rule.inst.*;
+import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -396,12 +398,42 @@ public abstract class TacletApp implements RuleApp {
      */
     public ImmutableList<Goal> execute(Goal goal, Services services) {
 
+        
+        
 	if (!complete()) {
 	    throw new IllegalStateException("Tried to apply rule \n" + taclet
 		    + "\nthat is not complete.");
 	}
+	
+
+	if (!isExecutable(services)) {
+        throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " + this);
+	}
+    registerSkolemConstants(services);
 	goal.addAppliedRuleApp(this);
 	return taclet().apply(goal, services, this);
+    }
+
+    /*
+     * checks if application conditions are satisfied and returns <code>true</code> if this is the case
+     */
+    public boolean isExecutable(Services services) {
+        // bugfix #1336, see bugtracker
+        if (taclet instanceof RewriteTaclet) {
+            ImmutableList<UpdateLabelPair> oldUpdCtx = 
+                    matchConditions().getInstantiations().getUpdateContext();
+            MatchConditions newConditions = ((RewriteTaclet)taclet).checkPrefix(posInOccurrence(), 
+                    MatchConditions.EMPTY_MATCHCONDITIONS, services);
+            if(newConditions == null) {
+                return false;
+            }
+            ImmutableList<UpdateLabelPair> newUpdCtx =
+                    newConditions.getInstantiations().getUpdateContext();
+            if(!oldUpdCtx.equals(newUpdCtx)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -637,7 +669,9 @@ public abstract class TacletApp implements RuleApp {
             nv = it.next();
             if(nv.first() == sv) {
                 Term term = (Term) instantiations.getInstantiation(nv.second());
-                term.execPostOrder(vcv);
+                if (term != null) {
+                    term.execPostOrder(vcv);
+                }
             }
         }
 
@@ -754,7 +788,7 @@ public abstract class TacletApp implements RuleApp {
 	    final SchemaVariable sv = svIt.next();
 	    if(sv instanceof SkolemTermSV) {
 		final Term inst = (Term) insts.getInstantiation(sv);
-		final Namespace functions = 
+		final Namespace functions =
                         services.getNamespaces().functions();
 
                 // skolem constant might already be registed in

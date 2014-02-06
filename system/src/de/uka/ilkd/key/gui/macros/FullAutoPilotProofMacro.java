@@ -58,5 +58,4 @@ public class FullAutoPilotProofMacro extends SequentialProofMacro {
                 new TryCloseMacro(NUMBER_OF_TRY_STEPS)
         };
     }
-
 }

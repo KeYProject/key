@@ -107,7 +107,7 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> extends KeYEn
                                                          boolean nonExecutionBranchHidingSideProofs,
                                                          boolean aliasChecks) {
       if (proof != null) {
-         StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, true, methodTreatmentContract, loopTreatmentInvariant, nonExecutionBranchHidingSideProofs, aliasChecks);
+         StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, methodTreatmentContract, loopTreatmentInvariant, nonExecutionBranchHidingSideProofs, aliasChecks);
          proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
          proof.getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
          proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfNodesPerBranch));

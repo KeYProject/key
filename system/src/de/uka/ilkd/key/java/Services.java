@@ -76,7 +76,6 @@ public class Services{
      */
     private KeYExceptionHandler exceptionHandler;
     
-
     /**
      * map of names to counters
      */
@@ -118,7 +117,7 @@ public class Services{
     
     // ONLY for tests
     public Services(Profile profile) {
-	this(profile, (KeYExceptionHandler) null);
+	this(profile, null);
     }    
     
 
@@ -127,12 +126,12 @@ public class Services{
    assert profile != null;
    assert counters != null;
    assert caches != null;
+
    this.profile = profile;
    this.counters = counters;
    this.caches = caches;
 	cee = new ConstantExpressionEvaluator(this);
 	typeconverter = new TypeConverter(this);
-	//	exceptionHandler = new KeYRecoderExcHandler();
 	javainfo = new JavaInfo
 	    (new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
 	nameRecorder = new NameRecorder();

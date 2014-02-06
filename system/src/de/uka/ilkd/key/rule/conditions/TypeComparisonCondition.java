@@ -18,6 +18,9 @@ package de.uka.ilkd.key.rule.conditions;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -91,9 +94,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
         }
         Sort fstSort = fst.resolveSort(var, subst, svInst, services);
         Sort sndSort = snd.resolveSort(var, subst, svInst, services);
-        if(fstSort instanceof GenericSort || sndSort instanceof GenericSort) {
-            return false;
-        }
+
         return checkSorts(fstSort, sndSort, services);
     }
 
@@ -101,49 +102,93 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     private boolean checkSorts(final Sort fstSort, 
 	                       final Sort sndSort, 
 	                       final Services services) {
-        switch (mode) {
-        case SAME:
-            return fstSort == sndSort;
-        case NOT_SAME:
-            return fstSort != sndSort;
-        case IS_SUBTYPE:        
-            return fstSort.extendsTrans(sndSort);
-        case STRICT_SUBTYPE:
-            return fstSort != sndSort && fstSort.extendsTrans(sndSort);
-        case NOT_IS_SUBTYPE:	    
-            return !fstSort.extendsTrans(sndSort);        
-        case DISJOINTMODULONULL:
-            return checkDisjointness(fstSort, sndSort, services);
-        default:
-            assert false;
-            return false;
+
+        boolean proxy1 = fstSort instanceof ProxySort;
+        boolean proxy2 = sndSort instanceof ProxySort;
+
+        if(!proxy1 && !proxy2) {
+            // This is the standard case where no proxy sorts are involved
+            switch (mode) {
+            case SAME:
+                return fstSort == sndSort;
+            case NOT_SAME:
+                return fstSort != sndSort;
+            case IS_SUBTYPE:
+                return fstSort.extendsTrans(sndSort);
+            case STRICT_SUBTYPE:
+                return fstSort != sndSort && fstSort.extendsTrans(sndSort);
+            case NOT_IS_SUBTYPE:
+                return !fstSort.extendsTrans(sndSort);
+            case DISJOINTMODULONULL:
+                return checkDisjointness(fstSort, sndSort, services);
+            }
+        } else {
+            switch (mode) {
+            case SAME:
+                return fstSort == sndSort;
+            case IS_SUBTYPE:
+                if(proxy2) {
+                    return false;
+                }
+                // If one of the extended types is a subtype to sndSort, then so
+                // is the proxy sort.
+                assert proxy1;
+                for (Sort extSort : fstSort.extendsSorts()) {
+                    if(extSort.extendsTrans(sndSort)) {
+                        return true;
+                    }
+                }
+                return false;
+            case STRICT_SUBTYPE:
+                if(proxy2) {
+                    return false;
+                }
+                // If one of the extended types is a subtype to sndSort, then so
+                // is the proxy sort.
+                assert proxy1;
+                for (Sort extSort : fstSort.extendsSorts()) {
+                    if(extSort != sndSort && extSort.extendsTrans(sndSort)) {
+                        return true;
+                    }
+                }
+                return false;
+
+            case NOT_SAME:
+            case DISJOINTMODULONULL:
+            case NOT_IS_SUBTYPE:
+                // There are cases where - based on the bounds - true could be returned.
+                // Implement them if needed. There is the Null type to consider as subtype.
+                return false;
+            }
         }
+
+        assert false : "All cases should have been covered";
+        return false;
     }
-    
-    
-    private static Map<Sort,Map<Sort,Boolean>> disjointnessCache 
+
+    private static Map<Sort,Map<Sort,Boolean>> disjointnessCache
     	= new WeakHashMap<Sort,Map<Sort,Boolean>>();
-    
-    
+
+
     private static Boolean lookupInCache(Sort s1, Sort s2) {
 	Boolean result = null;
-	
+
 	Map<Sort,Boolean> map = disjointnessCache.get(s1);
 	if(map != null) {
 	    result = map.get(s2);
 	}
-	
+
 	if(result == null) {
 	    map = disjointnessCache.get(s2);
 	    if(map != null) {
 		result = map.get(s1);
-	    }	    
+	    }
 	}
-	
+
 	return result;
     }
-    
-    
+
+
     private static void putIntoCache(Sort s1, Sort s2, boolean b) {
 	Map<Sort,Boolean> map = disjointnessCache.get(s1);
 	if(map == null) {

@@ -82,7 +82,7 @@ public interface ProofMacro {
     public String getDescription();
 
     /**
-     * Can apply this macro be applied?
+     * Can this macro be applied?
      * 
      * This method should not make any changes but check if the macro can be
      * applied or not in the given context.
@@ -125,4 +125,11 @@ public interface ProofMacro {
      */
     public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc, 
             ProverTaskListener listener) throws InterruptedException;
+
+    /**
+     * Gets the keyboard shortcut to invoke the macro (optional).
+     * 
+     * @return null if no shortcut or the key stroke to invoke the macro.
+     */
+    public javax.swing.KeyStroke getKeyStroke();
 }

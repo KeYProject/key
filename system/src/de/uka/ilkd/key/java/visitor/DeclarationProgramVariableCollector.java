@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.java.visitor;
 
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 

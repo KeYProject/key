@@ -8,42 +8,42 @@
                   <statement name="return c();" pathCondition="true" pathConditionChanged="false">
                      <methodCall name="self.c();" pathCondition="true" pathConditionChanged="false">
                         <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of self.c();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of self.c();&gt;" isReturnValueComputed="true">
-                              <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                           <methodReturn name="&lt;return of self.c();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.c();&gt;" isReturnValueComputed="true">
+                              <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                               </methodReturnValue>
-                              <methodReturn name="&lt;return of self.b();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of self.b();&gt;" isReturnValueComputed="true">
-                                 <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                              <methodReturn name="&lt;return of self.b();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.b();&gt;" isReturnValueComputed="true">
+                                 <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                  </methodReturnValue>
                                  <statement name="int b2 = b();" pathCondition="true" pathConditionChanged="false">
                                     <methodCall name="self.b();" pathCondition="true" pathConditionChanged="false">
                                        <statement name="return c();" pathCondition="true" pathConditionChanged="false">
                                           <methodCall name="self.c();" pathCondition="true" pathConditionChanged="false">
                                              <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
-                                                <methodReturn name="&lt;return of self.c();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of self.c();&gt;" isReturnValueComputed="true">
-                                                   <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                                                <methodReturn name="&lt;return of self.c();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.c();&gt;" isReturnValueComputed="true">
+                                                   <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                    </methodReturnValue>
-                                                   <methodReturn name="&lt;return of self.b();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of self.b();&gt;" isReturnValueComputed="true">
-                                                      <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                                                   <methodReturn name="&lt;return of self.b();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.b();&gt;" isReturnValueComputed="true">
+                                                      <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                       </methodReturnValue>
                                                       <statement name="int c = c();" pathCondition="true" pathConditionChanged="false">
                                                          <methodCall name="self.c();" pathCondition="true" pathConditionChanged="false">
                                                             <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
-                                                               <methodReturn name="&lt;return of self.c();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of self.c();&gt;" isReturnValueComputed="true">
-                                                                  <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                                                               <methodReturn name="&lt;return of self.c();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.c();&gt;" isReturnValueComputed="true">
+                                                                  <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                                   </methodReturnValue>
                                                                   <statement name="return b1+b2+c;" pathCondition="true" pathConditionChanged="false">
-                                                                     <methodReturn name="&lt;return of self.a();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 126 as result of self.a();&gt;" isReturnValueComputed="true">
-                                                                        <methodReturnValue name="126" returnValueString="126" hasCondition="false">
+                                                                     <methodReturn name="&lt;return of self.a();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(6(2(1(#)))) as result of self.a();&gt;" isReturnValueComputed="true">
+                                                                        <methodReturnValue name="Z(6(2(1(#))))" returnValueString="Z(6(2(1(#))))" hasCondition="false">
                                                                         </methodReturnValue>
                                                                         <statement name="int x = x();" pathCondition="true" pathConditionChanged="false">
                                                                            <methodCall name="self.x();" pathCondition="true" pathConditionChanged="false">
                                                                               <statement name="return 2;" pathCondition="true" pathConditionChanged="false">
-                                                                                 <methodReturn name="&lt;return of self.x();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 2 as result of self.x();&gt;" isReturnValueComputed="true">
-                                                                                    <methodReturnValue name="2" returnValueString="2" hasCondition="false">
+                                                                                 <methodReturn name="&lt;return of self.x();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(#)) as result of self.x();&gt;" isReturnValueComputed="true">
+                                                                                    <methodReturnValue name="Z(2(#))" returnValueString="Z(2(#))" hasCondition="false">
                                                                                     </methodReturnValue>
                                                                                     <statement name="return a*x;" pathCondition="true" pathConditionChanged="false">
-                                                                                       <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 252 as result of self.main();&gt;" isReturnValueComputed="true">
-                                                                                          <methodReturnValue name="252" returnValueString="252" hasCondition="false">
+                                                                                       <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(5(2(#)))) as result of self.main();&gt;" isReturnValueComputed="true">
+                                                                                          <methodReturnValue name="Z(2(5(2(#))))" returnValueString="Z(2(5(2(#))))" hasCondition="false">
                                                                                           </methodReturnValue>
                                                                                           <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                                           </termination>

@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -31,11 +32,14 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodyStatement> implements IExecutionMethodCall {
    /**
     * Constructor.
+    * @param settings The {@link ITreeSettings} to use.
     * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
-   public ExecutionMethodCall(KeYMediator mediator, Node proofNode) {
-      super(mediator, proofNode);
+   public ExecutionMethodCall(ITreeSettings settings,
+                              KeYMediator mediator, 
+                              Node proofNode) {
+      super(settings, mediator, proofNode);
    }
 
    /**
