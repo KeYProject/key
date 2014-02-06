@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
+import org.key_project.monkey.product.ui.util.MonKeYUtil;
 import org.key_project.util.java.StringUtil;
 
 /**
@@ -147,7 +148,7 @@ public class MonKeYBatchModeParameters {
    /**
     * The maximal number of rule applications;
     */
-   private int maxRuleApplications = 10000;
+   private int maxRuleApplications = MonKeYUtil.DEFAULT_MAX_RULE_APPLICATIONS;
    
    /**
     * Source locations.
