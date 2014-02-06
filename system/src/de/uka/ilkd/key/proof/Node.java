@@ -38,11 +38,11 @@ public class Node implements Iterable<Node> {
     private static final String NODES = "nodes";
 
     /** the proof the node belongs to */
-    private Proof               proof;
+    private final Proof               proof;
 
     private Sequent              seq                 = Sequent.EMPTY_SEQUENT;
 
-    private List<Node>           children            = new ArrayList<Node>(5);
+    private ArrayList<Node>           children            = new ArrayList<Node>(1);
 
     private Node                 parent              = null;
 
@@ -55,9 +55,9 @@ public class Node implements Iterable<Node> {
     private boolean              closed              = false;
 
     /** contains non-logical content, used for user feedback */
-    private NodeInfo             nodeInfo;
+    private final NodeInfo             nodeInfo;
 
-    private int                  serialNr;
+    private final int                  serialNr;
 
     private int                  siblingNr = -1;
 
@@ -68,7 +68,7 @@ public class Node implements Iterable<Node> {
     /**
      * If the rule base has been extended e.g. by loading a new taclet as
      * lemma or by applying a taclet with an addrule section on this node,
-     * then these taclets are stored in this set
+     * then these taclets are stored in this list
      */
     private ImmutableSet<NoPosTacletApp>  localIntroducedRules = DefaultImmutableSet.<NoPosTacletApp>nil();
 
@@ -87,7 +87,6 @@ public class Node implements Iterable<Node> {
     public Node(Proof proof, Sequent seq) {
 	this ( proof );
 	this.seq=seq;
-        serialNr = proof.getServices().getCounter(NODES).getCountPlusPlus();
     }
 
 
@@ -95,14 +94,9 @@ public class Node implements Iterable<Node> {
      * of children (all elements must be of class Node) and the given
      * parent node.
      */
-    public Node(Proof proof, Sequent seq, List<Node> children,
-		Node parent) {
-	this.proof = proof;
-	this.seq=seq;
-	this.parent=parent;
-	if (children!=null) {this.children=children;}
-        serialNr = proof.getServices().getCounter(NODES).getCountPlusPlus();
-        nodeInfo = new NodeInfo(this);
+    public Node(Proof proof, Sequent seq, Node parent) {
+        this(proof, seq);
+        this.parent=parent;
     }
 
     /** sets the sequent at this node
@@ -162,7 +156,7 @@ public class Node implements Iterable<Node> {
     }
 
     /** Returns the set of NoPosTacletApps at this node */
-    public ImmutableSet<NoPosTacletApp> getLocalIntroducedRules() {
+    public Iterable<NoPosTacletApp> getLocalIntroducedRules() {
 	return localIntroducedRules;
     }
 
@@ -256,11 +250,29 @@ public class Node implements Iterable<Node> {
      */
     public void add(Node child) {
         child.siblingNr = children.size();
-	children.add(child);
-	child.parent = this;
-	proof().fireProofExpanded(this);
+        children.add(child);
+        child.parent = this;
+        proof().fireProofExpanded(this);
     }
 
+    /**
+     *  makes the given node a child of this node.
+     */
+    public void addAll(Node[] newChildren) {
+        final int size = children.size();
+        for (int i = 0; i<newChildren.length; i++) {
+            newChildren[i].siblingNr = i + size; 
+            newChildren[i].parent = this;
+        }        
+        
+        Collections.addAll(children, newChildren);
+        children.trimToSize();
+        
+        proof().fireProofExpanded(this);
+    }
+    
+    
+    
     /** removes child/parent relationship between this node and its
      * parent; if this node is root nothing happens.
      * This is only used for testing purposes.
@@ -299,14 +311,14 @@ public class Node implements Iterable<Node> {
 	final List<Node> leaves = new LinkedList<Node>();
 	final LinkedList<Node> nodesToCheck = new LinkedList<Node>();
 	nodesToCheck.add(this);
-	while (!nodesToCheck.isEmpty()) {
-	    final Node n = nodesToCheck.removeFirst();
+	do {
+	    final Node n = nodesToCheck.poll();
 	    if (n.leaf()) {
 		leaves.add(n);
 	    } else {
 		nodesToCheck.addAll(0, n.children);
 	    }
-	}
+	} while (!nodesToCheck.isEmpty());
     	return leaves;
     }
 

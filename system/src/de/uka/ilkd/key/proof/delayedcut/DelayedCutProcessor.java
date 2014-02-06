@@ -211,7 +211,7 @@ public class DelayedCutProcessor implements Runnable {
                 cut.isDecisionPredicateInAntecendet());
         
         ImmutableList<Goal> result= apply(getHideTacletName(cut), goal, pio);
-          cut.setHideApp(result.head().node().getLocalIntroducedRules().iterator().next());
+        cut.setHideApp(result.head().node().getLocalIntroducedRules().iterator().next());
         return result;
     }
     
