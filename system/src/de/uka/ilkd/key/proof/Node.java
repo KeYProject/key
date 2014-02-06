@@ -24,7 +24,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 
-public class Node implements Iterable<Node> {
+public class Node  {
     private static final String RULE_WITHOUT_NAME = "rule without name";
 
     private static final String RULE_APPLICATION_WITHOUT_RULE = "rule application without rule";
@@ -542,7 +542,7 @@ public class Node implements Iterable<Node> {
     /** checks if an inner node is closeable */
     private boolean isCloseable() {
 	assert childrenCount() > 0;
-	for (Node child: this) {
+	for (Node child: children) {
 	    if ( !child.isClosed() ) {
 		return false;
 	    }
@@ -585,17 +585,8 @@ public class Node implements Iterable<Node> {
         return siblingNr;
     }
 
-
-    /** Iterator over children.
-     * Use <code>leavesIterator()</code> if you need to iterate over leaves instead.
-     */
-    @Override
-    public Iterator<Node> iterator() {
-        return childrenIterator();
-    }
-
     // inner iterator class
-    public static class NodeIterator implements Iterator<Node> {
+    private static class NodeIterator implements Iterator<Node> {
 	private Iterator<Node> it;
 
 	NodeIterator(Iterator<Node> it) {

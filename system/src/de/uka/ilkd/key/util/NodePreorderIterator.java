@@ -16,7 +16,6 @@ package de.uka.ilkd.key.util;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 
 /**
  * <p>

@@ -551,6 +551,7 @@ public final class Goal  {
 	
 	final Node parent = node; // has to be stored because the node
 	// of this goal will be replaced
+	
 	if (n == 1) {
 	    Node newNode = new Node(parent.proof(),
                 parent.sequent(),
@@ -561,7 +562,7 @@ public final class Goal  {
         parent.add(newNode);
         this.setNode(newNode);
         goalList = goalList.prepend(this);  
-	} else if (n > 0) {
+	} else if (n > 1) { // this would also work for n ==1 but the above avoids unnecessary creation of arrays
 	    Node[] newNode = new Node[n];
 
 	    for (int i = 0; i<n; i++) {
