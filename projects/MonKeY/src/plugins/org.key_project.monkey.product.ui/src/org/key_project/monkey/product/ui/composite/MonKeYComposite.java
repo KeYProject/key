@@ -352,6 +352,7 @@ public class MonKeYComposite extends Composite implements IProofProvider {
         maxRuleGroup.setLayout(new GridLayout(1, false));
         maxRuleGroup.setText("Max. Rule Applications");
         maxRuleText = new Text(maxRuleGroup, SWT.BORDER);
+        maxRuleText.setText(MonKeYUtil.DEFAULT_MAX_RULE_APPLICATIONS + StringUtil.EMPTY_STRING);
         maxRuleText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         maxRuleText.addVerifyListener(new IntegerVerifyListener(0, Integer.MAX_VALUE, true));
         Group methodTreatmentGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
@@ -1047,7 +1048,7 @@ public class MonKeYComposite extends Composite implements IProofProvider {
             proofDirectory = memento.getString(MEMENTO_KEY_PROOF_DIRECTORY);
             String maxRules = memento.getString(MEMENTO_KEY_MAX_RULES);
             if (StringUtil.isTrimmedEmpty(maxRules)) {
-               maxRuleText.setText("10000");
+               maxRuleText.setText(MonKeYUtil.DEFAULT_MAX_RULE_APPLICATIONS + StringUtil.EMPTY_STRING);
             }
             else {
                SWTUtil.setText(maxRuleText, maxRules);                
