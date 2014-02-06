@@ -44,6 +44,11 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
  */
 public final class MonKeYUtil {
    /**
+    * The default value of maximal rule applications used by MonKeY.
+    */
+   public static final int DEFAULT_MAX_RULE_APPLICATIONS = 10000;
+   
+   /**
     * Forbid instances.
     */
    private MonKeYUtil() {
