@@ -19,6 +19,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.swing.AbstractAction;
@@ -356,7 +357,7 @@ public class ProofDiffFrame extends JFrame {
             return node;
         }
 
-        NodeIterator it = node.childrenIterator();
+        Iterator<Node> it = node.childrenIterator();
         while(it.hasNext()) {
             Node n = it.next();
             if(n.serialNr() <= number) {

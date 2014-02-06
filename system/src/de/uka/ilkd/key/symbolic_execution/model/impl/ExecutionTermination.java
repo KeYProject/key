@@ -206,7 +206,7 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
          // Check if node can be treated as verified/closed
          if (predicate != null) {
             boolean verified = true;
-            NodeIterator leafsIter = getProofNode().leavesIterator();
+            Iterator<Node> leafsIter = getProofNode().leavesIterator();
             while (verified && leafsIter.hasNext()) {
                Node leaf = leafsIter.next();
                if (!leaf.isClosed()) {

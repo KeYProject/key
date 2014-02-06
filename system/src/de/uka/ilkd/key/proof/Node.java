@@ -42,7 +42,7 @@ public class Node implements Iterable<Node> {
 
     private Sequent              seq                 = Sequent.EMPTY_SEQUENT;
 
-    private ArrayList<Node>           children            = new ArrayList<Node>(1);
+    private ArrayList<Node>      children            = new ArrayList<Node>(1);
 
     private Node                 parent              = null;
 
@@ -327,19 +327,19 @@ public class Node implements Iterable<Node> {
      * returns an iterator for the leaves of the subtree below this
      * node. The computation is called at every call!
      */
-    public NodeIterator leavesIterator() {
+    public Iterator<Node> leavesIterator() {
 	return new NodeIterator(leaves().iterator());
     }
 
     /** returns an iterator for the direct children of this node.
      */
-    public NodeIterator childrenIterator() {
+    public Iterator<Node> childrenIterator() {
 	return new NodeIterator(children.iterator());
     }
 
     /** returns an iterator for all nodes in the subtree.
      */
-    public NodeIterator subtreeIterator() {
+    public Iterator<Node> subtreeIterator() {
         return new SubtreeIterator(this);
     }
 
@@ -558,7 +558,7 @@ public class Node implements Iterable<Node> {
      * retrieves number of nodes
      */
     public int countNodes() {
-        NodeIterator it = subtreeIterator();
+        Iterator<Node> it = subtreeIterator();
         int res = 0;
         for (; it.hasNext(); it.next()) res++;
         return res;
@@ -596,29 +596,10 @@ public class Node implements Iterable<Node> {
 
     // inner iterator class
     public static class NodeIterator implements Iterator<Node> {
-	protected Iterator<Node> it;
+	private Iterator<Node> it;
 
 	NodeIterator(Iterator<Node> it) {
 	    this.it=it;
-	}
-
-	/** Mock-up iterator for testing purposes. */
-	private NodeIterator() {
-	    it = new Iterator<Node>(){
-
-            @Override
-            public boolean hasNext() {
-                return false;
-            }
-
-            @Override
-            public Node next() {
-                return null;
-            }
-
-            @Override
-            public void remove() {
-            }};
 	}
 
 	public boolean hasNext() {
@@ -639,7 +620,7 @@ public class Node implements Iterable<Node> {
      * Current implementation iteratively traverses the tree depth-first.
      * @author bruns
      */
-    private static class SubtreeIterator extends NodeIterator {
+    private static class SubtreeIterator implements Iterator<Node> {
         private Node n;
         private boolean atRoot = true; // special handle
 
@@ -677,6 +658,11 @@ public class Node implements Iterable<Node> {
                 if (s != null) n = s;
             } else n = n.child(0);
             return n;
+        }
+        
+        public void remove() {
+            throw new UnsupportedOperationException("Changing the proof tree " +
+                    "structure this way is not allowed.");
         }
     }
  }

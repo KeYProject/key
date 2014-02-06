@@ -1693,7 +1693,7 @@ public final class SymbolicExecutionUtil {
       ImmutableList<Goal> result = ImmutableSLList.nil();
       if (node != null) {
          Proof proof = node.proof();
-         NodeIterator iter = node.leavesIterator();
+         Iterator<Node> iter = node.leavesIterator();
          while (iter.hasNext()) {
             Node next = iter.next();
             Goal nextGoal = proof.getGoal(next);

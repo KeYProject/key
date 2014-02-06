@@ -1026,7 +1026,7 @@ public class Proof implements Named {
 
 
         private Statistics(Proof proof) {
-            final NodeIterator it = proof.root().subtreeIterator();
+            final Iterator<Node> it = proof.root().subtreeIterator();
 
             int tmpNodes = 0;
             int tmpBranches = 1;

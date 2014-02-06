@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof.delayedcut;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -82,7 +83,7 @@ public interface ApplicationCheck {
 					}
 				}
 
-				for(NodeIterator it = next.childrenIterator(); it.hasNext();){
+				for(Iterator<Node> it = next.childrenIterator(); it.hasNext();){
 					queue.add(it.next());
 				}
 			}
