@@ -185,8 +185,12 @@ public final class RewriteTaclet extends FindTaclet {
 	            (op instanceof Modality || op instanceof ModalOperatorSV)) {
 	        return null;
 	    }
-	    polarity = polarity(op, it, polarity);
+	    
+	    if (polarity != 0) {
+	        polarity = polarity(op, it, polarity);
+	    }
 	}
+	
 	if (getApplicationRestriction() == NONE)
             return p_mc;
 	if (((getApplicationRestriction() & ANTECEDENT_POLARITY) != 0 && polarity != -1) ||
