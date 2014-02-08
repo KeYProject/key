@@ -418,8 +418,7 @@ public class NoPosTacletApp extends TacletApp {
         
 	if ( taclet() instanceof RewriteTaclet ) {
 	    mc = ((RewriteTaclet)taclet ()).checkPrefix ( pos,
-								mc,
-								services );
+								mc );
 	    if (mc == null) {
                 Debug.out("NoPosTacletApp: Update prefix check failed.");
             }

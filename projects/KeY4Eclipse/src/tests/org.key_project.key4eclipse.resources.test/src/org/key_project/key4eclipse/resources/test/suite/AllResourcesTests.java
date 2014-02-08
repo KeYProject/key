@@ -21,5 +21,5 @@ import org.key_project.key4eclipse.resources.test.testcase.junit.ProofMetaFileCo
    HideMetaFilesTests.class,
    ProofMetaFileContentExceptionTests.class
 })
-public class AllUnitTests {
+public class AllResourcesTests {
 }

@@ -98,6 +98,19 @@ public final class Goal  {
         setRuleAppManager ( ruleAppManager );
     }
 
+    private Goal( Node                    node,
+            RuleAppIndex            ruleAppIndex,
+            ImmutableList<RuleApp>           appliedRuleApps,
+            AutomatedRuleApplicationManager ruleAppManager ) {
+      this.node            = node;
+      this.ruleAppIndex    = ruleAppIndex;
+      this.appliedRuleApps = appliedRuleApps;
+      this.goalStrategy    = null;
+      this.ruleAppIndex.setup ( this );
+      setRuleAppManager ( ruleAppManager );
+      this.tagManager      = new FormulaTagManager ( this );;
+      }
+    
     /**
      * creates a new goal referencing the given node
      */
@@ -156,14 +169,13 @@ public final class Goal  {
     }
 
     public ImmutableSet<ProgramVariable> getGlobalProgVars() {
-	return node().getGlobalProgVars();
+	return node.getGlobalProgVars();
     }
 
     public Namespace createGlobalProgVarNamespace() {
-        final Namespace ns = new Namespace();
-        final Iterator<ProgramVariable> it = getGlobalProgVars().iterator();
-        while (it.hasNext()) {
-            ns.add(it.next());
+        final Namespace ns = new Namespace();        
+        for (final ProgramVariable pv : getGlobalProgVars()) {
+            ns.add(pv);
         }
         return ns;
     }
@@ -432,13 +444,13 @@ public final class Goal  {
     public void addTaclet(Taclet           rule,
 			  SVInstantiations insts,
 			  boolean          isAxiom) {
-	NoPosTacletApp tacletApp =
-	    NoPosTacletApp.createFixedNoPosTacletApp(rule,
+        NoPosTacletApp tacletApp =
+                NoPosTacletApp.createFixedNoPosTacletApp(rule,
 		    				     insts,
 		    				     proof().getServices());
 	if (tacletApp != null) {
 	    addNoPosTacletApp(tacletApp);
- 	    if (proof().env()!=null) { // do not break everything
+ 	    if (proof().env() != null) { // do not break everything
                                        // because of ProofMgt
 		proof().env().registerRuleIntroducedAtNode(
 		        tacletApp,
@@ -483,28 +495,31 @@ public final class Goal  {
 
     /**
      * clones the goal (with copy of tacletindex and ruleAppIndex)
+     * @param node the new Node to which the goal is attached
      * @return Object the clone
      */
     @SuppressWarnings("unchecked")
-    public Object clone() {
-	Goal clone = new Goal ( node,
-	                        ruleAppIndex.copy (),
-	                        appliedRuleApps,
-	                        getFormulaTagManager ().copy (),
-				ruleAppManager.copy () );
-	clone.listeners = (List<GoalListener>)
-	    ((ArrayList<GoalListener>) listeners).clone();
-	clone.automatic = this.automatic;
-	return clone;
+    public Goal clone(Node node) {    
+        Goal clone;
+        if (node.sequent() != this.node.sequent()) {
+            clone = new Goal ( node,
+                    ruleAppIndex.copy (),
+                    appliedRuleApps,
+                    ruleAppManager.copy () );
+        } else {
+            clone = new Goal ( node,
+                    ruleAppIndex.copy (),
+                    appliedRuleApps,
+                    getFormulaTagManager ().copy (),
+                    ruleAppManager.copy () );
+        }
+        clone.listeners = (List<GoalListener>)
+                ((ArrayList<GoalListener>) listeners).clone();
+        clone.automatic = this.automatic;
+        return clone;
     }
 
-    /** like the clone method but returns right type
-     * @return Goal clone of this Goal
-     */
-    public Goal copy() {
-	return (Goal)clone();
-    }
-
+    
     /**
      * puts a RuleApp to the list of the applied rule apps at this goal
      * and stores it in the node of the goal
@@ -533,34 +548,41 @@ public final class Goal  {
      */
     public ImmutableList<Goal> split(int n) {
 	ImmutableList<Goal> goalList=ImmutableSLList.<Goal>nil();
-	Node parent = node(); // has to be stored because the node
-	                      // of this goal will be replaced
-        if (n>0) {
-	    Node newNode;
-	    Goal newGoal;
+	
+	final Node parent = node; // has to be stored because the node
+	// of this goal will be replaced
+	
+	if (n == 1) {
+	    Node newNode = new Node(parent.proof(),
+                parent.sequent(),
+                parent);
 
-	    for (int i=0;i<n;i++) {
-		if (i==0) { // first new goal is this one
-		    newGoal = this;
-		} else { // otherwise it is a copy
-		    newGoal = copy();
-		}
-		// create new node and add to tree
+        // newNode.addNoPosTacletApps(parent.getNoPosTacletApps());
+        newNode.setGlobalProgVars(parent.getGlobalProgVars());
+        parent.add(newNode);
+        this.setNode(newNode);
+        goalList = goalList.prepend(this);  
+	} else if (n > 1) { // this would also work for n ==1 but the above avoids unnecessary creation of arrays
+	    Node[] newNode = new Node[n];
 
-		newNode = new Node(parent.proof(),
-			parent.sequent(),
-			null,
-			parent);
+	    for (int i = 0; i<n; i++) {
+	        // create new node and add to tree
+	        newNode[i] = new Node(parent.proof(),
+	                parent.sequent(),
+	                parent);
 
-		// newNode.addNoPosTacletApps(parent.getNoPosTacletApps());
-		newNode.setGlobalProgVars(parent.getGlobalProgVars());
-		parent.add(newNode);
-
-		// make new Goal and add to list
-		newGoal.setNode(newNode);
-
-		goalList = goalList.prepend(newGoal);
+	        // newNode[i].addNoPosTacletApps(parent.getNoPosTacletApps());
+	        newNode[i].setGlobalProgVars(parent.getGlobalProgVars());
 	    }
+
+        parent.addAll(newNode);
+
+        this.setNode(newNode[0]);
+        goalList = goalList.prepend(this);      
+	    
+        for (int i = 1; i<n; i++) {
+            goalList = goalList.prepend(clone(newNode[i]));	    
+        }	    
 	}
 
 	fireGoalReplaced ( this, parent, goalList );
@@ -569,7 +591,6 @@ public final class Goal  {
     }
 
     private void resetTagManager() {
-
         tagManager = new FormulaTagManager ( this );
     }
 
@@ -582,40 +603,13 @@ public final class Goal  {
             removeLastAppliedRuleApp();
     }
 
-    public ImmutableList<Goal> apply( RuleApp p_ruleApp ) {
+    public ImmutableList<Goal> apply(final RuleApp ruleApp ) {
 
         final Proof proof = proof();
 
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);
         addGoalListener(journal);
-
-        final RuleApp ruleApp = p_ruleApp;
-        if(ruleApp instanceof TacletApp) {
-            TacletApp tacletApp = (TacletApp)ruleApp;
-            tacletApp.registerSkolemConstants(proof.getServices());
-            Taclet t = tacletApp.taclet();
-
-            // bugfix #1336, see bugtracker
-            if (t instanceof RewriteTaclet) {
-                RewriteTaclet rwt = (RewriteTaclet) t;
-                ImmutableList<UpdateLabelPair> oldUpdCtx = 
-                        tacletApp.matchConditions().getInstantiations().getUpdateContext();
-                MatchConditions newConditions = rwt.checkPrefix(ruleApp.posInOccurrence(), 
-                        MatchConditions.EMPTY_MATCHCONDITIONS, proof.getServices());
-                if(newConditions == null) {
-                    throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " 
-                            + ruleApp);
-                }
-                ImmutableList<UpdateLabelPair> newUpdCtx =
-                        newConditions.getInstantiations().getUpdateContext();
-                if(!oldUpdCtx.equals(newUpdCtx)) {
-                    System.err.println("old context: " + oldUpdCtx);
-                    System.err.println("new context: " + oldUpdCtx);
-                    throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " 
-                                + ruleApp);
-                }
-            }
-        }
+      
 
         final Node n = node;
 
@@ -636,7 +630,7 @@ public final class Goal  {
         }
         }
 
-        final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(p_ruleApp);
+        final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(ruleApp);
 
         if ( goalList != null )
             proof.fireRuleApplied( new ProofEvent ( proof, ruleAppInfo ) );

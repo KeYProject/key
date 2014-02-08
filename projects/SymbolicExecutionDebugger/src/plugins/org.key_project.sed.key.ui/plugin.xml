@@ -515,9 +515,6 @@
                icon="icons/configurations_object_diagram.gif"
                id="org.key_project.sed.key.ui.ConfigurationObjectDiagramEditor"
                name="Configurations Object Diagram Editor">
-            <contentTypeBinding
-                  contentTypeId="org.eclipse.graphiti.content.diagram">
-            </contentTypeBinding>
          </editor>
       </extension>
       <extension

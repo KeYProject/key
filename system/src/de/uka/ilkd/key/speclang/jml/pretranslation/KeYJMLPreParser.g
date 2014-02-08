@@ -50,6 +50,8 @@ options {
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 }
 
+@annotateclass{ @SuppressWarnings("all") } 
+
 @members {
     private KeYJMLPreLexer lexer;
     private SLTranslationExceptionManager excManager;

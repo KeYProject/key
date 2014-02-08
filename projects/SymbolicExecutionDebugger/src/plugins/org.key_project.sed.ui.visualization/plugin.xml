@@ -96,20 +96,15 @@
              icon="icons/symbolic_debug.gif"
              id="org.key_project.sed.ui.visualization.symbolicExecutionTreeDiagramEditor"
              name="Symbolic Execution Tree Diagram Editor">
-          <contentTypeBinding
-                contentTypeId="org.eclipse.graphiti.content.diagram">
-          </contentTypeBinding>
        </editor>
        <editor
              class="org.eclipse.ui.editors.text.TextEditor"
              contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
-             default="false"
+             default="true"
+             extensions="set"
              icon="icons/symbolic_debug.gif"
              id="org.key_project.sed.ui.visualization.symbolicExecutionTreeEditor"
              name="Symbolic Execution Tree Editor">
-          <contentTypeBinding
-                contentTypeId="org.eclipse.core.runtime.xml">
-          </contentTypeBinding>
        </editor>
        <editor
              class="org.key_project.sed.ui.visualization.object_diagram.editor.ObjectDiagramEditor"
@@ -119,9 +114,6 @@
              icon="icons/object_diagram.gif"
              id="org.key_project.sed.ui.visualization.ObjectDiagramEditor"
              name="Object Diagram Editor">
-          <contentTypeBinding
-                contentTypeId="org.eclipse.graphiti.content.diagram">
-          </contentTypeBinding>
        </editor>
        <editor
              class="org.key_project.sed.ui.visualization.object_diagram.editor.ReadonlyObjectDiagramEditor"
@@ -130,9 +122,6 @@
              icon="icons/object_diagram.gif"
              id="org.key_project.sed.ui.visualization.ReadonlyObjectDiagramEditor"
              name="Read-only Object Diagram Editor">
-          <contentTypeBinding
-                contentTypeId="org.eclipse.graphiti.content.diagram">
-          </contentTypeBinding>
        </editor>
     </extension>
     <extension
@@ -140,6 +129,10 @@
        <file-association
              content-type="org.eclipse.graphiti.content.diagram"
              file-extensions="set_diagram">
+       </file-association>
+       <file-association
+             content-type="org.eclipse.graphiti.content.diagram"
+             file-extensions="od">
        </file-association>
        <file-association
              content-type="org.eclipse.core.runtime.xml"

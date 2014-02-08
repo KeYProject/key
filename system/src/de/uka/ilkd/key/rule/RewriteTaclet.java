@@ -159,8 +159,7 @@ public final class RewriteTaclet extends FindTaclet {
      * <code>p_pos</code>
      */
     public MatchConditions checkPrefix(PosInOccurrence p_pos,
-                                       MatchConditions p_mc,
-                                       Services        p_services) {
+                                       MatchConditions p_mc) {
 	int polarity = p_pos.isInAntec() ? -1 : 1;  // init polarity
 	SVInstantiations svi = p_mc.getInstantiations ();
 	// this is assumed to hold
@@ -186,8 +185,12 @@ public final class RewriteTaclet extends FindTaclet {
 	            (op instanceof Modality || op instanceof ModalOperatorSV)) {
 	        return null;
 	    }
-	    polarity = polarity(op, it, polarity);
+	    
+	    if (polarity != 0) {
+	        polarity = polarity(op, it, polarity);
+	    }
 	}
+	
 	if (getApplicationRestriction() == NONE)
             return p_mc;
 	if (((getApplicationRestriction() & ANTECEDENT_POLARITY) != 0 && polarity != -1) ||
