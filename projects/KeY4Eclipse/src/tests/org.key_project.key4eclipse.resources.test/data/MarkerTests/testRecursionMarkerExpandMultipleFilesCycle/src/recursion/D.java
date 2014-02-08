@@ -1,12 +1,12 @@
 package recursion;
 
-public class Rec2 {
+public class D {
 	
 	static int i = 0;
 	
     //@ public normal_behavior requires i>=0 && i<=2; ensures true;
-    public static void z() {
-        if (i>=0) Rec0.x();
+    public static void d() {
+        if (i>=0) E.e();
         i--;
     }
 }

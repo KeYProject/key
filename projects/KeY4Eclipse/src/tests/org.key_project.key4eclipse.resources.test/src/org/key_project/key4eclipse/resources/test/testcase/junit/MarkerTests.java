@@ -28,6 +28,7 @@ import org.key_project.key4eclipse.resources.test.Activator;
 import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
 
 // TODO: Test also the line number in all tests!
 public class MarkerTests extends AbstractResourceTest {
@@ -100,6 +101,34 @@ public class MarkerTests extends AbstractResourceTest {
    public void testFullBuildSingleThreadRecursionMarkerMultipleFilesCycle() throws CoreException, InterruptedException, IOException{
       IProject project = KeY4EclipseResourcesTestUtil.initializeTest("MarkerTests_testFullBuildSingleThreadRecursionMarkerMultipleFilesCycle", true, false, false, 1, false, false);
       testRecursionMarkerMultipleFilesCycle(project);
+      project.close(null);
+   }
+   
+   @Test
+   public void testFullBuildSingleThreadRecursionMarkerRemoveMultipleFilesCycle() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("MarkerTests_testFullBuildSingleThreadRecursionMarkerRemoveMultipleFilesCycle", true, false, false, 1, false, false);
+      testRecursionMarkerRemoveMultipleFilesCycle(project);
+      project.close(null);
+   }
+   
+   @Test
+   public void testFullBuildSingleThreadRecursionMarkerChangeMultipleFilesCycle() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("MarkerTests_testFullBuildSingleThreadRecursionMarkerChangeMultipleFilesCycle", true, false, false, 1, false, false);
+      testRecursionMarkerChangeMultipleFilesCycle(project);
+      project.close(null);
+   }
+   
+   @Test
+   public void testFullBuildSingleThreadRecursionMarkerExpandMultipleFilesCycle() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("MarkerTests_testFullBuildSingleThreadRecursionMarkerExpandMultipleFilesCycle", true, false, false, 1, false, false);
+      testRecursionMarkerExpandMultipleFilesCycle(project);
+      project.close(null);
+   }
+   
+   @Test
+   public void testFullBuildSingleThreadRecursionMarkerMultipleFilesDoubleCycle() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("MarkerTests_testFullBuildSingleThreadRecursionMarkerMultipleFilesDoubleCycle", true, false, false, 1, false, false);
+      testRecursionMarkerMultipleFilesDoubleCycle(project);
       project.close(null);
    }
    
@@ -181,6 +210,34 @@ public class MarkerTests extends AbstractResourceTest {
       testRecursionMarkerMultipleFilesCycle(project);
       project.close(null);
    }
+   
+   @Test
+   public void testFullBuildMultipleThreadsRecursionMarkerRemoveMultipleFilesCycle() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("MarkerTests_testFullBuildMultipleThreadsRecursionMarkerRemoveMultipleFilesCycle", true, false, true, 2, false, false);
+      testRecursionMarkerRemoveMultipleFilesCycle(project);
+      project.close(null);
+   }
+   
+   @Test
+   public void testFullBuildMultipleThreadsRecursionMarkerChangeMultipleFilesCycle() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("MarkerTests_testFullBuildMultipleThreadsRecursionMarkerChangeMultipleFilesCycle", true, false, true, 2, false, false);
+      testRecursionMarkerChangeMultipleFilesCycle(project);
+      project.close(null);
+   }
+   
+   @Test
+   public void testFullBuildMultipleThreadsRecursionMarkerExpandMultipleFilesCycle() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("MarkerTests_testFullBuildMultipleThreadsRecursionMarkerExpandMultipleFilesCycle", true, false, true, 2, false, false);
+      testRecursionMarkerExpandMultipleFilesCycle(project);
+      project.close(null);
+   }
+   
+   @Test
+   public void testFullBuildMultipleThreadsRecursionMarkerMultipleFilesDoubleCycle() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("MarkerTests_testFullBuildMultipleThreadsRecursionMarkerMultipleFilesDoubleCycle", true, false, true, 2, false, false);
+      testRecursionMarkerMultipleFilesDoubleCycle(project);
+      project.close(null);
+   }
 
    @Test
    public void testFullBuildMultipleThreadsProblemLoaderExceptionHandler() throws CoreException, InterruptedException{
@@ -260,6 +317,34 @@ public class MarkerTests extends AbstractResourceTest {
       testRecursionMarkerMultipleFilesCycle(project);
       project.close(null);
    }
+   
+   @Test
+   public void testEfficientBuildSingleThreadRecursionMarkerRemoveMultipleFilesCycle() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("MarkerTests_testEfficientBuildSingleThreadRecursionMarkerRemoveMultipleFilesCycle", true, true, false, 1, false, false);
+      testRecursionMarkerRemoveMultipleFilesCycle(project);
+      project.close(null);
+   }
+   
+   @Test
+   public void testEfficientBuildSingleThreadRecursionMarkerChangeMultipleFilesCycle() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("MarkerTests_testEfficientBuildSingleThreadRecursionMarkerChangeMultipleFilesCycle", true, true, false, 1, false, false);
+      testRecursionMarkerChangeMultipleFilesCycle(project);
+      project.close(null);
+   }
+   
+   @Test
+   public void testEfficientBuildSingleThreadRecursionMarkerExpandMultipleFilesCycle() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("MarkerTests_testEfficientBuildSingleThreadRecursionMarkerExpandMultipleFilesCycle", true, true, false, 1, false, false);
+      testRecursionMarkerExpandMultipleFilesCycle(project);
+      project.close(null);
+   }
+   
+   @Test
+   public void testEfficientBuildSingleThreadRecursionMarkerMultipleFilesDoubleCycle() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("MarkerTests_testEfficientBuildSingleThreadRecursionMarkerMultipleFilesDoubleCycle", true, true, false, 1, false, false);
+      testRecursionMarkerMultipleFilesDoubleCycle(project);
+      project.close(null);
+   }
 
    @Test
    public void testEfficientBuildSingleThreadProblemLoaderExceptionHandler() throws CoreException, InterruptedException{
@@ -337,6 +422,34 @@ public class MarkerTests extends AbstractResourceTest {
    public void testEfficientBuildMultipleThreadsRecursionMarkerMultipleFilesCycle() throws CoreException, InterruptedException, IOException{
       IProject project = KeY4EclipseResourcesTestUtil.initializeTest("MarkerTests_testEfficientBuildMultipleThreadsRecursionMarkerMultipleFilesCycle", true, true, true, 2, false, false);
       testRecursionMarkerMultipleFilesCycle(project);
+      project.close(null);
+   }
+   
+   @Test
+   public void testEfficientBuildMultipleThreadsRecursionMarkerRemoveMultipleFilesCycle() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("MarkerTests_testEfficientBuildMultipleThreadsRecursionMarkerRemoveMultipleFilesCycle", true, true, true, 2, false, false);
+      testRecursionMarkerRemoveMultipleFilesCycle(project);
+      project.close(null);
+   }
+   
+   @Test
+   public void testEfficientBuildMultipleThreadsRecursionMarkerChangeMultipleFilesCycle() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("MarkerTests_testEfficientBuildMultipleThreadsRecursionMarkerChangeMultipleFilesCycle", true, true, true, 2, false, false);
+      testRecursionMarkerChangeMultipleFilesCycle(project);
+      project.close(null);
+   }
+   
+   @Test
+   public void testEfficientBuildMultipleThreadsRecursionMarkerExpandMultipleFilesCycle() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("MarkerTests_testEfficientBuildMultipleThreadsRecursionMarkerExpandMultipleFilesCycle", true, true, true, 2, false, false);
+      testRecursionMarkerExpandMultipleFilesCycle(project);
+      project.close(null);
+   }
+   
+   @Test
+   public void testEfficientBuildMultipleThreadsRecursionMarkerMultipleFilesDoubleCycle() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("MarkerTests_testEfficientBuildMultipleThreadsRecursionMarkerMultipleFilesDoubleCycle", true, true, true, 2, false, false);
+      testRecursionMarkerMultipleFilesDoubleCycle(project);
       project.close(null);
    }
 
@@ -480,6 +593,15 @@ public class MarkerTests extends AbstractResourceTest {
             project.getFullPath().append("src").append("IntegerUtil.java"));
       IFile javaFile1 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("src").append("MultipleRecursion.java"));
+      IFile tmpProofFile2 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("proofs").append("MultipleRecursion.java").append("0.proof"));
+      IFile tmpProofFile3 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("proofs").append("MultipleRecursion.java").append("1.proof"));
+      IFile tmpMetaFile2 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("proofs").append("MultipleRecursion.java").append("0.proofmeta"));
+      IFile tmpMetaFile3 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("proofs").append("MultipleRecursion.java").append("1.proofmeta"));
+      
       IFile proofFile0 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("IntegerUtil.java").append("IntegerUtil[IntegerUtil__add(int,int)]_JML_normal_behavior_operation_contract_0.proof"));
       IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
@@ -495,9 +617,13 @@ public class MarkerTests extends AbstractResourceTest {
       
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testRecursionMarkerChangeOtherFile/src", project.getFolder("src"), true);
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testRecursionMarkerChangeOtherFile/proofs", project.getFolder("proofs"), true);
+      
+      createNewFile(proofFile2, tmpProofFile2);
+      createNewFile(proofFile3, tmpProofFile3);
+      createNewFile(metaFile2, tmpMetaFile2);
+      createNewFile(metaFile3, tmpMetaFile3);
 
       KeY4EclipseResourcesTestUtil.build(project);
-      
       assertTrue(javaFile0.exists() && javaFile1.exists());
       assertTrue(proofFile0.exists() && proofFile1.exists() && proofFile2.exists() && proofFile3.exists());
       assertTrue(metaFile0.exists() && metaFile1.exists() && metaFile2.exists() && metaFile3.exists());
@@ -595,11 +721,11 @@ public class MarkerTests extends AbstractResourceTest {
 
    private void testRecursionMarkerMultipleFilesCycle(IProject project) throws CoreException, IOException{
       IFile javaFile0 = KeY4EclipseResourcesTestUtil.getFile(
-            project.getFullPath().append("src").append("recursion").append("Rec0.java"));
+            project.getFullPath().append("src").append("recursion").append("A.java"));
       IFile javaFile1 = KeY4EclipseResourcesTestUtil.getFile(
-            project.getFullPath().append("src").append("recursion").append("Rec1.java"));
+            project.getFullPath().append("src").append("recursion").append("B.java"));
       IFile javaFile2 = KeY4EclipseResourcesTestUtil.getFile(
-            project.getFullPath().append("src").append("recursion").append("Rec2.java"));
+            project.getFullPath().append("src").append("recursion").append("C.java"));
       
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testRecursionMarkerMultipleFilesCycle/", project.getFolder("src"), true);
       
@@ -613,25 +739,267 @@ public class MarkerTests extends AbstractResourceTest {
       assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile2) == 1);
 
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile0);
-      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 154, 155));
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
       
       markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile1);
-      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 154, 155));
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
       
       markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile2);
-      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 154, 155));
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
    }
    
    private void testRecursionMarkerRemoveMultipleFilesCycle(IProject project) throws CoreException, IOException{
-   
+      IFile javaFile0 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("recursion").append("A.java"));
+      IFile javaFile1 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("recursion").append("B.java"));
+      
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testRecursionMarkerRemoveMultipleFilesCycle/src/", project.getFolder("src"), true);
+      
+      KeY4EclipseResourcesTestUtil.build(project);
+      
+      assertTrue(javaFile0.exists() && javaFile1.exists());
+
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(project) == 2);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile0) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile1) == 1);
+
+      LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile0);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+      
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile1);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+      
+      InputStream is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/MarkerTests/testRecursionMarkerRemoveMultipleFilesCycle/removedCycle/A.java");
+      javaFile0.setContents(IOUtil.unifyLineBreaks(is), IResource.FORCE, null);
+      is.close();
+      
+      KeY4EclipseResourcesTestUtil.build(project);
+      
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(project) == 2);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile0) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile1) == 1);
+
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile0);
+      assertTrue(testMarker(markerList, MarkerManager.CLOSEDMARKER_ID, 151, 152));
+      
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile1);
+      assertTrue(testMarker(markerList, MarkerManager.NOTCLOSEDMARKER_ID, 151, 152));
    }
 
    private void testRecursionMarkerChangeMultipleFilesCycle(IProject project) throws CoreException, IOException{
-   
+      IFile javaFile0 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("recursion").append("A.java"));
+      IFile javaFile1 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("recursion").append("B.java"));
+      IFile javaFile2 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("recursion").append("C.java"));
+      
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testRecursionMarkerChangeMultipleFilesCycle/src/", project.getFolder("src"), true);
+      
+      KeY4EclipseResourcesTestUtil.build(project);
+      
+      assertTrue(javaFile0.exists() && javaFile1.exists() && javaFile2.exists());
+
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(project) == 3);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile0) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile1) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile2) == 1);
+
+      LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile0);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile1);
+      assertTrue(testMarker(markerList, MarkerManager.NOTCLOSEDMARKER_ID, 151, 152));
+      
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile2);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+      
+      InputStream is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/MarkerTests/testRecursionMarkerChangeMultipleFilesCycle/changedCycle0/A.java");
+      javaFile0.setContents(IOUtil.unifyLineBreaks(is), IResource.FORCE, null);
+      is.close();
+      
+      KeY4EclipseResourcesTestUtil.build(project);
+
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile0);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile1);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+      
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile2);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+      
+      is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/MarkerTests/testRecursionMarkerChangeMultipleFilesCycle/changedCycle1/B.java");
+      javaFile1.setContents(IOUtil.unifyLineBreaks(is), IResource.FORCE, null);
+      is.close();
+      
+      KeY4EclipseResourcesTestUtil.build(project);
+
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile0);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile1);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+      
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile2);
+      assertTrue(testMarker(markerList, MarkerManager.NOTCLOSEDMARKER_ID, 151, 152));
    }
    
-   private void testRecursionMarkerDoubleCycle(IProject project) throws CoreException, IOException{
+   private void testRecursionMarkerExpandMultipleFilesCycle(IProject project) throws CoreException, IOException{
+      IFile javaFile0 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("recursion").append("A.java"));
+      IFile javaFile1 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("recursion").append("B.java"));
+      IFile javaFile2 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("recursion").append("C.java"));
+      IFile javaFile3 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("recursion").append("D.java"));
+      IFile javaFile4 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("recursion").append("E.java"));
+      
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testRecursionMarkerExpandMultipleFilesCycle/src/", project.getFolder("src"), true);
+      
+      KeY4EclipseResourcesTestUtil.build(project);
+      
+      assertTrue(javaFile0.exists() && javaFile1.exists() && javaFile2.exists() && javaFile3.exists() && javaFile4.exists());
+
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(project) == 5);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile0) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile1) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile2) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile3) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile4) == 1);
+
+      LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile0);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+      
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile1);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile2);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+      
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile3);
+      assertTrue(testMarker(markerList, MarkerManager.NOTCLOSEDMARKER_ID, 151, 152));
+
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile4);
+      assertTrue(testMarker(markerList, MarkerManager.NOTCLOSEDMARKER_ID, 151, 152));
+      
+      InputStream is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/MarkerTests/testRecursionMarkerExpandMultipleFilesCycle/expandedCycle/C.java");
+      javaFile2.setContents(IOUtil.unifyLineBreaks(is), IResource.FORCE, null);
+      is.close();
+      
+      KeY4EclipseResourcesTestUtil.build(project);
+
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(project) == 5);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile0) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile1) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile2) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile3) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile4) == 1);
+
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile0);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+      
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile1);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile2);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+      
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile3);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile4);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+   }
    
+   private void testRecursionMarkerMultipleFilesDoubleCycle(IProject project) throws CoreException, IOException{
+      IFile javaFile0 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("recursion").append("A.java"));
+      IFile javaFile1 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("recursion").append("B.java"));
+      IFile javaFile2 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("recursion").append("C.java"));
+      IFile javaFile3 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("recursion").append("D.java"));
+      IFile javaFile4 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("recursion").append("E.java"));
+      
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testRecursionMarkerMultipleFilesDoubleCycle/src/", project.getFolder("src"), true);
+      
+      KeY4EclipseResourcesTestUtil.build(project);
+      
+      assertTrue(javaFile0.exists() && javaFile1.exists() && javaFile2.exists() && javaFile3.exists() && javaFile4.exists());
+
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(project) == 5);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile0) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile1) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile2) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile3) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile4) == 1);
+
+      LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile0);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+      
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile1);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile2);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+      
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile3);
+      assertTrue(testMarker(markerList, MarkerManager.NOTCLOSEDMARKER_ID, 151, 152));
+
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile4);
+      assertTrue(testMarker(markerList, MarkerManager.NOTCLOSEDMARKER_ID, 151, 152));
+      
+      InputStream is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/MarkerTests/testRecursionMarkerMultipleFilesDoubleCycle/doubleCycle/C.java");
+      javaFile2.setContents(IOUtil.unifyLineBreaks(is), IResource.FORCE, null);
+      is.close();
+      
+      KeY4EclipseResourcesTestUtil.build(project);
+
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(project) == 6);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile0) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile1) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile2) == 2);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile3) == 1);
+      assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile4) == 1);
+
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile0);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+      
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile1);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+      
+      String markerMsg0 = "Cycle detected:" 
+                        + StringUtil.NEW_LINE 
+                        + project.getFullPath().toString() + "/proofs/recursion/C.java/recursion_C[recursion_C__c()]_JML_normal_behavior_operation_contract_0.proof" 
+                        + StringUtil.NEW_LINE 
+                        + project.getFullPath().toString() + "/proofs/recursion/A.java/recursion_A[recursion_A__a()]_JML_normal_behavior_operation_contract_0.proof"
+                        + StringUtil.NEW_LINE 
+                        + project.getFullPath().toString() + "/proofs/recursion/B.java/recursion_B[recursion_B__b()]_JML_normal_behavior_operation_contract_0.proof";
+String markerMsg1 = "Cycle detected:" 
+                        + StringUtil.NEW_LINE 
+                        + project.getFullPath().toString() + "/proofs/recursion/C.java/recursion_C[recursion_C__c()]_JML_normal_behavior_operation_contract_0.proof" 
+                        + StringUtil.NEW_LINE 
+                        + project.getFullPath().toString() + "/proofs/recursion/D.java/recursion_D[recursion_D__d()]_JML_normal_behavior_operation_contract_0.proof"
+                        + StringUtil.NEW_LINE 
+                        + project.getFullPath().toString() + "/proofs/recursion/E.java/recursion_E[recursion_E__e()]_JML_normal_behavior_operation_contract_0.proof";
+
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile2);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152, markerMsg0));
+      
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile2);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152, markerMsg1));
+      
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile3);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
+
+      markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile4);
+      assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152));
    }
    
    
@@ -649,18 +1017,43 @@ public class MarkerTests extends AbstractResourceTest {
 
    }
    
+   
    private boolean testMarker(LinkedList<IMarker> markerList, String type, int startChar, int endChar) throws CoreException{
+      return testMarker(markerList, type, startChar, endChar, null);
+   }
+      
+   private boolean testMarker(LinkedList<IMarker> markerList, String type, int startChar, int endChar, String message) throws CoreException{
       for(IMarker marker : markerList){
          if(marker != null && marker.exists()){
             if(marker.getType().equals(type)){
                int markerStartChar = (int) marker.getAttribute(IMarker.CHAR_START, -1);
                int markerEndChar = (int) marker.getAttribute(IMarker.CHAR_END, -1);
                if(markerStartChar == startChar && markerEndChar == endChar){
-                  return true;
+                  if(message == null){
+                     return true;
+                  }
+                  else{
+                     String msg = marker.getAttribute(IMarker.MESSAGE, "");
+                     if(message.equals(msg)){
+                        return true;
+                     }
+                  }
                }
             }
          }
       }
       return false;
+   }
+   
+   private void createNewFile(IFile newFile, IFile oldFile) throws CoreException, IOException{
+      InputStream is = oldFile.getContents();
+      if(!newFile.exists()){
+         newFile.create(is, IResource.FORCE, null);
+      }
+      else{
+         newFile.setContents(is, IResource.FORCE, null);
+      }
+      is.close();
+      oldFile.delete(IResource.FORCE, null);
    }
 }

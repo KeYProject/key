@@ -129,6 +129,8 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
                   deltasFiles.add(file);
                }
                break;
+            default:
+               break;
             }
       }
       return deltasFiles;

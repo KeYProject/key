@@ -59,6 +59,7 @@ import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -68,6 +69,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -79,6 +81,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -680,7 +683,7 @@ public class ProofManager {
          proof = createProof(pe);
       }
       else {
-         proof = loadProof(pe);
+         proof = loadProof(pe); //TODO: Wait for BugFix
          if(proof == null){
             proof = createProof(pe);
          }
@@ -705,8 +708,10 @@ public class ProofManager {
     * @throws ProofInputException 
     */
    private Proof createProof(ProofElement pe) throws ProofInputException{
-         Proof proof = pe.getKeYEnvironment().createProof(pe.getProofObl());
-         
+         Proof proof = pe.getKeYEnvironment().createProof(pe.getProofObl());         
+         StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+         strategyProperties.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_NONCLOSE);         
+         proof.getSettings().getStrategySettings().setActiveStrategyProperties(strategyProperties);
          ProofStarter ps = new ProofStarter(false);
          ps.init(new SingleProof(proof, pe.getProofObl().name()));
          
@@ -727,7 +732,8 @@ public class ProofManager {
       Proof proof = null;
       try{
          File file = pe.getProofFile().getLocation().toFile();
-         KeYEnvironment<CustomConsoleUserInterface> loadEnv = KeYEnvironment.load(file, null, null);
+         Profile profile = pe.getKeYEnvironment().getInitConfig().getProfile();
+         KeYEnvironment<CustomConsoleUserInterface> loadEnv = KeYEnvironment.load(profile, file, null, null);
          proof = loadEnv.getLoadedProof();
          if (proof != null) {
 //            if (!proof.closed()){
@@ -932,8 +938,8 @@ public class ProofManager {
     */
    private class ProofRunnable implements Runnable {
       
-      private KeYEnvironment<CustomConsoleUserInterface> environment;
-      private IProgressMonitor monitor;
+      private final KeYEnvironment<CustomConsoleUserInterface> environment;
+      private final IProgressMonitor monitor;
       
       public ProofRunnable(KeYEnvironment<CustomConsoleUserInterface> environment, IProgressMonitor monitor){
          this.environment = environment;
@@ -945,7 +951,6 @@ public class ProofManager {
          try{
             ProofElement pe;
             while ((pe = getProofToDo()) != null) {
-
                pe.setKeYEnvironment(environment);
                pe.setProofObl(pe.getContract().createProofObl(environment.getInitConfig(), pe.getContract()));
                
