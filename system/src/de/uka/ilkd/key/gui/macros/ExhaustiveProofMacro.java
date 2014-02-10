@@ -36,16 +36,17 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
 
 
     private PosInOccurrence getApplicablePosInOcc(KeYMediator mediator,
+                                                  Goal goal,
                                                   PosInOccurrence posInOcc,
-                                                  ProofMacro macro) {
+                                                  ExtendedProofMacro macro) {
         if (posInOcc == null || posInOcc.subTerm() == null) {
             return null;
-        } else if (macro.canApplyTo(mediator, posInOcc)) {
+        } else if (macro.canApplyTo(mediator, goal, posInOcc)) {
             return posInOcc;
         } else {
             Term subTerm = posInOcc.subTerm();
             for (int i = 0; i < subTerm.arity(); i++) {
-                return getApplicablePosInOcc(mediator, posInOcc.down(i), macro);
+                return getApplicablePosInOcc(mediator, goal, posInOcc.down(i), macro);
             }
             return null;
         }
@@ -55,7 +56,7 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
     @Override
     public boolean canApplyTo(KeYMediator mediator,
                               PosInOccurrence posInOcc) {
-        final ProofMacro macro = getProofMacro();
+        final ExtendedProofMacro macro = getProofMacro();
 
         assert macro != null;
         assert mediator != null;
@@ -66,60 +67,35 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
             return false;
         }
 
-        // stop interface, because the following changes of the goals should
-        // not be observable in the interface
-        // --> didn't work...
-//        mediator.stopInterface(true);
-//        mediator.setInteractive(false);
-
-        // save the original selected goal and the original selected node
-        Goal savedSelectedGoal = mediator.getSelectedGoal();
-        Node savedSelectedNode = mediator.getSelectedNode();
-
         // check whether macro can be applied
-        boolean isApplicable = canApplyToWorker(mediator, posInOcc, macro);
-
-        // restart interface
-//        mediator.startInterface(true);
-//        mediator.setInteractive(true);
-
-        // restore the original selected goal and the original selected node
-        if (savedSelectedGoal != null) {
-            mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
-        }
-        if (savedSelectedNode != null) {
-            mediator.getSelectionModel().setSelectedNode(savedSelectedNode);
+        final Proof proof = mediator.getSelectedProof();
+        boolean isApplicable = false;
+        for (Goal goal : proof.openGoals()) {
+            isApplicable = isApplicable ||
+                           canApplyTo(mediator, goal, posInOcc, macro);
         }
 
         return isApplicable;
     }
 
 
-    public boolean canApplyToWorker(KeYMediator mediator,
-                                    PosInOccurrence posInOcc,
-                                    ProofMacro macro) {
-        final Proof proof = mediator.getSelectedProof();
-        for (Goal goal : proof.openGoals()) {
-            mediator.getSelectionModel().setSelectedGoal(goal);
-            final Sequent seq = goal.sequent();
-            if (!applicalbeOnNodeAtPos.containsKey(goal.node())) {
-                // node has not been checked before, so do it
-                for (int i = 1; i <= seq.size() &&
-                                applicalbeOnNodeAtPos.get(goal.node()) == null; i++) {
-                    PosInOccurrence searchPos =
-                            PosInOccurrence.findInSequent(seq, i, PosInTerm.TOP_LEVEL);
-                    PosInOccurrence applicableAt =
-                            getApplicablePosInOcc(mediator, searchPos, macro);
-                    applicalbeOnNodeAtPos.put(goal.node(), applicableAt);
-                }
-            }
-            if (applicalbeOnNodeAtPos.get(goal.node()) != null) {
-                // applicable position found
-                return true;
+    public boolean canApplyTo(KeYMediator mediator,
+                              Goal goal,
+                              PosInOccurrence posInOcc,
+                              ExtendedProofMacro macro) {
+        final Sequent seq = goal.sequent();
+        if (!applicalbeOnNodeAtPos.containsKey(goal.node())) {
+            // node has not been checked before, so do it
+            for (int i = 1; i <= seq.size() &&
+                            applicalbeOnNodeAtPos.get(goal.node()) == null; i++) {
+                PosInOccurrence searchPos =
+                        PosInOccurrence.findInSequent(seq, i, PosInTerm.TOP_LEVEL);
+                PosInOccurrence applicableAt =
+                        getApplicablePosInOcc(mediator, goal, searchPos, macro);
+                applicalbeOnNodeAtPos.put(goal.node(), applicableAt);
             }
         }
-        // no applicable postition found
-        return false;
+        return (applicalbeOnNodeAtPos.get(goal.node()) != null);
     }
 
 
@@ -129,35 +105,12 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
                         ProverTaskListener listener) throws InterruptedException {
         final Proof proof = mediator.getSelectedProof();
 
-        // save the original selected goal and the original selected node
-        Goal savedSelectedGoal = mediator.getSelectedGoal();
-        Node savedSelectedNode = mediator.getSelectedNode();
-
-        // apply macro
-        applyToWorker(mediator, posInOcc, listener);
-
-        // restore the original selected goal and the original selected node
-        if (savedSelectedGoal != null) {
-            mediator.getSelectionModel().setSelectedGoal(savedSelectedGoal);
-        }
-        if (savedSelectedNode != null) {
-            mediator.getSelectionModel().setSelectedNode(savedSelectedNode);
-        }
-    }
-
-
-    public void applyToWorker(KeYMediator mediator,
-                              PosInOccurrence posInOcc,
-                              ProverTaskListener listener) throws InterruptedException {
-        final Proof proof = mediator.getSelectedProof();
-
         for (Goal goal : proof.openGoals()) {
-            mediator.getSelectionModel().setSelectedGoal(goal);
-            final Sequent seq = goal.sequent();
-            final ProofMacro macro = getProofMacro();
+            final ExtendedProofMacro macro = getProofMacro();
             if (!applicalbeOnNodeAtPos.containsKey(goal.node())) {
                 // node has not been checked before, so do it
-                boolean canBeApplied = canApplyTo(mediator, posInOcc);
+                boolean canBeApplied = canApplyTo(mediator, goal,
+                                                  posInOcc, macro);
                 if (!canBeApplied) {
                     // canApplyTo checks all open goals. thus, if it returns
                     // false, then this macro is not applicable at all and
@@ -168,8 +121,7 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
             PosInOccurrence applicableAt =
                     applicalbeOnNodeAtPos.get(goal.node());
             if (applicableAt != null) {
-                macro.applyTo(mediator, applicableAt, listener);
-                return;
+                macro.applyTo(mediator, goal, applicableAt, listener);
             }
         }
     }
@@ -180,7 +132,7 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
      * <p/>
      * @return the proofMacro.
      */
-    abstract ProofMacro getProofMacro();
+    abstract ExtendedProofMacro getProofMacro();
 
 
     @Override

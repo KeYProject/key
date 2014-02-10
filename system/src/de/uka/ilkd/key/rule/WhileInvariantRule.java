@@ -24,7 +24,6 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -59,7 +58,10 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
+import de.uka.ilkd.key.proof.init.InfFlowPO;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
@@ -99,6 +101,14 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term baseHeap = anonUpdateData.loopHeapAtPre;
         final Term guardTerm = TB.var(guardVar);
         final Term selfTerm = inst.selfTerm;
+
+        Proof proof = services.getProof();
+        ProofOblInput poi =
+                services.getSpecificationRepository().getProofOblInput(proof);
+        assert poi instanceof InfFlowPO;
+        InfFlowPO po = (InfFlowPO)poi;
+        IFProofObligationVars leaveIFVars = po.getLeaveIFVars();
+
         services.getSpecificationRepository().addLoopInvariant(inv);
         ruleApp.setLoopInvariant(inv);
         instantiate(ruleApp, services);

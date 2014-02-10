@@ -213,7 +213,7 @@ public class BlockContractRule implements BuiltInRule {
 
         Services services = goal.proof().getServices();
         Proof proof = goal.proof();
-        ProofOblInput po = services.getSpecificationRepository().getPOForProof(proof);
+        ProofOblInput po = services.getSpecificationRepository().getProofOblInput(proof);
         if (po instanceof SymbolicExecutionPO) {
             Goal initiatingGoal = ((SymbolicExecutionPO)po).getInitiatingGoal();
             return contractApplied(contract, initiatingGoal);

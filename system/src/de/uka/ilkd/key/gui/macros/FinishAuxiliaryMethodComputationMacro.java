@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -43,7 +42,7 @@ public class FinishAuxiliaryMethodComputationMacro
             return false;
         }
         final ProofOblInput poForProof =
-                services.getSpecificationRepository().getPOForProof(proof);
+                services.getSpecificationRepository().getProofOblInput(proof);
         return poForProof instanceof SymbolicExecutionPO;
     }
 
@@ -57,7 +56,7 @@ public class FinishAuxiliaryMethodComputationMacro
             return;
         }
         final ProofOblInput poForProof =
-                proof.getServices().getSpecificationRepository().getPOForProof(proof);
+                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
         if (!(poForProof instanceof SymbolicExecutionPO)) {
             return;
         }
@@ -66,7 +65,7 @@ public class FinishAuxiliaryMethodComputationMacro
         final Services services = initiatingProof.getServices();
         final InfFlowContractPO ifPO =
                 (InfFlowContractPO) services.getSpecificationRepository()
-                                         .getPOForProof(initiatingProof);
+                                         .getProofOblInput(initiatingProof);
         final IFProofObligationVars ifVars = ifPO.getIFVars().labelHeapAtPreAsAnonHeapFunc();
         final InformationFlowContract ifContract = ifPO.getContract();
 

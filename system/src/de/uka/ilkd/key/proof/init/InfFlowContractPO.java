@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.Proof;
 import static de.uka.ilkd.key.proof.init.AbstractPO.TB;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
@@ -27,7 +28,7 @@ import java.util.Properties;
  * @author christoph
  */
 public class InfFlowContractPO extends AbstractOperationPO
-        implements ContractPO, InfFlowRelatedPO {
+        implements ContractPO, InfFlowLeavePO {
 
     private final InformationFlowContract contract;
 
@@ -222,6 +223,14 @@ public class InfFlowContractPO extends AbstractOperationPO
         // information flow contracts do not have global defs
         return null;
     }
+
+
+
+    @Override
+    public IFProofObligationVars getLeaveIFVars() {
+        return getIFVars();
+    }
+
 
     // the following code is legacy code
     @Override

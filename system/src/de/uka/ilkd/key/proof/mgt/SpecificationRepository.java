@@ -1011,31 +1011,12 @@ public final class SpecificationRepository {
      * Returns the PO that the passed proof is about, or null.
      */
     public ContractPO getContractPOForProof(Proof proof) {
-	for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry
-		: proofs.entrySet()) {
-	    ProofOblInput po = entry.getKey();
-            ImmutableSet<Proof> sop = entry.getValue();
-            if(sop.contains(proof) && po instanceof ContractPO) {
-                return (ContractPO)po;
-            }
+        ProofOblInput po = getProofOblInput(proof);
+        if (po != null && po instanceof ContractPO) {
+            return (ContractPO)po;
+        } else {
+            return null;
         }
-        return null;
-    }
-
-
-    /**
-     * Returns the PO that the passed proof is about, or null.
-     */
-    public ProofOblInput getPOForProof(Proof proof) {
-	for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry
-		: proofs.entrySet()) {
-	    ProofOblInput po = entry.getKey();
-            ImmutableSet<Proof> sop = entry.getValue();
-            if(sop.contains(proof)) {
-                return po;
-            }
-        }
-        return null;
     }
 
 

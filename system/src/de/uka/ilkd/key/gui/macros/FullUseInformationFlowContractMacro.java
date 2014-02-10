@@ -31,8 +31,8 @@ public class FullUseInformationFlowContractMacro extends SequentialProofMacro {
     }
 
     @Override
-    protected ProofMacro[] createProofMacroArray() {
-        return new ProofMacro[] {
+    protected ExtendedProofMacro[] createProofMacroArray() {
+        return new ExtendedProofMacro[] {
                 new UseInformationFlowContractMacro(),
                 new PrepareInfFlowContractPreBranchesMacro()
         };

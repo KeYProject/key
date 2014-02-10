@@ -12,7 +12,9 @@ import de.uka.ilkd.key.logic.Term;
  *
  * @author christoph
  */
-public interface InfFlowRelatedPO {
+public interface InfFlowPO {
+
+    public IFProofObligationVars getLeaveIFVars();
 
     public InfFlowProofSymbols getIFSymbols();
 

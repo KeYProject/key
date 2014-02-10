@@ -33,8 +33,8 @@ public class StateExpansionAndInfFlowContractApplicationMacro extends Sequential
     }
 
     @Override
-    protected ProofMacro[] createProofMacroArray() {
-        return new ProofMacro[] {
+    protected ExtendedProofMacro[] createProofMacroArray() {
+        return new ExtendedProofMacro[] {
                 new SelfcompositionStateExpansionMacro(),
                 new PropositionalExpansionWithSimplificationMacro(),
                 new FullUseInformationFlowContractMacro()

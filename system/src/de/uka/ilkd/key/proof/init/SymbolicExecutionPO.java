@@ -27,7 +27,7 @@ import java.util.Properties;
  * @author christoph
  */
 public class SymbolicExecutionPO extends AbstractOperationPO
-        implements ContractPO, InfFlowRelatedPO {
+        implements ContractPO, InfFlowCompositePO {
 
     private final InformationFlowContract contract;
     private final ProofObligationVars symbExecVars;
@@ -88,7 +88,7 @@ public class SymbolicExecutionPO extends AbstractOperationPO
         if (initiatingProof != null) {
             // proof is not loaded
             final AbstractOperationPO initiatingPO =
-                    (AbstractOperationPO) specRepos.getPOForProof(initiatingProof);
+                    (AbstractOperationPO) specRepos.getProofOblInput(initiatingProof);
             taclets = initiatingPO.getInitialTaclets();
         }
     }
@@ -225,7 +225,27 @@ public class SymbolicExecutionPO extends AbstractOperationPO
         return null;
     }
 
-    // the following code is legacy code
+
+
+    @Override
+    public InfFlowPO getChildPO() {
+        Proof initiatingProof = getInitiatingGoal().proof();
+        Services initiatingServices = initiatingProof.getServices();
+        ProofOblInput initiatingPO =
+                initiatingServices.getSpecificationRepository().getProofOblInput(initiatingProof);
+        assert initiatingPO instanceof InfFlowPO : "Information flow auxiliary " +
+                "proof started from within non-information flow proof!?!";
+        return (InfFlowPO)initiatingPO;
+    }
+
+
+    @Override
+    public IFProofObligationVars getLeaveIFVars() {
+        return getChildPO().getLeaveIFVars();
+    }
+
+
+// the following code is legacy code
     @Override
     @Deprecated
     protected StatementBlock buildOperationBlock(

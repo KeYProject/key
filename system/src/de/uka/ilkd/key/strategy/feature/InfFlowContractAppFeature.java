@@ -280,7 +280,7 @@ public class InfFlowContractAppFeature implements Feature {
 
     private boolean isInfFlowProof(Proof proof) {
         ProofOblInput po =
-                proof.getServices().getSpecificationRepository().getPOForProof(proof);
+                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
         return po instanceof InfFlowContractPO ||
                po instanceof SymbolicExecutionPO ||
                po instanceof BlockExecutionPO ||

@@ -28,7 +28,7 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 public class LoopInvExecutionPO extends AbstractOperationPO
-        implements InfFlowRelatedPO {
+        implements InfFlowCompositePO {
     
     private final LoopInvariant loopInvariant;
 
@@ -121,7 +121,7 @@ public class LoopInvExecutionPO extends AbstractOperationPO
         if (initiatingProof != null) {
             // proof is not loaded
             final AbstractOperationPO initiatingPO =
-                    (AbstractOperationPO) specRepos.getPOForProof(initiatingProof);
+                    (AbstractOperationPO) specRepos.getProofOblInput(initiatingProof);
             taclets = initiatingPO.getInitialTaclets();
         }
     }
@@ -232,6 +232,26 @@ public class LoopInvExecutionPO extends AbstractOperationPO
         // information flow contracts do not have global defs
         return null;
     }
+
+
+
+    @Override
+    public InfFlowPO getChildPO() {
+        Proof initiatingProof = getInitiatingGoal().proof();
+        Services initiatingServices = initiatingProof.getServices();
+        ProofOblInput initiatingPO =
+                initiatingServices.getSpecificationRepository().getProofOblInput(initiatingProof);
+        assert initiatingPO instanceof InfFlowPO : "Information flow auxiliary " +
+                "proof started from within non-information flow proof!?!";
+        return (InfFlowPO)initiatingPO;
+    }
+
+
+    @Override
+    public IFProofObligationVars getLeaveIFVars() {
+        return getChildPO().getLeaveIFVars();
+    }
+
 
     // the following code is legacy code
     @Override

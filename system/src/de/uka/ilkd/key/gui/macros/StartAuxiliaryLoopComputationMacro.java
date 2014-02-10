@@ -22,7 +22,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import javax.swing.KeyStroke;
 
-public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
+public class StartAuxiliaryLoopComputationMacro implements ExtendedProofMacro {
 
     @Override
     public String getName() {
@@ -41,14 +41,27 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
     @Override
     public boolean canApplyTo(KeYMediator mediator,
                               PosInOccurrence posInOcc) {
+        if (mediator.getSelectedProof() == null) {
+            return false;
+        }
+        Goal goal = mediator.getSelectedGoal();
+        return canApplyTo(mediator, goal, posInOcc);
+    }
+
+    @Override
+    public boolean canApplyTo(KeYMediator mediator,
+                              Goal goal,
+                              PosInOccurrence posInOcc) {
+        if (goal == null || goal.node() == null || goal.node().parent() == null) {
+            return false;
+        }
         if (posInOcc == null
                 || posInOcc.subTerm() == null) {
             return false;
         }
-        Proof proof = mediator.getSelectedProof();
+        Proof proof = goal.proof();
         Services services = proof.getServices();
 
-        Goal goal = mediator.getSelectedGoal();
         if (goal == null || goal.node() == null || goal.node().parent() == null) {
             return false;
         }
@@ -82,8 +95,16 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
     public void applyTo(KeYMediator mediator,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) {
-        Proof proof = mediator.getSelectedProof();
         Goal goal = mediator.getSelectedGoal();
+        applyTo(mediator, goal, posInOcc, listener);
+    }
+
+    @Override
+    public void applyTo(KeYMediator mediator,
+                        Goal goal,
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) {
+        Proof proof = goal.proof();
         InitConfig initConfig = proof.env().getInitConfig();
 
         if (goal.node().parent() == null) {
@@ -93,6 +114,7 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
         if (!(app instanceof LoopInvariantBuiltInRuleApp)) {
             return;
         }
+
         final LoopInvariantBuiltInRuleApp loopInvRuleApp =
                 (LoopInvariantBuiltInRuleApp) app;
         final LoopInvariant loopInv = loopInvRuleApp.getInvariant();

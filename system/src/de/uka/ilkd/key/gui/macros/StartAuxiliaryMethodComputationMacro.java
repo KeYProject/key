@@ -29,7 +29,7 @@ import javax.swing.KeyStroke;
  *
  * @author christoph
  */
-public class StartAuxiliaryMethodComputationMacro implements ProofMacro {
+public class StartAuxiliaryMethodComputationMacro implements ExtendedProofMacro {
 
     @Override
     public String getName() {
@@ -50,14 +50,28 @@ public class StartAuxiliaryMethodComputationMacro implements ProofMacro {
     @Override
     public boolean canApplyTo(KeYMediator mediator,
                               PosInOccurrence posInOcc) {
+        if (mediator.getSelectedProof() == null) {
+            return false;
+        }
+        Goal goal = mediator.getSelectedGoal();
+        return canApplyTo(mediator, goal, posInOcc);
+    }
+
+    @Override
+    public boolean canApplyTo(KeYMediator mediator,
+                              Goal goal,
+                              PosInOccurrence posInOcc) {
+        if (goal == null) {
+            return false;
+        }
         if (posInOcc == null
                 || posInOcc.subTerm() == null) {
             return false;
         }
-        Proof proof = mediator.getSelectedProof();
+        Proof proof = goal.proof();
         Services services = proof.getServices();
         ProofOblInput poForProof =
-                services.getSpecificationRepository().getPOForProof(proof);
+                services.getSpecificationRepository().getProofOblInput(proof);
         if (!(poForProof instanceof InfFlowContractPO)) {
             return false;
         }
@@ -78,12 +92,20 @@ public class StartAuxiliaryMethodComputationMacro implements ProofMacro {
     public void applyTo(KeYMediator mediator,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) {
-        Proof proof = mediator.getSelectedProof();
         Goal goal = mediator.getSelectedGoal();
+        applyTo(mediator, goal, posInOcc, listener);
+    }
+
+    @Override
+    public void applyTo(KeYMediator mediator,
+                        Goal goal,
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) {
+        Proof proof = goal.proof();
         Services services = proof.getServices();
         InitConfig initConfig = proof.env().getInitConfig();
 
-        ProofOblInput poForProof = services.getSpecificationRepository().getPOForProof(proof);
+        ProofOblInput poForProof = services.getSpecificationRepository().getProofOblInput(proof);
         if (!(poForProof instanceof InfFlowContractPO)) {
             return;
         }

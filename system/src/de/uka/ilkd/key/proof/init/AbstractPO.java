@@ -298,7 +298,7 @@ public abstract class AbstractPO implements IPersistablePO {
                                 : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
         assert proof.openGoals().size() == 1 : "expected one first open goal";
         final boolean isInfFlowProof =
-                (this instanceof InfFlowRelatedPO);
+                (this instanceof InfFlowPO);
 //        ||
 //                // this is a hack and has to be changed by time
 //                proof.getSettings().getStrategySettings().getActiveStrategyProperties()

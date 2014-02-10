@@ -30,7 +30,7 @@ import javax.swing.KeyStroke;
  *
  * @author christoph
  */
-public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
+public class StartAuxiliaryBlockComputationMacro implements ExtendedProofMacro {
 
     @Override
     public String getName() {
@@ -51,17 +51,28 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
     @Override
     public boolean canApplyTo(KeYMediator mediator,
                               PosInOccurrence posInOcc) {
+        if (mediator.getSelectedProof() == null) {
+            return false;
+        }
+        Goal goal = mediator.getSelectedGoal();
+        return canApplyTo(mediator, goal, posInOcc);
+    }
+
+    @Override
+    public boolean canApplyTo(KeYMediator mediator,
+                              Goal goal,
+                              PosInOccurrence posInOcc) {
+        if (goal == null || goal.node() == null || goal.node().parent() == null) {
+            return false;
+        }
         if (posInOcc == null
                 || posInOcc.subTerm() == null) {
             return false;
         }
-        Proof proof = mediator.getSelectedProof();
+
+        Proof proof = goal.proof();
         Services services = proof.getServices();
 
-        Goal goal = mediator.getSelectedGoal();
-        if (goal == null || goal.node() == null || goal.node().parent() == null) {
-            return false;
-        }
         RuleApp app = goal.node().parent().getAppliedRuleApp();
         if (!(app instanceof BlockContractBuiltInRuleApp)) {
             return false;
@@ -92,10 +103,15 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
     public void applyTo(KeYMediator mediator,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) {
-        Proof proof = mediator.getSelectedProof();
         Goal goal = mediator.getSelectedGoal();
-        InitConfig initConfig = proof.env().getInitConfig();
+        applyTo(mediator, goal, posInOcc, listener);
+    }
 
+    @Override
+    public void applyTo(KeYMediator mediator,
+                        Goal goal,
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) {
         if (goal.node().parent() == null) {
             return;
         }
@@ -103,6 +119,10 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
         if (!(app instanceof BlockContractBuiltInRuleApp)) {
             return;
         }
+
+        Proof proof = goal.proof();
+        InitConfig initConfig = proof.env().getInitConfig();
+
         BlockContractBuiltInRuleApp blockRuleApp = (BlockContractBuiltInRuleApp) app;
         BlockContract contract = blockRuleApp.getContract();
         IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
