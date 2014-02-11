@@ -51,7 +51,7 @@ public class AboutAction extends MainWindowAction {
 	        + ((aspects.length() == 0) ? "" : "\nCompiled with Aspects:\n"
 	                + aspects)
 	                , JOptionPane.INFORMATION_MESSAGE,
-	        JOptionPane.DEFAULT_OPTION, IconFactory.keyLogo(108, 74));
+	        JOptionPane.DEFAULT_OPTION, IconFactory.key22Logo(108, 68));
 	JDialog dialog = pane.createDialog(mainWindow, "The KeY Project");
 	dialog.setVisible(true);
     }

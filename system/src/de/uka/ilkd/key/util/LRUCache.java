@@ -33,7 +33,7 @@ public class LRUCache<K,V> extends LinkedHashMap<K,V> {
      * creates a new LRU cached with maxEntires slots
      */
     public LRUCache(int maxEntries) {
-	super((int)(maxEntries*1.01), 1.0F, true);
+	super(maxEntries + 1, 1.0F, true);
 	this.maxEntries = maxEntries;
     }
 

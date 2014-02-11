@@ -97,7 +97,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -1693,7 +1692,7 @@ public final class SymbolicExecutionUtil {
       ImmutableList<Goal> result = ImmutableSLList.nil();
       if (node != null) {
          Proof proof = node.proof();
-         NodeIterator iter = node.leavesIterator();
+         Iterator<Node> iter = node.leavesIterator();
          while (iter.hasNext()) {
             Node next = iter.next();
             Goal nextGoal = proof.getGoal(next);

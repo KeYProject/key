@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -22,7 +23,6 @@ import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -197,7 +197,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
             Integer executedValue = executedNumberOfSetNodesPerGoal.get(goal);
             if (executedValue != null) {
                // Reuse number of set nodes for new created goals
-               NodeIterator childIter = updatedNode.childrenIterator();
+                Iterator<Node> childIter = updatedNode.childrenIterator();
                while (childIter.hasNext()) {
                   Node next = childIter.next();
                   Goal nextGoal = next.proof().getGoal(next);
