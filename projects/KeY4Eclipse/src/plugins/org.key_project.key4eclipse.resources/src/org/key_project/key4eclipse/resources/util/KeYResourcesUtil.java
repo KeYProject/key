@@ -37,6 +37,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -163,5 +164,29 @@ public class KeYResourcesUtil {
          }
       }
       return srcFolders;
+   }
+
+   /**
+    * Checks if the given {@link IFolder} is the proof folder of a KeY project.
+    * @param element The {@link IFolder} to check.
+    * @return {@code true} is proof folder of a KeY project, {@code false} is something else.
+    * @throws CoreException Occurred Exception.
+    */
+   public static boolean isProofFolder(IFolder element) throws CoreException {
+      return element != null &&
+             PROOF_FOLDER_NAME.equals(element.getName()) &&
+             element.getParent() instanceof IProject &&
+             isKeYProject(element.getProject());
+   }
+   
+   /**
+    * Checks if the given {@link IProject} is a KeY project.
+    * @param project The {@link IProject} to check.
+    * @return {@code true} is KeY project, {@code false} is something else.
+    * @throws CoreException Occurred Exception.
+    */
+   public static boolean isKeYProject(IProject project) throws CoreException {
+      return project != null &&
+             project.hasNature(KeYProjectNature.NATURE_ID);
    }
 }
