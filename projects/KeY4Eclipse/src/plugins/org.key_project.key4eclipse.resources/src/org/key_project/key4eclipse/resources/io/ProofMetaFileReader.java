@@ -26,6 +26,7 @@ public class ProofMetaFileReader {
 //   private Element rootElement;
    private String proofFileMD5;
    private boolean proofClosed;
+   private String markerMessage;
    private LinkedList<ProofMetaFileTypeElement> typeElemens = new LinkedList<ProofMetaFileTypeElement>();
    private LinkedList<IFile> usedContracts = new LinkedList<IFile>();
    
@@ -45,6 +46,7 @@ public class ProofMetaFileReader {
          
          Element rootElement = doc.getDocumentElement();
          this.proofFileMD5 = readMD5(rootElement);
+         this.markerMessage = readMarkerMessage(rootElement);
          this.proofClosed = readProofStatus(rootElement);
          this.typeElemens = readAllTypeElements(rootElement);
          this.usedContracts = readUsedContracts(rootElement);
@@ -66,6 +68,10 @@ public class ProofMetaFileReader {
    
    public boolean getProofClosed(){
       return proofClosed;
+   }
+   
+   public String getMarkerMessage(){
+      return markerMessage;
    }
 
 
@@ -91,10 +97,10 @@ public class ProofMetaFileReader {
       else{
          throw new ProofMetaFileContentException("No root found in this file");
       }
-      //check if rootElement has 4 childeren
+      //check if rootElement has 5 childeren
       if("proofMetaFile".equals(rootElement.getTagName())){
          NodeList rootNodeList = rootElement.getChildNodes();
-         if(rootNodeList.getLength() == 4){
+         if(rootNodeList.getLength() == 5){
             //check md5Format
             Node md5Node = rootNodeList.item(0);
             if(!"proofFileMD5".equals(md5Node.getNodeName())){
@@ -104,8 +110,12 @@ public class ProofMetaFileReader {
             if(!"proofStatus".equals(proofStatusNode.getNodeName())){
                throw new ProofMetaFileContentException("Missing root entries. Found " + proofStatusNode.getNodeName() + " | Expected proofStatus");
             }
+            Node markerMsgNode = rootNodeList.item(2);
+            if(!"markerMessage".equals(markerMsgNode.getNodeName())){
+               throw new ProofMetaFileContentException("Missing root entries. Found " + markerMsgNode.getNodeName() + " | Expected markerMessage");
+            }
             //check usedTypes format
-            Node usedTypes = rootNodeList.item(2);
+            Node usedTypes = rootNodeList.item(3);
             if("usedTypes".equals(usedTypes.getNodeName())){
                //check type format
                NodeList usedTypesNodeList = usedTypes.getChildNodes();
@@ -130,7 +140,7 @@ public class ProofMetaFileReader {
                throw new ProofMetaFileContentException("Missing root entries. Found " + rootNodeList.item(1).getNodeName() + " | Expected usedTypes");
             }
             //check usedContracts format
-            Node usedContracts = rootNodeList.item(3);
+            Node usedContracts = rootNodeList.item(4);
             if("usedContracts".equals(usedContracts.getNodeName())){
                NodeList usedContractsNodeList = usedContracts.getChildNodes();
                for(int i = 0; i < usedContractsNodeList.getLength(); i++){
@@ -196,6 +206,26 @@ public class ProofMetaFileReader {
    }
    
    
+   private String readMarkerMessage(Element rootElement) throws ProofMetaFileContentException{
+      NodeList nodeList = rootElement.getChildNodes();
+      Node node = nodeList.item(2);
+      NamedNodeMap attrMap = node.getAttributes();
+      if(attrMap.getLength() == 1){
+         Node attrNode = attrMap.item(0);
+         if("message".equals(attrNode.getNodeName())){
+            String message = attrNode.getNodeValue();
+            return message;
+         }
+         else{
+            throw new ProofMetaFileContentException("No message attribute found for markerMessage");
+         }
+      }
+      else{
+         throw new ProofMetaFileContentException("To many attributes for markerMessage");
+      }
+   }
+   
+   
    /**
     * Reads all types stored in the meta file.
     * @return a {@link LinkedList} with all read types
@@ -204,7 +234,7 @@ public class ProofMetaFileReader {
    private LinkedList<ProofMetaFileTypeElement> readAllTypeElements(Element rootElement) throws ProofMetaFileContentException{
       LinkedList<ProofMetaFileTypeElement> typeElements = new LinkedList<ProofMetaFileTypeElement>();
       NodeList rootNodeList = rootElement.getChildNodes();
-      Node usedTypes = rootNodeList.item(2);
+      Node usedTypes = rootNodeList.item(3);
       NodeList usedTypesNodeList = usedTypes.getChildNodes();
       for(int i = 0; i < usedTypesNodeList.getLength(); i++){
          Node type = usedTypesNodeList.item(i);
@@ -259,7 +289,7 @@ public class ProofMetaFileReader {
    private LinkedList<IFile> readUsedContracts(Element rootElement) throws ProofMetaFileContentException{
       LinkedList<IFile> usedContracts = new LinkedList<IFile>();
       NodeList rootNodeList = rootElement.getChildNodes();
-      Node usedContractsNode = rootNodeList.item(3);
+      Node usedContractsNode = rootNodeList.item(4);
       NodeList usedContractsNodeList = usedContractsNode.getChildNodes();
       for(int i = 0; i < usedContractsNodeList.getLength(); i++){
          Node node = usedContractsNodeList.item(i);

@@ -976,18 +976,18 @@ public class MarkerTests extends AbstractResourceTest {
       
       String markerMsg0 = "Cycle detected:" 
                         + StringUtil.NEW_LINE 
-                        + project.getFullPath().toString() + "/proofs/recursion/C.java/recursion_C[recursion_C__c()]_JML_normal_behavior_operation_contract_0.proof" 
+                        + "recursion_C[recursion_C__c()]_JML_normal_behavior_operation_contract_0" 
                         + StringUtil.NEW_LINE 
-                        + project.getFullPath().toString() + "/proofs/recursion/A.java/recursion_A[recursion_A__a()]_JML_normal_behavior_operation_contract_0.proof"
+                        + "recursion_A[recursion_A__a()]_JML_normal_behavior_operation_contract_0."
                         + StringUtil.NEW_LINE 
-                        + project.getFullPath().toString() + "/proofs/recursion/B.java/recursion_B[recursion_B__b()]_JML_normal_behavior_operation_contract_0.proof";
+                        + "recursion_B[recursion_B__b()]_JML_normal_behavior_operation_contract_0.";
 String markerMsg1 = "Cycle detected:" 
                         + StringUtil.NEW_LINE 
-                        + project.getFullPath().toString() + "/proofs/recursion/C.java/recursion_C[recursion_C__c()]_JML_normal_behavior_operation_contract_0.proof" 
+                        + "recursion_C[recursion_C__c()]_JML_normal_behavior_operation_contract_0" 
                         + StringUtil.NEW_LINE 
-                        + project.getFullPath().toString() + "/proofs/recursion/D.java/recursion_D[recursion_D__d()]_JML_normal_behavior_operation_contract_0.proof"
+                        + "/recursion_D[recursion_D__d()]_JML_normal_behavior_operation_contract_0"
                         + StringUtil.NEW_LINE 
-                        + project.getFullPath().toString() + "/proofs/recursion/E.java/recursion_E[recursion_E__e()]_JML_normal_behavior_operation_contract_0.proof";
+                        + "recursion_E[recursion_E__e()]_JML_normal_behavior_operation_contract_0";
 
       markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile2);
       assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 151, 152, markerMsg0));

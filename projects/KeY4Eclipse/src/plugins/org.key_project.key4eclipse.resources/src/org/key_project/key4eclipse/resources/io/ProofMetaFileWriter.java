@@ -115,6 +115,10 @@ public class ProofMetaFileWriter {
       proofStatus.setAttribute("proofClosed", status);
       rootElement.appendChild(proofStatus);
       
+      Element markerMessage = doc.createElement("markerMessage");
+      markerMessage.setAttribute("message", pe.getMarkerMsg());
+      rootElement.appendChild(markerMessage);
+      
       Element usedTypes = createUsedTypes();
       rootElement.appendChild(usedTypes);
       

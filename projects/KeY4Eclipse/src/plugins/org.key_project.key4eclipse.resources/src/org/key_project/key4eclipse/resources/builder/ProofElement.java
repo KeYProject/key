@@ -36,6 +36,7 @@ public class ProofElement {
    private IFile javaFile;
    private SourceLocation scl;
    private LinkedHashSet<IMarker> marker;
+   private String markerMsg;
    
    private IFolder proofFolder;
    private IFile proofFile;
@@ -59,6 +60,7 @@ public class ProofElement {
    public SourceLocation getSourceLocation() {
       return scl;
    }
+   
    public LinkedHashSet<IMarker> getMarker(){
       return marker;
    }
@@ -70,6 +72,13 @@ public class ProofElement {
    }
    public void removeMarker(IMarker marker){
       this.marker.remove(marker);
+   }
+   
+   public String getMarkerMsg() {
+      return markerMsg;
+   }
+   public void setMarkerMsg(String markerMsg) {
+      this.markerMsg = markerMsg;
    }
    
    public IFolder getProofFolder(){

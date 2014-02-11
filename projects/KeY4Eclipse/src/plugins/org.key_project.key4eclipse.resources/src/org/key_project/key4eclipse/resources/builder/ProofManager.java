@@ -59,12 +59,12 @@ import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -449,7 +449,7 @@ public class ProofManager {
    private void restoreOldMarkerForRemovedCycles() throws CoreException{
       for(ProofElement pe : proofElements){
          if(pe.getMarker().isEmpty()){
-            markerManager.setMarker(pe);
+            markerManager.setMarker(pe); //TODO restore whole message!
          }
       }
    }
@@ -677,22 +677,24 @@ public class ProofManager {
     * @throws Exception
     */
    private void processProof(ProofElement pe) throws Exception{
+      long proofStart = System.currentTimeMillis();
       IFile file = pe.getProofFile();
       Proof proof = null;
       if(!file.exists()){
          proof = createProof(pe);
       }
       else {
-         proof = loadProof(pe); //TODO: Wait for BugFix
+//         proof = loadProof(pe); //TODO: Wait for BugFix
          if(proof == null){
             proof = createProof(pe);
          }
       }
-      
+      long proofDuration = System.currentTimeMillis()-proofStart;
       if(proof != null){
          pe.setProofClosed(proof.closed());
          pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
          pe.setUsedContracts(KeYResourcesUtil.getUsedContractsProofElements(pe, proofElements));
+         pe.setMarkerMsg(generateProofMarkerMessage(pe, proof, proofDuration));
          markerManager.setMarker(pe);
          ByteArrayOutputStream out = generateSaveProof(proof, pe.getProofFile());
          proofsToSave.add(new Pair<ByteArrayOutputStream, ProofElement>(out, pe));
@@ -708,14 +710,16 @@ public class ProofManager {
     * @throws ProofInputException 
     */
    private Proof createProof(ProofElement pe) throws ProofInputException{
-         Proof proof = pe.getKeYEnvironment().createProof(pe.getProofObl());         
+         Proof proof = pe.getKeYEnvironment().createProof(pe.getProofObl());   
+         
          StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
          strategyProperties.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_NONCLOSE);         
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(strategyProperties);
+         
          ProofStarter ps = new ProofStarter(false);
          ps.init(new SingleProof(proof, pe.getProofObl().name()));
-         
          ps.start();
+         
          OneStepSimplifier oss = MiscTools.findOneStepSimplifier(proof);
          if (oss != null) {
             oss.refresh(null);
@@ -744,6 +748,53 @@ public class ProofManager {
          LogUtil.getLogger().logError(e);
       }
       return proof;
+   }
+   
+   
+
+   
+   private String generateProofMarkerMessage(ProofElement pe, Proof proof, long time){
+      StringBuffer sb = new StringBuffer();
+      boolean closed = pe.getProofClosed();
+      String newLine ="\n";
+      
+      sb.append(closed? "Closed Proof:" : "Open Proof:");
+      sb.append(newLine);
+      sb.append(pe.getContract().getName());
+      sb.append(newLine);
+      sb.append(newLine);
+      if(!proof.closed()){
+         boolean uncloseable = false;
+         for(Goal goal : proof.openEnabledGoals()){
+            if(false){//goal uncloseable //TODO ask martin for missing SymbolicExecutionUtil.hasApplicableRules(next)
+               uncloseable = true;
+               break;
+            }
+         }
+         if(uncloseable){
+            sb.append("Reason: Goal can't be closed automatically");
+            sb.append(newLine);
+            sb.append("Hint: Check code and specifications for bugs or continue proof");
+            sb.append(newLine);
+            sb.append(newLine);
+         }
+         else{
+            sb.append("Reason: Max. Rule Applications reached");
+            sb.append(newLine);
+            sb.append("Hint: Continue proof automatic- or interactively");
+            sb.append(newLine);
+            sb.append(newLine);
+         }
+      }
+      
+      sb.append("Time: " + time / 1000 + "." + time % 1000 + " s");
+      sb.append(newLine);
+      sb.append("Nodes: " + proof.countNodes());
+      sb.append(newLine);
+      sb.append("Branches: " + proof.countBranches());
+      sb.append(newLine);
+      
+      return sb.toString();
    }
    
    
@@ -973,6 +1024,7 @@ public class ProofManager {
                         }
                         else{
                            pe.setProofClosed(pmfr.getProofClosed());
+                           pe.setMarkerMsg(pmfr.getMarkerMessage());
                            pe.setUsedContracts(KeYResourcesUtil.getProofElementsByProofFiles(pmfr.getUsedContracts(), proofElements));
                         }
                      } catch (Exception e) {

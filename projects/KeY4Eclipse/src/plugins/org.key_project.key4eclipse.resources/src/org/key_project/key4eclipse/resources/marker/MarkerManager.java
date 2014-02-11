@@ -53,30 +53,30 @@ public class MarkerManager {
       }
       pe.setMarker(new LinkedHashSet<IMarker>());
       SourceLocation scl = pe.getSourceLocation();
-      IFile javaFile = pe.getJavaFile();
-      IFile proofFile = pe.getProofFile();
       if(scl != null){
          if (pe.getProofClosed()) {
-            IMarker marker = javaFile.createMarker(CLOSEDMARKER_ID);
+            IMarker marker = pe.getJavaFile().createMarker(CLOSEDMARKER_ID);
             if (marker.exists()) {
-               marker.setAttribute(IMarker.MESSAGE, "Proof closed: " + proofFile.getFullPath());
+               marker.setAttribute(IMarker.MESSAGE, pe.getMarkerMsg());
                marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
                marker.setAttribute(IMarker.LINE_NUMBER, scl.getLineNumber()); // Required for compatibility with other tools like FeatureIDE even if char start and end is defined.
                marker.setAttribute(IMarker.LOCATION, "line " + scl.getLineNumber()); // Otherwise value "Unknown" is shown in Problems-View
                marker.setAttribute(IMarker.CHAR_START, scl.getCharStart());
                marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
+               marker.setAttribute(IMarker.SOURCE_ID, pe.getProofFile().getFullPath().toString());
                pe.addMarker(marker);
             }
          }
          else {
-            IMarker marker = javaFile.createMarker(NOTCLOSEDMARKER_ID);
+            IMarker marker = pe.getJavaFile().createMarker(NOTCLOSEDMARKER_ID);
             if (marker.exists()) {
-               marker.setAttribute(IMarker.MESSAGE, "Proof not closed: " + proofFile.getFullPath());
+               marker.setAttribute(IMarker.MESSAGE, pe.getMarkerMsg());
                marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
                marker.setAttribute(IMarker.LINE_NUMBER, scl.getLineNumber()); // Required for compatibility with other tools like FeatureIDE even if char start and end is defined.
                marker.setAttribute(IMarker.LOCATION, "line " + scl.getLineNumber()); // Otherwise value "Unknown" is shown in Problems-View
                marker.setAttribute(IMarker.CHAR_START, scl.getCharStart());
                marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
+               marker.setAttribute(IMarker.SOURCE_ID, pe.getProofFile().getFullPath().toString());
                pe.addMarker(marker);
             }
          }
@@ -106,6 +106,7 @@ public class MarkerManager {
          marker.setAttribute(IMarker.LOCATION, "line " + pe.getSourceLocation().getLineNumber()); // Otherwise value "Unknown" is shown in Problems-View
          marker.setAttribute(IMarker.CHAR_START, pe.getSourceLocation().getCharStart());
          marker.setAttribute(IMarker.CHAR_END, pe.getSourceLocation().getCharEnd());
+         marker.setAttribute(IMarker.SOURCE_ID, pe.getProofFile().getFullPath().toString());
          pe.addMarker(marker);
       }
    }
@@ -121,7 +122,7 @@ public class MarkerManager {
       sb.append("Cycle detected:");
       for(ProofElement pe : cycle){
          sb.append(StringUtil.NEW_LINE);
-         sb.append(pe.getProofFile().getFullPath());
+         sb.append(pe.getContract().getName());
       }
       return sb.toString();
    }
@@ -151,27 +152,30 @@ public class MarkerManager {
       LinkedHashSet<IMarker> oldMarker = new LinkedHashSet<IMarker>();
       LinkedList<IMarker> allFileKeYMarker = getAllkeYMarkerForScl(javaFile, scl);
       for(IMarker marker : allFileKeYMarker){
-         String message = marker.getAttribute(IMarker.MESSAGE, "");
-         if(CLOSEDMARKER_ID.equals(marker.getType())){
-            if(message.equals("Proof closed: " + proofFile.getFullPath())){
-               oldMarker.add(marker);
-            }
+         String source = marker.getAttribute(IMarker.SOURCE_ID, "");
+         if(source.equals(proofFile.getFullPath().toString())){
+            oldMarker.add(marker);
          }
-         else if(NOTCLOSEDMARKER_ID.equals(marker.getType())){
-            if(message.equals("Proof not closed: " + proofFile.getFullPath())){
-               oldMarker.add(marker);
-            }
-         }
-         else if(RECURSIONMARKER_ID.equals(marker.getType())){
-            if(message.startsWith("Cycle detected:" + StringUtil.NEW_LINE + proofFile.getFullPath())){
-               oldMarker.add(marker);
-            }
-         }
-         else if(OLDPROOFMARKER_ID.equals(marker.getType())){
-            if(message.equals("Outdated proof: " + proofFile.getFullPath())){
-               oldMarker.add(marker);
-            }
-         }
+//         if(CLOSEDMARKER_ID.equals(marker.getType())){
+//            if(message.equals("Proof closed: " + proofFile.getFullPath())){
+//               oldMarker.add(marker);
+//            }
+//         }
+//         else if(NOTCLOSEDMARKER_ID.equals(marker.getType())){
+//            if(message.equals("Proof not closed: " + proofFile.getFullPath())){
+//               oldMarker.add(marker);
+//            }
+//         }
+//         else if(RECURSIONMARKER_ID.equals(marker.getType())){
+//            if(message.startsWith("Cycle detected:" + StringUtil.NEW_LINE + proofFile.getFullPath())){
+//               oldMarker.add(marker);
+//            }
+//         }
+//         else if(OLDPROOFMARKER_ID.equals(marker.getType())){
+//            if(message.equals("Outdated proof: " + proofFile.getFullPath())){
+//               oldMarker.add(marker);
+//            }
+//         }
       }
       return oldMarker;
    }
