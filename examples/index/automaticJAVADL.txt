@@ -15,6 +15,36 @@
 #
 
 
+provable: ./standard_key/strings/charAt0.key
+provable: ./standard_key/strings/charAt1.key
+provable: ./standard_key/strings/concat1.key
+provable: ./standard_key/strings/concat2.key
+provable: ./standard_key/strings/deriveLength1.key
+provable: ./standard_key/strings/emptyStringLengthZero.key
+provable: ./standard_key/strings/implicitBooleanStringConversion.key
+provable: ./standard_key/strings/implicitBooleanStringConversion2.key
+provable: ./standard_key/strings/implicitIntStringConversion.key
+provable: ./standard_key/strings/implicitNullStringConversion.key
+provable: ./standard_key/strings/implicitNullStringConversion2.key
+provable: ./standard_key/strings/implicitObjectStringConversion.key
+provable: ./standard_key/strings/literalEquality.key
+provable: ./standard_key/strings/replace0.key
+provable: ./standard_key/strings/replace1.key
+provable: ./standard_key/strings/simpleAssignment.key
+provable: ./standard_key/strings/simpleLengthComp.key
+provable: ./standard_key/strings/stringCompileTimeConstant1.key
+provable: ./standard_key/strings/stringCompileTimeConstant2.key
+provable: ./standard_key/strings/stringEquality1.key
+provable: ./standard_key/strings/stringEquality2.key
+provable: ./standard_key/strings/substring0.key
+provable: ./standard_key/strings/substring1.key
+provable: ./standard_key/strings/substring2.key
+provable: ./standard_key/strings/substring3.key
+provable: ./standard_key/strings/substring4.key
+provable: ./standard_key/strings/substring5.key
+
+
+
 # Comprehension Tests
 provable: ./heap/comprehensions/general_sum.key
 provable: ./heap/comprehensions/sum0.key
