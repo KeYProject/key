@@ -34,9 +34,9 @@ public class TestImplementation {
         test(false, false, null, 0, true);
         
         if (errors == 0) {
-            System.out.println("The map works as expected.");
+            //System.out.println("The map works as expected.");
         } else {
-            System.out.println("Unexpected map behaviour was observed.");
+            //System.out.println("Unexpected map behaviour was observed.");
         }
     }
 
