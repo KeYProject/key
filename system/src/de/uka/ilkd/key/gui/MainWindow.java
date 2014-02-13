@@ -25,13 +25,13 @@ import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagLayout;
 import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -58,7 +58,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
@@ -110,7 +109,6 @@ import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
-import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.gui.nodeviews.EmptySequent;
 import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
@@ -282,6 +280,22 @@ public final class MainWindow extends JFrame  {
         new HidePackagePrefixToggleAction(this);
     
     private final TermLabelMenu termLabelMenu;
+
+    /**
+     * set to true if the view of the current goal should not be updated
+     */
+    private boolean disableCurrentGoalView = false;
+
+    /**
+     * Menu for strategy macros.
+     */
+    private JMenuItem macroMenu;
+    
+    /**
+     * All main window actions except automode.
+     * Will all be disabled while automode is running.
+     */
+    private Collection<MainWindowAction> allActions = new ArrayList<MainWindowAction>(30);
     
     public VisibleTermLabels getVisibleTermLabels(){
         return termLabelMenu.getVisibleTermLabels();
@@ -392,6 +406,17 @@ public final class MainWindow extends JFrame  {
     public void setVisible(boolean v){
         super.setVisible(v && visible);
     }
+    
+    /**
+     * Enables/disables actions.
+     * See bug #1410.
+     * @param enabled
+     */
+    void setActionsEnabled (boolean enabled) {
+        this.macroMenu.setEnabled(enabled);
+        for (MainWindowAction a: allActions)
+            a.setEnabled(enabled);
+    }
 
     /** initialised, creates GUI and lays out the main frame */
     private void layoutMain() {
@@ -399,7 +424,7 @@ public final class MainWindow extends JFrame  {
         getContentPane().setLayout(new BorderLayout());
 
         // default size
-        setSize(1000, 750);
+        setPreferredSize(new java.awt.Dimension(1000, 750));
 
         // FIXME FIXME
         recentFiles = new RecentFileMenu(new ActionListener() {
@@ -435,6 +460,10 @@ public final class MainWindow extends JFrame  {
         loadKeYTaclets            = new LemmaGenerationAction.ProveKeYTaclets(this);
         lemmaGenerationBatchModeAction    = new LemmaGenerationBatchModeAction(this);
         unicodeToggleAction = new UnicodeToggleAction(this);
+        allActions.addAll(java.util.Arrays.asList(openFileAction, openExampleAction, openMostRecentFileAction, 
+                editMostRecentFileAction, saveFileAction, quickSaveAction, quickLoadAction, proofManagementAction,
+                /* exitMainAction, */ showActiveSettingsAction, loadUserDefinedTacletsAction, 
+                loadUserDefinedTacletsForProvingAction, loadKeYTaclets, lemmaGenerationBatchModeAction, unicodeToggleAction));
 
 	// create empty views
 	createViews();
@@ -505,14 +534,6 @@ public final class MainWindow extends JFrame  {
         pane.setSelectedIndex(0);
         pane.setPreferredSize(new java.awt.Dimension(250, 440));
 
-        // change some key mappings which collide with font settings.
-	pane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-	        .getParent().remove(
-	                KeyStroke.getKeyStroke(KeyEvent.VK_UP, Toolkit
-	                        .getDefaultToolkit().getMenuShortcutKeyMask()));
-	pane.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(
-	        KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit
-	                .getDefaultToolkit().getMenuShortcutKeyMask()));
 	pane.setName("leftTabbed");
 
 	return pane;
@@ -543,11 +564,15 @@ public final class MainWindow extends JFrame  {
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
         toolBar.addSeparator();        
-        toolBar.add(new CounterExampleAction(this));
+        final CounterExampleAction counterExampleAction = new CounterExampleAction(this);
+        toolBar.add(counterExampleAction);
         toolBar.addSeparator();
-        toolBar.add(new GoalBackAction(this, false));
-        toolBar.add(new PruneProofAction(this, false));
+        final GoalBackAction goalBackAction = new GoalBackAction(this, false);
+        toolBar.add(goalBackAction);
+        final PruneProofAction pruneProofAction = new PruneProofAction(this, false);
+        toolBar.add(pruneProofAction);
         JToggleButton oneStep = new JToggleButton(oneStepSimplAction);
+        allActions.addAll(java.util.Arrays.asList(counterExampleAction, goalBackAction, pruneProofAction, oneStepSimplAction));
         oneStep.setHideActionText(true);
         toolBar.addSeparator();
         toolBar.add(oneStep);
@@ -740,9 +765,9 @@ public final class MainWindow extends JFrame  {
         menuBar.add(createProofMenu());
         menuBar.add(createOptionsMenu());
         menuBar.add(Box.createHorizontalGlue());
-        menuBar.add(createHelpMenu());
         if (Debug.ENABLE_DEBUG)
             menuBar.add(createDebugMenu());
+        menuBar.add(createHelpMenu());
         return menuBar;
     }
 
@@ -801,15 +826,20 @@ public final class MainWindow extends JFrame  {
         view.add(new JCheckBoxMenuItem(hidePackagePrefixToggleAction));
 
         view.addSeparator();
-        {
-            JMenu fontSize = new JMenu("Font Size");
-            fontSize.add(new FontSizeAction(this, FontSizeAction.Mode.SMALLER));
-            fontSize.add(new FontSizeAction(this, FontSizeAction.Mode.LARGER));
-            view.add(fontSize);
-        }
-        view.add(new ToolTipOptionsAction(this));
+        JMenu fontSize = new JMenu("Font Size");
+        final FontSizeAction fontSmallerAction = new FontSizeAction(this, FontSizeAction.Mode.SMALLER);
+        fontSize.add(fontSmallerAction);
+        final FontSizeAction fontLargerAction = new FontSizeAction(this, FontSizeAction.Mode.LARGER);
+        fontSize.add(fontLargerAction);
+        view.add(fontSize);
+        final ToolTipOptionsAction toolTipAction = new ToolTipOptionsAction(this);
+        view.add(toolTipAction);
 
-        view.add(new ProofDiffFrame.Action(this));
+        final ProofDiffFrame.Action proofDiffAction = new ProofDiffFrame.Action(this);
+        view.add(proofDiffAction);
+        
+        allActions.addAll(java.util.Arrays.asList(unicodeToggleAction, hidePackagePrefixToggleAction,
+                fontSmallerAction, fontLargerAction, toolTipAction, proofDiffAction));
                 
         return view;
     }
@@ -819,19 +849,32 @@ public final class MainWindow extends JFrame  {
         proof.setMnemonic(KeyEvent.VK_P);
 
         proof.add(autoModeAction);
-        final JMenuItem macros = new de.uka.ilkd.key.gui.macros.ProofMacroMenu(mediator, null);
-        proof.add(macros);
-        proof.add(new UndoLastStepAction(this, true));
-        proof.add(new AbandonTaskAction(this));
+        macroMenu = new de.uka.ilkd.key.gui.macros.ProofMacroMenu(mediator, null);
+        // TODO: disable macro menu when no proof is loaded
+        proof.add(macroMenu);
+        final UndoLastStepAction undoAction = new UndoLastStepAction(this, true);
+        proof.add(undoAction);
+        final AbandonTaskAction abandonAction = new AbandonTaskAction(this);
+        proof.add(abandonAction);
         proof.addSeparator();
-        proof.add(new SearchInProofTreeAction(this));
-        proof.add(new SearchInSequentAction(this));
+        final SearchInProofTreeAction searchInProofTreeAction = new SearchInProofTreeAction(this);
+        proof.add(searchInProofTreeAction);
+        final SearchInSequentAction searchInSequentAction = new SearchInSequentAction(this);
+        proof.add(searchInSequentAction);
         proof.addSeparator();
-	proof.add(new ShowUsedContractsAction(this));
-        proof.add(new ShowActiveTactletOptionsAction(this));
+	final ShowUsedContractsAction showContractsAction = new ShowUsedContractsAction(this);
+        proof.add(showContractsAction);
+        final ShowActiveTactletOptionsAction showSettingsAction = new ShowActiveTactletOptionsAction(this);
+        proof.add(showSettingsAction);
 	proof.add(showActiveSettingsAction);
-        proof.add(new ShowProofStatistics(this));
-        proof.add(new ShowKnownTypesAction(this));
+        final ShowProofStatistics statisticsAction = new ShowProofStatistics(this);
+        proof.add(statisticsAction);
+        final ShowKnownTypesAction showTypesAction = new ShowKnownTypesAction(this);
+        proof.add(showTypesAction);
+        
+        allActions.addAll(java.util.Arrays.asList(undoAction, abandonAction, searchInProofTreeAction,
+                searchInSequentAction, showContractsAction, showSettingsAction, showActiveSettingsAction,
+                statisticsAction, showTypesAction));
 
         return proof;
     }
@@ -840,14 +883,19 @@ public final class MainWindow extends JFrame  {
 	JMenu options = new JMenu("Options");
 	options.setMnemonic(KeyEvent.VK_O);
 
-	options.add(new TacletOptionsAction(this));
-	options.add(new SMTOptionsAction(this));
+        final TacletOptionsAction tacletOptionsAction = new TacletOptionsAction(this);
+        options.add(tacletOptionsAction);
+        final SMTOptionsAction smtOptionsAction = new SMTOptionsAction(this);
+        options.add(smtOptionsAction);
 //	options.add(setupSpeclangMenu()); // legacy since only JML supported
 	options.addSeparator();
         options.add(new JCheckBoxMenuItem(new ToggleConfirmExitAction(this)));
         options.add(new MinimizeInteraction(this));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
         options.add(new JCheckBoxMenuItem(oneStepSimplAction));
+        
+        allActions.add(tacletOptionsAction);
+        allActions.add(smtOptionsAction);
 
         return options;
 
@@ -1116,11 +1164,6 @@ public final class MainWindow extends JFrame  {
         }
 
     }
-
-    /**
-     * set to true if the view of the current goal should not be updated
-     */
-    private boolean disableCurrentGoalView = false;
 
     /*
      * Updates the sequent displayed in the main frame.
