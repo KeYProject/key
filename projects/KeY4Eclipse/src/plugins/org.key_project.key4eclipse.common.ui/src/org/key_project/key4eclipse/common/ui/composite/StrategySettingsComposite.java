@@ -12,8 +12,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -28,6 +26,7 @@ import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
+import org.key_project.util.eclipse.swt.IntegerVerifyListener;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.XMLUtil;
@@ -262,23 +261,7 @@ public class StrategySettingsComposite extends Composite {
          maxStepsSection.setClient(maxStepText);
          data.setMaxStepText(maxStepText);
          maxStepText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-         maxStepText.addVerifyListener(new VerifyListener() {
-            @Override
-            public void verifyText(VerifyEvent e) {
-               if (!StringUtil.isTrimmedEmpty(e.text)) {
-                  try {
-                     int steps = Integer.valueOf(e.text);
-                     e.doit = steps >= 0;
-                  }
-                  catch (Exception exc) {
-                     e.doit = false;
-                  }
-               }
-               else {
-                 e.doit = true; // Allow empty text which will be treated as zero
-               }
-            }
-         });
+         maxStepText.addVerifyListener(new IntegerVerifyListener(0, Integer.MAX_VALUE, true));
          maxStepText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {

@@ -87,6 +87,7 @@ public class IconFactory {
 
     private static Image plus = getImage("images/toolbar/plus.png");
     private static Image minus = getImage("images/toolbar/minus.png");
+    private static Image expandGoals = getImage("images/toolbar/expandGoals.png");
 
     private static Image next = getImage("images/toolbar/go-next.png");
     private static Image previous = getImage("images/toolbar/go-previous.png");
@@ -158,6 +159,10 @@ public class IconFactory {
 
     public static ImageIcon minus(int x) {
         return scaleIcon(minus,x,x);
+    }
+
+    public static ImageIcon expandGoals(int x) {
+        return scaleIcon(expandGoals,x,x);
     }
 
     public static ImageIcon next(int x) {

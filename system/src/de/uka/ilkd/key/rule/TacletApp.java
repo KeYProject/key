@@ -423,7 +423,7 @@ public abstract class TacletApp implements RuleApp {
             ImmutableList<UpdateLabelPair> oldUpdCtx = 
                     matchConditions().getInstantiations().getUpdateContext();
             MatchConditions newConditions = ((RewriteTaclet)taclet).checkPrefix(posInOccurrence(), 
-                    MatchConditions.EMPTY_MATCHCONDITIONS, services);
+                    MatchConditions.EMPTY_MATCHCONDITIONS);
             if(newConditions == null) {
                 return false;
             }

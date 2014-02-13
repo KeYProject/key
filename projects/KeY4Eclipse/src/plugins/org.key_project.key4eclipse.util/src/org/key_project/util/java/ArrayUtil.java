@@ -145,6 +145,39 @@ public final class ArrayUtil {
            return new int[] {toAdd};
        }
    }
+   
+   /**
+    * <p>
+    * Inserts the given element at the given index to the existing array. 
+    * The result is a new array that contains one more element.
+    * </p>
+    * @param array The array to extend.
+    * @param toInsert The element to insert.
+    * @param index The index to insert the element at.
+    * @return The new created array with one more element.
+    */
+   @SuppressWarnings("unchecked")
+   public static <T> T[] insert(T[] array, T toInsert, int index) {
+       if (array != null) {
+           T[] result = (T[])java.lang.reflect.Array.newInstance(array.getClass().getComponentType(), array.length + 1);
+           if (index >= 1) {
+              System.arraycopy(array, 0, result, 0, index);
+           }
+           result[index] = toInsert;
+           System.arraycopy(array, index, result, index + 1, array.length - index);
+           return result;
+       }
+       else {
+          if (toInsert != null) {
+             T[] result = (T[])java.lang.reflect.Array.newInstance(toInsert.getClass(), 1);
+             result[0] = toInsert;
+             return result;
+         }
+         else {
+             throw new IllegalArgumentException("Can not create an array if array and element to insert are null.");
+         }
+       }
+   }
 
    /**
     * Checks if the given array contains the element to search.
