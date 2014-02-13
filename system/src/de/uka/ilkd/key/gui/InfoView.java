@@ -32,7 +32,7 @@ import javax.swing.tree.TreeCellRenderer;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.proof.RuleTreeModel;
+import de.uka.ilkd.key.proof.InfoTreeModel;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.GuiUtilities;
@@ -40,7 +40,7 @@ import de.uka.ilkd.key.util.GuiUtilities;
 public class InfoView extends JSplitPane implements TreeSelectionListener {
 
     private static final String DESC_RESOURCE = "/de/uka/ilkd/key/gui/help/ruleExplanations.xml";
-    private RuleTreeModel ruleTreeModel;
+    private InfoTreeModel infoTreeModel;
     private final JTree infoTree;
     private final JTextArea contentPane;
     private final JScrollPane contentScrollPane;
@@ -130,13 +130,13 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
         return lp.toString();
     }
 
-    protected void setRuleTreeModel(RuleTreeModel model) {
+    protected void setRuleTreeModel(InfoTreeModel model) {
 
-        ruleTreeModel = model;
+        infoTreeModel = model;
 
-        if (ruleTreeModel != null) {
-            ruleTreeModel.updateTacletCount();
-            infoTree.setModel(ruleTreeModel);
+        if (infoTreeModel != null) {
+            infoTreeModel.updateTacletCount();
+            infoTree.setModel(infoTreeModel);
         }
     }
 
@@ -147,7 +147,7 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
          */
         @Override
         public void selectedNodeChanged(KeYSelectionEvent e) {
-            ruleTreeModel.setSelectedGoal(e.getSource().getSelectedGoal());
+            infoTreeModel.setSelectedGoal(e.getSource().getSelectedGoal());
         }
 
         /**
@@ -160,9 +160,9 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
                 public void run() {
                     if (mediator != null) {
                         if (mediator.getSelectedProof() != null) {
-                            setRuleTreeModel(new RuleTreeModel(mediator.getSelectedGoal()));
+                            setRuleTreeModel(new InfoTreeModel(mediator.getSelectedGoal()));
                         } else {
-                            ruleTreeModel.setSelectedGoal(null);
+                            infoTreeModel.setSelectedGoal(null);
                         }
                     }
                 }
