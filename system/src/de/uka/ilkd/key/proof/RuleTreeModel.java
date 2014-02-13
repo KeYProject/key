@@ -36,7 +36,6 @@ import de.uka.ilkd.key.util.MiscTools;
 
 public class RuleTreeModel extends DefaultTreeModel {
     
-    private static final long serialVersionUID = -7536362498647498639L;
     private static final String LEMMAS = "Lemmas";
     private static final String TACLET_BASE = "Taclet Base";
     protected Goal goal;

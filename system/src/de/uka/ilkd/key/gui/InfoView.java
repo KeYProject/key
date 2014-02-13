@@ -10,8 +10,6 @@
 // The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
 // 
-
-
 package de.uka.ilkd.key.gui;
 
 import java.awt.Component;
@@ -43,9 +41,9 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
 
     private static final String DESC_RESOURCE = "/de/uka/ilkd/key/gui/help/ruleExplanations.xml";
     private RuleTreeModel ruleViewModel;
-    private JTree infoTree;
-    private JTextArea contentPane;
-    private JScrollPane contentScrollPane;
+    private final JTree infoTree;
+    private final JTextArea contentPane;
+    private final JScrollPane contentScrollPane;
     private KeYMediator mediator;
     private Properties descriptions;
 
@@ -56,7 +54,24 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
 
     public InfoView() {
         super(VERTICAL_SPLIT);
-        layoutPane();
+        // initial placement of the divider
+        setDividerLocation(300);
+
+        // growing goes to the upper half only
+        setResizeWeight(1.0);
+
+        // this triggers storing the bar position
+        setName("ruleViewPane");
+        infoTree = new JTree(new String[]{"No proof loaded"});
+        JScrollPane jp = new JScrollPane(infoTree);
+        setLeftComponent(jp);
+
+        contentPane = new JTextArea("", 15, 30);
+        contentPane.setEditable(false);
+        contentPane.setLineWrap(true);
+        contentPane.setWrapStyleWord(true);
+        contentScrollPane = new JScrollPane(contentPane);
+        setRightComponent(contentScrollPane);
         infoTree.setCellRenderer(new RuleRenderer());
         infoTree.addTreeSelectionListener(this);
         setVisible(true);
@@ -145,28 +160,6 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
         mediator.removeKeYSelectionListener(selectionListener);
     }
 
-    protected final void layoutPane() {
-        // initial placement of the divider
-        setDividerLocation(300);
-
-        // growing goes to the upper half only
-        setResizeWeight(1.0);
-
-        // this triggers storing the bar position
-        setName("ruleViewPane");
-        infoTree = new JTree(new String[]{"No proof loaded"});
-        JScrollPane jp = new JScrollPane(infoTree);
-        setLeftComponent(jp);
-
-        contentPane = new JTextArea("", 15, 30);
-        contentPane.setEditable(false);
-        contentPane.setLineWrap(true);
-        contentPane.setWrapStyleWord(true);
-        contentScrollPane = new JScrollPane(contentPane);
-        setRightComponent(contentScrollPane);
-
-    }
-
     private class SelectionListener implements KeYSelectionListener {
 
         /**
@@ -200,10 +193,7 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
 
     }
 
-    private static class RuleRenderer extends DefaultTreeCellRenderer
-            implements TreeCellRenderer, java.io.Serializable {
-
-        private static final long serialVersionUID = 6129388673386459052L;
+    private static class RuleRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree,
