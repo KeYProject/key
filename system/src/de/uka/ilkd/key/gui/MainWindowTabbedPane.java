@@ -37,7 +37,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
     /**
      * the rule view
      */
-    private final RuleView ruleView;
+    private final InfoView ruleView;
 
     MainWindowTabbedPane(MainWindow mainWindow, KeYMediator mediator) {
         
@@ -67,12 +67,12 @@ public class MainWindowTabbedPane extends JTabbedPane {
                 "Select strategy for automated proof search");
 
         // set ruleView
-        ruleView = new RuleView();
+        ruleView = new InfoView();
         if (mediator != null) {
             ruleView.setMediator(mediator);
         }
-        addTab("Rules", null, ruleView,
-                "All available rules");
+        addTab("Info", null, ruleView,
+                "Taclet and term label descriptions");
 
         setSelectedIndex(0);
         setPreferredSize(new java.awt.Dimension(250, 440));

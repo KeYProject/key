@@ -39,12 +39,11 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.GuiUtilities;
 
-public class RuleView extends JSplitPane implements TreeSelectionListener, java.io.Serializable {
+public class InfoView extends JSplitPane implements TreeSelectionListener {
 
     private static final String DESC_RESOURCE = "/de/uka/ilkd/key/gui/help/ruleExplanations.xml";
-    private static final long serialVersionUID = 911181673407907024L;
     private RuleTreeModel ruleViewModel;
-    private JTree ruleTree;
+    private JTree infoTree;
     private JTextArea contentPane;
     private JScrollPane contentScrollPane;
     private KeYMediator mediator;
@@ -55,18 +54,18 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
      */
     private final SelectionListener selectionListener = new SelectionListener();
 
-    public RuleView() {
+    public InfoView() {
         super(VERTICAL_SPLIT);
         layoutPane();
-        ruleTree.setCellRenderer(new RuleRenderer());
-        ruleTree.addTreeSelectionListener(this);
+        infoTree.setCellRenderer(new RuleRenderer());
+        infoTree.addTreeSelectionListener(this);
         setVisible(true);
     }
 
     @Override
     public void valueChanged(TreeSelectionEvent e) {
-        if (ruleTree.getLastSelectedPathComponent() != null) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) ruleTree
+        if (infoTree.getLastSelectedPathComponent() != null) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) infoTree
                     .getLastSelectedPathComponent();
             showTacletView(node);
         }
@@ -134,7 +133,7 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
 
         if (ruleViewModel != null) {
             ruleViewModel.updateTacletCount();
-            ruleTree.setModel(ruleViewModel);
+            infoTree.setModel(ruleViewModel);
         }
     }
 
@@ -155,8 +154,8 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
 
         // this triggers storing the bar position
         setName("ruleViewPane");
-        ruleTree = new JTree(new String[]{"No proof loaded"});
-        JScrollPane jp = new JScrollPane(ruleTree);
+        infoTree = new JTree(new String[]{"No proof loaded"});
+        JScrollPane jp = new JScrollPane(infoTree);
         setLeftComponent(jp);
 
         contentPane = new JTextArea("", 15, 30);
