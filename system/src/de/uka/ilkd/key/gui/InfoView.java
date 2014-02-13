@@ -44,16 +44,15 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
     private final JTree infoTree;
     private final JTextArea contentPane;
     private final JScrollPane contentScrollPane;
-    private KeYMediator mediator;
+    private final KeYMediator mediator;
     private Properties descriptions;
 
-    /**
-     * Listener for proof changes
-     */
-    private final SelectionListener selectionListener = new SelectionListener();
-
-    public InfoView() {
+    public InfoView(KeYMediator mediator) {
         super(VERTICAL_SPLIT);
+        
+        this.mediator = mediator;
+        mediator.addKeYSelectionListener(new SelectionListener());
+        
         // initial placement of the divider
         setDividerLocation(300);
 
@@ -130,18 +129,6 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
         return lp.toString();
     }
 
-    public void setMediator(KeYMediator p_mediator) {
-        if (mediator != null) {
-            unregisterAtMediator();
-        }
-
-        mediator = p_mediator;
-        registerAtMediator();
-        if (mediator != null && mediator.getSelectedProof() != null) {
-            setRuleTreeModel(new RuleTreeModel(mediator.getSelectedGoal()));
-        }
-    }
-
     protected void setRuleTreeModel(RuleTreeModel model) {
 
         ruleViewModel = model;
@@ -150,14 +137,6 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
             ruleViewModel.updateTacletCount();
             infoTree.setModel(ruleViewModel);
         }
-    }
-
-    protected void registerAtMediator() {
-        mediator.addKeYSelectionListener(selectionListener);
-    }
-
-    protected void unregisterAtMediator() {
-        mediator.removeKeYSelectionListener(selectionListener);
     }
 
     private class SelectionListener implements KeYSelectionListener {
@@ -187,7 +166,6 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
                     }
                 }
             };
-
             GuiUtilities.invokeOnEventQueue(action);
         }
 

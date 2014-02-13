@@ -40,6 +40,8 @@ public class MainWindowTabbedPane extends JTabbedPane {
     private final InfoView ruleView;
 
     MainWindowTabbedPane(MainWindow mainWindow, KeYMediator mediator) {
+        assert mediator != null;
+        assert mainWindow != null;
         
         // set proofTreeView
         proofTreeView = new ProofTreeView(mediator);
@@ -67,10 +69,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
                 "Select strategy for automated proof search");
 
         // set ruleView
-        ruleView = new InfoView();
-        if (mediator != null) {
-            ruleView.setMediator(mediator);
-        }
+        ruleView = new InfoView(mediator);
         addTab("Info", null, ruleView,
                 "Taclet and term label descriptions");
 
