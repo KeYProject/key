@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
@@ -577,7 +576,8 @@ final class JMLTranslator {
                         if (nullable) {
                             res = TB.and(res,TB.created(services, TB.var(qv)));
                         } else {
-                            res = TB.and(res,TB.createdAndNotNull(services, TB.var(qv)));
+                            res = TB.and(res, TB.and(
+                                    TB.created(services, TB.var(qv)), TB.deepNonNull(TB.var(qv), services)));
                         }
                     }
                 }
@@ -632,7 +632,8 @@ final class JMLTranslator {
                         if (nullable) {
                             res = TB.and(res,TB.created(services, TB.var(qv)));
                         } else {
-                            res = TB.and(res,TB.createdAndNotNull(services, TB.var(qv)));
+                            res = TB.and(res, TB.and(
+                                    TB.created(services, TB.var(qv)), TB.deepNonNull(TB.var(qv), services)));
                         }
                     }
                 }
@@ -1965,15 +1966,13 @@ final class JMLTranslator {
                 resultType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
             }
 
-            Term nullTerm = TB.NULL(services);
             for (LogicVariable lv : declVars) {
                 preTerm = TB.and(preTerm,
                                  TB.reachableValue(services, TB.var(lv),
                                                    declsType));
                 if (lv.sort().extendsTrans(services.getJavaInfo().objectSort())
                     && !nullable) {
-                    preTerm = TB.and(preTerm, TB.not(TB.equals(TB.var(lv),
-                                                               nullTerm)));
+                    preTerm = TB.and(preTerm, TB.deepNonNull(TB.var(lv), services));
                 }
             }
 
@@ -2023,7 +2022,8 @@ final class JMLTranslator {
                     if (nullable) {
                         res = TB.and(res,TB.created(services, TB.var(qv)));
                     } else {
-                        res = TB.and(res,TB.createdAndNotNull(services, TB.var(qv)));
+                        res = TB.and(res,TB.and(
+                                TB.created(services, TB.var(qv)), TB.deepNonNull(TB.var(qv), services)));
                     }
                 }
             }
@@ -2199,52 +2199,7 @@ final class JMLTranslator {
             return null;
         }
     }
-
-    /**
-     * Translation method for expressions only allowed to appear in a postcondition.
-     * @author bruns
-     *
-     */
-    private abstract static class JMLPostExpressionTranslationMethod implements JMLTranslationMethod {
-
-        protected void assertPost (Term heapAtPre) throws SLTranslationException{
-            if (heapAtPre == null){
-                throw new SLTranslationException("JML construct "+name()+" not allowed in this context.");
-            }
-        }
-
-
-        /**
-         * Converts a term so that all of its non-rigid operators refer to the pre-state.
-         */
-        protected Term convertToOld(Services services, Term heapAtPre, Term term) {
-            assert heapAtPre != null;
-            Map<Term,Term> map = new LinkedHashMap<Term, Term>();
-            map.put(TB.getBaseHeap(services), heapAtPre);
-            OpReplacer or = new OpReplacer(map);
-            return or.replace(term);
-        }
-
-        /**
-         * Name of this translation method;
-         */
-        protected abstract String name();
-
-        protected abstract Term translate (Services services, Term heapAtPre, Object[] params) throws SLTranslationException;
-
-        public Term translate (Object ... params) throws SLTranslationException{
-            if (!(params[0] instanceof Services && params[1] instanceof Term))
-                throw new SLTranslationException(
-                        "Parameter 2 does not match the expected type.\n"
-                        + "Parameter type was: " + params[1].getClass().getName()
-                        + "\nExpected type was:  Term");
-            Term heapAtPre = (Term) params[1];
-            assertPost(heapAtPre);
-            return translate((Services)params[0], heapAtPre, Arrays.copyOfRange(params, 1, params.length-1));
-        }
-    }
-
-
+    
     private abstract class JMLEqualityTranslationMethod implements
             JMLTranslationMethod {
 
@@ -2390,9 +2345,3 @@ final class JMLTranslator {
         protected abstract SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression left, SLExpression right) throws SLTranslationException;
     }
 }
-
-//if(symbol == null) {
-//  // no function -> look for predicates
-//  Namespace preds = services.getNamespaces().functions();
-//  Named symbol = funcs.lookup(new Name(functName));
-//}

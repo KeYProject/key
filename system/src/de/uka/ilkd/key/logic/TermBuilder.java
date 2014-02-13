@@ -1561,10 +1561,14 @@ public class TermBuilder {
     public Term NULL(Services services) {
         return func(services.getTypeConverter().getHeapLDT().getNull());
     }
-
-    /** Non-null comparison of reference types */
-    public Term notNull(Services services, Term o) {
-        return not(equals(o, NULL(services)));
+    
+    /** The "deep non null" predicate arising from JML non_null types.
+     * Deep non null means that it is recursively defined for arrays.
+     * See bug #1392.
+     */
+    public Term deepNonNull(Term o, Services services) {
+        final Function nonNull = (Function) services.getNamespaces().functions().lookup("nonNull");
+        return func(nonNull, o);
     }
 
     public Term wellFormed(Term heap, Services services) {
@@ -1770,15 +1774,6 @@ public class TermBuilder {
     public Term created(Services services, Term o) {
         return created(services, getBaseHeap(services), o);
     }
-
-    public Term createdAndNotNull(Services services, Term heap, Term o) {
-        return and(created(services, heap, o), notNull(services, o));
-    }
-
-    public Term createdAndNotNull(Services services, Term o) {
-        return and(created(services, o), notNull(services, o));
-    }
-
 
     public Term initialized(Services services, Term o) {
         final TypeConverter tc = services.getTypeConverter();

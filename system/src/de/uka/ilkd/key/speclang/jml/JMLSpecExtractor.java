@@ -20,7 +20,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
@@ -68,7 +67,6 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     private static final String THROWABLE = "java.lang.Throwable";
     private static final String ERROR = "java.lang.Error";
-    private static final String EXCEPTION = "java.lang.Exception";
     private static final String RUNTIME_EXCEPTION = "java.lang.RuntimeException";
     private static final String DEFAULT_SIGNALS_ONLY = "signals_only "+ERROR+", "+RUNTIME_EXCEPTION+";";
     private final Services services;
@@ -190,18 +188,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         final TypeConverter typeConverter = services.getTypeConverter();
         if (typeConverter.isReferenceType(varType) && !isImplicitVar) {
-            if (varType instanceof ArrayType &&
-                    typeConverter.
-                    isReferenceType(((ArrayType)varType).getBaseType().getKeYJavaType())) {
-                final PositionedString arrayElementsNonNull
-                = new PositionedString("(\\forall int i; 0 <= i && i < " + varName + ".length;"
-                                              + varName + "[i]" + " != null)",
-                                              fileName,
-                                              pos).label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
-                result = result.add(arrayElementsNonNull);
-            }
+            
             PositionedString ps
-            = new PositionedString(varName + " != null", fileName, pos)
+            // use special "deep" non null predicate (see bug #1392)
+            = new PositionedString("\\dl_nonNull("+varName+")", fileName, pos)
                                 .label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
             result = result.add(ps);
         }
