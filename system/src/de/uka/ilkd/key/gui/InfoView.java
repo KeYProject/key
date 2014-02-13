@@ -40,18 +40,19 @@ import de.uka.ilkd.key.util.GuiUtilities;
 public class InfoView extends JSplitPane implements TreeSelectionListener {
 
     private static final String DESC_RESOURCE = "/de/uka/ilkd/key/gui/help/ruleExplanations.xml";
-    private RuleTreeModel ruleViewModel;
+    private RuleTreeModel ruleTreeModel;
     private final JTree infoTree;
     private final JTextArea contentPane;
     private final JScrollPane contentScrollPane;
     private final KeYMediator mediator;
-    private Properties descriptions;
+    private final XMLProperties ruleExplanations;
 
     public InfoView(KeYMediator mediator) {
         super(VERTICAL_SPLIT);
         
         this.mediator = mediator;
         mediator.addKeYSelectionListener(new SelectionListener());
+        ruleExplanations = new XMLProperties(DESC_RESOURCE);
         
         // initial placement of the divider
         setDividerLocation(300);
@@ -71,7 +72,7 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
         contentPane.setWrapStyleWord(true);
         contentScrollPane = new JScrollPane(contentPane);
         setRightComponent(contentScrollPane);
-        infoTree.setCellRenderer(new RuleRenderer());
+        infoTree.setCellRenderer(new InfoRenderer());
         infoTree.addTreeSelectionListener(this);
         setVisible(true);
     }
@@ -114,7 +115,7 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
     }
 
     private String getRuleDescription(String name) {
-        String desc = getDescriptions().getProperty(name);
+        String desc = ruleExplanations.getProperty(name);
         if (desc == null) {
             return "No description available for " + name;
         } else {
@@ -131,11 +132,11 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
 
     protected void setRuleTreeModel(RuleTreeModel model) {
 
-        ruleViewModel = model;
+        ruleTreeModel = model;
 
-        if (ruleViewModel != null) {
-            ruleViewModel.updateTacletCount();
-            infoTree.setModel(ruleViewModel);
+        if (ruleTreeModel != null) {
+            ruleTreeModel.updateTacletCount();
+            infoTree.setModel(ruleTreeModel);
         }
     }
 
@@ -146,7 +147,7 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
          */
         @Override
         public void selectedNodeChanged(KeYSelectionEvent e) {
-            ruleViewModel.setSelectedGoal(e.getSource().getSelectedGoal());
+            ruleTreeModel.setSelectedGoal(e.getSource().getSelectedGoal());
         }
 
         /**
@@ -161,7 +162,7 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
                         if (mediator.getSelectedProof() != null) {
                             setRuleTreeModel(new RuleTreeModel(mediator.getSelectedGoal()));
                         } else {
-                            ruleViewModel.setSelectedGoal(null);
+                            ruleTreeModel.setSelectedGoal(null);
                         }
                     }
                 }
@@ -171,7 +172,7 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
 
     }
 
-    private static class RuleRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
+    private static class InfoRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree,
@@ -192,29 +193,23 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
             return comp;
         }
     }
-
-    /**
-     * This methods returns the map which contains descriptions for the elements
-     * in the tree. The elements are read from the resource with the name
-     * DESC_RESOURCE.
-     *
-     * @return the descriptions read in from the config file
-     */
-    public Properties getDescriptions() {
-        if (descriptions == null) {
-            descriptions = new Properties();
-            InputStream is = getClass().getResourceAsStream(DESC_RESOURCE);
+    
+    /*
+    * Use this class to get descriptions from an XML file.
+    */
+    private static class XMLProperties extends Properties{
+        XMLProperties(String xmlFile){
+            InputStream is = getClass().getResourceAsStream(xmlFile);
             try {
                 if (is == null) {
-                    throw new FileNotFoundException(DESC_RESOURCE + " not found");
+                    throw new FileNotFoundException("Descriptions file " + xmlFile + " not found.");
                 }
-                descriptions.loadFromXML(is);
+                loadFromXML(is);
             } catch (IOException e) {
-                System.err.println("Cannot not load help messages in rule view");
+                System.err.println("Cannot not load help messages in info view");
                 e.printStackTrace();
             }
         }
-        return descriptions;
     }
 
 }
