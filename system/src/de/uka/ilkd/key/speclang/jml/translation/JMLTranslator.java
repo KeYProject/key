@@ -45,6 +45,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -563,8 +564,7 @@ final class JMLTranslator {
             // TODO: make subtype of JMLBoundedNumericalQuantifierTranslationMethod and remove this
             private Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
                 final Type type = kjt.getJavaType();
-                final int arrayDepth = type instanceof ArrayType?
-                        ((ArrayType)type).getDimension(): 0;
+                final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
                 Term res = TB.tt();
                 for (QuantifiableVariable qv: qvs) {
                     if (type instanceof PrimitiveType) {
@@ -621,8 +621,7 @@ final class JMLTranslator {
             // TODO: make subtype of JMLBoundedNumericalQuantifierTranslationMethod and remove this
             private Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
                 final Type type = kjt.getJavaType();
-                final int arrayDepth = type instanceof ArrayType?
-                        ((ArrayType)type).getDimension(): 0;
+                final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
                 Term res = TB.tt();
                 for (QuantifiableVariable qv: qvs) {
                     if (type instanceof PrimitiveType) {
@@ -1960,8 +1959,7 @@ final class JMLTranslator {
             Term bodyTerm = (Term) params[1];
             KeYJavaType declsType = (KeYJavaType) params[2];
             final Type type = declsType.getJavaType();
-            final int arrayDepth = type instanceof ArrayType?
-                    ((ArrayType)type).getDimension(): 0;
+            final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
             ImmutableList<LogicVariable> declVars =
                     (ImmutableList<LogicVariable>) params[3];
             boolean nullable = (Boolean) params[4];
@@ -2016,8 +2014,7 @@ final class JMLTranslator {
         /** Provide restriction terms for the declared KeYJavaType */
         protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
             final Type type = kjt.getJavaType();
-            final int arrayDepth = type instanceof ArrayType?
-                    ((ArrayType)type).getDimension(): 0;
+            final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
             Term res = TB.tt();
             for (QuantifiableVariable qv: qvs) {
                 if (type instanceof PrimitiveType) {
