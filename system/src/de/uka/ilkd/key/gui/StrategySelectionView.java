@@ -490,7 +490,8 @@ public final class StrategySelectionView extends JPanel {
 
    private void refreshDefaultButton() {
       if (mediator.getSelectedProof() != null) {
-         boolean defaultMaxRules = components.getMaxRuleAppSlider().getPos() == DEFINITION.getDefaultMaxRuleApplications();
+         boolean defaultMaxRules = components.getMaxRuleAppSlider() == null ||
+                                   components.getMaxRuleAppSlider().getPos() == DEFINITION.getDefaultMaxRuleApplications();
          boolean defaultProperties = getProperties().equals(DEFINITION.getDefaultPropertiesFactory().createDefaultStrategyProperties());
          components.getDefaultButton().setEnabled(!defaultMaxRules || !defaultProperties);
       }
