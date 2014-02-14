@@ -93,9 +93,9 @@ public class StrategySettingsComposite extends Composite {
    };
    
    /**
-    * Maps a {@link Proof} to a {@link Map} which maps the strategy name to the {@link ScrolledForm} which is used to edit its settings.
+    * Maps the strategy name to the {@link ScrolledForm} which is used to edit its settings.
     */
-   private Map<Proof, Map<Name, ScrolledForm>> proofForms = new HashMap<Proof, Map<Name, ScrolledForm>>();
+   private Map<Name, ScrolledForm> proofForms = new HashMap<Name, ScrolledForm>();
    
    /**
     * The {@link StackLayout} used in this {@link Composite}.
@@ -210,18 +210,12 @@ public class StrategySettingsComposite extends Composite {
          StrategySettingsDefinition model = factory != null ? factory.getSettingsDefinition() : null;
          if (model != null) {
             // Show proof settings
-            Map<Name, ScrolledForm> forms = proofForms.get(proof);
-            
-            if (forms == null) {
-               forms = new HashMap<Name, ScrolledForm>();
-               proofForms.put(proof, forms);
-            }
-            ScrolledForm form = forms.get(strategyName);
+            ScrolledForm form = proofForms.get(strategyName);
             if (form == null) {
                FormToolkit toolkit = new FormToolkit(getDisplay());
                form = toolkit.createScrolledForm(this);
                createContent(toolkit, form, factory, model);
-               forms.put(strategyName, form);
+               proofForms.put(strategyName, form);
             }
             data = (FormData)form.getData();
             updateShownContent();
@@ -426,11 +420,8 @@ public class StrategySettingsComposite extends Composite {
       if (proof != null && !proof.isDisposed()) {
          proof.getSettings().getStrategySettings().removeSettingsListener(settingsListener);
       }
-      for (Map<Name, ScrolledForm> forms : proofForms.values()) {
-         for (ScrolledForm form : forms.values()) {
-            form.dispose();
-         }
-         forms.clear();
+      for (ScrolledForm form : proofForms.values()) {
+         form.dispose();
       }
       proofForms.clear();
       super.dispose();
