@@ -1959,13 +1959,13 @@ final class JMLTranslator {
             Term bodyTerm = (Term) params[1];
             KeYJavaType declsType = (KeYJavaType) params[2];
             final Type type = declsType.getJavaType();
+            services = (Services) params[6];
+            assert services != null;
             final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
             ImmutableList<LogicVariable> declVars =
                     (ImmutableList<LogicVariable>) params[3];
             boolean nullable = (Boolean) params[4];
             KeYJavaType resultType = (KeYJavaType) params[5];
-            services = (Services) params[6];
-            assert services != null;
             if (resultType == null) {
                 // quick fix. may happen with \num_of
                 resultType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
