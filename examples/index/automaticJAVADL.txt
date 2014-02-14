@@ -297,6 +297,7 @@ provable: ./standard_key/java_dl/danglingElseSolution2.key
 provable: ./standard_key/java_dl/deepNonNull/deepNonNull0.key
 provable: ./standard_key/java_dl/deepNonNull/deepNonNull1.key
 notprovable: ./standard_key/java_dl/deepNonNull/deepNonNull2.key
+provable: ./standard_key/java_dl/deepNonNull/deepNonNull3.key
 provable: ./standard_key/java_dl/exceptions.key
 provable: ./standard_key/java_dl/exceptions1.key
 provable: ./standard_key/java_dl/exceptions2.key

@@ -189,7 +189,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         final TypeConverter typeConverter = services.getTypeConverter();
         if (typeConverter.isReferenceType(varType) && !isImplicitVar) {
-            final int arrayDepth = getArrayTypeDepth(varType);
+            final int arrayDepth = varType instanceof ArrayType?
+                    ((ArrayType)varType).getDimension(): 0;
             
             PositionedString ps
             // use special "deep" non null predicate (see bug #1392)
@@ -199,20 +200,6 @@ public final class JMLSpecExtractor implements SpecExtractor {
             result = result.add(ps);
         }
         return result;
-    }
-    
-    /**
-     * Gets the array depth of a type.
-     * Non array types have depth 0,
-     * array types have 1 + (depth of their element type).
-     */
-    public static int getArrayTypeDepth(Type type) {
-        int depth = 0;
-        while (type instanceof ArrayType) {
-            depth++;
-            type = ((ArrayType)type).getBaseType().getKeYJavaType();
-        }
-        return depth;
     }
 
 
