@@ -43,6 +43,7 @@ import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -1206,15 +1207,25 @@ public class LogicPrinter {
     }
     
     public void printSelect(Term t) throws IOException {
-        assert t.boundVars().isEmpty();            
+        printSelect(t, null);
+    }
+
+    private void printSelect(Term t, Term tacitHeap) throws IOException {
+        assert t.boundVars().isEmpty();
         assert t.arity() == 3;	
 	final HeapLDT heapLDT = services == null 
                 ? null : services.getTypeConverter().getHeapLDT();
 
         if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
 
+            if(tacitHeap == null) {
+                tacitHeap = TermFactory.DEFAULT.createTerm(heapLDT.getHeap());
+            }
+
             startTerm(3);
-            
+
+
+            final Term heapTerm = t.sub(0);
             final Term objectTerm = t.sub(1);
             final Term fieldTerm  = t.sub(2);
                 
@@ -1246,7 +1257,16 @@ public class LogicPrinter {
             } else if(fieldTerm.arity() == 0) {
                 // field constant, skolemised field, field variable, ...
                 markStartSub(1);
-                printTerm(objectTerm);
+                if(objectTerm.op().name().toString().endsWith("::select")) {
+                    Term innerheap = objectTerm.sub(0);
+                    boolean paren = !heapTerm.equals(innerheap);
+                    if(paren) layouter.print("(");
+                    printSelect(objectTerm, heapTerm);
+                    if(paren) layouter.print(")");
+                } else {
+                    printTerm(objectTerm);
+                }
+
                 markEndSub();
         	
                 layouter.print(".");
@@ -1257,9 +1277,17 @@ public class LogicPrinter {
                 markEndSub();                    
             } else if(fieldTerm.op() == heapLDT.getArr()) {
                 markStartSub(1);
-                printTerm(objectTerm);
+                if(objectTerm.op().name().toString().endsWith("::select")) {
+                    Term innerheap = objectTerm.sub(0);
+                    boolean paren = !heapTerm.equals(innerheap);
+                    if(paren) layouter.print("(");
+                    printSelect(objectTerm, heapTerm);
+                    if(paren) layouter.print(")");
+                } else {
+                    printTerm(objectTerm);
+                }
                 markEndSub();
-        	
+
                 layouter.print("[");
                 
                 markStartSub();
@@ -1274,11 +1302,14 @@ public class LogicPrinter {
         	printFunctionTerm(t.op().name().toString(), t);
             }	
 
-            final boolean printHeap = t.sub(0).op() != heapLDT.getHeap();
+            final boolean printHeap = !heapTerm.equals(tacitHeap);
+
             if (printHeap) {
-                layouter.print(" in ");
+                layouter./*brk(1, -3).*/print("@");
                 markStartSub(0);
-                printTerm(t.sub(0));
+                // if, one day, there are infix heap expressions, this needs to be
+                // maybeParens(...):
+                printTerm(heapTerm);
                 markEndSub();
             } else {
                 markStartSub(0);
