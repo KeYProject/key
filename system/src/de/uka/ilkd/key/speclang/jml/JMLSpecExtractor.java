@@ -20,6 +20,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
@@ -188,14 +189,30 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         final TypeConverter typeConverter = services.getTypeConverter();
         if (typeConverter.isReferenceType(varType) && !isImplicitVar) {
+            final int arrayDepth = getArrayTypeDepth(varType);
             
             PositionedString ps
             // use special "deep" non null predicate (see bug #1392)
-            = new PositionedString("\\dl_nonNull("+varName+")", fileName, pos)
+            // ... looks a bit like a hack with those DL escapes ...
+            = new PositionedString("\\dl_nonNull(\\dl_heap(),"+varName+","+arrayDepth+")", fileName, pos)
                                 .label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
             result = result.add(ps);
         }
         return result;
+    }
+    
+    /**
+     * Gets the array depth of a type.
+     * Non array types have depth 0,
+     * array types have 1 + (depth of their element type).
+     */
+    public static int getArrayTypeDepth(Type type) {
+        int depth = 0;
+        while (type instanceof ArrayType) {
+            depth++;
+            type = ((ArrayType)type).getBaseType().getKeYJavaType();
+        }
+        return depth;
     }
 
 
