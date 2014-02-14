@@ -1568,7 +1568,8 @@ public class TermBuilder {
      */
     public Term deepNonNull(Term o, Services services) {
         final Function nonNull = (Function) services.getNamespaces().functions().lookup("nonNull");
-        return func(nonNull, o);
+        final Term heap = getBaseHeap(services);
+        return func(nonNull, heap, o);
     }
 
     public Term wellFormed(Term heap, Services services) {
