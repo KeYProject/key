@@ -208,11 +208,14 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * and its dimension -1 for array types with primitive base type.
      */
     public static int arrayDepth (Type type, Services services) {
+        assert services != null;
         final TypeConverter tc = services.getTypeConverter();
         if (type instanceof ArrayType) {
-            final ArrayType at = (ArrayType)type;
-            final int d = at.getDimension();
-            return tc.isReferenceType(at.getBaseType().getKeYJavaType().getJavaType())? d: d-1;
+            final int d = ((ArrayType)type).getDimension();
+            while (type instanceof ArrayType) {
+                type = ((ArrayType)type).getBaseType().getKeYJavaType().getJavaType();
+            }
+            return tc.isReferenceType(type)? d: d-1;
         } else return 0;
     }
 
