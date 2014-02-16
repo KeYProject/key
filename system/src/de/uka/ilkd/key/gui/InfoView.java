@@ -80,7 +80,6 @@ public class InfoView extends JSplitPane {
                     if (mediator != null) {
                         if (mediator.getSelectedProof() != null) {
                             infoTreeModel = new InfoTreeModel(mediator.getSelectedGoal());
-                            infoTreeModel.updateTacletCount();
                             infoTree.setModel(infoTreeModel);
                         }
                     }

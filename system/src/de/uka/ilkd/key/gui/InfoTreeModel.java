@@ -35,12 +35,9 @@ public class InfoTreeModel extends DefaultTreeModel {
 
     private static final String LEMMAS = "Lemmas";
     private static final String TACLET_BASE = "Taclet Base";
-    protected MutableTreeNode builtInRoot
-            = new DefaultMutableTreeNode("Built-In");
-    protected MutableTreeNode axiomTacletRoot
-            = new DefaultMutableTreeNode(TACLET_BASE);
-    protected MutableTreeNode proveableTacletsRoot
-            = new DefaultMutableTreeNode(LEMMAS);
+    protected MutableTreeNode builtInRoot = new DefaultMutableTreeNode("Built-In");
+    protected MutableTreeNode axiomTacletRoot = new DefaultMutableTreeNode(TACLET_BASE);
+    protected MutableTreeNode proveableTacletsRoot = new DefaultMutableTreeNode(LEMMAS);
 
     public InfoTreeModel(Goal goal) {
         super(new DefaultMutableTreeNode("Rule Base"));
@@ -64,15 +61,15 @@ public class InfoTreeModel extends DefaultTreeModel {
                     continue; // do not break system because of this
                 }
                 if (just.isAxiomJustification()) {
-                    insertAndGroup(new DefaultMutableTreeNode(app.taclet()),
-                            axiomTacletRoot);
+                    insertAndGroup(new DefaultMutableTreeNode(app.taclet()), axiomTacletRoot);
                 } else {
-                    insertAndGroup(new DefaultMutableTreeNode(app.taclet()),
-                            proveableTacletsRoot);
+                    insertAndGroup(new DefaultMutableTreeNode(app.taclet()), proveableTacletsRoot);
                 }
             }
         }
 
+        axiomTacletRoot.setUserObject(TACLET_BASE + " (" + getChildCount(axiomTacletRoot) + ")");
+        proveableTacletsRoot.setUserObject(LEMMAS + " (" + getChildCount(proveableTacletsRoot) + ")");
     }
 
     private void insertAsLast(MutableTreeNode ins, MutableTreeNode parent) {
@@ -128,19 +125,6 @@ public class InfoTreeModel extends DefaultTreeModel {
             }
         });
         return l;
-    }
-
-    public void updateTacletCount() {
-        axiomTacletRoot.setUserObject(TACLET_BASE + " (" + getAxiomTacletCount() + ")");
-        proveableTacletsRoot.setUserObject(LEMMAS + " (" + getLemmaTacletCount() + ")");
-    }
-
-    public int getAxiomTacletCount() {
-        return getChildCount(axiomTacletRoot);
-    }
-
-    public int getLemmaTacletCount() {
-        return getChildCount(proveableTacletsRoot);
     }
 
     private static int getChildCount(MutableTreeNode root) {
