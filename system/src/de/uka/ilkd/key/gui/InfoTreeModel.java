@@ -26,7 +26,6 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -57,7 +56,7 @@ public class InfoTreeModel extends DefaultTreeModel {
             for (final BuiltInRule br : getBuiltInIndex().rules()) {
                 insertAsLast(new DefaultMutableTreeNode(br), builtInRoot);
             }
-            ImmutableSet<NoPosTacletApp> set = getTacletIndex().allNoPosTacletApps();
+            ImmutableSet<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
             OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(g.proof());
             if (simplifier != null) {
                 set = set.union(simplifier.getCapturedTaclets());
@@ -133,10 +132,6 @@ public class InfoTreeModel extends DefaultTreeModel {
             }
         });
         return l;
-    }
-
-    private TacletIndex getTacletIndex() {
-        return goal.ruleAppIndex().tacletIndex();
     }
 
     private BuiltInRuleIndex getBuiltInIndex() {
