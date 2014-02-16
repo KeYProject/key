@@ -1,10 +1,7 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.rule.Taclet;
-import java.awt.Component;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
 /**
@@ -20,7 +17,11 @@ public class InfoTree extends JTree {
 
     InfoTree() {
         ruleExplanations = new XMLProperties(DESC_RESOURCE);
-        setModel(new DefaultTreeModel(new InfoTreeNode("No proof loaded", ruleExplanations)));
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        root.add(new InfoTreeNode("No proof loaded", ruleExplanations));
+        setModel(new DefaultTreeModel(root));
+        setShowsRootHandles(true);
+        setRootVisible(false);
     }
 
     @Override
