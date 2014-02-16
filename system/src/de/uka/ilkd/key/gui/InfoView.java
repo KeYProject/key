@@ -41,7 +41,7 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
 
     private static final String DESC_RESOURCE = "/de/uka/ilkd/key/gui/help/ruleExplanations.xml";
     private InfoTreeModel infoTreeModel;
-    private final JTree infoTree;
+    private final InfoTree infoTree;
     private final JTextArea contentPane;
     private final JScrollPane contentScrollPane;
     private final KeYMediator mediator;
@@ -62,7 +62,7 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
 
         // this triggers storing the bar position
         setName("ruleViewPane");
-        infoTree = new JTree(new String[]{"No proof loaded"});
+        infoTree = new InfoTree();
         JScrollPane jp = new JScrollPane(infoTree);
         setLeftComponent(jp);
 
@@ -79,33 +79,34 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
 
     @Override
     public void valueChanged(TreeSelectionEvent e) {
-        if (infoTree.getLastSelectedPathComponent() != null) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) infoTree
-                    .getLastSelectedPathComponent();
+        InfoTreeNode node = infoTree.getLastSelectedPathComponent();
+        if (node != null) {
 
             Object userObj = node.getUserObject();
-            String displayName;
-            if (userObj instanceof Rule) {
-                displayName = ((Rule) userObj).displayName();
-            } else {
-                displayName = userObj.toString();
-            }
 
-            contentScrollPane.setBorder(
-                    BorderFactory.createTitledBorder(displayName));
+            String descriptionTitle;
+            String description;
+
+            if (userObj instanceof Rule) {
+                descriptionTitle = ((Rule) userObj).displayName();
+            } else {
+                descriptionTitle = userObj.toString();
+            }
 
             if (userObj instanceof Taclet) {
                 Taclet tac = (Taclet) userObj;
-                contentPane.setText(toString(tac));
+                description = getDescriptionFromTaclet(tac);
             } else {
-                final int parenIdx = displayName.lastIndexOf("(");
+                int parenIdx = descriptionTitle.lastIndexOf("(");
                 if (parenIdx >= 0) // strip number of taclets
                 {
-                    displayName = displayName.substring(0, parenIdx - 1).intern();
+                    descriptionTitle = descriptionTitle.substring(0, parenIdx - 1).intern();
                 }
-                contentPane.setText(getRuleDescription(displayName));
+                description = getRuleDescription(descriptionTitle);
             }
 
+            contentScrollPane.setBorder(BorderFactory.createTitledBorder(descriptionTitle));
+            contentPane.setText(description);
             contentPane.setCaretPosition(0);
         }
     }
@@ -119,9 +120,8 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
         }
     }
 
-    private String toString(Taclet tac) {
-        LogicPrinter lp
-                = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
+    private static String getDescriptionFromTaclet(Taclet tac) {
+        LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
         lp.printTaclet(tac);
         return lp.toString();
     }
