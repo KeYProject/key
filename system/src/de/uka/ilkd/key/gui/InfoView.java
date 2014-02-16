@@ -21,7 +21,6 @@ import javax.swing.event.TreeSelectionEvent;
 
 public class InfoView extends JSplitPane {
 
-    private InfoTreeModel infoTreeModel;
     private final InfoTree infoTree;
     private final InfoViewContentPane contentPane;
     private final KeYMediator mediator;
@@ -79,8 +78,7 @@ public class InfoView extends JSplitPane {
                 public void run() {
                     if (mediator != null) {
                         if (mediator.getSelectedProof() != null) {
-                            infoTreeModel = new InfoTreeModel(mediator.getSelectedGoal());
-                            infoTree.setModel(infoTreeModel);
+                            infoTree.setModel(new InfoTreeModel(mediator.getSelectedGoal()));
                         }
                     }
                 }
