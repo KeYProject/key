@@ -40,14 +40,18 @@ public class InfoTreeModel extends DefaultTreeModel {
     public InfoTreeModel(Goal goal, XMLProperties ruleExplanations) {
         super(new InfoTreeNode());
 
+        InfoTreeNode rulesNode = new InfoTreeNode("Rules",
+                "Browse descriptions for currently available rules.");
+        insertAsLast(rulesNode, (InfoTreeNode) root);
+
         this.ruleExplanations = ruleExplanations;
 
         builtInRoot = new InfoTreeNode("Built-In", ruleExplanations);
-        insertAsLast(builtInRoot, (InfoTreeNode) root);
+        insertAsLast(builtInRoot, rulesNode);
         axiomTacletRoot = new InfoTreeNode(TACLET_BASE, ruleExplanations);
-        insertAsLast(axiomTacletRoot, (InfoTreeNode) root);
+        insertAsLast(axiomTacletRoot, rulesNode);
         proveableTacletsRoot = new InfoTreeNode(LEMMAS, ruleExplanations);
-        insertAsLast(proveableTacletsRoot, (InfoTreeNode) root);
+        insertAsLast(proveableTacletsRoot, rulesNode);
 
         if (goal != null) {
             for (final BuiltInRule br : goal.ruleAppIndex().builtInRuleAppIndex().builtInRuleIndex().rules()) {

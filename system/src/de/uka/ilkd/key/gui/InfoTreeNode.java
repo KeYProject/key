@@ -13,7 +13,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class InfoTreeNode extends DefaultMutableTreeNode {
 
-    final String title;
     final Description description;
 
     /*
@@ -21,10 +20,11 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
      * {@link InfoTreeModel}.
      */
     InfoTreeNode() {
-        title = "";
+        super("root node");
         description = new Description() {
+            @Override
             public String getString() {
-                return "";
+                return "This is the root node of InfoTreeModel. It should not be visible.";
             }
         };
     }
@@ -35,7 +35,6 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
      */
     InfoTreeNode(final String title, final XMLProperties explanations) {
         super(title);
-        this.title = title;
         description = new Description() {
             @Override
             public String getString() {
@@ -59,7 +58,7 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
     }
 
     InfoTreeNode(final Taclet taclet) {
-        title = taclet.displayName();
+        super(taclet.displayName());
         description = new Description() {
             @Override
             public String getString() {
@@ -70,8 +69,18 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
         };
     }
 
+    InfoTreeNode(String title, final String description) {
+        super(title);
+        this.description = new Description() {
+            @Override
+            public String getString() {
+                return description;
+            }
+        };
+    }
+
     String getTitle() {
-        return title;
+        return (String) getUserObject();
     }
 
     String getDescription() {
