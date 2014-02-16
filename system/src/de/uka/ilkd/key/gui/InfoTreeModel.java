@@ -27,7 +27,6 @@ import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -65,7 +64,7 @@ public class InfoTreeModel extends DefaultTreeModel {
             }
 
             for (final NoPosTacletApp app : sort(set)) {
-                RuleJustification just = mgt().getJustification(app);
+                RuleJustification just = goal.proof().mgt().getJustification(app);
                 if (just == null) {
                     continue; // do not break system because of this
                 }
@@ -143,10 +142,6 @@ public class InfoTreeModel extends DefaultTreeModel {
     private BuiltInRuleIndex getBuiltInIndex() {
         RuleAppIndex ri = goal.ruleAppIndex();
         return ri.builtInRuleAppIndex().builtInRuleIndex();
-    }
-
-    public final ProofCorrectnessMgt mgt() {
-        return goal.proof().mgt();
     }
 
     public void setSelectedGoal(Goal g) {
