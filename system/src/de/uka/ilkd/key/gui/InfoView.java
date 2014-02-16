@@ -12,7 +12,6 @@
 // 
 package de.uka.ilkd.key.gui;
 
-
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.event.TreeSelectionListener;
@@ -68,7 +67,6 @@ public class InfoView extends JSplitPane {
          */
         @Override
         public void selectedNodeChanged(KeYSelectionEvent e) {
-            infoTreeModel.setSelectedGoal(e.getSource().getSelectedGoal());
         }
 
         /**
@@ -84,8 +82,6 @@ public class InfoView extends JSplitPane {
                             infoTreeModel = new InfoTreeModel(mediator.getSelectedGoal());
                             infoTreeModel.updateTacletCount();
                             infoTree.setModel(infoTreeModel);
-                        } else {
-                            infoTreeModel.setSelectedGoal(null);
                         }
                     }
                 }

@@ -35,7 +35,6 @@ public class InfoTreeModel extends DefaultTreeModel {
 
     private static final String LEMMAS = "Lemmas";
     private static final String TACLET_BASE = "Taclet Base";
-    protected Goal goal;
     protected MutableTreeNode builtInRoot
             = new DefaultMutableTreeNode("Built-In");
     protected MutableTreeNode axiomTacletRoot
@@ -43,19 +42,18 @@ public class InfoTreeModel extends DefaultTreeModel {
     protected MutableTreeNode proveableTacletsRoot
             = new DefaultMutableTreeNode(LEMMAS);
 
-    public InfoTreeModel(Goal g) {
+    public InfoTreeModel(Goal goal) {
         super(new DefaultMutableTreeNode("Rule Base"));
-        this.goal = g;
         insertAsLast(builtInRoot, (MutableTreeNode) getRoot());
         insertAsLast(axiomTacletRoot, (MutableTreeNode) getRoot());
         insertAsLast(proveableTacletsRoot, (MutableTreeNode) getRoot());
 
-        if (g != null) {
+        if (goal != null) {
             for (final BuiltInRule br : goal.ruleAppIndex().builtInRuleAppIndex().builtInRuleIndex().rules()) {
                 insertAsLast(new DefaultMutableTreeNode(br), builtInRoot);
             }
             ImmutableSet<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
-            OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(g.proof());
+            OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(goal.proof());
             if (simplifier != null) {
                 set = set.union(simplifier.getCapturedTaclets());
             }
@@ -130,10 +128,6 @@ public class InfoTreeModel extends DefaultTreeModel {
             }
         });
         return l;
-    }
-
-    public void setSelectedGoal(Goal g) {
-        goal = g;
     }
 
     public void updateTacletCount() {
