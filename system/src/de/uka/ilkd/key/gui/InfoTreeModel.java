@@ -12,6 +12,7 @@
 // 
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,6 +21,7 @@ import java.util.List;
 import javax.swing.tree.DefaultTreeModel;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -37,12 +39,23 @@ public class InfoTreeModel extends DefaultTreeModel {
     protected final InfoTreeNode proveableTacletsRoot;
     private final XMLProperties ruleExplanations;
 
-    public InfoTreeModel(Goal goal, XMLProperties ruleExplanations) {
+    public InfoTreeModel(Goal goal, XMLProperties ruleExplanations,
+            XMLProperties termLabelExplanations, MainWindow mainWindow) {
         super(new InfoTreeNode());
 
         InfoTreeNode rulesNode = new InfoTreeNode("Rules",
                 "Browse descriptions for currently available rules.");
         insertAsLast(rulesNode, (InfoTreeNode) root);
+
+        InfoTreeNode termLabelsNode = new InfoTreeNode("Term Labels",
+                "Get descriptions for currently available term labels.");
+        insertAsLast(termLabelsNode, (InfoTreeNode) root);
+
+        ImmutableList<Name> labelNamesFromProfile = mainWindow.getMediator()
+                .getProfile().getTermLabelManager().getSupportedTermLabelNames();
+        for (Name labelName : labelNamesFromProfile) {
+            insertAsLast(new InfoTreeNode(labelName.toString(), termLabelExplanations), termLabelsNode);
+        }
 
         this.ruleExplanations = ruleExplanations;
 

@@ -4,7 +4,7 @@
     
 <comment>
     These properties define the help comments which are to be displayed
-    in the rule pane when selecting non-taclet tree elements
+    in the view pane when selecting tree elements for built-in rules.
 </comment>
 
 <entry key="Built-In">

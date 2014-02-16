@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    
+<comment>
+    These properties define the help comments which are to be displayed
+    in the view pane when selecting term label tree elements.
+</comment>
+
+</properties>
+
