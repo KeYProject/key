@@ -23,9 +23,7 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -53,7 +51,7 @@ public class InfoTreeModel extends DefaultTreeModel {
         insertAsLast(proveableTacletsRoot, (MutableTreeNode) getRoot());
 
         if (g != null) {
-            for (final BuiltInRule br : getBuiltInIndex().rules()) {
+            for (final BuiltInRule br : goal.ruleAppIndex().builtInRuleAppIndex().builtInRuleIndex().rules()) {
                 insertAsLast(new DefaultMutableTreeNode(br), builtInRoot);
             }
             ImmutableSet<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
@@ -132,11 +130,6 @@ public class InfoTreeModel extends DefaultTreeModel {
             }
         });
         return l;
-    }
-
-    private BuiltInRuleIndex getBuiltInIndex() {
-        RuleAppIndex ri = goal.ruleAppIndex();
-        return ri.builtInRuleAppIndex().builtInRuleIndex();
     }
 
     public void setSelectedGoal(Goal g) {
