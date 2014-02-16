@@ -19,17 +19,10 @@ import java.util.Properties;
 
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
 import javax.swing.event.TreeSelectionListener;
 
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.InfoTreeModel;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.GuiUtilities;
-import javax.swing.BorderFactory;
 import javax.swing.event.TreeSelectionEvent;
 
 public class InfoView extends JSplitPane {
@@ -37,8 +30,7 @@ public class InfoView extends JSplitPane {
     private static final String DESC_RESOURCE = "/de/uka/ilkd/key/gui/help/ruleExplanations.xml";
     private InfoTreeModel infoTreeModel;
     private final InfoTree infoTree;
-    private final JTextArea contentPane;
-    private final JScrollPane contentScrollPane;
+    private final InfoViewContentPane contentPane;
     private final KeYMediator mediator;
     private final XMLProperties ruleExplanations;
 
@@ -64,70 +56,17 @@ public class InfoView extends JSplitPane {
             public void valueChanged(TreeSelectionEvent e) {
                 InfoTreeNode node = infoTree.getLastSelectedPathComponent();
                 if (node != null) {
-
-                    Object userObj = node.getUserObject();
-
-                    String descriptionTitle;
-                    String description;
-
-                    if (userObj instanceof Rule) {
-                        descriptionTitle = ((Rule) userObj).displayName();
-                    } else {
-                        descriptionTitle = userObj.toString();
-                    }
-
-                    if (userObj instanceof Taclet) {
-                        Taclet tac = (Taclet) userObj;
-                        description = getDescriptionFromTaclet(tac);
-                    } else {
-                        int parenIdx = descriptionTitle.lastIndexOf("(");
-                        if (parenIdx >= 0) // strip number of taclets
-                        {
-                            descriptionTitle = descriptionTitle.substring(0, parenIdx - 1).intern();
-                        }
-                        description = getRuleDescription(descriptionTitle);
-                    }
-
-                    contentScrollPane.setBorder(BorderFactory.createTitledBorder(descriptionTitle));
-                    contentPane.setText(description);
-                    contentPane.setCaretPosition(0);
+                    contentPane.setNode(node);
                 }
             }
         });
 
-        contentPane = new JTextArea("", 15, 30);
-        contentPane.setEditable(false);
-        contentPane.setLineWrap(true);
-        contentPane.setWrapStyleWord(true);
-        contentScrollPane = new JScrollPane(contentPane);
+        contentPane = new InfoViewContentPane(ruleExplanations);
 
         setLeftComponent(new JScrollPane(infoTree));
-        setRightComponent(contentScrollPane);
+        setRightComponent(contentPane);
 
         setVisible(true);
-    }
-
-    private String getRuleDescription(String name) {
-        String desc = ruleExplanations.getProperty(name);
-        if (desc == null) {
-            return "No description available for " + name;
-        } else {
-            return desc;
-        }
-    }
-
-    private static String getDescriptionFromTaclet(Taclet tac) {
-        LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
-        lp.printTaclet(tac);
-        return lp.toString();
-    }
-
-    protected void setRuleTreeModel(InfoTreeModel model) {
-        infoTreeModel = model;
-        if (infoTreeModel != null) {
-            infoTreeModel.updateTacletCount();
-            infoTree.setModel(infoTreeModel);
-        }
     }
 
     private class SelectionListener implements KeYSelectionListener {
@@ -150,7 +89,9 @@ public class InfoView extends JSplitPane {
                 public void run() {
                     if (mediator != null) {
                         if (mediator.getSelectedProof() != null) {
-                            setRuleTreeModel(new InfoTreeModel(mediator.getSelectedGoal()));
+                            infoTreeModel = new InfoTreeModel(mediator.getSelectedGoal());
+                            infoTreeModel.updateTacletCount();
+                            infoTree.setModel(infoTreeModel);
                         } else {
                             infoTreeModel.setSelectedGoal(null);
                         }

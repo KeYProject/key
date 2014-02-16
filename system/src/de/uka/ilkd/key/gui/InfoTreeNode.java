@@ -9,8 +9,19 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class InfoTreeNode extends DefaultMutableTreeNode {
 
+    String title;
+
     InfoTreeNode(String title) {
         super(title);
+        this.title = title;
+    }
+
+    String getTitle() {
+        return title;
+    }
+
+    String getDescription() {
+        return "No description available for " + title;
     }
 
 }

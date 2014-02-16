@@ -49,9 +49,32 @@ public class InfoTreeModel extends DefaultTreeModel {
         insertAsLast(builtInRoot, (MutableTreeNode) getRoot());
         insertAsLast(axiomTacletRoot, (MutableTreeNode) getRoot());
         insertAsLast(proveableTacletsRoot, (MutableTreeNode) getRoot());
+
         if (g != null) {
-            rulesForGoal(g);
+            for (final BuiltInRule br : getBuiltInIndex().rules()) {
+                insertAsLast(new DefaultMutableTreeNode(br), builtInRoot);
+            }
+            ImmutableSet<NoPosTacletApp> set = getTacletIndex().allNoPosTacletApps();
+            OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(g.proof());
+            if (simplifier != null) {
+                set = set.union(simplifier.getCapturedTaclets());
+            }
+
+            for (final NoPosTacletApp app : sort(set)) {
+                RuleJustification just = mgt().getJustification(app);
+                if (just == null) {
+                    continue; // do not break system because of this
+                }
+                if (just.isAxiomJustification()) {
+                    insertAndGroup(new DefaultMutableTreeNode(app.taclet()),
+                            axiomTacletRoot);
+                } else {
+                    insertAndGroup(new DefaultMutableTreeNode(app.taclet()),
+                            proveableTacletsRoot);
+                }
+            }
         }
+
     }
 
     private void insertAsLast(MutableTreeNode ins, MutableTreeNode parent) {
@@ -90,31 +113,6 @@ public class InfoTreeModel extends DefaultTreeModel {
         }
     }
 
-    private void rulesForGoal(Goal g) {
-        for (final BuiltInRule br : getBuiltInIndex().rules()) {
-            insertAsLast(new DefaultMutableTreeNode(br), builtInRoot);
-        }
-        ImmutableSet<NoPosTacletApp> set = getTacletIndex().allNoPosTacletApps();
-        OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(g.proof());
-        if (simplifier != null) {
-            set = set.union(simplifier.getCapturedTaclets());
-        }
-
-        for (final NoPosTacletApp app : sort(set)) {
-            RuleJustification just = mgt().getJustification(app);
-            if (just == null) {
-                continue; // do not break system because of this
-            }
-            if (just.isAxiomJustification()) {
-                insertAndGroup(new DefaultMutableTreeNode(app.taclet()),
-                        axiomTacletRoot);
-            } else {
-                insertAndGroup(new DefaultMutableTreeNode(app.taclet()),
-                        proveableTacletsRoot);
-            }
-        }
-    }
-
     private List<NoPosTacletApp> sort(ImmutableSet<NoPosTacletApp> apps) {
         final ArrayList<NoPosTacletApp> l
                 = new ArrayList<NoPosTacletApp>(apps.size());
@@ -143,7 +141,7 @@ public class InfoTreeModel extends DefaultTreeModel {
         return ri.builtInRuleAppIndex().builtInRuleIndex();
     }
 
-    public ProofCorrectnessMgt mgt() {
+    public final ProofCorrectnessMgt mgt() {
         return goal.proof().mgt();
     }
 
