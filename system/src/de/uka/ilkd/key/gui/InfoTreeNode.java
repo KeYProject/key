@@ -14,14 +14,14 @@ import javax.swing.tree.DefaultMutableTreeNode;
 public class InfoTreeNode extends DefaultMutableTreeNode {
 
     final String title;
-    final Object description;
+    final Description description;
 
     InfoTreeNode(final String title, final XMLProperties explanations) {
         super(title);
         this.title = title;
-        description = new Object() {
+        description = new Description() {
             @Override
-            public String toString() {
+            public String getString() {
                 int parenIdx = title.lastIndexOf("(");
                 String shortenedTitle;
                 if (parenIdx >= 0) // strip number of taclets
@@ -43,9 +43,9 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
 
     InfoTreeNode(final Taclet taclet) {
         title = taclet.displayName();
-        description = new Object() {
+        description = new Description() {
             @Override
-            public String toString() {
+            public String getString() {
                 LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
                 lp.printTaclet(taclet);
                 return lp.toString();
@@ -58,7 +58,11 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
     }
 
     String getDescription() {
-        return description.toString();
+        return description.getString();
+    }
+    
+    private static interface Description{
+        String getString();
     }
 
 }
