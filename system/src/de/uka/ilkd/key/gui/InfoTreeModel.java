@@ -153,10 +153,6 @@ public class InfoTreeModel extends DefaultTreeModel {
         goal = g;
     }
 
-    public Goal getGoal() {
-        return goal;
-    }
-
     public void updateTacletCount() {
         axiomTacletRoot.setUserObject(TACLET_BASE + " (" + getAxiomTacletCount() + ")");
         proveableTacletsRoot.setUserObject(LEMMAS + " (" + getLemmaTacletCount() + ")");
