@@ -49,11 +49,11 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
 
     public InfoView(KeYMediator mediator) {
         super(VERTICAL_SPLIT);
-        
+
         this.mediator = mediator;
         mediator.addKeYSelectionListener(new SelectionListener());
         ruleExplanations = new XMLProperties(DESC_RESOURCE);
-        
+
         // initial placement of the divider
         setDividerLocation(300);
 
@@ -82,36 +82,32 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
         if (infoTree.getLastSelectedPathComponent() != null) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) infoTree
                     .getLastSelectedPathComponent();
-            showTacletView(node);
-        }
-    }
 
-    private void showTacletView(DefaultMutableTreeNode node) {
-
-        Object userObj = node.getUserObject();
-        String displayName;
-        if (userObj instanceof Rule) {
-            displayName = ((Rule) userObj).displayName();
-        } else {
-            displayName = userObj.toString();
-        }
-
-        contentScrollPane.setBorder(
-                BorderFactory.createTitledBorder(displayName));
-
-        if (userObj instanceof Taclet) {
-            Taclet tac = (Taclet) userObj;
-            contentPane.setText(toString(tac));
-        } else {
-            final int parenIdx = displayName.lastIndexOf("(");
-            if (parenIdx >= 0) // strip number of taclets
-            {
-                displayName = displayName.substring(0, parenIdx - 1).intern();
+            Object userObj = node.getUserObject();
+            String displayName;
+            if (userObj instanceof Rule) {
+                displayName = ((Rule) userObj).displayName();
+            } else {
+                displayName = userObj.toString();
             }
-            contentPane.setText(getRuleDescription(displayName));
-        }
 
-        contentPane.setCaretPosition(0);
+            contentScrollPane.setBorder(
+                    BorderFactory.createTitledBorder(displayName));
+
+            if (userObj instanceof Taclet) {
+                Taclet tac = (Taclet) userObj;
+                contentPane.setText(toString(tac));
+            } else {
+                final int parenIdx = displayName.lastIndexOf("(");
+                if (parenIdx >= 0) // strip number of taclets
+                {
+                    displayName = displayName.substring(0, parenIdx - 1).intern();
+                }
+                contentPane.setText(getRuleDescription(displayName));
+            }
+
+            contentPane.setCaretPosition(0);
+        }
     }
 
     private String getRuleDescription(String name) {
@@ -131,9 +127,7 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
     }
 
     protected void setRuleTreeModel(InfoTreeModel model) {
-
         infoTreeModel = model;
-
         if (infoTreeModel != null) {
             infoTreeModel.updateTacletCount();
             infoTree.setModel(infoTreeModel);
@@ -193,12 +187,13 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
             return comp;
         }
     }
-    
+
     /*
-    * Use this class to get descriptions from an XML file.
-    */
-    private static class XMLProperties extends Properties{
-        XMLProperties(String xmlFile){
+     * Use this class to get descriptions from an XML file.
+     */
+    private static class XMLProperties extends Properties {
+
+        XMLProperties(String xmlFile) {
             InputStream is = getClass().getResourceAsStream(xmlFile);
             try {
                 if (is == null) {

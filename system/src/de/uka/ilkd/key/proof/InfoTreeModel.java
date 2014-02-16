@@ -124,6 +124,7 @@ public class InfoTreeModel extends DefaultTreeModel {
         }
 
         Collections.sort(l, new Comparator<NoPosTacletApp>() {
+            @Override
             public int compare(NoPosTacletApp o1, NoPosTacletApp o2) {
                 final Taclet t1 = o1.taclet();
                 final Taclet t2 = o2.taclet();
