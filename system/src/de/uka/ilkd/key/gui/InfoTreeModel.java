@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
 // 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.gui;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +23,10 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.proof.BuiltInRuleIndex;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.RuleAppIndex;
+import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;

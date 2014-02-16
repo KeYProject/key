@@ -12,34 +12,26 @@
 // 
 package de.uka.ilkd.key.gui;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.event.TreeSelectionListener;
 
-import de.uka.ilkd.key.proof.InfoTreeModel;
 import de.uka.ilkd.key.util.GuiUtilities;
 import javax.swing.event.TreeSelectionEvent;
 
 public class InfoView extends JSplitPane {
 
-    private static final String DESC_RESOURCE = "/de/uka/ilkd/key/gui/help/ruleExplanations.xml";
     private InfoTreeModel infoTreeModel;
     private final InfoTree infoTree;
     private final InfoViewContentPane contentPane;
     private final KeYMediator mediator;
-    private final XMLProperties ruleExplanations;
 
     public InfoView(KeYMediator mediator) {
         super(VERTICAL_SPLIT);
 
         this.mediator = mediator;
         mediator.addKeYSelectionListener(new SelectionListener());
-        ruleExplanations = new XMLProperties(DESC_RESOURCE);
 
         // initial placement of the divider
         setDividerLocation(300);
@@ -61,7 +53,7 @@ public class InfoView extends JSplitPane {
             }
         });
 
-        contentPane = new InfoViewContentPane(ruleExplanations);
+        contentPane = new InfoViewContentPane();
 
         setLeftComponent(new JScrollPane(infoTree));
         setRightComponent(contentPane);
@@ -101,25 +93,6 @@ public class InfoView extends JSplitPane {
             GuiUtilities.invokeOnEventQueue(action);
         }
 
-    }
-
-    /*
-     * Use this class to get descriptions from an XML file.
-     */
-    private static class XMLProperties extends Properties {
-
-        XMLProperties(String xmlFile) {
-            InputStream is = getClass().getResourceAsStream(xmlFile);
-            try {
-                if (is == null) {
-                    throw new FileNotFoundException("Descriptions file " + xmlFile + " not found.");
-                }
-                loadFromXML(is);
-            } catch (IOException e) {
-                System.err.println("Cannot not load help messages in info view");
-                e.printStackTrace();
-            }
-        }
     }
 
 }
