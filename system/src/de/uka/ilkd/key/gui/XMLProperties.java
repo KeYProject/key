@@ -10,7 +10,7 @@ import java.util.Properties;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-class XMLProperties extends Properties {
+public class XMLProperties extends Properties {
 
     XMLProperties(String xmlFile) {
         InputStream is = getClass().getResourceAsStream(xmlFile);

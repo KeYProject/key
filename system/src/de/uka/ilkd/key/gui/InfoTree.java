@@ -12,18 +12,18 @@ import javax.swing.tree.DefaultTreeModel;
  */
 public class InfoTree extends JTree {
 
-    private static final String DESC_RESOURCE = "/de/uka/ilkd/key/gui/help/ruleExplanations.xml";
-    private final XMLProperties ruleExplanations;
-
-    InfoTree() {
-        ruleExplanations = new XMLProperties(DESC_RESOURCE);
+    InfoTree(InfoTreeNode node) {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-        root.add(new InfoTreeNode("No proof loaded", ruleExplanations));
+        root.add(node);
         setModel(new DefaultTreeModel(root));
         setShowsRootHandles(true);
         setRootVisible(false);
     }
 
+    /*
+     * This function is expected to return only {@link InfoTreeNode} instances.
+     * The super method returns {@link DefaultMutableTreeNode} instances.
+     */
     @Override
     public InfoTreeNode getLastSelectedPathComponent() {
         return (InfoTreeNode) super.getLastSelectedPathComponent();

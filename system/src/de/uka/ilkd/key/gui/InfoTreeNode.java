@@ -16,6 +16,23 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
     final String title;
     final Description description;
 
+    /*
+     * This constructor should only be used for the invisible root node of
+     * {@link InfoTreeModel}.
+     */
+    InfoTreeNode() {
+        title = "";
+        description = new Description() {
+            public String getString() {
+                return "";
+            }
+        };
+    }
+
+    /*
+     * @param title The name of the node.
+     * @param explanations The XML resource, where the description for this node comes from.
+     */
     InfoTreeNode(final String title, final XMLProperties explanations) {
         super(title);
         this.title = title;
@@ -60,8 +77,9 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
     String getDescription() {
         return description.getString();
     }
-    
-    private static interface Description{
+
+    private static interface Description {
+
         String getString();
     }
 

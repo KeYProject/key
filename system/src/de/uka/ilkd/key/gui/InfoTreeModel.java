@@ -17,10 +17,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.proof.Goal;
@@ -35,19 +32,26 @@ public class InfoTreeModel extends DefaultTreeModel {
 
     private static final String LEMMAS = "Lemmas";
     private static final String TACLET_BASE = "Taclet Base";
-    protected final MutableTreeNode builtInRoot = new DefaultMutableTreeNode("Built-In");
-    protected final MutableTreeNode axiomTacletRoot = new DefaultMutableTreeNode(TACLET_BASE);
-    protected final MutableTreeNode proveableTacletsRoot = new DefaultMutableTreeNode(LEMMAS);
+    protected final InfoTreeNode builtInRoot;
+    protected final InfoTreeNode axiomTacletRoot;
+    protected final InfoTreeNode proveableTacletsRoot;
+    private final XMLProperties ruleExplanations;
 
-    public InfoTreeModel(Goal goal) {
-        super(new DefaultMutableTreeNode("Rule Base"));
-        insertAsLast(builtInRoot, (MutableTreeNode) getRoot());
-        insertAsLast(axiomTacletRoot, (MutableTreeNode) getRoot());
-        insertAsLast(proveableTacletsRoot, (MutableTreeNode) getRoot());
+    public InfoTreeModel(Goal goal, XMLProperties ruleExplanations) {
+        super(new InfoTreeNode());
+
+        this.ruleExplanations = ruleExplanations;
+
+        builtInRoot = new InfoTreeNode("Built-In", ruleExplanations);
+        insertAsLast(builtInRoot, (InfoTreeNode) root);
+        axiomTacletRoot = new InfoTreeNode(TACLET_BASE, ruleExplanations);
+        insertAsLast(axiomTacletRoot, (InfoTreeNode) root);
+        proveableTacletsRoot = new InfoTreeNode(LEMMAS, ruleExplanations);
+        insertAsLast(proveableTacletsRoot, (InfoTreeNode) root);
 
         if (goal != null) {
             for (final BuiltInRule br : goal.ruleAppIndex().builtInRuleAppIndex().builtInRuleIndex().rules()) {
-                insertAsLast(new DefaultMutableTreeNode(br), builtInRoot);
+                insertAsLast(new InfoTreeNode(br.displayName(), ruleExplanations), builtInRoot);
             }
             ImmutableSet<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
             OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(goal.proof());
@@ -61,9 +65,9 @@ public class InfoTreeModel extends DefaultTreeModel {
                     continue; // do not break system because of this
                 }
                 if (just.isAxiomJustification()) {
-                    insertAndGroup(new DefaultMutableTreeNode(app.taclet()), axiomTacletRoot);
+                    insertAndGroup(new InfoTreeNode(app.taclet()), axiomTacletRoot);
                 } else {
-                    insertAndGroup(new DefaultMutableTreeNode(app.taclet()), proveableTacletsRoot);
+                    insertAndGroup(new InfoTreeNode(app.taclet()), proveableTacletsRoot);
                 }
             }
         }
@@ -72,24 +76,24 @@ public class InfoTreeModel extends DefaultTreeModel {
         proveableTacletsRoot.setUserObject(LEMMAS + " (" + getChildCount(proveableTacletsRoot) + ")");
     }
 
-    private void insertAsLast(MutableTreeNode ins, MutableTreeNode parent) {
+    private void insertAsLast(InfoTreeNode ins, InfoTreeNode parent) {
         insertNodeInto(ins, parent, parent.getChildCount());
     }
 
     /**
      * groups subsequent insertions with the same name under a new node
      */
-    private void insertAndGroup(MutableTreeNode ins, MutableTreeNode parent) {
-        DefaultMutableTreeNode insNode = (DefaultMutableTreeNode) ins;
+    private void insertAndGroup(InfoTreeNode ins, InfoTreeNode parent) {
+        InfoTreeNode insNode = (InfoTreeNode) ins;
         if (parent.getChildCount() > 0) {
-            DefaultMutableTreeNode lastNode
-                    = (DefaultMutableTreeNode) parent.getChildAt(
+            InfoTreeNode lastNode
+                    = (InfoTreeNode) parent.getChildAt(
                             parent.getChildCount() - 1);
             if (getName(insNode).equals(getName(lastNode))) {
                 if (lastNode.getChildCount() == 0) {
                     removeNodeFromParent(lastNode);
-                    MutableTreeNode oldParent = parent;
-                    parent = new DefaultMutableTreeNode(getName(insNode));
+                    InfoTreeNode oldParent = parent;
+                    parent = new InfoTreeNode(getName(insNode), ruleExplanations);
                     insertAsLast(parent, oldParent);
                     insertAsLast(lastNode, parent);
                 } else {
@@ -100,7 +104,7 @@ public class InfoTreeModel extends DefaultTreeModel {
         insertAsLast(ins, parent);
     }
 
-    private String getName(DefaultMutableTreeNode t1) {
+    private String getName(InfoTreeNode t1) {
         if (t1.getUserObject() instanceof Taclet) {
             return ((Taclet) t1.getUserObject()).displayName();
         } else {
@@ -127,10 +131,10 @@ public class InfoTreeModel extends DefaultTreeModel {
         return l;
     }
 
-    private static int getChildCount(MutableTreeNode root) {
+    private static int getChildCount(InfoTreeNode root) {
         int res = 0;
         for (int i = 0; i < root.getChildCount(); i++) {
-            final TreeNode child = root.getChildAt(i);
+            final InfoTreeNode child = (InfoTreeNode) root.getChildAt(i);
             // there is no deeper nesting
             final int grandchildren = child.getChildCount();
             res += grandchildren == 0 ? 1 : grandchildren;
