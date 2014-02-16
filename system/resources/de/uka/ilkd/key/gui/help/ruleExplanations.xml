@@ -7,10 +7,6 @@
     in the rule pane when selecting non-taclet tree elements
 </comment>
 
-<entry key="No proof loaded">
-In this pane, the available logical rules will be displayed and/or explained.
-</entry>
-
 <entry key="Built-In">
 Some logical rules are implemented in Java code. This is because their semantics cannot easily be expressed in KeY's Taclet language.
 </entry>

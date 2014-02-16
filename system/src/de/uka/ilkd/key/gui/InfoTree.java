@@ -12,9 +12,10 @@ import javax.swing.tree.DefaultTreeModel;
  */
 public class InfoTree extends JTree {
 
-    InfoTree(InfoTreeNode node) {
+    InfoTree() {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-        root.add(node);
+        root.add(new InfoTreeNode("No proof loaded", 
+        "In this pane, the available logical rules will be displayed and/or explained."));
         setModel(new DefaultTreeModel(root));
         setShowsRootHandles(true);
         setRootVisible(false);

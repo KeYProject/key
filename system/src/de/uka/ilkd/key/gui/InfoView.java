@@ -44,7 +44,7 @@ public class InfoView extends JSplitPane {
         // Setting a name for this causes {@link PreferenceSaver} to store its preferences.
         setName("ruleViewPane");
 
-        infoTree = new InfoTree(new InfoTreeNode("No proof loaded", ruleExplanations));
+        infoTree = new InfoTree();
         infoTree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent e) {
