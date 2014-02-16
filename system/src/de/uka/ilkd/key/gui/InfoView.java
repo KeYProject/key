@@ -12,22 +12,15 @@
 // 
 package de.uka.ilkd.key.gui;
 
-import java.awt.Component;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
-import javax.swing.JTree;
-import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeCellRenderer;
 
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -36,8 +29,10 @@ import de.uka.ilkd.key.proof.InfoTreeModel;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.GuiUtilities;
+import javax.swing.BorderFactory;
+import javax.swing.event.TreeSelectionEvent;
 
-public class InfoView extends JSplitPane implements TreeSelectionListener {
+public class InfoView extends JSplitPane {
 
     private static final String DESC_RESOURCE = "/de/uka/ilkd/key/gui/help/ruleExplanations.xml";
     private InfoTreeModel infoTreeModel;
@@ -60,55 +55,56 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
         // growing goes to the upper half only
         setResizeWeight(1.0);
 
-        // this triggers storing the bar position
+        // Setting a name for this causes {@link PreferenceSaver} to store its preferences.
         setName("ruleViewPane");
+
         infoTree = new InfoTree();
-        JScrollPane jp = new JScrollPane(infoTree);
-        setLeftComponent(jp);
+        infoTree.addTreeSelectionListener(new TreeSelectionListener() {
+            @Override
+            public void valueChanged(TreeSelectionEvent e) {
+                InfoTreeNode node = infoTree.getLastSelectedPathComponent();
+                if (node != null) {
+
+                    Object userObj = node.getUserObject();
+
+                    String descriptionTitle;
+                    String description;
+
+                    if (userObj instanceof Rule) {
+                        descriptionTitle = ((Rule) userObj).displayName();
+                    } else {
+                        descriptionTitle = userObj.toString();
+                    }
+
+                    if (userObj instanceof Taclet) {
+                        Taclet tac = (Taclet) userObj;
+                        description = getDescriptionFromTaclet(tac);
+                    } else {
+                        int parenIdx = descriptionTitle.lastIndexOf("(");
+                        if (parenIdx >= 0) // strip number of taclets
+                        {
+                            descriptionTitle = descriptionTitle.substring(0, parenIdx - 1).intern();
+                        }
+                        description = getRuleDescription(descriptionTitle);
+                    }
+
+                    contentScrollPane.setBorder(BorderFactory.createTitledBorder(descriptionTitle));
+                    contentPane.setText(description);
+                    contentPane.setCaretPosition(0);
+                }
+            }
+        });
 
         contentPane = new JTextArea("", 15, 30);
         contentPane.setEditable(false);
         contentPane.setLineWrap(true);
         contentPane.setWrapStyleWord(true);
         contentScrollPane = new JScrollPane(contentPane);
+
+        setLeftComponent(new JScrollPane(infoTree));
         setRightComponent(contentScrollPane);
-        infoTree.setCellRenderer(new InfoRenderer());
-        infoTree.addTreeSelectionListener(this);
+
         setVisible(true);
-    }
-
-    @Override
-    public void valueChanged(TreeSelectionEvent e) {
-        InfoTreeNode node = infoTree.getLastSelectedPathComponent();
-        if (node != null) {
-
-            Object userObj = node.getUserObject();
-
-            String descriptionTitle;
-            String description;
-
-            if (userObj instanceof Rule) {
-                descriptionTitle = ((Rule) userObj).displayName();
-            } else {
-                descriptionTitle = userObj.toString();
-            }
-
-            if (userObj instanceof Taclet) {
-                Taclet tac = (Taclet) userObj;
-                description = getDescriptionFromTaclet(tac);
-            } else {
-                int parenIdx = descriptionTitle.lastIndexOf("(");
-                if (parenIdx >= 0) // strip number of taclets
-                {
-                    descriptionTitle = descriptionTitle.substring(0, parenIdx - 1).intern();
-                }
-                description = getRuleDescription(descriptionTitle);
-            }
-
-            contentScrollPane.setBorder(BorderFactory.createTitledBorder(descriptionTitle));
-            contentPane.setText(description);
-            contentPane.setCaretPosition(0);
-        }
     }
 
     private String getRuleDescription(String name) {
@@ -164,28 +160,6 @@ public class InfoView extends JSplitPane implements TreeSelectionListener {
             GuiUtilities.invokeOnEventQueue(action);
         }
 
-    }
-
-    private static class InfoRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
-
-        @Override
-        public Component getTreeCellRendererComponent(JTree tree,
-                Object value,
-                boolean sel,
-                boolean expanded,
-                boolean leaf,
-                int row,
-                boolean hasFocus) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-            if (node.getUserObject() instanceof Taclet) {
-                Taclet t = (Taclet) node.getUserObject();
-                value = t.displayName();
-            }
-
-            Component comp = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-
-            return comp;
-        }
     }
 
     /*
