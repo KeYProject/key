@@ -35,9 +35,9 @@ public class InfoTreeModel extends DefaultTreeModel {
 
     private static final String LEMMAS = "Lemmas";
     private static final String TACLET_BASE = "Taclet Base";
-    protected MutableTreeNode builtInRoot = new DefaultMutableTreeNode("Built-In");
-    protected MutableTreeNode axiomTacletRoot = new DefaultMutableTreeNode(TACLET_BASE);
-    protected MutableTreeNode proveableTacletsRoot = new DefaultMutableTreeNode(LEMMAS);
+    protected final MutableTreeNode builtInRoot = new DefaultMutableTreeNode("Built-In");
+    protected final MutableTreeNode axiomTacletRoot = new DefaultMutableTreeNode(TACLET_BASE);
+    protected final MutableTreeNode proveableTacletsRoot = new DefaultMutableTreeNode(LEMMAS);
 
     public InfoTreeModel(Goal goal) {
         super(new DefaultMutableTreeNode("Rule Base"));

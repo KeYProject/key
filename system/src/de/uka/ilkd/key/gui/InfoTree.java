@@ -21,25 +21,6 @@ public class InfoTree extends JTree {
     InfoTree() {
         ruleExplanations = new XMLProperties(DESC_RESOURCE);
         setModel(new DefaultTreeModel(new InfoTreeNode("No proof loaded", ruleExplanations)));
-
-        setCellRenderer(new DefaultTreeCellRenderer() {
-            @Override
-            public Component getTreeCellRendererComponent(JTree tree,
-                    Object value,
-                    boolean sel,
-                    boolean expanded,
-                    boolean leaf,
-                    int row,
-                    boolean hasFocus) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-                if (node.getUserObject() instanceof Taclet) {
-                    Taclet t = (Taclet) node.getUserObject();
-                    value = t.displayName();
-                }
-                Component comp = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-                return comp;
-            }
-        });
     }
 
     @Override
