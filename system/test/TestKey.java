@@ -38,6 +38,7 @@ public class TestKey extends TestSuite {
 	de.uka.ilkd.key.logic.TestNamespace.class,
 	de.uka.ilkd.key.logic.TestSemisequent.class,
 	de.uka.ilkd.key.logic.TestPosInOcc.class,   	
+    de.uka.ilkd.key.logic.TestPosInTerm.class,       
 	de.uka.ilkd.key.logic.TestClashFreeSubst.class,
 	de.uka.ilkd.key.logic.TestSyntacticalReplaceVisitor.class,
 	de.uka.ilkd.key.logic.TestVariableNamer.class,
