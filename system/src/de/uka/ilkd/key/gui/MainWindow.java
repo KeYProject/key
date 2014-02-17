@@ -56,7 +56,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
@@ -170,19 +169,13 @@ public final class MainWindow extends JFrame  {
     public static final int TOOLBAR_ICON_SIZE = 16;
 
     /** the tab bar at the left */
-    private JTabbedPane mainWindowTabbedPane;
+    private final MainWindowTabbedPane mainWindowTabbedPane;
 
     /** the first toolbar */
     private JToolBar controlToolBar;
 
     /** the second toolbar */
     private JToolBar fileOpToolBar;
-
-    /** the current proof tree*/
-    private ProofTreeView proofTreeView;
-
-    /** the list of current open goals*/
-    private JScrollPane openGoalsView;
     
     /** JScrollPane for displaying SequentViews*/
     private final MainFrame mainFrame;
@@ -193,19 +186,10 @@ public final class MainWindow extends JFrame  {
     /** Use this SequentView in case no proof is loaded. */
     private final EmptySequent emptySequent;
 
-    /** the rule view */
-    private RuleView ruleView = null;
-
-    /** the strategy selection view */
-    private StrategySelectionView strategySelectionView = null;
-
     /** contains a list of all proofs */
-    private JScrollPane proofListView;
+    private final JScrollPane proofListView;
 
-    private TaskTree proofList;
-
-    /** list of open goals of the current proof */
-    private GoalList goalList;
+    private final TaskTree proofList;
 
     /** the mediator is stored here */
     private final KeYMediator mediator;
@@ -218,7 +202,7 @@ public final class MainWindow extends JFrame  {
 
     /** listener to global proof events */
     private final MainProofListener proofListener;
-
+    
     private RecentFileMenu recentFileMenu;
 
     public boolean frozen = false;
@@ -320,7 +304,10 @@ public final class MainWindow extends JFrame  {
         emptySequent = new EmptySequent(this);
         sequentViewSearchBar = new SequentViewSearchBar(emptySequent);
         termLabelMenu = new TermLabelMenu(this);
+        proofListView = new JScrollPane();
+        mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator);
         mainFrame = new MainFrame(this, emptySequent);
+        proofList = new TaskTree(mediator);
         notificationManager = new NotificationManager(mediator, this);
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);
@@ -463,11 +450,7 @@ public final class MainWindow extends JFrame  {
                 /* exitMainAction, */ showActiveSettingsAction, loadUserDefinedTacletsAction, 
                 loadUserDefinedTacletsForProvingAction, loadKeYTaclets, lemmaGenerationBatchModeAction, unicodeToggleAction));
 
-	// create empty views
-	createViews();
-
-	// create the contents of the views
-	createProofElements();
+	Config.DEFAULT.setDefaultFonts();
 
 	// create menubar
 	JMenuBar bar = createMenuBar();
@@ -485,9 +468,6 @@ public final class MainWindow extends JFrame  {
         // FIXME double entry?
         getContentPane().add(GuiUtilities.getClipBoardArea(), BorderLayout.PAGE_START);
         getContentPane().add(toolBarPanel, BorderLayout.PAGE_START);
-
-        // create tabbed pane
-        mainWindowTabbedPane = createTabbedPane();
 
         proofListView.setPreferredSize(new java.awt.Dimension(350, 100));
         GuiUtilities.paintEmptyViewComponent(proofListView, "Proofs");
@@ -516,25 +496,6 @@ public final class MainWindow extends JFrame  {
         // load preferred sizes from system preferences
         setName("mainWindow");
         loadPreferences(this);
-    }
-
-    private JTabbedPane createTabbedPane() {
-	JTabbedPane pane = new JTabbedPane();
-	pane.addTab("Proof", null, proofTreeView,
-	        "The current state of the proof as tree");
-	pane.addTab("Goals", null, openGoalsView,
-	        "The currently open goals");
-	pane.addTab("Proof Search Strategy", null, strategySelectionView,
-	        "Select strategy for automated proof search");
-	pane.addTab("Rules", null, ruleView,
-	        "All available rules");
-
-        pane.setSelectedIndex(0);
-        pane.setPreferredSize(new java.awt.Dimension(250, 440));
-
-	pane.setName("leftTabbed");
-
-	return pane;
     }
 
     private JToolBar createFileOpsToolBar() {
@@ -575,26 +536,6 @@ public final class MainWindow extends JFrame  {
         toolBar.addSeparator();
         toolBar.add(oneStep);
         return toolBar;
-    }
-
-    private void createViews() {
-
-	openGoalsView = new JScrollPane();
-	GuiUtilities.paintEmptyViewComponent(openGoalsView, "Open Goals");
-
-        proofListView = new JScrollPane();
-
-	strategySelectionView = new StrategySelectionView(this);
-	if ( mediator != null ) {
-	    strategySelectionView.setMediator(mediator);
-	}
-
-	ruleView = new RuleView ();
-	if ( mediator != null ) {
-	    ruleView.setMediator(mediator);
-	}
-
-        Config.DEFAULT.setDefaultFonts();
     }
 
     private ComplexButton createSMTComponent() {
@@ -719,24 +660,6 @@ public final class MainWindow extends JFrame  {
             getMediator().getNotationInfo().refresh(mediator.getServices());
             getMediator().getSelectedProof().fireProofGoalsChanged();
         }
-    }
-
-    /**
-     * create the goal list, proof tree, proof list. Add to their respective
-     * containers.
-     */
-    private void createProofElements() {
-
-	proofList = new TaskTree(mediator);
-
-        proofTreeView = new ProofTreeView(mediator);
-	proofTreeView.setSize(proofTreeView.getPreferredSize());
-	proofTreeView.setVisible(true);
-
-	goalList = new GoalList(mediator);
-        // FIXME IS that needed?
-        goalList.setSize(goalList.getPreferredSize());
-        openGoalsView.setViewportView(goalList);
     }
 
     private void addToProofList(de.uka.ilkd.key.proof.ProofAggregate plist) {
@@ -887,7 +810,6 @@ public final class MainWindow extends JFrame  {
 
     }
 
-
     private JMenu createHelpMenu() {
         JMenu help = new JMenu("About");
         help.setMnemonic(KeyEvent.VK_A);
@@ -995,8 +917,8 @@ public final class MainWindow extends JFrame  {
         return result;
     }
 
-    public ProofTreeView getProofView() {
-        return proofTreeView;
+    public ProofTreeView getProofTreeView() {
+        return mainWindowTabbedPane.getProofTreeView();
     }
 
     /** saves a proof */
@@ -1097,10 +1019,7 @@ public final class MainWindow extends JFrame  {
                 // disable all elements except the sequent window (drag'n'drop !) ...
                 enableMenuBar(MainWindow.this.getJMenuBar(), false);
                 MainWindow.this.mainFrame.setEnabled(false);
-                MainWindow.this.proofTreeView.setEnabled(false);
-                MainWindow.this.openGoalsView.setEnabled(false);
-                MainWindow.this.strategySelectionView.setEnabled(false);
-                MainWindow.this.ruleView.setEnabled(false);
+                mainWindowTabbedPane.setEnabledForAllTabs(false);
                 setToolBarDisabled();
             } else {
                 // disable the whole main window ...
@@ -1115,10 +1034,7 @@ public final class MainWindow extends JFrame  {
                 // enable all previously diabled elements ...
                 enableMenuBar(MainWindow.this.getJMenuBar(), true);
                 MainWindow.this.mainFrame.setEnabled(true);
-                MainWindow.this.proofTreeView.setEnabled(true);
-                MainWindow.this.openGoalsView.setEnabled(true);
-                MainWindow.this.strategySelectionView.setEnabled(true);
-                MainWindow.this.ruleView.setEnabled(true);
+                mainWindowTabbedPane.setEnabledForAllTabs(true);
                 setToolBarEnabled();
             } else {
                 // enable the whole main window ...
