@@ -72,6 +72,7 @@ import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.FontSizeAction;
 import de.uka.ilkd.key.gui.actions.GoalBackAction;
+import de.uka.ilkd.key.gui.actions.HidePackagePrefixToggleAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
 import de.uka.ilkd.key.gui.actions.LicenseAction;
@@ -255,8 +256,15 @@ public final class MainWindow extends JFrame  {
     private ExitMainAction exitMainAction;
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
+    private HidePackagePrefixToggleAction hidePackagePrefixToggleAction =
+        new HidePackagePrefixToggleAction(this);
     
     private final TermLabelMenu termLabelMenu;
+
+    /**
+     * set to true if the view of the current goal should not be updated
+     */
+    private boolean disableCurrentGoalView = false;
     
     public VisibleTermLabels getVisibleTermLabels(){
         return termLabelMenu.getVisibleTermLabels();
@@ -924,7 +932,6 @@ public final class MainWindow extends JFrame  {
 
 	private void setToolBarDisabled() {
 	    assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
-	    //assert doNotReenable == null : "toolbar disabled w/o prior enable";
 	    doNotReenable = new LinkedHashSet<Component>();
 	    Component[] cs = controlToolBar.getComponents();
 	    for (int i = 0; i < cs.length; i++) {
@@ -944,7 +951,6 @@ public final class MainWindow extends JFrame  {
 
         private void setToolBarEnabled() {
             assert EventQueue.isDispatchThread() : "toolbar enabled from wrong thread";
-            //assert doNotReenable != null : "toolbar enabled w/o prior disable";
             if (doNotReenable == null) return; // XXX ignore this problem for the moment XXX
 
             Component[] cs = controlToolBar.getComponents();
@@ -1000,11 +1006,6 @@ public final class MainWindow extends JFrame  {
         }
 
     }
-
-    /**
-     * set to true if the view of the current goal should not be updated
-     */
-    private boolean disableCurrentGoalView = false;
 
     /*
      * Updates the sequent displayed in the main frame.
@@ -1374,7 +1375,6 @@ public final class MainWindow extends JFrame  {
             if (!(message instanceof Component)) {
                 throw new InternalError("only messages of type " + Component.class + " supported, yet");
             }
-            // JFrame dlg = new JDialog(mainFrame(),title, modal);
             JFrame dlg = new JFrame(title);
             dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             dlg.getContentPane().add((Component) message);
@@ -1414,6 +1414,10 @@ public final class MainWindow extends JFrame  {
 
     public Action getUnicodeToggleAction() {
     	return unicodeToggleAction;
+    }
+    
+    public Action getHidePackagePrefixToggleAction() {
+        return hidePackagePrefixToggleAction;
     }
 
     /**
