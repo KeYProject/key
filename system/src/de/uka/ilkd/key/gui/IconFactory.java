@@ -14,14 +14,20 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.Image;
+import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.MetalIconFactory.FolderIcon16;
 import javax.swing.plaf.metal.MetalIconFactory.TreeControlIcon;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -36,6 +42,7 @@ public class IconFactory {
     private static Image keyHoleClosed       = getImage("images/keyproved.gif");
     private static Image keyHoleInteractive     = getImage("images/keyinteractive.gif");
     private static Image keyLogo             = getImage("images/key-color.gif");
+    private static Image keyLogo22 = getImage("images/key22.gif");
     private static Image keyLogoSmall        = getImage("images/key-color-icon-square.png");
     private static Icon provedFolderIcon     = KeYFolderIcon.getKeYFolderIconClosed();
     private static Icon closableFolderIcon   = KeYFolderIcon.getKeYFolderIconClosable();
@@ -80,6 +87,11 @@ public class IconFactory {
 
     private static Image plus = getImage("images/toolbar/plus.png");
     private static Image minus = getImage("images/toolbar/minus.png");
+    private static Image expandGoals = getImage("images/toolbar/expandGoals.png");
+
+    private static Image next = getImage("images/toolbar/go-next.png");
+    private static Image previous = getImage("images/toolbar/go-previous.png");
+    private static Image stop = getImage("images/toolbar/stop.png");
 
     private static Image interactiveAppLogo = 
         getImage("images/interactiveAppLogo.png");
@@ -149,6 +161,24 @@ public class IconFactory {
         return scaleIcon(minus,x,x);
     }
 
+    public static ImageIcon expandGoals(int x) {
+        return scaleIcon(expandGoals,x,x);
+    }
+
+    public static ImageIcon next(int x) {
+        return scaleIcon(next,x,x);
+    }
+
+    public static ImageIcon previous(int x) {
+        return scaleIcon(previous,x,x);
+    }
+
+
+    public static ImageIcon stop(int x) {
+        return scaleIcon(stop,x,x);
+    }
+
+
     public static ImageIcon keyHole(int x, int y) {
 	return scaleIcon(keyHole,x,y);
     }
@@ -167,6 +197,10 @@ public class IconFactory {
     
     public static ImageIcon keyLogo(int x, int y) {
 	return  scaleIcon(keyLogo,x,y);
+    }
+ 
+    public static ImageIcon key22Logo(int x, int y) {
+	return  scaleIcon(keyLogo22,x,y);
     }
 
     @Deprecated
@@ -267,7 +301,7 @@ public class IconFactory {
     }
 
 
-    private static class KeYFolderIcon extends FolderIcon16 {
+    public static class KeYFolderIcon extends FolderIcon16 {
 
         private static final long serialVersionUID = 5120051888984645985L;
         private static final Icon closedIcon   = new KeYFolderIcon(Color.green.darker());
@@ -289,7 +323,7 @@ public class IconFactory {
         }
 
         public void paintIcon(Component c, Graphics g, int x, int y) {
-            GraphicsConfiguration gc = c.getGraphicsConfiguration();
+            GraphicsConfiguration gc = c != null ? c.getGraphicsConfiguration() : null;
             Image image;
             if (gc != null) {
                 image = gc.createCompatibleImage(getIconWidth(), 
@@ -415,5 +449,4 @@ public class IconFactory {
                     }
         }
     }
-
 }

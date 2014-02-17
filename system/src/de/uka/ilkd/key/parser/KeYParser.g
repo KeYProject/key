@@ -90,7 +90,10 @@ options {
   import de.uka.ilkd.key.java.recoderext.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
+  
 }
+
+@annotateclass{ @SuppressWarnings("all") } 
 
 @members{
     private static final TermFactory tf = TermFactory.DEFAULT;

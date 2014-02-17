@@ -780,26 +780,27 @@ public class ProofTreeView extends JPanel {
     class ProofTreePopupMenu extends JPopupMenu
 	implements ActionListener, ItemListener {
 
+        private static final int ICON_SIZE = 16;
         private static final long serialVersionUID = -8905927848074190941L;
-    private JMenuItem expandAll   = new JMenuItem("Expand All");
+        private JMenuItem expandAll   = new JMenuItem("Expand All", IconFactory.plus(ICON_SIZE));
 	private JMenuItem expandAllBelow   = new JMenuItem("Expand All Below");
-	private JMenuItem expandGoals = new JMenuItem("Expand Goals Only");
+	private JMenuItem expandGoals = new JMenuItem("Expand Goals Only", IconFactory.expandGoals(ICON_SIZE));
 	private JMenuItem expandGoalsBelow =
 		new JMenuItem("Expand Goals Only Below");
-	private JMenuItem collapseAll = new JMenuItem("Collapse All");
+	private JMenuItem collapseAll = new JMenuItem("Collapse All", IconFactory.minus(ICON_SIZE));
 	private JMenuItem collapseOtherBranches =
 		new JMenuItem("Collapse Other Branches");
 	private JMenuItem collapseBelow = new JMenuItem("Collapse Below");
-	private JMenuItem prevSibling = new JMenuItem("Previous Sibling");
-	private JMenuItem nextSibling = new JMenuItem("Next Sibling");
+	private JMenuItem prevSibling = new JMenuItem("Previous Sibling", IconFactory.previous(ICON_SIZE));
+	private JMenuItem nextSibling = new JMenuItem("Next Sibling", IconFactory.next(ICON_SIZE));
 	private Map<JCheckBoxMenuItem, ProofTreeViewFilter> filters =
 		new LinkedHashMap<JCheckBoxMenuItem, ProofTreeViewFilter> (); // TODO: change to radio button ?
 	private JMenuItem notes = new JMenuItem("Edit Notes");
-	private JMenuItem search = new JMenuItem("Search");
+	private JMenuItem search = new JMenuItem("Search", IconFactory.search2(ICON_SIZE));
 	private JMenuItem prune    = new JMenuItem("Prune Proof");
 	private JMenuItem delayedCut = new JMenuItem("Delayed Cut");
 	private JMenuItem runStrategy = new JMenuItem("Apply Strategy",
-	    IconFactory.autoModeStartLogo(10));
+	    IconFactory.autoModeStartLogo(ICON_SIZE));
 
 	private TreePath path;
 	private TreePath branch;
@@ -837,7 +838,7 @@ public class ProofTreeView extends JPanel {
 	    this.add(prune);
 	    if (branch != path) {
 		prune.addActionListener(this);
-		prune.setIcon(IconFactory.pruneLogo(16));
+		prune.setIcon(IconFactory.pruneLogo(ICON_SIZE));
 		prune.setEnabled(false);
 		if (proof != null) {
 		    if (proof.isGoal(invokedNode) ||
@@ -863,7 +864,7 @@ public class ProofTreeView extends JPanel {
 	    // modifying the node
         this.add(new JSeparator());
         this.add(notes);
-        notes.setIcon(IconFactory.editFile(20));
+        notes.setIcon(IconFactory.editFile(ICON_SIZE));
         notes.addActionListener(this);
 
 	    // modifying the view

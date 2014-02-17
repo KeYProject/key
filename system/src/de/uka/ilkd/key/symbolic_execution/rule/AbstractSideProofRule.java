@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -121,7 +122,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
       // Extract results and conditions from side proof
       Map<Term, Set<Term>> conditionsAndResultsMap = new LinkedHashMap<Term, Set<Term>>();
       for (Goal resultGoal : info.getProof().openGoals()) {
-         if (resultGoal.getRuleAppManager().peekNext() != null) {
+         if (SymbolicExecutionUtil.hasApplicableRules(resultGoal)) {
             throw new IllegalStateException("Side roof contains goal with automatic applicable rules.");
          }
          Sequent sequent = resultGoal.sequent();
@@ -225,9 +226,9 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
       // Iterate along the PosInOccurrence and collect the parents and indices
       Deque<Pair<Integer, Term>> indexAndParents = new LinkedList<Pair<Integer, Term>>();
       Term root = pio.constrainedFormula().formula();
-      IntIterator iter = pio.posInTerm().iterator();
-      while (iter.hasNext()) {
-         int next = iter.next();
+      final PosInTerm pit = pio.posInTerm();
+      for (int i = 0, sz=pit.depth(); i<sz; i++) {
+         int next = pit.getIndexAt(i);
          indexAndParents.addFirst(new Pair<Integer, Term>(Integer.valueOf(next), root));
          root = root.sub(next);
       }

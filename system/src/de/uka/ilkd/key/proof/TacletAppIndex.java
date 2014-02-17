@@ -309,7 +309,7 @@ public class TacletAppIndex  {
             final Taclet t = tacletApp.taclet();
             if (t instanceof RewriteTaclet
                     && ((RewriteTaclet)t).checkPrefix(
-                            pos, MatchConditions.EMPTY_MATCHCONDITIONS, services)
+                            pos, MatchConditions.EMPTY_MATCHCONDITIONS)
                             != null)
                 result = result.prepend ( tacletApp );
         }

@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.util;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 
 /**
  * <p>
@@ -95,7 +96,7 @@ public class NodePreorderIterator {
       Node parent = node.parent();
       while (parent != null) {
          boolean nodeFound = false; // Indicates that node was found on the parent.
-         NodeIterator parentChildIter = parent.childrenIterator();
+         Iterator<Node> parentChildIter = parent.childrenIterator();
          Node nextChildOnParent = null; // The next child on the parent or the last child after iteration has finished
          while (parentChildIter.hasNext()) {
             nextChildOnParent = parentChildIter.next();

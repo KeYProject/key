@@ -23,7 +23,7 @@
       <constructors signature="PayCard()" visibility="default"/>
     </types>
   </packages>
-  <connectionSettings key="location" value="/BankingXX/src/banking"/>
+  <connectionSettings key="location" value="/Banking/src/banking"/>
   <connectionSettings key="packageManagement" value="FLAT_LIST"/>
   <connectionSettings key="packageManagementType" value="de.hentschel.visualdbc.datasource.model.DSPackageManagement"/>
   <connectionSettings key="locationType" value="org.eclipse.core.runtime.IPath"/>

@@ -118,7 +118,7 @@ public class BuiltInRuleAppIndex {
                                           SequentFormula cfma, 
                                           NewRuleListener listener ) {
         final PosInOccurrence    pos = new PosInOccurrence 
-		( cfma, PosInTerm.TOP_LEVEL, antec );
+		( cfma, PosInTerm.getTopLevel(), antec );
         if(rule instanceof UseDependencyContractRule || rule instanceof QueryExpand || rule instanceof QuerySideProofRule) {//HACK
             scanSimplificationRule(rule, goal, pos, listener);
         } else if (rule.isApplicable ( goal, pos ) ) {

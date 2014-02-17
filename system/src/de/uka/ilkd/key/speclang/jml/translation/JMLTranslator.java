@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
@@ -46,6 +45,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -564,6 +564,7 @@ final class JMLTranslator {
             // TODO: make subtype of JMLBoundedNumericalQuantifierTranslationMethod and remove this
             private Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
                 final Type type = kjt.getJavaType();
+                final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
                 Term res = TB.tt();
                 for (QuantifiableVariable qv: qvs) {
                     if (type instanceof PrimitiveType) {
@@ -577,7 +578,11 @@ final class JMLTranslator {
                         if (nullable) {
                             res = TB.and(res,TB.created(services, TB.var(qv)));
                         } else {
-                            res = TB.and(res,TB.createdAndNotNull(services, TB.var(qv)));
+                            final Term nonNull = arrayDepth > 0 ?
+                                    TB.deepNonNull(TB.var(qv), TB.zTerm(services, arrayDepth), services)
+                                    : TB.not(TB.equals(TB.var(qv), TB.NULL(services)));
+                            res = TB.and(res, TB.and(
+                                    TB.created(services, TB.var(qv)), nonNull));
                         }
                     }
                 }
@@ -619,6 +624,7 @@ final class JMLTranslator {
             // TODO: make subtype of JMLBoundedNumericalQuantifierTranslationMethod and remove this
             private Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
                 final Type type = kjt.getJavaType();
+                final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
                 Term res = TB.tt();
                 for (QuantifiableVariable qv: qvs) {
                     if (type instanceof PrimitiveType) {
@@ -632,7 +638,11 @@ final class JMLTranslator {
                         if (nullable) {
                             res = TB.and(res,TB.created(services, TB.var(qv)));
                         } else {
-                            res = TB.and(res,TB.createdAndNotNull(services, TB.var(qv)));
+                            final Term nonNull = arrayDepth > 0 ?
+                                    TB.deepNonNull(TB.var(qv), TB.zTerm(services, arrayDepth), services)
+                                    : TB.not(TB.equals(TB.var(qv), TB.NULL(services)));
+                            res = TB.and(res, TB.and(
+                                    TB.created(services, TB.var(qv)), nonNull));
                         }
                     }
                 }
@@ -1954,26 +1964,29 @@ final class JMLTranslator {
             Term preTerm = (Term) params[0];
             Term bodyTerm = (Term) params[1];
             KeYJavaType declsType = (KeYJavaType) params[2];
+            final Type type = declsType.getJavaType();
+            services = (Services) params[6];
+            assert services != null;
+            final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
             ImmutableList<LogicVariable> declVars =
                     (ImmutableList<LogicVariable>) params[3];
             boolean nullable = (Boolean) params[4];
             KeYJavaType resultType = (KeYJavaType) params[5];
-            services = (Services) params[6];
-            assert services != null;
             if (resultType == null) {
                 // quick fix. may happen with \num_of
                 resultType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
             }
 
-            Term nullTerm = TB.NULL(services);
             for (LogicVariable lv : declVars) {
                 preTerm = TB.and(preTerm,
                                  TB.reachableValue(services, TB.var(lv),
                                                    declsType));
                 if (lv.sort().extendsTrans(services.getJavaInfo().objectSort())
                     && !nullable) {
-                    preTerm = TB.and(preTerm, TB.not(TB.equals(TB.var(lv),
-                                                               nullTerm)));
+                    final Term nonNull = arrayDepth > 0 ?
+                            TB.deepNonNull(TB.var(lv), TB.zTerm(services, arrayDepth), services)
+                            : TB.not(TB.equals(TB.var(lv), TB.NULL(services)));
+                    preTerm = TB.and(preTerm, nonNull);
                 }
             }
 
@@ -2010,6 +2023,7 @@ final class JMLTranslator {
         /** Provide restriction terms for the declared KeYJavaType */
         protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
             final Type type = kjt.getJavaType();
+            final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
             Term res = TB.tt();
             for (QuantifiableVariable qv: qvs) {
                 if (type instanceof PrimitiveType) {
@@ -2023,7 +2037,11 @@ final class JMLTranslator {
                     if (nullable) {
                         res = TB.and(res,TB.created(services, TB.var(qv)));
                     } else {
-                        res = TB.and(res,TB.createdAndNotNull(services, TB.var(qv)));
+                        final Term nonNull = arrayDepth > 0 ?
+                                TB.deepNonNull(TB.var(qv), TB.zTerm(services, arrayDepth), services)
+                                : TB.not(TB.equals(TB.var(qv), TB.NULL(services)));
+                        res = TB.and(res,TB.and(
+                                TB.created(services, TB.var(qv)), nonNull));
                     }
                 }
             }
@@ -2199,52 +2217,7 @@ final class JMLTranslator {
             return null;
         }
     }
-
-    /**
-     * Translation method for expressions only allowed to appear in a postcondition.
-     * @author bruns
-     *
-     */
-    private abstract static class JMLPostExpressionTranslationMethod implements JMLTranslationMethod {
-
-        protected void assertPost (Term heapAtPre) throws SLTranslationException{
-            if (heapAtPre == null){
-                throw new SLTranslationException("JML construct "+name()+" not allowed in this context.");
-            }
-        }
-
-
-        /**
-         * Converts a term so that all of its non-rigid operators refer to the pre-state.
-         */
-        protected Term convertToOld(Services services, Term heapAtPre, Term term) {
-            assert heapAtPre != null;
-            Map<Term,Term> map = new LinkedHashMap<Term, Term>();
-            map.put(TB.getBaseHeap(services), heapAtPre);
-            OpReplacer or = new OpReplacer(map);
-            return or.replace(term);
-        }
-
-        /**
-         * Name of this translation method;
-         */
-        protected abstract String name();
-
-        protected abstract Term translate (Services services, Term heapAtPre, Object[] params) throws SLTranslationException;
-
-        public Term translate (Object ... params) throws SLTranslationException{
-            if (!(params[0] instanceof Services && params[1] instanceof Term))
-                throw new SLTranslationException(
-                        "Parameter 2 does not match the expected type.\n"
-                        + "Parameter type was: " + params[1].getClass().getName()
-                        + "\nExpected type was:  Term");
-            Term heapAtPre = (Term) params[1];
-            assertPost(heapAtPre);
-            return translate((Services)params[0], heapAtPre, Arrays.copyOfRange(params, 1, params.length-1));
-        }
-    }
-
-
+    
     private abstract class JMLEqualityTranslationMethod implements
             JMLTranslationMethod {
 
@@ -2390,9 +2363,3 @@ final class JMLTranslator {
         protected abstract SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression left, SLExpression right) throws SLTranslationException;
     }
 }
-
-//if(symbol == null) {
-//  // no function -> look for predicates
-//  Namespace preds = services.getNamespaces().functions();
-//  Named symbol = funcs.lookup(new Name(functName));
-//}

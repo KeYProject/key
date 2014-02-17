@@ -51,7 +51,7 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 public class WindowUserInterface extends AbstractUserInterface {
 
-	private MainWindow mainWindow;
+    private MainWindow mainWindow;
 
 
     private LinkedList<InteractiveRuleApplicationCompletion> completions =
@@ -197,13 +197,14 @@ public class WindowUserInterface extends AbstractUserInterface {
 
 	@Override
 	public void notifyAutoModeBeingStarted() {
-		mainWindow.setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
+	    mainWindow.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+	    mainWindow.setActionsEnabled(false);
 	}
 
 	@Override
 	public void notifyAutomodeStopped() {
-		mainWindow
-		        .setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+	    mainWindow.setCursor(java.awt.Cursor.getDefaultCursor());
+	    mainWindow.setActionsEnabled(true);
 	}
 
 	@Override

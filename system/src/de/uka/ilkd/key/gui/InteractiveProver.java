@@ -566,21 +566,7 @@ public class InteractiveProver implements InterruptListener {
                     .getActiveStrategyProperties().getProperty(
                             StrategyProperties.STOPMODE_OPTIONS_KEY)
                             .equals(StrategyProperties.STOPMODE_NONCLOSE);
-            boolean retreatMode = proof.getSettings().getStrategySettings()
-            .getActiveStrategyProperties().getProperty(
-                    StrategyProperties.RETREAT_MODE_OPTIONS_KEY)
-                    .equals(StrategyProperties.RETREAT_MODE_RETREAT);
-            /**
-             * In retreatMode, the proof on the node of each previous
-             * goal is pruned, unless it was closed in the automatic proof.
-             * Other than in standard mode, in retreatMode this is done for
-             * each goal (sequentially), even if we get stuck in a goal before.
-             */
-            if(retreatMode) {
-                return applyStrategy.startRetreat ( proof, goals, mediator ().getMaxAutomaticSteps(),
-                        getTimeout(), stopMode );
-            } else
-                return applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(),
+            return applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(),
                         getTimeout(), stopMode );
         }
 

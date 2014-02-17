@@ -160,6 +160,7 @@ public class KeYProgModelInfo{
     }
 
 
+    @SuppressWarnings("unchecked")
     public KeYJavaType resolveType(String shortName, KeYJavaType context) {
         recoder.abstraction.ClassType result = null;
 

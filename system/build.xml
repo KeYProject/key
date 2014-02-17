@@ -182,7 +182,7 @@
 	
     <target name="keylexer" unless="keylexer.notRequired">
 	<echo message="Running antlr ..."/>
-        <java jar="${ext.dir}/antlr.jar" fork="true">
+        <java jar="${ext.dir}/antlr.jar" fork="true" failonerror="true">
         <arg value="-o" />
         <arg value="${gen.dir}/de/uka/ilkd/key/parser" />
         <arg value="${src.dir}/de/uka/ilkd/key/parser/KeYLexer.g" />
@@ -191,7 +191,7 @@
 
     <target name="keyparser"  depends="keylexer" unless="keyparser.notRequired">
 	<echo message="Running antlr ..."/>
-     <java jar="${ext.dir}/antlr.jar" fork="true">
+     <java jar="${ext.dir}/antlr.jar" fork="true" failonerror="true">
         <arg value="-o" />
         <arg value="${gen.dir}/de/uka/ilkd/key/parser" />
         <arg value="${src.dir}/de/uka/ilkd/key/parser/KeYParser.g" />
@@ -200,7 +200,7 @@
 
     <target name="jmlprelexer" unless="jmlprelexer.notRequired">
 	<echo message="Running antlr ..."/>
-    <java jar="${ext.dir}/antlr.jar" fork="true">
+    <java jar="${ext.dir}/antlr.jar" fork="true" failonerror="true">
       <arg value="-o" />
       <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation" />
       <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.g" />
@@ -209,7 +209,7 @@
 
     <target name="jmlpreparser" depends="jmlprelexer" unless="jmlpreparser.notRequired">
 	<echo message="Running antlr ..."/>
-    <java jar="${ext.dir}/antlr.jar" fork="true">
+    <java jar="${ext.dir}/antlr.jar" fork="true" failonerror="true">
       <arg value="-o" />
       <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation" />
       <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreParser.g" />

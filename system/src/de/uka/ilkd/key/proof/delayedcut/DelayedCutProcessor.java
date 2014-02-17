@@ -207,11 +207,11 @@ public class DelayedCutProcessor implements Runnable {
         SequentFormula sf = getSequentFormula(goal, cut.isDecisionPredicateInAntecendet());
         
         
-        PosInOccurrence pio = new PosInOccurrence(sf,PosInTerm.TOP_LEVEL,
+        PosInOccurrence pio = new PosInOccurrence(sf,PosInTerm.getTopLevel(),
                 cut.isDecisionPredicateInAntecendet());
         
         ImmutableList<Goal> result= apply(getHideTacletName(cut), goal, pio);
-          cut.setHideApp(result.head().node().getLocalIntroducedRules().iterator().next());
+        cut.setHideApp(result.head().node().getLocalIntroducedRules().iterator().next());
         return result;
     }
     

@@ -348,11 +348,11 @@ public final class TestKeyUtil {
       con.addPackage(paycard);
       MemoryClass cardException = createCardException("CardException");
       paycard.addClass(cardException);
-      MemoryClass logFile = createLogFile("LogFile", "paycard.LogFile", "paycard.LogRecord", new String[] {"0", "1", "2"}, new String[] {"0", "2", "0"});
+      MemoryClass logFile = createLogFile("LogFile", "paycard.LogFile", "paycard.LogRecord", new String[] {"1", "2", "3"}, new String[] {"0", "2", "0"});
       paycard.addClass(logFile);
-      MemoryClass logRecord = createLogRecord("LogRecord", "paycard.LogRecord", new String[] {"4", "6"}, new String[] {"0", "0", "0", "0", "7"});
+      MemoryClass logRecord = createLogRecord("LogRecord", "paycard.LogRecord", new String[] {"5", "7"}, new String[] {"0", "0", "0", "0", "7"});
       paycard.addClass(logRecord);
-      MemoryClass payCard = createPayCard("PayCard", "paycard.PayCard", "paycard.LogFile", new String[] {"8", "9", "11", "13"}, new String[] {"0", "0", "1", "0", "0", "0", "0"});
+      MemoryClass payCard = createPayCard("PayCard", "paycard.PayCard", "paycard.LogFile", new String[] {"9", "10", "12", "14"}, new String[] {"0", "0", "1", "0", "0", "0", "0"});
       paycard.addClass(payCard);
       return con;
    }
@@ -366,9 +366,9 @@ public final class TestKeyUtil {
       MemoryConnection con = new MemoryConnection();
       MemoryClass payCard = createPayCard("PayCard", "PayCard", "packageA.LogFile", new String[] {"0", "1", "3", "5"}, new String[] {"0", "0", "1", "0", "0", "0", "0"});
       con.addClass(payCard);
-      MemoryClass logFile = createLogFile("packageA.LogFile", "packageA.LogFile", "packageB.p1.LogRecord", new String[] {"7", "8", "9"}, new String[] {"0", "8", "0"});
+      MemoryClass logFile = createLogFile("packageA.LogFile", "packageA.LogFile", "packageB.p1.LogRecord", new String[] {"8", "9", "10"}, new String[] {"0", "8", "0"});
       con.addClass(logFile);
-      MemoryClass logRecord = createLogRecord("packageB.p1.LogRecord", "packageB.p1.LogRecord", new String[] {"11", "13"}, new String[] {"0", "0", "0", "0", "13"});
+      MemoryClass logRecord = createLogRecord("packageB.p1.LogRecord", "packageB.p1.LogRecord", new String[] {"12", "14"}, new String[] {"0", "0", "0", "0", "13"});
       con.addClass(logRecord);
       MemoryClass cardException = createCardException("packageB.p2.p2a.CardException");
       con.addClass(cardException);
@@ -386,11 +386,11 @@ public final class TestKeyUtil {
       con.addClass(payCard);
       MemoryPackage packageA = new MemoryPackage("packageA");
       con.addPackage(packageA);
-      MemoryClass logFile = createLogFile("LogFile", "packageA.LogFile", "packageB.p1.LogRecord", new String[] {"7", "8", "9"}, new String[] {"0", "8", "0"});
+      MemoryClass logFile = createLogFile("LogFile", "packageA.LogFile", "packageB.p1.LogRecord", new String[] {"8", "9", "10"}, new String[] {"0", "8", "0"});
       packageA.addClass(logFile);
       MemoryPackage packageB_p1 = new MemoryPackage("packageB.p1");
       con.addPackage(packageB_p1);
-      MemoryClass logRecord = createLogRecord("LogRecord", "packageB.p1.LogRecord", new String[] {"11", "13"}, new String[] {"0", "0", "0", "0", "13"});
+      MemoryClass logRecord = createLogRecord("LogRecord", "packageB.p1.LogRecord", new String[] {"12", "14"}, new String[] {"0", "0", "0", "0", "13"});
       packageB_p1.addClass(logRecord);
       MemoryPackage packageB_p2_p2a = new MemoryPackage("packageB.p2.p2a");
       con.addPackage(packageB_p2_p2a);
@@ -410,13 +410,13 @@ public final class TestKeyUtil {
       con.addClass(payCard);
       MemoryPackage packageA = new MemoryPackage("packageA");
       con.addPackage(packageA);
-      MemoryClass logFile = createLogFile("LogFile", "packageA.LogFile", "packageB.p1.LogRecord", new String[] {"7", "8", "9"}, new String[] {"0", "8", "0"});
+      MemoryClass logFile = createLogFile("LogFile", "packageA.LogFile", "packageB.p1.LogRecord", new String[] {"8", "9", "10"}, new String[] {"0", "8", "0"});
       packageA.addClass(logFile);
       MemoryPackage packageB = new MemoryPackage("packageB");
       con.addPackage(packageB);
       MemoryPackage packageB_p1 = new MemoryPackage("p1");
       packageB.addPackage(packageB_p1);
-      MemoryClass logRecord = createLogRecord("LogRecord", "packageB.p1.LogRecord", new String[] {"11", "13"}, new String[] {"0", "0", "0", "0", "13"});
+      MemoryClass logRecord = createLogRecord("LogRecord", "packageB.p1.LogRecord", new String[] {"12", "14"}, new String[] {"0", "0", "0", "0", "13"});
       packageB_p1.addClass(logRecord);
       MemoryPackage packageB_p2 = new MemoryPackage("p2");
       packageB.addPackage(packageB_p2);
@@ -981,7 +981,7 @@ public final class TestKeyUtil {
       b.getExtendsFullnames().add("java.lang.Object");
       b.addAttribute(new MemoryAttribute("c", "test.Test", bugAttributeVisibility(DSVisibility.PRIVATE), false, bugAttributeFinal(true)));
       b.addConstructor(new MemoryConstructor("B(x : int)", DSVisibility.DEFAULT));
-      b.addInvariant(new MemoryInvariant("JML class invariant nr 0 in B", 
+      b.addInvariant(new MemoryInvariant("JML class invariant nr 1 in B", 
                                          "java.lang.Object::<inv>(heap,\n" +
                                          "                        test.Test::select(heap,\n" +
                                          "                                          self,\n" +
@@ -1523,21 +1523,21 @@ public final class TestKeyUtil {
 
       MemoryPackage packageC = new MemoryPackage("packageA.B.C");
       con.addPackage(packageC);
-      packageC.addClass(createClassContainer("ClassContainer", packageC.getName(), new String[] {"6", "7", "8"}, true));
-      packageC.addEnum(createEnumContainer("EnumContainer", packageC.getName(), new String[] {"9"}, true));
-      packageC.addInterface(createInterfaceContainer("InterfaceContainer", packageC.getName(), new String[] {"10", "11"}, true));
+      packageC.addClass(createClassContainer("ClassContainer", packageC.getName(), new String[] {"7", "8", "9"}, true));
+      packageC.addEnum(createEnumContainer("EnumContainer", packageC.getName(), new String[] {"10"}, true));
+      packageC.addInterface(createInterfaceContainer("InterfaceContainer", packageC.getName(), new String[] {"11", "12"}, true));
 
       MemoryPackage packageB = new MemoryPackage("packageA.B");
       con.addPackage(packageB);
-      packageB.addClass(createClassContainer("ClassContainer", packageB.getName(), new String[] {"12", "13", "14"}, true));
-      packageB.addEnum(createEnumContainer("EnumContainer", packageB.getName(), new String[] {"15"}, true));
-      packageB.addInterface(createInterfaceContainer("InterfaceContainer", packageB.getName(), new String[] {"16", "17"}, true));
+      packageB.addClass(createClassContainer("ClassContainer", packageB.getName(), new String[] {"13", "14", "15"}, true));
+      packageB.addEnum(createEnumContainer("EnumContainer", packageB.getName(), new String[] {"16"}, true));
+      packageB.addInterface(createInterfaceContainer("InterfaceContainer", packageB.getName(), new String[] {"17", "18"}, true));
       
       MemoryPackage packageA = new MemoryPackage("packageA");
       con.addPackage(packageA);
-      packageA.addClass(createClassContainer("ClassContainer", packageA.getName(), new String[] {"18", "19", "20"}, true));
-      packageA.addEnum(createEnumContainer("EnumContainer", packageA.getName(), new String[] {"21"}, true));
-      packageA.addInterface(createInterfaceContainer("InterfaceContainer", packageA.getName(), new String[] {"22", "23"}, true));
+      packageA.addClass(createClassContainer("ClassContainer", packageA.getName(), new String[] {"19", "20", "21"}, true));
+      packageA.addEnum(createEnumContainer("EnumContainer", packageA.getName(), new String[] {"22"}, true));
+      packageA.addInterface(createInterfaceContainer("InterfaceContainer", packageA.getName(), new String[] {"23", "24"}, true));
       
       con.addClass(createClassContainer("ClassContainer", null, new String[] {"0", "1", "2"}, false));
       con.addEnum(createEnumContainer("EnumContainer", null, new String[] {"3"}, false));

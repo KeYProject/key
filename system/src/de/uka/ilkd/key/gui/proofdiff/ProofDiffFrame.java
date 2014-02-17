@@ -19,9 +19,9 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Iterator;
 import java.util.LinkedList;
 
-import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
@@ -34,13 +34,13 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.proofdiff.diff_match_patch.Diff;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.Proof;
 
 /**
@@ -60,11 +60,12 @@ public class ProofDiffFrame extends JFrame {
     /**
      * The action to show a new frame of this class. Is used in {@link MainWindow}.
      */
-    public static class Action extends AbstractAction {
+    public static class Action extends MainWindowAction {
 
         private final MainWindow mainWindow;
 
         public Action(MainWindow mainWindow) {
+            super(mainWindow);
             this.mainWindow = mainWindow;
             putValue(NAME, "Visual node diff ...");
             // putValue(SMALL_ICON, ...);
@@ -356,7 +357,7 @@ public class ProofDiffFrame extends JFrame {
             return node;
         }
 
-        NodeIterator it = node.childrenIterator();
+        Iterator<Node> it = node.childrenIterator();
         while(it.hasNext()) {
             Node n = it.next();
             if(n.serialNr() <= number) {

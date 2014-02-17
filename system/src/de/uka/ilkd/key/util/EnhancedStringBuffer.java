@@ -106,9 +106,18 @@ public class EnhancedStringBuffer
                 res.append('s');
             }
             else {
-                final long min = sec/60;
-                res.append(min);
-                res.append("min");
+                long min = sec/60;
+                if (min < 120) {
+                    res.append(min);
+                    res.append("min");
+                } else {
+                    final long h = min/60;
+                    min %= 60;   
+                    res.append(h);
+                    res.append("h ");
+                    res.append(min);
+                    res.append("min");
+                }
             }
         }
         return res;

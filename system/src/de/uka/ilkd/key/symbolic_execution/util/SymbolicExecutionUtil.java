@@ -97,7 +97,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -133,6 +132,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -697,20 +697,10 @@ public final class SymbolicExecutionUtil {
       StrategyProperties sp = !proof.isDisposed() ? 
                               proof.getSettings().getStrategySettings().getActiveStrategyProperties() : // Is a clone that can be modified
                               new StrategyProperties();
+      SymbolicExecutionStrategy.setDefaultStrategyProperties(sp, false, true, true, false, false);
       sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, splittingOption); // Logical Splitting: Off is faster and avoids splits, but Normal allows to determine that two objects are different.
-      sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_CONTRACT); // Method Treatment: Contract
-      sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_INVARIANT); // Loop Treatment: Invariant
-      sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_ON); // Dependency Contracts: On
       sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_ON); // Query Treatment: On
-      sp.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_ON); // Expand local queries: Off
-      sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-                     StrategyProperties.NON_LIN_ARITH_DEF_OPS); // Arithmetic Treatment: DefOps
-      sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
-                     StrategyProperties.QUANTIFIERS_NON_SPLITTING); // Quantifier treatment: No Splits
-      sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY,
-                     StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER); // Alias checks
-      sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
-                     StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF); // Avoid branches caused by modalities not part of the main execution
+      sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NON_SPLITTING); // Quantifier treatment: No Splits
       starter.setStrategy(sp);
       // Execute proof in the current thread
       return starter.start();
@@ -1702,7 +1692,7 @@ public final class SymbolicExecutionUtil {
       ImmutableList<Goal> result = ImmutableSLList.nil();
       if (node != null) {
          Proof proof = node.proof();
-         NodeIterator iter = node.leavesIterator();
+         Iterator<Node> iter = node.leavesIterator();
          while (iter.hasNext()) {
             Node next = iter.next();
             Goal nextGoal = proof.getGoal(next);
@@ -2678,7 +2668,7 @@ public final class SymbolicExecutionUtil {
       }
       if (remove) {
          return sequent.removeFormula(
-                 new PosInOccurrence(sf, PosInTerm.TOP_LEVEL, antecedent)).sequent();
+                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), antecedent)).sequent();
       }
       else {
          return sequent;
@@ -3209,5 +3199,14 @@ public final class SymbolicExecutionUtil {
    public static void setUsePrettyPrinting(boolean usePrettyPrinting) {
       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);
       NotationInfo.PRETTY_SYNTAX = usePrettyPrinting;
+   }
+
+   /**
+    * Checks if the {@link Goal} has applicable rules.
+    * @param goal The {@link Goal} to check.
+    * @return {@code true} has applicable rules, {@code false} no rules are applicable.
+    */
+   public static boolean hasApplicableRules(Goal goal) {
+      return goal.getRuleAppManager().peekNext() != null;
    }
 }

@@ -44,6 +44,7 @@ public class PrettyPrintToggleAction extends MainWindowAction {
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(selected);
 	NotationInfo.PRETTY_SYNTAX = selected;
 	mainWindow.getUnicodeToggleAction().setEnabled(selected);
+	mainWindow.getHidePackagePrefixToggleAction().setEnabled(selected);
 	mainWindow.makePrettyView();
     }
 

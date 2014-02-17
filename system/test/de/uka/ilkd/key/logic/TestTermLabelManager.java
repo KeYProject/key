@@ -391,7 +391,7 @@ public class TestTermLabelManager extends TestCase {
       LocationVariable heap = services.getTypeConverter().getHeapLDT().getSavedHeap();
       Term update = TermBuilder.DF.label(TermBuilder.DF.elementary(services, TermBuilder.DF.var(heap), TermBuilder.DF.var(heap)), new ParameterlessTermLabel(new Name("UPDATE")));
       Term updateApp = TermBuilder.DF.apply(update, modality, new ImmutableArray<TermLabel>(new ParameterlessTermLabel(new Name("UPDATE-APPLICATION"))));
-      PosInOccurrence pos = new PosInOccurrence(new SequentFormula(updateApp), PosInTerm.TOP_LEVEL, true);
+      PosInOccurrence pos = new PosInOccurrence(new SequentFormula(updateApp), PosInTerm.getTopLevel(), true);
       Term taclet = TermBuilder.DF.tt();
       Rule rule = new DummyRule("rule");
       // Create labels

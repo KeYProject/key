@@ -18,3 +18,4 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
+Export-Package: org.key_project.key4eclipse.resources.test.suite
