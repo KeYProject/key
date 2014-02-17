@@ -190,12 +190,13 @@ public final class JMLSpecExtractor implements SpecExtractor {
         final TypeConverter typeConverter = services.getTypeConverter();
         if (typeConverter.isReferenceType(varType) && !isImplicitVar) {
             final int arrayDepth = arrayDepth(varType, services);
-            
-            PositionedString ps
+
             // use special "deep" non null predicate (see bug #1392)
             // ... looks a bit like a hack with those DL escapes ...
-            = new PositionedString("\\dl_nonNull(\\dl_heap(),"+varName+","+arrayDepth+")", fileName, pos)
-                                .label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
+            final String nonNullString = arrayDepth > 0 ?
+                    "\\dl_nonNull(\\dl_heap(),"+varName+","+arrayDepth+")" : varName+" != null";
+            PositionedString ps = new PositionedString(nonNullString, fileName, pos)
+                    .label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
             result = result.add(ps);
         }
         return result;
