@@ -1598,7 +1598,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             MonomialsSmallerThanFeature
             .create ( instOf ( "newSymLeft" ),
                       subAt ( antecFor,
-                              PosInTerm.TOP_LEVEL.down ( 0 ).down ( 0 ) ), numbers );
+                              PosInTerm.getTopLevel().down ( 0 ).down ( 0 ) ), numbers );
         bindRuleSet ( d, "polySimp_newSym",
            add ( isInstantiated ( "newSymDef" ),
                  sum ( antecFor, SequentFormulasGenerator.antecedent (),

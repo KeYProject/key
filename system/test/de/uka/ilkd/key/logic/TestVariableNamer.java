@@ -97,7 +97,7 @@ public class TestVariableNamer extends TestCase {
 
     
     private PosInOccurrence constructPIO(SequentFormula formula) {
-    	return new PosInOccurrence(formula, PosInTerm.TOP_LEVEL, true);
+    	return new PosInOccurrence(formula, PosInTerm.getTopLevel(), true);
     }
 
 

@@ -121,7 +121,7 @@ public class JoinProcessor implements Runnable{
 
     private void orRight(Goal goal){
         SequentFormula sf =goal.sequent().succedent().get(0);
-        PosInOccurrence pio =new PosInOccurrence(sf,PosInTerm.TOP_LEVEL,false);
+        PosInOccurrence pio =new PosInOccurrence(sf,PosInTerm.getTopLevel(),false);
         apply(new String[]{OR_RIGHT_TACLET}, goal, pio);
   
     }
@@ -140,7 +140,7 @@ public class JoinProcessor implements Runnable{
 
         SequentFormula sf = findFormula(goal.sequent(), cut.getFormula(), false);
         
-        PosInOccurrence pio = new PosInOccurrence(sf,PosInTerm.TOP_LEVEL.down(0),false);
+        PosInOccurrence pio = new PosInOccurrence(sf,PosInTerm.getTopLevel().down(0),false);
         Goal result = apply(SIMPLIFY_UPDATE, goal, pio).head();
 
         return result == null ? goal : result;
@@ -183,7 +183,7 @@ public class JoinProcessor implements Runnable{
     	}
         int index = goal.sequent().formulaNumberInSequent(false,partner.getFormulaForHiding());
         PosInOccurrence pio = PosInOccurrence.findInSequent(goal.sequent(),
-                index, PosInTerm.TOP_LEVEL);
+                index, PosInTerm.getTopLevel());
         return apply(new String [] {HIDE_RIGHT_TACLET}, goal, pio).head();
         
     }
