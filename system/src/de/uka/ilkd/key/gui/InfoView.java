@@ -34,7 +34,7 @@ public class InfoView extends JSplitPane {
 
     public InfoView(KeYMediator mediator, MainWindow mainWindow) {
         super(VERTICAL_SPLIT);
-
+        assert mediator != null;
         ruleExplanations = new XMLProperties(RULE_RESOURCE);
         termLabelExplanations = new XMLProperties(LABEL_RESOURCE);
         this.mainWindow = mainWindow;
@@ -86,11 +86,9 @@ public class InfoView extends JSplitPane {
             Runnable action = new Runnable() {
                 @Override
                 public void run() {
-                    if (mediator != null) {
-                        if (mediator.getSelectedProof() != null) {
-                            infoTree.setModel(new InfoTreeModel(mediator.getSelectedGoal(),
-                                    ruleExplanations, termLabelExplanations, mainWindow));
-                        }
+                    if (mediator.getSelectedProof() != null) {
+                        infoTree.setModel(new InfoTreeModel(mediator.getSelectedGoal(),
+                                ruleExplanations, termLabelExplanations, mainWindow));
                     }
                 }
             };
