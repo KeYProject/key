@@ -323,7 +323,7 @@ public final class MainWindow extends JFrame  {
         sequentViewSearchBar = new SequentViewSearchBar(emptySequent);
         termLabelMenu = new TermLabelMenu(this);
         mainFrame = new MainFrame(this, emptySequent);
-        initNotification();
+        notificationManager = new NotificationManager(mediator, this);
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);
         ToolTipManager.sharedInstance().setDismissDelay(30000);
@@ -376,10 +376,6 @@ public final class MainWindow extends JFrame  {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void initNotification() {
-    	notificationManager = new NotificationManager(mediator, this);
     }
 
     /**
