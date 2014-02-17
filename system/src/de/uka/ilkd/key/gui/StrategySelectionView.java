@@ -225,8 +225,6 @@ public final class StrategySelectionView extends JPanel {
       javaDLOptionsScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
       box.add(javaDLOptionsScrollPane);
 
-      box.add(Box.createVerticalGlue());
-
       // //////////////////////////////////////////////////////////////////////
 
       if (!DEFINITION.getProperties().isEmpty()) {
@@ -459,19 +457,6 @@ public final class StrategySelectionView extends JPanel {
          enableAll(false);
       }
       else {
-         // boolean methodExpandAllowed = false; // TODO: CHeck what it does
-         // for(de.uka.ilkd.key.logic.Choice c
-         // : proof.env().getInitConfig().getActivatedChoices()) {
-         // if(c.name().toString().equals("methodExpand:allow")) {
-         // methodExpandAllowed = true;
-         // break;
-         // }
-         // }
-         // rdBut12.setEnabled(methodExpandAllowed);
-         // if(!methodExpandAllowed && rdBut12.isSelected()) {
-         // rdBut13.doClick();
-         // }
-
          if (components.getMaxRuleAppSlider() != null) {
             components.getMaxRuleAppSlider().refresh();
          }
