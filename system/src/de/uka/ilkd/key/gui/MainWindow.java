@@ -615,7 +615,7 @@ public final class MainWindow extends JFrame  {
 	setStatusLine(s, 0);
     }
 
-    public void selectTab(int tab) {
+    public void selectFirstTab() {
     	this.mainWindowTabbedPane.setSelectedIndex(0);
     }
 
