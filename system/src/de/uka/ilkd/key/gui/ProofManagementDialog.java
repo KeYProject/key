@@ -52,8 +52,8 @@ import javax.swing.event.TreeSelectionListener;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -345,19 +345,8 @@ public final class ProofManagementDialog extends JDialog {
             }
         }
 
-        validateNotNull(selectedKJT);
-        validateNotNull(selectedTarget);
-        select(selectedKJT, selectedTarget);
-    }
-
-    /*
-     * Check for Nullpointers.
-     */
-    public static void validateNotNull(Object o) {
-        if (o == null) {
-            System.err.println("Unexpected null value.");
-            Thread.dumpStack();
-        }
+        if (selectedKJT != null && selectedTarget != null)
+            select(selectedKJT, selectedTarget);
     }
 
     /**
@@ -427,7 +416,8 @@ public final class ProofManagementDialog extends JDialog {
 
     private void select(KeYJavaType kjt, IObserverFunction target) {
         tabbedPane.setSelectedIndex(0);
-        classTree.select(kjt, target);
+        if (classTree != null)
+            classTree.select(kjt, target);
     }
 
     private void select(Proof p) {
@@ -515,7 +505,8 @@ public final class ProofManagementDialog extends JDialog {
         
     
     private boolean isInstanceMethodOfAbstractClass(KeYJavaType p_class, IObserverFunction obs) {
-        return p_class.getSort().isAbstract() && !obs.isStatic();
+        return p_class.getJavaType() instanceof InterfaceDeclaration
+            || (p_class.getSort().isAbstract() && !obs.isStatic());
     }
     
     private void updateContractPanel() {
@@ -524,12 +515,12 @@ public final class ProofManagementDialog extends JDialog {
 	    final ClassTree.Entry entry = classTree.getSelectedEntry();
 	    if(entry != null && entry.target != null && 
 	            !isInstanceMethodOfAbstractClass(entry.kjt, entry.target)) {
-		final ImmutableSet<Contract> contracts 
-			= specRepos.getContracts(entry.kjt, entry.target);
-		pan.setContracts(contracts, "Contracts");
+	        final ImmutableSet<Contract> contracts 
+	        = specRepos.getContracts(entry.kjt, entry.target);
+	        pan.setContracts(contracts, "Contracts");
 	    } else {
-		pan.setContracts(DefaultImmutableSet.<Contract>nil(), "Contracts");
-	    }
+	        pan.setContracts(DefaultImmutableSet.<Contract>nil(), "Contracts");	        
+	    }	    	    
 	} else if (pan == contractPanelByProof) {
 	    if(proofList.getSelectedValue() != null) {
 		final Proof p 

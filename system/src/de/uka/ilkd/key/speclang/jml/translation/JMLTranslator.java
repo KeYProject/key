@@ -578,8 +578,11 @@ final class JMLTranslator {
                         if (nullable) {
                             res = TB.and(res,TB.created(services, TB.var(qv)));
                         } else {
+                            final Term nonNull = arrayDepth > 0 ?
+                                    TB.deepNonNull(TB.var(qv), TB.zTerm(services, arrayDepth), services)
+                                    : TB.not(TB.equals(TB.var(qv), TB.NULL(services)));
                             res = TB.and(res, TB.and(
-                                    TB.created(services, TB.var(qv)), TB.deepNonNull(TB.var(qv), TB.zTerm(services, arrayDepth), services)));
+                                    TB.created(services, TB.var(qv)), nonNull));
                         }
                     }
                 }
@@ -635,8 +638,11 @@ final class JMLTranslator {
                         if (nullable) {
                             res = TB.and(res,TB.created(services, TB.var(qv)));
                         } else {
+                            final Term nonNull = arrayDepth > 0 ?
+                                    TB.deepNonNull(TB.var(qv), TB.zTerm(services, arrayDepth), services)
+                                    : TB.not(TB.equals(TB.var(qv), TB.NULL(services)));
                             res = TB.and(res, TB.and(
-                                    TB.created(services, TB.var(qv)), TB.deepNonNull(TB.var(qv), TB.zTerm(services, arrayDepth), services)));
+                                    TB.created(services, TB.var(qv)), nonNull));
                         }
                     }
                 }
@@ -1977,7 +1983,10 @@ final class JMLTranslator {
                                                    declsType));
                 if (lv.sort().extendsTrans(services.getJavaInfo().objectSort())
                     && !nullable) {
-                    preTerm = TB.and(preTerm, TB.deepNonNull(TB.var(lv), TB.zTerm(services, arrayDepth), services));
+                    final Term nonNull = arrayDepth > 0 ?
+                            TB.deepNonNull(TB.var(lv), TB.zTerm(services, arrayDepth), services)
+                            : TB.not(TB.equals(TB.var(lv), TB.NULL(services)));
+                    preTerm = TB.and(preTerm, nonNull);
                 }
             }
 
@@ -2028,8 +2037,11 @@ final class JMLTranslator {
                     if (nullable) {
                         res = TB.and(res,TB.created(services, TB.var(qv)));
                     } else {
+                        final Term nonNull = arrayDepth > 0 ?
+                                TB.deepNonNull(TB.var(qv), TB.zTerm(services, arrayDepth), services)
+                                : TB.not(TB.equals(TB.var(qv), TB.NULL(services)));
                         res = TB.and(res,TB.and(
-                                TB.created(services, TB.var(qv)), TB.deepNonNull(TB.var(qv), TB.zTerm(services, arrayDepth), services)));
+                                TB.created(services, TB.var(qv)), nonNull));
                     }
                 }
             }

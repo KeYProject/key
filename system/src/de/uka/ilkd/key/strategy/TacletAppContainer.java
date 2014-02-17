@@ -460,7 +460,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
             final SequentFormula cfma = p_ifInstantiation.getConstrainedFormula ();
             final PosInOccurrence pio = new PosInOccurrence ( cfma,
-                                                              PosInTerm.TOP_LEVEL,
+                                                              PosInTerm.getTopLevel(),
                                                               antec );
 
             final FormulaTagManager tagManager = goal.getFormulaTagManager ();

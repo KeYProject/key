@@ -2668,7 +2668,7 @@ public final class SymbolicExecutionUtil {
       }
       if (remove) {
          return sequent.removeFormula(
-                 new PosInOccurrence(sf, PosInTerm.TOP_LEVEL, antecedent)).sequent();
+                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), antecedent)).sequent();
       }
       else {
          return sequent;

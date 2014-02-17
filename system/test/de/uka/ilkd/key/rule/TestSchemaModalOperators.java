@@ -183,7 +183,7 @@ public class TestSchemaModalOperators extends TestCase {
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
 	PosInOccurrence applyPos= new 
 			PosInOccurrence(goal.sequent().succedent().getFirst(), 
-					PosInTerm.TOP_LEVEL,
+					PosInTerm.getTopLevel(),
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
@@ -217,7 +217,7 @@ public class TestSchemaModalOperators extends TestCase {
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
 	PosInOccurrence applyPos= new 
 			PosInOccurrence(goal.sequent().succedent().getFirst(), 
-					PosInTerm.TOP_LEVEL,
+					PosInTerm.getTopLevel(),
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
@@ -247,7 +247,7 @@ public class TestSchemaModalOperators extends TestCase {
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
 	PosInOccurrence applyPos= new 
 			PosInOccurrence(goal.sequent().succedent().getFirst(), 
-					PosInTerm.TOP_LEVEL,
+					PosInTerm.getTopLevel(),
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	

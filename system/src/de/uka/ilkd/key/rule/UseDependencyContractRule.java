@@ -89,7 +89,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    if(formula.op() instanceof Equality
 	       && formula.sub(1).equals(term)) {
 		final PosInOccurrence pos
-			= new PosInOccurrence(cf, PosInTerm.TOP_LEVEL, true);
+			= new PosInOccurrence(cf, PosInTerm.getTopLevel(), true);
 		result.add(new Pair<Term,PosInOccurrence>(formula.sub(0), pos));
 	    }
 	}
@@ -272,12 +272,12 @@ public final class UseDependencyContractRule implements BuiltInRule {
 		= new LinkedHashMap<Term, PosInOccurrence>();
 	for(SequentFormula cf : seq.antecedent()) {
 	    final PosInOccurrence pos
-	    	= new PosInOccurrence(cf, PosInTerm.TOP_LEVEL, true);
+	    	= new PosInOccurrence(cf, PosInTerm.getTopLevel(), true);
 	    collectBaseOccsHelper(focus, pos, result);
 	}
 	for(SequentFormula cf : seq.succedent()) {
 	    final PosInOccurrence pos
-	    	= new PosInOccurrence(cf, PosInTerm.TOP_LEVEL, false);
+	    	= new PosInOccurrence(cf, PosInTerm.getTopLevel(), false);
 	    collectBaseOccsHelper(focus, pos, result);
 	}
 	return result;

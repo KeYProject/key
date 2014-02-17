@@ -860,7 +860,7 @@ public class TermLabelManager {
       for (SequentFormula sfa : semisequent) {
          Term updatedTerm = refactorLabelsRecursive(services, applicationPosInOccurrence, applicationTerm, rule, goal, tacletTerm, sfa.formula(), activeRefactorings);
          goal.changeFormula(new SequentFormula(updatedTerm),
-                            new PosInOccurrence(sfa, PosInTerm.TOP_LEVEL, inAntec));
+                            new PosInOccurrence(sfa, PosInTerm.getTopLevel(), inAntec));
       }
    }
 

@@ -286,7 +286,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
     }
     
     protected ProjectionToTerm sub(ProjectionToTerm t, int index) {
-        return SubtermProjection.create ( t, PosInTerm.TOP_LEVEL.down ( index ) );
+        return SubtermProjection.create ( t, PosInTerm.getTopLevel().down ( index ) );
     }
     
     protected ProjectionToTerm opTerm(Operator op, ProjectionToTerm[] subTerms) {
