@@ -123,7 +123,7 @@ keyoptions=""
 
 #default values for Java Options Xmx and Xms
 javaOptionXmx="-Xmx2048m";
-javaOptionXms="-Xms64m";
+javaOptionXms="-Xms256m";
 
 while [ $# -ne 0 ]; do
     case $1 in
