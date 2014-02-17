@@ -54,14 +54,16 @@ import de.uka.ilkd.key.proof.Proof;
  * @author mattias ulbrich
  */
 
-@SuppressWarnings("serial")
 public class ProofDiffFrame extends JFrame {
+
+    private static final long serialVersionUID = -1593379776744771923L;
 
     /**
      * The action to show a new frame of this class. Is used in {@link MainWindow}.
      */
     public static class Action extends MainWindowAction {
 
+        private static final long serialVersionUID = -1745515272350810787L;
         private final MainWindow mainWindow;
 
         public Action(MainWindow mainWindow) {
