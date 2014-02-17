@@ -7,7 +7,7 @@
                <branchCondition name="not(equals(y,null))" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="true" branchCondition="not(equals(y,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="int add = sub(x,y);" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false">
                      <operationContract name="result_0 = sub(x, y) catch(exc_2)
-pre: !x = null &amp; !y = null
+pre: nonNull(heap, x, 0) &amp; nonNull(heap, y, 0)
 post: result_0 = javaAddInt(x.value, y.value) &amp; exc_2 = null
 mod: allLocs
 termination: diamond" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
