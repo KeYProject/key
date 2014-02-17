@@ -515,12 +515,12 @@ public final class ProofManagementDialog extends JDialog {
 	    final ClassTree.Entry entry = classTree.getSelectedEntry();
 	    if(entry != null && entry.target != null && 
 	            !isInstanceMethodOfAbstractClass(entry.kjt, entry.target)) {
-		final ImmutableSet<Contract> contracts 
-			= specRepos.getContracts(entry.kjt, entry.target);
-		pan.setContracts(contracts, "Contracts");
+	        final ImmutableSet<Contract> contracts 
+	        = specRepos.getContracts(entry.kjt, entry.target);
+	        pan.setContracts(contracts, "Contracts");
 	    } else {
-		pan.setContracts(DefaultImmutableSet.<Contract>nil(), "Contracts");
-	    }
+	        pan.setContracts(DefaultImmutableSet.<Contract>nil(), "Contracts");	        
+	    }	    	    
 	} else if (pan == contractPanelByProof) {
 	    if(proofList.getSelectedValue() != null) {
 		final Proof p 
