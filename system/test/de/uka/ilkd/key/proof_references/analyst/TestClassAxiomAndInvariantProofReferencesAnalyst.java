@@ -38,7 +38,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
                                  return IProofReference.USE_AXIOM.equals(element.getKind());
                               }
                             },
-                            new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),nonNull(heap,Child::select(heap,self,InvariantInOperationContract::$child),Z(0(#))))"));
+                            new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),not(equals(Child::select(heap,self,InvariantInOperationContract::$child),null)))"));
    }
    
    /**
@@ -57,7 +57,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
                                   return IProofReference.USE_AXIOM.equals(element.getKind());
                                }
                              },
-                            new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),nonNull(heap,ChildContainer::select(heap,self,NestedInvariantInOperationContract::$cc),Z(0(#))))"));
+                            new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),not(equals(ChildContainer::select(heap,self,NestedInvariantInOperationContract::$cc),null)))"));
    }
    
    /**
@@ -100,6 +100,6 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
                               new ClassAxiomAndInvariantProofReferencesAnalyst(),
                               new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),java.lang.Object::<inv>(heap,test.AccessibleTest::select(heap,self,test.B::$c)))"),
                               new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),true)"),
-                              new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),nonNull(heap,java.lang.Class::select(heap,null,java.lang.Integer::$TYPE),Z(0(#))))"));
+                              new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),not(equals(java.lang.Class::select(heap,null,java.lang.Integer::$TYPE),null)))"));
    }
 }
