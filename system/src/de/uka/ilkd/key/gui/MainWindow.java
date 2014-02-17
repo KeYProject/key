@@ -14,6 +14,7 @@
 
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.actions.TermLabelMenu;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -136,7 +137,11 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
@@ -216,7 +221,7 @@ public final class MainWindow extends JFrame  {
 
     /** listener to gui events */
     private final MainGUIListener guiListener;
-    private RecentFileMenu recentFiles;
+    private RecentFileMenu recentFileMenu;
 
     public boolean frozen = false;
 
@@ -427,13 +432,13 @@ public final class MainWindow extends JFrame  {
         setPreferredSize(new java.awt.Dimension(1000, 750));
 
         // FIXME FIXME
-        recentFiles = new RecentFileMenu(new ActionListener() {
+        recentFileMenu = new RecentFileMenu(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mediator.getUI().loadProblem(new File(recentFiles.getAbsolutePath((JMenuItem) e.getSource())));
+                mediator.getUI().loadProblem(new File(recentFileMenu.getAbsolutePath((JMenuItem) e.getSource())));
             }
         }, MAX_RECENT_FILES, null);
-        recentFiles.load(PathConfig.getRecentFileStorage());
+        recentFileMenu.load(PathConfig.getRecentFileStorage());
 
 
         // FIXME do this NOT in layout of GUI
@@ -782,7 +787,7 @@ public final class MainWindow extends JFrame  {
         submenu.add(loadKeYTaclets);
         submenu.add(lemmaGenerationBatchModeAction);
         fileMenu.addSeparator();
-        fileMenu.add(recentFiles.getMenu());
+        fileMenu.add(recentFileMenu.getMenu());
         fileMenu.addSeparator();
         fileMenu.add(exitMainAction);
         return fileMenu;
@@ -1252,7 +1257,7 @@ public final class MainWindow extends JFrame  {
      * This has been partly taken from the GlassPaneDemo of the Java Tutorial
      */
     private static class BlockingGlassPane extends JComponent {
-        GlassPaneListener listener;
+        private final GlassPaneListener listener;
 
         public BlockingGlassPane(Container contentPane) {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
@@ -1376,7 +1381,6 @@ public final class MainWindow extends JFrame  {
         }
     }
 
-
     private final class DPEnableControl implements KeYSelectionListener{
 
 	private void enable(boolean b){
@@ -1404,18 +1408,19 @@ public final class MainWindow extends JFrame  {
 
 
     /**
-     * This action is responsible for the invocation of an SMT solver
-     * For example the toolbar button is paramtrized with an instance of this action
+     * This action is responsible for the invocation of an SMT solver For
+     * example the toolbar button is paramtrized with an instance of this action
      */
     private final class SMTInvokeAction extends AbstractAction {
-	SolverTypeCollection solverUnion;
 
-	public SMTInvokeAction(SolverTypeCollection solverUnion) {
-	    this.solverUnion = solverUnion;
-	    if (solverUnion != SolverTypeCollection.EMPTY_COLLECTION) {
-		putValue(SHORT_DESCRIPTION, "Invokes " + solverUnion.toString());
-	    }
-	}
+        SolverTypeCollection solverUnion;
+
+        public SMTInvokeAction(SolverTypeCollection solverUnion) {
+            this.solverUnion = solverUnion;
+            if (solverUnion != SolverTypeCollection.EMPTY_COLLECTION) {
+                putValue(SHORT_DESCRIPTION, "Invokes " + solverUnion.toString());
+            }
+        }
 
         @Override
         public boolean isEnabled() {
@@ -1427,49 +1432,48 @@ public final class MainWindow extends JFrame  {
         }
 
         @Override
-	public void actionPerformed(ActionEvent e) {
-	    if (!mediator.ensureProofLoaded() || solverUnion ==SolverTypeCollection.EMPTY_COLLECTION){
-            MainWindow.this.popupWarning("No proof loaded or no solvers selected.", "Oops...");
-	    	return;
-	    }
-	    final Proof proof = mediator.getSelectedProof();
+        public void actionPerformed(ActionEvent e) {
+            if (!mediator.ensureProofLoaded() || solverUnion == SolverTypeCollection.EMPTY_COLLECTION) {
+                MainWindow.this.popupWarning("No proof loaded or no solvers selected.", "Oops...");
+                return;
+            }
+            final Proof proof = mediator.getSelectedProof();
 
-	    Thread thread = new Thread(new Runnable() {
-	        @Override
-	        public void run() {
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
 
+                    SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
+                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), proof);
+                    SolverLauncher launcher = new SolverLauncher(settings);
+                    launcher.addListener(new SolverListener(settings));
+                    launcher.launch(solverUnion.getTypes(),
+                            SMTProblem.createSMTProblems(proof),
+                            proof.getServices());
 
-	            SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
-	                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),proof);
-	            SolverLauncher launcher = new SolverLauncher(settings);
-	            launcher.addListener(new SolverListener(settings));
-	            launcher.launch(solverUnion.getTypes(),
-			            SMTProblem.createSMTProblems(proof),
-			            proof.getServices());
+                }
+            }, "SMTRunner");
+            thread.start();
 
-	        }
-	    },"SMTRunner");
-	    thread.start();
-
-	}
+        }
 
         @Override
-	public String toString(){
-	    return solverUnion.toString();
-	}
+        public String toString() {
+            return solverUnion.toString();
+        }
 
-	@Override
-	public boolean equals(Object obj) {
-	    if(!(obj instanceof SMTInvokeAction)){
-		return false;
-	    }
-	    return this.solverUnion.equals(((SMTInvokeAction)obj).solverUnion);
-	}
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof SMTInvokeAction)) {
+                return false;
+            }
+            return this.solverUnion.equals(((SMTInvokeAction) obj).solverUnion);
+        }
 
-    @Override
-    public int hashCode() {
-        return solverUnion.hashCode() * 7;
-    }
+        @Override
+        public int hashCode() {
+            return solverUnion.hashCode() * 7;
+        }
 
     }
 
@@ -1523,7 +1527,7 @@ public final class MainWindow extends JFrame  {
     }
 
     public RecentFileMenu getRecentFiles() {
-	return recentFiles;
+	return recentFileMenu;
     }
 
     public UserInterface getUserInterface() {
@@ -1629,7 +1633,7 @@ public final class MainWindow extends JFrame  {
     }
 
     protected void addRecentFile(String absolutePath) {
-        recentFiles.addRecentFile(absolutePath);
+        recentFileMenu.addRecentFile(absolutePath);
     }
 
     public void openExamples() {
@@ -1643,4 +1647,32 @@ public final class MainWindow extends JFrame  {
    public void loadProblem(File file, List<File> classPath, File bootClassPath) {
       getUserInterface().loadProblem(file, classPath, bootClassPath);
    }
+
+    /*
+     * Retrieves supported term label names from profile and returns a sorted
+     * list of them.
+     * TODO: Maybe there is a better place to put this than MainWindow.
+     */
+    public List<Name> getSortedTermLabelNames() {
+        /* 
+         * Get list of labels from profile. This list is not always identical,
+         * since the used Profile may change during execution.
+         */
+        ImmutableList<Name> labelNamesFromProfile = getMediator()
+                .getProfile().getTermLabelManager().getSupportedTermLabelNames();
+
+        List<Name> labelNames = new LinkedList();
+        for (Name labelName : labelNamesFromProfile) {
+            labelNames.add(labelName);
+        }
+        Collections.sort(labelNames, new Comparator<Name>() {
+
+            @Override
+            public int compare(Name t, Name t1) {
+                return String.CASE_INSENSITIVE_ORDER.compare(t.toString(), t1.toString());
+            }
+
+        });
+        return labelNames;
+    }
 }
