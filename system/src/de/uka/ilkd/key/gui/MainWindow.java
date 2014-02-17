@@ -494,7 +494,7 @@ public final class MainWindow extends JFrame  {
 	smtComponent= new ComplexButton(TOOLBAR_ICON_SIZE);
 	smtComponent.setEmptyItem("No solver available","<html>No SMT solver is applicable for KeY.<br><br>If a solver is installed on your system," +
 		"<br>please configure the KeY-System accordingly:\n" +
-		"<br>Options|SMT Solvers</html>");
+		"<br>Options | SMT Solvers</html>");
 
 	smtComponent.setPrefix("Run ");
 
@@ -614,14 +614,6 @@ public final class MainWindow extends JFrame  {
         }
     }
 
-    /**
-     * Return a list of aspects compiled into the system, one by line. The idea is that the aspects
-     * will advise this method to add themselves to the list.
-     */
-    public String compiledAspects() {
-        return "";
-    }
-
     private void addToProofList(de.uka.ilkd.key.proof.ProofAggregate plist) {
         proofList.addProof(plist);
         // GUI
@@ -676,7 +668,6 @@ public final class MainWindow extends JFrame  {
 
         JMenuItem laf = new JCheckBoxMenuItem("Use system look and feel (experimental)");
         laf.setToolTipText("If checked KeY tries to appear in the look and feel of your window manager, if not in the default Java LaF (aka Metal).");
-//        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofSettings.DEFAULT_SETTINGS.getViewSettings();
         final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         laf.setSelected(vs.useSystemLaF());
         laf.addActionListener(new ActionListener() {
@@ -692,21 +683,25 @@ public final class MainWindow extends JFrame  {
         
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
         view.add(new JCheckBoxMenuItem(unicodeToggleAction));
-
-        view.addSeparator();
-        {
-            JMenu fontSize = new JMenu("Font Size");
-            fontSize.add(new FontSizeAction(this, FontSizeAction.Mode.SMALLER));
-            fontSize.add(new FontSizeAction(this, FontSizeAction.Mode.LARGER));
-            view.add(fontSize);
-        }
-        view.add(new ToolTipOptionsAction(this));
-
-        view.add(new ProofDiffFrame.Action(this));
-        
-        view.addSeparator();
         view.add(termLabelMenu);
+        view.add(new JCheckBoxMenuItem(hidePackagePrefixToggleAction));
+
+        view.addSeparator();
+        JMenu fontSize = new JMenu("Font Size");
+        final FontSizeAction fontSmallerAction = new FontSizeAction(this, FontSizeAction.Mode.SMALLER);
+        fontSize.add(fontSmallerAction);
+        final FontSizeAction fontLargerAction = new FontSizeAction(this, FontSizeAction.Mode.LARGER);
+        fontSize.add(fontLargerAction);
+        view.add(fontSize);
+        final ToolTipOptionsAction toolTipAction = new ToolTipOptionsAction(this);
+        view.add(toolTipAction);
+
+        final ProofDiffFrame.Action proofDiffAction = new ProofDiffFrame.Action(this);
+        view.add(proofDiffAction);
         
+        allActions.addAll(java.util.Arrays.asList(unicodeToggleAction, hidePackagePrefixToggleAction,
+                fontSmallerAction, fontLargerAction, toolTipAction, proofDiffAction));
+                
         return view;
     }
 
@@ -715,19 +710,32 @@ public final class MainWindow extends JFrame  {
         proof.setMnemonic(KeyEvent.VK_P);
 
         proof.add(autoModeAction);
-        final JMenuItem macros = new de.uka.ilkd.key.gui.macros.ProofMacroMenu(mediator, null);
-        proof.add(macros);
-        proof.add(new UndoLastStepAction(this, true));
-        proof.add(new AbandonTaskAction(this));
+        macroMenu = new de.uka.ilkd.key.gui.macros.ProofMacroMenu(mediator, null);
+        // TODO: disable macro menu when no proof is loaded
+        proof.add(macroMenu);
+        final UndoLastStepAction undoAction = new UndoLastStepAction(this, true);
+        proof.add(undoAction);
+        final AbandonTaskAction abandonAction = new AbandonTaskAction(this);
+        proof.add(abandonAction);
         proof.addSeparator();
-        proof.add(new SearchInProofTreeAction(this));
-        proof.add(new SearchInSequentAction(this));
+        final SearchInProofTreeAction searchInProofTreeAction = new SearchInProofTreeAction(this);
+        proof.add(searchInProofTreeAction);
+        final SearchInSequentAction searchInSequentAction = new SearchInSequentAction(this);
+        proof.add(searchInSequentAction);
         proof.addSeparator();
-	proof.add(new ShowUsedContractsAction(this));
-        proof.add(new ShowActiveTactletOptionsAction(this));
+	final ShowUsedContractsAction showContractsAction = new ShowUsedContractsAction(this);
+        proof.add(showContractsAction);
+        final ShowActiveTactletOptionsAction showSettingsAction = new ShowActiveTactletOptionsAction(this);
+        proof.add(showSettingsAction);
 	proof.add(showActiveSettingsAction);
-        proof.add(new ShowProofStatistics(this));
-        proof.add(new ShowKnownTypesAction(this));
+        final ShowProofStatistics statisticsAction = new ShowProofStatistics(this);
+        proof.add(statisticsAction);
+        final ShowKnownTypesAction showTypesAction = new ShowKnownTypesAction(this);
+        proof.add(showTypesAction);
+        
+        allActions.addAll(java.util.Arrays.asList(undoAction, abandonAction, searchInProofTreeAction,
+                searchInSequentAction, showContractsAction, showSettingsAction, showActiveSettingsAction,
+                statisticsAction, showTypesAction));
 
         return proof;
     }
@@ -736,14 +744,19 @@ public final class MainWindow extends JFrame  {
 	JMenu options = new JMenu("Options");
 	options.setMnemonic(KeyEvent.VK_O);
 
-	options.add(new TacletOptionsAction(this));
-	options.add(new SMTOptionsAction(this));
+        final TacletOptionsAction tacletOptionsAction = new TacletOptionsAction(this);
+        options.add(tacletOptionsAction);
+        final SMTOptionsAction smtOptionsAction = new SMTOptionsAction(this);
+        options.add(smtOptionsAction);
 //	options.add(setupSpeclangMenu()); // legacy since only JML supported
 	options.addSeparator();
         options.add(new JCheckBoxMenuItem(new ToggleConfirmExitAction(this)));
         options.add(new MinimizeInteraction(this));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
         options.add(new JCheckBoxMenuItem(oneStepSimplAction));
+        
+        allActions.add(tacletOptionsAction);
+        allActions.add(smtOptionsAction);
 
         return options;
 
