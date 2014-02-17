@@ -29,6 +29,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.MiscTools;
+import java.util.LinkedList;
 
 public class InfoTreeModel extends DefaultTreeModel {
 
@@ -53,8 +54,13 @@ public class InfoTreeModel extends DefaultTreeModel {
 
         ImmutableList<Name> labelNamesFromProfile = mainWindow.getMediator()
                 .getProfile().getTermLabelManager().getSupportedTermLabelNames();
+        List<String> labelNames = new LinkedList();
         for (Name labelName : labelNamesFromProfile) {
-            insertAsLast(new InfoTreeNode(labelName.toString(), termLabelExplanations), termLabelsNode);
+            labelNames.add(labelName.toString());
+        }
+        Collections.sort(labelNames, String.CASE_INSENSITIVE_ORDER);
+        for (String name : labelNames) {
+            insertAsLast(new InfoTreeNode(name, termLabelExplanations), termLabelsNode);
         }
 
         this.ruleExplanations = ruleExplanations;
@@ -158,4 +164,5 @@ public class InfoTreeModel extends DefaultTreeModel {
         }
         return res;
     }
+
 }
