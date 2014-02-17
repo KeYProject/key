@@ -32,6 +32,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -68,6 +69,7 @@ import javax.swing.event.MouseInputAdapter;
 import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
 import de.uka.ilkd.key.gui.actions.AboutAction;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
+import de.uka.ilkd.key.gui.actions.CounterExampleAction;
 import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.FontSizeAction;
@@ -265,6 +267,17 @@ public final class MainWindow extends JFrame  {
      * set to true if the view of the current goal should not be updated
      */
     private boolean disableCurrentGoalView = false;
+
+    /**
+     * Menu for strategy macros.
+     */
+    private JMenuItem macroMenu;
+    
+    /**
+     * All main window actions except automode.
+     * Will all be disabled while automode is running.
+     */
+    private Collection<MainWindowAction> allActions = new ArrayList<MainWindowAction>(30);
     
     public VisibleTermLabels getVisibleTermLabels(){
         return termLabelMenu.getVisibleTermLabels();
@@ -374,6 +387,17 @@ public final class MainWindow extends JFrame  {
     public void setVisible(boolean v){
         super.setVisible(v && visible);
     }
+    
+    /**
+     * Enables/disables actions.
+     * See bug #1410.
+     * @param enabled
+     */
+    void setActionsEnabled (boolean enabled) {
+        this.macroMenu.setEnabled(enabled);
+        for (MainWindowAction a: allActions)
+            a.setEnabled(enabled);
+    }
 
     /** initialised, creates GUI and lays out the main frame */
     private void layoutMain() {
@@ -381,13 +405,12 @@ public final class MainWindow extends JFrame  {
         getContentPane().setLayout(new BorderLayout());
 
         // default size
-        setSize(1000, 750);
+        setPreferredSize(new java.awt.Dimension(1000, 750));
 
         // FIXME do this NOT in layout of GUI
         // minimize interaction
         final boolean stupidMode =
         		  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
-//            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().tacletFilter();
         mediator.setMinimizeInteraction(stupidMode);
 
         // set up actions
@@ -406,9 +429,13 @@ public final class MainWindow extends JFrame  {
         loadUserDefinedTacletsForProvingAction = new LemmaGenerationAction.ProveUserDefinedTaclets(this);
         loadKeYTaclets            = new LemmaGenerationAction.ProveKeYTaclets(this);
         lemmaGenerationBatchModeAction    = new LemmaGenerationBatchModeAction(this);
-        unicodeToggleAction = new UnicodeToggleAction(this);        
-        
-        Config.DEFAULT.setDefaultFonts();
+        unicodeToggleAction = new UnicodeToggleAction(this);
+        allActions.addAll(java.util.Arrays.asList(openFileAction, openExampleAction, openMostRecentFileAction, 
+                editMostRecentFileAction, saveFileAction, quickSaveAction, quickLoadAction, proofManagementAction,
+                /* exitMainAction, */ showActiveSettingsAction, loadUserDefinedTacletsAction, 
+                loadUserDefinedTacletsForProvingAction, loadKeYTaclets, lemmaGenerationBatchModeAction, unicodeToggleAction));
+
+	Config.DEFAULT.setDefaultFonts();
 
 	// create menubar
 	JMenuBar bar = createMenuBar();
@@ -480,10 +507,16 @@ public final class MainWindow extends JFrame  {
         ComplexButton comp = createSMTComponent();
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
+        toolBar.addSeparator();        
+        final CounterExampleAction counterExampleAction = new CounterExampleAction(this);
+        toolBar.add(counterExampleAction);
         toolBar.addSeparator();
-        toolBar.add(new GoalBackAction(this, false));
-        toolBar.add(new PruneProofAction(this, false));
+        final GoalBackAction goalBackAction = new GoalBackAction(this, false);
+        toolBar.add(goalBackAction);
+        final PruneProofAction pruneProofAction = new PruneProofAction(this, false);
+        toolBar.add(pruneProofAction);
         JToggleButton oneStep = new JToggleButton(oneStepSimplAction);
+        allActions.addAll(java.util.Arrays.asList(counterExampleAction, goalBackAction, pruneProofAction, oneStepSimplAction));
         oneStep.setHideActionText(true);
         toolBar.addSeparator();
         toolBar.add(oneStep);
