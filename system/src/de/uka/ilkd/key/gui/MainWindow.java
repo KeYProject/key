@@ -838,7 +838,6 @@ public final class MainWindow extends JFrame  {
         ButtonGroup group = new ButtonGroup();
         GeneralSettings gs
         =ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
 
         JRadioButtonMenuItem jmlButton
             = new JRadioButtonMenuItem("Source File Comments Are JML", gs.useJML());
@@ -848,26 +847,20 @@ public final class MainWindow extends JFrame  {
         jmlButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                GeneralSettings gs
-                =ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-//                    = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+                GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
                 gs.setUseJML(true);
-                gs.setUseOCL(false);
             }
         });
 
         JRadioButtonMenuItem noneButton
-        	= new JRadioButtonMenuItem("Source File Comments Are Ignored", !gs.useJML() && !gs.useOCL());
+        	= new JRadioButtonMenuItem("Source File Comments Are Ignored", !gs.useJML());
         result.add(noneButton);
         group.add(noneButton);
         noneButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-        	GeneralSettings gs
-        	=ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-    //    	= ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+        	GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
         	gs.setUseJML(false);
-        	gs.setUseOCL(false);
             }
     });
 
