@@ -25,7 +25,7 @@ public class TestPosInTerm extends TestCase {
         assertTrue(copy.depth() == 1);        
     
         pit = pit.up();
-        assertEquals(pit, copy);   
+        assertEquals(copy, pit);   
         
         pit = pit.up();
         pit = pit.down(15);
@@ -52,10 +52,10 @@ public class TestPosInTerm extends TestCase {
                 
         PosInTerm copy = pit;
         
-        assertEquals(pit.depth(), pos.length);
+        assertEquals(pos.length, pit.depth());
         
         for (int i = 0; i < pit.depth(); i++) {
-            assertEquals(pit.getIndexAt(i), pos[i]);
+            assertEquals(pos[i], pit.getIndexAt(i));
         }
         
         pit = pit.up().up().up();
@@ -67,8 +67,8 @@ public class TestPosInTerm extends TestCase {
                     + "an old one was changed", copy.getIndexAt(i), pos[i]);
         }
 
-        assertEquals(pit.getIndex(), 1000);
-        assertEquals(pit.up().getIndex(), 10000);        
+        assertEquals(1000, pit.getIndex());
+        assertEquals(10000, pit.up().getIndex());        
     }
 
     private PosInTerm toPosInTerm(int[] pos) {
@@ -109,10 +109,10 @@ public class TestPosInTerm extends TestCase {
         PosInTerm pitN7 = toPosInTerm(posN7);
 
         assertTrue(pit.firstN(0).isTopLevel());
-        assertEquals(pit.firstN(1), pitN1);
-        assertEquals(pit.firstN(4), pitN4);
-        assertEquals(pit.firstN(7), pitN7);
-        assertEquals(pit.firstN(pit.depth()), pit);        
+        assertEquals(pitN1, pit.firstN(1));
+        assertEquals(pitN4, pit.firstN(4));
+        assertEquals(pitN7, pit.firstN(7));
+        assertEquals(pit, pit.firstN(pit.depth()));        
     }
     
     public void testIntegerList() {
@@ -120,9 +120,8 @@ public class TestPosInTerm extends TestCase {
         
         PosInTerm pit = toPosInTerm(pos);
         
-        assertEquals(pit.integerList(pit.iterator()), "[10,2,5,20,4,100,25,65,23,40,2,0,1,0,1]");
-        assertEquals(pit.integerList(pit.reverseIterator()), 
-                "[1,0,1,0,2,40,23,65,25,100,4,20,5,2,10]");
+        assertEquals("[10,2,5,20,4,100,25,65,23,40,2,0,1,0,1]", pit.integerList(pit.iterator()));
+        assertEquals("[1,0,1,0,2,40,23,65,25,100,4,20,5,2,10]", pit.integerList(pit.reverseIterator()));
     }
         
     public void testParseReverseString() {
