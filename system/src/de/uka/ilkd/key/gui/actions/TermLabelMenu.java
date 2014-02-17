@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -8,7 +7,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -83,18 +82,16 @@ public class TermLabelMenu extends JMenu {
         add(displayLabelsCheckBox);
         addSeparator();
 
-        /* 
-         * Get list of labels from profile. This list is not always identical,
-         * since the used Profile may change during execution.
+        /*
+         * Get sorted list of term label names.
          */
-        ImmutableList<Name> labelNamesFromProfile = mainWindow.getMediator()
-                .getProfile().getTermLabelManager().getSupportedTermLabelNames();
+        List<Name> labelNames = mainWindow.getSortedTermLabelNames();
 
         /* 
-         * Add labels from Profile to checkBoxMap and checkBoxList.
+         * Create list of {@link TermLabelCheckBox} instances.
          */
         ArrayList<TermLabelCheckBox> checkBoxList = new ArrayList<TermLabelCheckBox>();
-        for (Name labelName : labelNamesFromProfile) {
+        for (Name labelName : labelNames) {
             TermLabelCheckBox checkBox = checkBoxMap.get(labelName);
             if (checkBox == null) {
                 checkBox = new TermLabelCheckBox(labelName);
@@ -104,9 +101,8 @@ public class TermLabelMenu extends JMenu {
         }
 
         /*
-         * Sort checkBoxList and add remaining menu entries.
+         * Add the checkboxes to the menu.
          */
-        Collections.sort(checkBoxList);
         for (TermLabelCheckBox c : checkBoxList) {
             add(c);
         }
@@ -139,7 +135,7 @@ public class TermLabelMenu extends JMenu {
         }
     }
 
-    private class TermLabelCheckBox extends KeYMenuCheckBox implements Comparable<TermLabelCheckBox> {
+    private class TermLabelCheckBox extends KeYMenuCheckBox {
 
         // The name of the label, which belongs to this checkbox.
         private final Name labelName;
@@ -160,12 +156,6 @@ public class TermLabelMenu extends JMenu {
         @Override
         public void handleClickEvent() {
             mainWindow.makePrettyView();
-        }
-
-        @Override
-        public int compareTo(TermLabelCheckBox t) {
-            return mainWindowAction.getName().toLowerCase().
-                    compareTo(t.mainWindowAction.getName().toLowerCase());
         }
 
         @Override

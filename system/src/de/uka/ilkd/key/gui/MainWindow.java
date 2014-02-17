@@ -14,6 +14,7 @@
 
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.actions.TermLabelMenu;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -131,7 +132,11 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
@@ -1505,4 +1510,31 @@ public final class MainWindow extends JFrame  {
    public void loadProblem(File file, List<File> classPath, File bootClassPath) {
       getUserInterface().loadProblem(file, classPath, bootClassPath);
    }
+
+    /*
+     * Retrieves supported term label names from profile and returns a sorted
+     * list of them.
+     */
+    public List<Name> getSortedTermLabelNames() {
+        /* 
+         * Get list of labels from profile. This list is not always identical,
+         * since the used Profile may change during execution.
+         */
+        ImmutableList<Name> labelNamesFromProfile = getMediator()
+                .getProfile().getTermLabelManager().getSupportedTermLabelNames();
+
+        List<Name> labelNames = new LinkedList();
+        for (Name labelName : labelNamesFromProfile) {
+            labelNames.add(labelName);
+        }
+        Collections.sort(labelNames, new Comparator<Name>() {
+
+            @Override
+            public int compare(Name t, Name t1) {
+                return String.CASE_INSENSITIVE_ORDER.compare(t.toString(), t1.toString());
+            }
+
+        });
+        return labelNames;
+    }
 }

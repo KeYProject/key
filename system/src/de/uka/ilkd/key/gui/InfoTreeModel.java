@@ -12,7 +12,6 @@
 // 
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,7 +28,6 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.MiscTools;
-import java.util.LinkedList;
 
 public class InfoTreeModel extends DefaultTreeModel {
 
@@ -52,15 +50,9 @@ public class InfoTreeModel extends DefaultTreeModel {
                 "Get descriptions for currently available term labels.");
         insertAsLast(termLabelsNode, (InfoTreeNode) root);
 
-        ImmutableList<Name> labelNamesFromProfile = mainWindow.getMediator()
-                .getProfile().getTermLabelManager().getSupportedTermLabelNames();
-        List<String> labelNames = new LinkedList();
-        for (Name labelName : labelNamesFromProfile) {
-            labelNames.add(labelName.toString());
-        }
-        Collections.sort(labelNames, String.CASE_INSENSITIVE_ORDER);
-        for (String name : labelNames) {
-            insertAsLast(new InfoTreeNode(name, termLabelExplanations), termLabelsNode);
+        List<Name> labelNames = mainWindow.getSortedTermLabelNames();
+        for (Name name : labelNames) {
+            insertAsLast(new InfoTreeNode(name.toString(), termLabelExplanations), termLabelsNode);
         }
 
         this.ruleExplanations = ruleExplanations;
