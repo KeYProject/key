@@ -78,7 +78,7 @@ public class DefaultProofFileParser implements IProofFileParser {
    private Goal currGoal = null;
    private String currTacletName = null;
    private int currFormula = 0;
-   private PosInTerm currPosInTerm = PosInTerm.TOP_LEVEL;
+   private PosInTerm currPosInTerm = PosInTerm.getTopLevel();
    private Contract currContract = null;
    private Stack<Iterator<Node>> stack = new Stack<Iterator<Node>>();
    private LinkedList<String> loadedInsts = null;
@@ -148,7 +148,7 @@ public class DefaultProofFileParser implements IProofFileParser {
            currTacletName= s;
            // set default state
            currFormula   = 0;
-           currPosInTerm = PosInTerm.TOP_LEVEL;
+           currPosInTerm = PosInTerm.getTopLevel();
            loadedInsts   = null;
            ifFormulaList = ImmutableSLList.<IfFormulaInstantiation>nil();
            break;
@@ -211,7 +211,7 @@ public class DefaultProofFileParser implements IProofFileParser {
            currTacletName = s;
            // set default state
            currFormula   = 0;
-           currPosInTerm = PosInTerm.TOP_LEVEL;
+           currPosInTerm = PosInTerm.getTopLevel();
            builtinIfInsts = null;
            break;
        case 'c' : //contract
@@ -225,7 +225,7 @@ public class DefaultProofFileParser implements IProofFileParser {
         builtinIfInsts = ImmutableSLList.<PosInOccurrence>nil();
            }
            currIfInstFormula = 0;
-           currIfInstPosInTerm = PosInTerm.TOP_LEVEL;
+           currIfInstPosInTerm = PosInTerm.getTopLevel();
            break;
        case 'w' : //newnames
            final String[] newNames = s.split(",");

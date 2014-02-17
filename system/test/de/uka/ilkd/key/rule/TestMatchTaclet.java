@@ -393,7 +393,7 @@ public class TestMatchTaclet extends TestCase {
 	                find_addrule_conflict.find(), 
 	                MatchConditions.EMPTY_MATCHCONDITIONS, services).getInstantiations(),
                     new PosInOccurrence(new SequentFormula(match),
-                            PosInTerm.TOP_LEVEL.down(0), true), services);
+                            PosInTerm.getTopLevel().down(0), true), services);
         
     
 	assertTrue("A match has been found but there is a free variable in"+
@@ -408,7 +408,7 @@ public class TestMatchTaclet extends TestCase {
                     find_addrule_conflict.find(), 
                     MatchConditions.EMPTY_MATCHCONDITIONS, services).getInstantiations(),
                     new PosInOccurrence(new SequentFormula(match),
-                            PosInTerm.TOP_LEVEL, true), services);
+                            PosInTerm.getTopLevel(), true), services);
 	assertTrue("A match should have been found,"+
 		   " because here there formerly free variable is bound.",
 		   app != null);	           
@@ -429,7 +429,7 @@ public class TestMatchTaclet extends TestCase {
                MatchConditions.EMPTY_MATCHCONDITIONS, 
                services).getInstantiations(),
                new PosInOccurrence(new SequentFormula(match.sub(0)),
-                       PosInTerm.TOP_LEVEL.down(0), true), services);
+                       PosInTerm.getTopLevel().down(0), true), services);
         
 	assertTrue("Match found but match term contains free var and"+
 		   "matching var occurs in two instantiation areas"+
@@ -487,7 +487,7 @@ public class TestMatchTaclet extends TestCase {
 	TacletIndex index = new TacletIndex();
 	index.add(close_rule.taclet());
         PosInOccurrence pio = new PosInOccurrence(new SequentFormula(closeable_two),
-                PosInTerm.TOP_LEVEL, false);
+                PosInTerm.getTopLevel(), false);
 
 	TacletApp tacletApp = index.getSuccedentTaclet(pio,
 	                                               new IHTacletFilter (true, ImmutableSLList.<RuleSet>nil()),

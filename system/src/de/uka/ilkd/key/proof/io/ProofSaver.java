@@ -392,7 +392,7 @@ public class ProofSaver {
    
 
    public static String posInTerm2Proof(PosInTerm pos) {
-      if (pos == PosInTerm.TOP_LEVEL) return "";
+      if (pos == PosInTerm.getTopLevel()) return "";
       String s = " (term \"";
       String list = pos.integerList(pos.reverseIterator()); // cheaper to read in
       s = s + list.substring(1,list.length()-1); // chop off "[" and "]"

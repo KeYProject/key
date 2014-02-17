@@ -22,7 +22,6 @@ import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
@@ -35,6 +34,7 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.proofdiff.diff_match_patch.Diff;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -60,11 +60,12 @@ public class ProofDiffFrame extends JFrame {
     /**
      * The action to show a new frame of this class. Is used in {@link MainWindow}.
      */
-    public static class Action extends AbstractAction {
+    public static class Action extends MainWindowAction {
 
         private final MainWindow mainWindow;
 
         public Action(MainWindow mainWindow) {
+            super(mainWindow);
             this.mainWindow = mainWindow;
             putValue(NAME, "Visual node diff ...");
             // putValue(SMALL_ICON, ...);

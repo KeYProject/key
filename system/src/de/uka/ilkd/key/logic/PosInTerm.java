@@ -1,258 +1,232 @@
-// This file is part of KeY - Integrated Deductive Software Design 
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General 
-// Public License. See LICENSE.TXT for details.
-// 
-
-
-/** this class describes a position in a term 
- */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.util.Debug;
+import java.util.LinkedList;
+import java.util.StringTokenizer;
 
-
+/**
+ * Describes the position within a term by a sequence of integers.
+ * 
+ * To create a position  
+ * <ul>
+ * <li>obtain the position object representing the top level position, which refers to
+ *  the term as a whole.</li>
+ * <li>use method {@link #down(int)} to keep track of the current position. Pass as argument the
+ * position of the subterm to be taken. Attention: Each invocation creates a new position in term
+ * object which has to be used for further navigation. The original one remains unchanged.</li>
+ * </ul>
+ * 
+ */
 public class PosInTerm {
-  
-    /** top level term position */
-    public static final PosInTerm TOP_LEVEL = new PosInTerm();
 
-    private final PosInTerm prev;
-    
-    /** 
-     * the position number
-     */
-    private final int pos;
+    private static final PosInTerm TOP_LEVEL = new PosInTerm();
 
-    // saves 8 bytes (due to alignment issues) per instance if we use a 
-    // short here instead of an int
-    /** 
-     * the depth
-     */
-    private final short depth;
-    
-    // saves 8 bytes (due to alignment issues) per instance if we use a 
-    // short here instead of an int
-    private final short hashCode;
+    private final int[] positions;
+    private final int size;
+    private int hash = -1;
 
     /**
-     * iterator cache
+     * returns the instance representing the top level position
+     * @return the top level position
      */
-    private int[] cache;
-
-    private PosInTerm(PosInTerm pit, int posNr) {
-	prev = pit;
-	pos = posNr;
-
-        if (pit.depth == Short.MAX_VALUE) {
-	    throw new IllegalStateException("Overflow detected for field depth in PosInTerm.");
-	}
-	depth = (short) (pit.depth + 1);
-	
-	hashCode = (short) (prev.hashCode * 13 + pos);
-    }   
-
+    public static PosInTerm getTopLevel() {
+        return TOP_LEVEL;
+    }
+    
     /**
-     * creates a new PosInTerm 
-     * position. 
+     * only used once to create the singleton for the top level position
      */
     private PosInTerm() {
-	pos = -1;
-	prev = null;
-	depth = 0;
-	hashCode = 13;
-    }   
+        positions = new int[0];
+        size = 0;
+        hash = 13;
+    }
 
-    /** size of the position list */
+    /**
+     * creates an instance representing the position <code>positions[0..size-1]</code>
+     * @param positions the integer array where each element describes the position to be taken (in top-to-bottom order)
+     * @param size the size of the integer list (attention: might be shorter than the length of the position array)
+     */
+    private PosInTerm(int[] positions, int size) {
+        assert size > 0;
+        this.positions = positions;
+        this.size = size;
+    }
+
+    /**
+     * the depth of the sub term described by this position
+     * @return the term depth
+     */
     public int depth() {
-	return depth;
+        return size;
     }
 
-  
-    /** descending downwards choosing the n'th subterm, subformula 
-     * @param n int describs the chosen subterm 
-     * @return Position like old Position but with a deeper
-     * subterm.
+    /**
+     * true if the position describes the top level position, i.e., the term as a whole
+     * @return true iff top level
      */
-    public PosInTerm down(int n) {
-	return new PosInTerm(this, n);
+    public boolean isTopLevel() {
+        return size == 0;
     }
-    
+
+    /**
+     * returns the position of the enclosing term
+     * @return the position of the parent
+     */
     public PosInTerm up() {
-       return prev;
-    }
-
-    /**
-     * @return the number/index of the deepest subterm that this
-     *         <code>PosInTerm</code> points to. If the position is top-level,
-     *         the result will be <code>-1</code>
-     */
-    public int getIndex () {
-        return pos;
-    }
-    
-
-    /** 
-     * compares this PosInTerm with another PosInTerm
-     * and returns true if both describe the same position 
-     */
-    public boolean equals(Object obj) {
-        if ( this == obj )
-            return true;
-        
-	if (!(obj instanceof PosInTerm)) {
-	    return false;
-	} 
-
-	PosInTerm cmp = (PosInTerm) obj;
-
-	if (depth != cmp.depth) {
-	    return false;
-	}
-		
-	PosInTerm thisPIT = this;
-    
-	while ( thisPIT != TOP_LEVEL ) {
-	    if ( thisPIT.pos != cmp.pos )
-	        return false;
-	    thisPIT = thisPIT.prev;
-	    cmp     = cmp.prev;
-	    if ( thisPIT == cmp )
-	        return true;
-	}
-    
-	return true;
-    }
-
-    /**
-     * get subterm/-formula information.  A PosInTerm defining the xn'th
-     * subterm of the x(n-1)'th subterm of ... of the x1'th subterm of a
-     * term returns an iterator subsequently resulting in the list xn...x1.
-     * @return Iterator<Integer> that iterates through the subterms
-     * of a sequent in the reverse order as the PosInTerm has been defined.
-     */ 
-    public IntIterator reverseIterator() {
-	return new PosIntIterator(this);
-    }
-
-
-    /**
-     * returns an iterator defining the position in a term according to
-     * subterm relation. A PosInTerm defining the xn'th subterm of the
-     * x(n-1)'th subterm of ... of the x1'th subterm of a term returns an
-     * iterator subsequently resulting in the list x1...xn.
-     * @return an iterator over the list defining the position in a term.
-     */
-    public IntIterator iterator() {	
-	if (cache == null) fillCache();
-	return new PosArrayIntIterator(cache);
-    }
-
-    private void fillCache() {
-	cache = new int[depth];
-
-	IntIterator it = reverseIterator();
-	int at = depth - 1;
-
-	while (it.hasNext()) {
-	    cache[at] = it.next();
-	    at--;
-	}
-    }
-
-    
-    public static PosInTerm parseReverseString(String s) {
-	PosInTerm result = TOP_LEVEL;
-	if ("".equals(s)) {
-	    return result;
-	}
-	ImmutableList<Integer> list = ImmutableSLList.<Integer>nil();
-	java.util.StringTokenizer tker = 
-	    new java.util.StringTokenizer(s, ",", false);
-	while (tker.hasMoreTokens()) 
-	    list = list.prepend(Integer.decode(tker.nextToken()));
-
-        for (Integer aList : list) {
-            result = new PosInTerm(result, aList.intValue());
+        if (size == 0) {
+            return null;
         }
-
-	return result;       
+        return size == 1 ? getTopLevel() : new PosInTerm(positions, size - 1);
     }
 
+    /**
+     * returns the position of the <code>depth-n</code> parent term
+     * @param n the integer specifying the length of the prefix 
+     * @return the prefix of this position of length <code>n</code>
+     * @throws IndexOutOfBoundsException if <code>n</code> is greater than the depth of this position
+     */
+    public PosInTerm firstN(int n) {
+        if (n > size) {
+            throw new IndexOutOfBoundsException("Position is shorter than " + n);
+        } else if (n == 0) {
+            return getTopLevel();
+        } else if (n == size) {
+            return this;
+        }
+        return new PosInTerm(positions, n);
+    }
     
+    public PosInTerm down(int i) {
+        final int[] newPositions = new int[size + 1];
+        System.arraycopy(positions, 0, newPositions, 0, size);
+        newPositions[size] = i;
+        return new PosInTerm(newPositions, size + 1);
+    }
 
-    public String integerList(IntIterator it) {
-	String list = "["; 
-	while (it.hasNext()) {
-	    list += ""+it.next();
-	    if (it.hasNext()) {
-		list +=","; 
-	    }
-	}
-	list += "]";
-	return list;
+    public int getIndexAt(int i) {
+        if (i<0 || i>=size) {
+            throw new IndexOutOfBoundsException("No position at index"+i);
+        }
+        return positions[i];
+    }
+    
+    public int getIndex() {
+        return size == 0 ? -1 : positions[size - 1];
+    }
+
+    public int hashCode() {        
+        if (hash == -1) {
+            hash = 13;
+            for (int i = 0; i < size; i++) {
+                hash = 13 * hash + positions[i];
+            }        
+            hash = hash == -1 ? 0 : hash;
+        } 
+        return hash;
+    }
+
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+
+        if (o != null && o.getClass() == this.getClass()) {
+            final PosInTerm p = (PosInTerm) o;
+
+            if (size == p.size) {
+                if (positions != p.positions) {
+                    for (int i = 0; i < size; i++) {
+                        if (positions[i] != p.positions[i]) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public IntIterator iterator() {
+        return new PiTIterator(this, true);
+    }
+
+    public IntIterator reverseIterator() {
+        return new PiTIterator(this, false);
     }
 
     public String toString() {
-	if (this==TOP_LEVEL) {
-	    return "top level";
-	}
+        if (this == getTopLevel()) {
+            return "top level";
+        }
 
-	return "subterm: " + integerList(iterator());
+        return "subterm: " + integerList(iterator());
     }
 
+    public static class PiTIterator implements IntIterator {
+        private final PosInTerm pit;
+        private int pos;
+        private final boolean order;
 
+        public PiTIterator(PosInTerm p, boolean order) {
+            this.pit = p;
+            this.order = order;
+            this.pos = order ? 0 : p.size - 1;
+        }
 
-    private static class PosIntIterator implements IntIterator {
-	private PosInTerm p;
-	
-	public PosIntIterator(PosInTerm p) {
-	    this.p = p;
-	}
+        @Override
+        public int next() {
+            if (pos < 0 || pos >= pit.size) {
+                throw new IndexOutOfBoundsException();
+            }
 
-	public boolean hasNext() {
-	    return p != null && p != TOP_LEVEL;
-	}
+            int result = pit.positions[pos];
 
-	public int next() {
-	    Debug.assertTrue(p != TOP_LEVEL && p!=null);
-	    int result = p.pos; 
-	    p = p.prev;
-	    return result;
-	}	
+            if (order) {
+                pos++;
+            } else {
+                pos--;
+            }
+            return result;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return (order ? pos < pit.size : pos >= 0);
+        }
     }
 
-    private static class PosArrayIntIterator implements IntIterator {
-	private int[] pos;
-	private int next;
-
-	public PosArrayIntIterator(int[] pos) {
-	    this.pos = pos;
-	    next = 0;
-	    
-	}
-
-	public boolean hasNext() {
-	    return next < pos.length;
-	}
-
-	public int next() {
-	    next++;
-	    return pos[next-1];
-	}		
+    public static PosInTerm parseReverseString(String s) {
+        if ("".equals(s)) {
+            return getTopLevel();
+        }
+        
+        final LinkedList<Integer> list = new LinkedList<Integer>();        
+        final StringTokenizer tker = new StringTokenizer(s,",",false);
+        
+        while (tker.hasMoreTokens()) {
+            list.addFirst(Integer.decode(tker.nextToken()));
+        }
+        
+        final int[] positions = new int[list.size()];
+        int i = 0;
+        for (int j : list) {
+            positions[i] = j;
+            ++i;
+        }
+               
+        return positions.length == 0 ? getTopLevel() : new PosInTerm(positions, positions.length);
     }
 
-    
-    public int hashCode () {
-        return hashCode;
+    public String integerList(IntIterator it) {
+        StringBuffer list = new StringBuffer("[");
+        while (it.hasNext()) {
+            list.append(it.next());
+            if (it.hasNext()) {
+                list.append(",");
+            }
+        }
+        list.append("]");
+        return list.toString();
     }
+
 }

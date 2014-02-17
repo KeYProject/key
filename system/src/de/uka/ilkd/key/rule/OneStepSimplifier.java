@@ -408,7 +408,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 
 	for(int i = 0; i < indices.length; i++) {
 	    PosInOccurrence pos = new PosInOccurrence(cf,
-	    		              		      PosInTerm.TOP_LEVEL,
+	    		              		      PosInTerm.getTopLevel(),
 	    		              		      true);
 	    result = simplifyPosOrSub(services, pos, i, protocol);
 	    if(result != null) {
@@ -436,14 +436,14 @@ public final class OneStepSimplifier implements BuiltInRule,
 	    if(!ante.equals(cf) && ante.formula().op() != Junctor.TRUE) {
 		context.put(
 			ante.formula(),
-			new PosInOccurrence(ante, PosInTerm.TOP_LEVEL, true));
+			new PosInOccurrence(ante, PosInTerm.getTopLevel(), true));
 	    }
 	}
 	for(SequentFormula succ : seq.succedent()) {
 	    if(!succ.equals(cf) && succ.formula().op() != Junctor.FALSE) {
 		context.put(
 			succ.formula(),
-			new PosInOccurrence(succ, PosInTerm.TOP_LEVEL, false));
+			new PosInOccurrence(succ, PosInTerm.getTopLevel(), false));
 	    }
 	}
 	final List<PosInOccurrence> ifInsts

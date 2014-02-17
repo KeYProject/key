@@ -135,7 +135,7 @@ public class NodeReplacement {
 	if ( !oldSS.contains ( p_cf ) &&
 	     newSS.contains ( p_cf ) ) {
 	    PosInOccurrence pio = new PosInOccurrence ( p_cf,
-							PosInTerm.TOP_LEVEL,
+							PosInTerm.getTopLevel(),
 							p_inAntec );
 	    addNodeChange ( new NodeChangeAddFormula ( pio ) );
 	}
@@ -150,7 +150,7 @@ public class NodeReplacement {
     private void addAddedRedundantChange(SequentFormula p_cf,
             boolean p_inAntec) {
 
-        final PosInOccurrence pio = new PosInOccurrence(p_cf, PosInTerm.TOP_LEVEL,
+        final PosInOccurrence pio = new PosInOccurrence(p_cf, PosInTerm.getTopLevel(),
                 p_inAntec);
         addNodeChange(new NodeRedundantAddChange(pio));
 
@@ -170,7 +170,7 @@ public class NodeReplacement {
 	
 	if ( oldSS.contains ( p_cf ) ) {
 	    PosInOccurrence pio = new PosInOccurrence ( p_cf,
-							PosInTerm.TOP_LEVEL,
+							PosInTerm.getTopLevel(),
 							p_inAntec );
 	    addNodeChange ( new NodeChangeRemoveFormula ( pio ) );
 	}

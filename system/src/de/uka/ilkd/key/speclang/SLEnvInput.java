@@ -98,17 +98,11 @@ public final class SLEnvInput extends AbstractEnvInput {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private static String getLanguage() {
-//        GeneralSettings gs 
-//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();        
+    private static String getLanguage() {      
     	GeneralSettings gs 
         = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-        if(gs.useJML() && gs.useOCL()) {
-            return "JML/OCL";
-        } else if(gs.useJML()) {
+        if(gs.useJML()) {
             return "JML";
-        } else if(gs.useOCL()) {
-            return "OCL";
         } else {
             return "no";
         }
@@ -376,7 +370,6 @@ public final class SLEnvInput extends AbstractEnvInput {
         final GeneralSettings gs
         = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
-//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
         if(gs.useJML()) {
             createSpecs(new JMLSpecExtractor(initConfig.getServices()));
         }
