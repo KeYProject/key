@@ -638,8 +638,6 @@ public final class MainWindow extends JFrame  {
         menuBar.add(createOptionsMenu());
         menuBar.add(Box.createHorizontalGlue());
         menuBar.add(createHelpMenu());
-        if (Debug.ENABLE_DEBUG)
-            menuBar.add(createDebugMenu());
         return menuBar;
     }
 
@@ -749,15 +747,6 @@ public final class MainWindow extends JFrame  {
 
         return options;
 
-    }
-
-
-    private JMenu createDebugMenu() {
-        JMenu debug = new JMenu("Debug");
-        debug.setMnemonic(KeyEvent.VK_D);
-        // please note: this is doubled in proof menu
-        debug.add(showActiveSettingsAction);
-        return debug;
     }
 
     private JMenu createHelpMenu() {
