@@ -54,6 +54,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -515,7 +516,8 @@ public final class ProofManagementDialog extends JDialog {
         
     
     private boolean isInstanceMethodOfAbstractClass(KeYJavaType p_class, IObserverFunction obs) {
-        return p_class.getSort().isAbstract() && !obs.isStatic();
+        return p_class.getJavaType() instanceof InterfaceDeclaration
+            || (p_class.getSort().isAbstract() && !obs.isStatic());
     }
     
     private void updateContractPanel() {
