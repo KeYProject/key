@@ -22,16 +22,20 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.TacletInstantiationsTableModel;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.rule.inst.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
@@ -56,7 +60,7 @@ public abstract class TacletApp implements RuleApp {
     private final Taclet taclet;
 
     /**
-     * contains the instantiations of the schemavarioables of the Taclet
+     * contains the instantiations of the schemavariables of the Taclet
      */
     protected final SVInstantiations instantiations;
 
@@ -562,8 +566,7 @@ public abstract class TacletApp implements RuleApp {
 		String proposal = varNamer
 			.getSuggestiveNameProposalForProgramVariable(sv, this,
 				services, proposals);
-		ProgramElement pe = TacletInstantiationsTableModel
-			.getProgramElement(app, proposal, sv, services);
+		ProgramElement pe = app.getProgramElement(proposal, sv, services);
 		app = app.addCheckedInstantiation(sv, pe, services, true);
 		proposals = proposals.append(proposal);
 	    } else if (sv.sort() == ProgramSVSort.LABEL) {
@@ -571,8 +574,7 @@ public abstract class TacletApp implements RuleApp {
 		do {
 		    String proposal = VariableNameProposer.DEFAULT.getProposal(
 			    this, sv, services, null, proposals);
-		    ProgramElement pe = TacletInstantiationsTableModel
-			    .getProgramElement(app, proposal, sv, services);
+		    ProgramElement pe = app.getProgramElement(proposal, sv, services);
 		    proposals = proposals.prepend(proposal);
 		    try {
 			app = app.addCheckedInstantiation(sv, pe, services,
@@ -1288,6 +1290,45 @@ public abstract class TacletApp implements RuleApp {
      */
     public boolean admissible(boolean interactive, ImmutableList<RuleSet> ruleSets) {
 	return taclet().admissible(interactive, ruleSets);
+    }
+
+    public ProgramElement getProgramElement(String instantiation,
+                                            SchemaVariable sv,
+                                            Services services) {
+        Sort svSort = sv.sort();
+        if (svSort == ProgramSVSort.LABEL) {
+            return VariableNamer.parseName(instantiation);
+        } else if (svSort == ProgramSVSort.VARIABLE ) {
+            NewVarcond nvc = taclet.varDeclaredNew(sv);
+            if (nvc != null) {
+        	KeYJavaType kjt;
+        	Object o = nvc.getTypeDefiningObject();
+        	JavaInfo javaInfo = services.getJavaInfo ();
+        	if (o instanceof SchemaVariable) {
+                    final TypeConverter tc = services.getTypeConverter();
+        	    final SchemaVariable peerSV = (SchemaVariable)o;
+        	    final Object peerInst = instantiations().getInstantiation(peerSV);
+                    if(peerInst instanceof TypeReference){
+                        kjt = ((TypeReference) peerInst).getKeYJavaType();
+                    } else {
+                        Expression peerInstExpr;
+                        if(peerInst instanceof Term) {
+                            peerInstExpr = tc.convertToProgramElement((Term)peerInst);
+                        } else {
+                            peerInstExpr = (Expression)peerInst;
+                        }
+                        kjt = tc.getKeYJavaType(peerInstExpr, 
+                        			instantiations().getContextInstantiation().activeStatementContext());
+                    }
+        	} else {
+        	    kjt = javaInfo.getKeYJavaType((Type)o);
+        	}
+                assert kjt != null : "could not find kjt for: " + o;
+        	return new LocationVariable
+        	    (VariableNamer.parseName(instantiation), kjt);
+            }
+        }
+        return null;
     }
 
     /**
