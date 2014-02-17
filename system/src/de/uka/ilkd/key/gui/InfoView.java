@@ -47,7 +47,7 @@ public class InfoView extends JSplitPane {
         // growing goes to the upper half only
         setResizeWeight(1.0);
 
-        // Setting a name for this causes {@link PreferenceSaver} to store its preferences.
+        // Setting a name for this causes {@link PreferenceSaver} to include this class.
         setName("ruleViewPane");
 
         infoTree = new InfoTree();

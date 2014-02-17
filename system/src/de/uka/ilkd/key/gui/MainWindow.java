@@ -1514,6 +1514,7 @@ public final class MainWindow extends JFrame  {
     /*
      * Retrieves supported term label names from profile and returns a sorted
      * list of them.
+     * TODO: Maybe there is a better place to put this than MainWindow.
      */
     public List<Name> getSortedTermLabelNames() {
         /* 

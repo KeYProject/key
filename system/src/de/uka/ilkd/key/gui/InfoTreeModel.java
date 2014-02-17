@@ -33,128 +33,130 @@ public class InfoTreeModel extends DefaultTreeModel {
 
     private static final String LEMMAS = "Lemmas";
     private static final String TACLET_BASE = "Taclet Base";
-    protected final InfoTreeNode builtInRoot;
-    protected final InfoTreeNode axiomTacletRoot;
-    protected final InfoTreeNode proveableTacletsRoot;
-    private final XMLProperties ruleExplanations;
 
     public InfoTreeModel(Goal goal, XMLProperties ruleExplanations,
             XMLProperties termLabelExplanations, MainWindow mainWindow) {
         super(new InfoTreeNode());
-
-        InfoTreeNode rulesNode = new InfoTreeNode("Rules",
-                "Browse descriptions for currently available rules.");
-        insertAsLast(rulesNode, (InfoTreeNode) root);
-
-        InfoTreeNode termLabelsNode = new InfoTreeNode("Term Labels",
-                "Get descriptions for currently available term labels.");
-        insertAsLast(termLabelsNode, (InfoTreeNode) root);
-
-        List<Name> labelNames = mainWindow.getSortedTermLabelNames();
-        for (Name name : labelNames) {
-            insertAsLast(new InfoTreeNode(name.toString(), termLabelExplanations), termLabelsNode);
-        }
-
-        this.ruleExplanations = ruleExplanations;
-
-        builtInRoot = new InfoTreeNode("Built-In", ruleExplanations);
-        insertAsLast(builtInRoot, rulesNode);
-        axiomTacletRoot = new InfoTreeNode(TACLET_BASE, ruleExplanations);
-        insertAsLast(axiomTacletRoot, rulesNode);
-        proveableTacletsRoot = new InfoTreeNode(LEMMAS, ruleExplanations);
-        insertAsLast(proveableTacletsRoot, rulesNode);
-
-        if (goal != null) {
-            for (final BuiltInRule br : goal.ruleAppIndex().builtInRuleAppIndex().builtInRuleIndex().rules()) {
-                insertAsLast(new InfoTreeNode(br.displayName(), ruleExplanations), builtInRoot);
-            }
-            ImmutableSet<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
-            OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(goal.proof());
-            if (simplifier != null) {
-                set = set.union(simplifier.getCapturedTaclets());
-            }
-
-            for (final NoPosTacletApp app : sort(set)) {
-                RuleJustification just = goal.proof().mgt().getJustification(app);
-                if (just == null) {
-                    continue; // do not break system because of this
-                }
-                if (just.isAxiomJustification()) {
-                    insertAndGroup(new InfoTreeNode(app.taclet()), axiomTacletRoot);
-                } else {
-                    insertAndGroup(new InfoTreeNode(app.taclet()), proveableTacletsRoot);
-                }
-            }
-        }
-
-        axiomTacletRoot.setUserObject(TACLET_BASE + " (" + getChildCount(axiomTacletRoot) + ")");
-        proveableTacletsRoot.setUserObject(LEMMAS + " (" + getChildCount(proveableTacletsRoot) + ")");
+        insertAsLast(new RulesNode(ruleExplanations, goal), (InfoTreeNode) root);
+        insertAsLast(new TermLabelsNode(mainWindow, termLabelExplanations), (InfoTreeNode) root);
     }
 
     private void insertAsLast(InfoTreeNode ins, InfoTreeNode parent) {
         insertNodeInto(ins, parent, parent.getChildCount());
     }
 
-    /**
-     * groups subsequent insertions with the same name under a new node
-     */
-    private void insertAndGroup(InfoTreeNode ins, InfoTreeNode parent) {
-        InfoTreeNode insNode = (InfoTreeNode) ins;
-        if (parent.getChildCount() > 0) {
-            InfoTreeNode lastNode
-                    = (InfoTreeNode) parent.getChildAt(
-                            parent.getChildCount() - 1);
-            if (getName(insNode).equals(getName(lastNode))) {
-                if (lastNode.getChildCount() == 0) {
-                    removeNodeFromParent(lastNode);
-                    InfoTreeNode oldParent = parent;
-                    parent = new InfoTreeNode(getName(insNode), ruleExplanations);
-                    insertAsLast(parent, oldParent);
-                    insertAsLast(lastNode, parent);
-                } else {
-                    parent = lastNode;
+    private class TermLabelsNode extends InfoTreeNode {
+
+        TermLabelsNode(MainWindow mainWindow, XMLProperties termLabelExplanations) {
+            super("Term Labels", "Get descriptions for currently available term labels.");
+
+            List<Name> labelNames = mainWindow.getSortedTermLabelNames();
+            for (Name name : labelNames) {
+                insertAsLast(new InfoTreeNode(name.toString(), termLabelExplanations), this);
+            }
+        }
+    }
+
+    private class RulesNode extends InfoTreeNode {
+
+        RulesNode(XMLProperties ruleExplanations, Goal goal) {
+            super("Rules", "Browse descriptions for currently available rules.");
+
+            InfoTreeNode builtInRoot = new InfoTreeNode("Built-In", ruleExplanations);
+            insertAsLast(builtInRoot, this);
+            InfoTreeNode axiomTacletRoot = new InfoTreeNode(TACLET_BASE, ruleExplanations);
+            insertAsLast(axiomTacletRoot, this);
+            InfoTreeNode proveableTacletsRoot = new InfoTreeNode(LEMMAS, ruleExplanations);
+            insertAsLast(proveableTacletsRoot, this);
+
+            if (goal != null) {
+                for (final BuiltInRule br : goal.ruleAppIndex().builtInRuleAppIndex().builtInRuleIndex().rules()) {
+                    insertAsLast(new InfoTreeNode(br.displayName(), ruleExplanations), builtInRoot);
+                }
+                ImmutableSet<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
+                OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(goal.proof());
+                if (simplifier != null) {
+                    set = set.union(simplifier.getCapturedTaclets());
+                }
+
+                for (final NoPosTacletApp app : sort(set)) {
+                    RuleJustification just = goal.proof().mgt().getJustification(app);
+                    if (just == null) {
+                        continue; // do not break system because of this
+                    }
+                    if (just.isAxiomJustification()) {
+                        insertAndGroup(new InfoTreeNode(app.taclet()), axiomTacletRoot, ruleExplanations);
+                    } else {
+                        insertAndGroup(new InfoTreeNode(app.taclet()), proveableTacletsRoot, ruleExplanations);
+                    }
                 }
             }
-        }
-        insertAsLast(ins, parent);
-    }
 
-    private String getName(InfoTreeNode t1) {
-        if (t1.getUserObject() instanceof Taclet) {
-            return ((Taclet) t1.getUserObject()).displayName();
-        } else {
-            return t1.toString();
-        }
-    }
-
-    private List<NoPosTacletApp> sort(ImmutableSet<NoPosTacletApp> apps) {
-        final ArrayList<NoPosTacletApp> l
-                = new ArrayList<NoPosTacletApp>(apps.size());
-
-        for (final NoPosTacletApp app : apps) {
-            l.add(app);
+            axiomTacletRoot.setUserObject(TACLET_BASE + " (" + getChildCount(axiomTacletRoot) + ")");
+            proveableTacletsRoot.setUserObject(LEMMAS + " (" + getChildCount(proveableTacletsRoot) + ")");
         }
 
-        Collections.sort(l, new Comparator<NoPosTacletApp>() {
-            @Override
-            public int compare(NoPosTacletApp o1, NoPosTacletApp o2) {
-                final Taclet t1 = o1.taclet();
-                final Taclet t2 = o2.taclet();
-                return t1.displayName().compareTo(t2.displayName());
+        private int getChildCount(InfoTreeNode root) {
+            int res = 0;
+            for (int i = 0; i < root.getChildCount(); i++) {
+                final InfoTreeNode child = (InfoTreeNode) root.getChildAt(i);
+                // there is no deeper nesting
+                final int grandchildren = child.getChildCount();
+                res += grandchildren == 0 ? 1 : grandchildren;
             }
-        });
-        return l;
-    }
-
-    private static int getChildCount(InfoTreeNode root) {
-        int res = 0;
-        for (int i = 0; i < root.getChildCount(); i++) {
-            final InfoTreeNode child = (InfoTreeNode) root.getChildAt(i);
-            // there is no deeper nesting
-            final int grandchildren = child.getChildCount();
-            res += grandchildren == 0 ? 1 : grandchildren;
+            return res;
         }
-        return res;
+
+        /**
+         * groups subsequent insertions with the same name under a new node
+         */
+        private void insertAndGroup(InfoTreeNode ins, InfoTreeNode parent, XMLProperties ruleExplanations) {
+            InfoTreeNode insNode = (InfoTreeNode) ins;
+            if (parent.getChildCount() > 0) {
+                InfoTreeNode lastNode
+                        = (InfoTreeNode) parent.getChildAt(
+                                parent.getChildCount() - 1);
+                if (getName(insNode).equals(getName(lastNode))) {
+                    if (lastNode.getChildCount() == 0) {
+                        removeNodeFromParent(lastNode);
+                        InfoTreeNode oldParent = parent;
+                        parent = new InfoTreeNode(getName(insNode), ruleExplanations);
+                        insertAsLast(parent, oldParent);
+                        insertAsLast(lastNode, parent);
+                    } else {
+                        parent = lastNode;
+                    }
+                }
+            }
+            insertAsLast(ins, parent);
+        }
+
+        private String getName(InfoTreeNode t1) {
+            if (t1.getUserObject() instanceof Taclet) {
+                return ((Taclet) t1.getUserObject()).displayName();
+            } else {
+                return t1.toString();
+            }
+        }
+
+        private List<NoPosTacletApp> sort(ImmutableSet<NoPosTacletApp> apps) {
+            final ArrayList<NoPosTacletApp> l
+                    = new ArrayList<NoPosTacletApp>(apps.size());
+
+            for (final NoPosTacletApp app : apps) {
+                l.add(app);
+            }
+
+            Collections.sort(l, new Comparator<NoPosTacletApp>() {
+                @Override
+                public int compare(NoPosTacletApp o1, NoPosTacletApp o2) {
+                    final Taclet t1 = o1.taclet();
+                    final Taclet t2 = o2.taclet();
+                    return t1.displayName().compareTo(t2.displayName());
+                }
+            });
+            return l;
+        }
     }
 
 }
