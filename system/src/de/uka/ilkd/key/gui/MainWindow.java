@@ -158,7 +158,7 @@ public final class MainWindow extends JFrame  {
         this.proofManagementDialog = proofManagementDialog;
     }
 
-    // Search bar for Sequent Views.
+    /** Search bar for Sequent Views. */
     public final SequentViewSearchBar sequentViewSearchBar;
     
     /**
@@ -170,7 +170,7 @@ public final class MainWindow extends JFrame  {
     public static final int TOOLBAR_ICON_SIZE = 16;
 
     /** the tab bar at the left */
-    private JTabbedPane tabbedPane;
+    private JTabbedPane mainWindowTabbedPane;
 
     /** the first toolbar */
     private JToolBar controlToolBar;
@@ -267,7 +267,8 @@ public final class MainWindow extends JFrame  {
     /** for locking of threads waiting for the prover to exit */
     public final Object monitor = new Object();
 
-    private NotificationManager notificationManager;
+    private final NotificationManager notificationManager;
+    
     private final PreferenceSaver prefSaver =
         new PreferenceSaver(Preferences.userNodeForPackage(MainWindow.class));
 
@@ -486,12 +487,12 @@ public final class MainWindow extends JFrame  {
         getContentPane().add(toolBarPanel, BorderLayout.PAGE_START);
 
         // create tabbed pane
-        tabbedPane = createTabbedPane();
+        mainWindowTabbedPane = createTabbedPane();
 
         proofListView.setPreferredSize(new java.awt.Dimension(350, 100));
         GuiUtilities.paintEmptyViewComponent(proofListView, "Proofs");
 
-        JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, proofListView, tabbedPane);
+        JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, proofListView, mainWindowTabbedPane);
         leftPane.setName("leftPane");
         leftPane.setOneTouchExpandable(true);
 
@@ -689,7 +690,7 @@ public final class MainWindow extends JFrame  {
     }
 
     public void selectTab(int tab) {
-    	this.tabbedPane.setSelectedIndex(0);
+    	this.mainWindowTabbedPane.setSelectedIndex(0);
     }
 
     /**
