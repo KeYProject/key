@@ -48,6 +48,8 @@ public class BatchMode {
 
         if (result instanceof Throwable) {
             // Error in batchMode. Terminate with status -1.
+            System.err.println("An error occurred during batch mode:");
+            System.err.println(""+result);
             System.exit ( -1 );
         }
 
@@ -99,6 +101,7 @@ public class BatchMode {
     private void printStatistics(String file, Object result,
                                  Proof.Statistics statistics,
                                  boolean proofClosed) {
+        
         try {
             final boolean fileExists = (new File(file)).exists();
             final FileWriter statisticsFW = new FileWriter ( file, true );
