@@ -102,6 +102,9 @@ public class BatchMode {
                                  Proof.Statistics statistics,
                                  boolean proofClosed) {
         
+        // get current memory consumption in MB
+        final long memory = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576;
+        
         try {
             final boolean fileExists = (new File(file)).exists();
             final FileWriter statisticsFW = new FileWriter ( file, true );
@@ -110,7 +113,7 @@ public class BatchMode {
             if (!fileExists) {
                 statPrinter.println("Name | Total rule apps | Nodes | " +
                         "Branches | Overall time | Automode time | " +
-                        "Closed | Time per step");
+                        "Closed | Time per step | Memory");
             }
 
             String name = fileName;
@@ -120,7 +123,7 @@ public class BatchMode {
 
             statPrinter.print ( name + " | " );
             if ("Error".equals ( result ) )
-                statPrinter.println ( "-1 | -1 | -1 | -1 | -1 | -1 | -1" );
+                statPrinter.println ( "-1 | -1 | -1 | -1 | -1 | -1 | -1 | -1" );
             else
                 statPrinter.println (statistics.totalRuleApps + " | " +
                                      statistics.nodes + " | " +
@@ -128,7 +131,8 @@ public class BatchMode {
                                      statistics.time + " | " +
                                      statistics.autoModeTime + " | " +
                                      (proofClosed ? 1 : 0) + " | " +
-                                     ((double)statistics.autoModeTime / (double)statistics.totalRuleApps));
+                                     ((double)statistics.autoModeTime / (double)statistics.totalRuleApps) + " | " +
+                                     memory);
             statPrinter.close();
         } catch ( IOException e ) {
             e.printStackTrace();
