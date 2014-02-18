@@ -14,6 +14,12 @@
 # It is used by bin/runAllProofs.pl.
 #
 
+# Examples used in the new book
+provable: ./newBook/09.list_modelfield/ArrayList.add.key
+provable: ./newBook/09.list_modelfield/ArrayList.remFirst.key
+provable: ./newBook/09.list_modelfield/ArrayList.empty.key
+provable: ./newBook/09.list_modelfield/ArrayList.size.key
+provable: ./newBook/09.list_modelfield/ArrayList.get.key
 
 # Comprehension Tests
 provable: ./heap/comprehensions/general_sum.key
