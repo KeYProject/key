@@ -102,8 +102,9 @@ public class BatchMode {
                                  Proof.Statistics statistics,
                                  boolean proofClosed) {
         
-        // get current memory consumption in MB
-        final long memory = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576;
+        // get current memory consumption (after GC) in kB
+        Runtime.getRuntime().gc();
+        final long memory = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024;
         
         try {
             final boolean fileExists = (new File(file)).exists();
