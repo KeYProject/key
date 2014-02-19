@@ -337,49 +337,53 @@ public abstract class Notation {
 	}
     }
     
-    
+
+    /**
+     * The standard concrete syntax for observer function terms.
+     */
+    static class ObserverNotation extends Notation {
+
+        public ObserverNotation() {
+            super(130);
+        }
+
+        protected ObserverNotation(int assoc) {
+            super(assoc);
+        }
+
+        @Override
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printObserver(t, null);
+        }
+
+        public void printWithHeap(Term t, LogicPrinter sp, Term heapTerm) throws IOException {
+            sp.printObserver(t, heapTerm);
+        }
+    }
+
     /**
      * The standard concrete syntax for select.
      */
-    public static final class SelectNotation extends Notation {
-	public SelectNotation() {
-	    super(140);
-	}
-
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printSelect(t);
-	}
-    }
-    
-    public static abstract class HeapNotation extends Notation {
-        protected HeapNotation(int priority) {
-            super(priority);
-        }
-
-        public abstract void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException;
-    }
-
-    /**
-     * The standard concrete syntax for store.
-     */
-    public static final class StoreNotation extends HeapNotation {
-        public StoreNotation() {
+    public static final class SelectNotation extends ObserverNotation {
+        public SelectNotation() {
             super(140);
         }
 
+        @Override
         public void print(Term t, LogicPrinter sp) throws IOException {
-            sp.printStore(t, true);
+            sp.printSelect(t, null);
         }
 
-        public void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException {
-            sp.printStore(t, false);
+        @Override
+        public void printWithHeap(Term t, LogicPrinter sp, Term heapTerm) throws IOException {
+            sp.printSelect(t, heapTerm);
         }
     }
 
     /**
-     * The standard concrete syntax for anon.
+     * The standard concrete syntax for heap constructors.
      */
-    public static final class HeapConstructorNotation extends HeapNotation {
+    public static class HeapConstructorNotation extends Notation {
         public HeapConstructorNotation() {
             super(140);
         }
@@ -392,6 +396,21 @@ public abstract class Notation {
             sp.printHeapConstructor(t, false);
         }
     }
+
+    /**
+     * The standard concrete syntax for store.
+     */
+    public static final class StoreNotation extends HeapConstructorNotation {
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printStore(t, true);
+        }
+
+        public void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException {
+            sp.printStore(t, false);
+        }
+    }
+
 
     /**
      * The standard concrete syntax for length.
@@ -409,22 +428,6 @@ public abstract class Notation {
 	    sp.printPostfix(t,postfix);
 	}
     }       
-    
-    
-    /**
-     * The standard concrete syntax for observer function terms.
-     */
-    static final class ObserverNotation extends Notation {
-
-	public ObserverNotation() {
-	    super(130);
-	}
-
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printObserver(t);
-	}
-    }
-    
     
     
     /**
