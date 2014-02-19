@@ -5,26 +5,29 @@ public abstract class AbstractMap implements MapInterface {
     public MapEntry[] entries;
 
     /*@
+     @ public invariant entries.length == \dl_mapSize(map);
+     @
+     @ public invariant (\forall Object o;
+     @          (\exists int i; 0 <= i && i < entries.length; entries[i].key == o) <==> \dl_inDomain(map, o));
+     @
+     @ public invariant (\forall int i; 0 <= i && i < entries.length;
+     @                      \dl_mapGet(map, entries[i].key) == entries[i].value);     
+     @
      @ public invariant (\forall int i1; 0 <= i1 && i1 < entries.length;
      @                      (\forall int i2; i1 < i2 && i2 < entries.length;
      @                          ( entries[i1].key != entries[i2].key )));
      @
      @ public invariant \typeof(entries) == \type(MapEntry[]);
-     @ public invariant entries.length == \dl_mapSize(map);
-     @
-     @ public invariant (\forall int i; 0 <= i && i < entries.length;
-     @                      \dl_mapGet(map, entries[i].key) == entries[i].value);
-     @
-     @ public invariant (\forall Object o;
-     @          (\exists int i; 0 <= i && i < entries.length; entries[i].key == o) <==> \dl_inDomain(map, o));
-     @
-     @ public invariant (\forall int i; 0 <= i && i < entries.length; 
-     @          entries[i] != null && entries[i].key != null && entries[i].value != null);
      @
      @ public invariant footprint ==
-     @      \set_union(\infinite_union(int i; 0 <= i && i < entries.length; entries[i].*),
-     @                 this.*,
-     @                 entries.*);
+     @      \set_union(\infinite_union(int i; 0 <= i && i < entries.length;
+     @                          entries[i].*), this.*, entries.*);
+     @*/
+    
+    // Null invariant should be redundant.
+    /*@
+     @ public invariant (\forall int i; 0 <= i && i < entries.length; 
+     @          entries[i] != null && entries[i].key != null && entries[i].value != null);
      @*/
     
     /*@ public normal_behaviour
