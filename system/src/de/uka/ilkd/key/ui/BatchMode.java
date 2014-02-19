@@ -80,11 +80,6 @@ public class BatchMode {
 
         if (proof.openGoals ().size () == 0) {
             // Says that all Proofs have succeeded
-            if (proof.getBasicTask() != null &&
-            		proof.getBasicTask().getStatus().getProofClosedButLemmasLeft()) {
-                // Says that the proof is closed by depends on (unproved) lemmas
-                System.exit ( 0 ); //XXX, was: 2
-            }
             System.exit ( 0 );
         } else {
             // Says that there is at least one open Proof
