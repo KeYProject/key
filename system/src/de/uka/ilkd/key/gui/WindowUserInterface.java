@@ -160,6 +160,8 @@ public class WindowUserInterface extends AbstractUserInterface {
 				mainWindow.displayResults(info.toString());
 			}
 		}
+	    // this seems to be a good place to free some memory
+	    Runtime.getRuntime().gc();
 	}
 
 	protected boolean inStopAtFirstUncloseableGoalMode(Proof proof) {
