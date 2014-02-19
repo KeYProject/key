@@ -100,7 +100,7 @@ import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 public class LogicPrinter {
 
     /**
-     * The default and minimal value o fthe
+     * The default and minimal value of the
      * max. number of characters to put in one line
      */
     public static final int DEFAULT_LINE_WIDTH = 55;
