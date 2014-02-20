@@ -1,10 +1,12 @@
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.LRUCache;
 
 public abstract class NumberRuleAppCost implements RuleAppCost {
 
     private static final NumberRuleAppCost ZERO_COST = new IntRuleAppCost ( 0 );
+    private static final LRUCache<Integer,NumberRuleAppCost> cache = new LRUCache<Integer,NumberRuleAppCost>(255);
 
     public static RuleAppCost getZeroCost() {
         return ZERO_COST;
@@ -13,16 +15,20 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
     public static RuleAppCost create(int p_cost) {
         
         if ( p_cost == 0 ) return NumberRuleAppCost.getZeroCost();
+        
+        NumberRuleAppCost ac = cache.get(p_cost);
+        if (ac != null) return ac;
+        
+        ac = new IntRuleAppCost(p_cost);
+        cache.put(p_cost, ac);
 
-        return new IntRuleAppCost ( p_cost );
+        return ac;
     }
     
     public static RuleAppCost create(long p_cost) {
         
-        if ( p_cost == 0 ) return NumberRuleAppCost.getZeroCost();
-
         if ( p_cost <= Integer.MAX_VALUE && p_cost >= Integer.MIN_VALUE) {
-            return new IntRuleAppCost((int)p_cost);
+            return create ((int) p_cost);
         }        
         
         return new LongRuleAppCost ( p_cost );
@@ -89,7 +95,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
      * a <code>long</code> value for the representation of costs, ordered by the
      * usual ordering of natural numbers. Objects of this class are immutable
      */
-    private static class LongRuleAppCost extends NumberRuleAppCost {
+    private final static class LongRuleAppCost extends NumberRuleAppCost {
 
         private final long cost;
 
@@ -108,7 +114,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
     }
 
 
-    private static class IntRuleAppCost extends NumberRuleAppCost {
+    private final static class IntRuleAppCost extends NumberRuleAppCost {
 
         private final int cost;
 
