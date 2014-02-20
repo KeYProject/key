@@ -4,7 +4,7 @@ import de.uka.ilkd.key.util.Debug;
 
 public abstract class NumberRuleAppCost implements RuleAppCost {
 
-    private static final NumberRuleAppCost ZERO_COST = new ByteRuleAppCost ((byte) 0 );
+    private static final NumberRuleAppCost ZERO_COST = new IntRuleAppCost ( 0 );
 
     public static RuleAppCost getZeroCost() {
         return ZERO_COST;
@@ -14,12 +14,6 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         
         if ( p_cost == 0 ) return NumberRuleAppCost.getZeroCost();
 
-        if ( p_cost <= Byte.MAX_VALUE && p_cost >= Byte.MIN_VALUE)
-            return new ByteRuleAppCost((byte) p_cost);
-        
-        if ( p_cost <= Short.MAX_VALUE && p_cost >= Short.MIN_VALUE)
-            return new ShortRuleAppCost((short) p_cost);
-        
         return new IntRuleAppCost ( p_cost );
     }
     
@@ -27,12 +21,6 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         
         if ( p_cost == 0 ) return NumberRuleAppCost.getZeroCost();
 
-        if ( p_cost <= Byte.MAX_VALUE && p_cost >= Byte.MIN_VALUE)
-            return new ByteRuleAppCost((byte) p_cost);
-        
-        if ( p_cost <= Short.MAX_VALUE && p_cost >= Short.MIN_VALUE)
-            return new ShortRuleAppCost((short) p_cost);
-        
         if ( p_cost <= Integer.MAX_VALUE && p_cost >= Integer.MIN_VALUE) {
             return new IntRuleAppCost((int)p_cost);
         }        
@@ -136,36 +124,4 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         }
     }
 
-    private static class ShortRuleAppCost extends NumberRuleAppCost {
-
-        private final short cost;
-
-        protected ShortRuleAppCost(short p_cost) {
-            this.cost = p_cost;
-        }
-
-     
-        @Override
-        public
-        final long getValue() {
-            return cost;
-        }
-    }
-
-    private static class ByteRuleAppCost extends NumberRuleAppCost {
-
-        private final byte cost;
-
-        protected ByteRuleAppCost(byte p_cost) {
-            this.cost = p_cost;
-        }
-
-     
-        @Override
-        public
-        final long getValue() {
-            return cost;
-        }
-    }
-    
 }
