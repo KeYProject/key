@@ -20,6 +20,7 @@
 package de.uka.ilkd.key.rule;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.gui.TacletInstantiationsTableModel;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -42,7 +43,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.SVInstantiationException;
 import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.TacletInstantiationsTableModel;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 

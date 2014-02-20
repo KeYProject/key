@@ -46,7 +46,6 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.TacletInstantiationsTableModel;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -486,8 +485,7 @@ public class DefaultProofFileParser implements IProofFileParser {
            result = app;
        } else if(sv instanceof ProgramSV) {
       final ProgramElement pe =
-          TacletInstantiationsTableModel.getProgramElement(
-         app, value, sv, services);
+          app.getProgramElement(value, sv, services);
       result = app.addCheckedInstantiation(sv, pe, services, true);
        } else if(sv instanceof SkolemTermSV) {
       result = app.createSkolemConstant ( value, sv, true, services );

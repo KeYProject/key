@@ -12,7 +12,7 @@
 // 
 
 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.gui;
 
 import java.io.StringReader;
 import java.util.Iterator;
@@ -23,17 +23,21 @@ import javax.swing.table.AbstractTableModel;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.parser.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.InstantiationProposerCollection;
+import de.uka.ilkd.key.proof.MissingInstantiationException;
+import de.uka.ilkd.key.proof.MissingSortException;
+import de.uka.ilkd.key.proof.SVInstantiationException;
+import de.uka.ilkd.key.proof.SVInstantiationParserException;
+import de.uka.ilkd.key.proof.SVRigidnessException;
+import de.uka.ilkd.key.proof.SortMismatchException;
+import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.*;
 
@@ -322,47 +326,6 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
         }
     }
 
-    public static ProgramElement getProgramElement(TacletApp app,
-						   String instantiation,
-						   SchemaVariable sv,
-						   Services services) {
-	Sort svSort = sv.sort();
-	if (svSort == ProgramSVSort.LABEL) {
-	    return VariableNamer.parseName(instantiation);
-	} else if (svSort == ProgramSVSort.VARIABLE ) {
-	    NewVarcond nvc = app.taclet().varDeclaredNew(sv);
-	    if (nvc != null) {
-		KeYJavaType kjt;
-		Object o = nvc.getTypeDefiningObject();
-		JavaInfo javaInfo = services.getJavaInfo ();
-		if (o instanceof SchemaVariable) {
-	            final TypeConverter tc = services.getTypeConverter();
-		    final SchemaVariable peerSV = (SchemaVariable)o;
-		    final Object peerInst = app.instantiations().getInstantiation(peerSV);
-                    if(peerInst instanceof TypeReference){
-                        kjt = ((TypeReference) peerInst).getKeYJavaType();
-                    } else {
-                        Expression peerInstExpr;
-                        if(peerInst instanceof Term) {
-                            peerInstExpr = tc.convertToProgramElement((Term)peerInst);
-                        } else {
-                            peerInstExpr = (Expression)peerInst;
-                        }
-                        kjt = tc.getKeYJavaType(peerInstExpr, 
-                        			app.instantiations().getContextInstantiation().activeStatementContext());
-                    }
-		} else {
-		    kjt = javaInfo.getKeYJavaType((Type)o);
-		}
-                assert kjt != null : "could not find kjt for: " + o;
-		return new LocationVariable
-		    (VariableNamer.parseName(instantiation), kjt);
-	    }
-	}
-	return null;
-    }
-
-
     /**
      * parses the indicated row and returns the ProgramElement
      * corresponding to the entry in the row
@@ -398,7 +361,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 	}
 
 
-	ProgramElement pe = getProgramElement(originalApp, instantiation, sv, services);
+	ProgramElement pe = originalApp.getProgramElement(instantiation, sv, services);
 	if (pe == null) {
 	    throw new SVInstantiationParserException
 		(instantiation, irow, -1, "Unexpected sort: "

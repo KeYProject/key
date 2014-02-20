@@ -30,7 +30,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 
 /*
  * At the moment this rule is unsound and not used. I am not sure if it only forgot to
- *  add the update context or if more needs to be checked. One slighlty worrying thing is 
+ *  add the update context or if more needs to be checked. One slightly worrying thing is 
  *  that it is applied also behind diamond and box modalities. 
  */
 public final class PullOutConditionalsRule implements BuiltInRule {

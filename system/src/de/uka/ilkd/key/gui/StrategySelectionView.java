@@ -31,6 +31,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -526,7 +527,13 @@ public final class StrategySelectionView extends JPanel {
       StrategyProperties p = new StrategyProperties();
 
       for (Entry<String, ButtonGroup> entry : components.getPropertyGroups().entrySet()) {
-         p.setProperty(entry.getKey(), entry.getValue().getSelection().getActionCommand());
+         ButtonModel selected = entry.getValue().getSelection();
+         if (selected != null) {
+            p.setProperty(entry.getKey(), selected.getActionCommand());
+         }
+         else {
+            p.setProperty(entry.getKey(), DEFINITION.getDefaultPropertiesFactory().createDefaultStrategyProperties().getProperty(entry.getKey()));
+         }
       }
 
       return p;
