@@ -23,7 +23,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
@@ -46,9 +46,9 @@ public class RuleSetDispatchFeature implements Feature {
     }
     
     public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
-        if ( ! ( app instanceof TacletApp ) ) return LongRuleAppCost.ZERO_COST;
+        if ( ! ( app instanceof TacletApp ) ) return NumberRuleAppCost.getZeroCost();
 
-        RuleAppCost res = LongRuleAppCost.ZERO_COST;
+        RuleAppCost res = NumberRuleAppCost.getZeroCost();
         for (RuleSet rs : ( (TacletApp)app ).taclet ().getRuleSets ()) {
             final Feature partialF = rulesetToFeature.get ( rs );
             if ( partialF != null ) {

@@ -22,7 +22,7 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -105,7 +105,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
             if(name.startsWith(WD_PREFIX)) {
-                return LongRuleAppCost.ZERO_COST;
+                return NumberRuleAppCost.getZeroCost();
             } else {
                 return TopRuleAppCost.INSTANCE;
             }

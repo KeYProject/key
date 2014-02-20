@@ -31,7 +31,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
@@ -198,7 +198,7 @@ class Instantiation {
 	if (cost.longValue() == -1)
 	    return TopRuleAppCost.INSTANCE;
 
-	return LongRuleAppCost.create(cost.longValue());
+	return NumberRuleAppCost.create(cost.longValue());
     }
 
     /** get all instances from instancesCostCache subsCache */

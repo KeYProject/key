@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
 /**
@@ -43,8 +43,8 @@ public class CountBranchFeature implements Feature {
 	if (app.rule() instanceof Taclet) {
 	    final Taclet tac     = (Taclet)app.rule();
 	    final long branches  = tac.goalTemplates().size();	    
-	    return LongRuleAppCost.create(branches);
+	    return NumberRuleAppCost.create(branches);
 	}
-	return LongRuleAppCost.ZERO_COST;
+	return NumberRuleAppCost.getZeroCost();
     }
 }
