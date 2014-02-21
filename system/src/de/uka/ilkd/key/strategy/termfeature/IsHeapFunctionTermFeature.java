@@ -14,33 +14,27 @@ package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import java.util.Iterator;
+import de.uka.ilkd.key.logic.op.Function;
 
 
-public final class PrimitiveHeapTermFeature extends BinaryTermFeature {
+public final class IsHeapFunctionTermFeature extends BinaryTermFeature {
 
     private final HeapLDT heapLDT;
 
-    private PrimitiveHeapTermFeature(HeapLDT heapLDT) {
+    private IsHeapFunctionTermFeature(HeapLDT heapLDT) {
         this.heapLDT = heapLDT;
     }
 
-    public static PrimitiveHeapTermFeature create(HeapLDT heapLDT) {
-        return new PrimitiveHeapTermFeature(heapLDT);
+    public static IsHeapFunctionTermFeature create(HeapLDT heapLDT) {
+        return new IsHeapFunctionTermFeature(heapLDT);
     }
 
     @Override
     protected boolean filter(Term t) {
-        // t.op() is the base heap or another primitive heap variable
-        boolean isPrimitive = false;
-        Iterator<LocationVariable> it = heapLDT.getAllHeaps().iterator();
-        while (!isPrimitive && it.hasNext()) {
-            isPrimitive = (it.next() == t.op());
+        if (t.op() instanceof Function) {
+          return heapLDT.containsFunction(t.op(Function.class));
+        } else {
+            return false;
         }
-        // the location variables which are created in the block contract rule
-        // also need to be classified primitive
-        isPrimitive = isPrimitive || (t.op() instanceof LocationVariable);
-        return isPrimitive;
     }
 }

@@ -112,6 +112,7 @@ import de.uka.ilkd.key.strategy.termfeature.AnonHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.PrimitiveHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.IsHeapFunctionTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsNonRigidTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsSelectSkolemConstantTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
@@ -636,7 +637,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                            longConst(-5600) ) );
         bindRuleSet ( d, "apply_auxiliary_eq",
                       // replace skolem constant by it's computed value
-                      add( applyTF("t1", IsSelectSkolemConstantTermFeature.INSTANCE),
+                      add( or ( applyTF("t1", IsSelectSkolemConstantTermFeature.INSTANCE),
+                                applyTF("t1", IsHeapFunctionTermFeature.create(heapLDT)) ),
                            longConst(-5500) ) );
         bindRuleSet ( d, "hide_auxiliary_eq",
                       // hide auxiliary equation after the skolem constatns have
