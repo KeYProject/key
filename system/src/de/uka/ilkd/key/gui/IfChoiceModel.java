@@ -12,9 +12,8 @@
 // 
 
 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.gui;
 
-import java.io.StringReader;
 import java.util.Iterator;
 
 import javax.swing.DefaultComboBoxModel;
@@ -27,6 +26,8 @@ import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.MissingInstantiationException;
+import de.uka.ilkd.key.proof.SVInstantiationParserException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;

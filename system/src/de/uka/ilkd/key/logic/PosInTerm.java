@@ -20,9 +20,10 @@ public class PosInTerm {
 
     private static final PosInTerm TOP_LEVEL = new PosInTerm();
 
-    private final int[] positions;
-    private final int size;
-    private int hash = -1;
+    // to save memory, we use 16bit integers (unsigned) instead of 32bit
+    private final char[] positions;
+    private final char size;
+    private char hash = (char)-1;
     private boolean copy;
 
     
@@ -49,14 +50,15 @@ public class PosInTerm {
             list.addFirst(Integer.decode(tker.nextToken()));
         }
         
-        final int[] positions = new int[list.size()];
+        final char[] positions = new char[list.size()];
         int i = 0;
         for (int j : list) {
-            positions[i] = j;
+            if (j > Character.MAX_VALUE) throw new ArithmeticException("Position "+j+" out of bounds");
+            positions[i] = (char)j;
             ++i;
         }
                
-        return positions.length == 0 ? getTopLevel() : new PosInTerm(positions, positions.length, true);
+        return positions.length == 0 ? getTopLevel() : new PosInTerm(positions, (char) positions.length, true);
     }
 
     /**
@@ -71,7 +73,7 @@ public class PosInTerm {
      * only used once to create the singleton for the top level position
      */
     private PosInTerm() {
-        positions = new int[0];
+        positions = new char[0];
         size = 0;
         hash = 13;
         copy = true;
@@ -83,7 +85,7 @@ public class PosInTerm {
      * @param size the size of the integer list (attention: might be shorter than the length of the position array)
      * @param copy indicates (i.e. true) if the position array has to be copied when going downwards
      */
-    private PosInTerm(int[] positions, int size, boolean copy) {
+    private PosInTerm(char[] positions, char size, boolean copy) {
         assert size > 0 && size <= positions.length;
         this.positions = positions;
         this.size = size;
@@ -114,7 +116,7 @@ public class PosInTerm {
         if (size == 0) {
             return null;
         }
-        return size == 1 ? getTopLevel() : new PosInTerm(positions, size - 1, true);
+        return size == 1 ? getTopLevel() : new PosInTerm(positions, (char)(size - 1), true);
     }
 
     /**
@@ -131,7 +133,7 @@ public class PosInTerm {
         } else if (n == size) {
             return this;
         }
-        return new PosInTerm(positions, n, true);
+        return new PosInTerm(positions, (char)n, true);
     }
     
     /**
@@ -140,18 +142,20 @@ public class PosInTerm {
      * @return the position of the i-th subterm
      */
     public PosInTerm down(int i) {
+        if (i > Character.MAX_VALUE) throw new ArithmeticException("Position "+i+" out of bounds");
+        
         final PosInTerm result; 
         synchronized(positions) { 
             if (copy) {        
-                final int[] newPositions = 
-                        new int[positions.length <= size ? size + 4 : positions.length];
+                final char[] newPositions = 
+                        new char[positions.length <= size ? size + 4 : positions.length];
                 System.arraycopy(positions, 0, newPositions, 0, size);
-                newPositions[size] = i;
-                result = new PosInTerm(newPositions, size + 1, false);
+                newPositions[size] = (char)i;
+                result = new PosInTerm(newPositions, (char)(size + 1), false);
             } else {
-                positions[size] = i;
+                positions[size] = (char)i;
                 copy   = true;
-                result = new PosInTerm(positions, size + 1, true);            
+                result = new PosInTerm(positions, (char)(size + 1), true);            
             }
         }
         return result;
@@ -164,7 +168,7 @@ public class PosInTerm {
      */
     public int getIndexAt(int i) {
         if (i<0 || i>=size) {
-            throw new IndexOutOfBoundsException("No position at index"+i);
+            throw new IndexOutOfBoundsException("No position at index "+i);
         }
         return positions[i];
     }
@@ -178,10 +182,10 @@ public class PosInTerm {
     }
 
     public int hashCode() {        
-        if (hash == -1) {
+        if (hash == (char)-1) {
             hash = 13;
             for (int i = 0; i < size; i++) {
-                hash = 13 * hash + positions[i];
+                hash = (char) (13 * hash + positions[i]);
             }        
             hash = hash == -1 ? 0 : hash;
         } 

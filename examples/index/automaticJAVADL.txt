@@ -141,6 +141,9 @@ provable: ./heap/observer/ExampleSubject_inv.key
 provable: ./heap/observer/ExampleSubject_notifyObservers.key
 provable: ./heap/observer/ExampleSubject_value_dep.key
 provable: ./heap/observer/ExampleSubject_value.key
+provable: ./heap/removeDups/arrayPart.key
+provable: ./heap/removeDups/contains.key
+provable: ./heap/removeDups/removeDup.key
 provable: ./heap/saddleback_search/Saddleback_search.key
 provable: ./heap/simple/anonymise_datagroup.key
 provable: ./heap/simple/array_creation.key
