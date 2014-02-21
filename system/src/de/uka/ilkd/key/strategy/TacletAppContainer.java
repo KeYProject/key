@@ -33,6 +33,13 @@ import de.uka.ilkd.key.util.Debug;
  */
 public abstract class TacletAppContainer extends RuleAppContainer {
 
+    // Implementation note (DB 21/02/2014):
+    // It is unlikely that we ever reach 2^31 proof nodes,
+    // so age could be changed from long to int.
+    // My benchmark tests however suggest that this would not
+    // save any memory (at the moment).
+    // This is because Java's memory alingment.
+    
     private final long age;
 
     protected TacletAppContainer ( RuleApp     p_app,
