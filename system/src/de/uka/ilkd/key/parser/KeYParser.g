@@ -188,7 +188,7 @@ options {
      * used we still require the caller to provide the parser mode explicitly, 
      * so that the code is readable.
      */
-    private KeYParser(ParserMode mode, TokenStream lexer) {
+    public KeYParser(ParserMode mode, TokenStream lexer) {
 	this(lexer);
         this.lexer = lexer;
 	this.parserMode = mode;
