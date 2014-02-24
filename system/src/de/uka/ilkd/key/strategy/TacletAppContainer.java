@@ -487,7 +487,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                 if ( ifInstCache.cacheKey != goal.node () ) return null;
 
                 // the cache contains formula lists for the right semisequent
-                return getCacheMap ( p_antec ).get ( getAgeObject () );
+                return getCacheMap ( p_antec ).get ( getAge () );
             }
         }
 
@@ -498,19 +498,13 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                     ifInstCache.reset(goal.node());
                 }
 
-                getCacheMap ( p_antec ).put ( getAgeObject (), p_list );
+                getCacheMap ( p_antec ).put ( getAge (), p_list );
             }
         }
-
 
         private HashMap<Long, ImmutableList<IfFormulaInstantiation>> getCacheMap (boolean p_antec) {
             return p_antec ? ifInstCache.antecCache : ifInstCache.succCache;
         }
-
-        private Long getAgeObject () {
-            return Long.valueOf( getAge() );
-        }
-
 
         private ImmutableList<IfFormulaInstantiation> getAllSequentFormulas ( boolean p_antec ) {
             return p_antec ? allAntecFormulas : allSuccFormulas;
