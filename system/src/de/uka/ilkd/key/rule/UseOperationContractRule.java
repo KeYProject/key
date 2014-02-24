@@ -546,6 +546,14 @@ public final class UseOperationContractRule implements BuiltInRule {
             return false;
         }
 
+        // contract can be applied if modality is box and needs no termination
+        // argument
+        // see #1417
+        // TODO what about BOX_TRANSACT? Better be conservative ...
+        if(inst.mod == Modality.BOX) {
+            return true;
+        }
+
         //applying a contract here must not create circular dependencies
         //between proofs
         for(FunctionalOperationContract contract : contracts) {
@@ -748,7 +756,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 		= services.getSpecificationRepository()
 		          .getPOForProof(goal.proof());
 	final Term mbyOk;
-	if(po != null && /* po.getMbyAtPre() != null && */ mby != null ) {
+	// see #1417
+	if(inst.mod != Modality.BOX && po != null && mby != null ) {
 //    	mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
 //    			       TB.lt(mby, po.getMbyAtPre(), services));
 //	    mbyOk = TB.prec(mby, po.getMbyAtPre(), services);
