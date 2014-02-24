@@ -289,7 +289,7 @@ public class SymbolicConfigurationExtractor {
             symbolicObjectsResultingInCurrentState.addAll(filterOutObjectsToIgnore(updateValueObjects, objectsToIgnore));
             symbolicObjectsResultingInCurrentState.addAll(collectObjectsFromSequent(node.sequent(), objectsToIgnore));
             symbolicObjectsResultingInCurrentState = sortTerms(symbolicObjectsResultingInCurrentState); // Sort terms alphabetically. This guarantees that in equivalence classes the representative term is for instance self.next and not self.next.next.
-            symbolicObjectsResultingInCurrentState.add(getServices().getTermBuilder().NULL(getServices())); // Add null because it can happen that a object is null and this option must be included in equivalence class computation
+            symbolicObjectsResultingInCurrentState.add(getServices().getTermBuilder().NULL()); // Add null because it can happen that a object is null and this option must be included in equivalence class computation
             // Compute a Sequent with the initial conditions of the proof without modality
             Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation(pathCondition);
             // Instantiate proof in which equivalent classes of symbolic objects are computed.
@@ -934,7 +934,7 @@ public class SymbolicConfigurationExtractor {
          sorts[i] = arguments[i].sort();
       }
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(getServices().getTermBuilder().newName(getServices(), "ConfigurationPredicate")), Sort.FORMULA, sorts);
+      Function newPredicate = new Function(new Name(getServices().getTermBuilder().newName("ConfigurationPredicate")), Sort.FORMULA, sorts);
       // Create formula which contains the value interested in.
       Term newTerm = getServices().getTermBuilder().func(newPredicate, arguments);
       return newTerm;
@@ -1553,7 +1553,7 @@ public class SymbolicConfigurationExtractor {
        */
       public Term createPreUpdate() {
          Term originalTerm = parentTerm != null ? parentTerm : getServices().getTermBuilder().var(programVariable);
-         return getServices().getTermBuilder().elementary(getServices(), preVariable, originalTerm);
+         return getServices().getTermBuilder().elementary(preVariable, originalTerm);
       }
       
       /**
@@ -1571,8 +1571,8 @@ public class SymbolicConfigurationExtractor {
       public Term createPreValueTerm() {
          if (parentTerm != null) {
             if (isArrayIndex()) {
-               Term idx = getServices().getTermBuilder().zTerm(getServices(), "" + arrayIndex);
-               return getServices().getTermBuilder().dotArr(getServices(), parentTerm, idx);
+               Term idx = getServices().getTermBuilder().zTerm("" + arrayIndex);
+               return getServices().getTermBuilder().dotArr(parentTerm, idx);
             }
             else {
                if (getServices().getJavaInfo().getArrayLength() == programVariable) {
@@ -1582,14 +1582,14 @@ public class SymbolicConfigurationExtractor {
                }
                else {
                   Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)programVariable, getServices());
-                  return getServices().getTermBuilder().dot(getServices(), programVariable.sort(), createPreParentTerm(), function);
+                  return getServices().getTermBuilder().dot(programVariable.sort(), createPreParentTerm(), function);
                }
             }
          }
          else {
             if (programVariable.isStatic()) {
                Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)programVariable, getServices());
-               return getServices().getTermBuilder().staticDot(getServices(), programVariable.sort(), function);
+               return getServices().getTermBuilder().staticDot(programVariable.sort(), function);
             }
             else {
                return getServices().getTermBuilder().var(programVariable);

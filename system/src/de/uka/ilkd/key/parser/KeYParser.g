@@ -863,9 +863,8 @@ options {
                 || sv.sort() == AbstractTermTransformer.METASORT) {
                 semanticError("Cannot use schema variable " + sv + " as an attribute"); 
             }
-            result = getServices().getTermBuilder().select(getServices(), 
-                                           sv.sort(), 
-                                           getServices().getTermBuilder().getBaseHeap(getServices()), 
+            result = getServices().getTermBuilder().select(sv.sort(), 
+                                           getServices().getTermBuilder().getBaseHeap(), 
                                            prefix, 
                                            tf.createTerm(attribute));
         } else {
@@ -873,7 +872,7 @@ options {
             if(pv instanceof ProgramConstant) {
                 result = tf.createTerm(pv);
             } else if(pv == getServices().getJavaInfo().getArrayLength()) {
-                result = getServices().getTermBuilder().dotLength(getServices(), result);
+                result = getServices().getTermBuilder().dotLength(result);
             } else {
             	Function fieldSymbol 
             		= getServices().getTypeConverter()
@@ -881,9 +880,9 @@ options {
             		               .getFieldSymbolForPV((LocationVariable)pv, 
             		                                    getServices());        
             	if (pv.isStatic()){
-                    result = getServices().getTermBuilder().staticDot(getServices(), pv.sort(), fieldSymbol);
+                    result = getServices().getTermBuilder().staticDot(pv.sort(), fieldSymbol);
             	} else {            
-                    result = getServices().getTermBuilder().dot(getServices(), pv.sort(), result, fieldSymbol);                
+                    result = getServices().getTermBuilder().dot(pv.sort(), result, fieldSymbol);                
             	}
             }
         }
@@ -2411,7 +2410,7 @@ elementary_update_term returns[Term _elementary_update_term=null]
         (
             ASSIGN a=equivalence_term
             {
-                result = getServices().getTermBuilder().elementary(getServices(), result, a);
+                result = getServices().getTermBuilder().elementary(result, a);
             }
         )?
    ;
@@ -2890,7 +2889,7 @@ elementary_heap_update [Term heap] returns [Term result=heap]
         {
            Term objectTerm = target.sub(1);
            Term fieldTerm  = target.sub(2);
-           result = getServices().getTermBuilder().store(getServices(), heap, objectTerm, fieldTerm, val);
+           result = getServices().getTermBuilder().store(heap, objectTerm, fieldTerm, val);
         }
     | id=simple_ident args=argument_list
         {
@@ -2923,7 +2922,7 @@ array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = n
   	LBRACKET 
 	(   STAR {
            	rangeFrom = toZNotation("0", functions());
-           	Term lt = getServices().getTermBuilder().dotLength(getServices(), arrayReference);
+           	Term lt = getServices().getTermBuilder().dotLength(arrayReference);
            	Term one = toZNotation("1", functions());
   	   		rangeTo = tf.createTerm
            		((Function) functions().lookup(new Name("sub")), lt, one); 
@@ -2949,7 +2948,7 @@ array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = n
 		Term guardTerm = tf.createTerm(Junctor.AND, fromTerm, toTerm);
 		quantifiedArrayGuard = tf.createTerm(Junctor.AND, quantifiedArrayGuard, guardTerm);
 		}
-            result = getServices().getTermBuilder().dotArr(getServices(), result, indexTerm); 
+            result = getServices().getTermBuilder().dotArr(result, indexTerm); 
     }            
     ;
         catch [TermCreationException ex] {
@@ -3358,7 +3357,7 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
                 
         {  
             if(varfuncid.equals("inReachableState") && args == null) {
-	        a = getServices().getTermBuilder().wellFormed(getServices().getTypeConverter().getHeapLDT().getHeap(), getServices());
+	        a = getServices().getTermBuilder().wellFormed(getServices().getTypeConverter().getHeapLDT().getHeap());
 	    } else if(varfuncid.equals("skip") && args == null) {
 	        a = tf.createTerm(UpdateJunctor.SKIP);
 	    } else {

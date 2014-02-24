@@ -70,8 +70,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
 	    } else {
 		return newSubHeapTerm == null 
 		       ? null 
-                       : services.getTermBuilder().store(services, 
-                	       	  newSubHeapTerm, 
+                       : services.getTermBuilder().store(newSubHeapTerm, 
                 	       	  objTerm, 
                 	       	  fieldTerm, 
                 	       	  valueTerm);
@@ -109,9 +108,8 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
 	}
 	
 	final Term properResultInst 
-		= dropEffectlessStores(services.getTermBuilder().store(services, 
-						hInst,
-						oInst, 
+		= dropEffectlessStores(services.getTermBuilder().store(hInst, 
+						oInst,
 						fInst, 
 						xInst), 
 				       services);

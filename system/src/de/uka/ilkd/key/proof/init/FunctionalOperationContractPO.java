@@ -190,10 +190,10 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
 */
             final Term mby = contract.getMby(selfVar, paramVars, services);
 //            mbyAtPreDef = TB.equals(mbyAtPre, mby);
-            mbyAtPreDef = TB.measuredBy(mby, services);
+            mbyAtPreDef = TB.measuredBy(mby);
         } else {
 //            mbyAtPreDef = TB.tt();
-            mbyAtPreDef = TB.measuredByEmpty(services);
+            mbyAtPreDef = TB.measuredByEmpty();
         }
         return mbyAtPreDef;
     }
@@ -241,10 +241,10 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
           final Term ft;
           if(!getContract().hasModifiesClause(heap)) {
             // strictly pure have a different contract.
-            ft = TB.frameStrictlyEmpty(services, TB.var(heap), heapToAtPre.get(heap));
+            ft = TB.frameStrictlyEmpty(TB.var(heap), heapToAtPre.get(heap));
           }else{
-            ft = TB.frame(services, TB.var(heap),
-                 heapToAtPre.get(heap), getContract().getMod(heap, selfVar,
+            ft = TB.frame(TB.var(heap), heapToAtPre.get(heap),
+                 getContract().getMod(heap, selfVar,
                          paramVars, services));
           }
           if(frameTerm == null) {
@@ -274,8 +274,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
        Term update = null;
        for(Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
           final LocationVariable heap = atPreEntry.getKey();
-          final Term u = TB.elementary(services, atPreEntry.getValue(), heap == getSavedHeap() ?
-                  TB.getBaseHeap(services) : TB.var(heap));
+          final Term u = TB.elementary(atPreEntry.getValue(), heap == getSavedHeap() ?
+                  TB.getBaseHeap() : TB.var(heap));
           if(update == null) {
              update = u;
           }else{
@@ -285,9 +285,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
         Iterator<ProgramVariable> paramIt = paramVars.iterator();
         while (formalParamIt.hasNext()) {
-            Term paramUpdate = TB.elementary(services,
-                                             formalParamIt.next(),
-                                             TB.var(paramIt.next()));
+            Term paramUpdate = TB.elementary(formalParamIt.next(), TB.var(paramIt.next()));
             update = TB.parallel(update, paramUpdate);
         }
         return update;

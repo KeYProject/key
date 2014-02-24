@@ -204,7 +204,7 @@ public class SemanticsBlastingMacro extends StrategyProofMacro {
 
 			LogicVariable o = new LogicVariable(new Name("o"), kjt.getSort());
 
-			Term exactInstance = tb.exactInstance(services, kjt.getSort(), tb.var(o));
+			Term exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));
 
 
 			for(ClassAxiom c : spec.getClassAxioms(kjt)){
@@ -229,7 +229,7 @@ public class SemanticsBlastingMacro extends StrategyProofMacro {
 							Term[] heaps = new Term[1];
 							heaps[0] = tb.var(h);
 
-							Term inv = tb.inv(services, heaps, tb.var(o));
+							Term inv = tb.inv(heaps, tb.var(o));
 
 							if(left.op().name().equals(inv.op().name())){
 

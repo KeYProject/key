@@ -81,7 +81,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
                     	= services.getTypeConverter()
                     	          .getHeapLDT()
                     	          .getFieldSymbolForPV(et, services);
-                    recTerm = services.getTermBuilder().dot(services, et.sort(), recTerm, fieldSymbol);
+                    recTerm = services.getTermBuilder().dot(et.sort(), recTerm, fieldSymbol);
                 }
             }else{
                 break;

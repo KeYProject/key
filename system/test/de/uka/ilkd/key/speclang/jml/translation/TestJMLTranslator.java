@@ -68,8 +68,8 @@ public class TestJMLTranslator extends TestCase {
             services = javaInfo.getServices();
             TB = services.getTermBuilder();
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
-            atPres.put(services.getTypeConverter().getHeapLDT().getHeap(), TB.var(TB.heapAtPreVar(services, "heapAtPre",
-                    services.getTypeConverter().getHeapLDT().getHeap().sort(), false)));
+            atPres.put(services.getTypeConverter().getHeapLDT().getHeap(), TB.var(TB.heapAtPreVar("heapAtPre", services.getTypeConverter().getHeapLDT().getHeap().sort(),
+                    false)));
 
         }
     }
@@ -185,7 +185,7 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(result != null);
         assertTrue(result.op().equals(Junctor.IMP));
         assertTrue(result.sub(0).op().equals(Junctor.AND));
-        assertTrue(termContains(result, TB.zTerm(services, "5")));
+        assertTrue(termContains(result, TB.zTerm("5")));
         assertTrue(termContains(result, selfVar));
     }
 
@@ -250,7 +250,7 @@ public class TestJMLTranslator extends TestCase {
 
         assertTrue(result != null);
         assertTrue(result.op().equals(Quantifier.ALL));
-        assertTrue(termContains(result, TB.zTerm(services, "2147483647")));
+        assertTrue(termContains(result, TB.zTerm("2147483647")));
         assertTrue(termContains(result, Junctor.AND));
         LogicVariable i =
                 new LogicVariable(new Name("i"),
@@ -258,13 +258,11 @@ public class TestJMLTranslator extends TestCase {
                 "int")));
         Term expected =
                 TB.all(i,
-                       TB.imp(TB.inInt(TB.var(i), services),
-                              TB.and(TB.leq(TB.zTerm(services, "0"),
-                                            TB.var(i),
-                                            services),
+                       TB.imp(TB.inInt(TB.var(i)),
+                              TB.and(TB.leq(TB.zTerm("0"),
+                                            TB.var(i)),
                                      TB.leq(TB.var(i),
-                                            TB.zTerm(services, "2147483647"),
-                                            services))));
+                                            TB.zTerm("2147483647")))));
         assertTrue("Result was: " + result + "; \nExpected was: " + expected,
                    result.equalsModRenaming(expected));
     }
@@ -285,7 +283,7 @@ public class TestJMLTranslator extends TestCase {
 
         assertTrue(result != null);
         assertTrue(result.op().equals(Quantifier.EX));
-        assertTrue(termContains(result, TB.zTerm(services, "2147483647")));
+        assertTrue(termContains(result, TB.zTerm("2147483647")));
         assertTrue(termContains(result, Junctor.AND));
         LogicVariable i =
                 new LogicVariable(new Name("i"),
@@ -293,13 +291,11 @@ public class TestJMLTranslator extends TestCase {
                 "int")));
         Term expected =
                 TB.ex(i,
-                      TB.and(TB.inInt(TB.var(i), services),
-                             TB.and(TB.leq(TB.zTerm(services, "0"),
-                                           TB.var(i),
-                                           services),
+                      TB.and(TB.inInt(TB.var(i)),
+                             TB.and(TB.leq(TB.zTerm("0"),
+                                           TB.var(i)),
                                     TB.leq(TB.var(i),
-                                           TB.zTerm(services, "2147483647"),
-                                           services))));
+                                           TB.zTerm("2147483647")))));
         assertTrue("Result was: " + result + "; \nExpected was: " + expected,
                    result.equalsModRenaming(expected));
     }
@@ -326,8 +322,8 @@ public class TestJMLTranslator extends TestCase {
         Term expected =
                 TB.func(services.getTypeConverter().getIntegerLDT().getJavaCastInt(),
                 TB.bsum(i,
-                        TB.zTerm(services, "0"),
-                        TB.zTerm(services, "2147483647"),
+                        TB.zTerm("0"),
+                        TB.zTerm("2147483647"),
                         TB.var(i), services));
         assertTrue(result != null);
         assertSame(q, result.sub(0).op());
@@ -356,8 +352,8 @@ public class TestJMLTranslator extends TestCase {
                                   (Sort) nss.sorts().lookup(new Name("int")));
         Term expected =
                 TB.bsum(i,
-                        TB.zTerm(services, "0"),
-                        TB.zTerm(services, "2147483647"),
+                        TB.zTerm("0"),
+                        TB.zTerm("2147483647"),
                         TB.var(i), services);
         assertTrue(result != null);
         assertSame(q, result.op());
@@ -382,7 +378,7 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(result != null);
         assertTrue(result.op().equals(Quantifier.EX));
         assertTrue(result.sub(0).op().equals(Junctor.AND));
-        assertTrue(termContains(result, TB.NULL(services)));
+        assertTrue(termContains(result, TB.NULL()));
     }
 
 
@@ -468,7 +464,7 @@ public class TestJMLTranslator extends TestCase {
 
         assertTrue(result != null);
         //assertTrue(termContains(result.getFormula(), AttributeOp.getAttributeOp(array)));
-        assertTrue(termContains(result, TB.NULL(services)));
+        assertTrue(termContains(result, TB.NULL()));
     }
 
 
@@ -516,7 +512,7 @@ public class TestJMLTranslator extends TestCase {
 
         assertTrue(result != null);
         assertTrue(result.op().equals(Equality.EQUALS));
-        assertTrue(termContains(result, TB.zTerm(services, "18")));
+        assertTrue(termContains(result, TB.zTerm("18")));
     }
 
 
@@ -688,19 +684,16 @@ public class TestJMLTranslator extends TestCase {
                 array, services);
         Term expected = TB.all(qv,
                                TB.imp(
-                TB.and(TB.and(TB.equals(TB.dot(services,
-                                               array.sort(),
+                TB.and(TB.and(TB.equals(TB.dot(array.sort(),
                                                TB.var(qv),
                                                fieldSymbol),
-                                        TB.dot(services,
-                                               array.sort(),
+                                        TB.dot(array.sort(),
                                                TB.var(selfVar),
                                                fieldSymbol)),
-                              TB.reachableValue(services,
-                                                TB.var(qv),
+                              TB.reachableValue(TB.var(qv),
                                                 selfVar.getKeYJavaType())),
                        TB.not(TB.equals(TB.var(qv),
-                                        TB.NULL(services)))), // implicit non null
+                                        TB.NULL()))), // implicit non null
                                       TB.equals(TB.var(qv), TB.var(selfVar))));
         assertTrue("Expected:" + ProofSaver.printTerm(expected, services)
                    + "\n Was:" + ProofSaver.printTerm(result, services),

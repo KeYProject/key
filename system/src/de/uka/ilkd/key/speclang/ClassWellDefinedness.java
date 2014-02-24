@@ -89,10 +89,10 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         final Term var = TB.var(sv);
         final Term wdSelf = TB.wd(var, services);
         final Term[] heaps = new Term[] {TB.var(heapSV)};
-        final Term staticInvTerm = TB.staticInv(services, heaps, kjt);
-        final Term invTerm = TB.inv(services, heaps, var);
-        final Term wdHeaps = TB.and(TB.wd(heaps, services));
-        final Term wellFormed = TB.wellFormed(TB.var(heapSV), services);
+        final Term staticInvTerm = TB.staticInv(heaps, kjt);
+        final Term invTerm = TB.inv(heaps, var);
+        final Term wdHeaps = TB.and(TB.wd(heaps));
+        final Term wellFormed = TB.wellFormed(TB.var(heapSV));
         final Term pre = TB.and(wdSelf, wdHeaps, wellFormed);
         final Term staticPre = TB.and(wdHeaps, wellFormed);
         final RewriteTaclet inv =

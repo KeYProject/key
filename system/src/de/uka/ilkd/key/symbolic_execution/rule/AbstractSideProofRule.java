@@ -54,7 +54,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
     * @return The created constant.
     */
    protected Function createResultConstant(Services services, Sort sort) {
-      String functionName = services.getTermBuilder().newName(services, "QueryResult");
+      String functionName = services.getTermBuilder().newName("QueryResult");
       Function function = new Function(new Name(functionName), sort);
       services.getNamespaces().functions().addSafely(function);
       return function;
@@ -67,7 +67,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
     * @return The created result {@link Function}.
     */
    protected Function createResultFunction(Services services, Sort sort) {
-      return new Function(new Name(services.getTermBuilder().newName(services, "ResultPredicate")), Sort.FORMULA, sort);
+      return new Function(new Name(services.getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, sort);
    }
    
    /**

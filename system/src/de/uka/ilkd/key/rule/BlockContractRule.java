@@ -290,7 +290,7 @@ public class BlockContractRule implements BuiltInRule {
         for (LocationVariable variable : variables) {
             if(contract.hasModifiesClause(variable)) {
                 final String anonymisationName =
-                      services.getTermBuilder().newName(services, ANONYMISATION_PREFIX + variable.name());
+                      services.getTermBuilder().newName(ANONYMISATION_PREFIX + variable.name());
                 final Function anonymisationFunction =
                         new Function(new Name(anonymisationName), variable.sort());
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
@@ -518,7 +518,7 @@ public class BlockContractRule implements BuiltInRule {
         private LocationVariable createAndRegisterVariable(final ProgramVariable placeholderVariable)
         {
             if (placeholderVariable != null) {
-                String newName = services.getTermBuilder().newName(services, placeholderVariable.name().toString());
+                String newName = services.getTermBuilder().newName(placeholderVariable.name().toString());
                 LocationVariable newVariable =
                         new LocationVariable(new ProgramElementName(newName),
                                              placeholderVariable.getKeYJavaType());
@@ -623,7 +623,7 @@ public class BlockContractRule implements BuiltInRule {
         {
             Term result = tt();
             for (LocationVariable heap : heaps) {
-                result = and(result, contract.getPrecondition(heap, getBaseHeap(services),
+                result = and(result, contract.getPrecondition(heap, getBaseHeap(),
                                                               terms.self, terms.remembranceHeaps,
                                                               services));
             }
@@ -678,7 +678,7 @@ public class BlockContractRule implements BuiltInRule {
         {
             Term result = tt();
             for (LocationVariable heap : heaps) {
-                result = and(result, contract.getPostcondition(heap, getBaseHeap(services),
+                result = and(result, contract.getPostcondition(heap, getBaseHeap(),
                                                                terms, services));
             }
             return result;
@@ -719,11 +719,6 @@ public class BlockContractRule implements BuiltInRule {
                                               var(remembranceLocalVariable.getValue()));
             }
             return result;
-        }
-
-        private LocationVariable getBaseHeap()
-        {
-            return services.getTypeConverter().getHeapLDT().getHeap();
         }
 
         public Term buildWellFormedAnonymisationHeapsCondition(

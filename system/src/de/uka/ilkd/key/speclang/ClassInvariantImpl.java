@@ -131,7 +131,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
         	= getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap);
         Term res = or.replace(originalInv);
-        res = services.getTermBuilder().convertToFormula(res, services);
+        res = services.getTermBuilder().convertToFormula(res);
         return res;
     }
 

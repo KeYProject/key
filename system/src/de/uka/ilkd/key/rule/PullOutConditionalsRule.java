@@ -166,8 +166,7 @@ public final class PullOutConditionalsRule implements BuiltInRule {
 	final Map<Term,Term> map = new LinkedHashMap<Term,Term>();
 	for(List<Term> equivalenceClass : equivalenceClasses) {	    
 	    if(equivalenceClass.size() > 1) {
-		final Function f = new Function(new Name(services.getTermBuilder().newName(services, 
-								    "cond")), 
+		final Function f = new Function(new Name(services.getTermBuilder().newName("cond")), 
 		                                equivalenceClass.get(0).sort());
 		final Term fTerm = services.getTermBuilder().func(f);
 		services.getNamespaces().functions().addSafely(f);

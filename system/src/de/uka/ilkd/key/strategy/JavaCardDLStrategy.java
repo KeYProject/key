@@ -1818,9 +1818,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                    
         final TermBuffer one = new TermBuffer ();
         final Services services = p_proof.getServices ();
-      one.setContent ( services.getTermBuilder().zTerm ( services, "1" ) );
+      one.setContent ( services.getTermBuilder().zTerm ( "1" ) );
         final TermBuffer two = new TermBuffer ();
-        two.setContent ( services.getTermBuilder().zTerm ( services, "2" ) );
+        two.setContent ( services.getTermBuilder().zTerm ( "2" ) );
 
         bindRuleSet ( d, "inEqSimp_or_tautInEqs",
            SumFeature.createSum ( new Feature[] {
@@ -2053,7 +2053,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer intRel = new TermBuffer ();
         final TermBuffer atom = new TermBuffer ();
         final TermBuffer zero = new TermBuffer ();
-        zero.setContent ( p_proof.getServices().getTermBuilder().zTerm ( p_proof.getServices (), "0" ) );
+        zero.setContent ( p_proof.getServices().getTermBuilder().zTerm ( "0" ) );
         final TermBuffer rootInf = new TermBuffer ();
 
         final Feature posNegSplitting =

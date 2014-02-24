@@ -113,7 +113,7 @@ public class ContractFactory {
 
     /** Add the specification contained in InitiallyClause as a postcondition. */
     public FunctionalOperationContract addPost(FunctionalOperationContract old, InitiallyClause ini) {
-        final ProgramVariable selfVar = tb.selfVar(services, ini.getKJT(), true);
+        final ProgramVariable selfVar = tb.selfVar(ini.getKJT(), true);
         return addPost(old, ini.getClause(selfVar, services), null, null, null, null, null);
     }
 
@@ -211,17 +211,17 @@ public class ContractFactory {
                                   Triple<IObserverFunction, Term, Term> dep,
                                   ProgramVariable selfVar) {
         final ImmutableList<ProgramVariable> paramVars =
-                tb.paramVars(services, dep.first, false);
+                tb.paramVars(dep.first, false);
         assert (selfVar == null) == dep.first.isStatic();
         Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable, Term>();
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
-                 selfVar == null ? tb.tt() : tb.inv(services, tb.var(selfVar)));
+                 selfVar == null ? tb.tt() : tb.inv(tb.var(selfVar)));
         Map<ProgramVariable,Term> accessibles = new LinkedHashMap<ProgramVariable, Term>();
         for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
         	if(heap == targetHeap) {
               accessibles.put(heap, dep.second);
         	}else{
-              accessibles.put(heap, tb.allLocs(services));        		
+              accessibles.put(heap, tb.allLocs());        		
         	}
         }
         // TODO: insert static invariant??
@@ -458,9 +458,8 @@ public class ContractFactory {
                             nm = m1;
                         } else {
                             Term ownPre = pres.get(h) == null ? pres.get(h) : tb.tt();
-                            nm = tb.intersect(services,
-                                    tb.ife(ownPre, m1, tb.allLocs(services)),
-                                    tb.ife(otherPre, m2, tb.allLocs(services)));
+                            nm = tb.intersect(tb.ife(ownPre, m1, tb.allLocs()),
+                                    tb.ife(otherPre, m2, tb.allLocs()));
                         }
                         mods.put(h, nm);
                     }
@@ -481,7 +480,7 @@ public class ContractFactory {
                     } else if(a2 == null) {
                         na = a1;
                     }else {
-                        na = tb.union(services, a1, a2);
+                        na = tb.union(a1, a2);
                     }
                     deps.put(h, na);
                 }
@@ -501,7 +500,7 @@ public class ContractFactory {
                         }else if(a2Pre == null) {
                             naPre = a1Pre;
                         }else{
-                            naPre = tb.union(services, a1Pre, a2Pre);
+                            naPre = tb.union(a1Pre, a2Pre);
                         }
                         deps.put(hPre, naPre);
                     }

@@ -95,7 +95,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
         
         //<inv> is special case (because it's really a predicate, not a boolean attribute)
         if(name.equals("<inv>") && receiver.isTerm()) {
-            return new SLExpression(services.getTermBuilder().inv(services, receiver.getTerm()));
+            return new SLExpression(services.getTermBuilder().inv(receiver.getTerm()));
         }
         
         ProgramVariable attribute = null;
@@ -122,7 +122,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                     if(recTerm != null){
                 	final Function thisFieldSymbol 
                 		= heapLDT.getFieldSymbolForPV(et, services);
-                        recTerm = services.getTermBuilder().dot(services, et.sort(), recTerm, thisFieldSymbol);
+                        recTerm = services.getTermBuilder().dot(et.sort(), recTerm, thisFieldSymbol);
                     }
                 } else {
                     break;
@@ -139,7 +139,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
         	return new SLExpression(services.getTermBuilder().var(attribute), 
         				attribute.getKeYJavaType());
             } else if(attribute == javaInfo.getArrayLength()) {
-        	return new SLExpression(services.getTermBuilder().dotLength(services, recTerm), 
+        	return new SLExpression(services.getTermBuilder().dotLength(recTerm), 
         		                attribute.getKeYJavaType());
             } else {
         	try {
@@ -149,12 +149,10 @@ public final class SLAttributeResolver extends SLExpressionResolver {
         	    		                       services);
         	    Term attributeTerm;
         	    if(attribute.isStatic()) {
-        		attributeTerm = services.getTermBuilder().staticDot(services, 
-        					     attribute.sort(), 
+        		attributeTerm = services.getTermBuilder().staticDot(attribute.sort(), 
         					     fieldSymbol);
         	    } else {
-        		attributeTerm = services.getTermBuilder().dot(services, 
-        				       attribute.sort(), 
+        		attributeTerm = services.getTermBuilder().dot(attribute.sort(), 
         				       recTerm, 
         				       fieldSymbol);
         	    }

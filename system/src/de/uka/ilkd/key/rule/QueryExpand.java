@@ -148,9 +148,9 @@ public class QueryExpand implements BuiltInRule {
 
            //Names for additional symbols
 
-           final String calleeName     = tb.newName(services, "callee");
-           final String progResultName = tb.newName(services, "queryResult");
-           final String logicResultName= tb.newName(services, "res_"+method.getName());
+           final String calleeName     = tb.newName("callee");
+           final String progResultName = tb.newName("queryResult");
+           final String logicResultName= tb.newName("res_"+method.getName());
            //For declaring the symbol that stores the result in a logical term a trick is done.
            //The new symbolc is introduced as a logical variable that is later skolemized by the ex_left rule.
            //  LogicVariable logicResultQV = new LogicVariable(new Name("res_"+method.getName()),query.sort());
@@ -228,14 +228,14 @@ public class QueryExpand implements BuiltInRule {
            final Term methodCall = tb.dia(jb, tb.not(tb.equals(tb.var(result),placeHolderResultTrm)));  //Not sure if box or diamond should be used.
            //final Term methodCall = tb.box(jb, tb.equals(tb.var(result), query));
 
-           Term update = tb.elementary(services, services.getTypeConverter().getHeapLDT().getHeap(), query.sub(0));
+           Term update = tb.elementary(services.getTypeConverter().getHeapLDT().getHeap(), query.sub(0));
            if (callee != null) {
-               update = tb.parallel(tb.elementary(services, tb.var(callee), query.sub(1)), update);
+               update = tb.parallel(tb.elementary(tb.var(callee), query.sub(1)), update);
            }
 
            final Term[] argUpdates = new Term[args.size()];
            for (int i = 0; i<args.size(); i++) {
-               argUpdates[i] = tb.elementary(services, tb.var(args.get(i)), query.sub(offset+1+i));
+               argUpdates[i] = tb.elementary(tb.var(args.get(i)), query.sub(offset+1+i));
            }
 
            update = tb.parallel(update, tb.parallel(argUpdates));
@@ -264,7 +264,7 @@ public class QueryExpand implements BuiltInRule {
         int i = 0;
         for (final ParameterDeclaration pdecl : paramDecls) {
         	final String baseName = pdecl.getVariableSpecification().getName();
-        	final String newName = services.getTermBuilder().newName(services,baseName);
+        	final String newName = services.getTermBuilder().newName(baseName);
             final ProgramElementName argVarName = new ProgramElementName(newName);
             args[i] = new LocationVariable(argVarName,
                     pdecl.getVariableSpecification().getProgramVariable().getKeYJavaType());

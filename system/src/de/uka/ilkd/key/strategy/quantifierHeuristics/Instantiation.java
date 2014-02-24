@@ -127,7 +127,7 @@ class Instantiation {
     private Term createArbitraryInstantiation(QuantifiableVariable var,
 	    Services services) {
         return services.getTermBuilder().func (var.sort().getCastSymbol (services),
-              services.getTermBuilder().zero(services));
+              services.getTermBuilder().zero());
     }
 
     private void addInstance(Substitution sub, Services services) {

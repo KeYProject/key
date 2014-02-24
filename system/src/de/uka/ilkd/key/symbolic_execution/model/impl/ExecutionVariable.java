@@ -306,7 +306,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
       if (SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
          // Static field access
          Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), getServices());
-         return getServices().getTermBuilder().staticDot(getServices(), getProgramVariable().sort(), function);
+         return getServices().getTermBuilder().staticDot(getProgramVariable().sort(), function);
       }
       else {
          if (getParentValue() == null) {
@@ -324,13 +324,13 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
                else {
                   // Field access on the parent variable
                   Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), getServices());
-                  return getServices().getTermBuilder().dot(getServices(), getProgramVariable().sort(), parentTerm, function);
+                  return getServices().getTermBuilder().dot(getProgramVariable().sort(), parentTerm, function);
                }
             }
             else {
                // Special handling for array indices.
-               Term idx = getServices().getTermBuilder().zTerm(getServices(), "" + arrayIndex);
-               return getServices().getTermBuilder().dotArr(getServices(), parentTerm, idx);
+               Term idx = getServices().getTermBuilder().zTerm("" + arrayIndex);
+               return getServices().getTermBuilder().dotArr(parentTerm, idx);
             }
          }
       }

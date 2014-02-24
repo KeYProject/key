@@ -382,8 +382,8 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
             if (visitedOp instanceof ElementaryUpdate
                     && elementaryUpdateLhs != null) {
                 assert neededsubs.length == 1;
-                Term newTerm = services.getTermBuilder().elementary(services,
-                        elementaryUpdateLhs, neededsubs[0]);
+                Term newTerm = services.getTermBuilder().elementary(elementaryUpdateLhs,
+                        neededsubs[0]);
                 ImmutableArray<TermLabel> labels =
                         instantiateLabels(visited, newTerm.op(), newTerm.subs(), newTerm.boundVars(),
                                           newTerm.javaBlock(), "elementary");

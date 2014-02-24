@@ -91,7 +91,7 @@ public final class DLSpecFactory {
 	    if(!(eu.lhs() instanceof ProgramVariable)) {
 		throw new ProofInputException("Program variable expected, "
 				              + "but found: " + eu.lhs());
-	    } else if(!update.sub(0).equals(services.getTermBuilder().getBaseHeap(services))) {
+	    } else if(!update.sub(0).equals(services.getTermBuilder().getBaseHeap())) {
 		throw new ProofInputException("heap expected, "
 					      + "but found: " + update.sub(0));
 	    } else {
@@ -282,7 +282,7 @@ public final class DLSpecFactory {
 	//heapAtPre variable may be omitted
 	TermBuilder tb = services.getTermBuilder();
 	if(heapAtPreVar == null) {
-	    heapAtPreVar = tb.heapAtPreVar(services, heapLDT.getHeap() + "AtPre", heapLDT.getHeap().sort(), false);
+	    heapAtPreVar = tb.heapAtPreVar(heapLDT.getHeap() + "AtPre", heapLDT.getHeap().sort(), false);
 	}
         Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
         atPreVars.put(heapLDT.getHeap(), heapAtPreVar);
@@ -291,13 +291,13 @@ public final class DLSpecFactory {
 
 	//result variable may be omitted
 	if(resultVar == null && !pm.isVoid()) {
-	    resultVar = tb.resultVar(services, pm, false);
+	    resultVar = tb.resultVar(pm, false);
 	}
 
 	//exception variable may be omitted
 	if(excVar == null) {
-	    excVar = tb.excVar(services, pm, false);
-	    Term excNullTerm = tb.equals(tb.var(excVar), tb.NULL(services));
+	    excVar = tb.excVar(pm, false);
+	    Term excNullTerm = tb.equals(tb.var(excVar), tb.NULL());
 	    if(modality == Modality.DIA) {
 		post = tb.and(post, excNullTerm);
 	    } else if(modality == Modality.BOX) {

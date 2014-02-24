@@ -111,14 +111,12 @@ public class HandleArith {
         if ( cd.op() == Junctor.FALSE || ab.op() == Junctor.FALSE ) return problem;
         Function addfun = services.getTypeConverter ().getIntegerLDT ().getAdd();
         Term arithTerm = tb.geq ( tb.func ( addfun, cd.sub ( 0 ), ab.sub ( 1 ) ),
-                                  tb.func ( addfun, ab.sub ( 0 ), cd.sub ( 1 ) ),
-                                  services );
+                                  tb.func ( addfun, ab.sub ( 0 ), cd.sub ( 1 ) ) );
         Term res = provedByArith ( arithTerm, services );
         if ( res.op() == Junctor.TRUE ) return trueT;
         Term t0 = formatArithTerm ( tb.not ( problem ), services );
         arithTerm = tb.geq ( tb.func ( addfun, t0.sub ( 0 ), ab.sub ( 1 ) ),
-                             tb.func ( addfun, ab.sub ( 0 ), t0.sub ( 1 ) ),
-                             services );
+                             tb.func ( addfun, ab.sub ( 0 ), t0.sub ( 1 ) ) );
         res = provedByArith ( arithTerm, services );
         if ( res.op() == Junctor.TRUE ) return falseT;
         return problem;
@@ -151,18 +149,16 @@ public class HandleArith {
                         pro = tb.geq ( pro.sub ( 1 ),
                                        tb.func ( ig.getAdd(),
                                                  pro.sub ( 0 ),
-                                                 ig.one() ),
-                                       services );
+                                                 ig.one() ) );
         } else {
             if ( op == leq ) {
                 if ( opNot )
                     pro = tb.geq ( pro.sub ( 0 ),
                                    tb.func ( ig.getAdd (),
                                              pro.sub ( 1 ),
-                                             ig.one() ),
-                                   services );
+                                             ig.one() ) );
                 else
-                    pro = tb.geq ( pro.sub ( 1 ), pro.sub ( 0 ), services );
+                    pro = tb.geq ( pro.sub ( 1 ), pro.sub ( 0 ) );
             } else
                 pro = falseT;
         }

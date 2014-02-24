@@ -85,7 +85,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     private static Function createAnonHeap(LocationVariable heap,
                                            Services services) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final Name anonHeapName = new Name(services.getTermBuilder().newName(services, "anon_"+heap.toString()));
+        final Name anonHeapName = new Name(services.getTermBuilder().newName("anon_"+heap.toString()));
         final Function anonHeap = new Function(anonHeapName, heapLDT.targetSort());
         return anonHeap;
     }
@@ -94,9 +94,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                                                KeYJavaType selfKJT,
                                                Services services) {
         if (pm == null) {
-            return services.getTermBuilder().selfVar(services, selfKJT, false);
+            return services.getTermBuilder().selfVar(selfKJT, false);
         } else {
-            return services.getTermBuilder().selfVar(services, pm, selfKJT, true);
+            return services.getTermBuilder().selfVar(pm, selfKJT, true);
         }
     }
 
@@ -105,7 +105,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         if (pm == null) {
             return null;
         } else {
-            return services.getTermBuilder().resultVar(services, pm, true);
+            return services.getTermBuilder().resultVar(pm, true);
         }
     }
 
@@ -114,7 +114,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         if (pm == null) {
             return null;
         } else {
-            return services.getTermBuilder().excVar(services, pm, true);
+            return services.getTermBuilder().excVar(pm, true);
         }
     }
 
@@ -123,7 +123,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final Map<LocationVariable, ProgramVariable> res =
                 new LinkedHashMap<LocationVariable, ProgramVariable>();
         final ProgramVariable atPre =
-              services.getTermBuilder().heapAtPreVar(services, heap.name()+"AtPre", heap.sort(), true);
+              services.getTermBuilder().heapAtPreVar(heap.name()+"AtPre", heap.sort(), true);
         res.put(heap, atPre);
         return res;
     }
@@ -146,7 +146,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                                                                ImmutableList<ProgramVariable>
                                                                           origParams,
                                                                Services services) {
-        final ImmutableList<ProgramVariable> params = services.getTermBuilder().paramVars(services, target, true);
+        final ImmutableList<ProgramVariable> params = services.getTermBuilder().paramVars(target, true);
         return addGhostParams(params, origParams);
     }
 
@@ -252,14 +252,14 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                 check.getPre(po.pre, vars.self, vars.heap, vars.params, false, services);
         final Term wdPre = TB.wd(preCond.term, services);
         final Term wdMod = TB.wd(po.mod, services);
-        final Term wdRest = TB.and(TB.wd(po.rest, services));
+        final Term wdRest = TB.and(TB.wd(po.rest));
         register(preCond.func);
         mbyAtPre = preCond.func != null ? check.replace(TB.func(preCond.func), vars) : null;
         final Term post = check.getPost(po.post, vars.result, services);
         final Term pre = preCond.term;
         final Term updates = check.getUpdates(po.mod, vars.heap, vars.heapAtPre,
                                               vars.anonHeap, services);
-        final Term wfAnon = TB.wellFormed(vars.anonHeap, services);
+        final Term wfAnon = TB.wellFormed(vars.anonHeap);
         final Term uPost = check instanceof ClassWellDefinedness ?
                 TB.tt() : TB.apply(updates, TB.wd(post, services));
         final Term imp = TB.imp(TB.and(pre, wfAnon),

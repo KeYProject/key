@@ -100,7 +100,7 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
       Map<LocationVariable,LocationVariable> atPreVars = UseOperationContractRule.computeAtPreVars(heapContext, getServices(), inst);
       Map<LocationVariable,Term> atPres = HeapContext.getAtPres(atPreVars, getServices());
       LocationVariable baseHeap = getServices().getTypeConverter().getHeapLDT().getHeap();
-      Term baseHeapTerm = getServices().getTermBuilder().getBaseHeap(getServices());
+      Term baseHeapTerm = getServices().getTermBuilder().getBaseHeap();
       
       Term contractSelf = null;
       if (contract.hasSelfVar()) {

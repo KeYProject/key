@@ -139,7 +139,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
         }
 
         protected Term generateOneTerm(Term superterm, int child) {
-            final Term index = services.getTermBuilder().zTerm ( services, "" + child );
+            final Term index = services.getTermBuilder().zTerm ( "" + child );
             return services.getTermBuilder().tf().createTerm( binFunc, superterm, index );
         }
     }

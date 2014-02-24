@@ -78,14 +78,14 @@ public final class DependencyContractPO extends AbstractPO
 	final Term selfNotNull 
             = selfVar == null
               ? TB.tt()
-              : TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
+              : TB.not(TB.equals(TB.var(selfVar), TB.NULL()));
               
         //"self.<created> = TRUE" for all heaps
 
         Term selfCreated = null;
         if (selfVar != null) {
             for(LocationVariable h : heaps) {
-                final Term sc = TB.created(services, TB.var(h), TB.var(selfVar));
+                final Term sc = TB.created(TB.var(h), TB.var(selfVar));
                 if (selfCreated == null) {
                     selfCreated = sc;
                 }else{
@@ -94,7 +94,7 @@ public final class DependencyContractPO extends AbstractPO
             }
             if (preHeaps != null) {
                 for(LocationVariable h : preHeaps) {
-                    final Term sc = TB.created(services, TB.var(h), TB.var(selfVar));
+                    final Term sc = TB.created(TB.var(h), TB.var(selfVar));
                     if (selfCreated == null) {
                        selfCreated = sc;
                     } else {
@@ -110,8 +110,7 @@ public final class DependencyContractPO extends AbstractPO
         final Term selfExactType
            = selfVar == null
              ? TB.tt()
-             : TB.exactInstance(services, 
-        	                selfKJT.getSort(), 
+             : TB.exactInstance(selfKJT.getSort(), 
         	                TB.var(selfVar));
 
 
@@ -120,7 +119,7 @@ public final class DependencyContractPO extends AbstractPO
         //- "inBounds(p_i)" for integer parameters
         Term paramsOK = TB.tt();
         for(ProgramVariable paramVar : paramVars) {
-            paramsOK = TB.and(paramsOK, TB.reachableValue(services, paramVar));
+            paramsOK = TB.and(paramsOK, TB.reachableValue(paramVar));
         }
 
         //initial value of measured_by clause
@@ -137,10 +136,10 @@ public final class DependencyContractPO extends AbstractPO
 */
             final Term mby = contract.getMby(selfVar, paramVars, services);
 //            mbyAtPreDef = TB.equals(mbyAtPre, mby);
-            mbyAtPreDef = TB.measuredBy(mby, services);
+            mbyAtPreDef = TB.measuredBy(mby);
         } else {
 //            mbyAtPreDef = TB.tt();
-            mbyAtPreDef = TB.measuredByEmpty(services);
+            mbyAtPreDef = TB.measuredByEmpty();
         }        
              
         return TB.and(wellFormedHeaps, selfNotNull, selfCreated,
@@ -166,9 +165,9 @@ public final class DependencyContractPO extends AbstractPO
 	//prepare variables
 	final ProgramVariable selfVar
                 = !contract.getTarget().isStatic() 
-                ? TB.selfVar(services, contract.getKJT(), true) : null;
+                ? TB.selfVar(contract.getKJT(), true) : null;
 	final ImmutableList<ProgramVariable> paramVars
-		= TB.paramVars(services, target, true);
+		= TB.paramVars(target, true);
 
 	final boolean twoState = (contract.getTarget().getStateCount() == 2);
 	final int heapCount = contract.getTarget().getHeapCount(services);
@@ -185,7 +184,7 @@ public final class DependencyContractPO extends AbstractPO
 	    }
 	    heaps.add(h);
 	    LocationVariable preVar = twoState ?
-	            TB.heapAtPreVar(services, h.name()+"AtPre", h.sort(), true)
+	            TB.heapAtPreVar(h.name()+"AtPre", h.sort(), true)
 	            : null ;
 	    if(preVar != null) { register(preVar); }
 	    preHeapVars.put(h, preVar);
@@ -205,18 +204,18 @@ public final class DependencyContractPO extends AbstractPO
         Term wellFormedHeaps = null;
         Term update = null;
         for(LocationVariable h : heaps) {
-            final Term wellFormedHeap = TB.wellFormed(h, services);
+            final Term wellFormedHeap = TB.wellFormed(h);
             if(wellFormedHeaps == null) {
                 wellFormedHeaps = wellFormedHeap;
             } else {
                 wellFormedHeaps = TB.and(wellFormedHeaps, wellFormedHeap);
             }
             //prepare anon heap
-            final Name anonHeapName = new Name(TB.newName(services, "anon_"+h.toString()));
+            final Name anonHeapName = new Name(TB.newName("anon_"+h.toString()));
             final Function anonHeapFunc = new Function(anonHeapName, heapLDT.targetSort());
             register(anonHeapFunc);
             final Term anonHeap = TB.label(TB.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
-            final Term wellFormedAnonHeap = TB.wellFormed(anonHeap, services);
+            final Term wellFormedAnonHeap = TB.wellFormed(anonHeap);
             if(wellFormedHeaps == null) {
                 wellFormedHeaps = wellFormedAnonHeap;
             } else {
@@ -227,9 +226,9 @@ public final class DependencyContractPO extends AbstractPO
             final Term dep = getContract().getDep(atPre ?
                     preHeapVarsReverse.get(h) : h, atPre, selfVar, paramVars, preHeapVars, services);
             final Term changedHeap =
-                    TB.anon(services, TB.var(h),
-                            TB.setMinus(services, TB.allLocs(services), dep), anonHeap);
-            final Term u = TB.elementary(services, h, changedHeap);
+                    TB.anon(TB.var(h), TB.setMinus(TB.allLocs(), dep),
+                            anonHeap);
+            final Term u = TB.elementary(h, changedHeap);
             if (update == null) {
                 update = u;
             } else {

@@ -202,7 +202,7 @@ public class Polynomial {
                               ( add, res, it.next ().toTerm ( services ) );
         }
         
-        final Term cTerm = services.getTermBuilder().zTerm(services, constantPart.toString());
+        final Term cTerm = services.getTermBuilder().zTerm(constantPart.toString());
         
         if ( res == null )
             res = cTerm;

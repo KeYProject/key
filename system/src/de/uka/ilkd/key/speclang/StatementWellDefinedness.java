@@ -105,7 +105,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
                                       Term leadingUpdate, Services services) {
         final Term pre = getPre(po.pre, vars.self, vars.heap, vars.params, false, services).term;
         final Term post = getPost(po.post, vars.result, services);
-        final ImmutableList<Term> wdRest = TB.wd(po.rest, services);
+        final ImmutableList<Term> wdRest = TB.wd(po.rest);
         final Term updates = getUpdates(po.mod, vars.heap, vars.heap, vars.anonHeap, services);
         final Term uPost = TB.apply(updates, TB.and(TB.wd(post, services), TB.and(wdRest)));
         return new SequentTerms(leadingUpdate, pre, vars.anonHeap, po.mod, po.rest, uPost, services);
@@ -201,9 +201,9 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
                              ImmutableList<Term> rest, Term anonWdPost, Services services) {
             this.context = context;
             this.pre = pre;
-            this.wfAnon = anonHeap != null ? TB.wellFormed(anonHeap, services) : TB.tt();
+            this.wfAnon = anonHeap != null ? TB.wellFormed(anonHeap) : TB.tt();
             this.wdMod = TB.wd(mod, services);
-            this.wdRest = TB.and(TB.wd(rest, services));
+            this.wdRest = TB.and(TB.wd(rest));
             this.anonWdPost = anonWdPost;
         }
     }

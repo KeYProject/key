@@ -70,10 +70,10 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
         
         public Term createIfElseTerm(Term phi, Services services){
             if(rhs1.equals(rhs2)){
-                return services.getTermBuilder().elementary(services, op, rhs1);
+                return services.getTermBuilder().elementary(op, rhs1);
             }
             Term ifThenElse = services.getTermBuilder().ife(phi, rhs1, rhs2);
-            return services.getTermBuilder().elementary(services,op,ifThenElse);
+            return services.getTermBuilder().elementary(op, ifThenElse);
             
         }
         

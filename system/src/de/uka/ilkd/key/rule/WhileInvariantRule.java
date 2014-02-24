@@ -143,11 +143,12 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term anonUpdate = null;
         for(ProgramVariable pv : localOuts) {
             final String anonFuncName 
-                = services.getTermBuilder().newName(services, pv.name().toString());
+                = services.getTermBuilder().newName(pv.name().toString());
             final Function anonFunc 
                 = new Function(new Name(anonFuncName), pv.sort());
             services.getNamespaces().functions().addSafely(anonFunc);
-            final Term elemUpd = services.getTermBuilder().elementary(services, (LocationVariable)pv, services.getTermBuilder().func(anonFunc));
+            final Term elemUpd = services.getTermBuilder().elementary((LocationVariable)pv,
+                                                                      services.getTermBuilder().func(anonFunc));
             if(anonUpdate == null) {
                 anonUpdate = elemUpd;
             }else{
@@ -165,7 +166,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                              Term mod,
                                              Services services) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final Name anonHeapName = new Name(services.getTermBuilder().newName(services, "anon_"+heap.name()+"_loop"));
+        final Name anonHeapName = new Name(services.getTermBuilder().newName("anon_"+heap.name()+"_loop"));
         final Function anonHeapFunc = new Function(anonHeapName,
                 heapLDT.targetSort());
         services.getNamespaces().functions().addSafely(anonHeapFunc);
@@ -176,7 +177,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         if(services.getTermBuilder().strictlyNothing().equals(mod)) {
             anonUpdate = services.getTermBuilder().skip();
         } else {
-            anonUpdate = services.getTermBuilder().anonUpd(heap, services, mod, anonHeapTerm);
+            anonUpdate = services.getTermBuilder().anonUpd(heap, mod, anonHeapTerm);
         }
 
         return new Pair<Term,Term>(anonUpdate, anonHeapTerm);
@@ -210,14 +211,14 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     private Pair<Term,Term> prepareVariant (Instantiation inst, Term variant, Services services) {
         final ProgramElementName variantName 
-            = new ProgramElementName(services.getTermBuilder().newName(services, "variant"));
+            = new ProgramElementName(services.getTermBuilder().newName("variant"));
         final LocationVariable variantPV = new LocationVariable(variantName, Sort.ANY);
         services.getNamespaces().programVariables().addSafely(variantPV);
 
         final boolean dia = ((Modality)inst.progPost.op()).terminationSensitive();
         final Term variantUpdate 
-            = dia ? services.getTermBuilder().elementary(services, variantPV, variant) : services.getTermBuilder().skip();
-        final Term variantPO = dia ? services.getTermBuilder().prec(variant, services.getTermBuilder().var(variantPV), services) : services.getTermBuilder().tt();
+            = dia ? services.getTermBuilder().elementary(variantPV, variant) : services.getTermBuilder().skip();
+        final Term variantPO = dia ? services.getTermBuilder().prec(variant, services.getTermBuilder().var(variantPV)) : services.getTermBuilder().tt();
         return new Pair<Term,Term> (variantUpdate,variantPO);
     }
 
@@ -281,7 +282,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                        final KeYJavaType booleanKJT,
                                                        final Services services) {
         final ProgramElementName guardVarName 
-        = new ProgramElementName(services.getTermBuilder().newName(services, "b"));
+        = new ProgramElementName(services.getTermBuilder().newName("b"));
         final LocationVariable guardVar = new LocationVariable(guardVarName, 
                 booleanKJT);
         services.getNamespaces().programVariables().addSafely(guardVar);        
@@ -301,9 +302,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         = JavaBlock.createJavaBlock(new StatementBlock(
                 guardVarMethodFrame));
         final Term guardTrueTerm = services.getTermBuilder().equals(services.getTermBuilder().var(guardVar), 
-                services.getTermBuilder().TRUE(services));
+                services.getTermBuilder().TRUE());
         final Term guardFalseTerm = services.getTermBuilder().equals(services.getTermBuilder().var(guardVar), 
-                services.getTermBuilder().FALSE(services));
+                services.getTermBuilder().FALSE());
         return new Triple<JavaBlock, Term, Term>(guardJb,guardTrueTerm,guardFalseTerm);
     }
 
@@ -457,14 +458,14 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term reachableIn = services.getTermBuilder().tt();
         for(ProgramVariable pv : localIns) {
             reachableIn = services.getTermBuilder().and(reachableIn, 
-                    services.getTermBuilder().reachableValue(services, pv));
+                    services.getTermBuilder().reachableValue(pv));
         }	
         final ImmutableSet<ProgramVariable> localOuts 
             = MiscTools.getLocalOuts(inst.loop, services);
         Term reachableOut = services.getTermBuilder().tt();
         for(ProgramVariable pv : localOuts) {
             reachableOut = services.getTermBuilder().and(reachableOut, 
-                    services.getTermBuilder().reachableValue(services, pv));
+                    services.getTermBuilder().reachableValue(pv));
         }
 
         Term beforeLoopUpdate = null;
@@ -474,9 +475,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         for(LocationVariable heap : heapContext) {
             heapToBeforeLoop.put(heap, new LinkedHashMap<Term,Term>());
             final LocationVariable lv =
-                    services.getTermBuilder().heapAtPreVar(services, heap.name()+"BeforeLoop", heap.sort(), true);
+                    services.getTermBuilder().heapAtPreVar(heap.name()+"BeforeLoop", heap.sort(), true);
             services.getNamespaces().programVariables().addSafely(lv);
-            final Term u = services.getTermBuilder().elementary(services, lv, services.getTermBuilder().var(heap));
+            final Term u = services.getTermBuilder().elementary(lv, services.getTermBuilder().var(heap));
             if(beforeLoopUpdate == null) {
                 beforeLoopUpdate = u;
             }else{
@@ -487,15 +488,13 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         for(ProgramVariable pv : localOuts) {
             final String pvBeforeLoopName 
-            = services.getTermBuilder().newName(services, pv.name().toString() + "BeforeLoop");
+            = services.getTermBuilder().newName(pv.name().toString() + "BeforeLoop");
             final LocationVariable pvBeforeLoop 
             = new LocationVariable(new ProgramElementName(pvBeforeLoopName), 
                     pv.getKeYJavaType());
             services.getNamespaces().programVariables().addSafely(pvBeforeLoop);
             beforeLoopUpdate = services.getTermBuilder().parallel(beforeLoopUpdate, 
-                    services.getTermBuilder().elementary(services, 
-                            pvBeforeLoop, 
-                            services.getTermBuilder().var(pv)));
+                    services.getTermBuilder().elementary(pvBeforeLoop, services.getTermBuilder().var(pv)));
             heapToBeforeLoop.get(services.getTypeConverter().getHeapLDT().getHeap()).put(
                     services.getTermBuilder().var(pv), services.getTermBuilder().var(pvBeforeLoop));
         }
@@ -515,9 +514,9 @@ public final class WhileInvariantRule implements BuiltInRule {
                 anonUpdate = services.getTermBuilder().parallel(anonUpdate, tAnon.first);
             }            
             if(wellFormedAnon == null) {
-                wellFormedAnon = services.getTermBuilder().wellFormed(tAnon.second, services);
+                wellFormedAnon = services.getTermBuilder().wellFormed(tAnon.second);
             } else {
-                wellFormedAnon = services.getTermBuilder().and(wellFormedAnon, services.getTermBuilder().wellFormed(tAnon.second, services));
+                wellFormedAnon = services.getTermBuilder().and(wellFormedAnon, services.getTermBuilder().wellFormed(tAnon.second));
             }
             if (anonHeap == null) {
                 anonHeap = tAnon.second;
@@ -525,16 +524,16 @@ public final class WhileInvariantRule implements BuiltInRule {
             final Term m = mods.get(heap);
             final Term fc;
             if(services.getTermBuilder().strictlyNothing().equals(m)) {
-                fc = services.getTermBuilder().frameStrictlyEmpty(services, services.getTermBuilder().var(heap), heapToBeforeLoop.get(heap)); 
+                fc = services.getTermBuilder().frameStrictlyEmpty(services.getTermBuilder().var(heap), heapToBeforeLoop.get(heap)); 
             }else{
-                fc = services.getTermBuilder().frame(services, services.getTermBuilder().var(heap), heapToBeforeLoop.get(heap), m);
+                fc = services.getTermBuilder().frame(services.getTermBuilder().var(heap), heapToBeforeLoop.get(heap), m);
             }
             if(frameCondition == null){
                 frameCondition = fc;
             }else{
                 frameCondition = services.getTermBuilder().and(frameCondition, fc);
             }
-            reachableState = services.getTermBuilder().and(reachableState, services.getTermBuilder().wellFormed(heap, services));
+            reachableState = services.getTermBuilder().and(reachableState, services.getTermBuilder().wellFormed(heap));
         }
         //prepare variant
         final Pair<Term,Term> variantPair = prepareVariant(inst, variant, services);

@@ -56,6 +56,6 @@ public class CoeffGcdProjection implements ProjectionToTerm {
         final Polynomial poly = Polynomial.create ( polyT, services );
 
         final BigInteger gcd = mono.getCoefficient ().gcd ( poly.coeffGcd () );
-        return services.getTermBuilder().zTerm ( services, gcd.abs ().toString () );
+        return services.getTermBuilder().zTerm ( gcd.abs ().toString () );
     }
 }

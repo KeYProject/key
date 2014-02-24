@@ -159,7 +159,7 @@ public class TacletGenerator {
         final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
         
         TermBuilder tb = services.getTermBuilder();
-        originalAxiom = tb.convertToFormula(originalAxiom, services);
+        originalAxiom = tb.convertToFormula(originalAxiom);
 
         // create schema terms
         ImmutableList<ProgramVariable> pvs = ImmutableSLList.<ProgramVariable>nil();
@@ -300,7 +300,7 @@ public class TacletGenerator {
         if (target.isStatic() || finalClass) {
             ifSeq = null;
         } else {
-            final Term ifFormula = TB.exactInstance(services, kjt.getSort(), TB.var(
+            final Term ifFormula = TB.exactInstance(kjt.getSort(), TB.var(
                     selfSV));
             final SequentFormula ifCf = new SequentFormula(ifFormula);
             final Semisequent ifSemiSeq = Semisequent.EMPTY_SEMISEQUENT.insertFirst(
@@ -317,14 +317,14 @@ public class TacletGenerator {
             Term wfFormula = null;
             Term createdFormula = null;
             for(SchemaVariable heapSV : heapSVs) {
-                final Term wf = TB.wellFormed(TB.var(heapSV), services);
+                final Term wf = TB.wellFormed(TB.var(heapSV));
                 if (wfFormula == null) {
                     wfFormula = wf;
                 } else {
                     wfFormula = TB.and(wfFormula, wf);
                 }
                 if (!target.isStatic()) {
-                    final Term crf = TB.created(services, TB.var(heapSV), TB.var(selfSV));
+                    final Term crf = TB.created(TB.var(heapSV), TB.var(selfSV));
                     if(createdFormula == null) {
                         createdFormula = crf;
                     } else {
@@ -332,7 +332,7 @@ public class TacletGenerator {
                     }
                 }
             }
-            final Term selfNull = target.isStatic() ? null : TB.equals(TB.var(selfSV), TB.NULL(services));
+            final Term selfNull = target.isStatic() ? null : TB.equals(TB.var(selfSV), TB.NULL());
             if (wfFormula != null) {
                 addForumlaTerm = TB.and(addForumlaTerm, wfFormula);
             }
@@ -467,8 +467,8 @@ public class TacletGenerator {
             Term targetSVReachable = null;
             for(SchemaVariable heapSV : heapSVs) {
                  tacletBuilder.addVarsNotFreeIn(targetSV, heapSV);
-                 final Term tReach = TB.reachableValue(services, TB.var(heapSV),
-                                                       TB.var(targetSV), target.getType());
+                 final Term tReach = TB.reachableValue(TB.var(heapSV), TB.var(targetSV),
+                                                       target.getType());
                  if(targetSVReachable == null) {
                 	 targetSVReachable = tReach;
                  }else{
@@ -538,14 +538,14 @@ public class TacletGenerator {
         Term createdFormula = null;
         TermBuilder TB = services.getTermBuilder();
         for(SchemaVariable heapSV : heapSVs) {
-            final Term wf = TB.wellFormed(TB.var(heapSV), services);
+            final Term wf = TB.wellFormed(TB.var(heapSV));
             if(wfFormula == null) {
                 wfFormula = wf;
             }else{
                 wfFormula = TB.and(wfFormula, wf);
             }
             if(!target.isStatic()) {
-                final Term crf = TB.created(services, TB.var(heapSV), TB.var(selfSV));
+                final Term crf = TB.created(TB.var(heapSV), TB.var(selfSV));
                 if(createdFormula == null) {
                     createdFormula = crf;
                 }else{
@@ -553,8 +553,8 @@ public class TacletGenerator {
                 }
             }
         }
-        final Term selfNull = target.isStatic() ? null : TB.equals(TB.var(selfSV), TB.NULL(services));
-        final Term mbyOK = originalMby != null ? TB.measuredByCheck(originalMby, services): null;
+        final Term selfNull = target.isStatic() ? null : TB.equals(TB.var(selfSV), TB.NULL());
+        final Term mbyOK = originalMby != null ? TB.measuredByCheck(originalMby): null;
 
         // create find
         final Term[] subs = new Term[target.arity()];
@@ -671,7 +671,7 @@ public class TacletGenerator {
         }
 
         final Term replaceTerm = TB.apply(
-                              TB.elementary(services, TB.var(resultProgSV), TB.func(target, updateSubs)),
+                              TB.elementary(TB.var(resultProgSV), TB.func(target, updateSubs)),
                               TermFactory.DEFAULT.createTerm(modalitySV, new Term[]{TB.var(postSV)}, null, replaceBlock));
 
         final RewriteTacletBuilder replaceTacletBuilder = new RewriteTacletBuilder();
@@ -734,9 +734,8 @@ public class TacletGenerator {
         //create taclet
         final AntecTacletBuilder tacletBuilder = new AntecTacletBuilder();
         final Term invTerm = isStatic? 
-                TB.staticInv(services,hs,kjt) :
-                    TB.inv(services,
-                            hs,
+                TB.staticInv(hs,kjt) :
+                    TB.inv(hs,
                             eqVersion
                             ? TB.var(eqSV)
                             : TB.var(selfSV));        
@@ -1061,7 +1060,7 @@ public class TacletGenerator {
             }
             Term targetLVReachable = null;
             for(SchemaVariable heapSV : heapSVs) {
-                final Term targetReachable = TB.reachableValue(services, TB.var(heapSV), TB.var(targetSV), target.getType());
+                final Term targetReachable = TB.reachableValue(TB.var(heapSV), TB.var(targetSV), target.getType());
             	if(targetLVReachable == null) {
             		targetLVReachable = targetReachable;
             	}else{
@@ -1091,7 +1090,7 @@ public class TacletGenerator {
         final TermBuilder TB = services.getTermBuilder();
         final Term exactInstance =
                 target.isStatic() || finalClass ? TB.tt()
-                : TB.exactInstance(services, kjt.getSort(), TB.var(selfSV));
+                : TB.exactInstance(kjt.getSort(), TB.var(selfSV));
         return exactInstance;
     }
 

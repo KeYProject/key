@@ -120,10 +120,10 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable, Term>();
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
                  rep.getOrigVars().self == null ?
-                         TB.tt() : TB.inv(services, TB.var(rep.getOrigVars().self)));
+                         TB.tt() : TB.inv(TB.var(rep.getOrigVars().self)));
         Map<ProgramVariable,Term> deps = new LinkedHashMap<ProgramVariable, Term>();
         for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
-            deps.put(heap, TB.allLocs(services));
+            deps.put(heap, TB.allLocs());
         }
         this.contract =
                 new DependencyContractImpl("JML model field",
@@ -195,7 +195,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             return findExcNull(t.sub(0), exc) || findExcNull(t.sub(1), exc);
         } else if (t.op().equals(Equality.EQUALS)) {
             assert t.arity() == 2;
-            return t.sub(1).equals(services.getTermBuilder().NULL(services)) && t.sub(0).op().equals(exc);
+            return t.sub(1).equals(services.getTermBuilder().NULL()) && t.sub(0).op().equals(exc);
         }
         return false;
     }
@@ -217,7 +217,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     @Override
     Function generateMbyAtPreFunc(Services services) {
         return hasMby() ?
-                new Function(new Name(TB.newName(services, "mbyAtPre")),
+                new Function(new Name(TB.newName("mbyAtPre")),
                              services.getTypeConverter().getIntegerLDT().targetSort()) :
                 null;
     }
@@ -316,8 +316,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                     selfSV, heapSV, paramsSV, true, services).term;
             final Term wdArgs =
                     TB.and(TB.wd(getArgs(selfSV, heapSV, heapAtPreSV, isStatic || isConstructor,
-                                         twoState, paramsSV),
-                                 services));
+                                         twoState, paramsSV)));
             return createTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps,
                                 TB.var(selfSV), TB.func(target, args),
                                 TB.and(wdArgs, pre), isStatic || isConstructor, services);

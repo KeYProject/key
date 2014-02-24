@@ -175,7 +175,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
       if (resultVar == null) {
          IProgramMethod pm = mbs.getProgramMethod(getServices());
          if (!pm.isVoid()) {
-            resultVar = new LocationVariable(new ProgramElementName(getServices().getTermBuilder().newName(getServices(), "TmpResultVar")), pm.getReturnType());
+            resultVar = new LocationVariable(new ProgramElementName(getServices().getTermBuilder().newName("TmpResultVar")), pm.getReturnType());
          }
       }
       if (resultVar != null) {

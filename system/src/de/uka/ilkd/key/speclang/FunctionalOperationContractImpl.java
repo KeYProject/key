@@ -881,7 +881,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         final Term update
         = TB.tf().createTerm(
                 ElementaryUpdate.getInstance(originalAtPreVars.get(baseHeap)),
-                TB.getBaseHeap(services));
+                TB.getBaseHeap());
         final Term modalityTerm
         = TB.tf().createTerm(modality,
                 new Term[]{originalPosts.get(baseHeap)},

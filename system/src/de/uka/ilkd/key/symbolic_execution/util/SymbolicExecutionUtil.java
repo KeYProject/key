@@ -268,10 +268,10 @@ public final class SymbolicExecutionUtil {
          Term subOne = term.sub(1);
          if (subOne.op() == integerLDT.getAdd()) {
             if (subOne.sub(0) == integerLDT.one()) {
-               term = services.getTermBuilder().leq(term.sub(0), subOne.sub(1), services);
+               term = services.getTermBuilder().leq(term.sub(0), subOne.sub(1));
             }
             else if (subOne.sub(1) == integerLDT.one()) {
-               term = services.getTermBuilder().leq(term.sub(0), subOne.sub(0), services);
+               term = services.getTermBuilder().leq(term.sub(0), subOne.sub(0));
             }
          }
       }
@@ -280,10 +280,10 @@ public final class SymbolicExecutionUtil {
          Term subOne = term.sub(1);
          if (subOne.op() == integerLDT.getAdd()) {
             if (subOne.sub(0) == integerLDT.one()) {
-               term = services.getTermBuilder().gt(term.sub(0), subOne.sub(1), services);
+               term = services.getTermBuilder().gt(term.sub(0), subOne.sub(1));
             }
             else if (subOne.sub(1) == integerLDT.one()) {
-               term = services.getTermBuilder().gt(term.sub(0), subOne.sub(0), services);
+               term = services.getTermBuilder().gt(term.sub(0), subOne.sub(0));
             }
          }
       }
@@ -292,15 +292,15 @@ public final class SymbolicExecutionUtil {
          Term subOne = term.sub(1);
          if (subOne.op() == integerLDT.getAdd()) {
             if (isMinusOne(subOne.sub(0), integerLDT)) {
-               term = services.getTermBuilder().lt(term.sub(0), subOne.sub(1), services);
+               term = services.getTermBuilder().lt(term.sub(0), subOne.sub(1));
             }
             else if (isMinusOne(subOne.sub(1), integerLDT)) {
-               term = services.getTermBuilder().lt(term.sub(0), subOne.sub(0), services);
+               term = services.getTermBuilder().lt(term.sub(0), subOne.sub(0));
             }
          }
          else if (subOne.op() == integerLDT.getSub()) {
             if (subOne.sub(1) == integerLDT.one()) {
-               term = services.getTermBuilder().lt(term.sub(0), subOne.sub(0), services);
+               term = services.getTermBuilder().lt(term.sub(0), subOne.sub(0));
             }
          }
       }
@@ -309,15 +309,15 @@ public final class SymbolicExecutionUtil {
          Term subOne = term.sub(1);
          if (subOne.op() == integerLDT.getAdd()) {
             if (isMinusOne(subOne.sub(0), integerLDT)) {
-               term = services.getTermBuilder().geq(term.sub(0), subOne.sub(1), services);
+               term = services.getTermBuilder().geq(term.sub(0), subOne.sub(1));
             }
             else if (isMinusOne(subOne.sub(1), integerLDT)) {
-               term = services.getTermBuilder().geq(term.sub(0), subOne.sub(0), services);
+               term = services.getTermBuilder().geq(term.sub(0), subOne.sub(0));
             }
          }
          else if (subOne.op() == integerLDT.getSub()) {
             if (subOne.sub(1) == integerLDT.one()) {
-               term = services.getTermBuilder().geq(term.sub(0), subOne.sub(0), services);
+               term = services.getTermBuilder().geq(term.sub(0), subOne.sub(0));
             }
          }
       }
@@ -325,16 +325,16 @@ public final class SymbolicExecutionUtil {
       else if (term.op() == Junctor.NOT) {
          Term sub = term.sub(0);
          if (sub.op() == integerLDT.getLessOrEquals()) {
-            term = services.getTermBuilder().gt(sub.sub(0), sub.sub(1), services);
+            term = services.getTermBuilder().gt(sub.sub(0), sub.sub(1));
          }
          else if (sub.op() == integerLDT.getLessThan()) {
-            term = services.getTermBuilder().geq(sub.sub(0), sub.sub(1), services);
+            term = services.getTermBuilder().geq(sub.sub(0), sub.sub(1));
          }
          else if (sub.op() == integerLDT.getGreaterOrEquals()) {
-            term = services.getTermBuilder().lt(sub.sub(0), sub.sub(1), services);
+            term = services.getTermBuilder().lt(sub.sub(0), sub.sub(1));
          }
          else if (sub.op() == integerLDT.getGreaterThan()) {
-            term = services.getTermBuilder().leq(sub.sub(0), sub.sub(1), services);
+            term = services.getTermBuilder().leq(sub.sub(0), sub.sub(1));
          }
       }
       return term;
@@ -511,7 +511,7 @@ public final class SymbolicExecutionUtil {
       JavaBlock newJavaBlock = JavaBlock.createJavaBlock(new StatementBlock(newMethodFrame));
       // Create predicate which will be used in formulas to store the value interested in.
       Function newPredicate =
-              new Function(new Name(services.getTermBuilder().newName(services, "ResultPredicate")),
+              new Function(new Name(services.getTermBuilder().newName("ResultPredicate")),
                                                            Sort.FORMULA, variable.sort());
       // Create formula which contains the value interested in.
       Term newTerm = services.getTermBuilder().func(newPredicate,
@@ -549,7 +549,7 @@ public final class SymbolicExecutionUtil {
       assert node != null;
       assert variable instanceof ProgramVariable;
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(services.getTermBuilder().newName(services, "ResultPredicate")), Sort.FORMULA, variable.sort());
+      Function newPredicate = new Function(new Name(services.getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, variable.sort());
       // Create formula which contains the value interested in.
       Term newTerm =
               services.getTermBuilder().func(newPredicate, services.getTermBuilder().var((ProgramVariable)variable));
@@ -580,7 +580,7 @@ public final class SymbolicExecutionUtil {
       assert node != null;
       assert term != null;
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(services.getTermBuilder().newName(services, "ResultPredicate")), Sort.FORMULA, term.sort());
+      Function newPredicate = new Function(new Name(services.getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, term.sort());
       // Create formula which contains the value interested in.
       Term newTerm = services.getTermBuilder().func(newPredicate, term);
       // Create Sequent to prove with new succedent.
@@ -2142,7 +2142,7 @@ public final class SymbolicExecutionUtil {
              loopConditionModalityTerm.sub(0).op() != Equality.EQUALS ||
              !(loopConditionModalityTerm.sub(0).sub(0).op() instanceof LocationVariable) ||
              loopConditionModalityTerm.sub(0).sub(1) != (childIndex == 1 ?
-                     services.getTermBuilder().TRUE(services) : services.getTermBuilder().FALSE(services))) {
+                     services.getTermBuilder().TRUE() : services.getTermBuilder().FALSE())) {
             throw new ProofInputException("Implementation of WhileInvariantRule has changed."); 
          }
          // Execute modality in a side proof to convert the JavaBlock of the modality into a Term
@@ -2486,7 +2486,7 @@ public final class SymbolicExecutionUtil {
       assert node != null;
       assert newSuccedent != null;
       // Create Sequent to prove
-      Term isNull = services.getTermBuilder().equals(newSuccedent, services.getTermBuilder().NULL(services));
+      Term isNull = services.getTermBuilder().equals(newSuccedent, services.getTermBuilder().NULL());
       Term isNotNull = services.getTermBuilder().not(isNull);
       Sequent sequentToProve =
               createSequentToProveWithNewSuccedent(node, additionalAntecedent,

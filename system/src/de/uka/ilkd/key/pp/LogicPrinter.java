@@ -1235,7 +1235,7 @@ public class LogicPrinter {
                 layouter.print("{"); // ("\u27E6");
             }
 
-            if(objectTerm.equals(services.getTermBuilder().NULL(services))
+            if(objectTerm.equals(services.getTermBuilder().NULL())
                     && fieldTerm.op() instanceof Function
                     && ((Function)fieldTerm.op()).isUnique()) {
 
@@ -1331,7 +1331,7 @@ public class LogicPrinter {
             markEndSub();
             }
 
-            if(objectTerm.equals(services.getTermBuilder().NULL(services))
+            if(objectTerm.equals(services.getTermBuilder().NULL())
                 && fieldTerm.op() instanceof Function
                 && ((Function)fieldTerm.op()).isUnique()) {
         	String className 

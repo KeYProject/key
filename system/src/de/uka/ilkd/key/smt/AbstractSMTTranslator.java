@@ -322,8 +322,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                         .getIntegerLDT().getMul();
 
                         multiplicationFunction = new Function(new Name(
-                                        TB.newName(services,
-                                                        "unin_mult")),
+                                        TB.newName("unin_mult")),
                                         reference.sort(), reference.argSorts());
                 }
                 return multiplicationFunction;
@@ -994,7 +993,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         private Term createLogicalVar(Services services, String baseName,
                         Sort sort) {
                 return TB.var(new LogicVariable(new Name(
-                                TB.newName(services, baseName)),
+                                TB.newName(baseName)),
                                 sort));
         }
 
@@ -1004,8 +1003,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 Sort sort = services.getTypeConverter().getIntegerLDT()
                                 .getMul().sort();
                 Function mult = getMultiplicationFunction(services);
-                Term zero = TB.zero(services);
-                Term one = TB.one(services);
+                Term zero = TB.zero();
+                Term one = TB.one();
                 LinkedList<Term> multAssumptions = new LinkedList<Term>();
 
                 Term x = createLogicalVar(services, "x", sort);
@@ -1088,7 +1087,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
 
         private Term getRightBorderAsTerm(long integer, Services services) {
-                return TB.zTerm(services, Long
+                return TB.zTerm(Long
                                 .toString(getRightBorderAsInteger(integer,
                                                 services)));
         }
@@ -1100,7 +1099,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         private StringBuffer getNameForIntegerConstant(Services services,
                         long integer) {
                 String val = integer < 0 ? "negative_value" : "positive_value";
-                return new StringBuffer(TB.newName(services, "i")
+                return new StringBuffer(TB.newName("i")
                                 + "_" + val);
 
         }

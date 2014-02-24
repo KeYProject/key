@@ -121,9 +121,9 @@ public class TestTermLabelManager extends TestCase {
       one = TB.label(one, new ParameterlessTermLabel(new Name("APPLICATION")));
       two = TB.label(two, new ParameterlessTermLabel(new Name("APPLICATION")));
       Sequent sequent = Sequent.EMPTY_SEQUENT;
-      sequent = sequent.addFormula(new SequentFormula(TB.inInt(one, services)), true, true).sequent();
+      sequent = sequent.addFormula(new SequentFormula(TB.inInt(one)), true, true).sequent();
       sequent = sequent.addFormula(pos.constrainedFormula(), true, false).sequent();
-      sequent = sequent.addFormula(new SequentFormula(TB.inInt(two, services)), false, true).sequent();
+      sequent = sequent.addFormula(new SequentFormula(TB.inInt(two)), false, true).sequent();
       // Test supported rule
       Rule rule = new DummyRule("rule");
       Term taclet = TB.tt();
@@ -391,7 +391,7 @@ public class TestTermLabelManager extends TestCase {
       TermBuilder TB = services.getTermBuilder();
       Term modality = TB.label(TB.box(JavaBlock.EMPTY_JAVABLOCK, TB.label(TB.tt(), new ParameterlessTermLabel(new Name("POST")))), new ParameterlessTermLabel(new Name("ONE")));
       LocationVariable heap = services.getTypeConverter().getHeapLDT().getSavedHeap();
-      Term update = TB.label(TB.elementary(services, TB.var(heap), TB.var(heap)), new ParameterlessTermLabel(new Name("UPDATE")));
+      Term update = TB.label(TB.elementary(TB.var(heap), TB.var(heap)), new ParameterlessTermLabel(new Name("UPDATE")));
       Term updateApp = TB.apply(update, modality, new ImmutableArray<TermLabel>(new ParameterlessTermLabel(new Name("UPDATE-APPLICATION"))));
       PosInOccurrence pos = new PosInOccurrence(new SequentFormula(updateApp), PosInTerm.getTopLevel(), true);
       Term taclet = TB.tt();
@@ -450,7 +450,7 @@ public class TestTermLabelManager extends TestCase {
 
    protected PosInOccurrence createTestPosInOccurrence(Services services) {
       Term testTerm = createTestTerm(services);
-      Term inInt = services.getTermBuilder().inInt(testTerm, services);
+      Term inInt = services.getTermBuilder().inInt(testTerm);
       return new PosInOccurrence(new SequentFormula(inInt), PosInTerm.parseReverseString("0"), true);
    }
 
@@ -463,8 +463,8 @@ public class TestTermLabelManager extends TestCase {
       one = TB.label(one, new ParameterlessTermLabel(new Name("ONE")));
       two = TB.label(one, new ParameterlessTermLabel(new Name("TWO")));
       three = TB.label(one, new ParameterlessTermLabel(new Name("THREE")));
-      Term innerAdd = TB.label(TB.add(services, two, three), new ParameterlessTermLabel(new Name("ADD")));
-      return TB.label(TB.add(services, one, innerAdd), new ParameterlessTermLabel(new Name("APPLICATION")));
+      Term innerAdd = TB.label(TB.add(two, three), new ParameterlessTermLabel(new Name("ADD")));
+      return TB.label(TB.add(one, innerAdd), new ParameterlessTermLabel(new Name("APPLICATION")));
    }
 
    /**

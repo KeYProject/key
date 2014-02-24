@@ -263,7 +263,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         }
 
         private Name createUniqueName(Services services, String baseName) {
-                return new Name(services.getTermBuilder().newName(services, baseName));
+                return new Name(services.getTermBuilder().newName(baseName));
         }
 
         private Sort[] computeArgSorts(ImmutableSet<SchemaVariable> svSet, Services services) {

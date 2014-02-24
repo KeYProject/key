@@ -176,7 +176,7 @@ public final class TypeConverter {
 	if(op instanceof Singleton) {
 	    assert heapLDT.getSortOfSelect(subs[0].op()) != null
 	           : "unexpected argument of \\singleton: " + subs[0];
-	    return tb.singleton(services, subs[0].sub(1), subs[0].sub(2));
+	    return tb.singleton(subs[0].sub(1), subs[0].sub(2));
 	}
 
 	LDT responsibleLDT = null;
@@ -282,7 +282,7 @@ public final class TypeConverter {
                        ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
             final Function fieldSymbol
             	= heapLDT.getFieldSymbolForPV(inst, services);
-            result = tb.dot(services, inst.sort(), result, fieldSymbol);
+            result = tb.dot(inst.sort(), result, fieldSymbol);
             context = inst.getKeYJavaType();
         }
         return result;
@@ -321,18 +321,17 @@ public final class TypeConverter {
 	if(var instanceof ProgramConstant) {
 	    return tb.var(var);
 	} else if(var == services.getJavaInfo().getArrayLength()) {
-	    return tb.dotLength(services, convertReferencePrefix(prefix, ec));
+	    return tb.dotLength(convertReferencePrefix(prefix, ec));
 	} else if(var.isStatic()) {
 	    final Function fieldSymbol
 	    	= heapLDT.getFieldSymbolForPV((LocationVariable)var, services);
-	    return tb.staticDot(services, var.sort(), fieldSymbol);
+	    return tb.staticDot(var.sort(), fieldSymbol);
 	} else if(prefix == null) {
 	    if(var.isMember()) {
 		final Function fieldSymbol
 			= heapLDT.getFieldSymbolForPV((LocationVariable)var,
 						      services);
-		return tb.dot(services,
-			      var.sort(),
+		return tb.dot(var.sort(),
 			      findThisForSort(var.getContainerType().getSort(),
 				              ec),
 			      fieldSymbol);
@@ -342,7 +341,7 @@ public final class TypeConverter {
 	} else if (!(prefix instanceof PackageReference) ) {
 	    final Function fieldSymbol
 	    	= heapLDT.getFieldSymbolForPV((LocationVariable)var, services);
-	    return tb.dot(services, var.sort(), convertReferencePrefix(prefix, ec), fieldSymbol);
+	    return tb.dot(var.sort(), convertReferencePrefix(prefix, ec), fieldSymbol);
 	}
 	Debug.out("typeconverter: Not supported reference type (fr, class):",
 		  fr, fr.getClass());
@@ -360,7 +359,7 @@ public final class TypeConverter {
                 convertToLogicElement(ar.getDimensionExpressions().get(i), ec);
         }
         assert index.length == 1 : "multi-dimensional arrays not implemented";
-        return tb.dotArr(services, t, index[0]);
+        return tb.dotArr(t, index[0]);
     }
 
     private Term convertToInstanceofTerm(Instanceof io,
@@ -374,7 +373,7 @@ public final class TypeConverter {
 	// in JavaDL S::instance(o) is also true if o (for reference types S)
 	// is null in opposite to Java
 	// we create here if (obj = null) then FALSE else S::instance(obj)
-	return tb.ife(tb.equals(obj, tb.NULL(services)), tb.FALSE(services),
+	return tb.ife(tb.equals(obj, tb.NULL()), tb.FALSE(),
                 tb.func(instanceOfSymbol, obj));
     }
 
@@ -451,7 +450,7 @@ public final class TypeConverter {
         if (lit instanceof BooleanLiteral) {
             return booleanLDT.translateLiteral(lit, services);
         } else if (lit instanceof NullLiteral) {
-            return tb.NULL(services);
+            return tb.NULL();
         } else if (lit instanceof IntLiteral) {
             return integerLDT.translateLiteral(lit, services);
         } else if (lit instanceof CharLiteral) {

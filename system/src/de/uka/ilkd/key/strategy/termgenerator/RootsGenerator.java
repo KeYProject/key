@@ -106,7 +106,7 @@ public class RootsGenerator implements TermGenerator {
 
     private Term breakDownEq(Term var, BigInteger lit, int pow,
                              Services services) {
-        final Term zero = tb.zero(services);
+        final Term zero = tb.zero();
 
         if ( ( pow % 2 == 0 ) ) {
             // the even case
@@ -122,12 +122,12 @@ public class RootsGenerator implements TermGenerator {
                 final BigInteger r = root ( lit, pow );
                 if ( power ( r, pow ).equals ( lit ) ) {
                     // two solutions
-                    final Term rTerm = tb.zTerm ( services, r.toString () );
-                    final Term rNegTerm = tb.zTerm ( services, r.negate ().toString () );
-                    return tb.or ( tb.or ( tb.lt ( var, rNegTerm, services ),
-                                           tb.gt ( var, rTerm, services ) ),
-                                   tb.and ( tb.gt ( var, rNegTerm, services ),
-                                            tb.lt ( var, rTerm, services ) ) );
+                    final Term rTerm = tb.zTerm ( r.toString () );
+                    final Term rNegTerm = tb.zTerm ( r.negate ().toString () );
+                    return tb.or ( tb.or ( tb.lt ( var, rNegTerm ),
+                                           tb.gt ( var, rTerm ) ),
+                                   tb.and ( tb.gt ( var, rNegTerm ),
+                                            tb.lt ( var, rTerm ) ) );
                 } else {
                     // no solution
                     return tb.ff ();
@@ -139,7 +139,7 @@ public class RootsGenerator implements TermGenerator {
             final BigInteger r = root ( lit, pow );
             if ( power ( r, pow ).equals ( lit ) ) {
                 // one solution
-                final Term rTerm = tb.zTerm ( services, r.toString () );
+                final Term rTerm = tb.zTerm ( r.toString () );
                 return tb.equals ( var, rTerm );
             } else {
                 // no solution
@@ -162,18 +162,16 @@ public class RootsGenerator implements TermGenerator {
                 return tb.ff ();
             case 1:
                 final BigInteger r = rootRoundingUpwards ( lit, pow );
-                final Term rTerm = tb.zTerm ( services, r.toString () );
-                final Term rNegTerm = tb.zTerm ( services, r.negate ().toString () );
-                return tb.or ( tb.leq ( var, rNegTerm, services ),
-                               tb.geq ( var, rTerm, services ) );
+                final Term rTerm = tb.zTerm ( r.toString () );
+                final Term rNegTerm = tb.zTerm ( r.negate ().toString () );
+                return tb.or ( tb.leq ( var, rNegTerm ),
+                               tb.geq ( var, rTerm ) );
             }
         } else {
             // the odd case
 
             return tb.geq ( var,
-                            tb.zTerm ( services,
-                                       rootRoundingUpwards ( lit, pow ).toString () ),
-                            services );
+                            tb.zTerm ( rootRoundingUpwards ( lit, pow ).toString () ) );
         }
         
         assert false; // unreachable
@@ -189,20 +187,19 @@ public class RootsGenerator implements TermGenerator {
                 // no solutions
                 return tb.ff ();
             case 0:
-                return tb.equals ( var, tb.zero( services ) );
+                return tb.equals ( var, tb.zero( ) );
             case 1:
                 final BigInteger r = root ( lit, pow );
-                final Term rTerm = tb.zTerm ( services, r.toString () );
-                final Term rNegTerm = tb.zTerm ( services, r.negate ().toString () );
-                return tb.and ( tb.geq ( var, rNegTerm, services ),
-                                tb.leq ( var, rTerm, services ) );
+                final Term rTerm = tb.zTerm ( r.toString () );
+                final Term rNegTerm = tb.zTerm ( r.negate ().toString () );
+                return tb.and ( tb.geq ( var, rNegTerm ),
+                                tb.leq ( var, rTerm ) );
             }
         } else {
             // the odd case
 
             return tb.leq ( var,
-                            tb.zTerm ( services, root ( lit, pow ).toString () ),
-                            services );
+                            tb.zTerm ( root ( lit, pow ).toString () ) );
         }
 
         assert false; // unreachable

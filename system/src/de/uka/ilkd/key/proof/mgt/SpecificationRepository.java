@@ -1058,13 +1058,13 @@ public final class SpecificationRepository {
                 if (kjt != selfKjt && !ji.isFinal(kjt)) continue; // only final classes
                 if (kjt != selfKjt && JavaInfo.isPrivate(kjt)) continue; // only non-private classes
                 final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(kjt);
-                final ProgramVariable selfVar = tb.selfVar(services, kjt, false);
+                final ProgramVariable selfVar = tb.selfVar(kjt, false);
                 Term invDef = tb.tt();
                 for (ClassInvariant inv : myInvs) {
                     invDef = tb.and(invDef, inv.getInv(selfVar, services));
                 }
                 invDef = tb.tf().createTerm(Equality.EQV,
-                        tb.inv(services, tb.var(selfVar)), invDef);
+                        tb.inv(tb.var(selfVar)), invDef);
                 final IObserverFunction invSymbol = services.getJavaInfo().getInv();
                 final ClassAxiom invRepresentsAxiom
                 = new RepresentsAxiom("Class invariant axiom for " + kjt.getFullName(),
@@ -1108,20 +1108,20 @@ public final class SpecificationRepository {
     private ImmutableSet<ClassAxiom> getModelMethodAxioms() {
         ImmutableSet<ClassAxiom> result  = DefaultImmutableSet.<ClassAxiom>nil();
         for(KeYJavaType kjt : services.getJavaInfo().getAllKeYJavaTypes()) {
-            final ProgramVariable selfVar = tb.selfVar(services, kjt, false);
+            final ProgramVariable selfVar = tb.selfVar(kjt, false);
             for(IProgramMethod pm : services.getJavaInfo().getAllProgramMethods(kjt)) {
                 if(!pm.isVoid() && pm.isModel()) {
                     pm = services.getJavaInfo().getToplevelPM(kjt, pm);
-                    ImmutableList<ProgramVariable> paramVars = tb.paramVars(services, pm, false);
+                    ImmutableList<ProgramVariable> paramVars = tb.paramVars(pm, false);
                     Map<LocationVariable,ProgramVariable> atPreVars =
                             new LinkedHashMap<LocationVariable,ProgramVariable>();
                     List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
                     for(LocationVariable heap : heaps) {
                         atPreVars.put(heap,
-                                      tb.heapAtPreVar(services, heap.name().toString()+"AtPre",
-                                                      heap.sort(), false));
+                                      tb.heapAtPreVar(heap.name().toString()+"AtPre", heap.sort(),
+                                                      false));
                     }
-                    ProgramVariable resultVar = tb.resultVar(services, pm, false);
+                    ProgramVariable resultVar = tb.resultVar(pm, false);
 
                     boolean definitionFound = false;
                     // This assumes there is one operation contract for each model pm per class
@@ -1140,7 +1140,7 @@ public final class SpecificationRepository {
                     }
                     for(FunctionalOperationContract fop : lookupContracts) {
                         Term representsFromContract =
-                                fop.getRepresentsAxiom(heaps.get(0), selfVar, paramVars, tb.resultVar(services, pm, false), atPreVars, services);
+                                fop.getRepresentsAxiom(heaps.get(0), selfVar, paramVars, tb.resultVar(pm, false), atPreVars, services);
                         Term preContract = fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
                         if(preContract == null) preContract = tb.tt();
                         if(representsFromContract != null) {

@@ -553,7 +553,7 @@ public final class SimpleBlockContract implements BlockContract {
         {
             assert newHeap != null;
             assert newHeap.sort().equals(services.getTypeConverter().getHeapLDT().targetSort());
-            put(services.getTermBuilder().getBaseHeap(services), newHeap);
+            put(services.getTermBuilder().getBaseHeap(), newHeap);
         }
 
         @Override

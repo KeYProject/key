@@ -101,12 +101,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
         Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
         for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-          final LocationVariable l = TB.heapAtPreVar(services, heap.name()+"Before_" + methodName, heap.sort(), true);
+          final LocationVariable l = TB.heapAtPreVar(heap.name()+"Before_" + methodName, heap.sort(), true);
           // buf fix. see #1197
           services.getNamespaces().programVariables().addSafely(l);
-          final Term u = TB.elementary(services,
-            l,
-            TB.var(heap));
+          final Term u = TB.elementary(l, TB.var(heap));
           if(atPreUpdate == null) {
              atPreUpdate =u;
           }else{
