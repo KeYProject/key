@@ -55,7 +55,7 @@ import de.uka.ilkd.key.util.Debug;
 
 public class TestMatchTaclet extends TestCase {
     
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static TermBuilder TB;
     
     FindTaclet if_addrule_conflict;
     FindTaclet find_addrule_conflict;
@@ -85,6 +85,7 @@ public class TestMatchTaclet extends TestCase {
         TacletForTests.parse();
     
         services = TacletForTests.services();
+        TB = services.getTermBuilder();
         
         all_left = (FindTaclet) TacletForTests.getTaclet(
                 "TestMatchTaclet_for_all").taclet();
@@ -587,7 +588,7 @@ public class TestMatchTaclet extends TestCase {
 	TermFactory tf=TermFactory.DEFAULT;
 	Function aPred = (Function)TacletForTests.getFunctions().lookup(new Name("A"));
 	Term sub = tf.createTerm(aPred);
-	Term match=TermBuilder.DF.all(new LogicVariable(new Name("lv"), osort4), 
+	Term match=TB.all(new LogicVariable(new Name("lv"), osort4), 
 					   sub);
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet
 	    ("TestMatchTaclet_subsort_variableSV").taclet();   

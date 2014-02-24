@@ -38,7 +38,6 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -1236,7 +1235,7 @@ public class LogicPrinter {
                 layouter.print("{"); // ("\u27E6");
             }
 
-            if(objectTerm.equals(TermBuilder.DF.NULL(services))
+            if(objectTerm.equals(services.getTermBuilder().NULL(services))
                     && fieldTerm.op() instanceof Function
                     && ((Function)fieldTerm.op()).isUnique()) {
 
@@ -1332,7 +1331,7 @@ public class LogicPrinter {
             markEndSub();
             }
 
-            if(objectTerm.equals(TermBuilder.DF.NULL(services))
+            if(objectTerm.equals(services.getTermBuilder().NULL(services))
                 && fieldTerm.op() instanceof Function
                 && ((Function)fieldTerm.op()).isUnique()) {
         	String className 

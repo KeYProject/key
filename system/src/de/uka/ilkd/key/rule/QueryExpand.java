@@ -84,7 +84,6 @@ public class QueryExpand implements BuiltInRule {
 
     private static Name QUERY_DEF_NAME = new Name("Evaluate Query");
 
-    private static final TermBuilder tb = TermBuilder.DF;
 
     /** Stores a number that indicates the time when term occurred for the first time where
      * this rule was applicable. The time is the number of rules applied on this branch.*/
@@ -145,6 +144,7 @@ public class QueryExpand implements BuiltInRule {
 
            final ImmutableArray<ProgramVariable> args = getRegisteredArgumentVariables(method.getParameters(), services);
 
+           final TermBuilder tb = services.getTermBuilder();
 
            //Names for additional symbols
 
@@ -264,7 +264,7 @@ public class QueryExpand implements BuiltInRule {
         int i = 0;
         for (final ParameterDeclaration pdecl : paramDecls) {
         	final String baseName = pdecl.getVariableSpecification().getName();
-        	final String newName = tb.newName(services,baseName);
+        	final String newName = services.getTermBuilder().newName(services,baseName);
             final ProgramElementName argVarName = new ProgramElementName(newName);
             args[i] = new LocationVariable(argVarName,
                     pdecl.getVariableSpecification().getProgramVariable().getKeYJavaType());
@@ -303,6 +303,7 @@ public class QueryExpand implements BuiltInRule {
     	removeRedundant(qeps);
     	//sorting is important in order to ensure that the original term is modified in a depth-first order.
     	Collections.sort(qeps);
+      final TermBuilder tb = services.getTermBuilder();
 
     	for(QueryEvalPos qep: qeps){
     	    //System.out.println("\nInserting: "+qep+"\n");
@@ -660,7 +661,7 @@ public class QueryExpand implements BuiltInRule {
     }
 
 	@Override
-    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos) {
+    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos, Services services) {
 	    return new DefaultBuiltInRuleApp(this, pos);
     }
 

@@ -385,14 +385,15 @@ public class DefaultProofFileParser implements IProofFileParser {
        }
 
        if (currContract != null) {
-        BuiltInRule useContractRule =
-              currContract instanceof OperationContract
-              ? UseOperationContractRule.INSTANCE
-                    : UseDependencyContractRule.INSTANCE;
-
-
-        ourApp = ((AbstractContractRuleApp)useContractRule.
-              createApp(pos)).setContract(currContract);
+          BuiltInRule useContractRule;
+          if (currContract instanceof OperationContract) {
+             useContractRule = UseOperationContractRule.INSTANCE;
+             ourApp = (((UseOperationContractRule)useContractRule).createApp(pos)).setContract(currContract);
+          }
+          else {
+             useContractRule = UseDependencyContractRule.INSTANCE;
+             ourApp = (((UseDependencyContractRule)useContractRule).createApp(pos)).setContract(currContract);
+          }
            currContract = null;
            if(builtinIfInsts != null) {
                ourApp = ourApp.setIfInsts(builtinIfInsts);

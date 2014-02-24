@@ -414,7 +414,7 @@ public class TermLabelManager {
       Term modalityTerm = applicationTerm != null && (!modalityTermPolicyMap.isEmpty() ||
                                                       !allRulesUpdates.isEmpty() ||
                                                       currentRuleSpecificUpdates != null) ?
-                          TermBuilder.DF.goBelowUpdates(applicationTerm) :
+                          TermBuilder.goBelowUpdates(applicationTerm) :
                           null;
       // Instantiate empty result
       List<TermLabel> newLabels = new LinkedList<TermLabel>();

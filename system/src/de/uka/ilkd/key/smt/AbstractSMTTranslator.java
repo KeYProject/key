@@ -15,15 +15,38 @@
 package de.uka.ilkd.key.smt;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Vector;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IfThenElse;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
@@ -87,7 +110,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         }
 
-        private static final TermBuilder TB = TermBuilder.DF;
+        private final TermBuilder TB; // TODO: Rename
         
         private int nameCounter =0;
 
@@ -242,6 +265,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 this.config = config;
                 integerSort = services.getTypeConverter().getIntegerLDT()
                                 .targetSort();
+                this.TB = services.getTermBuilder();
 
         }
 
@@ -298,7 +322,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                         .getIntegerLDT().getMul();
 
                         multiplicationFunction = new Function(new Name(
-                                        TermBuilder.DF.newName(services,
+                                        TB.newName(services,
                                                         "unin_mult")),
                                         reference.sort(), reference.argSorts());
                 }
@@ -969,8 +993,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         private Term createLogicalVar(Services services, String baseName,
                         Sort sort) {
-                return TermBuilder.DF.var(new LogicVariable(new Name(
-                                TermBuilder.DF.newName(services, baseName)),
+                return TB.var(new LogicVariable(new Name(
+                                TB.newName(services, baseName)),
                                 sort));
         }
 
@@ -980,30 +1004,29 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 Sort sort = services.getTypeConverter().getIntegerLDT()
                                 .getMul().sort();
                 Function mult = getMultiplicationFunction(services);
-                TermBuilder tb = TermBuilder.DF;
-                Term zero = tb.zero(services);
-                Term one = tb.one(services);
+                Term zero = TB.zero(services);
+                Term one = TB.one(services);
                 LinkedList<Term> multAssumptions = new LinkedList<Term>();
 
                 Term x = createLogicalVar(services, "x", sort);
                 Term y = createLogicalVar(services, "y", sort);
                 Term z = createLogicalVar(services, "z", sort);
-                multAssumptions.add(tb.equals(tb.func(mult, x, zero), zero));
-                multAssumptions.add(tb.equals(tb.func(mult, zero, x), zero));
-                multAssumptions.add(tb.equals(tb.func(mult, x, one), x));
-                multAssumptions.add(tb.equals(tb.func(mult, one, x), x));
-                multAssumptions.add(tb.equals(tb.func(mult, x, y),
-                                tb.func(mult, y, x)));
-                multAssumptions.add(tb.equals(
-                                tb.func(mult, tb.func(mult, y, x), z),
-                                tb.func(mult, y, tb.func(mult, x, z))));
-                multAssumptions.add(tb.imp(
-                                tb.equals(tb.func(mult, x, y), zero),
-                                tb.or(tb.equals(x, zero), tb.equals(y, zero))));
-                multAssumptions.add(tb.imp(tb.equals(tb.func(mult, x, y), one),
-                                tb.and(tb.equals(x, one), tb.equals(y, one))));
+                multAssumptions.add(TB.equals(TB.func(mult, x, zero), zero));
+                multAssumptions.add(TB.equals(TB.func(mult, zero, x), zero));
+                multAssumptions.add(TB.equals(TB.func(mult, x, one), x));
+                multAssumptions.add(TB.equals(TB.func(mult, one, x), x));
+                multAssumptions.add(TB.equals(TB.func(mult, x, y),
+                                TB.func(mult, y, x)));
+                multAssumptions.add(TB.equals(
+                                TB.func(mult, TB.func(mult, y, x), z),
+                                TB.func(mult, y, TB.func(mult, x, z))));
+                multAssumptions.add(TB.imp(
+                                TB.equals(TB.func(mult, x, y), zero),
+                                TB.or(TB.equals(x, zero), TB.equals(y, zero))));
+                multAssumptions.add(TB.imp(TB.equals(TB.func(mult, x, y), one),
+                                TB.and(TB.equals(x, one), TB.equals(y, one))));
                 for (Term assumption : multAssumptions) {
-                        assumption = tb.allClose(assumption);
+                        assumption = TB.allClose(assumption);
                         result.add(translateTerm(assumption,
                                         new Vector<QuantifiableVariable>(),
                                         services));
@@ -1065,7 +1088,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
 
         private Term getRightBorderAsTerm(long integer, Services services) {
-                return TermBuilder.DF.zTerm(services, Long
+                return TB.zTerm(services, Long
                                 .toString(getRightBorderAsInteger(integer,
                                                 services)));
         }
@@ -1077,7 +1100,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         private StringBuffer getNameForIntegerConstant(Services services,
                         long integer) {
                 String val = integer < 0 ? "negative_value" : "positive_value";
-                return new StringBuffer(TermBuilder.DF.newName(services, "i")
+                return new StringBuffer(TB.newName(services, "i")
                                 + "_" + val);
 
         }

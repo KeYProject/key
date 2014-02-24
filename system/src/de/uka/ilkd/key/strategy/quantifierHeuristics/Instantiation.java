@@ -25,7 +25,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -37,7 +36,6 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 class Instantiation {
 
-    private final static TermBuilder tb = TermBuilder.DF;
 
     /** universally quantifiable variable bound in<code>allTerm</code> */
     private final QuantifiableVariable firstVar;
@@ -62,7 +60,7 @@ class Instantiation {
 	matrix = TriggerUtils.discardQuantifiers(allterm);
 	/* Terms bound in every formula on <code>goal</code> */
 	triggersSet = TriggersSet.create(allterm, services);
-	assumedLiterals = initAssertLiterals(seq);
+	assumedLiterals = initAssertLiterals(seq, services);
 	addInstances(sequentToTerms(seq), services);
     }
 
@@ -128,8 +126,8 @@ class Instantiation {
 
     private Term createArbitraryInstantiation(QuantifiableVariable var,
 	    Services services) {
-        return tb.func (var.sort().getCastSymbol (services),
-	        tb.zero(services));
+        return services.getTermBuilder().func (var.sort().getCastSymbol (services),
+              services.getTermBuilder().zero(services));
     }
 
     private void addInstance(Substitution sub, Services services) {
@@ -156,10 +154,11 @@ class Instantiation {
 
     /**
      * @param seq
+    * @param services TODO
      * @return all literals in antesequent, and all negation of literal in
      *         succedent
      */
-    private ImmutableSet<Term> initAssertLiterals(Sequent seq) {
+    private ImmutableSet<Term> initAssertLiterals(Sequent seq, Services services) {
 	ImmutableSet<Term> assertLits = DefaultImmutableSet.<Term> nil();
 	for (final SequentFormula cf : seq.antecedent()) {
 	    final Term atom = cf.formula();
@@ -171,7 +170,7 @@ class Instantiation {
 	    final Term atom = cf.formula();
 	    final Operator op = atom.op();
             if ( !( op == Quantifier.ALL || op == Quantifier.EX ) )
-		assertLits = assertLits.add(tb.not(atom));
+		assertLits = assertLits.add(services.getTermBuilder().not(atom));
 	}
 	return assertLits;
     }

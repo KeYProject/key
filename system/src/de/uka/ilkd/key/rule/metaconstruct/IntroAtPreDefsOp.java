@@ -30,10 +30,12 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.util.Triple;
 
 public final class IntroAtPreDefsOp extends AbstractTermTransformer {
@@ -47,6 +49,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
     public Term transform(Term term,
                   SVInstantiations svInst,
                   Services services) {
+        final TermBuilder TB = services.getTermBuilder();
         final Term target = term.sub(0);
 
         //the target term should have a Java block

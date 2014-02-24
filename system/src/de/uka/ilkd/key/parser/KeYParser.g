@@ -188,7 +188,7 @@ options {
      * used we still require the caller to provide the parser mode explicitly, 
      * so that the code is readable.
      */
-    public KeYParser(ParserMode mode, TokenStream lexer) {
+    private KeYParser(ParserMode mode, TokenStream lexer) {
 	this(lexer);
         this.lexer = lexer;
 	this.parserMode = mode;
@@ -863,9 +863,9 @@ options {
                 || sv.sort() == AbstractTermTransformer.METASORT) {
                 semanticError("Cannot use schema variable " + sv + " as an attribute"); 
             }
-            result = TermBuilder.DF.select(getServices(), 
+            result = getServices().getTermBuilder().select(getServices(), 
                                            sv.sort(), 
-                                           TermBuilder.DF.getBaseHeap(getServices()), 
+                                           getServices().getTermBuilder().getBaseHeap(getServices()), 
                                            prefix, 
                                            tf.createTerm(attribute));
         } else {
@@ -873,7 +873,7 @@ options {
             if(pv instanceof ProgramConstant) {
                 result = tf.createTerm(pv);
             } else if(pv == getServices().getJavaInfo().getArrayLength()) {
-                result = TermBuilder.DF.dotLength(getServices(), result);
+                result = getServices().getTermBuilder().dotLength(getServices(), result);
             } else {
             	Function fieldSymbol 
             		= getServices().getTypeConverter()
@@ -881,9 +881,9 @@ options {
             		               .getFieldSymbolForPV((LocationVariable)pv, 
             		                                    getServices());        
             	if (pv.isStatic()){
-                    result = TermBuilder.DF.staticDot(getServices(), pv.sort(), fieldSymbol);
+                    result = getServices().getTermBuilder().staticDot(getServices(), pv.sort(), fieldSymbol);
             	} else {            
-                    result = TermBuilder.DF.dot(getServices(), pv.sort(), result, fieldSymbol);                
+                    result = getServices().getTermBuilder().dot(getServices(), pv.sort(), result, fieldSymbol);                
             	}
             }
         }
@@ -2411,7 +2411,7 @@ elementary_update_term returns[Term _elementary_update_term=null]
         (
             ASSIGN a=equivalence_term
             {
-                result = TermBuilder.DF.elementary(getServices(), result, a);
+                result = getServices().getTermBuilder().elementary(getServices(), result, a);
             }
         )?
    ;
@@ -2890,7 +2890,7 @@ elementary_heap_update [Term heap] returns [Term result=heap]
         {
            Term objectTerm = target.sub(1);
            Term fieldTerm  = target.sub(2);
-           result = TermBuilder.DF.store(getServices(), heap, objectTerm, fieldTerm, val);
+           result = getServices().getTermBuilder().store(getServices(), heap, objectTerm, fieldTerm, val);
         }
     | id=simple_ident args=argument_list
         {
@@ -2923,7 +2923,7 @@ array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = n
   	LBRACKET 
 	(   STAR {
            	rangeFrom = toZNotation("0", functions());
-           	Term lt = TermBuilder.DF.dotLength(getServices(), arrayReference);
+           	Term lt = getServices().getTermBuilder().dotLength(getServices(), arrayReference);
            	Term one = toZNotation("1", functions());
   	   		rangeTo = tf.createTerm
            		((Function) functions().lookup(new Name("sub")), lt, one); 
@@ -2949,7 +2949,7 @@ array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = n
 		Term guardTerm = tf.createTerm(Junctor.AND, fromTerm, toTerm);
 		quantifiedArrayGuard = tf.createTerm(Junctor.AND, quantifiedArrayGuard, guardTerm);
 		}
-            result = TermBuilder.DF.dotArr(getServices(), result, indexTerm); 
+            result = getServices().getTermBuilder().dotArr(getServices(), result, indexTerm); 
     }            
     ;
         catch [TermCreationException ex] {
@@ -2977,7 +2977,7 @@ atom returns [Term _atom = null]
         {
             a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(literal.getText()));
         }   
-    ) (LGUILLEMETS labels = label {if (labels.size() > 0) {a = TermBuilder.DF.label(a, labels);} } RGUILLEMETS)?
+    ) (LGUILLEMETS labels = label {if (labels.size() > 0) {a = getServices().getTermBuilder().label(a, labels);} } RGUILLEMETS)?
     ;
         catch [TermCreationException ex] {
               keh.reportException
@@ -3171,7 +3171,7 @@ substitutionterm returns [Term _substitution_term = null]
      }
    RBRACE
    ( a2 = term110 | a2 = unary_formula ) {
-      result = TermBuilder.DF.subst ( op, v, a1, a2 );
+      result = getServices().getTermBuilder().subst ( op, v, a1, a2 );
       if(!isGlobalDeclTermParser())
         unbindVars(orig);
    }
@@ -3358,7 +3358,7 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
                 
         {  
             if(varfuncid.equals("inReachableState") && args == null) {
-	        a = TermBuilder.DF.wellFormed(getServices().getTypeConverter().getHeapLDT().getHeap(), getServices());
+	        a = getServices().getTermBuilder().wellFormed(getServices().getTypeConverter().getHeapLDT().getHeap(), getServices());
 	    } else if(varfuncid.equals("skip") && args == null) {
 	        a = tf.createTerm(UpdateJunctor.SKIP);
 	    } else {

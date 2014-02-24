@@ -22,7 +22,6 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -34,9 +33,6 @@ import de.uka.ilkd.key.util.Debug;
  * variable to a term(instance).
  */
 public class Substitution {
-
-    private final TermBuilder tb = TermBuilder.DF;
-    
     private final ImmutableMap<QuantifiableVariable,Term> varMap;
     
     public Substitution(ImmutableMap<QuantifiableVariable,Term> map){
@@ -86,14 +82,14 @@ public class Substitution {
                 quantifiedVarSort.getCastSymbol (services);
             Term instance = getSubstitutedTerm( var );
             if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) )
-            	instance = tb.func ( quantifiedVarSortCast, instance );
-            t = applySubst ( var, instance, t );
+            	instance = services.getTermBuilder().func ( quantifiedVarSortCast, instance );
+            t = applySubst ( var, instance, t, services );
         }
         return t;
     }
 
-    private Term applySubst(QuantifiableVariable var, Term instance, Term t) {
-        final ClashFreeSubst subst = new ClashFreeSubst ( var,  instance);
+    private Term applySubst(QuantifiableVariable var, Term instance, Term t, Services services) {
+        final ClashFreeSubst subst = new ClashFreeSubst ( var,  instance, services);
         return subst.apply ( t );
     }
     
@@ -110,14 +106,14 @@ public class Substitution {
             Term instance = getSubstitutedTerm( var );
             
             try {
-                t = applySubst ( var, instance, t );
+                t = applySubst ( var, instance, t, services );
             } catch (TermCreationException e) {
                 final Sort quantifiedVarSort = var.sort ();                
                 if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) ) {
                     final Function quantifiedVarSortCast =
                         quantifiedVarSort.getCastSymbol (services);
-                    instance = tb.func ( quantifiedVarSortCast, instance );
-                    t = applySubst ( var, instance, t );
+                    instance = services.getTermBuilder().func ( quantifiedVarSortCast, instance );
+                    t = applySubst ( var, instance, t, services );
                 } else {
                     throw e;
                 }

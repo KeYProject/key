@@ -43,7 +43,7 @@ class TwoSidedMatching {
     TwoSidedMatching(UniTrigger trigger, Term targetTerm, Services services) {
         this.trigger = trigger;
         this.targetSubstWithMVs =
-            ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars ( targetTerm );
+            ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars ( targetTerm, services );
         this.triggerSubstWithMVs =
             trigger.getTriggerSetThisBelongsTo().getReplacementWithMVs ();
         
@@ -100,7 +100,7 @@ class TwoSidedMatching {
             for (QuantifiableVariable quantifiableVariable : trigger.getUniVariables()) {
                 QuantifiableVariable q = quantifiableVariable;
                 Term mv = triggerSubstWithMVs.getSubstitutedTerm(q);
-                Term t = c.getInstantiation((Metavariable) (mv.op()));
+                Term t = c.getInstantiation((Metavariable) (mv.op()), services);
                 if (t == null || t.op() instanceof Metavariable)
                     return null;
                 if (isGround(t))

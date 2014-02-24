@@ -22,7 +22,6 @@ import de.uka.ilkd.key.java.expression.literal.FreeLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -67,7 +66,7 @@ public final class FreeLDT extends LDT {
 
     @Override
     public Term translateLiteral(Literal lit, Services services) {
-        return TermBuilder.DF.func(atom);
+        return services.getTermBuilder().func(atom);
     }
 
     @Override

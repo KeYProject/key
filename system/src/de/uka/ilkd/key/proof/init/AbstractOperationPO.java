@@ -44,9 +44,8 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -588,7 +587,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                 argumentSorts.toArray(new Sort[argumentSorts.size()]));
       services.getNamespaces().functions().addSafely(f);
       // Create term that uses the new predicate
-      uninterpretedPredicate = TermBuilder.DF.func(f, arguments.toArray(new Term[arguments.size()]));
+      uninterpretedPredicate = services.getTermBuilder().func(f, arguments.toArray(new Term[arguments.size()]));
       return uninterpretedPredicate;
    }
 

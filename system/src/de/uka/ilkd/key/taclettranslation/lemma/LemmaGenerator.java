@@ -46,7 +46,7 @@ class LemmaFormula implements TacletFormula {
         }
 
         @Override
-        public Term getFormula() {
+        public Term getFormula(Services services) {
                 return formula.getFirst();
         }
 

@@ -31,7 +31,12 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramConstant;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
@@ -259,7 +264,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             replaceVariable(variables.result),
             replaceVariable(variables.exception),
             replaceRemembranceHeaps(variables.remembranceHeaps),
-            replaceRemembranceLocalVariables(variables.remembranceLocalVariables)
+            replaceRemembranceLocalVariables(variables.remembranceLocalVariables),
+            services
         );
     }
 

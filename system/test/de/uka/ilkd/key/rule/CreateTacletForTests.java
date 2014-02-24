@@ -348,7 +348,7 @@ public class CreateTacletForTests extends TestCase {
 
 	z = new LogicVariable(new Name("z"),sort1);
        	Term t_z=tf.createTerm(z,new Term[0]);
-	Term t_allzpz=TermBuilder.DF.all(z, tf.createTerm(func_p,new Term[]{t_z}));
+	Term t_allzpz=services.getTermBuilder().all(z, tf.createTerm(func_p,new Term[]{t_z}));
  	SequentFormula cf3=new SequentFormula(t_allzpz);
  	seq_testAll=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, 
  					  Semisequent.EMPTY_SEMISEQUENT

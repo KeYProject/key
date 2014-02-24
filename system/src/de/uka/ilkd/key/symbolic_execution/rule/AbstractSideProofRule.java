@@ -13,7 +13,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -21,7 +20,6 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -56,7 +54,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
     * @return The created constant.
     */
    protected Function createResultConstant(Services services, Sort sort) {
-      String functionName = TermBuilder.DF.newName(services, "QueryResult");
+      String functionName = services.getTermBuilder().newName(services, "QueryResult");
       Function function = new Function(new Name(functionName), sort);
       services.getNamespaces().functions().addSafely(function);
       return function;
@@ -69,7 +67,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
     * @return The created result {@link Function}.
     */
    protected Function createResultFunction(Services services, Sort sort) {
-      return new Function(new Name(TermBuilder.DF.newName(services, "ResultPredicate")), Sort.FORMULA, sort);
+      return new Function(new Name(services.getTermBuilder().newName(services, "ResultPredicate")), Sort.FORMULA, sort);
    }
    
    /**
@@ -147,7 +145,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
             }
             else {
                if (!isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
-                  if (resultConditions.add(TermBuilder.DF.not(sf.formula()))) {
+                  if (resultConditions.add(services.getTermBuilder().not(sf.formula()))) {
                      addNewNamesToNamespace(services, sf.formula());
                   }
                }
@@ -158,7 +156,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
             conditions = new LinkedHashSet<Term>();
             conditionsAndResultsMap.put(result, conditions);
          }
-         conditions.add(TermBuilder.DF.and(resultConditions));
+         conditions.add(services.getTermBuilder().and(resultConditions));
       }
       return conditionsAndResultsMap;
    }

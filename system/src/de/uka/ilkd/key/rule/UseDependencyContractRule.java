@@ -32,7 +32,12 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ContractPO;
@@ -50,7 +55,6 @@ public final class UseDependencyContractRule implements BuiltInRule {
                                             = new UseDependencyContractRule();
 
     private static final Name NAME = new Name("Use Dependency Contract");
-    private static final TermBuilder TB = TermBuilder.DF;
 
 
 
@@ -194,6 +198,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Operator op = heapTerm.op();
 	assert heapTerm.sort().equals(heapLDT.targetSort());
+	final TermBuilder TB = services.getTermBuilder();
 	if(heapTerm.equals(stepHeap)) {
 	    return new Pair<Term,ImmutableList<PosInOccurrence>>(
 		    		TB.empty(services),
@@ -443,6 +448,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final Term focus = pio.subTerm();
         final IObserverFunction target = (IObserverFunction) focus.op();
         final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        final TermBuilder TB = services.getTermBuilder();
         
         final Term selfTerm;
         if (target.isStatic()) {
@@ -625,8 +631,12 @@ public final class UseDependencyContractRule implements BuiltInRule {
         return displayName();
     }
 
-	@Override
     public UseDependencyContractApp createApp(PosInOccurrence pos) {
+       return createApp(pos, null);
+    }
+    
+    @Override
+    public UseDependencyContractApp createApp(PosInOccurrence pos, Services services) {
 		return new UseDependencyContractApp(this, pos);
     }
 }

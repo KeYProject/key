@@ -23,7 +23,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -38,9 +37,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
  * Standard implementation of the DependencyContract interface.
  */
 public final class DependencyContractImpl implements DependencyContract {
-
-    private static final TermBuilder TB = TermBuilder.DF;
-
     final String baseName;
     final String name;
     final KeYJavaType kjt;
@@ -185,7 +181,7 @@ public final class DependencyContractImpl implements DependencyContract {
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if(atPreVars.get(h) != null && originalAtPreVar != null) {
-                    map.put(TB.var(originalAtPreVar), TB.var(atPreVars.get(h)));
+                    map.put(services.getTermBuilder().var(originalAtPreVar), services.getTermBuilder().var(atPreVars.get(h)));
                 }
             }
         }
@@ -205,7 +201,7 @@ public final class DependencyContractImpl implements DependencyContract {
             if(result == null) {
                 result = p;
             }else{
-                result = TB.and(result, p);
+                result = services.getTermBuilder().and(result, p);
             }
         }
         return result;
@@ -225,19 +221,19 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
         Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
-        map.put(TB.var(heap), heapTerm);
+        map.put(services.getTermBuilder().var(heap), heapTerm);
         if (originalSelfVar != null) {
-            map.put(TB.var(originalSelfVar), selfTerm);
+            map.put(services.getTermBuilder().var(originalSelfVar), selfTerm);
         }
         for(ProgramVariable originalParamVar : originalParamVars) {
-            map.put(TB.var(originalParamVar), paramTerms.head());
+            map.put(services.getTermBuilder().var(originalParamVar), paramTerms.head());
             paramTerms = paramTerms.tail();
         }
         if(atPres != null && originalAtPreVars != null) {
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if(atPres.get(h) != null && originalAtPreVar != null) {
-                    map.put(TB.var(originalAtPreVar), atPres.get(h));
+                    map.put(services.getTermBuilder().var(originalAtPreVar), atPres.get(h));
                 }
             }
         }
@@ -258,7 +254,7 @@ public final class DependencyContractImpl implements DependencyContract {
             if(result == null) {
                 result = p;
             }else{
-                result = TB.and(result, p);
+                result = services.getTermBuilder().and(result, p);
             }
         }
         return result;
@@ -320,20 +316,20 @@ public final class DependencyContractImpl implements DependencyContract {
         assert services != null;
         Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
         for(LocationVariable heap : heapTerms.keySet()) {
-            map.put(TB.var(heap), heapTerms.get(heap));
+            map.put(services.getTermBuilder().var(heap), heapTerms.get(heap));
         }
         if (originalSelfVar != null) {
-            map.put(TB.var(originalSelfVar), selfTerm);
+            map.put(services.getTermBuilder().var(originalSelfVar), selfTerm);
         }
         for(ProgramVariable originalParamVar : originalParamVars) {
-            map.put(TB.var(originalParamVar), paramTerms.head());
+            map.put(services.getTermBuilder().var(originalParamVar), paramTerms.head());
             paramTerms = paramTerms.tail();
         }
         if(atPres != null && originalAtPreVars != null) {
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if(atPres.get(h) != null && originalAtPreVar != null) {
-                    map.put(TB.var(originalAtPreVar), atPres.get(h));
+                    map.put(services.getTermBuilder().var(originalAtPreVar), atPres.get(h));
                 }
             }
         }
@@ -430,7 +426,7 @@ public final class DependencyContractImpl implements DependencyContract {
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if(atPreVars.get(h) != null && originalAtPreVar != null) {
-                    map.put(TB.var(originalAtPreVar), TB.var(atPreVars.get(h)));
+                    map.put(services.getTermBuilder().var(originalAtPreVar), services.getTermBuilder().var(atPreVars.get(h)));
                 }
             }
         }
@@ -452,19 +448,19 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
         Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
-        map.put(TB.var(heap), heapTerm);
+        map.put(services.getTermBuilder().var(heap), heapTerm);
         if (originalSelfVar != null) {
-            map.put(TB.var(originalSelfVar), selfTerm);
+            map.put(services.getTermBuilder().var(originalSelfVar), selfTerm);
         }
         for(ProgramVariable originalParamVar : originalParamVars) {
-            map.put(TB.var(originalParamVar), paramTerms.head());
+            map.put(services.getTermBuilder().var(originalParamVar), paramTerms.head());
             paramTerms = paramTerms.tail();
         }
         if(atPres != null && originalAtPreVars != null) {
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if(originalAtPreVar != null && atPres.get(h) != null) {
-                    map.put(TB.var(originalAtPreVar), atPres.get(h));
+                    map.put(services.getTermBuilder().var(originalAtPreVar), atPres.get(h));
                 }
             }
         }

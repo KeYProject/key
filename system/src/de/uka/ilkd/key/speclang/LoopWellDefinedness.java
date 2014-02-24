@@ -35,9 +35,9 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     private LoopWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                 LocationVariable heap, OriginalVariables origVars,
                                 Condition requires, Term assignable, Term accessible,
-                                Condition ensures, Term mby, Term rep, LoopInvariant inv) {
+                                Condition ensures, Term mby, Term rep, LoopInvariant inv, Services services) {
         super(name, id, type, target, heap, origVars, requires,
-              assignable, accessible, ensures, mby, rep);
+              assignable, accessible, ensures, mby, rep, services);
         this.inv = inv;
     }
 
@@ -78,7 +78,7 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
         return new LoopWellDefinedness(getName(), newId, type(), getTarget(), getHeap(),
                                        getOrigVars(), getRequires(), getAssignable(),
                                        getAccessible(), getEnsures(), getMby(),
-                                       getRepresents(), getStatement());
+                                       getRepresents(), getStatement(), services);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
         return new LoopWellDefinedness(getName(), id(), type(), newPM, getHeap(),
                                        getOrigVars(), getRequires(), getAssignable(),
                                        getAccessible(), getEnsures(), getMby(),
-                                       getRepresents(), getStatement().setTarget(newKJT, newPM));
+                                       getRepresents(), getStatement().setTarget(newKJT, newPM), services);
     }
 
     @Override

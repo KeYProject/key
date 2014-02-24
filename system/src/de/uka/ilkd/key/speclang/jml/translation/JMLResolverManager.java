@@ -35,7 +35,7 @@ final class JMLResolverManager extends SLResolverManager {
                               KeYJavaType specInClass,
                               ParsableVariable selfVar,
                               SLTranslationExceptionManager eManager) {
-        super(eManager, specInClass, selfVar, false);
+        super(eManager, specInClass, selfVar, false, javaInfo.getServices().getTermBuilder());
         addResolver(new JMLBuiltInPropertyResolver(javaInfo, this, specInClass));
         addResolver(new SLAttributeResolver(javaInfo, this, specInClass));        
         addResolver(new SLMethodResolver(javaInfo, this, specInClass));

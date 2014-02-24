@@ -19,11 +19,16 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.expression.operator.adt.*;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -149,7 +154,7 @@ public final class SeqLDT extends LDT {
     @Override
     public Term translateLiteral(Literal lit, Services services) {
 	assert lit instanceof EmptySeqLiteral;
-	return TermBuilder.DF.func(seqEmpty);
+	return services.getTermBuilder().func(seqEmpty);
     }
     
 

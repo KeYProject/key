@@ -21,8 +21,8 @@ import java.util.Map;
 
 import antlr.Token;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
@@ -33,7 +33,14 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -63,7 +70,7 @@ import de.uka.ilkd.key.util.Triple;
  */
 final class JMLTranslator {
 
-    private final static TermBuilder TB = TermBuilder.DF;
+    private final TermBuilder TB; // TODO: Rename to tb
     private final String fileName;
     private Services services;                          // to be used in future
     private SLTranslationExceptionManager excManager;
@@ -177,6 +184,7 @@ final class JMLTranslator {
                          Services services) {
         this.excManager = excManager;
         this.services = services;
+        this.TB = services.getTermBuilder();
         this.fileName = fileName;
 
         translationMethods =
@@ -1704,7 +1712,7 @@ final class JMLTranslator {
                 T o = castToReturnType(result, resultClass);
                 assert o instanceof Term;
                 Term t = (Term)o;
-                t = TB.label((Term)castToReturnType(result, resultClass), expr.getLabels());
+                t = services.getTermBuilder().label((Term)castToReturnType(result, resultClass), expr.getLabels());
                 return castToReturnType(t, resultClass);
             }
         }

@@ -61,7 +61,6 @@ import de.uka.ilkd.key.util.Pair;
 public abstract class WellDefinednessCheck implements Contract {
 
     private static final String OPTION = "wdChecks";
-    protected static final TermBuilder TB = TermBuilder.DF;
     protected static final TermFactory TF = TermFactory.DEFAULT;
     public static final String INV_TACLET = "wd_Invariant";
     public static final String OP_TACLET = "wd_Operation";
@@ -84,6 +83,9 @@ public abstract class WellDefinednessCheck implements Contract {
     private Term accessible;
     private Term mby;
     private Term represents;
+    
+    protected final TermBuilder TB;
+    protected final Services services;
 
     WellDefinednessCheck(String name, int id, IObserverFunction target,
                          OriginalVariables origVars, Type type, Services services) {
@@ -93,12 +95,14 @@ public abstract class WellDefinednessCheck implements Contract {
         this.target = target;
         this.heap = services.getTypeConverter().getHeapLDT().getHeap();
         this.origVars = origVars;
+        this.services = services;
+        this.TB = services.getTermBuilder();
     }
 
     WellDefinednessCheck(String name, int id, Type type, IObserverFunction target,
                          LocationVariable heap, OriginalVariables origVars,
                          Condition requires, Term assignable, Term accessible,
-                         Condition ensures, Term mby, Term represents) {
+                         Condition ensures, Term mby, Term represents, Services services) {
         this.name = name;
         this.id = id;
         this.type = type;
@@ -111,6 +115,8 @@ public abstract class WellDefinednessCheck implements Contract {
         this.ensures = ensures;
         this.mby = mby;
         this.represents = represents;
+        this.services = services;
+        this.TB = services.getTermBuilder();
     }
 
     //-------------------------------------------------------------------------
@@ -123,7 +129,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param spec specification term
      * @return two lists for implicit and explicit specification parts
      */
-    private static Pair<ImmutableList<Term>, ImmutableList<Term>> sort(Term spec) {
+    private Pair<ImmutableList<Term>, ImmutableList<Term>> sort(Term spec) {
         assert spec != null;
         ImmutableList<Term> implicit = ImmutableSLList.<Term>nil();
         ImmutableList<Term> explicit = ImmutableSLList.<Term>nil();
@@ -355,7 +361,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param spec specification term
      * @return sorted and short-circuit conjuncted specification term
      */
-    private static Condition split(Term spec) {
+    private Condition split(Term spec) {
         Pair<ImmutableList<Term>, ImmutableList<Term>> p = sort(spec);
         ImmutableList<Term> implicit = p.first;
         ImmutableList<Term> explicit   = p.second;
@@ -742,7 +748,7 @@ public abstract class WellDefinednessCheck implements Contract {
             i++;
         }
         final OpReplacer or = new OpReplacer(map);
-        final Term goal = TB.orSC(goal1, or.replace(goal2));
+        final Term goal = services.getTermBuilder().orSC(goal1, or.replace(goal2));
         final RewriteTacletBuilder tb = new RewriteTacletBuilder();
         tb.setFind(find1);
         tb.setName(MiscTools.toValidTacletName(name));
@@ -768,6 +774,7 @@ public abstract class WellDefinednessCheck implements Contract {
                                             Term pre,
                                             boolean isStatic,
                                             Services services) {
+        final TermBuilder TB = services.getTermBuilder();
         final RewriteTacletBuilder tb = new RewriteTacletBuilder();
         final Term notNull = isStatic ? TB.tt() : TB.not(TB.equals(callee, TB.NULL(services)));
         final Term created = isStatic ? TB.tt() : TB.created(services, callee);
@@ -789,6 +796,7 @@ public abstract class WellDefinednessCheck implements Contract {
     final static RewriteTaclet createExcTaclet(String name,
                                                Term callTerm,
                                                Services services) {
+        final TermBuilder TB = services.getTermBuilder();
         final RewriteTacletBuilder tb = new RewriteTacletBuilder();
         tb.setFind(TB.wd(callTerm, services));
         tb.setName(MiscTools.toValidTacletName(name));

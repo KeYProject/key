@@ -79,7 +79,7 @@ class GenericTranslator {
 
                 if (list.size() > 0) {
                         for (Term gt : list) {
-                                result.add(AssumptionGenerator.quantifyTerm(gt));
+                                result.add(AssumptionGenerator.quantifyTerm(gt, services));
 
                         }
                 }
@@ -131,13 +131,13 @@ class GenericTranslator {
                 if (term.sort().equals(generic)) {
 
                         if (term.op() instanceof LogicVariable) {
-                                TermBuilder tb = TermBuilder.DF;
+                                TermBuilder tb = services.getTermBuilder();
                                 term = tb.var(pool.getInstantiationOfLogicVar(
                                                 instantiation,
                                                 (LogicVariable) term.op()));
                         } else if (term.op() instanceof SchemaVariable) {
                                 if (((SchemaVariable) term.op()) instanceof TermSV) {
-                                        term = TermBuilder.DF
+                                        term = services.getTermBuilder()
                                                         .var(pool.getInstantiationOfLogicVar(
                                                                         instantiation,
                                                                         pool.getLogicVariable(
@@ -223,10 +223,10 @@ class GenericTranslator {
                                 i++;
                         }
                         if ((term.op()).equals(Quantifier.ALL)) {
-                                term = TermBuilder.DF.all(copy[0], subTerms[0]);
+                                term = services.getTermBuilder().all(copy[0], subTerms[0]);
                         }
                         if ((term.op()).equals(Quantifier.EX)) {
-                                term = TermBuilder.DF.ex(copy[0], subTerms[0]);
+                                term = services.getTermBuilder().ex(copy[0], subTerms[0]);
                         }
 
                 } else {

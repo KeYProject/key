@@ -22,11 +22,29 @@ import javax.swing.table.AbstractTableModel;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.PosInProgram;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.parser.*;
+import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.parser.IdDeclaration;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InstantiationProposerCollection;
@@ -39,7 +57,10 @@ import de.uka.ilkd.key.proof.SortMismatchException;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.*;
+import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
+import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
+import de.uka.ilkd.key.rule.inst.RigidnessException;
+import de.uka.ilkd.key.rule.inst.SortException;
 
 
 public class TacletInstantiationsTableModel extends AbstractTableModel {
@@ -381,7 +402,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
     public TacletApp createTacletAppFromVarInsts()
         throws SVInstantiationException {
 
-        final TermBuilder tb = TermBuilder.DF;
+        final TermBuilder tb = services.getTermBuilder();
 	TacletApp      result = originalApp;
 	SchemaVariable sv     = null;
 	Sort           sort   = null;

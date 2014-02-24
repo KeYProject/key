@@ -34,8 +34,8 @@ import de.uka.ilkd.key.rule.TacletForTests;
 
 public class TestTerm extends TestCase { 
 
-    private static final TermBuilder TB = TermBuilder.DF;
-    private static final TermFactory tf=TermFactory.DEFAULT;
+    private TermBuilder tb;
+    private TermFactory tf;
 
     private Sort sort1=new SortImpl(new Name("S1"));
     private Sort sort2=new SortImpl(new Name("S2"));
@@ -65,6 +65,12 @@ public class TestTerm extends TestCase {
 	super(name);
     }
 
+    @Override
+    public void setUp() {
+       tb = TacletForTests.services().getTermBuilder();
+       tf = tb.tf();
+    }
+    
     private Term t1(){
 	Term t_x=tf.createTerm(x);
 	Term t_px=tf.createTerm(p, new Term[]{t_x}, null, null);
@@ -89,32 +95,32 @@ public class TestTerm extends TestCase {
     }
   
     public void testFreeVars1() {
-	Term t_allxt2=TB.all(x,t2());
+	Term t_allxt2=tb.all(x,t2());
 	Term t_allxt2_andt1=tf.createTerm(Junctor.AND,t_allxt2,t1());
 	assertTrue(t_allxt2_andt1.freeVars().contains(w) 
 		   && t_allxt2_andt1.freeVars().contains(x));
     }
 
    public void testFreeVars2() {
-	Term t_allxt2=TB.all(w ,t2());
+	Term t_allxt2=tb.all(w ,t2());
 	Term t_allxt2_andt1=tf.createTerm(Junctor.AND,t_allxt2,t1());
 	assertTrue(!t_allxt2_andt1.freeVars().contains(w) 
 		   && t_allxt2_andt1.freeVars().contains(x));
     }
     
     public void testFreeVars3() {
-	Term t_allxt1=TB.all(x, t2());
+	Term t_allxt1=tb.all(x, t2());
 	Term t_allxt1_andt2=tf.createTerm(Junctor.AND,t_allxt1,t1());
-	Term t_exw_allxt1_andt2=TB.ex(w, t_allxt1_andt2); 
+	Term t_exw_allxt1_andt2=tb.ex(w, t_allxt1_andt2); 
 	assertTrue(!t_exw_allxt1_andt2.freeVars().contains(w) 
 		   && t_exw_allxt1_andt2.freeVars().contains(x));
     }
 
    public void testFreeVars4() {
-	Term t_allxt1=TB.all(x, t2());
+	Term t_allxt1=tb.all(x, t2());
 	Term t_allxt1_andt2=tf.createTerm(Junctor.AND,t_allxt1,t1());
 	Term t_exw_allxt1_andt2 =
-                TB.ex(ImmutableSLList.<QuantifiableVariable>nil().append(w, x),
+                tb.ex(ImmutableSLList.<QuantifiableVariable>nil().append(w, x),
                      t_allxt1_andt2);
 	assertTrue(!t_exw_allxt1_andt2.freeVars().contains(w)
 		   && !t_exw_allxt1_andt2.freeVars().contains(x));
@@ -146,12 +152,12 @@ public class TestTerm extends TestCase {
     public void testEqualsModRenaming() {
         
         final Term px = tf.createTerm ( p, new Term[]{tf.createTerm(x)}, null, null );
-        final Term quant1 = TB.all(z, TB.all( zz, TB.all( x, px ) ) );
+        final Term quant1 = tb.all(z, tb.all( zz, tb.all( x, px ) ) );
         
         final Term pz = tf.createTerm ( p, new Term[]{tf.createTerm(z)}, null, null );
-        final Term quant2 = TB.all(z,
-                               TB.all( z,
-                                  TB.all( z, pz ) ) );
+        final Term quant2 = tb.all(z,
+                               tb.all( z,
+                                  tb.all( z, pz ) ) );
         
         assertTrue ( "Terms " + quant1 + " and " + quant2
                      + " should be equal mod renaming",

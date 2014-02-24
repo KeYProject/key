@@ -25,7 +25,6 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
@@ -66,7 +65,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                         throw new IllegalTacletException(result);
                 }
                 Term formula = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR
-                                .translate(taclet);
+                                .translate(taclet, services);
                 formula = rebuild(taclet, formula, services,
                                 new LinkedHashSet<QuantifiableVariable>());
                 result =   checkForIllegalOps(formula, taclet,false);
@@ -260,11 +259,11 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 Name name = createUniqueName(services, "f_"+sv.name().toString());
 
                 Function function = new Function(name, replaceSort(sv.sort(), services), argSorts);
-                return TermBuilder.DF.func(function, args);
+                return services.getTermBuilder().func(function, args);
         }
 
         private Name createUniqueName(Services services, String baseName) {
-                return new Name(TermBuilder.DF.newName(services, baseName));
+                return new Name(services.getTermBuilder().newName(services, baseName));
         }
 
         private Sort[] computeArgSorts(ImmutableSet<SchemaVariable> svSet, Services services) {

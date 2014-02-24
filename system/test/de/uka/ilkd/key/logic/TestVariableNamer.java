@@ -48,7 +48,6 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
 
 public class TestVariableNamer extends TestCase {
     
-    private static final TermBuilder TB = TermBuilder.DF;
 
     private final Proof proof = new Proof(new Services(AbstractProfile.getDefaultProfile()));
     private final Services services = proof.getServices();
@@ -90,7 +89,7 @@ public class TestVariableNamer extends TestCase {
     	StatementBlock statementBlock = new StatementBlock(statement);
     	JavaBlock javaBlock = JavaBlock.createJavaBlock(statementBlock);
 
-	Term term = TB.dia(javaBlock, TB.tt());
+	Term term = services.getTermBuilder().dia(javaBlock, services.getTermBuilder().tt());
 
 	return new SequentFormula(term);
     }
@@ -134,7 +133,7 @@ public class TestVariableNamer extends TestCase {
     }
     
     private void addTacletApp(Goal goal, ProgramVariable containedVar) {
-	Term findTerm = TB.tt();
+	Term findTerm = services.getTermBuilder().tt();
    	AntecTacletBuilder builder = new AntecTacletBuilder();
 	builder.setFind(findTerm);
     	AntecTaclet taclet = builder.getAntecTaclet();

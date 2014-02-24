@@ -87,7 +87,6 @@ public final class UseOperationContractRule implements BuiltInRule {
                                             = new UseOperationContractRule();
 
     private static final Name NAME = new Name("Use Operation Contract");
-    private static final TermBuilder TB = TermBuilder.DF;
 
     private Term lastFocusTerm;
     private Instantiation lastInstantiation;
@@ -308,6 +307,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	                                     	    	   Services services) {
 	assert pm != null;
 	assert mod != null;
+	final TermBuilder TB = services.getTermBuilder();
 
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name methodHeapName = new Name(TB.newName(services, heap+"After_" + pm.getName()));
@@ -333,6 +333,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    		     	    Term selfTerm,
 	    		     	    Map<LocationVariable, Term> heapAtPres,
 	    		     	    Services services) {
+        final TermBuilder TB = services.getTermBuilder();
         final Term result;
         if(pm.isConstructor()) {
             assert resultTerm == null;
@@ -454,6 +455,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	//leading update?
 	final Term u;
 	final Term progPost;
+   final TermBuilder TB = services.getTermBuilder();
 	if(focusTerm.op() instanceof UpdateApplication) {
 	    u = UpdateApplication.getUpdate(focusTerm);
 	    progPost = UpdateApplication.getTarget(focusTerm);
@@ -572,6 +574,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	final Instantiation inst
 		= instantiate(ruleApp.posInOccurrence().subTerm(), services);
         final JavaBlock jb = inst.progPost.javaBlock();
+        final TermBuilder TB = services.getTermBuilder();
 
         //configure contract
         final FunctionalOperationContract contract =
@@ -919,10 +922,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 	}
     }
 
-
-
-	@Override
     public ContractRuleApp createApp(PosInOccurrence pos) {
+       return createApp(pos, null);
+    }
+
+    @Override
+    public ContractRuleApp createApp(PosInOccurrence pos, Services services) {
 		return new ContractRuleApp(this, pos);
     }
 
@@ -950,6 +955,7 @@ public final class UseOperationContractRule implements BuiltInRule {
    }
 
    public static ProgramVariable computeResultVar(Instantiation inst, Services services) {
+      final TermBuilder TB = services.getTermBuilder();
       return inst.pm.isConstructor() ? 
              TB.selfVar(services, inst.staticType, true) : 
              TB.resultVar(services, inst.pm, true);

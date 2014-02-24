@@ -99,6 +99,7 @@ public interface BlockContract extends SpecificationElement {
     public OriginalVariables getOrigVars();
 
     public static class Variables {
+        private final Services services;
 
         public static Variables create(final StatementBlock block, final List<Label> labels,
                                        final IProgramMethod method, final Services services)
@@ -122,8 +123,10 @@ public interface BlockContract extends SpecificationElement {
                          final ProgramVariable result,
                          final ProgramVariable exception,
                          final Map<LocationVariable, LocationVariable> remembranceHeaps,
-                         final Map<LocationVariable, LocationVariable> remembranceLocalVariables)
+                         final Map<LocationVariable, LocationVariable> remembranceLocalVariables,
+                         final Services services)
         {
+            this.services = services;
             this.self = self;
             this.breakFlags = breakFlags;
             this.continueFlags = continueFlags;
@@ -183,7 +186,7 @@ public interface BlockContract extends SpecificationElement {
         private Term termifyVariable(final ProgramVariable variable)
         {
             if (variable != null) {
-                return TermBuilder.DF.var(variable);
+                return services.getTermBuilder().var(variable);
             }
             else {
                 return null;
@@ -192,7 +195,7 @@ public interface BlockContract extends SpecificationElement {
 
     }
 
-    public static class VariablesCreator extends TermBuilder.Serviced {
+    public static class VariablesCreator extends TermBuilder {
 
         private static final String BREAK_FLAG_BASE_NAME = "broke";
         private static final String CONTINUE_FLAG_BASE_NAME = "continued";
@@ -227,7 +230,8 @@ public interface BlockContract extends SpecificationElement {
                 resultVar(method, false),
                 excVar(method, false),
                 createRemembranceHeaps(),
-                createRemembranceLocalVariables()
+                createRemembranceLocalVariables(),
+                services
             );
         }
 

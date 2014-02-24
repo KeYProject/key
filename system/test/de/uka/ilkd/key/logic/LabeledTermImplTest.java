@@ -15,10 +15,12 @@ package de.uka.ilkd.key.logic;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.rule.TacletForTests;
 
 public class LabeledTermImplTest extends TestCase {
 
@@ -46,12 +48,13 @@ public class LabeledTermImplTest extends TestCase {
 	 */
 	public void testGetHasAndContainsLabels() {
 	   // Create terms
-	   Term unlabled = TermBuilder.DF.tt();
+	   Services services = TacletForTests.services();
+	   Term unlabled = services.getTermBuilder().tt();
 	   SymbolicExecutionTermLabel sedLabel = new SymbolicExecutionTermLabel(1);
       SymbolicExecutionTermLabel anotherSedLabel = new SymbolicExecutionTermLabel(2);
-	   Term oneLabel = TermBuilder.DF.label(unlabled, sedLabel);
-	   Term oneLabelChanged = TermBuilder.DF.label(oneLabel, ParameterlessTermLabel.LOOP_BODY_LABEL);
-	   Term twoLabels = TermBuilder.DF.label(unlabled, new ImmutableArray<TermLabel>(ParameterlessTermLabel.LOOP_BODY_LABEL, sedLabel));
+	   Term oneLabel = services.getTermBuilder().label(unlabled, sedLabel);
+	   Term oneLabelChanged = services.getTermBuilder().label(oneLabel, ParameterlessTermLabel.LOOP_BODY_LABEL);
+	   Term twoLabels = services.getTermBuilder().label(unlabled, new ImmutableArray<TermLabel>(ParameterlessTermLabel.LOOP_BODY_LABEL, sedLabel));
 	   // Test unlabled
 	   assertFalse(unlabled.hasLabels());
 	   assertNotNull(unlabled.getLabels());

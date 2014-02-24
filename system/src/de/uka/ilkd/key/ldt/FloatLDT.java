@@ -22,7 +22,6 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -72,7 +71,7 @@ public final class FloatLDT extends LDT {
     public Term translateLiteral(Literal lit, Services services) {
 	    // return skolem term
         final Function sk = new Function(new Name(""+NAME+lit),targetSort());
-        return TermBuilder.DF.func(sk);
+        return services.getTermBuilder().func(sk);
     }
 
 

@@ -37,7 +37,6 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -101,7 +100,6 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class Taclet implements Rule, Named {
     
     private static final String AUTONAME = "_taclet";
-    private static final TermBuilder TB = TermBuilder.DF;
 
     /** name of the taclet */
     private final Name name;
@@ -622,7 +620,7 @@ public abstract class Taclet implements Rule, Named {
 	if (p_matchCond.getInstantiations().getUpdateContext().isEmpty())
 	    updateFormula = p_template;
 	else
-	    updateFormula = TB.applyUpdatePairsSequential(p_matchCond.getInstantiations()
+	    updateFormula = p_services.getTermBuilder().applyUpdatePairsSequential(p_matchCond.getInstantiations()
 		    .getUpdateContext(), p_template);
 
 	IfFormulaInstantiation cf;
@@ -908,7 +906,7 @@ public abstract class Taclet implements Rule, Named {
                     services, matchCond, applicationPosInOccurrence);
                 
         if (!svInst.getUpdateContext().isEmpty()) {
-            instantiatedFormula = TB.applyUpdatePairsSequential(svInst.getUpdateContext(), 
+            instantiatedFormula = services.getTermBuilder().applyUpdatePairsSequential(svInst.getUpdateContext(), 
             		           	             instantiatedFormula);         
 	     }
         
@@ -1202,7 +1200,7 @@ public abstract class Taclet implements Rule, Named {
 
 		    // negate formulas of the if succedent
 		    if ( i <= 0 )
-			ifPart = TB.not(ifPart);		    
+			ifPart = p_goal.proof().getServices().getTermBuilder().not(ifPart);		    
 
 		    if ( res == null ) {
 			res   = p_goal.split( p_numberOfNewGoals + 1 );

@@ -62,7 +62,7 @@ public class TriggersSet {
 
     private TriggersSet(Term allTerm, Services services) {
         this.allTerm = allTerm;
-        replacementWithMVs = ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars(allTerm);
+        replacementWithMVs = ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars(allTerm, services);
         uniQuantifiedVariables = getAllUQS(allTerm);
         initTriggers(services);
     }

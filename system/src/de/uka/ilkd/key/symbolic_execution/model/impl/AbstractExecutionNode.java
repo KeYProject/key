@@ -18,7 +18,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -115,7 +114,7 @@ public abstract class AbstractExecutionNode extends AbstractExecutionElement imp
          }
       }
       // Check if a path condition was found.
-      return result != null ? result :  TermBuilder.DF.tt();
+      return result != null ? result : getServices().getTermBuilder().tt();
    }
 
    /**
@@ -135,7 +134,7 @@ public abstract class AbstractExecutionNode extends AbstractExecutionElement imp
          }
       }
       // Check if a path condition was found.
-      return result != null ? result :  TermBuilder.DF.tt().toString();
+      return result != null ? result : getServices().getTermBuilder().tt().toString();
    }
 
    /**

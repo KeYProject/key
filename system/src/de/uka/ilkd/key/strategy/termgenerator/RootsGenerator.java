@@ -47,16 +47,17 @@ public class RootsGenerator implements TermGenerator {
 
     private final ProjectionToTerm powerRelation;
 
-    final TermBuilder tb = TermBuilder.DF;        
+    private final TermBuilder tb;
     private final BigInteger one = BigInteger.ONE;
     private final BigInteger two = BigInteger.valueOf ( 2 );
 
-    public static TermGenerator create(ProjectionToTerm powerRelation) {
-        return new RootsGenerator ( powerRelation );
+    public static TermGenerator create(ProjectionToTerm powerRelation, Services services) {
+        return new RootsGenerator ( powerRelation, services.getTermBuilder() );
     }
     
-    private RootsGenerator(ProjectionToTerm powerRelation) {
+    private RootsGenerator(ProjectionToTerm powerRelation, TermBuilder tb) {
         this.powerRelation = powerRelation;
+        this.tb = tb;
     }
 
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {

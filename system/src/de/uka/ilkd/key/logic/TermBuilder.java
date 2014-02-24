@@ -82,13 +82,15 @@ public class TermBuilder {
 
     private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
 
-    public static final TermBuilder DF = new TermBuilder(); // TODO: Move instance into services (analog to TermFactory)
-
     private static final TermFactory tf = TermFactory.DEFAULT;
     private static final Term tt = TermFactory.DEFAULT.createTerm(Junctor.TRUE);
     private static final Term ff = TermFactory.DEFAULT.createTerm(Junctor.FALSE);
 
-    public TermBuilder() {
+    protected final Services services; // TODO; Make private
+    
+    public TermBuilder(Services services) {
+       assert services != null;
+       this.services = services;
     }
 
 
@@ -2109,7 +2111,7 @@ public class TermBuilder {
     /**
      * Removes leading updates from the passed term.
      */
-    public Term goBelowUpdates(Term term) {
+    public static Term goBelowUpdates(Term term) {
         while(term.op() instanceof UpdateApplication) {
             term = UpdateApplication.getTarget(term);
         }
@@ -2121,7 +2123,7 @@ public class TermBuilder {
     /**
      * Removes leading updates from the passed term.
      */
-    public Pair<ImmutableList<Term>,Term> goBelowUpdates2(Term term) {
+    public static Pair<ImmutableList<Term>,Term> goBelowUpdates2(Term term) {
     ImmutableList<Term> updates = ImmutableSLList.<Term>nil();
         while(term.op() instanceof UpdateApplication) {
             updates = updates.append(UpdateApplication.getUpdate(term));
@@ -2159,98 +2161,88 @@ public class TermBuilder {
        return result;
     }
 
-    public static class Serviced extends TermBuilder {
 
-        protected final Services services;
+    public String newName(final String baseName)
+    {
+        return newName(services, baseName);
+    }
 
-        public Serviced(final Services services)
-        {
-            assert services != null;
-            this.services = services;
-        }
+    public LocationVariable selfVar(final IProgramMethod method, final KeYJavaType type, final boolean makeNameUnique)
+    {
+        return selfVar(services, method, type, makeNameUnique);
+    }
 
-        public String newName(final String baseName)
-        {
-            return newName(services, baseName);
-        }
+    public LocationVariable resultVar(final IProgramMethod method, final boolean makeNameUnique)
+    {
+        return resultVar(services, method, makeNameUnique);
+    }
 
-        public LocationVariable selfVar(final IProgramMethod method, final KeYJavaType type, final boolean makeNameUnique)
-        {
-            return selfVar(services, method, type, makeNameUnique);
-        }
+    public LocationVariable excVar(final IProgramMethod method, final boolean makeNameUnique)
+    {
+        return excVar(services, method, makeNameUnique);
+    }
 
-        public LocationVariable resultVar(final IProgramMethod method, final boolean makeNameUnique)
-        {
-            return resultVar(services, method, makeNameUnique);
-        }
+    public LocationVariable heapAtPreVar(final String baseName, final Sort sort, final boolean makeNameUnique)
+    {
+        return heapAtPreVar(services, baseName, sort, makeNameUnique);
+    }
 
-        public LocationVariable excVar(final IProgramMethod method, final boolean makeNameUnique)
-        {
-            return excVar(services, method, makeNameUnique);
-        }
+    public Term convertToFormula(final Term term)
+    {
+        return convertToFormula(term, services);
+    }
 
-        public LocationVariable heapAtPreVar(final String baseName, final Sort sort, final boolean makeNameUnique)
-        {
-            return heapAtPreVar(services, baseName, sort, makeNameUnique);
-        }
+    public Term elementary(final UpdateableOperator leftHandSide, final Term rightHandSide) {
+        return elementary(services, leftHandSide, rightHandSide);
+    }
 
-        public Term convertToFormula(final Term term)
-        {
-            return convertToFormula(term, services);
-        }
+    public Term TRUE()
+    {
+        return TRUE(services);
+    }
 
-        public Term elementary(final UpdateableOperator leftHandSide, final Term rightHandSide) {
-            return elementary(services, leftHandSide, rightHandSide);
-        }
+    public Term FALSE()
+    {
+        return FALSE(services);
+    }
 
-        public Term TRUE()
-        {
-            return TRUE(services);
-        }
+    public Term NULL()
+    {
+        return NULL(services);
+    }
 
-        public Term FALSE()
-        {
-            return FALSE(services);
-        }
+    public Term wellFormed(final Term heap)
+    {
+        return wellFormed(heap, services);
+    }
 
-        public Term NULL()
-        {
-            return NULL(services);
-        }
+    public Term wellFormed(final LocationVariable heap)
+    {
+        return wellFormed(heap, services);
+    }
 
-        public Term wellFormed(final Term heap)
-        {
-            return wellFormed(heap, services);
-        }
+    public Term reachableValue(final ProgramVariable variable)
+    {
+        return reachableValue(services, variable);
+    }
 
-        public Term wellFormed(final LocationVariable heap)
-        {
-            return wellFormed(heap, services);
-        }
+    public Term frame(final Term heapTerm, final Map<Term, Term> normalToAtPre, final Term modifiesClause)
+    {
+        return frame(services, heapTerm, normalToAtPre, modifiesClause);
+    }
 
-        public Term reachableValue(final ProgramVariable variable)
-        {
-            return reachableValue(services, variable);
-        }
+    public Term frameStrictlyEmpty(final Term heapTerm, final Map<Term, Term> normalToAtPre)
+    {
+        return frameStrictlyEmpty(services, heapTerm, normalToAtPre);
+    }
 
-        public Term frame(final Term heapTerm, final Map<Term, Term> normalToAtPre, final Term modifiesClause)
-        {
-            return frame(services, heapTerm, normalToAtPre, modifiesClause);
-        }
+    public Term anonUpd(final LocationVariable heap, final Term modifiesClause, final Term anonymisationHeap)
+    {
+        return anonUpd(heap, services, modifiesClause, anonymisationHeap);
+    }
 
-        public Term frameStrictlyEmpty(final Term heapTerm, final Map<Term, Term> normalToAtPre)
-        {
-            return frameStrictlyEmpty(services, heapTerm, normalToAtPre);
-        }
-
-        public Term anonUpd(final LocationVariable heap, final Term modifiesClause, final Term anonymisationHeap)
-        {
-            return anonUpd(heap, services, modifiesClause, anonymisationHeap);
-        }
-
-        public Term union(final Term firstLocationSet, final Term secondLocationSet)
-        {
-            return union(services, firstLocationSet, secondLocationSet);
-        }
+    public Term union(final Term firstLocationSet, final Term secondLocationSet)
+    {
+        return union(services, firstLocationSet, secondLocationSet);
     }
 }

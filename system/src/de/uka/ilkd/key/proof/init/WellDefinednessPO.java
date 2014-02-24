@@ -36,8 +36,8 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassWellDefinedness;
-import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.POTerms;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.TermAndFunc;
@@ -85,7 +85,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     private static Function createAnonHeap(LocationVariable heap,
                                            Services services) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final Name anonHeapName = new Name(TB.newName(services, "anon_"+heap.toString()));
+        final Name anonHeapName = new Name(services.getTermBuilder().newName(services, "anon_"+heap.toString()));
         final Function anonHeap = new Function(anonHeapName, heapLDT.targetSort());
         return anonHeap;
     }
@@ -94,9 +94,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                                                KeYJavaType selfKJT,
                                                Services services) {
         if (pm == null) {
-            return TB.selfVar(services, selfKJT, false);
+            return services.getTermBuilder().selfVar(services, selfKJT, false);
         } else {
-            return TB.selfVar(services, pm, selfKJT, true);
+            return services.getTermBuilder().selfVar(services, pm, selfKJT, true);
         }
     }
 
@@ -105,7 +105,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         if (pm == null) {
             return null;
         } else {
-            return TB.resultVar(services, pm, true);
+            return services.getTermBuilder().resultVar(services, pm, true);
         }
     }
 
@@ -114,7 +114,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         if (pm == null) {
             return null;
         } else {
-            return TB.excVar(services, pm, true);
+            return services.getTermBuilder().excVar(services, pm, true);
         }
     }
 
@@ -123,7 +123,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final Map<LocationVariable, ProgramVariable> res =
                 new LinkedHashMap<LocationVariable, ProgramVariable>();
         final ProgramVariable atPre =
-                TB.heapAtPreVar(services, heap.name()+"AtPre", heap.sort(), true);
+              services.getTermBuilder().heapAtPreVar(services, heap.name()+"AtPre", heap.sort(), true);
         res.put(heap, atPre);
         return res;
     }
@@ -146,7 +146,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                                                                ImmutableList<ProgramVariable>
                                                                           origParams,
                                                                Services services) {
-        final ImmutableList<ProgramVariable> params = TB.paramVars(services, target, true);
+        final ImmutableList<ProgramVariable> params = services.getTermBuilder().paramVars(services, target, true);
         return addGhostParams(params, origParams);
     }
 
@@ -196,7 +196,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         } else {
             params = ImmutableSLList.<ProgramVariable>nil();
         }
-        return new Variables(self, result, exception, atPres, params, heap, anonHeap);
+        return new Variables(self, result, exception, atPres, params, heap, anonHeap, services);
     }
 
     /**
@@ -365,9 +365,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                           final Map<LocationVariable, ProgramVariable> atPres,
                           final ImmutableList<ProgramVariable> params,
                           final LocationVariable heap,
-                          final Function anonHeap) {
+                          final Function anonHeap, Services services) {
             this(self, result, exception, atPres, params, heap,
-                 TB.label(TB.func(anonHeap), ParameterlessTermLabel.ANON_HEAP_LABEL));
+                  services.getTermBuilder().label(services.getTermBuilder().func(anonHeap), ParameterlessTermLabel.ANON_HEAP_LABEL));
         }
     }
 }

@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -106,6 +107,7 @@ public final class QueryAxiom extends ClassAxiom {
 	    		ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, 
 	    		Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final TermBuilder TB = services.getTermBuilder();
 	
 	//create schema variables
 	final List<SchemaVariable> heapSVs = new ArrayList<SchemaVariable>();

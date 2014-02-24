@@ -75,7 +75,12 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
     public static class SMTRule implements BuiltInRule {
 	private Name name = new Name("SMTRule");
 
-	public RuleAppSMT createApp( PosInOccurrence pos ) {
+	  public RuleAppSMT createApp( PosInOccurrence pos) {
+	     return createApp(pos, null);
+	  }
+
+	@Override
+	public RuleAppSMT createApp( PosInOccurrence pos, Services services ) {
 		return new RuleAppSMT( this, pos );
 	}
 

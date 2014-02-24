@@ -20,7 +20,6 @@ import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -71,10 +70,10 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
         
         public Term createIfElseTerm(Term phi, Services services){
             if(rhs1.equals(rhs2)){
-                return TermBuilder.DF.elementary(services, op, rhs1);
+                return services.getTermBuilder().elementary(services, op, rhs1);
             }
-            Term ifThenElse = TermBuilder.DF.ife(phi, rhs1, rhs2);
-            return TermBuilder.DF.elementary(services,op,ifThenElse);
+            Term ifThenElse = services.getTermBuilder().ife(phi, rhs1, rhs2);
+            return services.getTermBuilder().elementary(services,op,ifThenElse);
             
         }
         
@@ -170,12 +169,12 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
         if(!collect(map,u2,false)){
             return null;
         }
-        Term result = TermBuilder.DF.skip();
+        Term result = services.getTermBuilder().skip();
         for(ElementaryUpdateWrapper euw : map.values()){
-            result = TermBuilder.DF.parallel(result, euw.createIfElseTerm(phi, services));
+            result = services.getTermBuilder().parallel(result, euw.createIfElseTerm(phi, services));
         }
         
-        result = TermBuilder.DF.apply(result, t, null);
+        result = services.getTermBuilder().apply(result, t, null);
         return result;
     }
     
@@ -196,8 +195,8 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
             return mc;
         }
         
-        u1Inst = u1Inst == null ? TermBuilder.DF.skip() : u1Inst;
-        u2Inst = u2Inst == null ? TermBuilder.DF.skip() : u2Inst;
+        u1Inst = u1Inst == null ? services.getTermBuilder().skip() : u1Inst;
+        u2Inst = u2Inst == null ? services.getTermBuilder().skip() : u2Inst;
 
         Term properResultInst = simplify(phiInst, u1Inst, u2Inst, tInst, services);
         if(properResultInst == null) {

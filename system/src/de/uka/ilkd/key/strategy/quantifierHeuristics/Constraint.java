@@ -14,11 +14,9 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 
 /**
  * Abstract constraint interface for constraints offering unification of terms
@@ -58,13 +56,14 @@ public interface Constraint {
     boolean isSatisfiable();
 
     /**
-     * @return Find a term the given metavariable can be instantiated with which
+     * @param services TODO
+    * @return Find a term the given metavariable can be instantiated with which
      *         is consistent with every instantiation that satisfies this
      *         constraint (that means, the term such an instantiation
      *         substitutes the metavariable with can always be unified with the
      *         returned term).
      */
-    Term getInstantiation(Metavariable p_mv);
+    Term getInstantiation(Metavariable p_mv, Services services);
 
     /**
      * tries to unify the terms t1 and t2
@@ -149,14 +148,6 @@ public interface Constraint {
      */
     Constraint join(Constraint co, Services services, BooleanContainer unchanged);
 
-    /**
-     * @return a constraint derived from this one by removing all constraints on
-     *         the given variable, which may therefore have any value according
-     *         to the new constraint (the possible values of other variables are
-     *         not modified)
-     */
-    Constraint removeVariables ( ImmutableSet<Metavariable> mvs );
-
     /** @return String representation of the constraint */
     String toString();
 
@@ -177,10 +168,10 @@ public interface Constraint {
 	    return false;
 	}
 
-	public Term getInstantiation(Metavariable p_mv) {
+	public Term getInstantiation(Metavariable p_mv, Services services) {
 	    // As there is in fact no instantiation satisfying this
 	    // constraint, we could return everything
-	    return TermBuilder.DF.var(p_mv);
+	    return services.getTermBuilder().var(p_mv);
 	}
 
 	/**
@@ -241,19 +232,6 @@ public interface Constraint {
 	 */
 	public boolean isBottom() {
 	    return false;
-	}
-
-	/**
-	 * @return a constraint derived from this one by removing all
-	 *         constraints on the given variable, which may therefore have
-	 *         any value according to the new constraint (the possible
-	 *         values of other variables are not modified)
-	 */
-	@Override
-	public Constraint removeVariables ( ImmutableSet<Metavariable> mvs ) {
-	    // the constraint will still be unsatisfiable, as the
-	    // other variables have no valid instantiations
-	    return this;
 	}
 
 	/**

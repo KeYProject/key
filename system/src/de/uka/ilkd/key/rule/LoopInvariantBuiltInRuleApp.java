@@ -51,20 +51,23 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private final List<LocationVariable> heapContext;
 
-    public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pos) {
-        this(rule, pos, null, null, null);
+   private final Services services;
+
+    public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pos, Services services) {
+        this(rule, pos, null, null, null, services);
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
-            LoopInvariant inv, List<LocationVariable> heapContext) {
+            LoopInvariant inv, List<LocationVariable> heapContext, Services services) {
         super(rule, pio, ifInsts);
         assert pio != null;
         this.loop = (While) JavaTools.getActiveStatement(programTerm()
                 .javaBlock());
         assert loop != null;
-        this.inv = instantiateIndexValues(inv);
+        this.inv = instantiateIndexValues(inv, services);
         this.heapContext = heapContext;
+        this.services = services;
     }
     
     /**
@@ -76,12 +79,13 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
      * if the second statement in the loop body has the form <code>v = xxx</code>,
      * where <code>v</code> is a ghost variable of type sequence, values is instantiated with <code>v</code>,
      * otherwise <code>rawInv</code> is returned.
+    * @param services TODO
      */
-    private LoopInvariant instantiateIndexValues(LoopInvariant rawInv){
+    private LoopInvariant instantiateIndexValues(LoopInvariant rawInv, Services services){
     	if (rawInv == null) return null;
     	Map<LocationVariable,Term> invs = rawInv.getInternalInvariants();
     	Term var = rawInv.getInternalVariant();
-        final TermBuilder tb = TermBuilder.DF;
+        final TermBuilder tb = services.getTermBuilder();
     	boolean skipIndex = false;
     	boolean skipValues = false;
     	
@@ -208,8 +212,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence pio, LoopInvariant inv) {
-        this(rule, pio, null, inv, null);
+            PosInOccurrence pio, LoopInvariant inv, Services services) {
+        this(rule, pio, null, inv, null, services);
 
     }
 
@@ -247,14 +251,14 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     public Term programTerm() {
         if (posInOccurrence() != null) {
-            return TermBuilder.DF.goBelowUpdates(posInOccurrence().subTerm());
+            return TermBuilder.goBelowUpdates(posInOccurrence().subTerm());
         }
         return null;
     }
 
     @Override
     public LoopInvariantBuiltInRuleApp replacePos(PosInOccurrence newPos) {
-        return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, inv, heapContext);
+        return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, inv, heapContext, services);
     }
 
     public LoopInvariant retrieveLoopInvariantFromSpecification(
@@ -271,7 +275,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public LoopInvariantBuiltInRuleApp setLoopInvariant(LoopInvariant inv) {
-        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext);
+        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext, services);
     }
 
     @Override
@@ -282,7 +286,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         final LoopInvariant inv = retrieveLoopInvariantFromSpecification(goal.proof().getServices());
         Modality m = (Modality)programTerm().op();
         boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION); 
-        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, HeapContext.getModHeaps(goal.proof().getServices(), transaction));
+        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, HeapContext.getModHeaps(goal.proof().getServices(), transaction), services);
     }
 
     public boolean variantAvailable() {

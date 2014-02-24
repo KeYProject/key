@@ -79,7 +79,6 @@ public class BlockContractRule implements BuiltInRule {
 
     private static final Name NAME = new Name("Block Contract");
     private static final String ANONYMISATION_PREFIX = "anon_";
-    private static final TermBuilder TB = TermBuilder.DF;
 
     private static Term lastFocusTerm;
     private static Instantiation lastInstantiation;
@@ -291,7 +290,7 @@ public class BlockContractRule implements BuiltInRule {
         for (LocationVariable variable : variables) {
             if(contract.hasModifiesClause(variable)) {
                 final String anonymisationName =
-                        TB.newName(services, ANONYMISATION_PREFIX + variable.name());
+                      services.getTermBuilder().newName(services, ANONYMISATION_PREFIX + variable.name());
                 final Function anonymisationFunction =
                         new Function(new Name(anonymisationName), variable.sort());
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
@@ -302,7 +301,7 @@ public class BlockContractRule implements BuiltInRule {
     }
 
     @Override
-    public BlockContractBuiltInRuleApp createApp(final PosInOccurrence occurrence)
+    public BlockContractBuiltInRuleApp createApp(final PosInOccurrence occurrence, Services services)
     {
         return new BlockContractBuiltInRuleApp(this, occurrence);
     }
@@ -400,7 +399,7 @@ public class BlockContractRule implements BuiltInRule {
                 return UpdateApplication.getUpdate(formula);
             }
             else {
-                return TB.skip();
+                return services.getTermBuilder().skip();
             }
         }
 
@@ -486,7 +485,8 @@ public class BlockContractRule implements BuiltInRule {
                 createAndRegisterVariable(placeholderVariables.result),
                 createAndRegisterVariable(placeholderVariables.exception),
                 createAndRegisterRemembranceVariables(placeholderVariables.remembranceHeaps),
-                createAndRegisterRemembranceVariables(placeholderVariables.remembranceLocalVariables)
+                createAndRegisterRemembranceVariables(placeholderVariables.remembranceLocalVariables),
+                services
             );
         }
 
@@ -518,7 +518,7 @@ public class BlockContractRule implements BuiltInRule {
         private LocationVariable createAndRegisterVariable(final ProgramVariable placeholderVariable)
         {
             if (placeholderVariable != null) {
-                String newName = TB.newName(services, placeholderVariable.name().toString());
+                String newName = services.getTermBuilder().newName(services, placeholderVariable.name().toString());
                 LocationVariable newVariable =
                         new LocationVariable(new ProgramElementName(newName),
                                              placeholderVariable.getKeYJavaType());
@@ -532,7 +532,7 @@ public class BlockContractRule implements BuiltInRule {
 
     }
 
-    private static final class UpdatesBuilder extends TermBuilder.Serviced {
+    private static final class UpdatesBuilder extends TermBuilder {
 
         private final BlockContract.Variables variables;
 
@@ -568,7 +568,7 @@ public class BlockContractRule implements BuiltInRule {
                 final Term modifiesClause = modifiesClauses.get(anonymisationHeap.getKey());
                 if (!modifiesClause.equals(strictlyNothing())) {
                     anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause,
-                                                  TB.label(TB.func(anonymisationHeap.getValue()),
+                          services.getTermBuilder().label(services.getTermBuilder().func(anonymisationHeap.getValue()),
                                                            ParameterlessTermLabel.ANON_HEAP_LABEL));
                 }
                 result = parallel(result, anonymisationUpdate);
@@ -600,7 +600,7 @@ public class BlockContractRule implements BuiltInRule {
 
     }
 
-    private static final class ConditionsAndClausesBuilder extends TermBuilder.Serviced {
+    private static final class ConditionsAndClausesBuilder extends TermBuilder {
 
         private final BlockContract contract;
         private final List<LocationVariable> heaps;
@@ -648,7 +648,7 @@ public class BlockContractRule implements BuiltInRule {
         {
             final Term reachableResult =
                     (variables.result != null) ?
-                    reachableValue(variables.result) : TB.tt();
+                    reachableValue(variables.result) : services.getTermBuilder().tt();
             return and(
                 buildReachableCondition(localOutVariables),
                 reachableResult,
@@ -731,7 +731,7 @@ public class BlockContractRule implements BuiltInRule {
         {
             Term result = tt();
             for (Function anonymisationFunction : anonymisationHeaps.values()) {
-                result = and(result, wellFormed(TB.label(TB.func(anonymisationFunction),
+                result = and(result, wellFormed(services.getTermBuilder().label(services.getTermBuilder().func(anonymisationFunction),
                                                          ParameterlessTermLabel.ANON_HEAP_LABEL)));
             }
             return result;
@@ -811,7 +811,7 @@ public class BlockContractRule implements BuiltInRule {
             final BlockWellDefinedness bwd = new BlockWellDefinedness(contract, localIns, services);
             services.getSpecificationRepository().addWdStatement(bwd);
             final LocationVariable heapAtPre = variables.remembranceHeaps.get(heap);
-            final Term anon = anonHeap != null ? TB.func(anonHeap) : null;
+            final Term anon = anonHeap != null ? services.getTermBuilder().func(anonHeap) : null;
             final SequentFormula wdBlock = bwd.generateSequent(variables.self, variables.exception,
                                                                variables.result, heap, heapAtPre,
                                                                anon, localIns, update, services);
@@ -823,7 +823,7 @@ public class BlockContractRule implements BuiltInRule {
         {
             goal.setBranchLabel("Validity");
             goal.addFormulaToAntecedent(new SequentFormula(
-                    TB.applySequential(updates, TB.and(assumptions))),
+                  services.getTermBuilder().applySequential(updates, services.getTermBuilder().and(assumptions))),
                     false);
 
             final StatementBlock block =
@@ -832,10 +832,10 @@ public class BlockContractRule implements BuiltInRule {
             Statement wrappedBlock = wrapInMethodFrameIfContextIsAvailable(block);
             StatementBlock finishedBlock = finishTransactionIfModalityIsTransactional(wrappedBlock);
             goal.changeFormula(new SequentFormula(
-                TB.applySequential(
+                  services.getTermBuilder().applySequential(
                     updates,
-                    TB.prog(instantiation.modality, JavaBlock.createJavaBlock(finishedBlock),
-                            TB.and(postconditions)))
+                    services.getTermBuilder().prog(instantiation.modality, JavaBlock.createJavaBlock(finishedBlock),
+                          services.getTermBuilder().and(postconditions)))
                 ),
                 occurrence
             );
@@ -870,7 +870,7 @@ public class BlockContractRule implements BuiltInRule {
         {
             goal.setBranchLabel("Precondition");
             goal.changeFormula(new SequentFormula(
-                    TB.apply(update, TB.and(preconditions), null)),
+                  services.getTermBuilder().apply(update, services.getTermBuilder().and(preconditions), null)),
                     occurrence);
         }
 
@@ -878,15 +878,15 @@ public class BlockContractRule implements BuiltInRule {
         {
             goal.setBranchLabel("Usage");
             goal.addFormula(new SequentFormula(
-                    TB.applySequential(updates, TB.and(assumptions))),
+                  services.getTermBuilder().applySequential(updates, services.getTermBuilder().and(assumptions))),
                     true, false);
             goal.changeFormula(new SequentFormula(
-                    TB.applySequential(updates, buildUsageFormula())), occurrence);
+                  services.getTermBuilder().applySequential(updates, buildUsageFormula())), occurrence);
         }
 
         private Term buildUsageFormula()
         {
-            return TB.prog(
+            return services.getTermBuilder().prog(
                 instantiation.modality,
                 replaceBlock(instantiation.formula.javaBlock(), instantiation.block,
                              constructAbruptTerminationIfCascade()),

@@ -13,14 +13,22 @@
 
 package de.uka.ilkd.key.speclang.jml.translation;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -29,17 +37,33 @@ import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.BranchStatement;
+import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.ClassAxiom;
+import de.uka.ilkd.key.speclang.ClassAxiomImpl;
+import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.ClassInvariantImpl;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.ContractFactory;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.speclang.InitiallyClause;
+import de.uka.ilkd.key.speclang.InitiallyClauseImpl;
+import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopInvariantImpl;
+import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.RepresentsAxiom;
+import de.uka.ilkd.key.speclang.SimpleBlockContract;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -65,7 +89,7 @@ import de.uka.ilkd.key.util.Triple;
  */
 public class JMLSpecFactory {
 
-    private static final de.uka.ilkd.key.logic.TermBuilder TB = TermBuilder.DF;
+    private final de.uka.ilkd.key.logic.TermBuilder TB; // TODO: Rename to tb
     private final de.uka.ilkd.key.java.Services services;
     private final ContractFactory cf;
     private int invCounter;
@@ -82,6 +106,7 @@ public class JMLSpecFactory {
     public JMLSpecFactory(Services services) {
         assert services != null;
         this.services = services;
+        this.TB = services.getTermBuilder();
         cf = new ContractFactory(services);
         modelFields = new LinkedHashSet<Pair<KeYJavaType, IObserverFunction>>();
     }

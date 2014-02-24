@@ -48,12 +48,13 @@ public class ContractFactory {
     private static final String UNKNOWN_CONTRACT_IMPLEMENTATION = "unknown contract implementation";
     private static final String CONTRACT_COMBINATION_MARKER = "#";
     private final Services services;
-    private final TermBuilder tb = TermBuilder.DF;
+    private final TermBuilder tb;
 
 
     public ContractFactory (Services services){
         assert services != null;
         this.services = services;
+        this.tb = services.getTermBuilder();
     }
 
     // PUBLIC INTERFACE
@@ -107,7 +108,7 @@ public class ContractFactory {
             foci.globalDefs,
             foci.id,
             foci.toBeSaved,
-            foci.transaction);
+            foci.transaction, services);
     }
 
     /** Add the specification contained in InitiallyClause as a postcondition. */
@@ -166,7 +167,7 @@ public class ContractFactory {
                                                    foci.originalMods.get(
                                                            services.getTypeConverter().getHeapLDT()
                                                            .getSavedHeap())
-                                                           != null
+                                                           != null, services
                                                    );
     }
 
@@ -187,7 +188,7 @@ public class ContractFactory {
                                                    foci.originalSelfVar, foci.originalParamVars,
                                                    foci.originalResultVar, foci.originalExcVar,
                                                    foci.originalAtPreVars, globalDefs, foci.id,
-                                                   foci.toBeSaved,foci.transaction);
+                                                   foci.toBeSaved,foci.transaction, services);
     }
 
     public DependencyContract dep(KeYJavaType containerType,
@@ -220,7 +221,7 @@ public class ContractFactory {
         	if(heap == targetHeap) {
               accessibles.put(heap, dep.second);
         	}else{
-              accessibles.put(heap, TermBuilder.DF.allLocs(services));        		
+              accessibles.put(heap, tb.allLocs(services));        		
         	}
         }
         // TODO: insert static invariant??
@@ -286,7 +287,7 @@ public class ContractFactory {
                                                    hasMod, selfVar, paramVars, resultVar, excVar,
                                                    atPreVars, null, Contract.INVALID_ID, toBeSaved,
                                                    mods.get(services.getTypeConverter().getHeapLDT()
-                                                           .getSavedHeap()) != null);
+                                                           .getSavedHeap()) != null, services);
     }
 
     public FunctionalOperationContract func (String baseName,
@@ -324,7 +325,7 @@ public class ContractFactory {
                                                    progVars.selfVar, progVars.paramVars,
                                                    progVars.resultVar, progVars.excVar,
                                                    progVars.atPreVars, null,
-                                                   Contract.INVALID_ID, toBeSaved, transaction);
+                                                   Contract.INVALID_ID, toBeSaved, transaction, services);
     }
 
     /**
@@ -529,7 +530,7 @@ public class ContractFactory {
                                                    t.globalDefs,
                                                    Contract.INVALID_ID,
                                                    t.toBeSaved,
-                                                   t.transaction);
+                                                   t.transaction, services);
     }
 
 

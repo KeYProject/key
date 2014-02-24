@@ -19,8 +19,10 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -28,9 +30,6 @@ import de.uka.ilkd.key.util.Pair;
 
 
 public final class DropEffectlessStoresCondition implements VariableCondition {
-    
-    private static final TermBuilder TB = TermBuilder.DF;
-    
     private final TermSV h;
     private final TermSV o;
     private final TermSV f;
@@ -71,7 +70,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
 	    } else {
 		return newSubHeapTerm == null 
 		       ? null 
-                       : TB.store(services, 
+                       : services.getTermBuilder().store(services, 
                 	       	  newSubHeapTerm, 
                 	       	  objTerm, 
                 	       	  fieldTerm, 
@@ -110,7 +109,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
 	}
 	
 	final Term properResultInst 
-		= dropEffectlessStores(TB.store(services, 
+		= dropEffectlessStores(services.getTermBuilder().store(services, 
 						hInst,
 						oInst, 
 						fInst, 

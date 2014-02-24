@@ -25,6 +25,7 @@ package de.uka.ilkd.key.taclettranslation;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -40,9 +41,10 @@ public interface SkeletonGenerator{
      * Override this method to introduce a translating mechanism for taclets.
      * @param t
      *            taclet to be translated.
+    * @param services TODO
      * @return returns the translation of the taclet.
      */
-    public Term translate(Taclet t)
+    public Term translate(Taclet t, Services services)
 	    throws IllegalTacletException;
 }
 
@@ -60,11 +62,12 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
       * 
       * @param s
       *            The sequent to be translated.
+    * @param services TODO
       * @return the resulting term of the translation or <code>null</code> if
       *         both antecedent and succendent are empty.
       */
-     protected Term translate(Sequent s) {
- 	TermBuilder builder = TermBuilder.DF;
+     protected Term translate(Sequent s, Services services) {
+ 	TermBuilder builder = services.getTermBuilder();
 
  	ImmutableList<Term> ante = getFormulaeOfSemisequent(s.antecedent());
  	ImmutableList<Term> succ = getFormulaeOfSemisequent(s.succedent());

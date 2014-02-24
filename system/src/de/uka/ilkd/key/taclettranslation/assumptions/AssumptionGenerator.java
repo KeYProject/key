@@ -84,7 +84,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
                 // // variables
                 // // and do not quantify the variables.
 
-                Term term = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(t);
+                Term term = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(t, services);
 
                 // rebuild the term to exchange schema variables with logic
                 // varibales.
@@ -97,7 +97,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
                 // step: quantify all free variables.
                 for (Term te : result) {
-                        te = quantifyTerm(te);
+                        te = quantifyTerm(te, services);
                         result2.add(te);
                 }
 
@@ -369,11 +369,12 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
          * 
          * @param term
          *                the term to be quantify.
+       * @param services TODO
          * @return the quantified term.
          */
-        protected static Term quantifyTerm(Term term)
+        protected static Term quantifyTerm(Term term, Services services)
                         throws IllegalTacletException {
-                TermBuilder tb = TermBuilder.DF;
+                TermBuilder tb = services.getTermBuilder();
                 // Quantify over all free variables.
                 for (QuantifiableVariable qv : term.freeVars()) {
 
@@ -470,7 +471,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
          */
         protected Term changeTerm(Term term) {
 
-                TermBuilder tb = TermBuilder.DF;
+                TermBuilder tb = services.getTermBuilder();
 
                 // translate schema variables into logical variables
                 if (term.op() instanceof SchemaVariable) {

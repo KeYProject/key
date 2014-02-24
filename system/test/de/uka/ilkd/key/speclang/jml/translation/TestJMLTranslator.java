@@ -54,7 +54,7 @@ public class TestJMLTranslator extends TestCase {
                                           + File.separator + "_testcase"
                                           + File.separator + "speclang"
                                           + File.separator + "testFile.key";
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static TermBuilder TB;
     private static JavaInfo javaInfo;
     private static Services services;
     private static KeYJavaType testClassType;
@@ -66,6 +66,7 @@ public class TestJMLTranslator extends TestCase {
             javaInfo = new HelperClassForTests().parse(
                     new File(testFile)).getFirstProof().getJavaInfo();
             services = javaInfo.getServices();
+            TB = services.getTermBuilder();
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
             atPres.put(services.getTypeConverter().getHeapLDT().getHeap(), TB.var(TB.heapAtPreVar(services, "heapAtPre",
                     services.getTypeConverter().getHeapLDT().getHeap().sort(), false)));

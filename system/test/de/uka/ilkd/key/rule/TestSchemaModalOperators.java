@@ -49,6 +49,7 @@ public class TestSchemaModalOperators extends TestCase {
                    "i=3", "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3" };
     Proof[] proof;
     Proof   mvProof;
+   private TermBuilder TB;
    
     private static Semisequent parseTermForSemisequent(String t) {
 	if ("".equals(t)) { 
@@ -71,6 +72,8 @@ public class TestSchemaModalOperators extends TestCase {
 	    proof[i].setRoot(new Node(proof[i], s));
 	}
 
+        TB = TacletForTests.services().getTermBuilder();
+        
 	// proof required to test application with mv
 	/*
        TermFactory tf=TermFactory.DEFAULT;
@@ -142,7 +145,7 @@ public class TestSchemaModalOperators extends TestCase {
 
 	Term replace = tf.createTerm(
 	    osv,
-	    new Term[]{TermBuilder.DF.tt()},
+	    new Term[]{TB.tt()},
 	    null,
             JavaBlock.EMPTY_JAVABLOCK);
 
@@ -155,10 +158,10 @@ public class TestSchemaModalOperators extends TestCase {
 
 	RewriteTaclet t = rtb.getRewriteTaclet();
 
-	Term goal = TermBuilder.DF.prog(
+	Term goal = TB.prog(
 	    Modality.DIA, 
             JavaBlock.EMPTY_JAVABLOCK,
-            TermBuilder.DF.ff());
+            TB.ff());
          MatchConditions mc=(t.match                                                   
                             (goal,                                                        
                              find,                                                

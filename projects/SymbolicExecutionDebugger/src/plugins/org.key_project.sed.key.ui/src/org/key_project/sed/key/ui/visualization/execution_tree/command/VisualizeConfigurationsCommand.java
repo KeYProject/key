@@ -27,7 +27,7 @@ import org.key_project.sed.key.ui.visualization.object_diagram.editor.Configurat
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 
@@ -69,7 +69,7 @@ public class VisualizeConfigurationsCommand extends AbstractHandler {
             IKeYSEDDebugNode<?> node = (IKeYSEDDebugNode<?>)element;
             return !node.getExecutionNode().isDisposed() &&
                    node.getExecutionNode() instanceof IExecutionStateNode<?> &&
-                   !TermBuilder.DF.ff().equals(node.getExecutionNode().getPathCondition());
+                   node.getExecutionNode().getPathCondition().op() != Junctor.FALSE;
          }
          else {
             return false;

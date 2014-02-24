@@ -53,9 +53,9 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     StatementWellDefinedness(String name, int id, Type type, IObserverFunction target,
                              LocationVariable heap, OriginalVariables origVars,
                              Condition requires, Term assignable, Term accessible,
-                             Condition ensures, Term mby, Term rep) {
+                             Condition ensures, Term mby, Term rep, Services services) {
         super(name, id, type, target, heap, origVars, requires,
-              assignable, accessible, ensures, mby, rep);
+              assignable, accessible, ensures, mby, rep, services);
     }
 
     /**

@@ -19,7 +19,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
-import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.expression.operator.Intersect;
 import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
 import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
 import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
@@ -27,7 +27,6 @@ import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -183,7 +182,7 @@ public final class LocSetLDT extends LDT {
     @Override
     public Term translateLiteral(Literal lit, Services services) {
 	assert lit instanceof EmptySetLiteral;
-	return TermBuilder.DF.func(empty);
+	return services.getTermBuilder().func(empty);
     }
     
 

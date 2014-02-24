@@ -42,7 +42,7 @@ public final class MemberPVToField extends AbstractTermTransformer {
 	    LocationVariable fieldPV = (LocationVariable) term.sub(0).op();
 	    Function fieldSymbol 
 	    	= heapLDT.getFieldSymbolForPV(fieldPV, services);
-	    return TB.func(fieldSymbol);
+	    return services.getTermBuilder().func(fieldSymbol);
 	} else if(heapLDT.getSortOfSelect(op) != null) {
 	    return term.sub(0).sub(2);
 	} else {

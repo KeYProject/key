@@ -19,8 +19,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.WeakHashMap;
+
+import javax.naming.OperationNotSupportedException;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -30,7 +31,6 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -159,7 +159,7 @@ public class EqualityConstraint implements Constraint {
      * @return the term by which p_mv is instantiated by the most
      * general substitution satisfying the constraint
      */
-    public synchronized Term getInstantiation (Metavariable p_mv) {
+    public synchronized Term getInstantiation (Metavariable p_mv, Services services) {
         Term t = null;
         if ( instantiationCache == null )
             instantiationCache = new LinkedHashMap<Metavariable, Term> ();
@@ -169,7 +169,7 @@ public class EqualityConstraint implements Constraint {
         if ( t == null ) {
             t = map.get ( p_mv );
             if ( t == null )
-                t = TermBuilder.DF.var ( p_mv );
+                t = services.getTermBuilder().var ( p_mv );
             else
                 t = instantiate ( t );
 
@@ -178,7 +178,7 @@ public class EqualityConstraint implements Constraint {
 
         return t;
     }
-
+    
     private synchronized Term getInstantiationIfExisting (Metavariable p_mv) {
         if ( instantiationCache == null )
             return null;
@@ -751,78 +751,6 @@ public class EqualityConstraint implements Constraint {
 
         return newConstraint;
     }
-    
-    /**
-     * @return a constraint derived from this one by removing all
-     * constraints on the given variable, which may therefore have any
-     * value according to the new constraint (the possible values of
-     * other variables are not modified)
-     */
-    @Override
-    public Constraint removeVariables ( ImmutableSet<Metavariable> mvs ) {
-	if ( !mvs.isEmpty() && !isBottom () ) {
-	    EqualityConstraint removeConstraint = new EqualityConstraint ();
-	    EqualityConstraint newConstraint    = new EqualityConstraint ();
-
-	    // Find equalities with removed metavariable as left side
-            for ( Map.Entry<Metavariable, Term>  entry : map.entrySet() ) {
-		if ( mvs.contains ( entry.getKey () ) )
-		    removeConstraint.map.put
-			( entry.getKey (), entry.getValue () );
-		else
-		    newConstraint   .map.put
-			( entry.getKey (), entry.getValue () );
-	    }
-
-	    // Find equalities with removed metavariable as right side
-	    final Iterator<Map.Entry<Metavariable, Term>> it = 
-	        newConstraint.map.entrySet ().iterator ();
-	    
-	    while ( it.hasNext () ) {
-	        Map.Entry<Metavariable, Term> entry = it.next ();
-		if ( (entry.getValue ()).op () instanceof Metavariable &&
-		     ( (entry.getKey   ()).sort () ==
-		       (        entry.getValue ()).sort () ) &&
-		     ( mvs.contains
-		       ( (Metavariable)(entry.getValue ()).op () ) ) &&
-		     !( removeConstraint.map.containsKey
-			( (entry.getValue ()).op () ) ) ) {
-		    removeConstraint.map.put
-			( (Metavariable)(entry.getValue ()).op (),
-			  TermBuilder.DF.var
-			  ( entry.getKey () ) );
-		    it.remove ();
-		}
-	    }
-
-	    if ( !removeConstraint.map.isEmpty () ) {
-		// Substitute removed variables occurring within right
-		// sides of the remaining equalities
-
-		// Usually at this point removeConstraint is not a
-		// well-formed constraint, as the order of MV may be
-		// wrong. However, "SyntacticalReplaceVisitor" doesn't
-		// care about that.
-		if ( newConstraint.map.isEmpty () )
-		    return Constraint.BOTTOM;
-
-		final Set<Map.Entry<Metavariable, Term>> entrySet = 
-		    newConstraint.map.entrySet ();
-		
-		newConstraint = new EqualityConstraint ();
-
-		for (final Map.Entry<Metavariable, Term> entry : entrySet) {		    
-		    newConstraint.map.put ( entry.getKey (),
-		                            removeConstraint.instantiate
-		                            ( entry.getValue () ) );
-		}
-
-		return newConstraint;
-	    }
-	}
-
-	return this;
-    }
 
     /** checks if there is a cycle if the metavariable mv and Term
      * term would be added to this constraint e.g. X=g(Y), Y=f(X) 
@@ -946,19 +874,21 @@ public class EqualityConstraint implements Constraint {
     
     private static final ECPair  ecPair0   = new ECPair ( null, null, 0 );
 
+    @Override
     public int hashCode () {
-        if ( hashCode == null ) {
-            int h = 0;
-            final Iterator<Metavariable> it = restrictedMetavariables ();
-            while ( it.hasNext () ) {
-                final Metavariable mv = it.next ();
-                h += mv.hashCode ();
-                h += getInstantiation ( mv ).hashCode ();
-            }
-
-            hashCode = Integer.valueOf ( h );
-        }
-
-        return hashCode.intValue ();
+       throw new UnsupportedOperationException();
+//        if ( hashCode == null ) {
+//            int h = 0;
+//            final Iterator<Metavariable> it = restrictedMetavariables ();
+//            while ( it.hasNext () ) {
+//                final Metavariable mv = it.next ();
+//                h += mv.hashCode ();
+//                h += getInstantiation ( mv, services ).hashCode ();
+//            }
+//
+//            hashCode = Integer.valueOf ( h );
+//        }
+//
+//        return hashCode.intValue ();
     }
 }

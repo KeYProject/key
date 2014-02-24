@@ -41,7 +41,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
          Services services = environment.getServices();
          IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
          Sort intSort = integerLDT.targetSort();
-         final TermBuilder TB = TermBuilder.DF;
+         final TermBuilder TB = services.getTermBuilder();
          // Create test terms
          Term a = TB.var(new LogicVariable(new Name("a"), intSort));
          Term b = TB.var(new LogicVariable(new Name("b"), intSort));
@@ -92,15 +92,15 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
          assertTerm(ageqb, SymbolicExecutionUtil.improveReadability(agtBPlusMinusOne, services));
          assertTerm(ageqb, SymbolicExecutionUtil.improveReadability(agtBMinusOne, services));
          // Test combined
-         assertTerm(agtb, SymbolicExecutionUtil.improveReadability(TermBuilder.DF.not(altOnePlusB), services));
-         assertTerm(aleqb, SymbolicExecutionUtil.improveReadability(TermBuilder.DF.not(ageqOnePlusB), services));
-         assertTerm(ageqb, SymbolicExecutionUtil.improveReadability(TermBuilder.DF.not(aleqBPlusMinusOne), services));
-         assertTerm(altb, SymbolicExecutionUtil.improveReadability(TermBuilder.DF.not(agtBMinusOne), services));
+         assertTerm(agtb, SymbolicExecutionUtil.improveReadability(TB.not(altOnePlusB), services));
+         assertTerm(aleqb, SymbolicExecutionUtil.improveReadability(TB.not(ageqOnePlusB), services));
+         assertTerm(ageqb, SymbolicExecutionUtil.improveReadability(TB.not(aleqBPlusMinusOne), services));
+         assertTerm(altb, SymbolicExecutionUtil.improveReadability(TB.not(agtBMinusOne), services));
          // Test complex term
-         Term complex = TermBuilder.DF.and(altOnePlusB,
-                                           TermBuilder.DF.or(ageqBPlusOne, agtMinusOnePlusB));
-         Term expectedComplex = TermBuilder.DF.and(aleqb,
-                                                   TermBuilder.DF.or(agtb, ageqb));
+         Term complex = TB.and(altOnePlusB,
+                               TB.or(ageqBPlusOne, agtMinusOnePlusB));
+         Term expectedComplex = TB.and(aleqb,
+                                       TB.or(agtb, ageqb));
          assertTerm(expectedComplex, SymbolicExecutionUtil.improveReadability(complex, services));
       }
       finally {

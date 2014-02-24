@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -40,9 +41,9 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     private ClassWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                  LocationVariable heap, OriginalVariables origVars,
                                  Condition requires, Term assignable, Term accessible,
-                                 Condition ensures, Term mby, Term rep, ClassInvariant inv) {
+                                 Condition ensures, Term mby, Term rep, ClassInvariant inv, Services services) {
         super(name, id, type, target, heap, origVars, requires,
-              assignable, accessible, ensures, mby, rep);
+              assignable, accessible, ensures, mby, rep, services);
         this.inv = inv;
     }
 
@@ -77,6 +78,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
      * @return the well-definedness taclet for an invariant reference
      */
     public static ImmutableSet<RewriteTaclet> createInvTaclet(Services services) {
+        final TermBuilder TB = services.getTermBuilder();
         final KeYJavaType kjt = services.getJavaInfo().getJavaLangObject();
         final String prefix = WellDefinednessCheck.INV_TACLET;
         final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
@@ -139,7 +141,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         return new ClassWellDefinedness(getName(), newId, type(), getTarget(), getHeap(),
                                         getOrigVars(), getRequires(), getAssignable(),
                                         getAccessible(), getEnsures(), getMby(),
-                                        getRepresents(), getInvariant());
+                                        getRepresents(), getInvariant(), services);
     }
 
     @Override
@@ -147,7 +149,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         return new ClassWellDefinedness(getName(), id(), type(), newPM, getHeap(),
                                         getOrigVars(), getRequires(), getAssignable(),
                                         getAccessible(), getEnsures(), getMby(),
-                                        getRepresents(), getInvariant().setKJT(newKJT));
+                                        getRepresents(), getInvariant().setKJT(newKJT), services);
     }
 
     @Override

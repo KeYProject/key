@@ -159,7 +159,7 @@ public final class SimpleBlockContract implements BlockContract {
         assert remembranceHeaps != null;
         assert services != null;
         final Map<ProgramVariable, ProgramVariable> replacementMap = createReplacementMap(
-            new Variables(self, null, null, null, null, null, remembranceHeaps, null), services
+            new Variables(self, null, null, null, null, null, remembranceHeaps, null, services), services
         );
         final OpReplacer replacer = new OpReplacer(replacementMap);
         return replacer.replace(preconditions.get(heap));
@@ -229,7 +229,7 @@ public final class SimpleBlockContract implements BlockContract {
         assert (self == null) == (variables.self == null);
         assert services != null;
         final Map<ProgramVariable, ProgramVariable> replacementMap = createReplacementMap(
-            new Variables(self, null, null, null, null, null, null, null), services
+            new Variables(self, null, null, null, null, null, null, null, services), services
         );
         final OpReplacer replacer = new OpReplacer(replacementMap);
         return replacer.replace(modifiesClauses.get(heap));
@@ -429,16 +429,16 @@ public final class SimpleBlockContract implements BlockContract {
                                                                        final Services services)
     {
         final VariableReplacementMap result = new VariableReplacementMap();
-        result.replaceSelf(variables.self, newVariables.self);
-        result.replaceFlags(variables.breakFlags, newVariables.breakFlags);
-        result.replaceFlags(variables.continueFlags, newVariables.continueFlags);
-        result.replaceVariable(variables.returnFlag, newVariables.returnFlag);
-        result.replaceVariable(variables.result, newVariables.result);
-        result.replaceVariable(variables.exception, newVariables.exception);
+        result.replaceSelf(variables.self, newVariables.self, services);
+        result.replaceFlags(variables.breakFlags, newVariables.breakFlags, services);
+        result.replaceFlags(variables.continueFlags, newVariables.continueFlags, services);
+        result.replaceVariable(variables.returnFlag, newVariables.returnFlag, services);
+        result.replaceVariable(variables.result, newVariables.result, services);
+        result.replaceVariable(variables.exception, newVariables.exception, services);
         result.replaceRemembranceHeaps(variables.remembranceHeaps,
                                        newVariables.remembranceHeaps, services);
         result.replaceRemembranceLocalVariables(variables.remembranceLocalVariables,
-                                                newVariables.remembranceLocalVariables);
+                                                newVariables.remembranceLocalVariables, services);
         return result;
     }
 
@@ -447,16 +447,16 @@ public final class SimpleBlockContract implements BlockContract {
     {
         final TermReplacementMap result = new TermReplacementMap();
         result.replaceHeap(newHeap, services);
-        result.replaceSelf(variables.self, newTerms.self);
-        result.replaceFlags(variables.breakFlags, newTerms.breakFlags);
-        result.replaceFlags(variables.continueFlags, newTerms.continueFlags);
-        result.replaceVariable(variables.returnFlag, newTerms.returnFlag);
-        result.replaceVariable(variables.result, newTerms.result);
-        result.replaceVariable(variables.exception, newTerms.exception);
+        result.replaceSelf(variables.self, newTerms.self, services);
+        result.replaceFlags(variables.breakFlags, newTerms.breakFlags, services);
+        result.replaceFlags(variables.continueFlags, newTerms.continueFlags, services);
+        result.replaceVariable(variables.returnFlag, newTerms.returnFlag, services);
+        result.replaceVariable(variables.result, newTerms.result, services);
+        result.replaceVariable(variables.exception, newTerms.exception, services);
         result.replaceRemembranceHeaps(variables.remembranceHeaps,
                                        newTerms.remembranceHeaps, services);
         result.replaceRemembranceLocalVariables(variables.remembranceLocalVariables,
-                                                newTerms.remembranceLocalVariables);
+                                                newTerms.remembranceLocalVariables, services);
         return result;
     }
 
@@ -464,30 +464,30 @@ public final class SimpleBlockContract implements BlockContract {
 
         private static final long serialVersionUID = -2339350643000987576L;
 
-        public void replaceSelf(final ProgramVariable oldSelf, final S newSelf)
+        public void replaceSelf(final ProgramVariable oldSelf, final S newSelf, Services services)
         {
             if (newSelf != null) {
                 assert newSelf.sort().extendsTrans(oldSelf.sort());
-                put(convert(oldSelf), newSelf);
+                put(convert(oldSelf, services), newSelf);
             }
         }
 
         public void replaceFlags(final Map<Label, ProgramVariable> oldFlags,
-                                 final Map<Label, S> newFlags)
+                                 final Map<Label, S> newFlags, Services services)
         {
             if (newFlags != null) {
                 assert newFlags.size() == oldFlags.size();
                 for (Map.Entry<Label, ProgramVariable> oldFlag : oldFlags.entrySet()) {
-                    replaceVariable(oldFlag.getValue(), newFlags.get(oldFlag.getKey()));
+                    replaceVariable(oldFlag.getValue(), newFlags.get(oldFlag.getKey()), services);
                 }
             }
         }
 
-        public void replaceVariable(final ProgramVariable oldVariable, final S newVariable)
+        public void replaceVariable(final ProgramVariable oldVariable, final S newVariable, Services services)
         {
             if (newVariable != null) {
                 assert oldVariable.sort().equals(newVariable.sort());
-                put(convert(oldVariable), newVariable);
+                put(convert(oldVariable, services), newVariable);
             }
         }
 
@@ -503,7 +503,7 @@ public final class SimpleBlockContract implements BlockContract {
                         final LocationVariable oldRemembranceHeap = oldRemembranceHeaps.get(heap);
                         final S newRemembranceHeap = newRemembranceHeaps.get(heap);
                         assert oldRemembranceHeap.sort().equals(newRemembranceHeap.sort());
-                        put(convert(oldRemembranceHeap), newRemembranceHeap);
+                        put(convert(oldRemembranceHeap, services), newRemembranceHeap);
                     }
                 }
             }
@@ -512,7 +512,8 @@ public final class SimpleBlockContract implements BlockContract {
         public void replaceRemembranceLocalVariables(final Map<LocationVariable, LocationVariable>
                                                                       oldRemembranceLocalVariables,
                                                      final Map<LocationVariable, ? extends S>
-                                                                      newRemembranceLocalVariables)
+                                                                      newRemembranceLocalVariables, 
+                                                     final Services services)
         {
             if (newRemembranceLocalVariables != null) {
                 for (LocationVariable localVariable : oldRemembranceLocalVariables.keySet()) {
@@ -523,13 +524,13 @@ public final class SimpleBlockContract implements BlockContract {
                                 newRemembranceLocalVariables.get(localVariable);
                         assert oldRemembranceLocalVariable.sort().equals(
                                 newRemembranceLocalVariable.sort());
-                        put(convert(oldRemembranceLocalVariable), newRemembranceLocalVariable);
+                        put(convert(oldRemembranceLocalVariable, services), newRemembranceLocalVariable);
                     }
                 }
             }
         }
 
-        protected abstract S convert(ProgramVariable variable);
+        protected abstract S convert(ProgramVariable variable, Services services);
 
     }
 
@@ -537,7 +538,7 @@ public final class SimpleBlockContract implements BlockContract {
 
         private static final long serialVersionUID = 8964634070766482218L;
 
-        protected ProgramVariable convert(ProgramVariable variable)
+        protected ProgramVariable convert(ProgramVariable variable, Services services)
         {
             return variable;
         }
@@ -547,23 +548,23 @@ public final class SimpleBlockContract implements BlockContract {
     private static class TermReplacementMap extends ReplacementMap<Term> {
 
         private static final long serialVersionUID = 5465241780257247301L;
-        private static final TermBuilder TB = TermBuilder.DF;
 
         public void replaceHeap(final Term newHeap, final Services services)
         {
             assert newHeap != null;
             assert newHeap.sort().equals(services.getTypeConverter().getHeapLDT().targetSort());
-            put(TB.getBaseHeap(services), newHeap);
+            put(services.getTermBuilder().getBaseHeap(services), newHeap);
         }
 
-        protected Term convert(ProgramVariable variable)
+        @Override
+        protected Term convert(ProgramVariable variable, Services services)
         {
-            return TB.var(variable);
+            return services.getTermBuilder().var(variable);
         }
 
     }
 
-    public static final class Creator extends TermBuilder.Serviced {
+    public static final class Creator extends TermBuilder {
 
         private final StatementBlock block;
         private final List<Label> labels;
@@ -860,7 +861,7 @@ public final class SimpleBlockContract implements BlockContract {
 
     }
 
-    private static final class Combinator extends TermBuilder.Serviced {
+    private static final class Combinator extends TermBuilder {
 
         private final BlockContract[] contracts;
 

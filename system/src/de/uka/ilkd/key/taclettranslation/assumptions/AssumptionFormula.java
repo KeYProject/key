@@ -16,8 +16,8 @@ package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.Collection;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
@@ -53,8 +53,8 @@ public class AssumptionFormula implements TacletFormula {
 
     }
 
-    public Term getFormula() {
-	return TermBuilder.DF.and(formula.toArray(new Term[formula.size()]));
+    public Term getFormula(Services services) {
+	return services.getTermBuilder().and(formula.toArray(new Term[formula.size()]));
 	// return formula;
     }
 
