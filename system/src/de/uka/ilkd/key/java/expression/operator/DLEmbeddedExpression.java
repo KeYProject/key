@@ -26,7 +26,6 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -168,12 +167,12 @@ public class DLEmbeddedExpression extends Operator {
         // we silently assume that check has been called earlier
 
         if(f.arity() == subs.length) {
-            return TermFactory.DEFAULT.createTerm(f, subs); 
+            return services.getTermFactory().createTerm(f, subs); 
         } else {
             Term[] extSubs = new Term[subs.length + 1];
             System.arraycopy(subs, 0, extSubs, 1, subs.length);
             extSubs[0] = services.getTermBuilder().var(heap);
-            return TermFactory.DEFAULT.createTerm(f, extSubs);
+            return services.getTermFactory().createTerm(f, extSubs);
         }
     }
 }

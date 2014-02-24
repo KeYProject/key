@@ -45,7 +45,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -319,7 +318,7 @@ public class QueryExpand implements BuiltInRule {
         	}
         	//System.out.println("----------- Calling replace. Insert term: ----------------\n"+termToInsert+"\n-----------------------\n");
         	//Attention, when the term is modified, then the paths in the term have changed. Perform the changes in a depth-first order.
-        	term = replace(term, termToInsert, it);
+        	term = replace(term, termToInsert, it, services);
     	}
         	//TermBuilder TB = TermBuilder.DF;
         	//result = TB.and( queryExp, term);
@@ -544,10 +543,11 @@ public class QueryExpand implements BuiltInRule {
      * @param term
      * @param with
      * @param it iterator with argument positions. This is the path in the syntax tree of term.
+     * @param services TODO
      * @return Resulting term after replacement.
      * @note Was originally implemented in QueryExpand.java.
      */
-    protected Term replace(Term term, Term with, Iterator<Integer> it) {
+    protected Term replace(Term term, Term with, Iterator<Integer> it, Services services) {
         if ( !it.hasNext() ) {
             return with;
         }
@@ -560,7 +560,7 @@ public class QueryExpand implements BuiltInRule {
         for(int i = 0; i < arity; i++) {
             Term subTerm = term.sub(i);
             if (i == next) {
-                newSubTerms[i] = replace(subTerm, with, it);
+                newSubTerms[i] = replace(subTerm, with, it, services);
                 if(newSubTerms[i] != subTerm) {
                     changedSubTerm = true;
                 }
@@ -574,7 +574,7 @@ public class QueryExpand implements BuiltInRule {
 
         final Term result;
         if(changedSubTerm) {
-            result = TermFactory.DEFAULT.createTerm(term.op(),
+            result = services.getTermFactory().createTerm(term.op(),
                     newSubTerms,
                     newBoundVars,
                     term.javaBlock());

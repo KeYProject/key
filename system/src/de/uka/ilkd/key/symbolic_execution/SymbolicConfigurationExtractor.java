@@ -790,7 +790,7 @@ public class SymbolicConfigurationExtractor {
                }
                if (SymbolicExecutionUtil.hasReferenceSort(getServices(), updateTerm.sub(0))) {
                   Term objectTerm = updateTerm.sub(0);
-                  objectTerm = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), objectTerm);
+                  objectTerm = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), objectTerm, getServices());
                   updateValueObjectsToFill.add(objectTerm);
                }
             }
@@ -885,7 +885,7 @@ public class SymbolicConfigurationExtractor {
          }
          if (SymbolicExecutionUtil.hasReferenceSort(getServices(), term.sub(3)) && term.sub(3).op() instanceof ProgramVariable) {
             Term objectTerm = term.sub(3);
-            objectTerm = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), objectTerm);
+            objectTerm = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), objectTerm, getServices());
             updateValueObjectsToFill.add(objectTerm);
          }
          // Iterate over child heap modifications
@@ -893,7 +893,7 @@ public class SymbolicConfigurationExtractor {
       }
       else if (term.op() == heapLDT.getCreate()) {
          Term newObject = term.sub(1);
-         newObject = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), newObject);
+         newObject = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), newObject, getServices());
          updateCreatedObjectsToFill.add(newObject);
          // Iterate over child heap modifications
          collectLocationsFromHeapUpdate(term.sub(0), locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill);

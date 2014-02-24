@@ -29,7 +29,6 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -178,7 +177,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         if(t.op() instanceof ProgramVariable) {
             if(replaceMap.containsKey(t.op())) {
                 ProgramVariable replacement = replaceMap.get(t.op());
-                return TermFactory.DEFAULT.createTerm(replacement);
+                return services.getTermFactory().createTerm(replacement);
             } else {
                 return t;
             }
@@ -196,7 +195,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     op = ElementaryUpdate.getInstance(replacedLhs);
                 }
             }
-            return TermFactory.DEFAULT.createTerm(op,
+            return services.getTermFactory().createTerm(op,
                                                   subTerms,
                                                   t.boundVars(),
                                                   t.javaBlock(),

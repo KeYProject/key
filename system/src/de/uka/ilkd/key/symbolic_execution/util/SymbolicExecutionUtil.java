@@ -76,7 +76,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -261,17 +260,18 @@ public final class SymbolicExecutionUtil {
          }
       }
       if (subChanged) {
-         term = TermFactory.DEFAULT.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), term.getLabels());
+         term = services.getTermFactory().createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), term.getLabels());
       }
       // Improve readability: a < 1 + b, a < b + 1
+      final TermBuilder tb = services.getTermBuilder();
       if (term.op() == integerLDT.getLessThan()) {
          Term subOne = term.sub(1);
          if (subOne.op() == integerLDT.getAdd()) {
             if (subOne.sub(0) == integerLDT.one()) {
-               term = services.getTermBuilder().leq(term.sub(0), subOne.sub(1));
+               term = tb.leq(term.sub(0), subOne.sub(1));
             }
             else if (subOne.sub(1) == integerLDT.one()) {
-               term = services.getTermBuilder().leq(term.sub(0), subOne.sub(0));
+               term = tb.leq(term.sub(0), subOne.sub(0));
             }
          }
       }
@@ -280,10 +280,10 @@ public final class SymbolicExecutionUtil {
          Term subOne = term.sub(1);
          if (subOne.op() == integerLDT.getAdd()) {
             if (subOne.sub(0) == integerLDT.one()) {
-               term = services.getTermBuilder().gt(term.sub(0), subOne.sub(1));
+               term = tb.gt(term.sub(0), subOne.sub(1));
             }
             else if (subOne.sub(1) == integerLDT.one()) {
-               term = services.getTermBuilder().gt(term.sub(0), subOne.sub(0));
+               term = tb.gt(term.sub(0), subOne.sub(0));
             }
          }
       }
@@ -292,15 +292,15 @@ public final class SymbolicExecutionUtil {
          Term subOne = term.sub(1);
          if (subOne.op() == integerLDT.getAdd()) {
             if (isMinusOne(subOne.sub(0), integerLDT)) {
-               term = services.getTermBuilder().lt(term.sub(0), subOne.sub(1));
+               term = tb.lt(term.sub(0), subOne.sub(1));
             }
             else if (isMinusOne(subOne.sub(1), integerLDT)) {
-               term = services.getTermBuilder().lt(term.sub(0), subOne.sub(0));
+               term = tb.lt(term.sub(0), subOne.sub(0));
             }
          }
          else if (subOne.op() == integerLDT.getSub()) {
             if (subOne.sub(1) == integerLDT.one()) {
-               term = services.getTermBuilder().lt(term.sub(0), subOne.sub(0));
+               term = tb.lt(term.sub(0), subOne.sub(0));
             }
          }
       }
@@ -309,15 +309,15 @@ public final class SymbolicExecutionUtil {
          Term subOne = term.sub(1);
          if (subOne.op() == integerLDT.getAdd()) {
             if (isMinusOne(subOne.sub(0), integerLDT)) {
-               term = services.getTermBuilder().geq(term.sub(0), subOne.sub(1));
+               term = tb.geq(term.sub(0), subOne.sub(1));
             }
             else if (isMinusOne(subOne.sub(1), integerLDT)) {
-               term = services.getTermBuilder().geq(term.sub(0), subOne.sub(0));
+               term = tb.geq(term.sub(0), subOne.sub(0));
             }
          }
          else if (subOne.op() == integerLDT.getSub()) {
             if (subOne.sub(1) == integerLDT.one()) {
-               term = services.getTermBuilder().geq(term.sub(0), subOne.sub(0));
+               term = tb.geq(term.sub(0), subOne.sub(0));
             }
          }
       }
@@ -325,16 +325,16 @@ public final class SymbolicExecutionUtil {
       else if (term.op() == Junctor.NOT) {
          Term sub = term.sub(0);
          if (sub.op() == integerLDT.getLessOrEquals()) {
-            term = services.getTermBuilder().gt(sub.sub(0), sub.sub(1));
+            term = tb.gt(sub.sub(0), sub.sub(1));
          }
          else if (sub.op() == integerLDT.getLessThan()) {
-            term = services.getTermBuilder().geq(sub.sub(0), sub.sub(1));
+            term = tb.geq(sub.sub(0), sub.sub(1));
          }
          else if (sub.op() == integerLDT.getGreaterOrEquals()) {
-            term = services.getTermBuilder().lt(sub.sub(0), sub.sub(1));
+            term = tb.lt(sub.sub(0), sub.sub(1));
          }
          else if (sub.op() == integerLDT.getGreaterThan()) {
-            term = services.getTermBuilder().leq(sub.sub(0), sub.sub(1));
+            term = tb.leq(sub.sub(0), sub.sub(1));
          }
       }
       return term;
@@ -2381,7 +2381,7 @@ public final class SymbolicExecutionUtil {
          result = improveReadability(result, services);
       }
       // Make sure that no skolem constant is contained in the result.
-      result = replaceSkolemConstants(node.sequent(), result);
+      result = replaceSkolemConstants(node.sequent(), result, services);
       return result;
    }
 
@@ -2701,10 +2701,11 @@ public final class SymbolicExecutionUtil {
    /**
     * Replaces all skolem constants in the given {@link Term}.
     * @param sequent The {@link Sequent} which provides the skolem equalities.
-    * @param term The {@link Term} to replace its skolem constants.
+ * @param term The {@link Term} to replace its skolem constants.
+ * @param services TODO
     * @return The skolem constant free {@link Term}.
     */
-   public static Term replaceSkolemConstants(Sequent sequent, Term term) {
+   public static Term replaceSkolemConstants(Sequent sequent, Term term, Services services) {
       if (isSkolemConstant(term)) {
          return findSkolemReplacement(sequent, term);
       }
@@ -2713,13 +2714,13 @@ public final class SymbolicExecutionUtil {
          boolean changed = false;
          for (int i = 0; i < term.arity(); i++) {
             Term oldChild = term.sub(i);
-            Term newChild = replaceSkolemConstants(sequent, oldChild);
+            Term newChild = replaceSkolemConstants(sequent, oldChild, services);
             if (newChild != oldChild) {
                changed = true;
             }
             newChildren.add(newChild);
          }
-         return changed ? TermFactory.DEFAULT.createTerm(term.op(),
+         return changed ? services.getTermFactory().createTerm(term.op(),
                                                          new ImmutableArray<Term>(newChildren),
                                                          term.boundVars(),
                                                          term.javaBlock(),
@@ -2729,7 +2730,7 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Utility method of {@link #replaceSkolemConstants(Sequent, Term)} to
+    * Utility method of {@link #replaceSkolemConstants(Sequent, Term, Services)} to
     * find the equality part of the given skolem constant.
     * @param sequent The {@link Sequent} which provides the skolem equalities.
     * @param skolemConstant The skolem constant to solve.

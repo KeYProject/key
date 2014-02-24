@@ -186,7 +186,7 @@ public final class DependencyContractImpl implements DependencyContract {
             }
         }
 
-        OpReplacer or = new OpReplacer(map);
+        OpReplacer or = new OpReplacer(map, services.getTermFactory());
         return or.replace(originalPres.get(heap));
     }
 
@@ -237,7 +237,7 @@ public final class DependencyContractImpl implements DependencyContract {
                 }
             }
         }
-        OpReplacer or = new OpReplacer(map);
+        OpReplacer or = new OpReplacer(map, services.getTermFactory());
         return or.replace(originalPres.get(heap));
     }
 
@@ -297,7 +297,7 @@ public final class DependencyContractImpl implements DependencyContract {
             map.put(originalParamVar, paramVars.head());
             paramVars = paramVars.tail();
         }
-        OpReplacer or = new OpReplacer(map);
+        OpReplacer or = new OpReplacer(map, services.getTermFactory());
         return or.replace(originalMby);
     }
 
@@ -333,7 +333,7 @@ public final class DependencyContractImpl implements DependencyContract {
                 }
             }
         }
-        OpReplacer or = new OpReplacer(map);
+        OpReplacer or = new OpReplacer(map, services.getTermFactory());
         return or.replace(originalMby);
     }
 
@@ -430,7 +430,7 @@ public final class DependencyContractImpl implements DependencyContract {
                 }
             }
         }
-        OpReplacer or = new OpReplacer(map);
+        OpReplacer or = new OpReplacer(map, services.getTermFactory());
         return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
     }
 
@@ -465,7 +465,7 @@ public final class DependencyContractImpl implements DependencyContract {
             }
         }
 
-        OpReplacer or = new OpReplacer(map);
+        OpReplacer or = new OpReplacer(map, services.getTermFactory());
         return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
     }
 

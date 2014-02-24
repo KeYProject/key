@@ -34,7 +34,6 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -468,7 +467,7 @@ public class DefaultProofFileParser implements IProofFileParser {
                                     String value, Services services) {
        LogicVariable lv = new LogicVariable(new Name(value),
                                           app.getRealSort(sv, services));
-       Term instance = TermFactory.DEFAULT.createTerm(lv);
+       Term instance = services.getTermFactory().createTerm(lv);
        return app.addCheckedInstantiation(sv, instance, services,true);
    }
 

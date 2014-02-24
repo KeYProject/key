@@ -24,7 +24,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -198,7 +197,7 @@ public class Polynomial {
         if ( it.hasNext () ) {
             res = it.next ().toTerm ( services );
             while ( it.hasNext () )
-                res = TermFactory.DEFAULT.createTerm
+                res = services.getTermFactory().createTerm
                               ( add, res, it.next ().toTerm ( services ) );
         }
         
@@ -207,7 +206,7 @@ public class Polynomial {
         if ( res == null )
             res = cTerm;
         else if ( !BigInteger.ZERO.equals ( constantPart ) )
-            res = TermFactory.DEFAULT.createTerm ( add, cTerm, res );
+            res = services.getTermFactory().createTerm ( add, cTerm, res );
         
         return res;        
     }

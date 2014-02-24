@@ -789,14 +789,15 @@ public class TermLabelManager {
           (!directChildRefactorings.isEmpty() || !childAndGrandchildRefactorings.isEmpty())) {
          Term newApplicationTerm = applicationTerm;
          // Do direct child refactoring if required
-         if (!directChildRefactorings.isEmpty()) {
+         final TermFactory tf = services.getTermFactory();
+        if (!directChildRefactorings.isEmpty()) {
             Term[] newSubs = new Term[newApplicationTerm.arity()];
             for (int i = 0; i < newSubs.length; i++) {
                Term sub = newApplicationTerm.sub(i);
                ImmutableArray<TermLabel> newLabels = performRefactoring(services, applicationPosInOccurrence, applicationTerm, rule, goal, tacletTerm, sub, directChildRefactorings);
-               newSubs[i] = TermFactory.DEFAULT.createTerm(sub.op(), sub.subs(), sub.boundVars(), sub.javaBlock(), newLabels);
+               newSubs[i] = tf.createTerm(sub.op(), sub.subs(), sub.boundVars(), sub.javaBlock(), newLabels);
             }
-            newApplicationTerm = TermFactory.DEFAULT.createTerm(newApplicationTerm.op(), newSubs, newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(), newApplicationTerm.getLabels());
+            newApplicationTerm = tf.createTerm(newApplicationTerm.op(), newSubs, newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(), newApplicationTerm.getLabels());
          }
          // Do child and grandchild refactoring if required
          if (!childAndGrandchildRefactorings.isEmpty()) {
@@ -805,7 +806,7 @@ public class TermLabelManager {
                Term sub = newApplicationTerm.sub(i);
                newSubs[i] = refactorLabelsRecursive(services, applicationPosInOccurrence, applicationTerm, rule, goal, tacletTerm, sub, childAndGrandchildRefactorings);
             }
-            newApplicationTerm = TermFactory.DEFAULT.createTerm(newApplicationTerm.op(), newSubs, newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(), newApplicationTerm.getLabels());
+            newApplicationTerm = tf.createTerm(newApplicationTerm.op(), newSubs, newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(), newApplicationTerm.getLabels());
          }
          // Update goal
          PosInOccurrence pio = applicationPosInOccurrence;
@@ -823,7 +824,7 @@ public class TermLabelManager {
                Term[] newSubs = root.subs().toArray(new Term[root.arity()]);
                newSubs[childIndex] = newChild;
 
-               root = TermFactory.DEFAULT.createTerm(root.op(), new ImmutableArray<Term>(newSubs), root.boundVars(), root.javaBlock(), root.getLabels());
+               root = tf.createTerm(root.op(), new ImmutableArray<Term>(newSubs), root.boundVars(), root.javaBlock(), root.getLabels());
             }
          } while (pio != null);
          goal.changeFormula(new SequentFormula(root), applicationPosInOccurrence.topLevel());
@@ -889,7 +890,7 @@ public class TermLabelManager {
          newSubs[i] = refactorLabelsRecursive(services, applicationPosInOccurrence, applicationTerm, rule, goal, tacletTerm, term.sub(i), activeRefactorings);
       }
       ImmutableArray<TermLabel> newLabels = performRefactoring(services, applicationPosInOccurrence, applicationTerm, rule, goal, tacletTerm, term, activeRefactorings);
-      return TermFactory.DEFAULT.createTerm(term.op(), newSubs, term.boundVars(), term.javaBlock(), newLabels);
+      return services.getTermFactory().createTerm(term.op(), newSubs, term.boundVars(), term.javaBlock(), newLabels);
    }
 
    /**

@@ -38,7 +38,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 
 public class TestClashFreeSubst extends TestCase {
  
-    TermFactory tf=TermFactory.DEFAULT;
+    TermFactory tf;
 
     Services services;
     NamespaceSet nss;
@@ -60,6 +60,7 @@ public class TestClashFreeSubst extends TestCase {
     public void setUp() {
 	services = new Services(AbstractProfile.getDefaultProfile());
 	nss = services.getNamespaces();
+	tf = services.getTermFactory();
 	
 	String sorts = "\\sorts{boolean;int;LocSet;}";
 	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(sorts,null),

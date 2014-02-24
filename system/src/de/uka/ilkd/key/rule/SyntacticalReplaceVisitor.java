@@ -40,7 +40,6 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -86,7 +85,6 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
      * because one of its subterms has been built, too.
      */
     private final Stack<Object> subStack; //of Term (and Boolean)
-    private final TermFactory tf = TermFactory.DEFAULT;
     private final Boolean newMarker = new Boolean(true);
 
     /** an empty array for resource optimisation*/
@@ -103,7 +101,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                                      Constraint metavariableInst,
                                      boolean allowPartialReplacement,
                                      boolean  resolveSubsts) {
-	this.services         = services;	
+	this.services         = services;
 	this.svInst           = svInst;
 	this.metavariableInst = metavariableInst;
 	this.allowPartialReplacement = allowPartialReplacement;
@@ -397,7 +395,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                 ImmutableArray<TermLabel> labels =
                         instantiateLabels(visited, newOp, new ImmutableArray<Term>(neededsubs),
                                           boundVars, jb, "boundVars");
-               Term newTerm = tf.createTerm(newOp, neededsubs, boundVars, jb, labels);
+               Term newTerm = services.getTermFactory().createTerm(newOp, neededsubs, boundVars, jb, labels);
                 pushNew(resolveSubst(newTerm));
             } else {
                 Term t;
@@ -408,9 +406,9 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                    t = visited;
                 }
                 else {
-                   t = TermFactory.DEFAULT.createTerm(visited.op(), visited.subs(),
-                                                      visited.boundVars(),
-                                                      visited.javaBlock(), labels);
+                   t = services.getTermFactory().createTerm(visited.op(), visited.subs(),
+                                                            visited.boundVars(),
+                                                            visited.javaBlock(), labels);
                 }
                 t = resolveSubst(t);
                 if (t == visited)

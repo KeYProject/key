@@ -82,15 +82,18 @@ public class TermBuilder {
 
     private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
 
-    private static final TermFactory tf = TermFactory.DEFAULT;
-    private static final Term tt = TermFactory.DEFAULT.createTerm(Junctor.TRUE);
-    private static final Term ff = TermFactory.DEFAULT.createTerm(Junctor.FALSE);
+    private final TermFactory tf;
+    private final Term tt;
+    private final Term ff;
 
     protected final Services services; // TODO; Make private
     
     public TermBuilder(Services services) {
        assert services != null;
        this.services = services;
+       this.tf = services.getTermFactory();
+       this.tt = tf.createTerm(Junctor.TRUE);
+       this.ff = tf.createTerm(Junctor.FALSE);
     }
 
 
@@ -1634,7 +1637,7 @@ public class TermBuilder {
                 && !term.hasLabels()) {
             return term;
         } else if (!term.hasLabels()) {
-            return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(),
+            return tf.createTerm(term.op(), term.subs(), term.boundVars(),
                     term.javaBlock(), labels);
         } else {
             ImmutableList<TermLabel> newLabelList = ImmutableSLList.<TermLabel>nil();
@@ -1653,7 +1656,7 @@ public class TermBuilder {
             labels.arraycopy(0, newLabels, 0, labels.size());
             new ImmutableArray<TermLabel>(newLabelArr).arraycopy(0, newLabels, labels.size(),
                                                                   newLabelArr.length);
-            return TermFactory.DEFAULT.createTerm(term.op(), term.subs(),
+            return tf.createTerm(term.op(), term.subs(),
                                                   term.boundVars(), term.javaBlock(),
                                                   new ImmutableArray<TermLabel>(newLabels));
         }
@@ -1677,8 +1680,8 @@ public class TermBuilder {
                 && !WellDefinednessCheck.isOn()) {
             return term; // FIXME: This case is only for SET Tests
         } else {
-            return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(),
-                                                  term.javaBlock(), labels);
+            return tf.createTerm(term.op(), term.subs(), term.boundVars(),
+                                 term.javaBlock(), labels);
         }
     }
 
@@ -1869,7 +1872,7 @@ public class TermBuilder {
         final Term objVarTerm = var(objVar);
         final Term fieldVarTerm = var(fieldVar);
 
-        final OpReplacer or = new OpReplacer(normalToAtPre);
+        final OpReplacer or = new OpReplacer(normalToAtPre, tf);
         final Term modAtPre = or.replace(mod);
         final Term createdAtPre = or.replace(created(heapTerm, objVarTerm));
 
@@ -1912,7 +1915,7 @@ public class TermBuilder {
         final Term objVarTerm = var(objVar);
         final Term fieldVarTerm = var(fieldVar);
 
-        final OpReplacer or = new OpReplacer(normalToAtPre);
+        final OpReplacer or = new OpReplacer(normalToAtPre, tf);
 
         ImmutableList<QuantifiableVariable> quantVars =
                 ImmutableSLList.<QuantifiableVariable>nil();
@@ -1942,7 +1945,7 @@ public class TermBuilder {
         final Map<LocationVariable, LogicVariable> map
         = new LinkedHashMap<LocationVariable, LogicVariable>();
         map.put(heapLDT.getHeap(), heapLV);
-        final OpReplacer or = new OpReplacer(map);
+        final OpReplacer or = new OpReplacer(map, tf);
         t = or.replace(t);
         return all(heapLV, t);
     }

@@ -131,10 +131,12 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
             }
          }
          else {
-            contractSelf = UseOperationContractRule.computeSelf(baseHeapTerm, atPres, baseHeap, inst, resultTerm);
+            contractSelf = UseOperationContractRule.computeSelf(baseHeapTerm, atPres, baseHeap, 
+                    inst, resultTerm, getServices().getTermFactory());
          }
       }
-      ImmutableList<Term> contractParams = UseOperationContractRule.computeParams(baseHeapTerm, atPres, baseHeap, inst);
+      ImmutableList<Term> contractParams = UseOperationContractRule.computeParams(baseHeapTerm, atPres, 
+              baseHeap, inst, getServices().getTermFactory());
       // Compute contract text
       synchronized (NotationInfo.class) {
          boolean originalPrettySyntax = NotationInfo.PRETTY_SYNTAX;

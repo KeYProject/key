@@ -23,8 +23,19 @@ import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.parser.KeYLexerF;
@@ -77,7 +88,7 @@ public class CreateTacletForTests extends TestCase {
     static SchemaVariable b;
     static LogicVariable z;
     static Sort sort1;
-    static TermFactory tf=TermFactory.DEFAULT;
+    static TermFactory tf;
 
     static NamespaceSet nss;
 
@@ -86,6 +97,7 @@ public class CreateTacletForTests extends TestCase {
     public CreateTacletForTests(String name) {
 	super(name);
 	services = new Services(AbstractProfile.getDefaultProfile());
+	tf = services.getTermFactory();
     }
 
 

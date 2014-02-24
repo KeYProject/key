@@ -177,7 +177,7 @@ public final class PullOutConditionalsRule implements BuiltInRule {
 	}
 	
 	//replace
-	final OpReplacer or = new OpReplacer(map);
+	final OpReplacer or = new OpReplacer(map, services.getTermFactory());
 	final SequentFormula newCF 
 		= new SequentFormula(or.replace(focus));
 	result.head().changeFormula(newCF, ruleApp.posInOccurrence());

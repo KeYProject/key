@@ -118,7 +118,7 @@ public final class RepresentsAxiom extends ClassAxiom {
 	if(selfVar != null) {
 	    map.put(originalSelfVar, selfVar);
 	}
-	final OpReplacer or = new OpReplacer(map);
+	final OpReplacer or = new OpReplacer(map, services.getTermFactory());
 	return or.replace(originalRep);
     }
     

@@ -161,7 +161,7 @@ public final class SimpleBlockContract implements BlockContract {
         final Map<ProgramVariable, ProgramVariable> replacementMap = createReplacementMap(
             new Variables(self, null, null, null, null, null, remembranceHeaps, null, services), services
         );
-        final OpReplacer replacer = new OpReplacer(replacementMap);
+        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
         return replacer.replace(preconditions.get(heap));
     }
 
@@ -180,7 +180,7 @@ public final class SimpleBlockContract implements BlockContract {
         final Map<Term, Term> replacementMap = createReplacementMap(
             heap, new Terms(self, null, null, null, null, null, remembranceHeaps, null), services
         );
-        final OpReplacer replacer = new OpReplacer(replacementMap);
+        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
         return replacer.replace(preconditions.get(heapVariable));
     }
 
@@ -198,7 +198,8 @@ public final class SimpleBlockContract implements BlockContract {
         assert variables != null;
         assert (variables.self == null) == (this.variables.self == null);
         assert services != null;
-        final OpReplacer replacer = new OpReplacer(createReplacementMap(variables, services));
+        final OpReplacer replacer = new OpReplacer(createReplacementMap(variables, services), 
+                                                   services.getTermFactory());
         return replacer.replace(postconditions.get(heap));
     }
 
@@ -211,7 +212,8 @@ public final class SimpleBlockContract implements BlockContract {
         assert terms != null;
         assert (terms.self == null) == (variables.self == null);
         assert services != null;
-        final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services));
+        final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services), 
+                                                   services.getTermFactory());
         return replacer.replace(postconditions.get(heapVariable));
     }
 
@@ -231,7 +233,7 @@ public final class SimpleBlockContract implements BlockContract {
         final Map<ProgramVariable, ProgramVariable> replacementMap = createReplacementMap(
             new Variables(self, null, null, null, null, null, null, null, services), services
         );
-        final OpReplacer replacer = new OpReplacer(replacementMap);
+        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
         return replacer.replace(modifiesClauses.get(heap));
     }
 
@@ -246,7 +248,7 @@ public final class SimpleBlockContract implements BlockContract {
         final Map<Term, Term> replacementMap = createReplacementMap(
             heap, new Terms(self, null, null, null, null, null, null, null), services
         );
-        final OpReplacer replacer = new OpReplacer(replacementMap);
+        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
         return replacer.replace(modifiesClauses.get(heapVariable));
     }
 
@@ -1016,7 +1018,7 @@ public final class SimpleBlockContract implements BlockContract {
                                            var(remembranceVariable.getValue()));
                     }
                 }
-                return new OpReplacer(replacementMap).replace(formula);
+                return new OpReplacer(replacementMap, services.getTermFactory()).replace(formula);
             }
         }
 

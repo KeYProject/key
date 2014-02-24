@@ -27,7 +27,6 @@ import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -61,7 +60,6 @@ import de.uka.ilkd.key.util.Pair;
 public abstract class WellDefinednessCheck implements Contract {
 
     private static final String OPTION = "wdChecks";
-    protected static final TermFactory TF = TermFactory.DEFAULT;
     public static final String INV_TACLET = "wd_Invariant";
     public static final String OP_TACLET = "wd_Operation";
     public static final String OP_EXC_TACLET = "wd_Exc_Operation";
@@ -198,54 +196,51 @@ public abstract class WellDefinednessCheck implements Contract {
         return new Pair<ImmutableList<Term>, ImmutableList<Term>> (implicit, explicit);
     }
 
-    private static Term replaceSV(Term t, SchemaVariable self,
-                                  ImmutableList<ParsableVariable> params,
-                                  WellDefinednessCheck check) {
+    protected Term replaceSV(Term t, SchemaVariable self,
+                                  ImmutableList<ParsableVariable> params) {
         return replaceSV(t, self, null, null, null, params,
-                         check.getOrigVars(), check.getHeaps());
+                         getOrigVars(), getHeaps());
     }
 
-    private static Term replace(Term t, OriginalVariables newVars,
-                                WellDefinednessCheck check) {
+    protected Term replace(Term t, OriginalVariables newVars) {
         return replace(t, newVars.self, newVars.result, newVars.exception, newVars.atPres,
-                       newVars.params, check.getOrigVars(), check.getHeaps());
+                       newVars.params, getOrigVars(), getHeaps());
     }
 
-    private static Term replace(Term t, Variables vars,
-                                WellDefinednessCheck check) {
+    public Term replace(Term t, Variables vars) {
         return replace(t, vars.self, vars.result, vars.exception, vars.atPres,
-                       vars.params, check.getOrigVars(), check.getHeaps());
+                       vars.params, getOrigVars(), getHeaps());
     }
 
-    private static Term replaceSV(Term t,
-                                  SchemaVariable selfVar,
-                                  SchemaVariable resultVar,
-                                  SchemaVariable excVar,
-                                  Map<LocationVariable,
-                                      SchemaVariable> atPreVars,
-                                  ImmutableList<ParsableVariable> paramVars,
-                                  OriginalVariables origVars,
-                                  ImmutableList<LocationVariable> heaps) {
+    private Term replaceSV(Term t,
+            SchemaVariable selfVar,
+            SchemaVariable resultVar,
+            SchemaVariable excVar,
+            Map<LocationVariable,
+            SchemaVariable> atPreVars,
+            ImmutableList<ParsableVariable> paramVars,
+            OriginalVariables origVars,
+            ImmutableList<LocationVariable> heaps) {
         Map<ProgramVariable, SchemaVariable> map =
                 getSchemaMap(selfVar, resultVar, excVar, atPreVars,
-                             paramVars, origVars, heaps);
-        final OpReplacer or = new OpReplacer(map);
+                        paramVars, origVars, heaps);
+        final OpReplacer or = new OpReplacer(map, TB.tf());
         return or.replace(t);
     }
 
-    private static Term replace(Term t,
-                                ProgramVariable selfVar,
-                                ProgramVariable resultVar,
-                                ProgramVariable excVar,
-                                Map<LocationVariable,
-                                    ProgramVariable> atPreVars,
-                                ImmutableList<ProgramVariable> paramVars,
-                                OriginalVariables origVars,
-                                ImmutableList<LocationVariable> heaps) {
+    private Term replace(Term t,
+            ProgramVariable selfVar,
+            ProgramVariable resultVar,
+            ProgramVariable excVar,
+            Map<LocationVariable,
+            ProgramVariable> atPreVars,
+            ImmutableList<ProgramVariable> paramVars,
+            OriginalVariables origVars,
+            ImmutableList<LocationVariable> heaps) {
         Map<ProgramVariable, ProgramVariable> map =
                 getReplaceMap(selfVar, resultVar, excVar, atPreVars,
-                              paramVars, origVars, heaps);
-        final OpReplacer or = new OpReplacer(map);
+                        paramVars, origVars, heaps);
+        final OpReplacer or = new OpReplacer(map, TB.tf());
         return or.replace(t);
     }
 
@@ -386,11 +381,6 @@ public abstract class WellDefinednessCheck implements Contract {
             res = res.append(replace(t, vars));
         }
         return res;
-    }
-
-    private Term replaceSV(Term t, SchemaVariable self,
-                           ImmutableList<ParsableVariable> params) {
-        return replaceSV(t, self, params, this);
     }
 
     private ImmutableList<LocationVariable> getHeaps() {
@@ -744,7 +734,7 @@ public abstract class WellDefinednessCheck implements Contract {
             map.put((ParsableVariable)find2.sub(0).sub(i).op(), (ParsableVariable)sub.op());
             i++;
         }
-        final OpReplacer or = new OpReplacer(map);
+        final OpReplacer or = new OpReplacer(map, services.getTermFactory());
         final Term goal = services.getTermBuilder().orSC(goal1, or.replace(goal2));
         final RewriteTacletBuilder tb = new RewriteTacletBuilder();
         tb.setFind(find1);
@@ -803,10 +793,6 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     abstract Function generateMbyAtPreFunc(Services services);
-
-    final Term replace(Term t, OriginalVariables newVars) {
-        return replace(t, newVars, this);
-    }
 
     final Condition replaceSV(Condition pre, SchemaVariable self,
                               ImmutableList<ParsableVariable> params) {
@@ -1108,10 +1094,6 @@ public abstract class WellDefinednessCheck implements Contract {
                 TB.elementary(TB.var(heapAtPre), TB.var(heap))
                 : TB.skip();
         return TB.parallel(oldUpd, havocUpd);
-    }
-
-    public final Term replace(Term t, Variables vars) {
-        return replace(t, vars, this);
     }
 
     public final POTerms replace(POTerms po, Variables vars) {

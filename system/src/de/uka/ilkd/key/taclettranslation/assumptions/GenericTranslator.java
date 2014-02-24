@@ -28,7 +28,6 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -187,7 +186,7 @@ class GenericTranslator {
                                                 }
                                         }
 
-                                        term = TermFactory.DEFAULT.createTerm(
+                                        term = services.getTermFactory().createTerm(
                                                         func, subTerms);
 
                                 }
@@ -231,7 +230,7 @@ class GenericTranslator {
 
                 } else {
 
-                        term = TermFactory.DEFAULT.createTerm(term.op(),
+                        term = services.getTermFactory().createTerm(term.op(),
                                         subTerms, variables,
                                         JavaBlock.EMPTY_JAVABLOCK);
 

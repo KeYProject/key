@@ -37,7 +37,6 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -1199,14 +1198,15 @@ public abstract class Taclet implements Rule, Named {
 		    ifPart = inst.getConstrainedFormula ().formula ();
 
 		    // negate formulas of the if succedent
-		    if ( i <= 0 )
-			ifPart = p_goal.proof().getServices().getTermBuilder().not(ifPart);		    
+		    final Services services = p_goal.proof().getServices();
+            if ( i <= 0 )
+			ifPart = services.getTermBuilder().not(ifPart);		    
 
 		    if ( res == null ) {
 			res   = p_goal.split( p_numberOfNewGoals + 1 );
 			ifObl = ifPart;
 		    } else
-			ifObl = TermFactory.DEFAULT.createTerm
+			ifObl = services.getTermFactory().createTerm
 			    ( Junctor.AND, ifObl, ifPart );
 		    
 		    // UGLY: We create a flat structure of the new

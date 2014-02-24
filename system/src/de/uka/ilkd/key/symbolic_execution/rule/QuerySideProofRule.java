@@ -216,7 +216,9 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
          else {
             Function resultFunction = createResultConstant(services, varTerm.sort());
             Term resultFunctionTerm = tb.func(resultFunction);
-            resultGoal.addFormula(replace(pio, varFirst ? tb.equals(resultFunctionTerm, varTerm) : tb.equals(resultFunctionTerm, varTerm)), pio.isInAntec(), false);
+            resultGoal.addFormula(replace(pio, 
+                    varFirst ? tb.equals(resultFunctionTerm, varTerm) : tb.equals(resultFunctionTerm, varTerm),
+                    services), pio.isInAntec(), false);
             for (Entry<Term, Set<Term>> conditionsAndResult : conditionsAndResultsMap.entrySet()) {
                for (Term conditionTerm : conditionsAndResult.getValue()) { // Combining the different conditions for the same value with an OR does not work well because the strategy then tries to establish CNF by splitting or ausmultiplizieren
                   Term resultTerm = tb.imp(conditionTerm, varFirst ? tb.equals(resultFunctionTerm, conditionsAndResult.getKey()) : tb.equals(conditionsAndResult.getKey(), resultFunctionTerm));

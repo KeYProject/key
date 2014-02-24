@@ -20,7 +20,6 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -220,12 +219,12 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
     * @param newTerm The new {@link Term}.
     * @return The created {@link SequentFormula} in which the {@link Term} is replaced.
     */
-   protected static SequentFormula replace(PosInOccurrence pio, Term newTerm) {
+   protected static SequentFormula replace(PosInOccurrence pio, Term newTerm, Services services) {
       // Iterate along the PosInOccurrence and collect the parents and indices
       Deque<Pair<Integer, Term>> indexAndParents = new LinkedList<Pair<Integer, Term>>();
       Term root = pio.constrainedFormula().formula();
       final PosInTerm pit = pio.posInTerm();
-      for (int i = 0, sz=pit.depth(); i<sz; i++) {
+      for (int i = 0, sz=pit.depth(); i<sz; i++) { 
          int next = pit.getIndexAt(i);
          indexAndParents.addFirst(new Pair<Integer, Term>(Integer.valueOf(next), root));
          root = root.sub(next);
@@ -236,7 +235,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
          Term parent = pair.second;
          Term[] newSubs = parent.subs().toArray(new Term[parent.subs().size()]);
          newSubs[pair.first] = root;
-         root = TermFactory.DEFAULT.createTerm(parent.op(), newSubs, parent.boundVars(), parent.javaBlock(), parent.getLabels());
+         root =  services.getTermFactory().createTerm(parent.op(), newSubs, parent.boundVars(), parent.javaBlock(), parent.getLabels());
       }
       return new SequentFormula(root);
    }

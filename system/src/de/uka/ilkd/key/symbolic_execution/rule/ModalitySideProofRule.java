@@ -13,7 +13,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -141,9 +140,10 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
          // Compute sequent for side proof to compute query in.
          Sequent sequentToProve = computeGeneralSequentToProve(goal.sequent(), pio.constrainedFormula());
          Function newPredicate = createResultFunction(services, varTerm.sort());
-         Term newTerm = services.getTermBuilder().func(newPredicate, varTerm);
-         Term newModalityTerm = TermFactory.DEFAULT.createTerm(modalityTerm.op(), new ImmutableArray<Term>(newTerm), modalityTerm.boundVars(), modalityTerm.javaBlock(), modalityTerm.getLabels());
-         Term newModalityWithUpdatesTerm = services.getTermBuilder().applySequential(updates, newModalityTerm);
+         final TermBuilder tb = services.getTermBuilder();
+         Term newTerm = tb.func(newPredicate, varTerm);
+         Term newModalityTerm = services.getTermFactory().createTerm(modalityTerm.op(), new ImmutableArray<Term>(newTerm), modalityTerm.boundVars(), modalityTerm.javaBlock(), modalityTerm.getLabels());
+         Term newModalityWithUpdatesTerm = tb.applySequential(updates, newModalityTerm);
          sequentToProve = sequentToProve.addFormula(new SequentFormula(newModalityWithUpdatesTerm), false, false).sequent();
          // Compute results and their conditions
          Map<Term, Set<Term>> conditionsAndResultsMap = computeResultsAndConditions(services, goal, sequentToProve, newPredicate);
@@ -152,13 +152,13 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
          Goal resultGoal = goals.head();
          resultGoal.removeFormula(pio);
          for (Entry<Term, Set<Term>> conditionsAndResult : conditionsAndResultsMap.entrySet()) {
-            Term conditionTerm = services.getTermBuilder().and(conditionsAndResult.getValue());
+            Term conditionTerm = tb.and(conditionsAndResult.getValue());
             Term resultEqualityTerm = varFirst ?
-                                      services.getTermBuilder().equals(conditionsAndResult.getKey(), otherTerm) :
-                                      services.getTermBuilder().equals(otherTerm, conditionsAndResult.getKey());
+                                      tb.equals(conditionsAndResult.getKey(), otherTerm) :
+                                      tb.equals(otherTerm, conditionsAndResult.getKey());
             Term resultTerm = pio.isInAntec() ?
-                              services.getTermBuilder().imp(conditionTerm, resultEqualityTerm) :
-                              services.getTermBuilder().and(conditionTerm, resultEqualityTerm);
+                              tb.imp(conditionTerm, resultEqualityTerm) :
+                              tb.and(conditionTerm, resultEqualityTerm);
             resultGoal.addFormula(new SequentFormula(resultTerm), pio.isInAntec(), false);
          }
          return goals;

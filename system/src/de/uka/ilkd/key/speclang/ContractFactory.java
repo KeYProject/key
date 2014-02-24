@@ -549,7 +549,7 @@ public class ContractFactory {
             map.put(tb.var(h), tb.var(atPreVars.get(h)));
           }
         }
-        return new OpReplacer(map).replace(t);
+        return new OpReplacer(map, services.getTermFactory()).replace(t);
     }
 
 
@@ -588,7 +588,7 @@ public class ContractFactory {
                 map.put(it1.next(), it2.next());
             }
         }
-        OpReplacer or = new OpReplacer(map);
+        OpReplacer or = new OpReplacer(map, services.getTermFactory());
         original = or.replace(original);
         return original;
     }

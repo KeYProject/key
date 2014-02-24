@@ -26,7 +26,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
@@ -270,7 +269,7 @@ public final class RewriteTaclet extends FindTaclet {
 		}
 	    }
 
-	    return TermFactory.DEFAULT.createTerm(term.op(),
+	    return services.getTermFactory().createTerm(term.op(),
                                                   subs,
                                                   term.boundVars(),
                                                   term.javaBlock(),

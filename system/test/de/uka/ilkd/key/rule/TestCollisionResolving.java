@@ -92,16 +92,16 @@ public class TestCollisionResolving extends TestCase {
 	Function p = new Function(new Name("p"), Sort.FORMULA, new Sort[]{s});
 	Function q = new Function(new Name("q"), Sort.FORMULA, new Sort[]{s});
 
-	Term t_x = TermFactory.DEFAULT.createTerm(x);	
-	Term t_p_x = TermFactory.DEFAULT.createTerm(p, new Term[]{t_x}, null, null);
-	Term t_q_x = TermFactory.DEFAULT.createTerm(q, new Term[]{t_x}, null, null);
+	Term t_x = services.getTermFactory().createTerm(x);	
+	Term t_p_x = services.getTermFactory().createTerm(p, new Term[]{t_x}, null, null);
+	Term t_q_x = services.getTermFactory().createTerm(q, new Term[]{t_x}, null, null);
    TermBuilder tb = services.getTermBuilder();
 	Term t_all_p_x =
 	    tb.all(x, t_p_x);
 	Term t_ex_q_x =
 	    tb.ex(x, t_q_x);
 	Term term = 
-	    TermFactory.DEFAULT.createTerm(Junctor.AND, t_all_p_x,
+	        services.getTermFactory().createTerm(Junctor.AND, t_all_p_x,
 						  t_ex_q_x);
 	FindTaclet coll_varSV = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_coll_varSV").taclet();
@@ -140,17 +140,20 @@ public class TestCollisionResolving extends TestCase {
 	Function p = new Function(new Name("p"), Sort.FORMULA, new Sort[]{s});
 	Function q = new Function(new Name("q"), Sort.FORMULA, new Sort[]{s});
 
-	Term t_x = TermFactory.DEFAULT.createTerm(x);	
-	Term t_p_x = TermFactory.DEFAULT.createTerm(p, new Term[]{t_x}, null, null);
-	Term t_q_x = TermFactory.DEFAULT.createTerm(q, new Term[]{t_x}, null, null);
-	
 	TermBuilder tb = services.getTermBuilder();
+
+	final TermFactory tf = services.getTermFactory();
+    
+	Term t_x = tf.createTerm(x);	
+	Term t_p_x = tf.createTerm(p, new Term[]{t_x}, null, null);
+	Term t_q_x = tf.createTerm(q, new Term[]{t_x}, null, null);
+	
 
 	Term t_ex_q_x =
 	    tb.ex(x, t_q_x);
 
 	Term t_px_and_exxqx = 
-	    TermFactory.DEFAULT.createTerm(Junctor.AND, t_p_x,
+	    tf.createTerm(Junctor.AND, t_p_x,
 						  t_ex_q_x);
 	Term term =
 	    tb.all(x, t_px_and_exxqx);

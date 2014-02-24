@@ -129,7 +129,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     public Term getInv(ParsableVariable selfVar, Services services) {
         final Map<Operator, Operator> replaceMap 
         	= getReplaceMap(selfVar, services);
-        final OpReplacer or = new OpReplacer(replaceMap);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         Term res = or.replace(originalInv);
         res = services.getTermBuilder().convertToFormula(res);
         return res;

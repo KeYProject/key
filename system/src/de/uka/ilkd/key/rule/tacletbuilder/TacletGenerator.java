@@ -47,7 +47,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -457,9 +456,9 @@ public class TacletGenerator {
         final Term axiomSatisfiable;
         if (target.sort() == Sort.FORMULA) {
             axiomSatisfiable = TB.or(OpReplacer.replace(targetTerm, TB.tt(),
-                                                        schemaRepresents.term),
+                                                        schemaRepresents.term, services.getTermFactory()),
                                      OpReplacer.replace(targetTerm, TB.ff(),
-                                                        schemaRepresents.term));
+                                                        schemaRepresents.term, services.getTermFactory()));
         } else {
             final VariableSV targetSV = SchemaVariableFactory.createVariableSV(
                     new Name(target.sort().name().toString().substring(0, 1)),
@@ -486,7 +485,8 @@ public class TacletGenerator {
                           TB.and(targetSVReachable,
                                  OpReplacer.replace(targetTerm,
                                                     TB.var(targetSV),
-                                                    schemaRepresents.term)));
+                                                    schemaRepresents.term, 
+                                                    services.getTermFactory())));
         }
         return axiomSatisfiable;
     }
@@ -588,7 +588,8 @@ public class TacletGenerator {
         pvs = pvs.append(originalSelfVar).append(originalParamVars); // .append(originalResultVar)
         svs = svs.append(selfSV).append(paramSVs); // .append(resultSV)
         final TermAndBoundVarPair schemaAdd =
-               createSchemaTerm(TB.imp(addForumlaTerm, OpReplacer.replace(TB.var(originalResultVar), find, originalPost)), pvs, svs, services);
+               createSchemaTerm(TB.imp(addForumlaTerm, OpReplacer.replace(TB.var(originalResultVar), 
+                       find, originalPost, services.getTermFactory())), pvs, svs, services);
 
         final Term addedFormula = schemaAdd.term;
         final SequentFormula addedCf = new SequentFormula(addedFormula);
@@ -653,7 +654,7 @@ public class TacletGenerator {
                                         DefaultImmutableSet.<Modality>nil().add(Modality.DIA).add(Modality.BOX).add(Modality.DIA_TRANSACTION).add(Modality.BOX_TRANSACTION));
         SchemaVariable postSV = SchemaVariableFactory.createFormulaSV(new Name("#post_sv"));
 
-        final Term findTerm = TermFactory.DEFAULT.createTerm(modalitySV, new Term[]{TB.var(postSV)}, null, findBlock);
+        final Term findTerm = TB.tf().createTerm(modalitySV, new Term[]{TB.var(postSV)}, null, findBlock);
 
         final JavaBlock replaceBlock = JavaBlock.createJavaBlock(new ContextStatementBlock(new StatementBlock(),null));
 
@@ -672,7 +673,7 @@ public class TacletGenerator {
 
         final Term replaceTerm = TB.apply(
                               TB.elementary(TB.var(resultProgSV), TB.func(target, updateSubs)),
-                              TermFactory.DEFAULT.createTerm(modalitySV, new Term[]{TB.var(postSV)}, null, replaceBlock));
+                              TB.tf().createTerm(modalitySV, new Term[]{TB.var(postSV)}, null, replaceBlock));
 
         final RewriteTacletBuilder replaceTacletBuilder = new RewriteTacletBuilder();
 
@@ -707,7 +708,7 @@ public class TacletGenerator {
         for(ProgramVariable heap : HeapContext.getModHeaps(services, false)) {
                 replace.put(TB.var(heap), TB.var(heapSVs.get(i++)));
         }
-        final OpReplacer replacer = new OpReplacer(replace);
+        final OpReplacer replacer = new OpReplacer(replace, services.getTermFactory());
         // TB.getBaseHeap(services),  TB.var(heapSV)
         //instantiate axiom with schema variables
         final Term rawAxiom = replacer.replace(term);
@@ -790,7 +791,7 @@ public class TacletGenerator {
     private TermAndBoundVarPair createSchemaTerm(Term term,
                                                  ImmutableList<ProgramVariable> programVars,
                                                  ImmutableList<SchemaVariable> schemaVars, Services services) {
-        final OpReplacer or = createOpReplacer(programVars, schemaVars);
+        final OpReplacer or = createOpReplacer(programVars, schemaVars, services);
         final Term rawTerm = or.replace(term);
         final TermAndBoundVarPair schemaTerm = replaceBoundLogicVars(rawTerm, services);
         return schemaTerm;
@@ -824,7 +825,7 @@ public class TacletGenerator {
 
     private OpReplacer createOpReplacer(
             ImmutableList<ProgramVariable> programVars,
-            ImmutableList<SchemaVariable> schemaVars) {
+            ImmutableList<SchemaVariable> schemaVars, Services services) {
         assert programVars.size() == schemaVars.size();
         final Map<ProgramVariable, ParsableVariable> map =
                 new LinkedHashMap<ProgramVariable, ParsableVariable>();
@@ -835,7 +836,7 @@ public class TacletGenerator {
                 map.put(progVar, schemaVar);
             }
         }
-        return new OpReplacer(map);
+        return new OpReplacer(map, services.getTermFactory());
     }
 
 
@@ -890,7 +891,7 @@ public class TacletGenerator {
                 namesOfNewSVs.add(sv.name());
             }
         }
-        final OpReplacer or = new OpReplacer(replaceMap);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         final Term newTerm = or.replace(intermediateRes.term);
 
         return new TermAndBoundVarPair(newTerm, newSVs);
@@ -918,7 +919,7 @@ public class TacletGenerator {
                 newBoundVars[i] = qv;
             }
         }
-        final OpReplacer or = new OpReplacer(map);
+        final OpReplacer or = new OpReplacer(map, services.getTermFactory());
 
         //handle subterms
         final Term[] newSubs = new Term[t.arity()];
@@ -1039,8 +1040,8 @@ public class TacletGenerator {
     	final Term axiomSatisfiable;
         if (target.sort() == Sort.FORMULA) {
             axiomSatisfiable =
-                    TB.or(OpReplacer.replace(targetTerm, TB.tt(), schemaAxiom),
-                          OpReplacer.replace(targetTerm, TB.ff(), schemaAxiom));
+                    TB.or(OpReplacer.replace(targetTerm, TB.tt(), schemaAxiom, services.getTermFactory()),
+                          OpReplacer.replace(targetTerm, TB.ff(), schemaAxiom, services.getTermFactory()));
         } else {
             final VariableSV targetSV =
                     SchemaVariableFactory.createVariableSV(new Name(target.sort().name().toString().substring(
@@ -1072,7 +1073,7 @@ public class TacletGenerator {
                     TB.ex(targetSV,
                           TB.and(targetLVReachable,
                                  OpReplacer.replace(targetTerm, TB.var(targetSV),
-                                                    schemaAxiom)));
+                                                    schemaAxiom, services.getTermFactory())));
         }
         return axiomSatisfiable;
     }

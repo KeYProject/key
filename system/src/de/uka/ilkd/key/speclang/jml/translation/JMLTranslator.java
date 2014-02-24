@@ -344,7 +344,7 @@ final class JMLTranslator {
                     Map /* Operator -> Operator */ replaceMap =
                             new LinkedHashMap();
                     replaceMap.put(eVar, excVar);
-                    OpReplacer excVarReplacer = new OpReplacer(replaceMap);
+                    OpReplacer excVarReplacer = new OpReplacer(replaceMap, services.getTermFactory());
 
                     Sort os = excType.getSort();
                     Function instance = os.getInstanceofSymbol(services);

@@ -119,7 +119,7 @@ public final class WhileInvariantTransformer {
         post = initialPost.sub(0);
 
         javaInfo = services.getJavaInfo();
-        tf = TermFactory.DEFAULT ;
+        tf = services.getTermFactory() ;
         typeConv = services.getTypeConverter();
         
         returnType = removeWhile.returnType();

@@ -25,7 +25,6 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -219,7 +218,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 Name name = createUniqueName(services, "v_"+sv.name().toString());
                 Sort sort = replaceSort(sv.sort(), services);
                 LogicVariable variable = new LogicVariable(name, sort);
-                return TermFactory.DEFAULT.createTerm(variable);
+                return services.getTermFactory().createTerm(variable);
         }
 
         /**
@@ -317,7 +316,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
                 Operator newOp = replaceOp(term.op(), services);
 
-                return TermFactory.DEFAULT
+                return services.getTermFactory()
                                 .createTerm(newOp,
                                                 newSubs,
                                                 new ImmutableArray<QuantifiableVariable>(

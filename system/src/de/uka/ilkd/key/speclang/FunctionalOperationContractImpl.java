@@ -408,7 +408,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                                                null,
                                                                                atPreVars,
                                                                                services);
-        final OpReplacer or = new OpReplacer(replaceMap);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalPres.get(heap));
     }
 
@@ -455,7 +455,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 	                                                 null,
 	                                                 atPres,
 	                                                 services);
-	final OpReplacer or = new OpReplacer(replaceMap);
+	final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
 	return or.replace(originalPres.get(heap));
     }
 
@@ -524,7 +524,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 	                                                                       null,
 	                                                                       null,
 	                                                                       services);
-	final OpReplacer or = new OpReplacer(replaceMap);
+	final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
 	return or.replace(originalMby);
     }
 
@@ -546,7 +546,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 	                                                 null,
 	                                                 atPres,
 	                                                 services);
-	final OpReplacer or = new OpReplacer(replaceMap);
+	final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
 	return or.replace(originalMby);
     }
 
@@ -944,7 +944,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 excVar,
                 atPreVars,
                 services);
-        final OpReplacer or = new OpReplacer(replaceMap);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalPosts.get(heap));
     }
 
@@ -996,7 +996,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                          excTerm,
                                                          atPres,
                                                          services);
-        final OpReplacer or = new OpReplacer(replaceMap);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalPosts.get(heap));
     }
 
@@ -1045,7 +1045,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 null,
                 atPreVars,
                 services);
-        final OpReplacer or = new OpReplacer(replaceMap);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalAxioms.get(heap));
     }
 
@@ -1077,7 +1077,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                excTerm,
                atPres,
                services);
-       final OpReplacer or = new OpReplacer(replaceMap);
+       final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
        return or.replace(originalAxioms.get(heap));
     }
 
@@ -1100,7 +1100,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                                                null,
                                                                                null,
                                                                                services);
-        final OpReplacer or = new OpReplacer(replaceMap);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(mod);
     }
 
@@ -1132,7 +1132,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                          null,
                                                          null,
                                                          services);
-        final OpReplacer or = new OpReplacer(replaceMap);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(mod);
     }
 
@@ -1175,7 +1175,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 }
             }
         }
-        OpReplacer or = new OpReplacer(map);
+        OpReplacer or = new OpReplacer(map, services.getTermFactory());
         return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
     }
 
@@ -1208,7 +1208,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 }
             }
         }
-        OpReplacer or = new OpReplacer(map);
+        OpReplacer or = new OpReplacer(map, services.getTermFactory());
         return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
     }
 
@@ -1231,7 +1231,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 selfTerm,
                 paramTerms,
                 services);
-        final OpReplacer or = new OpReplacer(replaceMap);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(globalDefs);
     }
 

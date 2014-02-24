@@ -28,7 +28,6 @@ import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -55,7 +54,6 @@ import de.uka.ilkd.key.util.Pair;
  */
 public abstract class AbstractPO implements IPersistablePO {
 
-    protected static final TermFactory TF = TermFactory.DEFAULT;
     protected final TermBuilder TB; // TODO: Rename into tb;
     protected final InitConfig initConfig;
     protected final Services services;

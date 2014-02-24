@@ -124,7 +124,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     public Term getClause(ParsableVariable selfVar, Services services) {
         final Map<Operator, Operator> replaceMap 
         	= getReplaceMap(selfVar, services);
-        final OpReplacer or = new OpReplacer(replaceMap);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         Term res = or.replace(originalInv);
         res = services.getTermBuilder().convertToFormula(res);
         return res;

@@ -24,19 +24,29 @@ import de.uka.ilkd.key.rule.TacletForTests;
 
 public class LabeledTermImplTest extends TestCase {
 
+        private Services services;
+        private TermFactory tf;
+
+        @Override
+        public void setUp() {
+            services = TacletForTests.services();
+            tf = services.getTermFactory();
+
+        }
+    
 	public void testEqualsLabelOnTop() {
-		Term unlabeledTerm = 
-				TermFactory.DEFAULT.createTerm(Junctor.AND, 
-						TermFactory.DEFAULT.createTerm(Junctor.TRUE), 
-						TermFactory.DEFAULT.createTerm(Junctor.FALSE));
+                Term unlabeledTerm = 
+				tf.createTerm(Junctor.AND, 
+						tf.createTerm(Junctor.TRUE), 
+						tf.createTerm(Junctor.FALSE));
 		
 		ImmutableArray<TermLabel> labels = new ImmutableArray<TermLabel>(
 		      ParameterlessTermLabel.LOOP_BODY_LABEL);
 		
 		Term labeledTerm = 
-				TermFactory.DEFAULT.createTerm(Junctor.AND, 
-						TermFactory.DEFAULT.createTerm(Junctor.TRUE), 
-						TermFactory.DEFAULT.createTerm(Junctor.FALSE), labels);
+				tf.createTerm(Junctor.AND, 
+						tf.createTerm(Junctor.TRUE), 
+						tf.createTerm(Junctor.FALSE), labels);
 				
 		assertFalse("Labeled and unlabeled terms must not be equal", labeledTerm.equals(unlabeledTerm));
 		assertFalse("Labeled and unlabeled terms must not be equal", unlabeledTerm.equals(labeledTerm));
@@ -48,10 +58,9 @@ public class LabeledTermImplTest extends TestCase {
 	 */
 	public void testGetHasAndContainsLabels() {
 	   // Create terms
-	   Services services = TacletForTests.services();
 	   Term unlabled = services.getTermBuilder().tt();
 	   SymbolicExecutionTermLabel sedLabel = new SymbolicExecutionTermLabel(1);
-      SymbolicExecutionTermLabel anotherSedLabel = new SymbolicExecutionTermLabel(2);
+	   SymbolicExecutionTermLabel anotherSedLabel = new SymbolicExecutionTermLabel(2);
 	   Term oneLabel = services.getTermBuilder().label(unlabled, sedLabel);
 	   Term oneLabelChanged = services.getTermBuilder().label(oneLabel, ParameterlessTermLabel.LOOP_BODY_LABEL);
 	   Term twoLabels = services.getTermBuilder().label(unlabled, new ImmutableArray<TermLabel>(ParameterlessTermLabel.LOOP_BODY_LABEL, sedLabel));

@@ -57,7 +57,6 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         // only for testing.
         // private boolean appendGenericTerm = false;
 
-        protected final static TermFactory tf = TermFactory.DEFAULT;
 
         protected HashMap<String, LogicVariable> usedVariables = new LinkedHashMap<String, LogicVariable>();
 
@@ -135,8 +134,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
                 }
 
-                term = tf.createTerm(term.op(), subTerms, variables,
-                                JavaBlock.EMPTY_JAVABLOCK);
+                term = services.getTermFactory().createTerm(term.op(), subTerms, 
+                                                            variables, JavaBlock.EMPTY_JAVABLOCK);
           
                 term = changeTerm(term);
            
@@ -497,7 +496,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
                         ImmutableArray<QuantifiableVariable> array = new ImmutableArray<QuantifiableVariable>(
                                         list);
 
-                        term = TermFactory.DEFAULT.createTerm(term.op(),
+                        term = services.getTermFactory().createTerm(term.op(),
                                         term.subs(), array,
                                         JavaBlock.EMPTY_JAVABLOCK,
                                         term.getLabels());

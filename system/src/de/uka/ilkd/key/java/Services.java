@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.NameRecorder;
@@ -347,5 +348,13 @@ public class Services{
      */
     public TermBuilder getTermBuilder() {
        return termBuilder;
+    }
+
+    /**
+     * Returns the {@link TermBuilder} used to create {@link Term}s.
+     * @return The {@link TermBuilder} used to create {@link Term}s.
+     */
+    public TermFactory getTermFactory() {
+        return TermFactory.DEFAULT;
     }
 }

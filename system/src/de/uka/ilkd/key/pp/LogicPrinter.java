@@ -38,7 +38,6 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
@@ -1741,7 +1740,7 @@ public class LogicPrinter {
             final QuantifiableVariable v = vars.get (j);
             if(v instanceof LogicVariable) {
                 Term t =
-                    TermFactory.DEFAULT.createTerm(v);
+                    services.getTermFactory().createTerm(v);
                 if (mode != QuantifiableVariablePrintMode.WITH_OUT_DECLARATION) {
                     // do not print declarations in taclets...
                     printClassName(v.sort().name().toString());
@@ -1993,7 +1992,7 @@ public class LogicPrinter {
                     for (int i = 0; i < phi.arity(); i++) {
                         ta[i] = phi.sub(i);
                     }
-                    Term term = TermFactory.DEFAULT.
+                    Term term = services.getTermFactory().
 			createTerm((Modality)o, ta, phi.boundVars(), phi.javaBlock());
                     notationInfo.getNotation((Modality)o, services).print(term, this);
                     return;

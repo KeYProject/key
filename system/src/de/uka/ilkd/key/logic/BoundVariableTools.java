@@ -33,9 +33,7 @@ public class BoundVariableTools {
     public final static BoundVariableTools DEFAULT = new BoundVariableTools ();
     
     private BoundVariableTools () {}
-    
-    private final TermFactory tf = TermFactory.DEFAULT;
-    
+        
     /**
      * Compare the arrays <code>oldBoundVars</code> and
      * <code>newBoundVars</code> component-wise, and in case of differences
@@ -51,8 +49,7 @@ public class BoundVariableTools {
             if ( oldBoundVars.get ( i )
                  != newBoundVars.get ( i ) ) {
                 final Term newVarTerm =
-                    tf.createTerm
-                    ( newBoundVars.get ( i ) );
+                    services.getTermFactory().createTerm( newBoundVars.get ( i ) );
                 final ClashFreeSubst subst =
                     new ClashFreeSubst ( oldBoundVars.get ( i ),
                                          newVarTerm, services );

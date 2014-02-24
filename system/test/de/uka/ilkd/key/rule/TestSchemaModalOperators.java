@@ -23,6 +23,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -128,22 +129,21 @@ public class TestSchemaModalOperators extends TestCase {
 	//	Debug.ENABLE_DEBUG = true;
 	
 	RewriteTacletBuilder rtb = new RewriteTacletBuilder();
-	TermFactory tf = TermFactory.DEFAULT;
 
 	SchemaVariable fsv = SchemaVariableFactory.createFormulaSV(new Name("post"), true);
 	ImmutableSet<Modality> modalities = DefaultImmutableSet.<Modality>nil();
 	modalities = modalities.add(Modality.DIA).add(Modality.BOX);
 	SchemaVariable osv = SchemaVariableFactory.createModalOperatorSV(
 	      new Name("diabox"), Sort.FORMULA, modalities);
-	Term tpost = tf.createTerm(fsv, new Term[0]);
+	Term tpost = TB.tf().createTerm(fsv, new Term[0]);
 
-	Term find = tf.createTerm(
+	Term find = TB.tf().createTerm(
 	    osv,
 	    new Term[]{tpost},
 	    null,
             JavaBlock.EMPTY_JAVABLOCK);
 
-	Term replace = tf.createTerm(
+	Term replace = TB.tf().createTerm(
 	    osv,
 	    new Term[]{TB.tt()},
 	    null,
