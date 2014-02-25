@@ -14,26 +14,26 @@
 package de.hentschel.visualdbc.datasource.key.test.testCase;
 
 import org.junit.Test;
-import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
-import de.hentschel.visualdbc.datasource.key.test.util.TestKeyUtil;
+import de.hentschel.visualdbc.datasource.key.test.Activator;
 import de.hentschel.visualdbc.datasource.model.DSPackageManagement;
 
 /**
  * Tests the handling of generalization (extends and implements) in a {@link KeyConnection}.
  * @author Martin Hentschel
  */
-public class GeneralizationTest extends AbstractSetupTestCase {
+public class GeneralizationTest extends AbstractKeYTest {
    /**
     * Tests attributes.
     */
    @Test
    public void testExtendsAndImplements() throws Exception {
-      TestKeyUtil.testKeyConnection("GeneralizationTest_testExtendsAndImplements",
-                                    "data/generalizationTest",
-                                    null,
-                                    DSPackageManagement.FLAT_LIST,
-                                    TestKeyUtil.createExpectedGeneralizationTestModel());
+      testKeyConnection("GeneralizationTest_testExtendsAndImplements",
+                        "data/generalizationTest/test",
+                        null,
+                        DSPackageManagement.FLAT_LIST,
+                        Activator.PLUGIN_ID,
+                        "data/generalizationTest/oracle/generalizationTest.dbc");
    }
 }

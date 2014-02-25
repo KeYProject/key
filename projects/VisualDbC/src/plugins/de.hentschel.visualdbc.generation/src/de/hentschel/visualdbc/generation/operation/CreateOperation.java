@@ -279,6 +279,9 @@ public class CreateOperation {
                   dbcInterface.getExtends().add((DbcInterface)dbcExtend);
                }
             }
+            for (String fullName : dsInterface.getExtendsFullnames()) {
+               dbcInterface.getExtendsFullNames().add(fullName);
+            }
          }
          else if (dsType instanceof IDSClass) {
             IDSClass dsClass = (IDSClass)dsType;
@@ -292,12 +295,18 @@ public class CreateOperation {
                   dbcClass.getExtends().add((DbcClass)dbcExtend);
                }
             }
+            for (String fullName : dsClass.getExtendsFullnames()) {
+               dbcClass.getExtendsFullNames().add(fullName);
+            }
             for (IDSInterface dsImplements : dsClass.getImplements()) {
                AbstractDbcType dbcImplements = mapping.get(dsImplements);
                if (dbcImplements != null) {
                   Assert.isTrue(dbcImplements instanceof DbcInterface);
                   dbcClass.getImplements().add((DbcInterface)dbcImplements);
                }
+            }
+            for (String fullName : dsClass.getImplementsFullnames()) {
+               dbcClass.getImplementsFullNames().add(fullName);
             }
          }
          else if (dsType instanceof IDSEnum) {
@@ -311,6 +320,9 @@ public class CreateOperation {
                   Assert.isTrue(dbcImplements instanceof DbcInterface);
                   dbcEnum.getImplements().add((DbcInterface)dbcImplements);
                }
+            }
+            for (String fullName : dsEnum.getImplementsFullnames()) {
+               dbcEnum.getImplementsFullNames().add(fullName);
             }
          }
       }

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel" driverId="de.hentschel.visualdbc.dataSource.key">
+  <types xsi:type="dbcmodel:DbcClass" name="PayCard">
+    <invariants name="JML class invariant nr 0 in PayCard" condition="!  packageA.LogFile::select(heap, self, PayCard::$log)&#xA; = null"/>
+    <invariants name="JML class invariant nr 1 in PayCard" condition="geq(int::select(heap, self, PayCard::$balance),&#xA;    Z(0(#)))"/>
+    <invariants name="JML class invariant nr 3 in PayCard" condition="gt(int::select(heap, self, PayCard::$limit), Z(0(#)))"/>
+    <invariants name="JML class invariant nr 5 in PayCard" condition="geq(int::select(heap,&#xA;                self,&#xA;                PayCard::$unsuccessfulOperations),&#xA;    Z(0(#)))"/>
+    <methods signature="createJuniorCard()" static="true" returnType="PayCard">
+      <operationContracts name="PayCard[PayCard::createJuniorCard()].JML normal_behavior operation contract.0" proofObligations="//@proofObligations.0" pre="true" post="int::select(heap, result, PayCard::$limit)&#xA;  = Z(0(0(1(#))))&#xA;&amp; !result = null&#xA;&amp; exc = null" modifies="mod[heap]: allLocs" termination="diamond"/>
+    </methods>
+    <methods signature="charge(amount : int)" returnType="boolean">
+      <operationContracts name="PayCard[PayCard::charge(int)].JML exceptional_behavior operation contract.0" proofObligations="//@proofObligations.0" pre="leq(amount, Z(0(#)))&#xA;&amp; java.lang.Object::&lt;inv>(heap, self)" post="!exc = null&#xA;&amp; (  (   java.lang.Throwable::instance(exc) = TRUE&#xA;      -> java.lang.Object::&lt;inv>(heap, self))&#xA;   &amp;   java.lang.IllegalArgumentException::instance(exc)&#xA;     = TRUE)" modifies="mod[heap]: allLocs" termination="diamond"/>
+      <operationContracts name="PayCard[PayCard::charge(int)].JML normal_behavior operation contract.1" proofObligations="//@proofObligations.0" pre="gt(amount, Z(0(#)))&#xA;&amp; (  (  geq(javaAddInt(amount,&#xA;                       int::select(heap,&#xA;                                   self,&#xA;                                   PayCard::$balance)),&#xA;            int::select(heap, self, PayCard::$limit))&#xA;      |   PayCard::isValid(heap, self)&#xA;        = \if (false)  \then (TRUE)  \else (FALSE))&#xA;   &amp; java.lang.Object::&lt;inv>(heap, self))" post="result = \if (false)  \then (TRUE)  \else (FALSE)&#xA;&amp; (    int::select(heap,&#xA;                   self,&#xA;                   PayCard::$unsuccessfulOperations)&#xA;     = javaAddInt(int::select(heapAtPre,&#xA;                              self,&#xA;                              PayCard::$unsuccessfulOperations),&#xA;                  Z(1(#)))&#xA;   &amp; java.lang.Object::&lt;inv>(heap, self))&#xA;&amp; exc = null" modifies="mod[heap]: singleton(self, PayCard::$unsuccessfulOperations)" termination="diamond"/>
+      <operationContracts name="PayCard[PayCard::charge(int)].JML normal_behavior operation contract.0" proofObligations="//@proofObligations.0" pre="gt(amount, Z(0(#)))&#xA;&amp; (  lt(javaAddInt(amount,&#xA;                   int::select(heap,&#xA;                               self,&#xA;                               PayCard::$balance)),&#xA;        int::select(heap, self, PayCard::$limit))&#xA;   &amp;   PayCard::isValid(heap, self)&#xA;     = \if (true)  \then (TRUE)  \else (FALSE)&#xA;   &amp; java.lang.Object::&lt;inv>(heap, self))" post="result = \if (true)  \then (TRUE)  \else (FALSE)&#xA;&amp; (    int::select(heap, self, PayCard::$balance)&#xA;     = javaAddInt(amount,&#xA;                  int::select(heapAtPre,&#xA;                              self,&#xA;                              PayCard::$balance))&#xA;   &amp; java.lang.Object::&lt;inv>(heap, self))&#xA;&amp; exc = null" modifies="mod[heap]: singleton(self, PayCard::$balance)" termination="diamond"/>
+    </methods>
+    <methods signature="chargeAndRecord(amount : int)" returnType="void">
+      <operationContracts name="PayCard[PayCard::chargeAndRecord(int)].JML normal_behavior operation contract.0" proofObligations="//@proofObligations.0" pre="gt(amount, Z(0(#)))&#xA;&amp; java.lang.Object::&lt;inv>(heap, self)" post="geq(int::select(heap, self, PayCard::$balance),&#xA;      int::select(heapAtPre, self, PayCard::$balance))&#xA;&amp; java.lang.Object::&lt;inv>(heap, self)&#xA;&amp; exc = null" modifies="mod[heap]: setMinus(allLocs, freshLocs(heap))" termination="diamond"/>
+    </methods>
+    <methods signature="isValid()" returnType="boolean">
+      <operationContracts name="PayCard[PayCard::isValid()].JML normal_behavior operation contract.0" proofObligations="//@proofObligations.0" pre="java.lang.Object::&lt;inv>(heap, self)" post="result&#xA;  = \if (leq(int::select(heap,&#xA;                         self,&#xA;                         PayCard::$unsuccessfulOperations),&#xA;             Z(3(#))))&#xA;        \then (TRUE)&#xA;        \else (FALSE)&#xA;&amp; java.lang.Object::&lt;inv>(heap, self)&#xA;&amp; exc = null" modifies="mod[heap]: empty" termination="diamond"/>
+    </methods>
+    <methods signature="infoCardMsg()" returnType="java.lang.String"/>
+    <attributes name="limit" type="int" visibility="default"/>
+    <attributes name="unsuccessfulOperations" type="int" visibility="default"/>
+    <attributes name="id" type="int" visibility="default"/>
+    <attributes name="balance" type="int" visibility="default"/>
+    <attributes name="log" type="packageA.LogFile" visibility="default"/>
+    <constructors signature="PayCard(limit : int)"/>
+    <constructors signature="PayCard()"/>
+    <extendsFullNames>java.lang.Object</extendsFullNames>
+  </types>
+  <packages name="packageA">
+    <types xsi:type="dbcmodel:DbcClass" name="LogFile">
+      <invariants name="JML class invariant nr 8 in LogFile" condition="nonNull(heap,&#xA;        packageB.p1.LogRecord[]::select(heap,&#xA;                                        self,&#xA;                                        packageA.LogFile::$logArray),&#xA;        Z(1(#)))"/>
+      <invariants name="JML class invariant nr 9 in LogFile" condition="length(packageB.p1.LogRecord[]::select(heap,&#xA;                                           self,&#xA;                                           packageA.LogFile::$logArray))&#xA;  = int::select(heap,&#xA;                null,&#xA;                packageA.LogFile::$logFileSize)&#xA;&amp; (  lt(int::select(heap,&#xA;                    self,&#xA;                    packageA.LogFile::$currentRecord),&#xA;        int::select(heap,&#xA;                    null,&#xA;                    packageA.LogFile::$logFileSize))&#xA;   &amp; (  geq(int::select(heap,&#xA;                        self,&#xA;                        packageA.LogFile::$currentRecord),&#xA;            Z(0(#)))&#xA;      &amp; (  !  packageB.p1.LogRecord[]::select(heap,&#xA;                                              self,&#xA;                                              packageA.LogFile::$logArray)&#xA;            = null&#xA;         &amp; \forall int i;&#xA;             (     leq(Z(0(#)), i)&#xA;                 &amp; lt(i,&#xA;                      length(packageB.p1.LogRecord[]::select(heap,&#xA;                                                             self,&#xA;                                                             packageA.LogFile::$logArray)))&#xA;              -> !  packageB.p1.LogRecord::select(heap,&#xA;                                                  packageB.p1.LogRecord[]::select(heap,&#xA;                                                                                  self,&#xA;                                                                                  packageA.LogFile::$logArray),&#xA;                                                  arr(i))&#xA;                  = null))))"/>
+      <methods signature="addRecord(balance : int)" returnType="void">
+        <operationContracts name="packageA.LogFile[packageA.LogFile::addRecord(int)].JML normal_behavior operation contract.0" proofObligations="//@proofObligations.0" pre="geq(balance, Z(0(#)))&#xA;&amp; java.lang.Object::&lt;inv>(heap, self)" post="\if (!  javaAddInt(int::select(heapAtPre,&#xA;                                 self,&#xA;                                 packageA.LogFile::$currentRecord),&#xA;                     Z(1(#)))&#xA;        = int::select(heap,&#xA;                      null,&#xA;                      packageA.LogFile::$logFileSize))&#xA;      \then (  int::select(heap,&#xA;                           self,&#xA;                           packageA.LogFile::$currentRecord)&#xA;             = javaAddInt(int::select(heapAtPre,&#xA;                                      self,&#xA;                                      packageA.LogFile::$currentRecord),&#xA;                          Z(1(#))))&#xA;      \else (  int::select(heap,&#xA;                           self,&#xA;                           packageA.LogFile::$currentRecord)&#xA;             = Z(0(#)))&#xA;&amp; (    int::select(heap,&#xA;                   packageB.p1.LogRecord::select(heap,&#xA;                                                 packageB.p1.LogRecord[]::select(heap,&#xA;                                                                                 self,&#xA;                                                                                 packageA.LogFile::$logArray),&#xA;                                                 arr(int::select(heap,&#xA;                                                                 self,&#xA;                                                                 packageA.LogFile::$currentRecord))),&#xA;                   packageB.p1.LogRecord::$balance)&#xA;     = balance&#xA;   &amp; java.lang.Object::&lt;inv>(heap, self))&#xA;&amp; exc = null" modifies="mod[heap]: allLocs" termination="diamond"/>
+      </methods>
+      <methods signature="getMaximumRecord()" returnType="packageB.p1.LogRecord">
+        <operationContracts name="packageA.LogFile[packageA.LogFile::getMaximumRecord()].JML normal_behavior operation contract.0" proofObligations="//@proofObligations.0" pre="java.lang.Object::&lt;inv>(heap, self)" post="\forall int i;&#xA;    (     leq(Z(0(#)), i)&#xA;        &amp; lt(i,&#xA;             length(packageB.p1.LogRecord[]::select(heap,&#xA;                                                    self,&#xA;                                                    packageA.LogFile::$logArray)))&#xA;        &amp; inInt(i)&#xA;     -> leq(int::select(heap,&#xA;                        packageB.p1.LogRecord::select(heap,&#xA;                                                      packageB.p1.LogRecord[]::select(heap,&#xA;                                                                                      self,&#xA;                                                                                      packageA.LogFile::$logArray),&#xA;                                                      arr(i)),&#xA;                        packageB.p1.LogRecord::$balance),&#xA;            int::select(heap,&#xA;                        result,&#xA;                        packageB.p1.LogRecord::$balance)))&#xA;&amp; (java.lang.Object::&lt;inv>(heap, self) &amp; !result = null)&#xA;&amp; exc = null" modifies="mod[heap]: empty" termination="box"/>
+      </methods>
+      <attributes name="logFileSize" type="int" visibility="default" static="true"/>
+      <attributes name="currentRecord" type="int" visibility="default"/>
+      <attributes name="logArray" type="packageB.p1.LogRecord[]" visibility="default"/>
+      <constructors signature="LogFile()"/>
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+  </packages>
+  <packages name="packageB">
+    <packages name="p1">
+      <types xsi:type="dbcmodel:DbcClass" name="LogRecord">
+        <invariants name="JML class invariant nr 11 in LogRecord" condition="!  boolean::select(heap,&#xA;                      self,&#xA;                      packageB.p1.LogRecord::$empty)&#xA;    = TRUE&#xA;->   geq(int::select(heap,&#xA;                     self,&#xA;                     packageB.p1.LogRecord::$balance),&#xA;         Z(0(#)))&#xA;   &amp; geq(int::select(heap,&#xA;                     self,&#xA;                     packageB.p1.LogRecord::$transactionId),&#xA;         Z(0(#)))"/>
+        <invariants name="JML class invariant nr 13 in LogRecord" condition="geq(int::select(heap,&#xA;                null,&#xA;                packageB.p1.LogRecord::$transactionCounter),&#xA;    Z(0(#)))"/>
+        <methods signature="setRecord(balance : int)" returnType="void">
+          <operationContracts name="packageB.p1.LogRecord[packageB.p1.LogRecord::setRecord(int)].JML normal_behavior operation contract.0" proofObligations="//@proofObligations.0" pre="geq(balance, Z(0(#)))&#xA;&amp; java.lang.Object::&lt;inv>(heap, self)" post="int::select(heap,&#xA;                self,&#xA;                packageB.p1.LogRecord::$balance)&#xA;  = balance&#xA;&amp;   int::select(heap,&#xA;                self,&#xA;                packageB.p1.LogRecord::$transactionId)&#xA;  = int::select(heapAtPre,&#xA;                null,&#xA;                packageB.p1.LogRecord::$transactionCounter)&#xA;&amp; java.lang.Object::&lt;inv>(heap, self)&#xA;&amp; exc = null" modifies="mod[heap]: union(union(union(singleton(self,&#xA;                            packageB.p1.LogRecord::$empty),&#xA;                  singleton(self,&#xA;                            packageB.p1.LogRecord::$balance)),&#xA;            singleton(self,&#xA;                      packageB.p1.LogRecord::$transactionId)),&#xA;      singleton(null,&#xA;                packageB.p1.LogRecord::$transactionCounter))" termination="diamond"/>
+        </methods>
+        <methods signature="getBalance()" returnType="int">
+          <operationContracts name="packageB.p1.LogRecord[packageB.p1.LogRecord::getBalance()].JML normal_behavior operation contract.0" proofObligations="//@proofObligations.0" pre="java.lang.Object::&lt;inv>(heap, self)" post="result&#xA;  = int::select(heap,&#xA;                self,&#xA;                packageB.p1.LogRecord::$balance)&#xA;&amp; java.lang.Object::&lt;inv>(heap, self)&#xA;&amp; exc = null" modifies="mod[heap]: empty" termination="diamond"/>
+        </methods>
+        <methods signature="getTransactionId()" returnType="int">
+          <operationContracts name="packageB.p1.LogRecord[packageB.p1.LogRecord::getTransactionId()].JML normal_behavior operation contract.0" proofObligations="//@proofObligations.0" pre="java.lang.Object::&lt;inv>(heap, self)" post="result&#xA;  = int::select(heap,&#xA;                self,&#xA;                packageB.p1.LogRecord::$transactionId)&#xA;&amp; java.lang.Object::&lt;inv>(heap, self)&#xA;&amp; exc = null" modifies="mod[heap]: empty" termination="diamond"/>
+        </methods>
+        <attributes name="transactionCounter" type="int" visibility="default" static="true"/>
+        <attributes name="balance" type="int" visibility="default"/>
+        <attributes name="transactionId" type="int" visibility="default"/>
+        <attributes name="empty" type="boolean" visibility="default"/>
+        <constructors signature="LogRecord()"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+    </packages>
+    <packages name="p2">
+      <packages name="p2a">
+        <types xsi:type="dbcmodel:DbcClass" name="CardException">
+          <constructors signature="CardException()"/>
+          <extendsFullNames>java.lang.Exception</extendsFullNames>
+        </types>
+      </packages>
+    </packages>
+  </packages>
+  <connectionSettings key="location" value="D:\Forschung\Development\KeY_Master\junit-workspace\testPackageManagement_hierarchy"/>
+  <connectionSettings key="packageManagement" value="HIERARCHY"/>
+  <connectionSettings key="packageManagementType" value="de.hentschel.visualdbc.datasource.model.DSPackageManagement"/>
+  <connectionSettings key="locationType" value="java.io.File"/>
+  <proofObligations obligation="ContractPO"/>
+</dbcmodel:DbcModel>
