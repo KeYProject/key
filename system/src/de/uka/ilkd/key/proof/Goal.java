@@ -21,6 +21,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
@@ -29,6 +30,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -634,10 +637,13 @@ public final class Goal  {
         return goalList;
     }
 
-
     public String toString() {
-	String result = node.sequent().prettyprint(proof().getServices()).toString();
-	return result;
+        de.uka.ilkd.key.pp.LogicPrinter lp = (new de.uka.ilkd.key.pp.LogicPrinter
+                (new de.uka.ilkd.key.pp.ProgramPrinter(null),
+                        new NotationInfo(),
+                        proof().getServices()));
+        lp.printSequent(node.sequent());
+	return lp.toString();
     }
 
     private <T extends Named> ImmutableSet<Name> names(ImmutableSet<T> set) {
