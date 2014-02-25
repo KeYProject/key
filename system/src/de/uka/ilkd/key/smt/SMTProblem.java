@@ -38,7 +38,7 @@ public class SMTProblem {
 
         private Term term;
         private Collection<SMTSolver> solvers = new LinkedList<SMTSolver>();
-        private Goal goal;
+        private final Goal goal;
         private Sequent sequent;
         private String name = "";
 
@@ -70,15 +70,9 @@ public class SMTProblem {
         }
 
         public SMTProblem(Goal goal) {
+                this.goal = goal;
                 name = "Goal " + goal.node().serialNr();
                 term = goalToTerm(goal);
-                this.goal = goal;
-        }
-
-        public SMTProblem(Sequent sequent) {
-                term = sequentToTerm(sequent);
-                this.sequent = sequent;
-
         }
 
         public Goal getGoal() {
@@ -143,19 +137,19 @@ public class SMTProblem {
 
                 ImmutableList<Term> ante = ImmutableSLList.nil();
 
-                ante = ante.append(TermBuilder.DF.tt());
+                final TermBuilder tb = goal.proof().getServices().getTermBuilder();
+                ante = ante.append(tb.tt());
                 for (SequentFormula f : s.antecedent()) {
                         ante = ante.append(f.formula());
                 }
 
                 ImmutableList<Term> succ = ImmutableSLList.nil();
-                succ = succ.append(TermBuilder.DF.ff());
+                succ = succ.append(tb.ff());
                 for (SequentFormula f : s.succedent()) {
                         succ = succ.append(f.formula());
                 }
 
-                return TermBuilder.DF.imp(TermBuilder.DF.and(ante),
-                                TermBuilder.DF.or(succ));
+                return tb.imp(tb.and(ante), tb.or(succ));
 
         }
 

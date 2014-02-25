@@ -163,10 +163,10 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
       if (getParentValue() != null || SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
          siteProofSelectTerm = createSelectTerm();
          if (getParentValue() != null) { // Is null at static variables
-            siteProofCondition = TermBuilder.DF.and(siteProofCondition, getParentValue().getCondition());
+            siteProofCondition = getServices().getTermBuilder().and(siteProofCondition, getParentValue().getCondition());
          }
          if (lengthValue != null) {
-            siteProofCondition = TermBuilder.DF.and(siteProofCondition, lengthValue.getCondition());
+            siteProofCondition = getServices().getTermBuilder().and(siteProofCondition, lengthValue.getCondition());
          }
          sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(getServices(), getProofNode(), siteProofCondition, siteProofSelectTerm, true); 
       }
@@ -246,7 +246,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          // Extract value
          Term value = SymbolicExecutionUtil.extractOperatorValue(goal, operator);
          assert value != null;
-         value = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), value);
+         value = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), value, getServices());
          // Compute unknown flag if required
          boolean unknownValue = false;
          if (siteProofSelectTerm != null) {
@@ -287,13 +287,13 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
             pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(), false, false));
             proof = valueGoal.node().proof();
          }
-         Term comboundPathCondition = TermBuilder.DF.or(pathConditions);
+         Term comboundPathCondition = getServices().getTermBuilder().or(pathConditions);
          comboundPathCondition = SymbolicExecutionUtil.simplify(proof, comboundPathCondition);
          comboundPathCondition = SymbolicExecutionUtil.improveReadability(comboundPathCondition, proof.getServices());
          return comboundPathCondition;
       }
       else {
-         return TermBuilder.DF.tt();
+         return getServices().getTermBuilder().tt();
       }
    }
    
@@ -306,12 +306,12 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
       if (SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
          // Static field access
          Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), getServices());
-         return TermBuilder.DF.staticDot(getServices(), getProgramVariable().sort(), function);
+         return getServices().getTermBuilder().staticDot(getProgramVariable().sort(), function);
       }
       else {
          if (getParentValue() == null) {
             // Direct access to a variable, so return it as term
-            return TermBuilder.DF.var((ProgramVariable)getProgramVariable());
+            return getServices().getTermBuilder().var((ProgramVariable)getProgramVariable());
          }
          else {
             Term parentTerm = getParentValue().getVariable().createSelectTerm();
@@ -319,18 +319,18 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
                if (getServices().getJavaInfo().getArrayLength() == getProgramVariable()) {
                   // Special handling for length attribute of arrays
                   Function function = getServices().getTypeConverter().getHeapLDT().getLength();
-                  return TermBuilder.DF.func(function, parentTerm);
+                  return getServices().getTermBuilder().func(function, parentTerm);
                }
                else {
                   // Field access on the parent variable
                   Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), getServices());
-                  return TermBuilder.DF.dot(getServices(), getProgramVariable().sort(), parentTerm, function);
+                  return getServices().getTermBuilder().dot(getProgramVariable().sort(), parentTerm, function);
                }
             }
             else {
                // Special handling for array indices.
-               Term idx = TermBuilder.DF.zTerm(getServices(), "" + arrayIndex);
-               return TermBuilder.DF.dotArr(getServices(), parentTerm, idx);
+               Term idx = getServices().getTermBuilder().zTerm("" + arrayIndex);
+               return getServices().getTermBuilder().dotArr(parentTerm, idx);
             }
          }
       }

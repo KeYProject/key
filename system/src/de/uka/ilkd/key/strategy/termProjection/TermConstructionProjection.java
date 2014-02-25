@@ -15,9 +15,9 @@
 
 package de.uka.ilkd.key.strategy.termProjection;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
@@ -53,8 +53,7 @@ public class TermConstructionProjection implements ProjectionToTerm {
         for ( int i = 0; i != subTerms.length; ++i ) {
             subs[i] = subTerms[i].toTerm ( app, pos, goal );           
         }
-        return TermFactory.DEFAULT.createTerm ( op, subs, null,
-                                                null );
+        return goal.proof().getServices().getTermFactory().createTerm ( op, subs, null, null );
     }
     
 }

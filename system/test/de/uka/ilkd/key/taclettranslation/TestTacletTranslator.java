@@ -122,7 +122,7 @@ public class TestTacletTranslator extends TestCase {
 
         Taclet taclet = parseTaclet(tacletString);
         Term expected = parseTerm(termString);
-        Term translation = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(taclet);
+        Term translation = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(taclet, services);
 
         assertEquals("Taclet " + taclet.name() + " not translated as expected", expected,
                 translation);

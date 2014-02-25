@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -52,7 +53,7 @@ public abstract class LDT implements Named {
     //constructors
     //-------------------------------------------------------------------------
     
-    protected LDT(Name name, Services services) {
+    protected LDT(Name name, TermServices services) {
         sort = (Sort) services.getNamespaces().sorts().lookup(name);
 	    if (sort == null)
 	        throw new RuntimeException("LDT "+name+" not found.\n"+
@@ -81,7 +82,7 @@ public abstract class LDT implements Named {
      * @param funcName the String with the name of the function to look up
      * @return the added function (for convenience reasons)
      */
-    protected final Function addFunction(Services services, String funcName) {
+    protected final Function addFunction(TermServices services, String funcName) {
 	final Namespace funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name(funcName));
         if (f == null)
@@ -92,7 +93,7 @@ public abstract class LDT implements Named {
     
     
     protected final SortDependingFunction addSortDependingFunction(
-	    					Services services, 
+	    					TermServices services, 
 	    					String kind) {	
 	final SortDependingFunction f 
 		= SortDependingFunction.getFirstInstance(new Name(kind), 
@@ -200,7 +201,7 @@ public abstract class LDT implements Named {
     public abstract boolean isResponsible(
 	    		de.uka.ilkd.key.java.expression.Operator op, 
 	    		Term sub, 
-	    		Services services, 
+	    		TermServices services, 
 	    		ExecutionContext ec);
 
 

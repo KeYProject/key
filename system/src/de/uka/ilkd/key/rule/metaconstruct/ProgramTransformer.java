@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -217,7 +218,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
 	return null;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public KeYJavaType getKeYJavaType(TermServices javaServ) {
 	return getKeYJavaType();
     }
 

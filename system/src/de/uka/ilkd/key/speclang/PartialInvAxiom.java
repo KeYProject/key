@@ -151,7 +151,7 @@ public final class PartialInvAxiom extends ClassAxiom {
     public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(
 	    						Services services) {
 	final ProgramVariable dummySelfVar 
-		= TB.selfVar(services, inv.getKJT(), false);
+		= services.getTermBuilder().selfVar(inv.getKJT(), false);
 	return MiscTools.collectObservers(inv.getInv(dummySelfVar, services));
     }
     

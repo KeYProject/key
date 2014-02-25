@@ -22,6 +22,7 @@ import java.util.Set;
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -197,11 +198,11 @@ public final class GenericSortInstantiations {
      * @throws GenericSortException iff p_s is a generic sort which is
      * not yet instantiated
      */
-    public Sort getRealSort ( SchemaVariable p_sv, Services services ) {
+    public Sort getRealSort ( SchemaVariable p_sv, TermServices services ) {
 	return getRealSort ( p_sv.sort (), services );
     }
 
-    public Sort getRealSort ( Sort p_s, Services services ) {
+    public Sort getRealSort ( Sort p_s, TermServices services ) {
 	if ( p_s instanceof GenericSort ) {
 	    p_s = getInstantiation ( (GenericSort)p_s );
 	    if ( p_s == null ) {
