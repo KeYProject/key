@@ -39,6 +39,7 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -1088,7 +1089,7 @@ public class SymbolicConfigurationExtractor {
       if (!locations.isEmpty()) {
          // Get original updates
          Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-         ImmutableList<Term> originalUpdates = getServices().getTermBuilder().goBelowUpdates2(originalModifiedFormula).first;
+         ImmutableList<Term> originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
          // Combine configuration with original updates
          Term configurationCondition = getServices().getTermBuilder().and(configuration);
          if (pathCondition != null) {
