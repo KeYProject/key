@@ -292,7 +292,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final boolean twoState = target.getStateCount() == 2;
         final LocationVariable heap = getHeap();
         final LocationVariable heapAtPre;
-        if (getOrigVars().atPres.get(heap) != null) {
+        if (getOrigVars().atPres != null && getOrigVars().atPres.get(heap) != null) {
             heapAtPre = (LocationVariable) getOrigVars().atPres.get(heap);
         } else {
             heapAtPre = heap;
