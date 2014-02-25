@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
@@ -166,21 +167,16 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
         return false;
     }
 
-    //TODO: Avoid static cache 'disjointnessCache' and move it into {@link ServiceCaches}
-    private static Map<Sort,Map<Sort,Boolean>> disjointnessCache
-    	= new WeakHashMap<Sort,Map<Sort,Boolean>>();
-
-
-    private static Boolean lookupInCache(Sort s1, Sort s2) {
+    private static Boolean lookupInCache(Sort s1, Sort s2, ServiceCaches caches) {
 	Boolean result = null;
 
-	Map<Sort,Boolean> map = disjointnessCache.get(s1);
+	Map<Sort,Boolean> map = caches.getDisjointnessCache().get(s1);
 	if(map != null) {
 	    result = map.get(s2);
 	}
 
 	if(result == null) {
-	    map = disjointnessCache.get(s2);
+	    map = caches.getDisjointnessCache().get(s2);
 	    if(map != null) {
 		result = map.get(s1);
 	    }
@@ -189,13 +185,13 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     }
 
 
-    private static void putIntoCache(Sort s1, Sort s2, boolean b) {
-	Map<Sort,Boolean> map = disjointnessCache.get(s1);
+    private static void putIntoCache(Sort s1, Sort s2, boolean b, ServiceCaches caches) {
+	Map<Sort,Boolean> map = caches.getDisjointnessCache().get(s1);
 	if(map == null) {
 	    map = new WeakHashMap<Sort,Boolean>();
 	}
 	map.put(s2, b);
-	disjointnessCache.put(s1, map);
+	caches.getDisjointnessCache().put(s1, map);
     }
     
     
@@ -211,7 +207,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 	}
 	
 	//result cached?
-	Boolean result = lookupInCache(fstSort, sndSort);
+	Boolean result = lookupInCache(fstSort, sndSort, services.getCaches());
 	
 	//if not, compute it 
 	if(result == null) {
@@ -262,7 +258,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 		}
 	    }
 	    
-    	    putIntoCache(fstSort, sndSort, result);
+    	    putIntoCache(fstSort, sndSort, result, services.getCaches());
     	}
 	
 	return result;
