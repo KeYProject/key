@@ -1,6 +1,10 @@
 package de.uka.ilkd.key.logic;
 
-
+/**
+ * This interface defines the basic functionalities of services
+ * required to construct {@link Term}s.
+ * @author Richard Bubel
+ */
 public interface TermServices {
 
     /**

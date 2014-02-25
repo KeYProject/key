@@ -175,7 +175,7 @@ public class SemanticsBlastingMacro extends StrategyProofMacro {
 
 		Services services = mediator.getServices();
 		JavaInfo info = mediator.getJavaInfo();
-		TermBuilder tb = new TermBuilder(services);
+		TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
 		SpecificationRepository spec = services.getSpecificationRepository();
 
 		Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();

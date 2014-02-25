@@ -279,7 +279,7 @@ public final class SymbolicExecutionUtil {
       else if (term.op() == integerLDT.getGreaterOrEquals()) {
          Term subOne = term.sub(1);
          if (subOne.op() == integerLDT.getAdd()) {
-            if (isOne(subOne, integerLDT)) {
+            if (isOne(subOne.sub(0), integerLDT)) {
                term = tb.gt(term.sub(0), subOne.sub(1));
             }
             else if (isOne(subOne.sub(1), integerLDT)) {

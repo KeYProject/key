@@ -214,7 +214,7 @@ public interface BlockContract extends SpecificationElement {
         public VariablesCreator(final StatementBlock block, final List<Label> labels,
                                 final IProgramMethod method, final Services services)
         {
-            super(services);
+            super(services.getTermFactory(), services);
             this.block = block;
             this.labels = labels;
             this.method = method;

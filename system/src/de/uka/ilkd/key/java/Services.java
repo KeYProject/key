@@ -98,8 +98,6 @@ public class Services implements TermServices {
     
     private final TermBuilder termBuilder;
 
-    private final TermFactory termFactory;
-
    /**
      * creates a new Services object with a new TypeConverter and a new
      * JavaInfo object with no information stored at none of these.
@@ -109,8 +107,7 @@ public class Services implements TermServices {
        this.profile = profile;
        this.counters = new LinkedHashMap<String, Counter>();
        this.caches = new ServiceCaches();
-       this.termFactory = new TermFactory(caches.getTermFactoryCache());
-       this.termBuilder = new TermBuilder(this);
+       this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
        this.specRepos = new SpecificationRepository(this);
 	cee = new ConstantExpressionEvaluator(this);
         typeconverter = new TypeConverter(this);
@@ -139,8 +136,7 @@ public class Services implements TermServices {
    this.profile = profile;
    this.counters = counters;
    this.caches = caches;
-   this.termFactory = new TermFactory(caches.getTermFactoryCache());
-   this.termBuilder = new TermBuilder(this);
+   this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
    this.specRepos = new SpecificationRepository(this);
 	cee = new ConstantExpressionEvaluator(this);
 	typeconverter = new TypeConverter(this);
@@ -309,6 +305,7 @@ public class Services implements TermServices {
      * returns the namespaces for functions, predicates etc.
      * @return the proof specific namespaces
      */
+    @Override
     public NamespaceSet getNamespaces() {
         return namespaces;
     }
@@ -351,15 +348,17 @@ public class Services implements TermServices {
      * Returns the {@link TermBuilder} used to create {@link Term}s.
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */
+    @Override
     public TermBuilder getTermBuilder() {
        return termBuilder;
     }
 
     /**
-     * Returns the {@link TermBuilder} used to create {@link Term}s.
-     * @return The {@link TermBuilder} used to create {@link Term}s.
+     * Returns the {@link TermFactory} used to create {@link Term}s.
+     * @return The {@link TermFactory} used to create {@link Term}s.
      */
+    @Override
     public TermFactory getTermFactory() {
-        return termFactory;
+        return termBuilder.tf();
     }
 }

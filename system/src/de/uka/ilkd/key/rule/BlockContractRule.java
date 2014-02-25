@@ -539,7 +539,7 @@ public class BlockContractRule implements BuiltInRule {
 
         public UpdatesBuilder(final BlockContract.Variables variables, final Services services)
         {
-            super(services);
+            super(services.getTermFactory(), services);
             this.variables = variables;
         }
 
@@ -613,7 +613,7 @@ public class BlockContractRule implements BuiltInRule {
                                            final BlockContract.Variables variables,
                                            final Term self, final Services services)
         {
-            super(services);
+            super(services.getTermFactory(), services);
             this.contract = contract;
             this.heaps = heaps;
             this.variables = variables;

@@ -603,7 +603,7 @@ public final class SimpleBlockContract implements BlockContract {
                        final Map<LocationVariable,Boolean> hasMod,
                        final Services services)
         {
-            super(services);
+            super(services.getTermFactory(), services);
             this.block = block;
             this.labels = labels;
             this.method = method;
@@ -877,7 +877,7 @@ public final class SimpleBlockContract implements BlockContract {
 
         public Combinator(final ImmutableSet<BlockContract> contracts, final Services services)
         {
-            super(services);
+            super(services.getTermFactory(), services);
             this.contracts = sort(contracts);
             preconditions = new LinkedHashMap<LocationVariable, Term>();
             postconditions = new LinkedHashMap<LocationVariable, Term>();

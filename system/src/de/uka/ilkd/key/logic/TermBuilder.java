@@ -88,10 +88,10 @@ public class TermBuilder {
 
     protected final Services services; // TODO; Make private
     
-    public TermBuilder(Services services) {
+    public TermBuilder(TermFactory tf, Services services) {
        assert services != null;
        this.services = services;
-       this.tf = services.getTermFactory();
+       this.tf = tf;
        this.tt = tf.createTerm(Junctor.TRUE);
        this.ff = tf.createTerm(Junctor.FALSE);
     }
