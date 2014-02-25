@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -490,7 +491,7 @@ public class TermLabelManager {
     * @param policies The {@link TermLabelPolicy} instances to perform.
     * @param newLabels The result {@link List} with the {@link TermLabel}s of the new {@link Term}.
     */
-   protected void performTermLabelPolicies(Services services,
+   protected void performTermLabelPolicies(TermServices services,
                                            PosInOccurrence applicationPosInOccurrence,
                                            Term applicationTerm,
                                            Rule rule,
@@ -535,7 +536,7 @@ public class TermLabelManager {
     * @param ruleIndependentPolicies All rules {@link ChildTermLabelPolicy} instances.
     * @returnThe active {@link ChildTermLabelPolicy} which have to be performed.
     */
-   protected Map<Name, ChildTermLabelPolicy> computeActiveChildPolicies(Services services,
+   protected Map<Name, ChildTermLabelPolicy> computeActiveChildPolicies(TermServices services,
                                                                         PosInOccurrence applicationPosInOccurrence,
                                                                         Term applicationTerm,
                                                                         Rule rule,
@@ -590,7 +591,7 @@ public class TermLabelManager {
     * @param policies The {@link ChildTermLabelPolicy} instances to perform.
     * @param newLabels The result {@link List} with the {@link TermLabel}s of the new {@link Term}.
     */
-   protected void performDirectChildPolicies(Services services,
+   protected void performDirectChildPolicies(TermServices services,
                                              PosInOccurrence applicationPosInOccurrence,
                                              Term applicationTerm,
                                              Rule rule,
@@ -634,7 +635,7 @@ public class TermLabelManager {
     * @param policies The {@link ChildTermLabelPolicy} instances to perform.
     * @param newLabels The result {@link List} with the {@link TermLabel}s of the new {@link Term}.
     */
-   protected void performChildAndGrandchildPolicies(final Services services,
+   protected void performChildAndGrandchildPolicies(final TermServices services,
                                                     final PosInOccurrence applicationPosInOccurrence,
                                                     final Term applicationTerm,
                                                     final Rule rule,
@@ -746,7 +747,7 @@ public class TermLabelManager {
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
     * @param tacletTerm The optional taclet {@link Term}.
     */
-   public void refactorLabels(Services services,
+   public void refactorLabels(TermServices services,
                               PosInOccurrence applicationPosInOccurrence,
                               Term applicationTerm,
                               Rule rule,
@@ -849,7 +850,7 @@ public class TermLabelManager {
     * @param inAntec {@code true} antecedent, {@code false} succedent.
     * @param activeRefactorings The active {@link TermLabelRefactoring}s to execute.
     */
-   protected void refactorLabels(Services services,
+   protected void refactorLabels(TermServices services,
                                  PosInOccurrence applicationPosInOccurrence,
                                  Term applicationTerm,
                                  Rule rule,
@@ -877,7 +878,7 @@ public class TermLabelManager {
     * @param activeRefactorings The active {@link TermLabelRefactoring}s to execute.
     * @return The refactored {@link Term} in which the {@link TermLabel}s may have changed.
     */
-   protected Term refactorLabelsRecursive(Services services,
+   protected Term refactorLabelsRecursive(TermServices services,
                                           PosInOccurrence applicationPosInOccurrence,
                                           Term applicationTerm,
                                           Rule rule,
@@ -905,7 +906,7 @@ public class TermLabelManager {
     * @param activeRefactorings The active {@link TermLabelRefactoring}s to execute.
     * @return The new {@link TermLabel} which should be used for the given {@link Term}.
     */
-   protected ImmutableArray<TermLabel> performRefactoring(Services services,
+   protected ImmutableArray<TermLabel> performRefactoring(TermServices services,
                                                           PosInOccurrence applicationPosInOccurrence,
                                                           Term applicationTerm,
                                                           Rule rule,

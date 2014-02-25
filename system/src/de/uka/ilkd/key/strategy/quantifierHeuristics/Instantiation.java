@@ -25,6 +25,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -125,7 +126,7 @@ class Instantiation {
     }
 
     private Term createArbitraryInstantiation(QuantifiableVariable var,
-	    Services services) {
+	    TermServices services) {
         return services.getTermBuilder().func (var.sort().getCastSymbol (services),
               services.getTermBuilder().zero());
     }
@@ -158,7 +159,7 @@ class Instantiation {
      * @return all literals in antesequent, and all negation of literal in
      *         succedent
      */
-    private ImmutableSet<Term> initAssertLiterals(Sequent seq, Services services) {
+    private ImmutableSet<Term> initAssertLiterals(Sequent seq, TermServices services) {
 	ImmutableSet<Term> assertLits = DefaultImmutableSet.<Term> nil();
 	for (final SequentFormula cf : seq.antecedent()) {
 	    final Term atom = cf.formula();

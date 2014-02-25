@@ -45,6 +45,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -256,7 +257,7 @@ public class QueryExpand implements BuiltInRule {
 
 
     private ImmutableArray<ProgramVariable> getRegisteredArgumentVariables(
-            ImmutableArray<ParameterDeclaration> paramDecls, Services services) {
+            ImmutableArray<ParameterDeclaration> paramDecls, TermServices services) {
 
         final Namespace progvarsNS = services.getNamespaces().programVariables();
         final ProgramVariable[] args = new ProgramVariable[paramDecls.size()];
@@ -547,7 +548,7 @@ public class QueryExpand implements BuiltInRule {
      * @return Resulting term after replacement.
      * @note Was originally implemented in QueryExpand.java.
      */
-    protected Term replace(Term term, Term with, Iterator<Integer> it, Services services) {
+    protected Term replace(Term term, Term with, Iterator<Integer> it, TermServices services) {
         if ( !it.hasNext() ) {
             return with;
         }
@@ -661,7 +662,7 @@ public class QueryExpand implements BuiltInRule {
     }
 
 	@Override
-    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos, Services services) {
+    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
 	    return new DefaultBuiltInRuleApp(this, pos);
     }
 

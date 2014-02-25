@@ -694,7 +694,8 @@ public class TestJMLTranslator extends TestCase {
                                                 selfVar.getKeYJavaType())),
                        TB.not(TB.equals(TB.var(qv),
                                         TB.NULL()))), // implicit non null
-                                      TB.equals(TB.var(qv), TB.var(selfVar))));
+                                      TB.equals(TB.var(qv), TB.var(selfVar))));        
+                
         assertTrue("Expected:" + ProofSaver.printTerm(expected, services)
                    + "\n Was:" + ProofSaver.printTerm(result, services),
                    result.equalsModRenaming(expected));

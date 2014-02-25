@@ -17,7 +17,6 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
@@ -25,9 +24,9 @@ public class ClashFreeSubst {
     protected QuantifiableVariable v;
     protected Term s;
     protected ImmutableSet<QuantifiableVariable> svars;
-    protected final Services services;
+    protected final TermServices services;
 
-    public ClashFreeSubst(QuantifiableVariable v,Term s, Services services) {
+    public ClashFreeSubst(QuantifiableVariable v,Term s, TermServices services) {
        this.services = services;
        this.v = v;
        this.s = s;

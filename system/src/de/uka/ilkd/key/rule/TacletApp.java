@@ -48,6 +48,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
@@ -449,7 +450,7 @@ public abstract class TacletApp implements RuleApp {
     /*
      * checks if application conditions are satisfied and returns <code>true</code> if this is the case
      */
-    public boolean isExecutable(Services services) {
+    public boolean isExecutable(TermServices services) {
         // bugfix #1336, see bugtracker
         if (taclet instanceof RewriteTaclet) {
             ImmutableList<UpdateLabelPair> oldUpdCtx = 
@@ -690,7 +691,7 @@ public abstract class TacletApp implements RuleApp {
      * @return a fresh created collection of strings in which a freshly created
      *         variable name should not fall.
      */
-    private Collection<String> collectClashNames(SchemaVariable sv, Services services) {
+    private Collection<String> collectClashNames(SchemaVariable sv, TermServices services) {
         Collection<String> result = new LinkedHashSet<String>();
         VariableCollectVisitor vcv = new VariableCollectVisitor();
         Iterator<NotFreeIn> it = taclet().varsNotFreeIn();
@@ -776,7 +777,7 @@ public abstract class TacletApp implements RuleApp {
      * @throws GenericSortException
      *             iff p_s is a generic sort which is not yet instantiated
      */
-    public Sort getRealSort(SchemaVariable p_sv, Services services) {
+    public Sort getRealSort(SchemaVariable p_sv, TermServices services) {
 	return instantiations().getGenericSortInstantiations().getRealSort(
 		p_sv, services);
     }
@@ -811,7 +812,7 @@ public abstract class TacletApp implements RuleApp {
     }
     
     
-    public void registerSkolemConstants(Services services) {
+    public void registerSkolemConstants(TermServices services) {
 	final SVInstantiations insts = instantiations();
 	final Iterator<SchemaVariable> svIt = insts.svIterator();
 	while(svIt.hasNext()) {

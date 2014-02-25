@@ -188,7 +188,7 @@ public class TermBuilder {
      * Returns an available name constructed by affixing a counter to a self-
      * chosen base name for the passed sort.
      */
-    public String newName(Services services, Sort sort) {
+    public String newName(TermServices services, Sort sort) {
     return newName(shortBaseName(sort));
     }
 
@@ -467,7 +467,7 @@ public class TermBuilder {
         }
     }
 
-    public Term cast(Services services, Sort s, Term t) {
+    public Term cast(TermServices services, Sort s, Term t) {
     return tf.createTerm(s.getCastSymbol(services), t);
     }
 
@@ -545,7 +545,7 @@ public class TermBuilder {
     }
 
     /** General (unbounded) sum */
-    public Term sum (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, Services services) {
+    public Term sum (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, TermServices services) {
         final Function sum = (Function)services.getNamespaces().functions().lookup("sum");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
         Term res = func(sum, new Term[]{convertToBoolean(range), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
@@ -570,7 +570,7 @@ public class TermBuilder {
 
 
     /** General (unbounded) product */
-    public Term prod (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, Services services) {
+    public Term prod (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, TermServices services) {
         final Function prod = (Function)services.getNamespaces().functions().lookup("prod");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
         Term res = func(prod, new Term[]{convertToBoolean(range), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
@@ -582,7 +582,7 @@ public class TermBuilder {
 
 
     /** minimum operator */
-    public Term min (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, Services services) {
+    public Term min (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, TermServices services) {
         final Function min = (Function)services.getNamespaces().functions().lookup("min");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
         Term res = func(min, new Term[]{convertToBoolean(range), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
@@ -594,7 +594,7 @@ public class TermBuilder {
 
 
     /** minimum operator */
-    public Term max (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, Services services) {
+    public Term max (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, TermServices services) {
         final Function max = (Function)services.getNamespaces().functions().lookup("max");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
         Term res = func(max, new Term[]{convertToBoolean(range), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
@@ -1501,7 +1501,7 @@ public class TermBuilder {
     public static final Transformer WD_FORMULA =
             new Transformer(new Name("WD"), Sort.FORMULA);
 
-    public Term wd(Term t, Services services) {
+    public Term wd(Term t, TermServices services) {
         if(t.op() == Junctor.FALSE || t.op() == Junctor.TRUE) {
             return tt();
         } else if (t.sort().equals(Sort.FORMULA)) {
@@ -1809,7 +1809,7 @@ public class TermBuilder {
     }
 
 
-    public Term fieldStore(Services services, Term o, Function f, Term v) {
+    public Term fieldStore(TermServices services, Term o, Function f, Term v) {
         return store(getBaseHeap(), o, func(f), v);
     }
 

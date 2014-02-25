@@ -39,6 +39,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -160,7 +161,7 @@ public final class SpecificationRepository {
 
     private static Taclet getLimitedToUnlimitedTaclet(IObserverFunction limited,
                                                       IObserverFunction unlimited, 
-                                                      Services services) {
+                                                      TermServices services) {
        final TermBuilder tb = services.getTermBuilder();
        assert limited.arity() == unlimited.arity();
 
@@ -187,7 +188,7 @@ public final class SpecificationRepository {
     }
 
     private static Taclet getUnlimitedToLimitedTaclet(IObserverFunction limited,
-                                                      IObserverFunction unlimited, Services services) {
+                                                      IObserverFunction unlimited, TermServices services) {
         assert limited.arity() == unlimited.arity();
 
         final TermBuilder tb = services.getTermBuilder();

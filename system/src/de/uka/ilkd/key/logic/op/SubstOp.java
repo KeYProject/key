@@ -16,9 +16,9 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -71,7 +71,7 @@ public abstract class SubstOp extends AbstractOperator {
      * has this operator as top-level operator
     * @param services TODO
      */
-    public abstract Term apply(Term term, Services services);// {
+    public abstract Term apply(Term term, TermServices services);// {
 //	QuantifiableVariable v = term.varsBoundHere(1).getQuantifiableVariable(0);
 //	ClashFreeSubst cfSubst = new ClashFreeSubst(v, term.sub(0));
 //	Term res = cfSubst.apply(term.sub(1));

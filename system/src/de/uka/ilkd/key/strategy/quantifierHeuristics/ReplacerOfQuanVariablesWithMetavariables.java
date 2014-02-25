@@ -16,9 +16,9 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.collection.DefaultImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableMap;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -36,7 +36,7 @@ class ReplacerOfQuanVariablesWithMetavariables {
 
     private ReplacerOfQuanVariablesWithMetavariables () {}
     
-    public static Substitution createSubstitutionForVars(Term allTerm, Services services) {
+    public static Substitution createSubstitutionForVars(Term allTerm, TermServices services) {
         ImmutableMap<QuantifiableVariable,Term> res =
             DefaultImmutableMap.<QuantifiableVariable,Term>nilMap();
         Term t = allTerm;

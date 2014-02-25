@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -153,7 +154,7 @@ public class TriggeredInstantiations implements TermGenerator {
 
     private void collectAxiomsAndCandidateTerms(final Set<Term> terms,
             final Set<Term> axioms, final IntegerLDT integerLDT,
-            Semisequent antecedent, boolean inAntecedent, Services services) {
+            Semisequent antecedent, boolean inAntecedent, TermServices services) {
         
         for (SequentFormula sf : antecedent) {
             collectTerms(sf.formula(), terms, integerLDT);

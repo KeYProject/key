@@ -222,7 +222,7 @@ public final class PullOutConditionalsRule implements BuiltInRule {
 
 
 	@Override
-    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos, Services services) {
+    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
 	    return new DefaultBuiltInRuleApp(this, pos);
     }    
 }

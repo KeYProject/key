@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -341,7 +342,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     public static PosInOccurrence findStepInIfInsts(
 	    		List<PosInOccurrence> steps,
 	    		UseDependencyContractApp app,
-	    		Services services) {
+	    		TermServices services) {
     	for(PosInOccurrence pio : app.ifInsts()) {
     		if(steps.contains(pio)) {
     			return pio;
@@ -634,7 +635,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     }
     
     @Override
-    public UseDependencyContractApp createApp(PosInOccurrence pos, Services services) {
+    public UseDependencyContractApp createApp(PosInOccurrence pos, TermServices services) {
 		return new UseDependencyContractApp(this, pos);
     }
 }

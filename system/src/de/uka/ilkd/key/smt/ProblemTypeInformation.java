@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.lang.SMTTermNumber;
@@ -30,7 +31,7 @@ public class ProblemTypeInformation {
 
 	private Map<String, SMTSort> sorts;
 
-	public ProblemTypeInformation(Services services) {
+	public ProblemTypeInformation(TermServices services) {
 		super();
 		fieldTypes = new HashMap<String, SMTSort>();
 		constantsTypes = new HashMap<String, SMTSort>();
@@ -130,7 +131,7 @@ public class ProblemTypeInformation {
 		return result;
 	}
 
-	public Services getServices() {
+	public TermServices getServices() {
 		return services;
 	}
 

@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -99,7 +100,7 @@ public interface BlockContract extends SpecificationElement {
     public OriginalVariables getOrigVars();
 
     public static class Variables {
-        private final Services services;
+        private final TermServices services;
 
         public static Variables create(final StatementBlock block, final List<Label> labels,
                                        final IProgramMethod method, final Services services)
@@ -124,7 +125,7 @@ public interface BlockContract extends SpecificationElement {
                          final ProgramVariable exception,
                          final Map<LocationVariable, LocationVariable> remembranceHeaps,
                          final Map<LocationVariable, LocationVariable> remembranceLocalVariables,
-                         final Services services)
+                         final TermServices services)
         {
             this.services = services;
             this.self = self;

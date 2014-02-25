@@ -604,12 +604,12 @@ public class TestTermLabelManager extends TestCase {
       }
 
       @Override
-      public RefactoringScope defineRefactoringScope(Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Term tacletTerm) {
+      public RefactoringScope defineRefactoringScope(TermServices services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Term tacletTerm) {
          return scope;
       }
 
       @Override
-      public void refactoreLabels(Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Term tacletTerm, Term term, List<TermLabel> labels) {
+      public void refactoreLabels(TermServices services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Term tacletTerm, Term term, List<TermLabel> labels) {
          List<TermLabel> changedLabels = new LinkedList<TermLabel>();
          for (TermLabel label : labels) {
             if (label.name().toString().endsWith("-CHANGED")) {
@@ -667,12 +667,12 @@ public class TestTermLabelManager extends TestCase {
       }
 
       @Override
-      public boolean isRuleApplicationSupported(Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock) {
+      public boolean isRuleApplicationSupported(TermServices services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock) {
          return true;
       }
 
       @Override
-      public boolean addLabel(Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock, Term childTerm, TermLabel label) {
+      public boolean addLabel(TermServices services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock, Term childTerm, TermLabel label) {
          log.add(label);
          return true;
       }
@@ -686,7 +686,7 @@ public class TestTermLabelManager extends TestCase {
       private List<TermLabel> log = new LinkedList<TermLabel>();
 
       @Override
-      public boolean keepLabel(Services services,
+      public boolean keepLabel(TermServices services,
                                PosInOccurrence applicationPosInOccurrence,
                                Term applicationTerm,
                                Rule rule,

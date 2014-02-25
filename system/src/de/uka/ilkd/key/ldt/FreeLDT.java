@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.expression.literal.FreeLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -38,7 +39,7 @@ public final class FreeLDT extends LDT {
     // neutral element, the only pre-defined function
     private Function atom;
 
-    public FreeLDT(Services services) {
+    public FreeLDT(TermServices services) {
         super(NAME, services);
         atom      = addFunction(services, "atom");
     }
@@ -58,7 +59,7 @@ public final class FreeLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term sub, Services services,
+    public boolean isResponsible(Operator op, Term sub, TermServices services,
             ExecutionContext ec) {
         // TODO Auto-generated method stub
         return false;

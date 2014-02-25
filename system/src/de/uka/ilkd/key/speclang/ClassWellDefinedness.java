@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -41,7 +42,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     private ClassWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                  LocationVariable heap, OriginalVariables origVars,
                                  Condition requires, Term assignable, Term accessible,
-                                 Condition ensures, Term mby, Term rep, ClassInvariant inv, Services services) {
+                                 Condition ensures, Term mby, Term rep, ClassInvariant inv, TermServices services) {
         super(name, id, type, target, heap, origVars, requires,
               assignable, accessible, ensures, mby, rep, services);
         this.inv = inv;
@@ -123,7 +124,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public ClassWellDefinedness combine(WellDefinednessCheck wdc, Services services) {
+    public ClassWellDefinedness combine(WellDefinednessCheck wdc, TermServices services) {
         assert wdc instanceof ClassWellDefinedness;
         final ClassWellDefinedness cwd = (ClassWellDefinedness)wdc;
         assert this.getInvariant().getKJT().equals(cwd.getInvariant().getKJT());

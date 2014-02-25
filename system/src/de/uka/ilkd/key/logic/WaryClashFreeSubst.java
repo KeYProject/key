@@ -15,7 +15,6 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.*;
 
 public class WaryClashFreeSubst extends ClashFreeSubst {
@@ -34,7 +33,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * term to be substituted */
     private ImmutableSet<QuantifiableVariable> warysvars            = null;
 
-    public WaryClashFreeSubst ( QuantifiableVariable v, Term s, Services services ) {
+    public WaryClashFreeSubst ( QuantifiableVariable v, Term s, TermServices services ) {
 	super ( v, s, services );
 	warysvars = null;
     }

@@ -28,6 +28,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -92,7 +93,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     private static LocationVariable createSelf(IProgramMethod pm,
                                                KeYJavaType selfKJT,
-                                               Services services) {
+                                               TermServices services) {
         if (pm == null) {
             return services.getTermBuilder().selfVar(selfKJT, false);
         } else {
@@ -101,7 +102,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     }
 
     private static ProgramVariable createResult(IProgramMethod pm,
-                                                Services services) {
+                                                TermServices services) {
         if (pm == null) {
             return null;
         } else {
@@ -110,7 +111,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     }
 
     private static ProgramVariable createException(IProgramMethod pm,
-                                                   Services services) {
+                                                   TermServices services) {
         if (pm == null) {
             return null;
         } else {
@@ -119,7 +120,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     }
 
     private static Map<LocationVariable, ProgramVariable> createAtPres(LocationVariable heap,
-                                                                       Services services) {
+                                                                       TermServices services) {
         final Map<LocationVariable, ProgramVariable> res =
                 new LinkedHashMap<LocationVariable, ProgramVariable>();
         final ProgramVariable atPre =
@@ -145,7 +146,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     private static ImmutableList<ProgramVariable> createParams(IObserverFunction target,
                                                                ImmutableList<ProgramVariable>
                                                                           origParams,
-                                                               Services services) {
+                                                               TermServices services) {
         final ImmutableList<ProgramVariable> params = services.getTermBuilder().paramVars(target, true);
         return addGhostParams(params, origParams);
     }
@@ -365,7 +366,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                           final Map<LocationVariable, ProgramVariable> atPres,
                           final ImmutableList<ProgramVariable> params,
                           final LocationVariable heap,
-                          final Function anonHeap, Services services) {
+                          final Function anonHeap, TermServices services) {
             this(self, result, exception, atPres, params, heap,
                   services.getTermBuilder().label(services.getTermBuilder().func(anonHeap), ParameterlessTermLabel.ANON_HEAP_LABEL));
         }

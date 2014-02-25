@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
@@ -47,7 +48,7 @@ public final class BooleanLDT extends LDT {
     //constructors
     //-------------------------------------------------------------------------    
 
-    public BooleanLDT(Services services) {
+    public BooleanLDT(TermServices services) {
         super(NAME, services);
         
         bool_true       = addFunction(services, "TRUE");
@@ -110,7 +111,7 @@ public final class BooleanLDT extends LDT {
     
     @Override
     public boolean isResponsible
-	(de.uka.ilkd.key.java.expression.Operator op, Term sub, Services services, ExecutionContext ec) {
+	(de.uka.ilkd.key.java.expression.Operator op, Term sub, TermServices services, ExecutionContext ec) {
 	return false;
     }
 

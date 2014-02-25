@@ -19,6 +19,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -51,7 +52,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     
     private static Term dropEffectlessStoresHelper(
 	    		Term heapTerm, 
-	    		Services services,
+	    		TermServices services,
 	    		ImmutableSet<Pair<Term,Term>> overwrittenLocs,
 	    		Function store) {
 	if(heapTerm.op() == store) {

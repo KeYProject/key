@@ -27,6 +27,7 @@ import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -52,7 +53,7 @@ public final class LocSetLDT extends LDT {
     private final Function createdInHeap;    
     
     
-    public LocSetLDT(Services services) {
+    public LocSetLDT(TermServices services) {
 	super(NAME, services);
         empty	         = addFunction(services, "empty");
         allLocs          = addFunction(services, "allLocs");
@@ -169,7 +170,7 @@ public final class LocSetLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
 	    			 Term sub, 
-	    			 Services services, 
+	    			 TermServices services, 
 	    			 ExecutionContext ec) {
 	return op instanceof Singleton
 	       || op instanceof SetUnion

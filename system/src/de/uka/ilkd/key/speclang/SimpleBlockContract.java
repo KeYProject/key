@@ -29,6 +29,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -466,7 +467,7 @@ public final class SimpleBlockContract implements BlockContract {
 
         private static final long serialVersionUID = -2339350643000987576L;
 
-        public void replaceSelf(final ProgramVariable oldSelf, final S newSelf, Services services)
+        public void replaceSelf(final ProgramVariable oldSelf, final S newSelf, TermServices services)
         {
             if (newSelf != null) {
                 assert newSelf.sort().extendsTrans(oldSelf.sort());
@@ -475,7 +476,7 @@ public final class SimpleBlockContract implements BlockContract {
         }
 
         public void replaceFlags(final Map<Label, ProgramVariable> oldFlags,
-                                 final Map<Label, S> newFlags, Services services)
+                                 final Map<Label, S> newFlags, TermServices services)
         {
             if (newFlags != null) {
                 assert newFlags.size() == oldFlags.size();
@@ -485,7 +486,7 @@ public final class SimpleBlockContract implements BlockContract {
             }
         }
 
-        public void replaceVariable(final ProgramVariable oldVariable, final S newVariable, Services services)
+        public void replaceVariable(final ProgramVariable oldVariable, final S newVariable, TermServices services)
         {
             if (newVariable != null) {
                 assert oldVariable.sort().equals(newVariable.sort());
@@ -515,7 +516,7 @@ public final class SimpleBlockContract implements BlockContract {
                                                                       oldRemembranceLocalVariables,
                                                      final Map<LocationVariable, ? extends S>
                                                                       newRemembranceLocalVariables, 
-                                                     final Services services)
+                                                     final TermServices services)
         {
             if (newRemembranceLocalVariables != null) {
                 for (LocationVariable localVariable : oldRemembranceLocalVariables.keySet()) {
@@ -532,7 +533,7 @@ public final class SimpleBlockContract implements BlockContract {
             }
         }
 
-        protected abstract S convert(ProgramVariable variable, Services services);
+        protected abstract S convert(ProgramVariable variable, TermServices services);
 
     }
 
@@ -540,7 +541,7 @@ public final class SimpleBlockContract implements BlockContract {
 
         private static final long serialVersionUID = 8964634070766482218L;
 
-        protected ProgramVariable convert(ProgramVariable variable, Services services)
+        protected ProgramVariable convert(ProgramVariable variable, TermServices services)
         {
             return variable;
         }
@@ -559,7 +560,7 @@ public final class SimpleBlockContract implements BlockContract {
         }
 
         @Override
-        protected Term convert(ProgramVariable variable, Services services)
+        protected Term convert(ProgramVariable variable, TermServices services)
         {
             return services.getTermBuilder().var(variable);
         }

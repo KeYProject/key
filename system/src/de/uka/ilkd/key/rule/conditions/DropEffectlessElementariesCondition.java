@@ -18,6 +18,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -48,7 +49,7 @@ public final class DropEffectlessElementariesCondition
     
     private static Term dropEffectlessElementariesHelper(
 	    				Term update, 
-	    				Set<LocationVariable> relevantVars, Services services) {
+	    				Set<LocationVariable> relevantVars, TermServices services) {
 	if(update.op() instanceof ElementaryUpdate) {
 	    ElementaryUpdate eu = (ElementaryUpdate) update.op();
 	    LocationVariable lhs = (LocationVariable) eu.lhs();

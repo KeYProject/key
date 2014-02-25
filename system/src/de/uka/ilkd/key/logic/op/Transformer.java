@@ -14,12 +14,12 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -57,7 +57,7 @@ public class Transformer extends Function {
     public static Transformer getTransformer(Name name,
                                                       Sort sort,
                                                       ImmutableArray<Sort> argSorts,
-                                                      Services services) {
+                                                      TermServices services) {
         final Named f = services.getNamespaces().functions().lookup(name);
         if (f != null && f instanceof Transformer) {
             Transformer t = (Transformer)f;
@@ -77,7 +77,7 @@ public class Transformer extends Function {
      * @return the term transformer to be used
      */
     public static Transformer getTransformer(Transformer t,
-                                                      Services services) {
+                                                      TermServices services) {
         return getTransformer(t.name(), t.sort(), t.argSorts(), services);
     }
 

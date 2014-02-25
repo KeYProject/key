@@ -15,7 +15,6 @@ package de.uka.ilkd.key.logic;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -24,7 +23,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 
 public class LabeledTermImplTest extends TestCase {
 
-        private Services services;
+        private TermServices services;
         private TermFactory tf;
 
         @Override

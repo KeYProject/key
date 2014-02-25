@@ -14,9 +14,9 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 
 /**
  * Abstract constraint interface for constraints offering unification of terms
@@ -63,7 +63,7 @@ public interface Constraint {
      *         substitutes the metavariable with can always be unified with the
      *         returned term).
      */
-    Term getInstantiation(Metavariable p_mv, Services services);
+    Term getInstantiation(Metavariable p_mv, TermServices services);
 
     /**
      * tries to unify the terms t1 and t2
@@ -81,7 +81,7 @@ public interface Constraint {
      * @return TOP if not possible, else a new constraint with after unification
      *         of t1 and t2
      */
-    Constraint unify(Term t1, Term t2, Services services);
+    Constraint unify(Term t1, Term t2, TermServices services);
 
     /**
      * tries to unify terms t1 and t2.
@@ -97,7 +97,7 @@ public interface Constraint {
      * @return TOP if not possible, else a new constraint with after unification
      *         of t1 and t2
      */
-    Constraint unify(Term t1, Term t2, Services services,
+    Constraint unify(Term t1, Term t2, TermServices services,
 	    BooleanContainer unchanged);
 
     /**
@@ -128,7 +128,7 @@ public interface Constraint {
      *            the Services providing access to the type model
      * @return the joined constraint
      */
-    Constraint join(Constraint co, Services services);
+    Constraint join(Constraint co, TermServices services);
 
     /**
      * joins constraint co with this constraint and returns the joint new
@@ -146,7 +146,7 @@ public interface Constraint {
      *            strong as co
      * @return the joined constraint
      */
-    Constraint join(Constraint co, Services services, BooleanContainer unchanged);
+    Constraint join(Constraint co, TermServices services, BooleanContainer unchanged);
 
     /** @return String representation of the constraint */
     String toString();
@@ -168,7 +168,7 @@ public interface Constraint {
 	    return false;
 	}
 
-	public Term getInstantiation(Metavariable p_mv, Services services) {
+	public Term getInstantiation(Metavariable p_mv, TermServices services) {
 	    // As there is in fact no instantiation satisfying this
 	    // constraint, we could return everything
 	    return services.getTermBuilder().var(p_mv);
@@ -180,11 +180,11 @@ public interface Constraint {
 	 * 
 	 * @return always this
 	 */
-	public Constraint unify(Term t1, Term t2, Services services) {
+	public Constraint unify(Term t1, Term t2, TermServices services) {
 	    return this;
 	}
 
-	public Constraint unify(Term t1, Term t2, Services services,
+	public Constraint unify(Term t1, Term t2, TermServices services,
 		BooleanContainer unchanged) {
 	    unchanged.setVal(true);
 	    return this;
@@ -210,7 +210,7 @@ public interface Constraint {
 	 * 
 	 * @return this
 	 */
-	public Constraint join(Constraint co, Services services) {
+	public Constraint join(Constraint co, TermServices services) {
 	    return this;
 	}
 
@@ -219,7 +219,7 @@ public interface Constraint {
 	 * 
 	 * @return this
 	 */
-	public Constraint join(Constraint co, Services services,
+	public Constraint join(Constraint co, TermServices services,
 		BooleanContainer c) {
 	    c.setVal(true);
 	    return this;

@@ -16,8 +16,8 @@ package de.uka.ilkd.key.taclettranslation;
 
 import java.util.Collection;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Taclet;
 
 /**
@@ -44,7 +44,7 @@ public interface TacletFormula {
      *         generic sorts) the returned term is a conjunction of these 
      *         instantiations.
      */
-    Term getFormula(Services services);
+    Term getFormula(TermServices services);
 
     /**
      * @return if the taclet can not be translated the reason why. Otherwise a

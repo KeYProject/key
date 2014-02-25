@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -35,7 +36,7 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     private LoopWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                 LocationVariable heap, OriginalVariables origVars,
                                 Condition requires, Term assignable, Term accessible,
-                                Condition ensures, Term mby, Term rep, LoopInvariant inv, Services services) {
+                                Condition ensures, Term mby, Term rep, LoopInvariant inv, TermServices services) {
         super(name, id, type, target, heap, origVars, requires,
               assignable, accessible, ensures, mby, rep, services);
         this.inv = inv;
@@ -55,7 +56,7 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
-    SequentFormula generateSequent(SequentTerms seq, Services services) {
+    SequentFormula generateSequent(SequentTerms seq, TermServices services) {
         // wd(phi) & (phi & wf(anon) -> wd(mod) & wd(variant) & {anon^mod}(wd(phi) & wd(variant)))
         final Term imp = TB.imp(TB.and(seq.pre, seq.wfAnon),
                                 TB.and(seq.wdMod, seq.wdRest, seq.anonWdPost));
@@ -105,7 +106,7 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
-    public LoopWellDefinedness combine(WellDefinednessCheck wdc, Services services) {
+    public LoopWellDefinedness combine(WellDefinednessCheck wdc, TermServices services) {
         assert wdc instanceof LoopWellDefinedness;
         final LoopWellDefinedness lwd = (LoopWellDefinedness)wdc;
         assert this.getStatement().getName().equals(lwd.getStatement().getName());

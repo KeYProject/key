@@ -19,10 +19,10 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -71,7 +71,7 @@ public class Substitution {
     }   
   
     
-    public Term apply(Term t, Services services) {
+    public Term apply(Term t, TermServices services) {
         assert isGround() :
             "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
@@ -88,7 +88,7 @@ public class Substitution {
         return t;
     }
 
-    private Term applySubst(QuantifiableVariable var, Term instance, Term t, Services services) {
+    private Term applySubst(QuantifiableVariable var, Term instance, Term t, TermServices services) {
         final ClashFreeSubst subst = new ClashFreeSubst ( var,  instance, services);
         return subst.apply ( t );
     }
@@ -97,7 +97,7 @@ public class Substitution {
      * Try to apply the substitution to a term, introducing casts if
      * necessary (may never be the case any more, XXX)
      */
-    public Term applyWithoutCasts(Term t, Services services) {
+    public Term applyWithoutCasts(Term t, TermServices services) {
         assert isGround() :
             "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();

@@ -1739,15 +1739,15 @@ public class LogicPrinter {
         for(int j = 0; j != size; j++) {
             final QuantifiableVariable v = vars.get (j);
             if(v instanceof LogicVariable) {
-                Term t =
-                    services.getTermFactory().createTerm(v);
                 if (mode != QuantifiableVariablePrintMode.WITH_OUT_DECLARATION) {
                     // do not print declarations in taclets...
                     printClassName(v.sort().name().toString());
                     layouter.print(" ");
                 }
-                if(notationInfo.getAbbrevMap().containsTerm(t)) {
-                    layouter.print (notationInfo.getAbbrevMap().getAbbrev(t));
+                if(services != null && 
+                        notationInfo.getAbbrevMap().containsTerm(services.getTermFactory().createTerm(v))) {
+                    layouter.print (notationInfo.getAbbrevMap().
+                                        getAbbrev(services.getTermFactory().createTerm(v)));
                 } else {
                     layouter.print (v.name().toString());
                 }

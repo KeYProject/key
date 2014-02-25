@@ -27,6 +27,7 @@ import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -83,7 +84,7 @@ public abstract class WellDefinednessCheck implements Contract {
     private Term represents;
     
     protected final TermBuilder TB;
-    protected final Services services;
+    protected final TermServices services;
 
     WellDefinednessCheck(String name, int id, IObserverFunction target,
                          OriginalVariables origVars, Type type, Services services) {
@@ -100,7 +101,7 @@ public abstract class WellDefinednessCheck implements Contract {
     WellDefinednessCheck(String name, int id, Type type, IObserverFunction target,
                          LocationVariable heap, OriginalVariables origVars,
                          Condition requires, Term assignable, Term accessible,
-                         Condition ensures, Term mby, Term represents, Services services) {
+                         Condition ensures, Term mby, Term represents, TermServices services) {
         this.name = name;
         this.id = id;
         this.type = type;
@@ -570,7 +571,7 @@ public abstract class WellDefinednessCheck implements Contract {
     private Term appendFreePre(Term pre,
                                ParsableVariable self,
                                ParsableVariable heap,
-                               Services services) {
+                               TermServices services) {
         final IObserverFunction target = getTarget();
         final KeYJavaType selfKJT = target.getContainerType();
         final Term notNull = target.isStatic() ?
@@ -587,7 +588,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
-    private Term generateSelfNotNull(ParsableVariable selfVar, Services services) {
+    private Term generateSelfNotNull(ParsableVariable selfVar, TermServices services) {
         return selfVar == null || isConstructor() ?
                 TB.tt() : TB.not(TB.equals(TB.var(selfVar), TB.NULL()));
     }
@@ -599,7 +600,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return The term representing the general assumption.
      */
     private Term generateSelfCreated(ParsableVariable selfVar, ParsableVariable heap,
-                                     Services services) {
+                                     TermServices services) {
         if(selfVar == null || isConstructor()) {
             return TB.tt();
         } else {
@@ -615,7 +616,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param selfKJT The {@link KeYJavaType} of the self variable.
      * @return The term representing the general assumption.
      */
-    private Term generateSelfExactType(ParsableVariable selfVar, Services services) {
+    private Term generateSelfExactType(ParsableVariable selfVar, TermServices services) {
         return selfVar == null || isConstructor() ? TB.tt() :
             TB.exactInstance(getKJT().getSort(), TB.var(selfVar));
     }
@@ -625,7 +626,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param paramVars The parameters {@link ProgramVariable}s.
      * @return The term representing the general assumption.
      */
-    private Term generateParamsOK(ImmutableList<ParsableVariable> paramVars, Services services) {
+    private Term generateParamsOK(ImmutableList<ParsableVariable> paramVars, TermServices services) {
         Term paramsOK = TB.tt();
         if (paramVars.size() == getOrigVars().params.size()) {
             final Iterator<ProgramVariable> origParams = getOrigVars().params.iterator();
@@ -721,7 +722,7 @@ public abstract class WellDefinednessCheck implements Contract {
                                             Term find2,
                                             Term goal1,
                                             Term goal2,
-                                            Services services) {
+                                            TermServices services) {
         assert find1.op().name().equals(TermBuilder.WD_ANY.name());
         assert find2.op().name().equals(TermBuilder.WD_ANY.name());
         assert find1.sub(0).op().name().equals(find2.sub(0).op().name());
@@ -760,7 +761,7 @@ public abstract class WellDefinednessCheck implements Contract {
                                             Term callTerm,
                                             Term pre,
                                             boolean isStatic,
-                                            Services services) {
+                                            TermServices services) {
         final TermBuilder TB = services.getTermBuilder();
         final RewriteTacletBuilder tb = new RewriteTacletBuilder();
         final Term notNull = isStatic ? TB.tt() : TB.not(TB.equals(callee, TB.NULL()));
@@ -782,7 +783,7 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     final static RewriteTaclet createExcTaclet(String name,
                                                Term callTerm,
-                                               Services services) {
+                                               TermServices services) {
         final TermBuilder TB = services.getTermBuilder();
         final RewriteTacletBuilder tb = new RewriteTacletBuilder();
         tb.setFind(TB.wd(callTerm, services));
@@ -820,7 +821,7 @@ public abstract class WellDefinednessCheck implements Contract {
         this.requires = split(req);
     }
 
-    final void setAssignable(Term ass, Services services) {
+    final void setAssignable(Term ass, TermServices services) {
         this.assignable = ass;
         if (TB.strictlyNothing().equals(ass) || TB.FALSE().equals(ass)
                 || ass == null || ass.op() == BooleanLiteral.FALSE) {
@@ -831,7 +832,7 @@ public abstract class WellDefinednessCheck implements Contract {
         }
     }
 
-    final void combineAssignable(Term ass1, Term ass2, Services services) {
+    final void combineAssignable(Term ass1, Term ass2, TermServices services) {
         if (ass1 == null || TB.strictlyNothing().equals(ass1)) {
             setAssignable(ass2, services);
         } else if(ass2 == null || TB.strictlyNothing().equals(ass2)) {
@@ -845,7 +846,7 @@ public abstract class WellDefinednessCheck implements Contract {
         this.accessible = acc;
     }
 
-    final void combineAccessible(Term acc, Term accPre, Services services) {
+    final void combineAccessible(Term acc, Term accPre, TermServices services) {
         if (acc == null && accPre == null) {
             setAccessible(null);
         } else if (accPre == null || accPre.equals(acc)) {
@@ -935,7 +936,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param services
      * @return the combined well-definedness contract
      */
-    public WellDefinednessCheck combine(WellDefinednessCheck wdc, Services services) {
+    public WellDefinednessCheck combine(WellDefinednessCheck wdc, TermServices services) {
         assert this.getName().equals(wdc.getName());
         assert this.id() == wdc.id();
         assert this.getTarget().equals(wdc.getTarget());
@@ -1062,7 +1063,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return the full valid post-condition
      */
     public final Term getPost(final Condition post, ParsableVariable result,
-                              Services services) {
+                              TermServices services) {
         final Term reachable;
         if (result != null) {
             reachable = TB.reachableValue(TB.var(result), origVars.result.getKeYJavaType());
@@ -1084,7 +1085,7 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     public final Term getUpdates(Term mod, LocationVariable heap,
                                  ProgramVariable heapAtPre,
-                                 Term anonHeap, Services services) {
+                                 Term anonHeap, TermServices services) {
         assert mod != null;
         assert anonHeap != null || TB.strictlyNothing().equals(mod);
         final Term havocUpd = TB.strictlyNothing().equals(mod) ?

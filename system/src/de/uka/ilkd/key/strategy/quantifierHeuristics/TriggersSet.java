@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -234,7 +235,7 @@ public class TriggersSet {
             return foundSubtriggers;
         }
 
-        private Set<Term> expandIfThenElse(Term t, Services services) {
+        private Set<Term> expandIfThenElse(Term t, TermServices services) {
             final Set<Term>[] possibleSubs = new Set[t.arity()];
             boolean changed = false;
             for (int i = 0; i != t.arity(); ++i) {
@@ -264,7 +265,7 @@ public class TriggersSet {
                 Set<Term>[] possibleSubs,
                 Term[] chosenSubs,
                 ImmutableArray<QuantifiableVariable> boundVars,
-                int i, Services services) {
+                int i, TermServices services) {
             final HashSet<Term> set = new LinkedHashSet<Term>();
             if (i >= possibleSubs.length) {
                 final Term res =

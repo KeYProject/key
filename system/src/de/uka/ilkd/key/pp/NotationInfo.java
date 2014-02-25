@@ -19,6 +19,7 @@ import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.*;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -372,7 +373,7 @@ public final class NotationInfo {
     /** Get the Notation for a given Operator.  
      * If no notation is registered, a Function notation is returned.
      */
-    Notation getNotation(Operator op, Services services) {
+    Notation getNotation(Operator op, TermServices services) {
         Notation result = notationTable.get(op);
         if(result != null) {
             return result;

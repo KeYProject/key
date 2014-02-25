@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -35,7 +36,7 @@ public final class DoubleLDT extends LDT {
     public static final Name NAME = new Name("double");
 
 
-    public DoubleLDT(Services services) {
+    public DoubleLDT(TermServices services) {
 	super(NAME, services);
     }
 
@@ -62,7 +63,7 @@ public final class DoubleLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
 	    		         Term sub,
-	    		         Services services,
+	    		         TermServices services,
 	    		         ExecutionContext ec) {
 	return false;
     }

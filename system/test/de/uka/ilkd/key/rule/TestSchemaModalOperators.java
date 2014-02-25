@@ -51,6 +51,7 @@ public class TestSchemaModalOperators extends TestCase {
     Proof[] proof;
     Proof   mvProof;
    private TermBuilder TB;
+   private Services services;
    
     private static Semisequent parseTermForSemisequent(String t) {
 	if ("".equals(t)) { 
@@ -73,6 +74,7 @@ public class TestSchemaModalOperators extends TestCase {
 	    proof[i].setRoot(new Node(proof[i], s));
 	}
 
+        services = TacletForTests.services();
         TB = TacletForTests.services().getTermBuilder();
         
 	// proof required to test application with mv
@@ -172,8 +174,8 @@ public class TestSchemaModalOperators extends TestCase {
 	 Debug.out("Find: ", find);
 	 Debug.out("Replace: ", replace);
 	 Debug.out("Goal: ", goal);
-	 Term instreplace = t.syntacticalReplace(replace, null, mc, null);
-	 Term instfind = t.syntacticalReplace(replace, null, mc, null);
+	 Term instreplace = t.syntacticalReplace(replace, services, mc, null);
+	 Term instfind = t.syntacticalReplace(replace, services, mc, null);
 	 Debug.out("Instantiated replace: ", instreplace);
 	 Debug.out("Instantiated find: ", instfind);
     }
@@ -193,7 +195,7 @@ public class TestSchemaModalOperators extends TestCase {
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
-	ImmutableList<Goal> goals=rApp.execute(goal, TacletForTests.services());
+	ImmutableList<Goal> goals=rApp.execute(goal, services);
 	assertTrue("There should be 1 goal for testSchemaModal1 taclet, was "+goals.size(), goals.size()==1);	
 	Sequent seq=goals.head().sequent();
         Semisequent antec0 = parseTermForSemisequent("\\<{ i--; }\\> i=0");

@@ -56,6 +56,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -284,7 +285,7 @@ public class BlockContractRule implements BuiltInRule {
     private Map<LocationVariable, Function>
                 createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables,
                                                         final BlockContract contract,
-                                                        final Services services)
+                                                        final TermServices services)
     {
         Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>(40);
         for (LocationVariable variable : variables) {
@@ -301,7 +302,7 @@ public class BlockContractRule implements BuiltInRule {
     }
 
     @Override
-    public BlockContractBuiltInRuleApp createApp(final PosInOccurrence occurrence, Services services)
+    public BlockContractBuiltInRuleApp createApp(final PosInOccurrence occurrence, TermServices services)
     {
         return new BlockContractBuiltInRuleApp(this, occurrence);
     }
@@ -464,11 +465,11 @@ public class BlockContractRule implements BuiltInRule {
 
         private final Goal goal;
         private final BlockContract.Variables placeholderVariables;
-        private final Services services;
+        private final TermServices services;
 
         public VariablesCreatorAndRegistrar(final Goal goal,
                                             final BlockContract.Variables placeholderVariables,
-                                            final Services services)
+                                            final TermServices services)
         {
             this.goal = goal;
             this.placeholderVariables = placeholderVariables;

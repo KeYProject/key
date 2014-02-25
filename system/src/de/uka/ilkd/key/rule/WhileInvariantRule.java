@@ -42,6 +42,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -139,7 +140,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         return result;
     }
 
-    private Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts, Services services) {
+    private Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts, TermServices services) {
         Term anonUpdate = null;
         for(ProgramVariable pv : localOuts) {
             final String anonFuncName 
@@ -209,7 +210,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         return invTerm;
     }
 
-    private Pair<Term,Term> prepareVariant (Instantiation inst, Term variant, Services services) {
+    private Pair<Term,Term> prepareVariant (Instantiation inst, Term variant, TermServices services) {
         final ProgramElementName variantName 
             = new ProgramElementName(services.getTermBuilder().newName("variant"));
         final LocationVariable variantPV = new LocationVariable(variantName, Sort.ANY);
@@ -257,7 +258,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
     private SequentFormula initFormula(Instantiation inst, final Term invTerm,
-            Term reachableState, Services services) {
+            Term reachableState, TermServices services) {
         return new SequentFormula(
                 services.getTermBuilder().apply(inst.u, services.getTermBuilder().and(invTerm, reachableState), null));
     }
@@ -280,7 +281,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     private Triple<JavaBlock, Term, Term> prepareGuard(final Instantiation inst,
                                                        final KeYJavaType booleanKJT,
-                                                       final Services services) {
+                                                       final TermServices services) {
         final ProgramElementName guardVarName 
         = new ProgramElementName(services.getTermBuilder().newName("b"));
         final LocationVariable guardVar = new LocationVariable(guardVarName, 
@@ -398,7 +399,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    static Pair<Term, Term> applyUpdates(Term focusTerm, Services services) {
+    static Pair<Term, Term> applyUpdates(Term focusTerm, TermServices services) {
         if (focusTerm.op() instanceof UpdateApplication) {
             return new Pair<Term, Term>(UpdateApplication.getUpdate(focusTerm),
                     UpdateApplication.getTarget(focusTerm));
@@ -620,7 +621,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
     @Override
-    public LoopInvariantBuiltInRuleApp createApp(PosInOccurrence pos, Services services) {
+    public LoopInvariantBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
         return new LoopInvariantBuiltInRuleApp(this, pos, services);
     }
 

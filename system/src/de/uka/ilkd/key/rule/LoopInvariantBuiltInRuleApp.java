@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -51,15 +52,15 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private final List<LocationVariable> heapContext;
 
-   private final Services services;
+   private final TermServices services;
 
-    public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pos, Services services) {
+    public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pos, TermServices services) {
         this(rule, pos, null, null, null, services);
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
-            LoopInvariant inv, List<LocationVariable> heapContext, Services services) {
+            LoopInvariant inv, List<LocationVariable> heapContext, TermServices services) {
         super(rule, pio, ifInsts);
         assert pio != null;
         this.loop = (While) JavaTools.getActiveStatement(programTerm()
@@ -81,7 +82,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
      * otherwise <code>rawInv</code> is returned.
     * @param services TODO
      */
-    private LoopInvariant instantiateIndexValues(LoopInvariant rawInv, Services services){
+    private LoopInvariant instantiateIndexValues(LoopInvariant rawInv, TermServices services){
     	if (rawInv == null) return null;
     	Map<LocationVariable,Term> invs = rawInv.getInternalInvariants();
     	Term var = rawInv.getInternalVariant();
@@ -212,7 +213,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence pio, LoopInvariant inv, Services services) {
+            PosInOccurrence pio, LoopInvariant inv, TermServices services) {
         this(rule, pio, null, inv, null, services);
 
     }

@@ -16,6 +16,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateSV;
@@ -39,7 +40,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
     }
     
     
-    private static Term applyUpdateOnRigid(Term update, Term target, Services services) {
+    private static Term applyUpdateOnRigid(Term update, Term target, TermServices services) {
 	Term[] updatedSubs = new Term[target.arity()];
 	for(int i = 0; i < updatedSubs.length; i++) {
 	    updatedSubs[i] = services.getTermBuilder().apply(update, target.sub(i), null);

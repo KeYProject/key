@@ -39,6 +39,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -65,7 +66,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 public class FunctionalOperationContractImpl implements FunctionalOperationContract {
 
     protected final TermBuilder TB; // TODO: Rename into tb
-    private final Services services;
+    private final TermServices services;
 
     final String baseName;
     final String name;
@@ -142,7 +143,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                     Term globalDefs,
                                     int id,
                                     boolean toBeSaved,
-                                    boolean transaction, Services services) {
+                                    boolean transaction, TermServices services) {
         assert !(name == null && baseName == null);
         assert kjt != null;
         assert pm != null;

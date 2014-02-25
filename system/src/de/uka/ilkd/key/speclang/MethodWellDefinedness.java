@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -56,7 +57,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                   LocationVariable heap, OriginalVariables origVars,
                                   Condition requires, Term assignable, Term accessible,
                                   Condition ensures, Term mby, Term rep, Contract contract,
-                                  Term globalDefs, Term axiom, boolean model, Services services) {
+                                  Term globalDefs, Term axiom, boolean model, TermServices services) {
         super(name, id, type, target, heap, origVars, requires, assignable, accessible,
               ensures, mby, rep, services);
         this.contract = contract;
@@ -334,7 +335,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return the combined taclet
      */
-    public RewriteTaclet combineTaclets(RewriteTaclet t1, RewriteTaclet t2, Services services) {
+    public RewriteTaclet combineTaclets(RewriteTaclet t1, RewriteTaclet t2, TermServices services) {
         assert t1.goalTemplates().size() == 1;
         assert t2.goalTemplates().size() == 1;
         final Term rw1 = ((RewriteTacletGoalTemplate)t1.goalTemplates().head()).replaceWith();
@@ -376,7 +377,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * is a model field/method and can thus not throw any exception.
      * @return true for either normal behaviour or model fields
      */
-    public boolean isNormal(Services services) {
+    public boolean isNormal(TermServices services) {
         if (modelField() || isModel()) {
             return true;
         }
@@ -420,7 +421,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public MethodWellDefinedness combine(WellDefinednessCheck wdc, Services services) {
+    public MethodWellDefinedness combine(WellDefinednessCheck wdc, TermServices services) {
         assert wdc instanceof MethodWellDefinedness;
         final MethodWellDefinedness mwd = (MethodWellDefinedness)wdc;
         assert getMethodContract() instanceof FunctionalOperationContract ?

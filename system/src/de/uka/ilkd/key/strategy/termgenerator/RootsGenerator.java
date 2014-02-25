@@ -24,6 +24,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -51,7 +52,7 @@ public class RootsGenerator implements TermGenerator {
     private final BigInteger one = BigInteger.ONE;
     private final BigInteger two = BigInteger.valueOf ( 2 );
 
-    public static TermGenerator create(ProjectionToTerm powerRelation, Services services) {
+    public static TermGenerator create(ProjectionToTerm powerRelation, TermServices services) {
         return new RootsGenerator ( powerRelation, services.getTermBuilder() );
     }
     
@@ -105,7 +106,7 @@ public class RootsGenerator implements TermGenerator {
     }
 
     private Term breakDownEq(Term var, BigInteger lit, int pow,
-                             Services services) {
+                             TermServices services) {
         final Term zero = tb.zero();
 
         if ( ( pow % 2 == 0 ) ) {
@@ -151,7 +152,7 @@ public class RootsGenerator implements TermGenerator {
         return null;
     }
 
-    private Term breakDownGeq(Term var, BigInteger lit, int pow, Services services) {
+    private Term breakDownGeq(Term var, BigInteger lit, int pow, TermServices services) {
         if ( ( pow % 2 == 0 ) ) {
             // the even case
             
@@ -178,7 +179,7 @@ public class RootsGenerator implements TermGenerator {
         return null;
     }
 
-    private Term breakDownLeq(Term var, BigInteger lit, int pow, Services services) {
+    private Term breakDownLeq(Term var, BigInteger lit, int pow, TermServices services) {
         if ( ( pow % 2 == 0 ) ) {
             // the even case
             

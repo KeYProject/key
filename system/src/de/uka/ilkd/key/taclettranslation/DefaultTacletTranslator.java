@@ -18,10 +18,10 @@ package de.uka.ilkd.key.taclettranslation;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.FindTaclet;
@@ -51,7 +51,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
        ASSUM,
        FIND;
        
-       public Term getDefaultValue(Services services) {
+       public Term getDefaultValue(TermServices services) {
           return services.getTermBuilder().ff();
        }
     }
@@ -72,7 +72,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
      * @return translation
      */
     private Term translateReplaceAndAddTerm(TacletGoalTemplate template,
-	    Term find, Services services) {
+	    Term find, TermServices services) {
 	TermBuilder tb = services.getTermBuilder();
 	Term replace = find;
 	if(template instanceof RewriteTacletGoalTemplate){
@@ -107,7 +107,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
      * @return translation
      */
     private Term translateReplaceAndAddFormula(
-	    TacletGoalTemplate template, Term find, int polarity, Services services) {
+	    TacletGoalTemplate template, Term find, int polarity, TermServices services) {
 	TermBuilder tb = services.getTermBuilder();
 	
 	Term replace = find;
@@ -130,7 +130,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 
     }
     
-    private Term translateEquivalence(Term find, Term replace, int polarity, Services services){
+    private Term translateEquivalence(Term find, Term replace, int polarity, TermServices services){
 	TermBuilder tb = services.getTermBuilder();
 	switch(polarity) {
 	case 0: return tb.equals(find, replace);
@@ -140,7 +140,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 	}
     }
     
-    private Term translateReplaceAndAddSequent(TacletGoalTemplate template, int type, Services services){
+    private Term translateReplaceAndAddSequent(TacletGoalTemplate template, int type, TermServices services){
 	
 	TermBuilder tb = services.getTermBuilder();
 	Sequent replace=null;
@@ -165,7 +165,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
      * Translates a RewriteTaclet to a formula.
      */
     @Override
-    public Term translate(Taclet taclet, Services services)
+    public Term translate(Taclet taclet, TermServices services)
     	throws IllegalTacletException {
 	
 

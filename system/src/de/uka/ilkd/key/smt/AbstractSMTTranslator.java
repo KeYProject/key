@@ -34,6 +34,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfThenElse;
@@ -762,7 +763,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * 
          * @return structured List of declaration.
          */
-        private ArrayList<ArrayList<StringBuffer>> buildTranslatedFuncDecls(Services services) {
+        private ArrayList<ArrayList<StringBuffer>> buildTranslatedFuncDecls(TermServices services) {
                 ArrayList<ArrayList<StringBuffer>> toReturn = new ArrayList<ArrayList<StringBuffer>>();
                 // add the function declarations for each used function
                 for (Operator op : this.functionDecls.keySet()) {
@@ -990,7 +991,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         
      
 
-        private Term createLogicalVar(Services services, String baseName,
+        private Term createLogicalVar(TermServices services, String baseName,
                         Sort sort) {
                 return TB.var(new LogicVariable(new Name(
                                 TB.newName(baseName)),
@@ -1061,7 +1062,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return result;
         }
         
-        private ArrayList<StringBuffer> buildAssumptionsForSorts(Services services){
+        private ArrayList<StringBuffer> buildAssumptionsForSorts(TermServices services){
         	ArrayList<StringBuffer> result = new ArrayList<StringBuffer>();
         	if(this.isMultiSorted()){
          		for(Sort sort : usedRealSort.keySet()){
@@ -1086,17 +1087,17 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 : constantsForBigIntegers;
         }
 
-        private Term getRightBorderAsTerm(long integer, Services services) {
+        private Term getRightBorderAsTerm(long integer, TermServices services) {
                 return TB.zTerm(Long
                                 .toString(getRightBorderAsInteger(integer,
                                                 services)));
         }
 
-        private Long getRightBorderAsInteger(long integer, Services services) {
+        private Long getRightBorderAsInteger(long integer, TermServices services) {
                 return integer < 0 ? getMinNumber() : getMaxNumber();
         }
 
-        private StringBuffer getNameForIntegerConstant(Services services,
+        private StringBuffer getNameForIntegerConstant(TermServices services,
                         long integer) {
                 String val = integer < 0 ? "negative_value" : "positive_value";
                 return new StringBuffer(TB.newName("i")
@@ -1104,7 +1105,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         }
 
-        private StringBuffer buildUniqueConstant(long integer, Services services)
+        private StringBuffer buildUniqueConstant(long integer, TermServices services)
                         throws IllegalFormulaException {
                 HashMap<Long, StringBuffer> map = getRightConstantContainer(integer);
                 StringBuffer buf = map.get(integer);

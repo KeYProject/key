@@ -19,6 +19,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.*;
@@ -80,7 +81,7 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
 	  }
 
 	@Override
-	public RuleAppSMT createApp( PosInOccurrence pos, Services services ) {
+	public RuleAppSMT createApp( PosInOccurrence pos, TermServices services ) {
 		return new RuleAppSMT( this, pos );
 	}
 

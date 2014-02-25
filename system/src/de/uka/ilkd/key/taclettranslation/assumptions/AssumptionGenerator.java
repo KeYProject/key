@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -371,7 +372,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
        * @param services TODO
          * @return the quantified term.
          */
-        protected static Term quantifyTerm(Term term, Services services)
+        protected static Term quantifyTerm(Term term, TermServices services)
                         throws IllegalTacletException {
                 TermBuilder tb = services.getTermBuilder();
                 // Quantify over all free variables.

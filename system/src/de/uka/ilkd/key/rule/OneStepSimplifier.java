@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -312,7 +313,7 @@ public final class OneStepSimplifier implements BuiltInRule,
      */
     private Term replaceKnownHelper(Map<Term,PosInOccurrence> map,
 	                            Term in,
-	                            /*out*/ List<PosInOccurrence> ifInsts, Protocol protocol, Services services) {
+	                            /*out*/ List<PosInOccurrence> ifInsts, Protocol protocol, TermServices services) {
 	final PosInOccurrence pos = map.get(in);
 	if(pos != null) {
 	    ifInsts.add(pos);
@@ -354,7 +355,7 @@ public final class OneStepSimplifier implements BuiltInRule,
      * @param protocol
      */
     private SequentFormula replaceKnown(
-	    				Services services,
+	    				TermServices services,
 	                             	SequentFormula cf,
 	                             	Map<Term,PosInOccurrence> context,
 	                             	/*out*/ List<PosInOccurrence> ifInsts,
@@ -660,7 +661,7 @@ public final class OneStepSimplifier implements BuiltInRule,
     }
 
 	@Override
-    public OneStepSimplifierRuleApp createApp(PosInOccurrence pos, Services services) {
+    public OneStepSimplifierRuleApp createApp(PosInOccurrence pos, TermServices services) {
 	    return new OneStepSimplifierRuleApp(this, pos);
     }
 }

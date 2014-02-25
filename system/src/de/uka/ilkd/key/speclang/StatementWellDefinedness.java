@@ -22,6 +22,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -53,7 +54,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     StatementWellDefinedness(String name, int id, Type type, IObserverFunction target,
                              LocationVariable heap, OriginalVariables origVars,
                              Condition requires, Term assignable, Term accessible,
-                             Condition ensures, Term mby, Term rep, Services services) {
+                             Condition ensures, Term mby, Term rep, TermServices services) {
         super(name, id, type, target, heap, origVars, requires,
               assignable, accessible, ensures, mby, rep, services);
     }
@@ -65,7 +66,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return
      */
-    abstract SequentFormula generateSequent(SequentTerms seqTerms, Services services);
+    abstract SequentFormula generateSequent(SequentTerms seqTerms, TermServices services);
 
     public abstract SpecificationElement getStatement();
 
@@ -198,7 +199,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         final Term anonWdPost;
 
         private SequentTerms(Term context, Term pre, Term anonHeap, Term mod,
-                             ImmutableList<Term> rest, Term anonWdPost, Services services) {
+                             ImmutableList<Term> rest, Term anonWdPost, TermServices services) {
             this.context = context;
             this.pre = pre;
             this.wfAnon = anonHeap != null ? TB.wellFormed(anonHeap) : TB.tt();

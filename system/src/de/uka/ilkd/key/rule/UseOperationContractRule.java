@@ -56,6 +56,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.Function;
@@ -928,12 +929,12 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
     @Override
-    public ContractRuleApp createApp(PosInOccurrence pos, Services services) {
+    public ContractRuleApp createApp(PosInOccurrence pos, TermServices services) {
 		return new ContractRuleApp(this, pos);
     }
 
    public static Map<LocationVariable, LocationVariable> computeAtPreVars(List<LocationVariable> heapContext, 
-                                                                          Services services, 
+                                                                          TermServices services, 
                                                                           Instantiation inst) {
       return HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
    }
@@ -956,7 +957,7 @@ public final class UseOperationContractRule implements BuiltInRule {
       return OpReplacer.replace(baseHeapTerm, atPres.get(baseHeap), inst.actualParams, tf);
    }
 
-   public static ProgramVariable computeResultVar(Instantiation inst, Services services) {
+   public static ProgramVariable computeResultVar(Instantiation inst, TermServices services) {
       final TermBuilder TB = services.getTermBuilder();
       return inst.pm.isConstructor() ? 
              TB.selfVar(inst.staticType, true) : 

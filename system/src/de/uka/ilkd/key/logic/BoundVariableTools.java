@@ -19,7 +19,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.util.Debug;
@@ -43,7 +42,7 @@ public class BoundVariableTools {
      */
     public Term renameVariables (Term originalTerm,
                                  ImmutableArray<QuantifiableVariable> oldBoundVars,
-                                 ImmutableArray<QuantifiableVariable> newBoundVars, Services services) {
+                                 ImmutableArray<QuantifiableVariable> newBoundVars, TermServices services) {
         Term res = originalTerm;
         for (int i = 0; i != oldBoundVars.size(); ++i) {
             if ( oldBoundVars.get ( i )
@@ -62,7 +61,7 @@ public class BoundVariableTools {
 
     public Term[] renameVariables (Term[] originalTerms,
                                    ImmutableArray<QuantifiableVariable> oldBoundVars,
-                                   ImmutableArray<QuantifiableVariable> newBoundVars, Services services) {
+                                   ImmutableArray<QuantifiableVariable> newBoundVars, TermServices services) {
         final Term[] res = new Term [originalTerms.length];
         for ( int i = 0; i != res.length; ++i )
             res[i] = renameVariables ( originalTerms[i],
@@ -137,7 +136,7 @@ public class BoundVariableTools {
     public boolean resolveCollisions (Term originalTerm,
                                       ImmutableSet<QuantifiableVariable> criticalVars,
                                       ImmutableArray<QuantifiableVariable>[] newBoundVars,
-                                      Term[] newSubs, Services services) {
+                                      Term[] newSubs, TermServices services) {
         boolean changed = false;
 
         for ( int i = 0; i != originalTerm.arity (); ++i ) {
@@ -180,7 +179,7 @@ public class BoundVariableTools {
                 unifyBoundVariables (ImmutableArray<QuantifiableVariable>[] boundVarsPerSub,
                                      Term[] subs,
                                      int subtermsBegin,
-                                     int subtermsEnd, Services services) {
+                                     int subtermsEnd, TermServices services) {
         // at least one subterms belongs to the entry (value)
         ImmutableArray<QuantifiableVariable> unifiedVariable = boundVarsPerSub[subtermsBegin];
 
@@ -232,7 +231,7 @@ public class BoundVariableTools {
     public boolean equalsModRenaming (ImmutableArray<QuantifiableVariable> vars0,
 				      Term term0,
 				      ImmutableArray<QuantifiableVariable> vars1,
-				      Term term1, Services services) {
+				      Term term1, TermServices services) {
         if ( !consistentVariableArrays ( vars0, vars1 ) ) return false;
         if ( vars0.size () == 0 ) return term0.equalsModRenaming ( term1 );
         
