@@ -34,15 +34,12 @@ public class Name implements Comparable<Name> {
     private static final String NONAME = "_noname_";
 
     private final /*@Interned*/ String nameString;
-
-    private final int hashCode;
-
+    
     /**
      * creates a name object
      */
     public Name(String n) {
 	nameString = (n == null ? NONAME : n).intern();
-	hashCode = nameString.hashCode();
     }
 
     public String toString() {
@@ -63,7 +60,7 @@ public class Name implements Comparable<Name> {
     }
 
     public int hashCode() {
-	return hashCode;
+	return nameString.hashCode();
     }
 
 }
