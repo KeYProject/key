@@ -716,7 +716,7 @@ public class BlockContractRule implements BuiltInRule {
             }
             for (Map.Entry<LocationVariable, LocationVariable> remembranceLocalVariable
                     : variables.remembranceLocalVariables.entrySet()) {
-                result.get(getBaseHeap()).put(var(remembranceLocalVariable.getKey()),
+                result.get(services.getTypeConverter().getHeapLDT().getHeap()).put(var(remembranceLocalVariable.getKey()),
                                               var(remembranceLocalVariable.getValue()));
             }
             return result;
