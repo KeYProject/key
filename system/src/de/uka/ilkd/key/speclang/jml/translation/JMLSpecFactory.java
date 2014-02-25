@@ -597,6 +597,7 @@ public class JMLSpecFactory {
     }
 
 
+    @SuppressWarnings("unused")
     private Term translateAccessible(IProgramMethod pm,
                                      ProgramVariable selfVar,
                                      ImmutableList<ProgramVariable> paramVars,
