@@ -18,9 +18,6 @@ package de.uka.ilkd.key.rule.conditions;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -28,7 +25,10 @@ import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.ProxySort;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -166,6 +166,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
         return false;
     }
 
+    //TODO: Avoid static cache 'disjointnessCache' and move it into {@link ServiceCaches}
     private static Map<Sort,Map<Sort,Boolean>> disjointnessCache
     	= new WeakHashMap<Sort,Map<Sort,Boolean>>();
 
@@ -184,7 +185,6 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 		result = map.get(s1);
 	    }
 	}
-
 	return result;
     }
 

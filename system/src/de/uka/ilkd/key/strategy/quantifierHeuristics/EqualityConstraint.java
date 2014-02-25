@@ -39,6 +39,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
+import de.uka.ilkd.key.util.LRUCache;
 
 
 /** 
@@ -608,7 +609,7 @@ public class EqualityConstraint implements Constraint {
         if ( modifyThis ) return this;
         return new EqualityConstraint ( (HashMap<Metavariable, Term>)map.clone () );
     }
-
+ 
     /**
      * checks equality of constraints by subsuming relation (only equal if no
      * new sorts need to be introduced for subsumption)
@@ -868,28 +869,30 @@ public class EqualityConstraint implements Constraint {
     
     private static final Object joinCacheMonitor = new Object();
     
+    // the methods using these caches seem not to be used anymore otherwise refactor and move it into ServiceCaches
     private static Map<ECPair, Constraint> joinCache = 
-        new LinkedHashMap<ECPair, Constraint> ();
+        new LRUCache<ECPair, Constraint> (0);
     private static Map<ECPair, Constraint> joinCacheOld = 
-        new LinkedHashMap<ECPair, Constraint> ();
+        new LRUCache<ECPair, Constraint> (0);
     
     private static final ECPair  ecPair0   = new ECPair ( null, null, 0 );
 
     @Override
     public int hashCode () {
-       throw new UnsupportedOperationException();
-//        if ( hashCode == null ) {
-//            int h = 0;
-//            final Iterator<Metavariable> it = restrictedMetavariables ();
-//            while ( it.hasNext () ) {
-//                final Metavariable mv = it.next ();
-//                h += mv.hashCode ();
-//                h += getInstantiation ( mv, services ).hashCode ();
-//            }
-//
-//            hashCode = Integer.valueOf ( h );
-//        }
-//
-//        return hashCode.intValue ();
+        if ( hashCode == null ) {
+            int h = 0;
+            final Iterator<Metavariable> it = restrictedMetavariables ();
+            while ( it.hasNext () ) {
+                final Metavariable mv = it.next ();
+                h += mv.hashCode ();
+                //h += getInstantiation ( mv, services ).hashCode (); // removed line because no idea how
+                // to get the services here and the method seems not to be called and the class is deprecated
+                // and it still satisfies the contract of 'hashcode'
+            }
+
+            hashCode = Integer.valueOf ( h );
+        }
+
+        return hashCode.intValue ();
     }
 }
