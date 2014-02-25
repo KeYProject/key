@@ -42,7 +42,8 @@ public class BoundVariableTools {
      */
     public Term renameVariables (Term originalTerm,
                                  ImmutableArray<QuantifiableVariable> oldBoundVars,
-                                 ImmutableArray<QuantifiableVariable> newBoundVars, TermServices services) {
+                                 ImmutableArray<QuantifiableVariable> newBoundVars, 
+                                 TermServices services) {
         Term res = originalTerm;
         for (int i = 0; i != oldBoundVars.size(); ++i) {
             if ( oldBoundVars.get ( i )
@@ -61,7 +62,8 @@ public class BoundVariableTools {
 
     public Term[] renameVariables (Term[] originalTerms,
                                    ImmutableArray<QuantifiableVariable> oldBoundVars,
-                                   ImmutableArray<QuantifiableVariable> newBoundVars, TermServices services) {
+                                   ImmutableArray<QuantifiableVariable> newBoundVars, 
+                                   TermServices services) {
         final Term[] res = new Term [originalTerms.length];
         for ( int i = 0; i != res.length; ++i )
             res[i] = renameVariables ( originalTerms[i],

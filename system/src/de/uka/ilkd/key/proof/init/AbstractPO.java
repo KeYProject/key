@@ -54,7 +54,7 @@ import de.uka.ilkd.key.util.Pair;
  */
 public abstract class AbstractPO implements IPersistablePO {
 
-    protected final TermBuilder TB; // TODO: Rename into tb;
+    protected final TermBuilder tb; 
     protected final InitConfig initConfig;
     protected final Services services;
     protected final JavaInfo javaInfo;
@@ -75,7 +75,7 @@ public abstract class AbstractPO implements IPersistablePO {
                       String name) {
         this.initConfig = initConfig;
         this.services = initConfig.getServices();
-        this.TB = services.getTermBuilder();
+        this.tb = services.getTermBuilder();
         this.javaInfo = initConfig.getServices().getJavaInfo();
         this.heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
         this.specRepos = initConfig.getServices().getSpecificationRepository();

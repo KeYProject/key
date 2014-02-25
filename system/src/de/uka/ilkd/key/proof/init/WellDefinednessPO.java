@@ -251,21 +251,21 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final POTerms po = check.replace(check.createPOTerms(), vars);
         final TermAndFunc preCond =
                 check.getPre(po.pre, vars.self, vars.heap, vars.params, false, services);
-        final Term wdPre = TB.wd(preCond.term, services);
-        final Term wdMod = TB.wd(po.mod, services);
-        final Term wdRest = TB.and(TB.wd(po.rest));
+        final Term wdPre = tb.wd(preCond.term, services);
+        final Term wdMod = tb.wd(po.mod, services);
+        final Term wdRest = tb.and(tb.wd(po.rest));
         register(preCond.func);
-        mbyAtPre = preCond.func != null ? check.replace(TB.func(preCond.func), vars) : null;
+        mbyAtPre = preCond.func != null ? check.replace(tb.func(preCond.func), vars) : null;
         final Term post = check.getPost(po.post, vars.result, services);
         final Term pre = preCond.term;
         final Term updates = check.getUpdates(po.mod, vars.heap, vars.heapAtPre,
                                               vars.anonHeap, services);
-        final Term wfAnon = TB.wellFormed(vars.anonHeap);
+        final Term wfAnon = tb.wellFormed(vars.anonHeap);
         final Term uPost = check instanceof ClassWellDefinedness ?
-                TB.tt() : TB.apply(updates, TB.wd(post, services));
-        final Term imp = TB.imp(TB.and(pre, wfAnon),
-                                TB.and(wdMod, wdRest, uPost));
-        final Term poTerms = TB.and(wdPre, imp);
+                tb.tt() : tb.apply(updates, tb.wd(post, services));
+        final Term imp = tb.imp(tb.and(pre, wfAnon),
+                                tb.and(wdMod, wdRest, uPost));
+        final Term poTerms = tb.and(wdPre, imp);
         assignPOTerms(poTerms);
         // add axioms
         collectClassAxioms(getKJT());

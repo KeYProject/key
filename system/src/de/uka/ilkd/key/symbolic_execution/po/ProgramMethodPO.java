@@ -161,7 +161,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
    @Override
    protected Term generateMbyAtPreDef(ProgramVariable selfVar,
                                       ImmutableList<ProgramVariable> paramVars) {
-      return TB.tt();
+      return tb.tt();
    }
 
    /**
@@ -187,7 +187,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
             return parser.parseExpression();
          }
          else {
-            return TB.tt();
+            return tb.tt();
          }
       }
       catch (SLTranslationException e) {
@@ -206,7 +206,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
                           ProgramVariable exceptionVar,
                           Map<LocationVariable, LocationVariable> atPreVars,
                           Services services) {
-      return TB.tt();
+      return tb.tt();
    }
 
    /**
@@ -217,7 +217,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
                                    Map<LocationVariable, Map<Term, Term>> heapToAtPre,
                                    ProgramVariable selfVar,
                                    ImmutableList<ProgramVariable> paramVars) {
-      return TB.tt();
+      return tb.tt();
    }
 
    /**
