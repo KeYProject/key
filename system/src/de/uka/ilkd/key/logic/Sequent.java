@@ -432,7 +432,7 @@ public class Sequent implements Iterable<SequentFormula> {
      * Returns names of TermLabels, that occur in term or one of its subterms.
      */
     private static Set<Name> getLabelsForTermRecursively(Term term) {
-        Set<Name> result = new HashSet();
+        Set<Name> result = new HashSet<Name>();
 
         if (term.hasLabels()) {
             for (TermLabel label : term.getLabels()) {
@@ -440,7 +440,7 @@ public class Sequent implements Iterable<SequentFormula> {
             }
         }
 
-        for (Term subTerm : term.subs()) {
+        for (final Term subTerm : term.subs()) {
             result.addAll(getLabelsForTermRecursively(subTerm));
         }
 
@@ -451,10 +451,9 @@ public class Sequent implements Iterable<SequentFormula> {
      * Returns names of TermLabels, that occur in this sequent.
      */
     public Set<Name> getOccuringTermLabels() {
-        Set<Name> result = new HashSet();
-        Iterator<SequentFormula> iterator = iterator();
-        while (iterator.hasNext()) {
-            result.addAll(getLabelsForTermRecursively(iterator.next().formula()));
+        final Set<Name> result = new HashSet<Name>();
+        for (final SequentFormula sf : this) {
+            result.addAll(getLabelsForTermRecursively(sf.formula()));
         }
         return result;
     }
