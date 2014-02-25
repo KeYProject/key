@@ -65,10 +65,6 @@ public abstract class ProgramVariable extends AbstractSortedOperator
     				                 ReferenceSuffix, 
     				                 ProgramInLogic {
 
-    // attention: this counter is used to get a unique variable name, once the
-    // names are unique the counter should be removed %%%%
-    private static long COUNTER = 0;
-    private long id;
     private final KeYJavaType type;
     private final boolean isStatic;
     private final boolean isModel;
@@ -94,9 +90,6 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 	this.isModel = isModel;
 	this.isGhost = isGhost;
 	this.isFinal = isFinal;
-	// remove this as soon as possible %%%
-	id = COUNTER;
-	COUNTER++;
 	
 	assert sort() != Sort.FORMULA;
 	assert sort() != Sort.UPDATE;
@@ -114,12 +107,6 @@ public abstract class ProgramVariable extends AbstractSortedOperator
     }
     
  
-    /** returns unique id %%%% HACK */
-    public long id() {
-	return id;
-    }
-
-
     /** @return name of the ProgramVariable */
     public ProgramElementName getProgramElementName() {
 	return (ProgramElementName) name();

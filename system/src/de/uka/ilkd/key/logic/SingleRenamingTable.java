@@ -47,7 +47,8 @@ public class SingleRenamingTable extends RenamingTable{
     public String toString(){
         LocationVariable ov = (LocationVariable) oldVar;
         LocationVariable nv = (LocationVariable) newVar;
-	return ("SingleRenamingTable: "+oldVar+" id: "+ ov.id() +" -> "+newVar + " id: " + nv.id());
+	return ("SingleRenamingTable: "+oldVar+" id: "+ System.identityHashCode(ov) +" -> "+
+	                newVar + " id: " + System.identityHashCode(nv));
     }
     
     public HashMap<SourceElement, SourceElement> getHashMap(){
