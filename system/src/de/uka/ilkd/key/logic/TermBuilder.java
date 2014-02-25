@@ -881,9 +881,9 @@ public class TermBuilder {
             if (a.op() == IfThenElse.IF_THEN_ELSE) {
                 assert a.subs().size() == 3;
                 assert a.sub(0).sort() == Sort.FORMULA;
-                if (a.sub(1) == booleanLDT.getTrueTerm() && a.sub(2) == booleanLDT.getFalseTerm())
+                if (a.sub(1).op() == booleanLDT.getTrueConst() && a.sub(2).op() == booleanLDT.getFalseConst())
                     return a.sub(0);
-                else if (a.sub(1) == booleanLDT.getFalseTerm() && a.sub(2) == booleanLDT.getTrueTerm())
+                else if (a.sub(1).op() == booleanLDT.getFalseConst() && a.sub(2).op() == booleanLDT.getTrueConst())
                     return not(a.sub(0));
             }
             return equals(a, TRUE());
@@ -900,7 +900,7 @@ public class TermBuilder {
             return a;
         } else if (a.sort() == Sort.FORMULA) {
             // special case where a is the result of convertToFormula
-            if (a.op() == Equality.EQUALS && a.sub(1) == booleanLDT.getTrueTerm() ) {
+            if (a.op() == Equality.EQUALS && a.sub(1).op() == booleanLDT.getTrueConst() ) {
                 return a.sub(0);
             }
             return ife(a, TRUE(), FALSE());

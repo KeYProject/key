@@ -89,6 +89,11 @@ public class ServiceCaches {
     * Map from  <code>Term</code>(allTerm) to <code>ClausesGraph</code> 
     */
    private final Map<Term, ClausesGraph> graphCache = new LRUCache<Term, ClausesGraph> (1000);
+
+   /**
+    * Cache used by the TermFactory to avoid unnecessary creation of terms
+    */
+   private final Map<Term, Term> termCache = new LRUCache<Term, Term>(20000);
    
    /**
     * Returns the cache used by {@link TermTacletAppIndexCacheSet} instances.
@@ -124,5 +129,9 @@ public class ServiceCaches {
 
    public Map<Term, ClausesGraph> getGraphCache() {
       return graphCache;
+   }
+
+   public Map<Term, Term> getTermFactoryCache() {
+       return termCache;
    }
 }

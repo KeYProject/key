@@ -235,7 +235,7 @@ public final class SymbolicExecutionUtil {
       }
       return term;
    }
-
+   
    /**
     * Helper method of {@link #improveReadability(Term, Services)}.
     * @param term The {@link Term} to improve.
@@ -267,10 +267,10 @@ public final class SymbolicExecutionUtil {
       if (term.op() == integerLDT.getLessThan()) {
          Term subOne = term.sub(1);
          if (subOne.op() == integerLDT.getAdd()) {
-            if (subOne.sub(0) == integerLDT.one()) {
+            if (isOne(subOne.sub(0), integerLDT)) {
                term = tb.leq(term.sub(0), subOne.sub(1));
             }
-            else if (subOne.sub(1) == integerLDT.one()) {
+            else if (isOne(subOne.sub(1), integerLDT)) {
                term = tb.leq(term.sub(0), subOne.sub(0));
             }
          }
@@ -279,10 +279,10 @@ public final class SymbolicExecutionUtil {
       else if (term.op() == integerLDT.getGreaterOrEquals()) {
          Term subOne = term.sub(1);
          if (subOne.op() == integerLDT.getAdd()) {
-            if (subOne.sub(0) == integerLDT.one()) {
+            if (isOne(subOne, integerLDT)) {
                term = tb.gt(term.sub(0), subOne.sub(1));
             }
-            else if (subOne.sub(1) == integerLDT.one()) {
+            else if (isOne(subOne.sub(1), integerLDT)) {
                term = tb.gt(term.sub(0), subOne.sub(0));
             }
          }
@@ -299,7 +299,7 @@ public final class SymbolicExecutionUtil {
             }
          }
          else if (subOne.op() == integerLDT.getSub()) {
-            if (subOne.sub(1) == integerLDT.one()) {
+            if (isOne(subOne.sub(1), integerLDT)) {
                term = tb.lt(term.sub(0), subOne.sub(0));
             }
          }
@@ -316,7 +316,7 @@ public final class SymbolicExecutionUtil {
             }
          }
          else if (subOne.op() == integerLDT.getSub()) {
-            if (subOne.sub(1) == integerLDT.one()) {
+            if (isOne(subOne.sub(1), integerLDT)) {
                term = tb.geq(term.sub(0), subOne.sub(0));
             }
          }
@@ -338,6 +338,16 @@ public final class SymbolicExecutionUtil {
          }
       }
       return term;
+   }
+
+   /**
+    * Checks if the given term represent the number one
+    * @param subOne the term to be checked
+    * @param integerLDT the LDT for integers
+    * @return true if the term represents the one
+    */
+   private static boolean isOne(Term subOne, IntegerLDT integerLDT) {
+       return subOne.equals(integerLDT.one());
    }
 
    /**
@@ -2743,10 +2753,10 @@ public final class SymbolicExecutionUtil {
          SequentFormula sf = iter.next();
          Term term = sf.formula();
          if (term.op() == Equality.EQUALS) {
-            if (term.sub(0) == skolemConstant) {
+            if (term.sub(0).equals(skolemConstant)) {
                result = term.sub(1);
             }
-            if (term.sub(1) == skolemConstant) {
+            if (term.sub(1).equals(skolemConstant)) {
                result = term.sub(0);
             }
          }
