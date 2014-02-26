@@ -638,13 +638,19 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "apply_auxiliary_eq",
                       // replace skolem constant by it's computed value
                       add( or ( applyTF("t1", IsSelectSkolemConstantTermFeature.INSTANCE),
-                                applyTF("t1", IsHeapFunctionTermFeature.create(heapLDT)) ),
+                                applyTF("t1", 
+                                    add( IsHeapFunctionTermFeature.create(heapLDT),
+                                         not( PrimitiveHeapTermFeature.create(heapLDT) ),
+                                         not( AnonHeapTermFeature.INSTANCE ) ) ) ),
                            longConst(-5500) ) );
         bindRuleSet ( d, "hide_auxiliary_eq",
                       // hide auxiliary equation after the skolem constatns have
                       // been replaced by it's computed value
                       add( or( applyTF( "auxiliarySK", IsSelectSkolemConstantTermFeature.INSTANCE),
-                               applyTF( "auxiliarySK", IsHeapFunctionTermFeature.create(heapLDT)) ),
+                               applyTF( "auxiliarySK",
+                                   add( IsHeapFunctionTermFeature.create(heapLDT),
+                                        not( PrimitiveHeapTermFeature.create(heapLDT) ),
+                                        not( AnonHeapTermFeature.INSTANCE ) ) ) ),
                            applyTF( "result", rec( any(), add( SimplifiedSelectTermFeature.create(heapLDT),
                                                                not( ff.ifThenElse ) ) ) ),
                            not( ContainsTermFeature.create( instOf("result"),

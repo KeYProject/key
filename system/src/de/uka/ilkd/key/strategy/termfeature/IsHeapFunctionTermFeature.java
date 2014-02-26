@@ -14,7 +14,7 @@ package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 
 
@@ -33,8 +33,9 @@ public final class IsHeapFunctionTermFeature extends BinaryTermFeature {
     @Override
     protected boolean filter(Term t) {
         if (t.op() instanceof Function) {
-          return heapLDT.containsFunction(t.op(Function.class))
-                  && t.op(Function.class) != heapLDT.getNull();
+            Function op = t.op(Function.class);
+            return op.arity() == 0 &&
+                   op.sort() == heapLDT.targetSort();
         } else {
             return false;
         }
