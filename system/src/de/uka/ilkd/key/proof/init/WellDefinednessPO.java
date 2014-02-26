@@ -251,8 +251,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final POTerms po = check.replace(check.createPOTerms(), vars);
         final TermAndFunc preCond =
                 check.getPre(po.pre, vars.self, vars.heap, vars.params, false, services);
-        final Term wdPre = tb.wd(preCond.term, services);
-        final Term wdMod = tb.wd(po.mod, services);
+        final Term wdPre = tb.wd(preCond.term);
+        final Term wdMod = tb.wd(po.mod);
         final Term wdRest = tb.and(tb.wd(po.rest));
         register(preCond.func);
         mbyAtPre = preCond.func != null ? check.replace(tb.func(preCond.func), vars) : null;
@@ -262,7 +262,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                                               vars.anonHeap, services);
         final Term wfAnon = tb.wellFormed(vars.anonHeap);
         final Term uPost = check instanceof ClassWellDefinedness ?
-                tb.tt() : tb.apply(updates, tb.wd(post, services));
+                tb.tt() : tb.apply(updates, tb.wd(post));
         final Term imp = tb.imp(tb.and(pre, wfAnon),
                                 tb.and(wdMod, wdRest, uPost));
         final Term poTerms = tb.and(wdPre, imp);

@@ -22,6 +22,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -54,9 +55,9 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     StatementWellDefinedness(String name, int id, Type type, IObserverFunction target,
                              LocationVariable heap, OriginalVariables origVars,
                              Condition requires, Term assignable, Term accessible,
-                             Condition ensures, Term mby, Term rep, TermServices services) {
+                             Condition ensures, Term mby, Term rep, TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires,
-              assignable, accessible, ensures, mby, rep, services);
+              assignable, accessible, ensures, mby, rep, tb);
     }
 
     /**
@@ -108,7 +109,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         final Term post = getPost(po.post, vars.result, services);
         final ImmutableList<Term> wdRest = TB.wd(po.rest);
         final Term updates = getUpdates(po.mod, vars.heap, vars.heap, vars.anonHeap, services);
-        final Term uPost = TB.apply(updates, TB.and(TB.wd(post, services), TB.and(wdRest)));
+        final Term uPost = TB.apply(updates, TB.and(TB.wd(post), TB.and(wdRest)));
         return new SequentTerms(leadingUpdate, pre, vars.anonHeap, po.mod, po.rest, uPost, services);
     }
 
@@ -203,7 +204,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
             this.context = context;
             this.pre = pre;
             this.wfAnon = anonHeap != null ? TB.wellFormed(anonHeap) : TB.tt();
-            this.wdMod = TB.wd(mod, services);
+            this.wdMod = TB.wd(mod);
             this.wdRest = TB.and(TB.wd(rest));
             this.anonWdPost = anonWdPost;
         }
