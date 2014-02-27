@@ -668,7 +668,6 @@ public class SVInstantiations {
     }
 
     public int hashCode() {
-        int hashcode = 0;
         int result = 37 * getUpdateContext().hashCode() + size();
         final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it = 
                 pairIterator();
@@ -677,7 +676,7 @@ public class SVInstantiations {
             result = 37 * result + e.value().getInstantiation().hashCode() + 
                     e.key().hashCode();
         }
-        return hashcode;
+        return result;
     }
 
     public SVInstantiations union(SVInstantiations other, Services services) {
