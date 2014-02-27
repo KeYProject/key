@@ -148,7 +148,8 @@ public abstract class BreakpointStopCondition implements IStopCondition {
    }
    
    /**
-    * Determines whether the execution should stop with the given parameters
+    * Determines if the breakpoint represented by this BreakpointStopConition is triggered.
+    * Override this method in order to suspend execution when a breakpoint is hit.
     * 
     * @param activeStatement the activeStatement of the node
     * @param ruleApp the applied ruleapp

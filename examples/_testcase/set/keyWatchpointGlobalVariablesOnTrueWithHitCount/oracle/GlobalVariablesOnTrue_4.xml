@@ -4,13 +4,13 @@
       <statement name="x_global=17;" pathCondition="true" pathConditionChanged="false">
          <statement name="main(x_global);" pathCondition="true" pathConditionChanged="false">
             <methodCall name="GlobalVariablesOnTrue.main(x_1);" pathCondition="true" pathConditionChanged="false">
-               <branchStatement name="if (x_1&gt;=0) {return 42; }else  {return    -4711; }" pathCondition="true" pathConditionChanged="false">
+               <branchStatement name="if (x_1&gt;=0)" pathCondition="true" pathConditionChanged="false">
                   <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
                      <methodReturn name="&lt;return of GlobalVariablesOnTrue.main(x_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                         <statement name="x_global=-1;" pathCondition="true" pathConditionChanged="false">
                            <statement name="main(x_global);" pathCondition="true" pathConditionChanged="false">
                               <methodCall name="GlobalVariablesOnTrue.main(x_4);" pathCondition="true" pathConditionChanged="false">
-                                 <branchStatement name="if (x_4&gt;=0) {return 42; }else  {return    -4711; }" pathCondition="true" pathConditionChanged="false">
+                                 <branchStatement name="if (x_4&gt;=0)" pathCondition="true" pathConditionChanged="false">
                                     <statement name="return -4711;" pathCondition="true" pathConditionChanged="false">
                                        <methodReturn name="&lt;return of GlobalVariablesOnTrue.main(x_4);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                           <methodReturn name="&lt;return of GlobalVariablesOnTrue.doSomething();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">

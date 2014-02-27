@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="MethodsOnSatisfiable.doSomething();" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (x_global&gt;=0) {main(x_global); }else  {main(x_global); }" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="!MethodsOnSatisfiable.x_global &lt;= -1" pathCondition="!MethodsOnSatisfiable.x_global &lt;= -1" pathConditionChanged="true" branchCondition="!MethodsOnSatisfiable.x_global &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <statement name="main(x_global);" pathCondition="!MethodsOnSatisfiable.x_global &lt;= -1" pathConditionChanged="false">
+      <branchStatement name="if (x_global&gt;=0)" pathCondition="true" pathConditionChanged="false">
+         <branchCondition name="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="main(x_global);" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false">
             </statement>
          </branchCondition>
-         <branchCondition name="!MethodsOnSatisfiable.x_global &gt;= 0" pathCondition="!MethodsOnSatisfiable.x_global &gt;= 0" pathConditionChanged="true" branchCondition="!MethodsOnSatisfiable.x_global &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <statement name="main(x_global);" pathCondition="!MethodsOnSatisfiable.x_global &gt;= 0" pathConditionChanged="false">
+         <branchCondition name="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="true" branchCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="main(x_global);" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false">
             </statement>
          </branchCondition>
       </branchStatement>

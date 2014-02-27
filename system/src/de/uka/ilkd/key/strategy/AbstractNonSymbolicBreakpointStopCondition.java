@@ -20,7 +20,6 @@ public abstract class AbstractNonSymbolicBreakpointStopCondition extends Breakpo
    @Override
    public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
          IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
-      // TODO Auto-generated method stub
       return true;
    }
 

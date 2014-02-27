@@ -2,32 +2,18 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="ClassCastInherit castInto = (ClassCastInherit)this.castable;" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="  self.castable = null
-| ClassCastInherit::instance(self.castable) = TRUE" pathCondition="  self.castable = null
-| ClassCastInherit::instance(self.castable) = TRUE" pathConditionChanged="true" branchCondition="  self.castable = null
-| ClassCastInherit::instance(self.castable) = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <branchStatement name="if (this.x&gt;0) {try {     castInto=(ClassCastInherit)this.castable;return this.next.x;   }catch (Exception e) {return this.x;   } }" pathCondition="  self.castable = null
-| ClassCastInherit::instance(self.castable) = TRUE" pathConditionChanged="false">
-               <branchCondition name="!self.x &lt;= 0" pathCondition="  self.x &gt;= 1
-&amp; (  self.castable = null
-   | ClassCastInherit::instance(self.castable) = TRUE)" pathConditionChanged="true" branchCondition="!self.x &lt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <statement name="castInto=(ClassCastInherit)this.castable;" pathCondition="  self.x &gt;= 1
-&amp; (  self.castable = null
-   | ClassCastInherit::instance(self.castable) = TRUE)" pathConditionChanged="false">
-                     <statement name="return this.next.x;" pathCondition="  self.x &gt;= 1
-&amp; (  self.castable = null
-   | ClassCastInherit::instance(self.castable) = TRUE)" pathConditionChanged="false">
+         <branchCondition name="or(equals(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable),null),equals(ClassCastInherit::instance(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable)),TRUE))" pathCondition="or(equals(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable),null),equals(ClassCastInherit::instance(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable)),TRUE))" pathConditionChanged="true" branchCondition="or(equals(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable),null),equals(ClassCastInherit::instance(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable)),TRUE))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchStatement name="if (this.x&gt;0)" pathCondition="or(equals(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable),null),equals(ClassCastInherit::instance(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable)),TRUE))" pathConditionChanged="false">
+               <branchCondition name="gt(int::select(heap,self,ClassCastAndNullpointerExceptions::$x),Z(0(#)))" pathCondition="and(geq(int::select(heap,self,ClassCastAndNullpointerExceptions::$x),Z(1(#))),or(equals(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable),null),equals(ClassCastInherit::instance(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable)),TRUE)))" pathConditionChanged="true" branchCondition="gt(int::select(heap,self,ClassCastAndNullpointerExceptions::$x),Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="castInto=(ClassCastInherit)this.castable;" pathCondition="and(geq(int::select(heap,self,ClassCastAndNullpointerExceptions::$x),Z(1(#))),or(equals(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable),null),equals(ClassCastInherit::instance(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable)),TRUE)))" pathConditionChanged="false">
+                     <statement name="return this.next.x;" pathCondition="and(geq(int::select(heap,self,ClassCastAndNullpointerExceptions::$x),Z(1(#))),or(equals(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable),null),equals(ClassCastInherit::instance(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable)),TRUE)))" pathConditionChanged="false">
                      </statement>
                   </statement>
                </branchCondition>
             </branchStatement>
          </branchCondition>
-         <branchCondition name="!(  self.castable = null
-  | ClassCastInherit::instance(self.castable) = TRUE)" pathCondition="!(  self.castable = null
-  | ClassCastInherit::instance(self.castable) = TRUE)" pathConditionChanged="true" branchCondition="!(  self.castable = null
-  | ClassCastInherit::instance(self.castable) = TRUE)" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.ClassCastException&gt;" pathCondition="!(  self.castable = null
-  | ClassCastInherit::instance(self.castable) = TRUE)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+         <branchCondition name="not(or(equals(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable),null),equals(ClassCastInherit::instance(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable)),TRUE)))" pathCondition="not(or(equals(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable),null),equals(ClassCastInherit::instance(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable)),TRUE)))" pathConditionChanged="true" branchCondition="not(or(equals(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable),null),equals(ClassCastInherit::instance(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable)),TRUE)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <termination name="&lt;uncaught java.lang.ClassCastException&gt;" pathCondition="not(or(equals(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable),null),equals(ClassCastInherit::instance(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable)),TRUE)))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
             </termination>
          </branchCondition>
       </statement>

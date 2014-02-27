@@ -17,7 +17,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotAddBreakpointsPostResume;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotAddBreakpointsPostTarget;
-import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotAddBreakpointsPreTarget;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotChangeAccessModification;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotChangeCaughtUncaughtSubclasses;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotChangeConditonWithErrorCancel;
@@ -65,7 +64,6 @@ import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotStepReturnTest;
    SWTBotStepReturnTest.class,
    SWTBotAddBreakpointsPostResume.class,
    SWTBotAddBreakpointsPostTarget.class,
-   SWTBotAddBreakpointsPreTarget.class,
    SWTBotChangeAccessModification.class,
    SWTBotChangeCaughtUncaughtSubclasses.class,
    SWTBotChangeConditonWithErrorCancel.class,

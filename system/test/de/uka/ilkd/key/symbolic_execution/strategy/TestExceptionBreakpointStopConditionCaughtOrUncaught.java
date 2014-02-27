@@ -14,7 +14,11 @@ import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
-
+/**
+ * Tests whether caught and uncaught ExceptionBreakpoints are handled correctly
+ * 
+ * @author Marco Drebing
+ */
 public class TestExceptionBreakpointStopConditionCaughtOrUncaught extends
       AbstractSymbolicExecutionTestCase {
 
