@@ -65,6 +65,11 @@ public final class UnicodeHelper {
     public static final char LLBRACKET = '\u27E6';
     public static final char RRBRACKET = '\u27E7';
 
+    // sequences
+    public static final char SEQ_SINGLETON_L = '\u2329';
+    public static final char SEQ_SINGLETON_R = '\u232A';
+    public static final char SEQ_CONCAT = '\u2218';
+
     // greek alphabet
     public static final char ALPHA = '\u03B1';
     public static final char BETA = '\u03B2';

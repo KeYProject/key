@@ -1179,6 +1179,17 @@ public final class LogicPrinter {
     }  
     
     
+    public void printSeqSingleton(Term t, String lDelimiter, String rDelimiter) throws IOException {
+	assert t.arity() == 1;
+	startTerm(1);
+	layouter.print(lDelimiter).beginC(0);
+	markStartSub();
+	printTerm(t.sub(0));
+	markEndSub();
+	layouter.print(rDelimiter).end();
+    }
+
+
     public void printElementOf(Term t) throws IOException {
 	assert t.arity() == 3;
 	startTerm(3);
