@@ -98,7 +98,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
                 return true;
             }
 
-            // abort if
+            // approve if
             //  - the parent.parent rule application is an information
             //    flow contract rule application,
             //  - the parent rule application is an impLeft rule application
