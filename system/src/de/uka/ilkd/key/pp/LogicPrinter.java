@@ -866,11 +866,13 @@ public class LogicPrinter {
             startTerm(0);
             layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
         } else {
-            if(t.hasLabels() && notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
+            if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+					&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
                 layouter.print("(");
             }
             notationInfo.getNotation(t.op()).print(t,this);
-            if(t.hasLabels() && notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
+            if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+					&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
                 layouter.print(")");
             }
         }
@@ -965,11 +967,13 @@ public class LogicPrinter {
      *
      * @param t the Term to be printed */
     public void printTermContinuingBlock(Term t) throws IOException {
-       if(t.hasLabels() && notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
+       if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+				&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
            layouter.print("(");
        }
        notationInfo.getNotation(t.op()).printContinuingBlock(t,this);
-       if(t.hasLabels() && notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
+       if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+				&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
            layouter.print(")");
        }
        if (t.hasLabels()) {
