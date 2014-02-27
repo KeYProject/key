@@ -20,6 +20,7 @@ import java.io.StringWriter;
 import javax.swing.JMenuItem;
 
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
@@ -44,7 +45,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
      * @param notationInfo the NotationInfo used to print terms
      */
     public DefaultTacletMenuItem(JMenuItem menu, 
-            TacletApp connectedTo, NotationInfo notationInfo) {
+            TacletApp connectedTo, NotationInfo notationInfo, Services services) {
         super(connectedTo.taclet().displayName());
         this.connectedTo = connectedTo;	    	    
         StringBuilder taclet_sb = new StringBuilder();
@@ -53,7 +54,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         WriterBackend backend = new WriterBackend(w, 68);
         SequentViewLogicPrinter tp = new SequentViewLogicPrinter(new ProgramPrinter(w,
                 connectedTo.instantiations()),
-                notationInfo, backend, null,
+                notationInfo, backend, services,
                 true,
                 MainWindow.getInstance().getVisibleTermLabels());
         tp.printTaclet(connectedTo.taclet(), 
