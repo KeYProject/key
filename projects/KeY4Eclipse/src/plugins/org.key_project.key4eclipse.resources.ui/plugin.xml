@@ -128,4 +128,16 @@
          </enabledWhen>
       </page>
    </extension>
+      <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.eclipse.ui.editors.text.TextEditor"
+            contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
+            default="true"
+            extensions="meta"
+            icon="icons/proofmetafile16.png"
+            id="org.key_project.key4eclipse.common.ui.keyTextEditor"
+            name="Proof Meta Text Editor">
+      </editor>
+   </extension>
 </plugin>

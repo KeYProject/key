@@ -159,8 +159,6 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	private final ImmutableSLList<S> cons;
 	/** size of the list */
 	private final int size;
-	/** caches the hashcode */
-	private int hashCode = -1;
 
 	/** new list with only one element
 	 * @param element the only element in list
@@ -247,19 +245,20 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	}
 
 	/**
-	 * hashcode for collections, implemented same algorithm as
+	 * hashcode for collections, implemented similar (just reverse) algorithm as
          * java.util.Collections use
 	 * @return the hashcode of the list
          */
         @Override
 	public int hashCode() {
-	    if (hashCode == -1) {
-		hashCode = (element == null ? 0 : element.hashCode()) +
-		31*cons.hashCode();
-		if (hashCode == -1) {
-		    hashCode = 2;
-		}
-	    }
+            int hashCode = 0;
+            ImmutableList<S> crt = this;
+
+            while (!crt.isEmpty()) {
+                final S element = crt.head();
+                hashCode = (element == null ? 0 : element.hashCode()) + 31 * hashCode;                
+                crt = crt.tail();
+            }
 	    return hashCode;
 	}
 

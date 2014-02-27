@@ -20,12 +20,12 @@ import java.io.File;
 import java.util.List;
 
 import de.uka.ilkd.key.gui.ApplyStrategy;
+import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.gui.KeYMediator;
 import static de.uka.ilkd.key.gui.Main.Verbosity.*;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -75,7 +75,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
         final Proof proof = info.getProof();
         if (proof==null) {
             if (verbosity > SILENT) System.out.println("Proof loading failed");
-            return;
+            System.exit(1);
         }
         final int openGoals = proof.openGoals().size();
         final Object result2 = info.getResult();
@@ -107,7 +107,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                 }
                 System.exit(-1);
             }
-            if(batchMode.isLoadOnly() ||  openGoals==0) {
+            if(batchMode.isLoadOnly() || openGoals==0) {
                 if (verbosity > SILENT)
                 System.out.println("Number of open goals after loading: " +
                         openGoals);
@@ -272,7 +272,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    public ProblemInitializer createProblemInitializer(Profile profile) {
       ProblemInitializer pi = new ProblemInitializer(this,
             new Services(profile, mediator.getExceptionHandler()),
-            false,
             this);
       return pi;
    }
@@ -424,11 +423,4 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        pcs.firePropertyChange(propertyName, oldValue, newValue);
    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected boolean isRegisterProofs() {
-      return false;
-   }
 }

@@ -14,14 +14,14 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
 
 
 /** This class represents a sequent. A sequent consists of an
@@ -331,23 +331,6 @@ public class Sequent implements Iterable<SequentFormula> {
        return formulaNumber <= antecedent.size();
     }
 
-    public void prettyprint(de.uka.ilkd.key.pp.LogicPrinter printer) {
-	printer.printSequent(this);
-    }
-
-    public void prettyprint(de.uka.ilkd.key.pp.LogicPrinter printer, SequentPrintFilter filter) {
-	printer.printSequent(this, true);
-    }
-
-
-    public StringBuffer prettyprint(Services services) {
-	de.uka.ilkd.key.pp.LogicPrinter lp = (new de.uka.ilkd.key.pp.LogicPrinter
-					       (new de.uka.ilkd.key.pp.ProgramPrinter(null),
-						new NotationInfo(),
-						services));
-	lp.printSequent(this);
-	return lp.result();
-    }
 
     /** removes the formula at position p (NOTICE:Sequent determines
      * index using identity (==) not equality.)
@@ -443,5 +426,35 @@ public class Sequent implements Iterable<SequentFormula> {
         public void remove() {
             throw new UnsupportedOperationException();
         }
-    }    
+    }
+    
+    /*
+     * Returns names of TermLabels, that occur in term or one of its subterms.
+     */
+    private static Set<Name> getLabelsForTermRecursively(Term term) {
+        Set<Name> result = new HashSet<Name>();
+
+        if (term.hasLabels()) {
+            for (TermLabel label : term.getLabels()) {
+                result.add(label.name());
+            }
+        }
+
+        for (final Term subTerm : term.subs()) {
+            result.addAll(getLabelsForTermRecursively(subTerm));
+        }
+
+        return result;
+    }
+
+    /*
+     * Returns names of TermLabels, that occur in this sequent.
+     */
+    public Set<Name> getOccuringTermLabels() {
+        final Set<Name> result = new HashSet<Name>();
+        for (final SequentFormula sf : this) {
+            result.addAll(getLabelsForTermRecursively(sf.formula()));
+        }
+        return result;
+    }
 }

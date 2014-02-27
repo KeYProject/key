@@ -77,50 +77,49 @@ public final class DependencyContractPO extends AbstractPO
         //"self != null"
 	final Term selfNotNull 
             = selfVar == null
-              ? TB.tt()
-              : TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
+              ? tb.tt()
+              : tb.not(tb.equals(tb.var(selfVar), tb.NULL()));
               
         //"self.<created> = TRUE" for all heaps
 
         Term selfCreated = null;
         if (selfVar != null) {
             for(LocationVariable h : heaps) {
-                final Term sc = TB.created(services, TB.var(h), TB.var(selfVar));
+                final Term sc = tb.created(tb.var(h), tb.var(selfVar));
                 if (selfCreated == null) {
                     selfCreated = sc;
                 }else{
-                    selfCreated = TB.and(selfCreated, sc);
+                    selfCreated = tb.and(selfCreated, sc);
                 }
             }
             if (preHeaps != null) {
                 for(LocationVariable h : preHeaps) {
-                    final Term sc = TB.created(services, TB.var(h), TB.var(selfVar));
+                    final Term sc = tb.created(tb.var(h), tb.var(selfVar));
                     if (selfCreated == null) {
                        selfCreated = sc;
                     } else {
-                       selfCreated = TB.and(selfCreated, sc);
+                       selfCreated = tb.and(selfCreated, sc);
                     }
                 }
             }
         } else {
-            selfCreated = TB.tt();
+            selfCreated = tb.tt();
         }
 
         //"MyClass::exactInstance(self) = TRUE"
         final Term selfExactType
            = selfVar == null
-             ? TB.tt()
-             : TB.exactInstance(services, 
-        	                selfKJT.getSort(), 
-        	                TB.var(selfVar));
+             ? tb.tt()
+             : tb.exactInstance(selfKJT.getSort(), 
+        	                tb.var(selfVar));
 
 
         //conjunction of... 
         //- "p_i = null | p_i.<created> = TRUE" for object parameters, and
         //- "inBounds(p_i)" for integer parameters
-        Term paramsOK = TB.tt();
+        Term paramsOK = tb.tt();
         for(ProgramVariable paramVar : paramVars) {
-            paramsOK = TB.and(paramsOK, TB.reachableValue(services, paramVar));
+            paramsOK = tb.and(paramsOK, tb.reachableValue(paramVar));
         }
 
         //initial value of measured_by clause
@@ -137,18 +136,14 @@ public final class DependencyContractPO extends AbstractPO
 */
             final Term mby = contract.getMby(selfVar, paramVars, services);
 //            mbyAtPreDef = TB.equals(mbyAtPre, mby);
-            mbyAtPreDef = TB.measuredBy(mby, services);
+            mbyAtPreDef = tb.measuredBy(mby);
         } else {
 //            mbyAtPreDef = TB.tt();
-            mbyAtPreDef = TB.measuredByEmpty(services);
+            mbyAtPreDef = tb.measuredByEmpty();
         }        
              
-        return TB.and(new Term[]{wellFormedHeaps,
-        	       		 selfNotNull,
-        	       		 selfCreated,
-        	       		 selfExactType,
-        	       		 paramsOK,
-        	       		 mbyAtPreDef});        
+        return tb.and(wellFormedHeaps, selfNotNull, selfCreated,
+                selfExactType, paramsOK, mbyAtPreDef);
     }    
     
     
@@ -170,9 +165,9 @@ public final class DependencyContractPO extends AbstractPO
 	//prepare variables
 	final ProgramVariable selfVar
                 = !contract.getTarget().isStatic() 
-                ? TB.selfVar(services, contract.getKJT(), true) : null;
+                ? tb.selfVar(contract.getKJT(), true) : null;
 	final ImmutableList<ProgramVariable> paramVars
-		= TB.paramVars(services, target, true);
+		= tb.paramVars(target, true);
 
 	final boolean twoState = (contract.getTarget().getStateCount() == 2);
 	final int heapCount = contract.getTarget().getHeapCount(services);
@@ -189,7 +184,7 @@ public final class DependencyContractPO extends AbstractPO
 	    }
 	    heaps.add(h);
 	    LocationVariable preVar = twoState ?
-	            TB.heapAtPreVar(services, h.name()+"AtPre", h.sort(), true)
+	            tb.heapAtPreVar(h.name()+"AtPre", h.sort(), true)
 	            : null ;
 	    if(preVar != null) { register(preVar); }
 	    preHeapVars.put(h, preVar);
@@ -209,65 +204,65 @@ public final class DependencyContractPO extends AbstractPO
         Term wellFormedHeaps = null;
         Term update = null;
         for(LocationVariable h : heaps) {
-            final Term wellFormedHeap = TB.wellFormed(h, services);
+            final Term wellFormedHeap = tb.wellFormed(h);
             if(wellFormedHeaps == null) {
                 wellFormedHeaps = wellFormedHeap;
             } else {
-                wellFormedHeaps = TB.and(wellFormedHeaps, wellFormedHeap);
+                wellFormedHeaps = tb.and(wellFormedHeaps, wellFormedHeap);
             }
             //prepare anon heap
-            final Name anonHeapName = new Name(TB.newName(services, "anon_"+h.toString()));
+            final Name anonHeapName = new Name(tb.newName("anon_"+h.toString()));
             final Function anonHeapFunc = new Function(anonHeapName, heapLDT.targetSort());
             register(anonHeapFunc);
-            final Term anonHeap = TB.label(TB.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
-            final Term wellFormedAnonHeap = TB.wellFormed(anonHeap, services);
+            final Term anonHeap = tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
+            final Term wellFormedAnonHeap = tb.wellFormed(anonHeap);
             if(wellFormedHeaps == null) {
                 wellFormedHeaps = wellFormedAnonHeap;
             } else {
-                wellFormedHeaps = TB.and(wellFormedHeaps,wellFormedAnonHeap);
+                wellFormedHeaps = tb.and(wellFormedHeaps,wellFormedAnonHeap);
             }
             //prepare update
             final boolean atPre = preHeapVars.values().contains(h);
             final Term dep = getContract().getDep(atPre ?
                     preHeapVarsReverse.get(h) : h, atPre, selfVar, paramVars, preHeapVars, services);
             final Term changedHeap =
-                    TB.anon(services, TB.var(h),
-                            TB.setMinus(services, TB.allLocs(services), dep), anonHeap);
-            final Term u = TB.elementary(services, h, changedHeap);
+                    tb.anon(tb.var(h), tb.setMinus(tb.allLocs(), dep),
+                            anonHeap);
+            final Term u = tb.elementary(h, changedHeap);
             if (update == null) {
                 update = u;
             } else {
-                update = TB.parallel(update, u);
+                update = tb.parallel(update, u);
             }
         }
 
 	//translate contract
-	final Term pre = TB.and(
+	final Term pre = tb.and(
 	   buildFreePre(heaps, twoState ? preHeapVars.values() : null, selfVar,
 	                contract.getKJT(), paramVars, wellFormedHeaps),
 	                contract.getPre(heapLDT.getHeap(), selfVar, paramVars,
 	                                null, services));
 
-	assert heaps.size() == heapCount;
+	assert heaps.size() == heapCount * contract.getTarget().getStateCount();
 	//prepare target term
 	final Term[] subs
 	    = new Term[paramVars.size() + heaps.size() + (target.isStatic() ? 0 : 1)];
 	int offset = 0;
 	for(LocationVariable heap : heaps) {
-	    subs[offset++] = TB.var(heap);
+	    subs[offset++] = tb.var(heap);
 	}
 	if(!target.isStatic()) {
-	    subs[offset++] = TB.var(selfVar);
+	    subs[offset++] = tb.var(selfVar);
 	}
 	for(ProgramVariable paramVar : paramVars) {
-	    subs[offset++] = TB.var(paramVar);
+	    subs[offset++] = tb.var(paramVar);
 	}
-	final Term targetTerm = TB.func(target, subs);
+	final Term targetTerm = tb.func(target, subs);
 	
 	//build po
-	final Term po = TB.imp(pre,
-                               TB.equals(targetTerm, 
-                        	         TB.apply(update, targetTerm, null)));
+	final Term po = tb.imp(pre,
+                               tb.equals(targetTerm, 
+                        	         tb.apply(update, targetTerm, null)));
 	
         //save in field
         assignPOTerms(po);

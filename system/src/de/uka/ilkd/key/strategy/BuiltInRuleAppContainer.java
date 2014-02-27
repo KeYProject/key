@@ -81,11 +81,9 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
             if(topPos == null) {
         	//the formula does not exist anymore, bail out
         	return false;
-            } else if(topPos.constrainedFormula()
-        	            .equals(applicationPosition.constrainedFormula())) {
-        	return true;
             } else {
-        	return false;
+                return topPos.constrainedFormula()
+                    .equals(applicationPosition.constrainedFormula());
             }
 	}
     }
@@ -162,7 +160,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         }                
         
         final BuiltInRule rule = bir.rule();
-        IBuiltInRuleApp app = rule.createApp(pio);
+        IBuiltInRuleApp app = rule.createApp(pio, goal.proof().getServices());
 		
 		if (!app.complete()) {
 		    app = app.setIfInsts(bir.ifInsts());

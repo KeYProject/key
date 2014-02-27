@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -36,15 +37,20 @@ public class TestStepReturnSymbolicExecutionTreeNodesStopCondition extends Abstr
     * Does some step return tests on one branch.
     */
    public void testStepReturn() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+      HashMap<String, String> originalTacletOptions = null;
+      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = null;
+      boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       // Define test settings
       String javaPathInkeyRepDirectory = "examples/_testcase/set/stepReturnTest/test/StepReturnTest.java";
       String containerTypeName = "StepReturnTest";
       final String methodFullName = "main";
       String oraclePathInkeyRepDirectoryFile = "examples/_testcase/set/stepReturnTest/oracle/StepReturnTest";
       String oracleFileExtension = ".xml";
-      // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false);
       try {
+         originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
+         setOneStepSimplificationEnabled(null, true);
+         // Create proof environment for symbolic execution
+         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false);
          // Make sure that initial tree is valid
          int oracleIndex = 0;
          assertSetTreeAfterStep(env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory);
@@ -64,7 +70,11 @@ public class TestStepReturnSymbolicExecutionTreeNodesStopCondition extends Abstr
          stepReturn(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory); // end
       }
       finally {
-         env.dispose();
+         setOneStepSimplificationEnabled(null, originalOneStepSimplification);
+         restoreTacletOptions(originalTacletOptions);
+         if (env != null) {
+            env.dispose();
+         }
       }
   }
 }

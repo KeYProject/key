@@ -14,28 +14,36 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.util.LRUCache;
+import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.IfThenElse;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 
 /**
  * This class is used to select and store <code>Trigger</code>s 
  * for a quantified formula in Prenex CNF(PCNF).
  */
-class TriggersSet {
+public class TriggersSet {
 
-    /**a <code>HashMap</code> from <code>Term</code> to 
-     * <code>TriggersSet</code> uses to cache all created TriggersSets*/
-    private final static Map<Term, TriggersSet> cache = new LRUCache<Term, TriggersSet>(1000);
     /** Quantified formula of PCNF*/
     private final Term allTerm;
     /**all <code>Trigger</code>s  for <code>allTerm</code>*/
@@ -54,17 +62,17 @@ class TriggersSet {
 
     private TriggersSet(Term allTerm, Services services) {
         this.allTerm = allTerm;
-        replacementWithMVs = ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars(allTerm);
+        replacementWithMVs = ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars(allTerm, services);
         uniQuantifiedVariables = getAllUQS(allTerm);
         initTriggers(services);
     }
 
     static TriggersSet create(Term allTerm, Services services) {
-        TriggersSet trs = cache.get(allTerm);
+        TriggersSet trs = services.getCaches().getTriggerSetCache().get(allTerm);
         if (trs == null) {
             // add check whether it is in PCNF
             trs = new TriggersSet(allTerm, services);
-            cache.put(allTerm, trs);
+            services.getCaches().getTriggerSetCache().put(allTerm, trs);
         }         return trs;
     }
 
@@ -185,7 +193,7 @@ class TriggersSet {
                     TriggerUtils.iteratorByOperator(clause, Junctor.OR);
             while (it.hasNext()) {
                 final Term oriTerm = it.next();
-                for (Term term : expandIfThenElse(oriTerm)) {
+                for (Term term : expandIfThenElse(oriTerm, services)) {
                     Term t = term;
                     if (t.op() == Junctor.NOT) {
                         t = t.sub(0);
@@ -227,12 +235,12 @@ class TriggersSet {
             return foundSubtriggers;
         }
 
-        private Set<Term> expandIfThenElse(Term t) {
+        private Set<Term> expandIfThenElse(Term t, TermServices services) {
             final Set<Term>[] possibleSubs = new Set[t.arity()];
             boolean changed = false;
             for (int i = 0; i != t.arity(); ++i) {
                 final Term oriSub = t.sub(i);
-                possibleSubs[i] = expandIfThenElse(oriSub);
+                possibleSubs[i] = expandIfThenElse(oriSub, services);
                 changed = changed || possibleSubs[i].size() != 1 || possibleSubs[i].iterator().next() != oriSub;
             }
 
@@ -249,7 +257,7 @@ class TriggersSet {
 
             final Term[] chosenSubs = new Term[t.arity()];
             res.addAll(combineSubterms(t, possibleSubs, chosenSubs,
-                    t.boundVars(), 0));
+                    t.boundVars(), 0, services));
             return res;
         }
 
@@ -257,11 +265,11 @@ class TriggersSet {
                 Set<Term>[] possibleSubs,
                 Term[] chosenSubs,
                 ImmutableArray<QuantifiableVariable> boundVars,
-                int i) {
+                int i, TermServices services) {
             final HashSet<Term> set = new LinkedHashSet<Term>();
             if (i >= possibleSubs.length) {
                 final Term res =
-                        TermFactory.DEFAULT.createTerm(oriTerm.op(),
+                        services.getTermFactory().createTerm(oriTerm.op(),
                         chosenSubs,
                         boundVars,
                         oriTerm.javaBlock());
@@ -276,7 +284,7 @@ class TriggersSet {
                 chosenSubs[i] = term;
                 set.addAll(combineSubterms(oriTerm, possibleSubs,
                         chosenSubs, boundVars,
-                        i + 1));
+                        i + 1, services));
             }
             return set;
         }

@@ -16,6 +16,7 @@ package de.uka.ilkd.key.logic;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.SourceElement;
 
@@ -29,10 +30,9 @@ public abstract class RenamingTable{
     public static RenamingTable getRenamingTable(HashMap<? extends SourceElement, ? extends SourceElement> hmap){
 	if (hmap.size()==0)return null;
 	if (hmap.size()==1){
-	    SourceElement[] oldVar= hmap.keySet().toArray(new SourceElement[]{});
-	    // XXX chosing entry 0 from a _set_ is quite arbitrarily, isnt it???
-	    SourceElement newVar= hmap.get(oldVar[0]);
-	    return new SingleRenamingTable(oldVar[0],newVar);
+	    Entry<? extends SourceElement, ? extends SourceElement> entry = 
+	            hmap.entrySet().iterator().next();
+	    return new SingleRenamingTable(entry.getKey(), entry.getValue());
 	}
 	else return new MultiRenamingTable(hmap);
     }

@@ -26,22 +26,29 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.TacletForTests;
 
 
 public class TestPosInOcc extends TestCase {
     
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static TermBuilder TB;
 
     public TestPosInOcc(String name) {
 	super(name);
     }
 
+    @Override
+    public void setUp () {
+       TB = TacletForTests.services().getTermBuilder();
+    }
+    
     public void testIterator () {
 	Sort sort1=new SortImpl(new Name("S1"));
 	LogicVariable x=new LogicVariable(new Name("x"),sort1);  
 	Function f=new Function(new Name("f"),sort1,new Sort[]{sort1});
 	Function p=new Function(new Name("p"),Sort.FORMULA,new Sort[]{sort1});
 
+	
 	Term terms[] = new Term [ 3 ];
 	terms[0]     = TB.var ( x );
 	terms[1]     = TB.func ( f, new Term[] { terms[0] } );
@@ -49,7 +56,7 @@ public class TestPosInOcc extends TestCase {
 
 	PosInOccurrence pio = new PosInOccurrence
 	    ( new SequentFormula ( terms[2] ),
-	      PosInTerm.TOP_LEVEL,
+	      PosInTerm.getTopLevel(),
 	    true);
 
 	PIOPathIterator it = pio.iterator ();
@@ -114,7 +121,7 @@ public class TestPosInOcc extends TestCase {
         SequentFormula cfma2 = new SequentFormula ( terms2[3] );
 
         final PosInOccurrence topPIO = new PosInOccurrence ( cfma,
-                                                             PosInTerm.TOP_LEVEL,
+                                                             PosInTerm.getTopLevel(),
                                                              true );
 
 

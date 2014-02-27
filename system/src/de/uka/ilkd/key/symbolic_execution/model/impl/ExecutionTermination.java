@@ -27,12 +27,11 @@ import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.util.Pair;
@@ -137,7 +136,7 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
          // Search final value of the exceptional variable which is used to check if the verified program terminates normally
          ImmutableArray<Term> value = null;
          for (SequentFormula f : getProofNode().sequent().succedent()) {
-            Pair<ImmutableList<Term>,Term> updates = TermBuilder.DF.goBelowUpdates2(f.formula());
+            Pair<ImmutableList<Term>,Term> updates = TermBuilder.goBelowUpdates2(f.formula());
             Iterator<Term> iter = updates.first.iterator();
             while (value == null && iter.hasNext()) {
                value = extractValueFromUpdate(iter.next(), exceptionVariable);
@@ -162,8 +161,8 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
                                                          IProgramVariable variable) {
       ImmutableArray<Term> result = null;
       if (term.op() instanceof ElementaryUpdate) {
-         ElementaryUpdate update = (ElementaryUpdate)term.op();;
-         if (JavaUtil.equals(variable, update.lhs())) {
+         ElementaryUpdate update = (ElementaryUpdate)term.op();
+          if (JavaUtil.equals(variable, update.lhs())) {
             result = term.subs();
          }
       }
@@ -206,7 +205,7 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
          // Check if node can be treated as verified/closed
          if (predicate != null) {
             boolean verified = true;
-            NodeIterator leafsIter = getProofNode().leavesIterator();
+            Iterator<Node> leafsIter = getProofNode().leavesIterator();
             while (verified && leafsIter.hasNext()) {
                Node leaf = leafsIter.next();
                if (!leaf.isClosed()) {

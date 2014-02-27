@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.proof.Goal;
@@ -37,7 +38,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
     * @param tacletTerm The optional taclet {@link Term}.
     * @return The required {@link RefactoringScope}.
     */
-   public RefactoringScope defineRefactoringScope(Services services,
+   public RefactoringScope defineRefactoringScope(TermServices services,
                                                   PosInOccurrence applicationPosInOccurrence,
                                                   Term applicationTerm,
                                                   Rule rule,
@@ -55,7 +56,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
     * @param term The {@link Term} which is now refactored.
     * @param labels The new labels the {@link Term} will have after the refactoring.
     */
-   public void refactoreLabels(Services services,
+   public void refactoreLabels(TermServices services,
                                PosInOccurrence applicationPosInOccurrence,
                                Term applicationTerm,
                                Rule rule,
@@ -87,6 +88,6 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
       /**
        * Refactor the whole sequent.
        */
-      SEQUENT;
+      SEQUENT
    }
 }

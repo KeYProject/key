@@ -38,8 +38,6 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
@@ -83,7 +81,7 @@ import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 /**
  * The front end for the Sequent pretty-printer.  It prints a sequent
  * and its parts and computes the PositionTable, which is needed for
- * highliting.
+ * highlighting.
  *
  * <P>The actual layouting/formatting is done using the {@link
  * de.uka.ilkd.key.util.pp.Layouter} class.  The concrete syntax for
@@ -98,7 +96,7 @@ import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
  *
  *
  */
-public final class LogicPrinter {
+public class LogicPrinter {
 
     /**
      * The default and minimal value o fthe
@@ -136,7 +134,6 @@ public final class LogicPrinter {
     private enum QuantifiableVariablePrintMode {NORMAL, WITH_OUT_DECLARATION}
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
             QuantifiableVariablePrintMode.NORMAL;
-
     
     public static String quickPrintTerm(Term t, Services services) {
         final NotationInfo ni = new NotationInfo();
@@ -197,21 +194,20 @@ public final class LogicPrinter {
                     (simulates the behaviour of the former PureSequentPrinter)
      */
     public LogicPrinter(ProgramPrinter prgPrinter,
-                        NotationInfo notationInfo,
-                        Backend backend, 
-                        Services services,
-                        boolean purePrint) {
-	this.backend      = backend;
-	this.layouter     = new Layouter(backend,2);
-	this.prgPrinter   = prgPrinter;
-	this.notationInfo = notationInfo;
-	this.services     = services;
-	this.pure         = purePrint;
-	if(services != null) {
-	    notationInfo.refresh(services);
-	}
-    }    
-    
+            NotationInfo notationInfo,
+            Backend backend,
+            Services services,
+            boolean purePrint) {
+        this.backend = backend;
+        this.layouter = new Layouter(backend, 2);
+        this.prgPrinter = prgPrinter;
+        this.notationInfo = notationInfo;
+        this.services = services;
+        this.pure = purePrint;
+        if (services != null) {
+            notationInfo.refresh(services);
+        }
+    }
 
     /**
      * Creates a LogicPrinter.  Sets the sequent to be printed, as
@@ -244,17 +240,15 @@ public final class LogicPrinter {
      * @param services     the Services object               
      */
     public LogicPrinter(ProgramPrinter prgPrinter,
-                        NotationInfo notationInfo, 
-                        Services services,
-                        boolean purePrint) {
-	this(prgPrinter, 
-	     notationInfo,
-	     new PosTableStringBackend(DEFAULT_LINE_WIDTH), 
-	     services,
-	     purePrint);
+            NotationInfo notationInfo,
+            Services services,
+            boolean purePrint) {
+        this(prgPrinter,
+                notationInfo,
+                new PosTableStringBackend(DEFAULT_LINE_WIDTH),
+                services,
+                purePrint);
     }
-
-
 
 
     /**
@@ -292,7 +286,6 @@ public final class LogicPrinter {
 
     /** Reprints the sequent.  This can be useful if settings like
      * PresentationFeatures or abbreviations have changed.
-     * @param seq The Sequent to be reprinted
      * @param filter The SequentPrintFilter for seq
      * @param lineWidth the max. number of character to put on one line
      *   (the actual taken linewidth is the max of
@@ -534,7 +527,7 @@ public final class LogicPrinter {
     }
 
     protected void printHeuristics(Taclet taclet) throws IOException{
-        if (taclet.getRuleSets().size() == 0) {
+        if (taclet.getRuleSets().isEmpty()) {
                 return;
         }
                 layouter.brk().beginC(2).print("\\heuristics (");
@@ -792,7 +785,6 @@ public final class LogicPrinter {
      * formula, the sequent arrow is on a line of its own, and formulae
      * are indented w.r.t. the arrow.
      * A line-break is printed after the Sequent.
-     * @param seq The Sequent to be pretty-printed
      * @param filter The SequentPrintFilter for seq
      */
     public void printSequent(SequentPrintFilter filter) {
@@ -886,11 +878,31 @@ public final class LogicPrinter {
             printLabels(t);
         }
     }
+    
+    /*
+     * Use this method to determine the Set of printed TermLabels. 
+     * The class SequentViewLogicPrinter overrides this method.
+     * The default is to print all TermLabels.
+     */
+    protected ImmutableArray<TermLabel> getVisibleTermLabels(Term t){
+        return t.getLabels();
+    }
 
     public void printLabels(Term t) throws IOException {
-        layouter.beginC().print("\u00ab"); //  ("<<");
+        notationInfo.getNotation(TermLabel.class).print(t, this);
+    }
+
+    void printLabels(Term t, String left, String right) throws IOException {
+        
+        ImmutableArray<TermLabel> termLabelList = getVisibleTermLabels(t);
+        if (termLabelList.isEmpty()) {
+            return;
+        }
+        
+        layouter.beginC().print(left);
         boolean afterFirst = false;
-        for (TermLabel l : t.getLabels()) {
+        
+        for (TermLabel l : termLabelList) {
             if (afterFirst) {
                layouter.print(",").brk(1, 0);
             }
@@ -909,9 +921,9 @@ public final class LogicPrinter {
                layouter.end().print(")");
             }
         }
-        layouter.end().print("\u00bb"); // (">>");
+        layouter.end().print(right);
     }
-
+    
     /**
      * Pretty-prints a set of terms.
      * @param terms the terms to be printed
@@ -986,7 +998,7 @@ public final class LogicPrinter {
             final String prettyFieldName 
             	= services.getTypeConverter()
                           .getHeapLDT()
-                          .getPrettyFieldName((Function)t.op());            
+                          .getPrettyFieldName(t.op());
             layouter.print(prettyFieldName);
         } 
         
@@ -1090,6 +1102,10 @@ public final class LogicPrinter {
         } else {
             printFunctionTerm(t.op().name().toString(), t);
         }
+    }
+    
+    public void printClassName (String className) throws IOException {
+        layouter.print(className);
     }
 
     public void printCreate(Term t, boolean closingBrace) throws IOException {
@@ -1218,7 +1234,7 @@ public final class LogicPrinter {
                 layouter.print("{"); // ("\u27E6");
             }
 
-            if(objectTerm.equals(TermBuilder.DF.NULL(services))
+            if(objectTerm.equals(services.getTermBuilder().NULL())
                     && fieldTerm.op() instanceof Function
                     && ((Function)fieldTerm.op()).isUnique()) {
 
@@ -1232,7 +1248,7 @@ public final class LogicPrinter {
                     markStartSub();
                     // "null" not printed
                     markEndSub();
-                    layouter.print(className);
+                    printClassName(className);
                 }
 
                 layouter.print(".");
@@ -1310,11 +1326,11 @@ public final class LogicPrinter {
                 layouter.print("[");
             } else {
                 markStartSub();
-                //heap not printed
-                markEndSub();
+            //heap not printed
+            markEndSub();
             }
 
-            if(objectTerm.equals(TermBuilder.DF.NULL(services))
+            if(objectTerm.equals(services.getTermBuilder().NULL())
                 && fieldTerm.op() instanceof Function
                 && ((Function)fieldTerm.op()).isUnique()) {
         	String className 
@@ -1328,7 +1344,7 @@ public final class LogicPrinter {
         	    markStartSub();
         	    //"null" not printed
         	    markEndSub();
-        	    layouter.print(className);
+        	    printClassName(className);
         	}
         	
         	layouter.print(".");
@@ -1375,18 +1391,14 @@ public final class LogicPrinter {
     }
     
     
-    public void printLength(Term t) throws IOException {
-	final HeapLDT heapLDT = services == null 
-        			? null 
-        			: services.getTypeConverter().getHeapLDT();
-	if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
-	    assert t.op() == heapLDT.getLength();
+    public void printPostfix(Term t, String postfix) throws IOException {
+	if(NotationInfo.PRETTY_SYNTAX) {
 	    startTerm(t.arity());
 	    
 	    markStartSub();
 	    printTerm(t.sub(0));
 	    markEndSub();
-	    layouter.print(".length");
+	    layouter.print(postfix);
 	} else {
 	    printFunctionTerm(t.op().name().toString(), t);            
 	}	
@@ -1438,7 +1450,7 @@ public final class LogicPrinter {
             final String prettyFieldName 
             	= services.getTypeConverter()
                           .getHeapLDT()
-                          .getPrettyFieldName((Function)t.op());
+                          .getPrettyFieldName(t.op());
             layouter.print(prettyFieldName);
 
             if(obs.getNumParams() > 0 || obs instanceof IProgramMethod) {
@@ -1465,9 +1477,9 @@ public final class LogicPrinter {
     public void printSingleton(Term t) throws IOException {
 	assert t.arity() == 2;
 	startTerm(2);	 
-	layouter.print("{(").beginC(0);;
+	layouter.print("{(").beginC(0);
 
-	markStartSub();	 
+        markStartSub();
 	printTerm(t.sub(0));
 	markEndSub();
 	
@@ -1720,21 +1732,22 @@ public final class LogicPrinter {
     }
     
 
-    protected void printVariables (ImmutableArray<QuantifiableVariable> vars,
+    private void printVariables (ImmutableArray<QuantifiableVariable> vars,
                                    QuantifiableVariablePrintMode mode)
                                             throws IOException {
         int size = vars.size ();
         for(int j = 0; j != size; j++) {
             final QuantifiableVariable v = vars.get (j);
             if(v instanceof LogicVariable) {
-                Term t =
-                    TermFactory.DEFAULT.createTerm(v);
                 if (mode != QuantifiableVariablePrintMode.WITH_OUT_DECLARATION) {
                     // do not print declarations in taclets...
-                    layouter.print(v.sort().name().toString() + " ");
+                    printClassName(v.sort().name().toString());
+                    layouter.print(" ");
                 }
-                if(notationInfo.getAbbrevMap().containsTerm(t)) {
-                    layouter.print (notationInfo.getAbbrevMap().getAbbrev(t));
+                if(services != null && 
+                        notationInfo.getAbbrevMap().containsTerm(services.getTermFactory().createTerm(v))) {
+                    layouter.print (notationInfo.getAbbrevMap().
+                                        getAbbrev(services.getTermFactory().createTerm(v)));
                 } else {
                     layouter.print (v.name().toString());
                 }
@@ -1979,7 +1992,7 @@ public final class LogicPrinter {
                     for (int i = 0; i < phi.arity(); i++) {
                         ta[i] = phi.sub(i);
                     }
-                    Term term = TermFactory.DEFAULT.
+                    Term term = services.getTermFactory().
 			createTerm((Modality)o, ta, phi.boundVars(), phi.javaBlock());
                     notationInfo.getNotation((Modality)o, services).print(term, this);
                     return;
@@ -2016,14 +2029,15 @@ public final class LogicPrinter {
      *
      * @return the pretty-printed sequent.
      */
+    @Override
     public String toString() {
         try {
             layouter.flush();
         } catch (IOException e) {
-            throw new RuntimeException (
-              "IO Exception in pretty printer:\n"+e);
+            throw new RuntimeException(
+                    "IO Exception in pretty printer:\n" + e);
         }
-        return ((PosTableStringBackend)backend).getString()+"\n";
+        return ((PosTableStringBackend) backend).getString() + "\n";
     }
 
     /**
@@ -2238,7 +2252,7 @@ public final class LogicPrinter {
      * @return the text with special characters replaced
      */
     public static String escapeHTML(String text, boolean escapeWhitespace) {
-         StringBuffer sb = new StringBuffer();
+         StringBuilder sb = new StringBuilder();
         
          for (int i = 0, sz = text.length(); i < sz; i++) {
              char c = text.charAt(i); 
@@ -2389,6 +2403,7 @@ public final class LogicPrinter {
 
         /** Receive a mark and act appropriately.
          */
+        @Override
         public void mark(Object o) {
 
             // IMPLEMENTATION NOTE

@@ -50,6 +50,8 @@ options {
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 }
 
+@annotateclass{ @SuppressWarnings("all") } 
+
 @members {
     private KeYJMLPreLexer lexer;
     private SLTranslationExceptionManager excManager;
@@ -143,10 +145,11 @@ options {
       }
       for(Name heapName : validHeapNames) {
         t = t.trim();
-	String l = "<"+heapName+">";
-        if(t.startsWith(l)) {
+	    String l = "<"+heapName+">";
+	    String lsp = "< "+heapName+" >";
+        if(t.startsWith(l) || t.startsWith(lsp)) {
            p = l + p;
-           t = t.substring(l.length());
+           t = t.substring(t.startsWith(lsp) ? lsp.length() : l.length());
         }
         result = new PositionedString(t, result.fileName, result.pos);
       }
@@ -206,6 +209,7 @@ classlevel_element[ImmutableList<String> mods]
     |   result=assert_statement[mods] //RecodeR workaround
     |   result=assume_statement[mods] //RecodeR workaround
     |   result=nowarn_pragma[mods]
+    |   EOF
 ;
 
 

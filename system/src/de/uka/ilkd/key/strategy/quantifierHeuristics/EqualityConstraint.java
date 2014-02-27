@@ -19,8 +19,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.WeakHashMap;
+
+import javax.naming.OperationNotSupportedException;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -30,7 +31,7 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -38,6 +39,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
+import de.uka.ilkd.key.util.LRUCache;
 
 
 /** 
@@ -159,7 +161,7 @@ public class EqualityConstraint implements Constraint {
      * @return the term by which p_mv is instantiated by the most
      * general substitution satisfying the constraint
      */
-    public synchronized Term getInstantiation (Metavariable p_mv) {
+    public synchronized Term getInstantiation (Metavariable p_mv, TermServices services) {
         Term t = null;
         if ( instantiationCache == null )
             instantiationCache = new LinkedHashMap<Metavariable, Term> ();
@@ -169,7 +171,7 @@ public class EqualityConstraint implements Constraint {
         if ( t == null ) {
             t = map.get ( p_mv );
             if ( t == null )
-                t = TermBuilder.DF.var ( p_mv );
+                t = services.getTermBuilder().var ( p_mv );
             else
                 t = instantiate ( t );
 
@@ -178,7 +180,7 @@ public class EqualityConstraint implements Constraint {
 
         return t;
     }
-
+    
     private synchronized Term getInstantiationIfExisting (Metavariable p_mv) {
         if ( instantiationCache == null )
             return null;
@@ -211,7 +213,7 @@ public class EqualityConstraint implements Constraint {
      * @return TOP if not possible, else a new constraint with after
      * unification of t1 and t2
      */
-    public Constraint unify ( Term t1, Term t2, Services services  ) {
+    public Constraint unify ( Term t1, Term t2, TermServices services  ) {
 	return unify(t1, t2, services, CONSTRAINTBOOLEANCONTAINER);
     }
 
@@ -227,7 +229,7 @@ public class EqualityConstraint implements Constraint {
      */
     public Constraint unify ( Term             t1,
 			      Term             t2,
-                              Services        services,
+                              TermServices        services,
 			      BooleanContainer unchanged ) {
 	final Constraint newConstraint = unifyHelp ( t1, t2, false, services );
 
@@ -322,7 +324,7 @@ public class EqualityConstraint implements Constraint {
                                    ImmutableList<QuantifiableVariable> cmpBoundVars,
                                    NameAbstractionTable       nat,
                                    boolean                    modifyThis, 
-                                   Services services ) {
+                                   TermServices services ) {
 
 	if ( t0 == t1 && ownBoundVars.equals ( cmpBoundVars ) )
                 return this;
@@ -393,7 +395,7 @@ public class EqualityConstraint implements Constraint {
     private Constraint introduceNewMV (Term t0,
                                        Term t1,
                                        boolean modifyThis,
-                                       Services services) {
+                                       TermServices services) {
 /*        if (services == null) return Constraint.TOP;
         
         final ImmutableSet<Sort> set = 
@@ -467,7 +469,7 @@ public class EqualityConstraint implements Constraint {
                        ImmutableList<QuantifiableVariable> cmpBoundVars,
                        NameAbstractionTable nat,
                        boolean modifyThis,
-                       Services services) {
+                       TermServices services) {
         Constraint newConstraint = this;
 
         for ( int i = 0; i < t0.arity (); i++ ) {
@@ -507,7 +509,7 @@ public class EqualityConstraint implements Constraint {
     private Constraint handleTwoMetavariables (Term t0,
                                                Term t1,
                                                boolean modifyThis,
-                                               Services services) {
+                                               TermServices services) {
         final Metavariable mv0 = (Metavariable)t0.op ();
         final Metavariable mv1 = (Metavariable)t1.op ();
         final Sort mv0S = mv0.sort ();
@@ -559,7 +561,7 @@ public class EqualityConstraint implements Constraint {
      *         <code>Constraint.TOP</code> is always returned for ununifiable
      *         terms
      */
-    private Constraint unifyHelp (Term t1, Term t2, boolean modifyThis, Services services) {
+    private Constraint unifyHelp (Term t1, Term t2, boolean modifyThis, TermServices services) {
 	return unifyHelp ( t1, t2,
 			   ImmutableSLList.<QuantifiableVariable>nil(), 
 			   ImmutableSLList.<QuantifiableVariable>nil(),
@@ -584,7 +586,7 @@ public class EqualityConstraint implements Constraint {
      */ 
     private Constraint normalize(Metavariable mv, Term t,
                                  boolean modifyThis, 
-                                 Services services) {
+                                 TermServices services) {
 	// MV cycles are impossible if the orders of MV pairs are
 	// correct
 
@@ -607,7 +609,7 @@ public class EqualityConstraint implements Constraint {
         if ( modifyThis ) return this;
         return new EqualityConstraint ( (HashMap<Metavariable, Term>)map.clone () );
     }
-
+ 
     /**
      * checks equality of constraints by subsuming relation (only equal if no
      * new sorts need to be introduced for subsumption)
@@ -666,7 +668,7 @@ public class EqualityConstraint implements Constraint {
      * @param co Constraint to be joined with this one
      * @return the joined constraint 
      */	
-    public Constraint join(Constraint co, Services services) { 
+    public Constraint join(Constraint co, TermServices services) { 
 	return join(co, services, CONSTRAINTBOOLEANCONTAINER); 
     }
     
@@ -682,7 +684,7 @@ public class EqualityConstraint implements Constraint {
      * @return the joined constraint     
      */
     public synchronized Constraint join (Constraint co, 
-            Services services, 
+            TermServices services, 
             BooleanContainer unchanged) {
         if ( co.isBottom () || co == this ) {
             unchanged.setVal ( true );
@@ -723,7 +725,7 @@ public class EqualityConstraint implements Constraint {
         synchronized ( joinCacheMonitor ) {
             if ( joinCache.size () > 1000 ) {
                 joinCacheOld.clear ();
-                final HashMap<ECPair, Constraint> t = joinCacheOld;
+                final Map<ECPair, Constraint> t = joinCacheOld;
                 joinCacheOld = joinCache;
                 joinCache = t;
             }
@@ -734,7 +736,7 @@ public class EqualityConstraint implements Constraint {
     }
 
         
-    private Constraint joinHelp (EqualityConstraint co, Services services) {
+    private Constraint joinHelp (EqualityConstraint co, TermServices services) {
         Constraint newConstraint = this;
         boolean newCIsNew = false;
         for (Map.Entry<Metavariable, Term> entry : co.map.entrySet ()) {
@@ -750,78 +752,6 @@ public class EqualityConstraint implements Constraint {
             return this;
 
         return newConstraint;
-    }
-    
-    /**
-     * @return a constraint derived from this one by removing all
-     * constraints on the given variable, which may therefore have any
-     * value according to the new constraint (the possible values of
-     * other variables are not modified)
-     */
-    @Override
-    public Constraint removeVariables ( ImmutableSet<Metavariable> mvs ) {
-	if ( !mvs.isEmpty() && !isBottom () ) {
-	    EqualityConstraint removeConstraint = new EqualityConstraint ();
-	    EqualityConstraint newConstraint    = new EqualityConstraint ();
-
-	    // Find equalities with removed metavariable as left side
-            for ( Map.Entry<Metavariable, Term>  entry : map.entrySet() ) {
-		if ( mvs.contains ( entry.getKey () ) )
-		    removeConstraint.map.put
-			( entry.getKey (), entry.getValue () );
-		else
-		    newConstraint   .map.put
-			( entry.getKey (), entry.getValue () );
-	    }
-
-	    // Find equalities with removed metavariable as right side
-	    final Iterator<Map.Entry<Metavariable, Term>> it = 
-	        newConstraint.map.entrySet ().iterator ();
-	    
-	    while ( it.hasNext () ) {
-	        Map.Entry<Metavariable, Term> entry = it.next ();
-		if ( (entry.getValue ()).op () instanceof Metavariable &&
-		     ( (entry.getKey   ()).sort () ==
-		       (        entry.getValue ()).sort () ) &&
-		     ( mvs.contains
-		       ( (Metavariable)(entry.getValue ()).op () ) ) &&
-		     !( removeConstraint.map.containsKey
-			( (entry.getValue ()).op () ) ) ) {
-		    removeConstraint.map.put
-			( (Metavariable)(entry.getValue ()).op (),
-			  TermBuilder.DF.var
-			  ( entry.getKey () ) );
-		    it.remove ();
-		}
-	    }
-
-	    if ( !removeConstraint.map.isEmpty () ) {
-		// Substitute removed variables occurring within right
-		// sides of the remaining equalities
-
-		// Usually at this point removeConstraint is not a
-		// well-formed constraint, as the order of MV may be
-		// wrong. However, "SyntacticalReplaceVisitor" doesn't
-		// care about that.
-		if ( newConstraint.map.isEmpty () )
-		    return Constraint.BOTTOM;
-
-		final Set<Map.Entry<Metavariable, Term>> entrySet = 
-		    newConstraint.map.entrySet ();
-		
-		newConstraint = new EqualityConstraint ();
-
-		for (final Map.Entry<Metavariable, Term> entry : entrySet) {		    
-		    newConstraint.map.put ( entry.getKey (),
-		                            removeConstraint.instantiate
-		                            ( entry.getValue () ) );
-		}
-
-		return newConstraint;
-	    }
-	}
-
-	return this;
     }
 
     /** checks if there is a cycle if the metavariable mv and Term
@@ -939,13 +869,15 @@ public class EqualityConstraint implements Constraint {
     
     private static final Object joinCacheMonitor = new Object();
     
-    private static HashMap<ECPair, Constraint> joinCache = 
-        new LinkedHashMap<ECPair, Constraint> ();
-    private static HashMap<ECPair, Constraint> joinCacheOld = 
-        new LinkedHashMap<ECPair, Constraint> ();
+    // the methods using these caches seem not to be used anymore otherwise refactor and move it into ServiceCaches
+    private static Map<ECPair, Constraint> joinCache = 
+        new LRUCache<ECPair, Constraint> (0);
+    private static Map<ECPair, Constraint> joinCacheOld = 
+        new LRUCache<ECPair, Constraint> (0);
     
     private static final ECPair  ecPair0   = new ECPair ( null, null, 0 );
 
+    @Override
     public int hashCode () {
         if ( hashCode == null ) {
             int h = 0;
@@ -953,7 +885,9 @@ public class EqualityConstraint implements Constraint {
             while ( it.hasNext () ) {
                 final Metavariable mv = it.next ();
                 h += mv.hashCode ();
-                h += getInstantiation ( mv ).hashCode ();
+                //h += getInstantiation ( mv, services ).hashCode (); // removed line because no idea how
+                // to get the services here and the method seems not to be called and the class is deprecated
+                // and it still satisfies the contract of 'hashcode'
             }
 
             hashCode = Integer.valueOf ( h );

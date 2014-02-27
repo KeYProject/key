@@ -22,7 +22,6 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -161,6 +160,8 @@ public class WindowUserInterface extends AbstractUserInterface {
 				mainWindow.displayResults(info.toString());
 			}
 		}
+	    // this seems to be a good place to free some memory
+	    Runtime.getRuntime().gc();
 	}
 
 	protected boolean inStopAtFirstUncloseableGoalMode(Proof proof) {
@@ -250,7 +251,6 @@ public class WindowUserInterface extends AbstractUserInterface {
 	public ProblemInitializer createProblemInitializer(Profile profile) {
 	    ProblemInitializer pi = new ProblemInitializer(this,
 	            new Services(profile, mainWindow.getMediator().getExceptionHandler()),
-	            true,
 	            this);
 	    return pi;
 	}
@@ -309,13 +309,5 @@ public class WindowUserInterface extends AbstractUserInterface {
            Runtime r = Runtime.getRuntime();
            r.gc();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean isRegisterProofs() {
-       return true;
     }
 }

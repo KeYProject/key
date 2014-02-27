@@ -13,14 +13,10 @@
 
 package de.uka.ilkd.key.gui.macros;
 
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
@@ -39,7 +35,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -54,7 +50,6 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
 
     private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("notHumanReadable");
-
 
     @Override
     public String getName() {
@@ -110,26 +105,26 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
      * Checks if a rule is marked as not suited for interaction.
      */
     private static boolean isNonHumanInteractionTagged(Rule rule) {
+        return isInRuleSet(rule, NON_HUMAN_INTERACTION_RULESET);
+    }
+
+    private static boolean isInRuleSet(Rule rule, Name ruleSetName) {
         if (rule instanceof Taclet) {
             Taclet taclet = (Taclet) rule;
             for (RuleSet rs : taclet.getRuleSets()) {
-                if (NON_HUMAN_INTERACTION_RULESET.equals(rs.name())) 
+                if (ruleSetName.equals(rs.name())) 
                     return true;
             }
         }
         return false;
     }
-
+    
     private static class AutoPilotStrategy implements Strategy {
 
         private static final Name NAME = new Name("Autopilot filter strategy");
-        private final KeYMediator mediator;
-        private final PosInOccurrence posInOcc;
         private final Strategy delegate;
 
         public AutoPilotStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
-            this.mediator = mediator;
-            this.posInOcc = posInOcc;
             this.delegate = mediator.getInteractiveProver().getProof().getActiveStrategy();
         }
 
@@ -168,20 +163,16 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
             String name = rule.name().toString();
             if(ADMITTED_RULES_SET.contains(name)) {
-                return LongRuleAppCost.ZERO_COST;
+                return NumberRuleAppCost.getZeroCost();
             }
-
-            if(name.startsWith("Class_invariant_axiom_for")) {
-                return LongRuleAppCost.ZERO_COST;
-            }
-
+            
             // apply OSS to <inv>() calls.
             if(rule instanceof OneStepSimplifier) {
                 Term target = pio.subTerm();
                 if(target.op() instanceof UpdateApplication) {
                     Operator updatedOp = target.sub(1).op();
                     if(updatedOp instanceof ObserverFunction) {
-                        return LongRuleAppCost.ZERO_COST;
+                        return NumberRuleAppCost.getZeroCost();
                     }
                 }
             }
@@ -195,11 +186,6 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
             delegate.instantiateApp(app, pio, goal, collector);
         }
 
-    }
-
-    @Override
-    public KeyStroke getKeyStroke () {
-	return KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.SHIFT_DOWN_MASK);
     }
 
     @Override

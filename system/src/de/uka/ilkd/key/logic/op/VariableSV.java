@@ -17,7 +17,6 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
@@ -44,7 +43,7 @@ public final class VariableSV extends AbstractSV implements QuantifiableVariable
 	    			 Services services) {                
         final Term substTerm;
         if(subst instanceof LogicVariable) {
-            substTerm = TermBuilder.DF.var((LogicVariable)subst);
+            substTerm = services.getTermBuilder().var((LogicVariable)subst);
         } else if(subst instanceof Term && 
                  ((Term)subst).op() instanceof QuantifiableVariable) {
             substTerm = (Term) subst;
@@ -56,7 +55,7 @@ public final class VariableSV extends AbstractSV implements QuantifiableVariable
         	= (Term)mc.getInstantiations().getInstantiation(this);
         if(foundMapping == null) {
             return addInstantiation(substTerm, mc, services);
-        } else if (((QuantifiableVariable)foundMapping.op()) == substTerm.op()) {
+        } else if (foundMapping.op() == substTerm.op()) {
             return mc;
         } else {
             Debug.out("FAILED. Already instantiated with different variable.");

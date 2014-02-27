@@ -99,6 +99,23 @@
 	<mkdir dir="${build.dir}"/>
   	<mkdir dir="${test.reports}" />
 
+	<uptodate property="keylexer.notRequired"
+		  targetFile="${gen.dir}/de/uka/ilkd/key/parser/KeYLexer.java"
+		  srcFile="${src.dir}/de/uka/ilkd/key/parser/KeYLexer.g"/>
+
+	<uptodate property="keyparser.notRequired"
+		  targetFile="${gen.dir}/de/uka/ilkd/key/parser/KeYParser.java"
+		  srcFile="${src.dir}/de/uka/ilkd/key/parser/KeYParser.g"/>
+
+	<uptodate property="jmlprelexer.notRequired"
+		  targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.java"
+		  srcFile="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.g"/>
+
+	<uptodate property="jmlpreparser.notRequired"
+		  targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreParser.java"
+		  srcFile="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreParser.g"/>
+
+	<!-- no uptodate checks are needed for the javacc/antlr tasks, it is built-in there -->
   </target>
 
   <taskdef classpathref="jcoverage" resource="tasks.properties"/>
@@ -141,7 +158,7 @@
       <classpath>
         <pathelement location="${ext.dir}/antlr.jar"/>
         <pathelement location="${ext.dir}/recoderKey.jar"/>
-        <pathelement location="${ext.dir}/javacc.jar"/>
+		<!-- <pathelement location="${ext.dir}/javacc.jar"/>  not needed to compile, only to build -->
         <pathelement location="${ext.dir}/junit.jar"/>
       </classpath>
     </javac>
@@ -163,35 +180,36 @@
   	  />
   </target>
 	
-
-
-
-  <target name="keylexer">
-        <java jar="${ext.dir}/antlr.jar" fork="true">
+    <target name="keylexer" unless="keylexer.notRequired">
+	<echo message="Running antlr ..."/>
+        <java jar="${ext.dir}/antlr.jar" fork="true" failonerror="true">
         <arg value="-o" />
         <arg value="${gen.dir}/de/uka/ilkd/key/parser" />
         <arg value="${src.dir}/de/uka/ilkd/key/parser/KeYLexer.g" />
      </java>
   </target>
 
-  <target name="keyparser"  depends="keylexer">
-     <java jar="${ext.dir}/antlr.jar" fork="true">
+    <target name="keyparser"  depends="keylexer" unless="keyparser.notRequired">
+	<echo message="Running antlr ..."/>
+     <java jar="${ext.dir}/antlr.jar" fork="true" failonerror="true">
         <arg value="-o" />
         <arg value="${gen.dir}/de/uka/ilkd/key/parser" />
         <arg value="${src.dir}/de/uka/ilkd/key/parser/KeYParser.g" />
      </java>
   </target>
 
-  <target name="jmlprelexer">
-    <java jar="${ext.dir}/antlr.jar" fork="true">
+    <target name="jmlprelexer" unless="jmlprelexer.notRequired">
+	<echo message="Running antlr ..."/>
+    <java jar="${ext.dir}/antlr.jar" fork="true" failonerror="true">
       <arg value="-o" />
       <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation" />
       <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.g" />
     </java>
   </target>
 
-  <target name="jmlpreparser" depends="jmlprelexer">
-    <java jar="${ext.dir}/antlr.jar" fork="true">
+    <target name="jmlpreparser" depends="jmlprelexer" unless="jmlpreparser.notRequired">
+	<echo message="Running antlr ..."/>
+    <java jar="${ext.dir}/antlr.jar" fork="true" failonerror="true">
       <arg value="-o" />
       <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation" />
       <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreParser.g" />

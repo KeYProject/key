@@ -54,7 +54,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      @param rhs an expression.
      */
     public Operator(Expression lhs, Expression rhs) {
-	this.children=new ImmutableArray<Expression>(new Expression[]{lhs, rhs});
+	this.children=new ImmutableArray<Expression>(lhs, rhs);
     }
 
     /**

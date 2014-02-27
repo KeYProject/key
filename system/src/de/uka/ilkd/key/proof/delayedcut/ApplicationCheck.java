@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof.delayedcut;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +23,6 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 
 
 public interface ApplicationCheck {
@@ -82,7 +82,7 @@ public interface ApplicationCheck {
 					}
 				}
 
-				for(NodeIterator it = next.childrenIterator(); it.hasNext();){
+				for(Iterator<Node> it = next.childrenIterator(); it.hasNext();){
 					queue.add(it.next());
 				}
 			}
@@ -105,7 +105,7 @@ public interface ApplicationCheck {
 			}
 
 			StringBuffer buf = new StringBuffer(newSymbols.size()==1 ?INFORMATION1 : INFORMATION2);
-			buf.append(node.serialNr()+": ");
+			buf.append(node.serialNr()).append(": ");
 			for(String name : newSymbols){
 				buf.append(name);
 				buf.append(", ");

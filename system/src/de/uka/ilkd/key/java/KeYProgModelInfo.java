@@ -160,6 +160,7 @@ public class KeYProgModelInfo{
     }
 
 
+    @SuppressWarnings("unchecked")
     public KeYJavaType resolveType(String shortName, KeYJavaType context) {
         recoder.abstraction.ClassType result = null;
 
@@ -234,7 +235,7 @@ public class KeYProgModelInfo{
         recoder.abstraction.Type result;
         if (tr instanceof TypeRef) {
             result = (recoder.abstraction.Type)
-            rec2key().toRecoder(((TypeRef)tr).getKeYJavaType());
+            rec2key().toRecoder(tr.getKeYJavaType());
             return result;
         }
         result=getServConf().getSourceInfo().getType
@@ -352,13 +353,13 @@ public class KeYProgModelInfo{
 	if (bt1 instanceof recoder.abstraction.ArrayType &&
 	    bt2 instanceof recoder.abstraction.ClassType) {
 	    if (((recoder.abstraction.ClassType)bt2).isInterface()) {
-		return ((recoder.abstraction.ClassType)bt2).
+		return bt2.
                     getFullName().equals("java.lang.Cloneable") ||
-                    ((recoder.abstraction.ClassType)bt2).
+                    bt2.
                     getFullName().equals("java.lang.Serializable")
                     ;
 	    } else {
-		return ((recoder.abstraction.ClassType)bt2).
+		return bt2.
 		    getFullName().equals("java.lang.Object");
 	    }
 	}

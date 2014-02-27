@@ -170,7 +170,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
             		     Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap);
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalInvariants.get(heap));
     }
     
@@ -181,7 +181,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap);
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalModifies.get(heap));
     }
     
@@ -193,7 +193,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap);
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalVariant);
     }
     
@@ -249,7 +249,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> inverseReplaceMap 
             = getInverseReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(inverseReplaceMap);
+        OpReplacer or = new OpReplacer(inverseReplaceMap, services.getTermFactory());
         Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable heap : invariants.keySet()) {
            newInvariants.put(heap, or.replace(invariants.get(heap)));

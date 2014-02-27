@@ -24,13 +24,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.LRUCache;
 
 /**
  * Class for analysing and modifying polynomial expressions over the integers
@@ -45,8 +42,6 @@ public class Polynomial {
         this.constantPart = constantPart;
     }
     
-    private static final LRUCache<Term, Polynomial> polynomialCache = 
-        new LRUCache<Term, Polynomial> ( 2000 );
     private static final BigInteger MINUS_ONE = BigInteger.valueOf ( -1 );
 
     public final static Polynomial ZERO =
@@ -55,10 +50,10 @@ public class Polynomial {
         new Polynomial ( ImmutableSLList.<Monomial>nil(), BigInteger.ONE );    
 
     public static Polynomial create(Term polyTerm, Services services) {
-        Polynomial res = polynomialCache.get ( polyTerm );
+        Polynomial res = services.getCaches().getPolynomialCache().get ( polyTerm );
         if ( res == null ) {
             res = createHelp ( polyTerm, services );
-            polynomialCache.put ( polyTerm, res );
+            services.getCaches().getPolynomialCache().put ( polyTerm, res );
         }
         return res;
     }
@@ -202,16 +197,16 @@ public class Polynomial {
         if ( it.hasNext () ) {
             res = it.next ().toTerm ( services );
             while ( it.hasNext () )
-                res = TermFactory.DEFAULT.createTerm
+                res = services.getTermFactory().createTerm
                               ( add, res, it.next ().toTerm ( services ) );
         }
         
-        final Term cTerm = TermBuilder.DF.zTerm(services, constantPart.toString());
+        final Term cTerm = services.getTermBuilder().zTerm(constantPart.toString());
         
         if ( res == null )
             res = cTerm;
         else if ( !BigInteger.ZERO.equals ( constantPart ) )
-            res = TermFactory.DEFAULT.createTerm ( add, cTerm, res );
+            res = services.getTermFactory().createTerm ( add, cTerm, res );
         
         return res;        
     }

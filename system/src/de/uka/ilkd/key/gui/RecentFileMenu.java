@@ -82,6 +82,7 @@ public class RecentFileMenu {
         if (p != null) load(p);
 
 	menu.setEnabled(menu.getItemCount()!=0);
+        menu.setIcon(IconFactory.recentFiles(16));
 
     }
 

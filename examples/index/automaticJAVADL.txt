@@ -14,6 +14,12 @@
 # It is used by bin/runAllProofs.pl.
 #
 
+# Examples used in the new book
+provable: ./newBook/09.list_modelfield/ArrayList.add.key
+provable: ./newBook/09.list_modelfield/ArrayList.remFirst.key
+provable: ./newBook/09.list_modelfield/ArrayList.empty.key
+provable: ./newBook/09.list_modelfield/ArrayList.size.key
+provable: ./newBook/09.list_modelfield/ArrayList.get.key
 
 # Comprehension Tests
 provable: ./heap/comprehensions/general_sum.key
@@ -135,6 +141,9 @@ provable: ./heap/observer/ExampleSubject_inv.key
 provable: ./heap/observer/ExampleSubject_notifyObservers.key
 provable: ./heap/observer/ExampleSubject_value_dep.key
 provable: ./heap/observer/ExampleSubject_value.key
+provable: ./heap/removeDups/arrayPart.key
+provable: ./heap/removeDups/contains.key
+provable: ./heap/removeDups/removeDup.key
 provable: ./heap/saddleback_search/Saddleback_search.key
 provable: ./heap/simple/anonymise_datagroup.key
 provable: ./heap/simple/array_creation.key
@@ -294,6 +303,10 @@ provable: ./standard_key/java_dl/continue2.key
 provable: ./standard_key/java_dl/complexAssignment.key
 provable: ./standard_key/java_dl/danglingElseSolution1.key
 provable: ./standard_key/java_dl/danglingElseSolution2.key
+provable: ./standard_key/java_dl/deepNonNull/deepNonNull0.key
+provable: ./standard_key/java_dl/deepNonNull/deepNonNull1.key
+notprovable: ./standard_key/java_dl/deepNonNull/deepNonNull2.key
+provable: ./standard_key/java_dl/deepNonNull/deepNonNull3.key
 provable: ./standard_key/java_dl/exceptions.key
 provable: ./standard_key/java_dl/exceptions1.key
 provable: ./standard_key/java_dl/exceptions2.key
@@ -306,6 +319,9 @@ provable: ./standard_key/java_dl/incrementcounter.key
 # that needs a non-trivial fix.
 # provable: ./standard_key/java_dl/innerClasses/inner.key
 provable: ./standard_key/java_dl/iteratedAssignment.key
+notprovable: ./standard_key/java_dl/assert/assert1.key
+provable: ./standard_key/java_dl/assert/assert2.key
+notprovable: ./standard_key/java_dl/assert/assert3.key
 provable: ./standard_key/java_dl/java5/vararg.key
 provable: ./standard_key/java_dl/java5/for_Array.key
 provable: ./standard_key/java_dl/java5/for_Iterable.key

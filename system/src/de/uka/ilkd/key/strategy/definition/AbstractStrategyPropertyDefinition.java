@@ -13,30 +13,38 @@ public abstract class AbstractStrategyPropertyDefinition {
    /**
     * The key used in KeY's API.
     */
-   private String apiKey;
+   private final String apiKey;
    
    /**
     * The human readable name of the property.
     */
-   private String name;
+   private final String name;
+   
+   /**
+    * The optional tooltip text which describes this property.
+    */
+   private final String tooltip;
 
    /**
     * Optional children which edits related properties to this.
     * They might be shown different in the user interface.
     */
-   private ImmutableArray<AbstractStrategyPropertyDefinition> subProperties;
+   private final ImmutableArray<AbstractStrategyPropertyDefinition> subProperties;
    
    /**
     * Constructor.
     * @param apiKey The key used in KeY's API.
     * @param name The human readable name of the property.
+    * @param tooltip The optional tooltip text which describes this property.
     * @param subProperties Optional children which edits related properties to this.
     */
    public AbstractStrategyPropertyDefinition(String apiKey, 
-                                   String name, 
-                                   AbstractStrategyPropertyDefinition... subProperties) {
+                                             String name, 
+                                             String tooltip,
+                                             AbstractStrategyPropertyDefinition... subProperties) {
       this.apiKey = apiKey;
       this.name = name;
+      this.tooltip = tooltip;
       this.subProperties = new ImmutableArray<AbstractStrategyPropertyDefinition>(subProperties);
    }
 
@@ -54,6 +62,14 @@ public abstract class AbstractStrategyPropertyDefinition {
     */
    public String getName() {
       return name;
+   }
+
+   /**
+    * Returns the optional tooltip text which describes this property. 
+    * @return The optional tooltip text which describes this property.
+    */
+   public String getTooltip() {
+      return tooltip;
    }
 
    /**

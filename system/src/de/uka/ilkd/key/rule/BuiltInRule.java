@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 
 /**
@@ -31,8 +32,7 @@ public interface BuiltInRule extends Rule {
      * will change the goal (this decision is made due to performance
      * reasons)
      */
-    boolean isApplicable(Goal            goal, 				
-			 PosInOccurrence pio);
+    boolean isApplicable(Goal goal, PosInOccurrence pio);
 
-    IBuiltInRuleApp createApp( PosInOccurrence pos );
+    IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services);
 }

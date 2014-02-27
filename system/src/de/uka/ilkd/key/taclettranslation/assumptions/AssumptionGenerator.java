@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -57,7 +58,6 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         // only for testing.
         // private boolean appendGenericTerm = false;
 
-        protected final static TermFactory tf = TermFactory.DEFAULT;
 
         protected HashMap<String, LogicVariable> usedVariables = new LinkedHashMap<String, LogicVariable>();
 
@@ -84,7 +84,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
                 // // variables
                 // // and do not quantify the variables.
 
-                Term term = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(t);
+                Term term = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(t, services);
 
                 // rebuild the term to exchange schema variables with logic
                 // varibales.
@@ -97,7 +97,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
                 // step: quantify all free variables.
                 for (Term te : result) {
-                        te = quantifyTerm(te);
+                        te = quantifyTerm(te, services);
                         result2.add(te);
                 }
 
@@ -125,10 +125,9 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
         private Term rebuildTerm(Term term) {
 
-                ImmutableArray<QuantifiableVariable> variables = new ImmutableArray<QuantifiableVariable>();
                 Term[] subTerms = new Term[term.arity()];
-                
-                variables = term.boundVars();
+
+            ImmutableArray<QuantifiableVariable> variables = term.boundVars();
                 for (int i = 0; i < term.arity(); i++) {
                      
                         subTerms[i] = rebuildTerm(term.sub(i));
@@ -136,8 +135,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
                 }
 
-                term = tf.createTerm(term.op(), subTerms, variables,
-                                JavaBlock.EMPTY_JAVABLOCK);
+                term = services.getTermFactory().createTerm(term.op(), subTerms, 
+                                                            variables, JavaBlock.EMPTY_JAVABLOCK);
           
                 term = changeTerm(term);
            
@@ -370,11 +369,12 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
          * 
          * @param term
          *                the term to be quantify.
+       * @param services TODO
          * @return the quantified term.
          */
-        protected static Term quantifyTerm(Term term)
+        protected static Term quantifyTerm(Term term, TermServices services)
                         throws IllegalTacletException {
-                TermBuilder tb = TermBuilder.DF;
+                TermBuilder tb = services.getTermBuilder();
                 // Quantify over all free variables.
                 for (QuantifiableVariable qv : term.freeVars()) {
 
@@ -471,7 +471,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
          */
         protected Term changeTerm(Term term) {
 
-                TermBuilder tb = TermBuilder.DF;
+                TermBuilder tb = services.getTermBuilder();
 
                 // translate schema variables into logical variables
                 if (term.op() instanceof SchemaVariable) {
@@ -497,7 +497,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
                         ImmutableArray<QuantifiableVariable> array = new ImmutableArray<QuantifiableVariable>(
                                         list);
 
-                        term = TermFactory.DEFAULT.createTerm(term.op(),
+                        term = services.getTermFactory().createTerm(term.op(),
                                         term.subs(), array,
                                         JavaBlock.EMPTY_JAVABLOCK,
                                         term.getLabels());

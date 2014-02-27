@@ -33,6 +33,7 @@ public class AboutAction extends MainWindowAction {
     public AboutAction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("About KeY");
+        setIcon(IconFactory.help(16));
 	// About KeY
     }
 
@@ -42,13 +43,12 @@ public class AboutAction extends MainWindowAction {
     }
 
     public void showAbout() {
-	String aspects = mainWindow.compiledAspects();
-	JOptionPane pane = new JOptionPane(Main.COPYRIGHT.replace("and", "\n"+UnicodeHelper.emSpaces(8)+"and")
-	        + "\n\nWWW: http://key-project.org/\n\nVersion "
-	        + Main.VERSION
-	        + ((aspects.length() == 0) ? "" : "\nCompiled with Aspects:\n"
-	                + aspects), JOptionPane.INFORMATION_MESSAGE,
-	        JOptionPane.DEFAULT_OPTION, IconFactory.keyLogo(108, 74));
+	JOptionPane pane = new JOptionPane(
+	        Main.COPYRIGHT.replace("and", "\n"+UnicodeHelper.emSpaces(8)+"and")
+	        + "\n\nWWW: http://key-project.org/"
+	        + "\n\nVersion " + Main.VERSION
+	                , JOptionPane.INFORMATION_MESSAGE,
+	        JOptionPane.DEFAULT_OPTION, IconFactory.key22Logo(108, 68));
 	JDialog dialog = pane.createDialog(mainWindow, "The KeY Project");
 	dialog.setVisible(true);
     }

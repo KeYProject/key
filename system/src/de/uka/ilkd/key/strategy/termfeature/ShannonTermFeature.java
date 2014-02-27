@@ -14,8 +14,9 @@
 
 package de.uka.ilkd.key.strategy.termfeature;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
 /**
@@ -59,11 +60,11 @@ public class ShannonTermFeature implements TermFeature {
         elseFeature = p_elseFeature;
     }
 
-    public RuleAppCost compute(Term term) {
-        if ( cond.compute ( term ).equals ( trueCost ) )
-            return thenFeature.compute ( term );
+    public RuleAppCost compute(Term term, Services services) {
+        if ( cond.compute ( term, services ).equals ( trueCost ) )
+            return thenFeature.compute ( term, services );
         else
-            return elseFeature.compute ( term );
+            return elseFeature.compute ( term, services );
     }
 
     /**
@@ -99,7 +100,7 @@ public class ShannonTermFeature implements TermFeature {
         return createConditionalBinary ( cond,
                                          thenFeature,
                                          ConstTermFeature.createConst
-                                         	(LongRuleAppCost.ZERO_COST) );
+                                         	(NumberRuleAppCost.getZeroCost()) );
     }
 
 }

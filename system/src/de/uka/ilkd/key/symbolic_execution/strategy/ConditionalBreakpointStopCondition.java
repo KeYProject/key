@@ -283,10 +283,10 @@ public abstract class ConditionalBreakpointStopCondition extends
     */
    private Term computeTermForCondition(String condition) throws SLTranslationException {
       if(condition==null){
-         return TermBuilder.DF.tt();
+         return getProof().getServices().getTermBuilder().tt();
       }
       //collect all variables needed to parse the condition
-      setSelfVar(new LocationVariable(new ProgramElementName(TermBuilder.DF.newName(getProof().getServices(), "self")), containerType, null, false, false));
+      setSelfVar(new LocationVariable(new ProgramElementName(getProof().getServices().getTermBuilder().newName("self")), containerType, null, false, false));
       ImmutableList<ProgramVariable> varsForCondition = ImmutableSLList.nil();
       if(getPm()!=null){
        //collect parameter variables
@@ -347,17 +347,18 @@ public abstract class ConditionalBreakpointStopCondition extends
       //initialize values
       PosInOccurrence pio = ruleApp.posInOccurrence();
       Term term = pio.subTerm();
-      term = TermBuilder.DF.goBelowUpdates(term);
+      getProof().getServices().getTermBuilder();
+      term = TermBuilder.goBelowUpdates(term);
       IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
       //put values into map which have to be replaced
       if(ec!=null){
          getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
       }
       //replace renamings etc.
-      OpReplacer replacer = new OpReplacer(getVariableNamingMap());
+      OpReplacer replacer = new OpReplacer(getVariableNamingMap(), getProof().getServices().getTermFactory());
       Term termForSideProof = replacer.replace(condition);
       //start side proof
-      Term toProof = TermBuilder.DF.equals(TermBuilder.DF.tt(), termForSideProof);
+      Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
       Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
       ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
       proof.getServices().getNameRecorder();
@@ -445,7 +446,7 @@ public abstract class ConditionalBreakpointStopCondition extends
     */
    public void setCondition(String condition) throws SLTranslationException {
       this.conditionString = condition;
-      this.condition = conditionEnabled? computeTermForCondition(condition) : TermBuilder.DF.tt();
+      this.condition = conditionEnabled? computeTermForCondition(condition) : getProof().getServices().getTermBuilder().tt();
    }
    
    /**

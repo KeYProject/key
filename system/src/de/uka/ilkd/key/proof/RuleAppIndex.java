@@ -24,6 +24,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.rulefilter.AnyRuleSetTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.NotRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
@@ -234,7 +235,7 @@ public final class RuleAppIndex  {
      */
     public ImmutableList<NoPosTacletApp> getFindTaclet(TacletFilter    filter,
 					      PosInOccurrence pos,
-					      Services        services) { 
+					      TermServices        services) { 
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
@@ -288,7 +289,7 @@ public final class RuleAppIndex  {
      */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet (TacletFilter    filter,
 						  PosInOccurrence pos,
-						  Services        services) { 
+						  TermServices        services) { 
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 

@@ -16,10 +16,9 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -31,9 +30,7 @@ import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 public class HeuristicInstantiation implements TermGenerator {
 	
     public final static TermGenerator INSTANCE = new HeuristicInstantiation ();
-    
-    private final TermBuilder tb = TermBuilder.DF;
-    
+        
     private HeuristicInstantiation() {}
     
     public Iterator<Term> generate(RuleApp app,
@@ -59,12 +56,14 @@ public class HeuristicInstantiation implements TermGenerator {
         private final Function             quantifiedVarSortCast;
 
         private Term                       nextInst = null;
+        private final TermServices services;
 
         private HIIterator(Iterator<Term> it, 
 					 QuantifiableVariable var, 
-        	         Services services) {
+        	         TermServices services) {
             this.instances = it;
             this.quantifiedVar = var;
+            this.services = services;
             quantifiedVarSort = quantifiedVar.sort ();
             quantifiedVarSortCast = quantifiedVarSort.getCastSymbol (services);
             findNextInst ();
@@ -78,7 +77,7 @@ public class HeuristicInstantiation implements TermGenerator {
                         nextInst = null;
                         continue;
                     }
-                    nextInst = tb.func ( quantifiedVarSortCast, nextInst );
+                    nextInst = services.getTermBuilder().func ( quantifiedVarSortCast, nextInst );
                 }
             }
         }

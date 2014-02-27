@@ -17,6 +17,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -122,7 +123,7 @@ public abstract class StrategyProofMacro implements ProofMacro {
 
     @Override
     public javax.swing.KeyStroke getKeyStroke () {
-	return null; // default implementation
+	return KeyStrokeManager.get(this);
     }
 
 }

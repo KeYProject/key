@@ -13,15 +13,13 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -55,7 +53,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
     * @return The created constant.
     */
    protected Function createResultConstant(Services services, Sort sort) {
-      String functionName = TermBuilder.DF.newName(services, "QueryResult");
+      String functionName = services.getTermBuilder().newName("QueryResult");
       Function function = new Function(new Name(functionName), sort);
       services.getNamespaces().functions().addSafely(function);
       return function;
@@ -68,7 +66,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
     * @return The created result {@link Function}.
     */
    protected Function createResultFunction(Services services, Sort sort) {
-      return new Function(new Name(TermBuilder.DF.newName(services, "ResultPredicate")), Sort.FORMULA, sort);
+      return new Function(new Name(services.getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, sort);
    }
    
    /**
@@ -121,7 +119,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
       // Extract results and conditions from side proof
       Map<Term, Set<Term>> conditionsAndResultsMap = new LinkedHashMap<Term, Set<Term>>();
       for (Goal resultGoal : info.getProof().openGoals()) {
-         if (resultGoal.getRuleAppManager().peekNext() != null) {
+         if (SymbolicExecutionUtil.hasApplicableRules(resultGoal)) {
             throw new IllegalStateException("Side roof contains goal with automatic applicable rules.");
          }
          Sequent sequent = resultGoal.sequent();
@@ -146,7 +144,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
             }
             else {
                if (!isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
-                  if (resultConditions.add(TermBuilder.DF.not(sf.formula()))) {
+                  if (resultConditions.add(services.getTermBuilder().not(sf.formula()))) {
                      addNewNamesToNamespace(services, sf.formula());
                   }
                }
@@ -157,7 +155,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
             conditions = new LinkedHashSet<Term>();
             conditionsAndResultsMap.put(result, conditions);
          }
-         conditions.add(TermBuilder.DF.and(resultConditions));
+         conditions.add(services.getTermBuilder().and(resultConditions));
       }
       return conditionsAndResultsMap;
    }
@@ -221,13 +219,13 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
     * @param newTerm The new {@link Term}.
     * @return The created {@link SequentFormula} in which the {@link Term} is replaced.
     */
-   protected static SequentFormula replace(PosInOccurrence pio, Term newTerm) {
+   protected static SequentFormula replace(PosInOccurrence pio, Term newTerm, Services services) {
       // Iterate along the PosInOccurrence and collect the parents and indices
       Deque<Pair<Integer, Term>> indexAndParents = new LinkedList<Pair<Integer, Term>>();
       Term root = pio.constrainedFormula().formula();
-      IntIterator iter = pio.posInTerm().iterator();
-      while (iter.hasNext()) {
-         int next = iter.next();
+      final PosInTerm pit = pio.posInTerm();
+      for (int i = 0, sz=pit.depth(); i<sz; i++) { 
+         int next = pit.getIndexAt(i);
          indexAndParents.addFirst(new Pair<Integer, Term>(Integer.valueOf(next), root));
          root = root.sub(next);
       }
@@ -237,7 +235,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
          Term parent = pair.second;
          Term[] newSubs = parent.subs().toArray(new Term[parent.subs().size()]);
          newSubs[pair.first] = root;
-         root = TermFactory.DEFAULT.createTerm(parent.op(), newSubs, parent.boundVars(), parent.javaBlock(), parent.getLabels());
+         root =  services.getTermFactory().createTerm(parent.op(), newSubs, parent.boundVars(), parent.javaBlock(), parent.getLabels());
       }
       return new SequentFormula(root);
    }
@@ -399,10 +397,10 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
          @Override
          public void visit(Term visited) {
             if (visited.op() instanceof Function) {
-               functions.add((Function)visited.op());
+               functions.add(visited.op());
             }
             else if (visited.op() instanceof IProgramVariable) {
-               progVars.add((IProgramVariable)visited.op());
+               progVars.add(visited.op());
             }
          }
       });

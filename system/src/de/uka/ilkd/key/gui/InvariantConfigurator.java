@@ -349,7 +349,7 @@ public class InvariantConfigurator {
                 heapPanes.add(invPane);
                 heapPanes.add(modPane);
 
-                JScrollPane rightPane = new JScrollPane(panel);;
+                JScrollPane rightPane = new JScrollPane(panel);
 
                 final int charXWidth = vararea.getFontMetrics(vararea.getFont()).charWidth('X');
                 final int fontHeight = vararea.getFontMetrics(vararea.getFont()).getHeight();

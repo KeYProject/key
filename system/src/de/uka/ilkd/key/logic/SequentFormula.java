@@ -31,7 +31,6 @@ public class SequentFormula {
 
     private final Term term;
    
-
     private final int hashCode;
     
     /** creates a new SequentFormula 

@@ -84,10 +84,8 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
 
         private HashSet<SchemaVariable> usedFormulaSV = new LinkedHashSet<SchemaVariable>();
 
-        private boolean quitInstantiationFailuresWithException = false;
 
-        
-        private final SMTSettings settings;
+    private final SMTSettings settings;
 
         public DefaultTacletSetTranslation(Services services, SMTSettings settings) {
  
@@ -231,7 +229,7 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
                 for (TacletFormula tf : list) {
                         toStore += "//" + tf.getTaclet().name().toString()
                                         + "\n";
-                        toStore += convertTerm(tf.getFormula());
+                        toStore += convertTerm(tf.getFormula(services));
                         if (i != list.size() - 1)
                                 toStore += "\n\n& //and\n\n";
                         i++;
@@ -287,7 +285,7 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
                  * "sort: "+ sort +"\n"; instantiationFailures =
                  * instantiationFailures.append(s);
                  */
-                return quitInstantiationFailuresWithException;
+            return false;
         }
 
 }

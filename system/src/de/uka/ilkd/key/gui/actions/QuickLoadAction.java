@@ -14,9 +14,7 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
-import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
@@ -35,7 +33,6 @@ public class QuickLoadAction extends MainWindowAction {
         setName("Quickload");
 //        setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Load previously quicksaved file");
-        setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F6,0));
     }
 
     public void actionPerformed(ActionEvent e) {

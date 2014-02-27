@@ -18,6 +18,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.Pair;
@@ -32,6 +33,7 @@ public class ShowProofStatistics extends MainWindowAction {
     public ShowProofStatistics(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("Show Proof Statistics...");
+        setIcon(IconFactory.statistics(16));
 	
 	getMediator().enableWhenProofLoaded(this);
 

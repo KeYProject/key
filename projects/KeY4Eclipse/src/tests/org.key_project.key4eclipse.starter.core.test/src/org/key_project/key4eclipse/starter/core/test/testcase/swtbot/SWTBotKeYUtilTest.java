@@ -15,6 +15,7 @@ package org.key_project.key4eclipse.starter.core.test.testcase.swtbot;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,7 +47,6 @@ import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 
@@ -126,7 +126,7 @@ public class SWTBotKeYUtilTest extends AbstractSetupTestCase {
       if (nodeName != null) {
          result.add(nodeName);
       }
-      NodeIterator iter = node.childrenIterator();
+      Iterator<Node> iter = node.childrenIterator();
       while (iter.hasNext()) {
          result.addAll(collectRuleNames(iter.next()));
       }

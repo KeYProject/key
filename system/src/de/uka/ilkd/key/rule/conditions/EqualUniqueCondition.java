@@ -17,17 +17,18 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.FormulaSV;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 public final class EqualUniqueCondition implements VariableCondition {
-    
-    private static final TermBuilder TB = TermBuilder.DF;
-    
     private final TermSV t;
     private final TermSV t2;
     private final FormulaSV res;
@@ -40,20 +41,20 @@ public final class EqualUniqueCondition implements VariableCondition {
     }
     
     
-    private static Term equalUnique(Term t1, Term t2, Services services) {
+    private static Term equalUnique(Term t1, Term t2, TermServices services) {
 	if(!(t1.op() instanceof Function 
 	     && t2.op() instanceof Function
 	     && ((Function)t1.op()).isUnique()
 	     && ((Function)t2.op()).isUnique())) {
 	    return null;
 	} else if(t1.op() == t2.op()) {
-	    Term result = TB.tt();
+	    Term result = services.getTermBuilder().tt();
 	    for(int i = 0, n = t1.arity(); i < n; i++) {
-		result = TB.and(result, TB.equals(t1.sub(i), t2.sub(i)));
+		result = services.getTermBuilder().and(result, services.getTermBuilder().equals(t1.sub(i), t2.sub(i)));
 	    }
 	    return result;
 	} else {
-	    return TB.ff();
+	    return services.getTermBuilder().ff();
 	}
     }
     

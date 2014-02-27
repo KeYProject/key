@@ -33,6 +33,13 @@ import de.uka.ilkd.key.util.Debug;
  */
 public abstract class TacletAppContainer extends RuleAppContainer {
 
+    // Implementation note (DB 21/02/2014):
+    // It is unlikely that we ever reach 2^31 proof nodes,
+    // so age could be changed from long to int.
+    // My benchmark tests however suggest that this would not
+    // save any memory (at the moment).
+    // This is because Java's memory alingment.
+    
     private final long age;
 
     protected TacletAppContainer ( RuleApp     p_app,
@@ -194,7 +201,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                                                        false ) );
     }
 
-    private boolean sufficientlyCompleteApp(TacletApp app, Services services) {
+    private boolean sufficientlyCompleteApp(TacletApp app, TermServices services) {
         final ImmutableSet<SchemaVariable> needed = app.uninstantiatedVars ();
         if ( needed.size () == 0 ) return true;
         for (SchemaVariable aNeeded : needed) {
@@ -318,15 +325,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
         if ( !app.complete() )
             app = app.tryToInstantiate ( services );
-
-        Taclet taclet = app == null ? null : app.taclet();
-        if (taclet instanceof RewriteTaclet) {
-            RewriteTaclet rwTaclet = (RewriteTaclet) taclet;
-            MatchConditions check = 
-                    rwTaclet.checkPrefix(pio, MatchConditions.EMPTY_MATCHCONDITIONS, services);
-            if (check == null) return null;
-        }
-        
+        else if (!app.isExecutable(services)) {
+            return null;
+        }        
         return app;
     }
 
@@ -466,7 +467,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
             final SequentFormula cfma = p_ifInstantiation.getConstrainedFormula ();
             final PosInOccurrence pio = new PosInOccurrence ( cfma,
-                                                              PosInTerm.TOP_LEVEL,
+                                                              PosInTerm.getTopLevel(),
                                                               antec );
 
             final FormulaTagManager tagManager = goal.getFormulaTagManager ();
@@ -486,7 +487,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                 if ( ifInstCache.cacheKey != goal.node () ) return null;
 
                 // the cache contains formula lists for the right semisequent
-                return getCacheMap ( p_antec ).get ( getAgeObject () );
+                return getCacheMap ( p_antec ).get ( getAge () );
             }
         }
 
@@ -497,19 +498,13 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                     ifInstCache.reset(goal.node());
                 }
 
-                getCacheMap ( p_antec ).put ( getAgeObject (), p_list );
+                getCacheMap ( p_antec ).put ( getAge (), p_list );
             }
         }
-
 
         private HashMap<Long, ImmutableList<IfFormulaInstantiation>> getCacheMap (boolean p_antec) {
             return p_antec ? ifInstCache.antecCache : ifInstCache.succCache;
         }
-
-        private Long getAgeObject () {
-            return Long.valueOf( getAge() );
-        }
-
 
         private ImmutableList<IfFormulaInstantiation> getAllSequentFormulas ( boolean p_antec ) {
             return p_antec ? allAntecFormulas : allSuccFormulas;

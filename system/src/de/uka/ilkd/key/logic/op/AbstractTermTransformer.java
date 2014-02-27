@@ -14,16 +14,46 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.metaconstruct.*;
-import de.uka.ilkd.key.rule.metaconstruct.arith.*;
+import de.uka.ilkd.key.rule.metaconstruct.AddCast;
+import de.uka.ilkd.key.rule.metaconstruct.ArrayBaseInstanceOf;
+import de.uka.ilkd.key.rule.metaconstruct.ConstantValue;
+import de.uka.ilkd.key.rule.metaconstruct.EnumConstantValue;
+import de.uka.ilkd.key.rule.metaconstruct.ExpandQueriesMetaConstruct;
+import de.uka.ilkd.key.rule.metaconstruct.IntroAtPreDefsOp;
+import de.uka.ilkd.key.rule.metaconstruct.MemberPVToField;
+import de.uka.ilkd.key.rule.metaconstruct.arith.DivideLCRMonomials;
+import de.uka.ilkd.key.rule.metaconstruct.arith.DivideMonomials;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaAdd;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaDiv;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaEqual;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaGeq;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaGreater;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaIntAnd;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaIntOr;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaIntShiftLeft;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaIntShiftRight;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaIntUnsignedShiftRight;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaIntXor;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaLongAnd;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaLongOr;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaLongShiftLeft;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaLongShiftRight;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaLongUnsignedShiftRight;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaLongXor;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaLeq;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaLess;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaMul;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaSub;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -34,7 +64,7 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class AbstractTermTransformer extends AbstractSortedOperator 
                                            implements TermTransformer {
 
-    private static final HashMap<String, AbstractTermTransformer> name2metaop 
+    private static final Map<String, AbstractTermTransformer> name2metaop 
     	= new LinkedHashMap<String, AbstractTermTransformer>(70);
     
     //must be first
@@ -99,10 +129,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer ADD_CAST = new AddCast();    
 
     public static final AbstractTermTransformer EXPAND_QUERIES = new ExpandQueriesMetaConstruct();
-    
-    protected static final TermFactory termFactory = TermFactory.DEFAULT;
-    protected static final TermBuilder TB = TermBuilder.DF;
-    
+        
     
     private static Sort[] createMetaSortArray(int arity) {
 	Sort[] result = new Sort[arity];

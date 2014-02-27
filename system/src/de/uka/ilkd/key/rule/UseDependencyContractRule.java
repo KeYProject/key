@@ -32,7 +32,13 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ContractPO;
@@ -50,7 +56,6 @@ public final class UseDependencyContractRule implements BuiltInRule {
                                             = new UseDependencyContractRule();
 
     private static final Name NAME = new Name("Use Dependency Contract");
-    private static final TermBuilder TB = TermBuilder.DF;
 
 
 
@@ -89,7 +94,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    if(formula.op() instanceof Equality
 	       && formula.sub(1).equals(term)) {
 		final PosInOccurrence pos
-			= new PosInOccurrence(cf, PosInTerm.TOP_LEVEL, true);
+			= new PosInOccurrence(cf, PosInTerm.getTopLevel(), true);
 		result.add(new Pair<Term,PosInOccurrence>(formula.sub(0), pos));
 	    }
 	}
@@ -194,19 +199,20 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Operator op = heapTerm.op();
 	assert heapTerm.sort().equals(heapLDT.targetSort());
+	final TermBuilder TB = services.getTermBuilder();
 	if(heapTerm.equals(stepHeap)) {
 	    return new Pair<Term,ImmutableList<PosInOccurrence>>(
-		    		TB.empty(services),
+		    		TB.empty(),
 		    		ImmutableSLList.<PosInOccurrence>nil());
 	} else if(op == heapLDT.getStore()) {
 	    final Term h = heapTerm.sub(0);
 	    final Term o = heapTerm.sub(1);
 	    final Term f = heapTerm.sub(2);
-	    final Term locs = TB.singleton(services, o, f);
+	    final Term locs = TB.singleton(o, f);
 	    final Pair<Term,ImmutableList<PosInOccurrence>> furtherLocs
 	    	= getChangedLocsForStep(h, stepHeap, seq, services);
 	    return new Pair<Term,ImmutableList<PosInOccurrence>>(
-		    	    TB.union(services, locs, furtherLocs.first),
+		    	    TB.union(locs, furtherLocs.first),
 		    	    furtherLocs.second);
 	} else if(op == heapLDT.getCreate()) {
 	    final Term h = heapTerm.sub(0);
@@ -219,7 +225,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    final Pair<Term,ImmutableList<PosInOccurrence>> furtherLocs
 	    	= getChangedLocsForStep(h, stepHeap, seq, services);
 	    return new Pair<Term,ImmutableList<PosInOccurrence>>(
-		    	    TB.union(services, s, furtherLocs.first),
+		    	    TB.union(s, furtherLocs.first),
 	                    furtherLocs.second);
 	} else if(op.arity() == 0) {
 	    final List<Pair<Term,PosInOccurrence>> defs
@@ -272,12 +278,12 @@ public final class UseDependencyContractRule implements BuiltInRule {
 		= new LinkedHashMap<Term, PosInOccurrence>();
 	for(SequentFormula cf : seq.antecedent()) {
 	    final PosInOccurrence pos
-	    	= new PosInOccurrence(cf, PosInTerm.TOP_LEVEL, true);
+	    	= new PosInOccurrence(cf, PosInTerm.getTopLevel(), true);
 	    collectBaseOccsHelper(focus, pos, result);
 	}
 	for(SequentFormula cf : seq.succedent()) {
 	    final PosInOccurrence pos
-	    	= new PosInOccurrence(cf, PosInTerm.TOP_LEVEL, false);
+	    	= new PosInOccurrence(cf, PosInTerm.getTopLevel(), false);
 	    collectBaseOccsHelper(focus, pos, result);
 	}
 	return result;
@@ -336,7 +342,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     public static PosInOccurrence findStepInIfInsts(
 	    		List<PosInOccurrence> steps,
 	    		UseDependencyContractApp app,
-	    		Services services) {
+	    		TermServices services) {
     	for(PosInOccurrence pio : app.ifInsts()) {
     		if(steps.contains(pio)) {
     			return pio;
@@ -443,6 +449,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final Term focus = pio.subTerm();
         final IObserverFunction target = (IObserverFunction) focus.op();
         final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        final TermBuilder TB = services.getTermBuilder();
         
         final Term selfTerm;
         if (target.isStatic()) {
@@ -485,7 +492,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
         assert !step.subTerm().equals(focus);
         
-        Term freePre = !target.isStatic() ? TB.not(TB.equals(selfTerm, TB.NULL(services))) : null;
+        Term freePre = !target.isStatic() ? TB.not(TB.equals(selfTerm, TB.NULL())) : null;
         Term disjoint = null;
         Term pre = null;
         final Term[] subs = focus.subs().toArray(new Term[focus.arity()]);
@@ -509,14 +516,14 @@ public final class UseDependencyContractRule implements BuiltInRule {
             //store insts 
             ifInsts = ifInsts.append(changedLocs.second.prepend(step));
             if(!target.isStatic()) {
-                final Term cr = TB.created(services, subStep, selfTerm);
+                final Term cr = TB.created(subStep, selfTerm);
                 if(freePre == null) {
                 	freePre = cr;
                 }else{
                     freePre = TB.and(freePre, cr);
                 }
             }
-            final Term wf = TB.and(TB.wellFormed(subStep, services), TB.wellFormed(focus.sub(heapExprIndex), services));
+            final Term wf = TB.and(TB.wellFormed(subStep), TB.wellFormed(focus.sub(heapExprIndex)));
             if(freePre == null) {
             	freePre = wf;
             }else{
@@ -525,13 +532,12 @@ public final class UseDependencyContractRule implements BuiltInRule {
             i = 0;
     	    for(Term paramTerm : paramTerms) {
     	    	assert freePre != null;
-    	        freePre = TB.and(freePre, TB.reachableValue(services,
-    					       		subStep,
+    	        freePre = TB.and(freePre, TB.reachableValue(subStep,
     					       		paramTerm,
     					       		target.getParamType(i++)));
     	    }
     	    final Term dep = contract.getDep(heap, atPre, subStep, selfTerm, paramTerms, atPres, services);
-    	    final Term ds = TB.disjoint(services, changedLocs.first, dep);
+    	    final Term ds = TB.disjoint(changedLocs.first, dep);
     	    if(disjoint == null) {
                disjoint = ds;
             } else {
@@ -541,8 +547,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
             if(!useful && !changedLocs.first.op().equals(locSetLDT.getEmpty())) {
                 final ImmutableSet<Term> changed
                 	= addEqualDefs(TB.unionToSet(
-                				      changedLocs.first,
-                				      services),
+                				      changedLocs.first),
                 				      goal);
                 if(!changed.contains(dep)) {
             	  useful = true;
@@ -590,12 +595,11 @@ public final class UseDependencyContractRule implements BuiltInRule {
 //	        mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
 //		           TB.lt(mby, po.getMbyAtPre(), services));
 //                mbyOk = TB.prec(mby, po.getMbyAtPre(), services);
-            mbyOk = TB.measuredByCheck(mby, services);
+            mbyOk = TB.measuredByCheck(mby);
 	    } else {
 	       mbyOk = TB.tt();
 	    }
-        final Term cutFormula
-        	= TB.and(new Term[]{freePre, pre, disjoint, mbyOk});
+        final Term cutFormula = TB.and(freePre, pre, disjoint, mbyOk);
 
 
         //create "Post" branch
@@ -626,8 +630,12 @@ public final class UseDependencyContractRule implements BuiltInRule {
         return displayName();
     }
 
-	@Override
     public UseDependencyContractApp createApp(PosInOccurrence pos) {
+       return createApp(pos, null);
+    }
+    
+    @Override
+    public UseDependencyContractApp createApp(PosInOccurrence pos, TermServices services) {
 		return new UseDependencyContractApp(this, pos);
     }
 }

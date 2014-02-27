@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -23,7 +24,6 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -114,7 +114,7 @@ public abstract class BreakpointStopCondition implements IStopCondition {
          if (updatedNode.childrenCount() >= 2) {
             if (getBreakpointGoals().contains(goal)) {
                // Reuse number of set nodes for new created goals
-               NodeIterator childIter = updatedNode.childrenIterator();
+               Iterator<Node> childIter = updatedNode.childrenIterator();
                while (childIter.hasNext()) {
                   Node next = childIter.next();
                   Goal nextGoal = next.proof().getGoal(next);

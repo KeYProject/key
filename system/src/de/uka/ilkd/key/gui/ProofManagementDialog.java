@@ -53,6 +53,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -91,14 +92,11 @@ public final class ProofManagementDialog extends JDialog {
     private JButton startButton;
     private JButton cancelButton;
     private KeYMediator mediator;
-    private final MainWindow mainWindow;
-
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
     private ProofManagementDialog(MainWindow mainWindow, InitConfig initConfig) {
         super(mainWindow, "Proof Management", true);
-        this.mainWindow = mainWindow;
         this.initConfig = initConfig;
         this.services = initConfig.getServices();
         this.specRepos = initConfig.getServices().getSpecificationRepository();
@@ -347,19 +345,8 @@ public final class ProofManagementDialog extends JDialog {
             }
         }
 
-        validateNotNull(selectedKJT);
-        validateNotNull(selectedTarget);
-        select(selectedKJT, selectedTarget);
-    }
-
-    /*
-     * Check for Nullpointers.
-     */
-    public static void validateNotNull(Object o) {
-        if (o == null) {
-            System.err.println("Unexpected null value.");
-            Thread.dumpStack();
-        }
+        if (selectedKJT != null && selectedTarget != null)
+            select(selectedKJT, selectedTarget);
     }
 
     /**
@@ -407,7 +394,6 @@ public final class ProofManagementDialog extends JDialog {
            instance.selectKJTandTarget();
        }
 
-       startedProof = false;
        instance.updateGlobalStatus();
        
        // The selected elements have to be select before the dialog is made visible!
@@ -430,7 +416,8 @@ public final class ProofManagementDialog extends JDialog {
 
     private void select(KeYJavaType kjt, IObserverFunction target) {
         tabbedPane.setSelectedIndex(0);
-        classTree.select(kjt, target);
+        if (classTree != null)
+            classTree.select(kjt, target);
     }
 
     private void select(Proof p) {
@@ -475,7 +462,7 @@ public final class ProofManagementDialog extends JDialog {
         if (proof == null) {
             UserInterface ui = mediator.getUI();
             ProblemInitializer pi =
-                    new ProblemInitializer(ui, services, true, ui);
+                    new ProblemInitializer(ui, services, ui);
             try {
                 pi.startProver(initConfig, po, 0);
             } catch (ProofInputException exc) {
@@ -515,18 +502,25 @@ public final class ProofManagementDialog extends JDialog {
             startButton.setEnabled(true);
         }
     }
-
+        
+    
+    private boolean isInstanceMethodOfAbstractClass(KeYJavaType p_class, IObserverFunction obs) {
+        return p_class.getJavaType() instanceof InterfaceDeclaration
+            || (p_class.getSort().isAbstract() && !obs.isStatic());
+    }
+    
     private void updateContractPanel() {
         ContractSelectionPanel pan = getActiveContractPanel();
 	if (pan == contractPanelByMethod) {
 	    final ClassTree.Entry entry = classTree.getSelectedEntry();
-	    if(entry != null && entry.target != null) {
-		final ImmutableSet<Contract> contracts
-			= specRepos.getContracts(entry.kjt, entry.target);
-		pan.setContracts(contracts, "Contracts");
+	    if(entry != null && entry.target != null && 
+	            !isInstanceMethodOfAbstractClass(entry.kjt, entry.target)) {
+	        final ImmutableSet<Contract> contracts 
+	        = specRepos.getContracts(entry.kjt, entry.target);
+	        pan.setContracts(contracts, "Contracts");
 	    } else {
-		pan.setContracts(DefaultImmutableSet.<Contract>nil(), "Contracts");
-	    }
+	        pan.setContracts(DefaultImmutableSet.<Contract>nil(), "Contracts");	        
+	    }	    	    
 	} else if (pan == contractPanelByProof) {
 	    if(proofList.getSelectedValue() != null) {
 		final Proof p 
@@ -548,6 +542,7 @@ public final class ProofManagementDialog extends JDialog {
         for (KeYJavaType kjt : kjts) {
             ImmutableSet<IObserverFunction> targets = specRepos.getContractTargets(kjt);
             for (IObserverFunction target : targets) {
+	          if (!isInstanceMethodOfAbstractClass(kjt, target)) {                
                 ImmutableSet<Contract> contracts = specRepos.getContracts(kjt, target);
                 boolean startedProving = false;
                 boolean allClosed = true;
@@ -575,7 +570,8 @@ public final class ProofManagementDialog extends JDialog {
                         : keyClosedIcon)
                         : keyIcon)
                         : null);
-            }
+              }
+		    }
         }
         classTree.updateUI();
 

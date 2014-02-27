@@ -39,10 +39,10 @@ import de.uka.ilkd.key.logic.PosInTerm;
 public class PositionTable {
 
     // the start positions of the direct subterms (or parts of sequent, etc.)
-    protected int[] startPos;
+    protected short[] startPos;
 
     //the end positions of the direct subterms (or parts of sequent, etc.)   
-    protected int[] endPos;
+    protected short[] endPos;
 
     // the PositionTables for the direct subterms (or parts of sequent, etc.)
     protected PositionTable[] child;    
@@ -55,7 +55,7 @@ public class PositionTable {
 
     // the number of rows in the above arrays. Equals the number of direct 
     // subterms (or parts of sequent, etc.)
-    private final int rows;
+    private final short rows;
 
     /**
      * creates a new PositionTable with the number of subterms (or number of
@@ -65,11 +65,14 @@ public class PositionTable {
      * position information is represented by the constructed object.
      */
     public PositionTable(int rows) {
-	this.rows=rows;
-	startPos=new int[rows];
-	endPos=new int[rows];
-	child=new PositionTable[rows];
-	for (int i=0; i<rows; i++) {
+        if (rows < Short.MIN_VALUE || rows > Short.MAX_VALUE)
+            throw new ArithmeticException("The number of subterms "+rows+" exceeds the designed range.");
+        
+	this.rows=(short)rows;
+	startPos=new short[this.rows];
+	endPos=new short[this.rows];
+	child=new PositionTable[this.rows];
+	for (short i=0; i<this.rows; i++) {
 	    startPos[i]=-1;
 	    endPos[i]=-1;
 	    child[i]=null;
@@ -203,7 +206,9 @@ public class PositionTable {
      * @param child PositionTable for the sub-element from start to end
      */
     public void setEnd(int end, PositionTable child) {
-	endPos[currentEndEntry]=end;
+        if (end < Short.MIN_VALUE || Short.MAX_VALUE < end)
+            throw new ArithmeticException("Position "+end+" exceeds the design limits.");
+	endPos[currentEndEntry]=(short)end;
 	this.child[currentEndEntry]=child;
 	currentEndEntry++;
     }
@@ -214,7 +219,9 @@ public class PositionTable {
      * @param start char position that starts a sub-element
      */
     public void setStart(int start) {
-	startPos[currentStartEntry]=start;
+        if (start < Short.MIN_VALUE || Short.MAX_VALUE < start)
+            throw new ArithmeticException("Position "+start+" exceeds the design limits.");
+	startPos[currentStartEntry]=(short)start;
 	currentStartEntry++;
     }
 
@@ -263,7 +270,7 @@ public class PositionTable {
 	SequentFormula cfma = filterEntry.getOriginalFormula();
 
 	PosInOccurrence currentPos = 
-	    new PosInOccurrence ( cfma, PosInTerm.TOP_LEVEL,
+	    new PosInOccurrence ( cfma, PosInTerm.getTopLevel(),
 				  filter.getSequent ().antecedent().contains(cfma) );
 	
 	return child[cfmaNo].getTermPIS(filterEntry,tail,

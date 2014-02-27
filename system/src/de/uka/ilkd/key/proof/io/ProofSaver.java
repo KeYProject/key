@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
 
+import javax.swing.event.EventListenerList;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -45,6 +47,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.event.ProofSaverEvent;
+import de.uka.ilkd.key.proof.io.event.ProofSaverListener;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -75,6 +79,17 @@ public class ProofSaver {
    final protected String internalVersion;
    
    LogicPrinter printer;
+   
+   /**
+    * <p>
+    * Contains all listener. 
+    * </p>
+    * <p>
+    * They are used for instance by the Eclipse integration to refresh the
+    * workspace when a proof file was saved.
+    * </p>.
+    */
+   private static final EventListenerList listeners = new EventListenerList();
    
    public ProofSaver(Proof proof, String filename, String internalVersion) {
       //this.main = main;
@@ -112,7 +127,9 @@ public class ProofSaver {
    }
    
    public String save() throws IOException {
-      return save(new FileOutputStream(filename));
+      String errorMsg = save(new FileOutputStream(filename));
+      fireProofSaved(new ProofSaverEvent(this, filename, errorMsg));
+      return errorMsg;
    }
    
    public String save(OutputStream out) throws IOException {
@@ -375,7 +392,7 @@ public class ProofSaver {
    
 
    public static String posInTerm2Proof(PosInTerm pos) {
-      if (pos == PosInTerm.TOP_LEVEL) return "";
+      if (pos == PosInTerm.getTopLevel()) return "";
       String s = " (term \"";
       String list = pos.integerList(pos.reverseIterator()); // cheaper to read in
       s = s + list.substring(1,list.length()-1); // chop off "[" and "]"
@@ -543,5 +560,36 @@ public class ProofSaver {
 
         p =  new LogicPrinter(new ProgramPrinter(null), ni, (shortAttrNotation ? serv : null), true);
         return p;
+    }
+    
+    /**
+     * Adds the {@link ProofSaverListener}.
+     * @param l The {@link ProofSaverListener} to add.
+     */
+    public static void addProofSaverListener(ProofSaverListener l) {
+       if (l != null) {
+          listeners.add(ProofSaverListener.class, l);
+       }
+    }
+    
+    /**
+     * Removes the {@link ProofSaverListener}.
+     * @param l The {@link ProofSaverListener} to remove.
+     */
+    public static void removeProofSaverListener(ProofSaverListener l) {
+       if (l != null) {
+          listeners.remove(ProofSaverListener.class, l);
+       }
+    }
+    
+    /**
+     * Informs all listener about the event {@link ProofSaverListener#proofSaved(ProofSaverEvent)}.
+     * @param e The event.
+     */
+    protected static void fireProofSaved(ProofSaverEvent e) {
+       ProofSaverListener[] toInform = listeners.getListeners(ProofSaverListener.class);
+       for (ProofSaverListener l : toInform) {
+          l.proofSaved(e);
+       }
     }
 }

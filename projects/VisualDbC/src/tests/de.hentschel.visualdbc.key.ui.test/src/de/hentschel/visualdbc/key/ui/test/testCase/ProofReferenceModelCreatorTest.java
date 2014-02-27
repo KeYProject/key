@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
@@ -204,26 +205,14 @@ public class ProofReferenceModelCreatorTest extends AbstractProofReferenceModelC
          // Compare initial model
          ProofReferenceModelCreator creator = new ProofReferenceModelCreator(proof);
          creator.updateModel(ProofReferenceUtil.computeProofReferences(proof), new NullProgressMonitor());
-         compareWithOracle(oracleDirectory, creator.getModel(), initialOracleFileInBundle);
+         compareWithOracle(oracleDirectory, creator.getModel(), Activator.PLUGIN_ID, initialOracleFileInBundle);
          // Start auto mode
-         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-         sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_EXPAND);
-         sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_EXPAND);
-         sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, useContracts ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
-         sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_OFF);
-         sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
-         sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_OFF);
-         sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF);
-         sp.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_OFF);
-         sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_DELAYED);
-         sp.setProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, StrategyProperties.RETREAT_MODE_NONE);
-         sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
-         sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_INSTANTIATE);
+         StrategyProperties sp = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, useContracts, false, false, false);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
          environment.getUi().startAndWaitForAutoMode(proof);
          // Compare final model
          creator.updateModel(ProofReferenceUtil.computeProofReferences(proof), new NullProgressMonitor());
-         compareWithOracle(oracleDirectory, creator.getModel(), finalOracleFileInBundle);
+         compareWithOracle(oracleDirectory, creator.getModel(), Activator.PLUGIN_ID, finalOracleFileInBundle);
       }
       finally {
          // Dispose proof and environment

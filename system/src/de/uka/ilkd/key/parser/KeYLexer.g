@@ -38,6 +38,8 @@ lexer grammar KeYLexer;
     import java.io.*;
 }
 
+@annotateclass{ @SuppressWarnings("all") } 
+
 @members{
     class SaveStruct {
         SaveStruct (CharStream input) {

@@ -20,7 +20,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.Contract;
@@ -46,7 +45,8 @@ public class ProofElement {
    private Contract contract;
    private ProofOblInput proofObl;
    
-   private Proof proof;
+   private boolean proofClosed;
+   private boolean proofLoadingError;
    
    private LinkedHashSet<IProofReference<?>> proofReferences;
    
@@ -100,11 +100,23 @@ public class ProofElement {
    }
 
    
-   public Proof getProof(){
-      return proof;
+//   public Proof getProof(){
+//      return proof;
+//   }
+//   public void setProof(Proof proof){
+//      this.proof = proof;
+//   }
+   public boolean getProofClosed(){
+      return proofClosed;
    }
-   public void setProof(Proof proof){
-      this.proof = proof;
+   public void setProofClosed(boolean proofStatus){
+      this.proofClosed = proofStatus;
+   }
+   public boolean getProofLoadingError(){
+      return proofLoadingError;
+   }
+   public void setProofLoadingError(boolean proofLoadingError){
+      this.proofLoadingError = proofLoadingError;
    }
    
    
@@ -125,8 +137,6 @@ public class ProofElement {
       this.environment = environment;
       
       this.contract = contract;
-      
-      this.proof = null;
       
       this.proofReferences = new LinkedHashSet<IProofReference<?>>();
    }

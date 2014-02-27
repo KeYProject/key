@@ -16,9 +16,9 @@ package de.uka.ilkd.key.pp;
 
 
 /**
- * This is a position table for program modality formaulae.  In
+ * This is a position table for program modality formulae.  In
  * addition to the usual tables, it can store a range of character
- * positions for the first statemnt in the java block.
+ * positions for the first statement in the Java block.
  */
 
 public class ModalityPositionTable extends PositionTable {

@@ -12,7 +12,7 @@ public class StrategyPropertiesSetupParticipant implements ISetupParticipant {
     */
    @Override
    public void setupWorkspace() {
-      StrategyProperties sp = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, true, false, false, false, false);
+      StrategyProperties sp = SymbolicExecutionStrategy.DEFAULT_FACTORY.createDefaultStrategyProperties();
       ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);
    }
 

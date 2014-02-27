@@ -13,11 +13,6 @@
 
 package de.uka.ilkd.key.gui.macros;
 
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -27,7 +22,7 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -61,12 +56,6 @@ public class WellDefinednessMacro extends StrategyProofMacro {
     protected Strategy createStrategy(KeYMediator mediator,
                                       PosInOccurrence posInOcc) {
         return new WellDefinednessStrategy();
-    }
-
-    @Override
-    public KeyStroke getKeyStroke () {
-        // FIXME: Does apparently not work for the moment.
-        return KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.SHIFT_DOWN_MASK);
     }
 
     @Override
@@ -116,7 +105,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
             if(name.startsWith(WD_PREFIX)) {
-                return LongRuleAppCost.ZERO_COST;
+                return NumberRuleAppCost.getZeroCost();
             } else {
                 return TopRuleAppCost.INSTANCE;
             }

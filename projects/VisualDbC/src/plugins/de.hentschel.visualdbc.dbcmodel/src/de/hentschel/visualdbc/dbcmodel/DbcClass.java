@@ -33,6 +33,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.DbcClass#isFinal <em>Final</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.DbcClass#getExtends <em>Extends</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.DbcClass#isAnonymous <em>Anonymous</em>}</li>
+ *   <li>{@link de.hentschel.visualdbc.dbcmodel.DbcClass#getExtendsFullNames <em>Extends Full Names</em>}</li>
  * </ul>
  * </p>
  *
@@ -82,6 +83,22 @@ public interface DbcClass extends AbstractDbcClass {
     * @generated
     */
    void setAnonymous(boolean value);
+
+   /**
+    * Returns the value of the '<em><b>Extends Full Names</b></em>' attribute list.
+    * The list contents are of type {@link java.lang.String}.
+    * <!-- begin-user-doc -->
+    * <p>
+    * If the meaning of the '<em>Extends Full Names</em>' attribute list isn't clear,
+    * there really should be more of a description here...
+    * </p>
+    * <!-- end-user-doc -->
+    * @return the value of the '<em>Extends Full Names</em>' attribute list.
+    * @see de.hentschel.visualdbc.dbcmodel.DbcmodelPackage#getDbcClass_ExtendsFullNames()
+    * @model
+    * @generated
+    */
+   EList<String> getExtendsFullNames();
 
    /**
     * Returns the value of the '<em><b>Abstract</b></em>' attribute.

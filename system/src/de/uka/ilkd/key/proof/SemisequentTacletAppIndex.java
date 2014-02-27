@@ -68,7 +68,7 @@ public class SemisequentTacletAppIndex {
                                 TacletIndex        tacletIndex,
                                 NewRuleListener    listener ) {
         final PosInOccurrence pos =
-            new PosInOccurrence ( cfma, PosInTerm.TOP_LEVEL, antec );
+            new PosInOccurrence ( cfma, PosInTerm.getTopLevel(), antec );
         termIndices =
             termIndices.put ( cfma, TermTacletAppIndex.create ( pos,
                                                                 services,
@@ -96,7 +96,7 @@ public class SemisequentTacletAppIndex {
             "does not exist";
     
         final PosInOccurrence pos =
-            new PosInOccurrence ( cfma, PosInTerm.TOP_LEVEL, antec );
+            new PosInOccurrence ( cfma, PosInTerm.getTopLevel(), antec );
 
         termIndices = termIndices.put ( cfma,
                                         oldIndex.addTaclets ( filter,
@@ -314,7 +314,7 @@ public class SemisequentTacletAppIndex {
             final SequentFormula cfma = entry.key (); 
             final TermTacletAppIndex index = entry.value ();
             final PosInOccurrence pio = 
-                new PosInOccurrence ( cfma, PosInTerm.TOP_LEVEL, antec );
+                new PosInOccurrence ( cfma, PosInTerm.getTopLevel(), antec );
             
             index.reportTacletApps( pio, l );
         }

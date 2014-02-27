@@ -47,7 +47,7 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
  * </p>
  * <p>
  * Each {@link Profile} has a unique name {@link #name()}.
- * </p>
+ * </p> 
  * <p>
  * It is recommended
  * to have only one instance of each {@link Profile}. The default instances
@@ -122,19 +122,18 @@ public interface Profile {
     /** returns the (default) justification for the given rule */
     RuleJustification getJustification(Rule r);
 
-
+    
     /**
      * returns the file name of the internal class directory relative to JavaRedux
      * @return the file name of the internal class directory relative to JavaRedux
      */
     String getInternalClassDirectory();
-
+	
     /**
      * returns the file name of the internal class list
      * @return the file name of the internal class list
      */
     String getInternalClasslistFilename();
-
-
+    
     TermLabelManager getTermLabelManager();
 }

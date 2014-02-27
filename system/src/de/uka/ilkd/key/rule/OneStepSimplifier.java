@@ -33,7 +33,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -59,7 +59,6 @@ public final class OneStepSimplifier implements BuiltInRule,
     }
 
     private static final Name NAME = new Name("One Step Simplification");
-    private static final TermBuilder TB = TermBuilder.DF;
 
     private static final ImmutableList<String> ruleSets
     	= ImmutableSLList.<String>nil().append("concrete")
@@ -175,8 +174,8 @@ public final class OneStepSimplifier implements BuiltInRule,
 	if(proof != lastProof) {
 	    shutdownIndices();
 	    lastProof = proof;
-	    appsTakenOver = DefaultImmutableSet.<NoPosTacletApp>nil();;
-	    indices = new TacletIndex[ruleSets.size()];
+	    appsTakenOver = DefaultImmutableSet.<NoPosTacletApp>nil();
+        indices = new TacletIndex[ruleSets.size()];
 	    notSimplifiableCaches = (Map<Term,Term>[]) new LRUCache[indices.length];
 	    int i = 0;
 	    ImmutableList<String> done = ImmutableSLList.<String>nil();
@@ -309,18 +308,19 @@ public final class OneStepSimplifier implements BuiltInRule,
 
     /**
      * Helper for replaceKnown (handles recursion).
-     * @param protocol
+    * @param protocol
+    * @param services TODO
      */
     private Term replaceKnownHelper(Map<Term,PosInOccurrence> map,
 	                            Term in,
-	                            /*out*/ List<PosInOccurrence> ifInsts, Protocol protocol) {
+	                            /*out*/ List<PosInOccurrence> ifInsts, Protocol protocol, TermServices services) {
 	final PosInOccurrence pos = map.get(in);
 	if(pos != null) {
 	    ifInsts.add(pos);
 	    if(protocol != null) {
 	        protocol.add(makeReplaceKnownTacletApp(in, pos));
 	    }
-	    return pos.isInAntec() ? TB.tt() : TB.ff();
+	    return pos.isInAntec() ? services.getTermBuilder().tt() : services.getTermBuilder().ff();
 	} else if(in.op() instanceof Modality
                   || in.op() instanceof UpdateApplication
                   || in.op() instanceof Transformer) {
@@ -329,13 +329,13 @@ public final class OneStepSimplifier implements BuiltInRule,
 	    Term[] subs = new Term[in.arity()];
 	    boolean changed = false;
 	    for(int i = 0; i < subs.length; i++) {
-		subs[i] = replaceKnownHelper(map, in.sub(i), ifInsts, protocol);
+		subs[i] = replaceKnownHelper(map, in.sub(i), ifInsts, protocol, services);
 		if(subs[i] != in.sub(i)) {
 		    changed = true;
 		}
 	    }
 	    if(changed) {
-		return TB.tf().createTerm(in.op(),
+		return services.getTermBuilder().tf().createTerm(in.op(),
 					  subs,
 					  in.boundVars(),
 					  in.javaBlock());
@@ -355,7 +355,7 @@ public final class OneStepSimplifier implements BuiltInRule,
      * @param protocol
      */
     private SequentFormula replaceKnown(
-	    				Services services,
+	    				TermServices services,
 	                             	SequentFormula cf,
 	                             	Map<Term,PosInOccurrence> context,
 	                             	/*out*/ List<PosInOccurrence> ifInsts,
@@ -365,7 +365,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 	}
 	final Term formula = cf.formula();
 	final Term simplifiedFormula
-		= replaceKnownHelper(context, formula, ifInsts, protocol);
+		= replaceKnownHelper(context, formula, ifInsts, protocol, services);
 	if(simplifiedFormula.equals(formula)) {
 	    return null;
 	} else {
@@ -408,7 +408,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 
 	for(int i = 0; i < indices.length; i++) {
 	    PosInOccurrence pos = new PosInOccurrence(cf,
-	    		              		      PosInTerm.TOP_LEVEL,
+	    		              		      PosInTerm.getTopLevel(),
 	    		              		      true);
 	    result = simplifyPosOrSub(services, pos, i, protocol);
 	    if(result != null) {
@@ -436,14 +436,14 @@ public final class OneStepSimplifier implements BuiltInRule,
 	    if(!ante.equals(cf) && ante.formula().op() != Junctor.TRUE) {
 		context.put(
 			ante.formula(),
-			new PosInOccurrence(ante, PosInTerm.TOP_LEVEL, true));
+			new PosInOccurrence(ante, PosInTerm.getTopLevel(), true));
 	    }
 	}
 	for(SequentFormula succ : seq.succedent()) {
 	    if(!succ.equals(cf) && succ.formula().op() != Junctor.FALSE) {
 		context.put(
 			succ.formula(),
-			new PosInOccurrence(succ, PosInTerm.TOP_LEVEL, false));
+			new PosInOccurrence(succ, PosInTerm.getTopLevel(), false));
 	    }
 	}
 	final List<PosInOccurrence> ifInsts
@@ -661,7 +661,7 @@ public final class OneStepSimplifier implements BuiltInRule,
     }
 
 	@Override
-    public OneStepSimplifierRuleApp createApp(PosInOccurrence pos) {
+    public OneStepSimplifierRuleApp createApp(PosInOccurrence pos, TermServices services) {
 	    return new OneStepSimplifierRuleApp(this, pos);
     }
 }

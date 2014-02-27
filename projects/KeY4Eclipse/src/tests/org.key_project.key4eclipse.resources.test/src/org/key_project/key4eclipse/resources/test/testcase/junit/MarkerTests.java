@@ -240,7 +240,7 @@ public class MarkerTests extends AbstractResourceTest {
       IFile javaFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("src").append("proofClosed").append("ClosedProofFile.java"));
       
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testProofClosed", project.getFolder("src"));
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testProofClosed", project.getFolder("src"), true);
       
       KeY4EclipseResourcesTestUtil.build(project);
       
@@ -255,7 +255,7 @@ public class MarkerTests extends AbstractResourceTest {
       IFile javaFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("src").append("proofNotClosed").append("NotClosedProofFile.java"));
       
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testProofNotClosed", project.getFolder("src"));
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testProofNotClosed", project.getFolder("src"), true);
       
       KeY4EclipseResourcesTestUtil.build(project);
       
@@ -263,7 +263,7 @@ public class MarkerTests extends AbstractResourceTest {
       
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
       assertTrue(markerList.size() == 1);
-      assertTrue(testMarker(markerList.get(0), MarkerManager.NOTCLOSEDMARKER_ID, 115, 118));
+      assertTrue(testMarker(markerList.get(0), MarkerManager.NOTCLOSEDMARKER_ID, 121, 124));
    }
    
    private void testNoDuplicatedMarker(IProject project) throws CoreException{
@@ -272,7 +272,7 @@ public class MarkerTests extends AbstractResourceTest {
       IFile javaFile1 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("src").append("noDuplicates").append("NoDuplicatesTooFile.java"));
       
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testNoDuplicatedMarker/first", project.getFolder("src"));
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testNoDuplicatedMarker/first", project.getFolder("src"), true);
       
       KeY4EclipseResourcesTestUtil.build(project);
       
@@ -286,7 +286,7 @@ public class MarkerTests extends AbstractResourceTest {
       assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(project) == 1);
       assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile0) == 1);
       
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testNoDuplicatedMarker/second", project.getFolder("src"));
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testNoDuplicatedMarker/second", project.getFolder("src"), true);
       
       KeY4EclipseResourcesTestUtil.build(project);
       
@@ -302,7 +302,7 @@ public class MarkerTests extends AbstractResourceTest {
       IFile javaFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("src").append("addMethod").append("File.java"));
       
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testAddMethod/first", project.getFolder("src"));
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testAddMethod/first", project.getFolder("src"), true);
       
       KeY4EclipseResourcesTestUtil.build(project);
       
@@ -324,7 +324,7 @@ public class MarkerTests extends AbstractResourceTest {
       IFile javaFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("src").append("removeMethod").append("File.java"));
       
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testRemoveMethod/first", project.getFolder("src"));
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testRemoveMethod/first", project.getFolder("src"), true);
       
       KeY4EclipseResourcesTestUtil.build(project);
       
@@ -346,7 +346,7 @@ public class MarkerTests extends AbstractResourceTest {
       IFile javaFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("src").append("recursion").append("MultipleRecursion.java"));
       
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testRecursionMarker", project.getFolder("src"));
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testRecursionMarker", project.getFolder("src"), true);
       
       KeY4EclipseResourcesTestUtil.build(project);
       
@@ -355,11 +355,11 @@ public class MarkerTests extends AbstractResourceTest {
       assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile) == 2);
       
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
-      if(testMarker(markerList.get(0), MarkerManager.CYCLEDETECTEDMARKER_ID, 293, 294)){
-         assertTrue(testMarker(markerList.get(1), MarkerManager.CYCLEDETECTEDMARKER_ID, 446, 447));
+      if(testMarker(markerList.get(0), MarkerManager.RECURSIONMARKER_ID, 285, 286)){
+         assertTrue(testMarker(markerList.get(1), MarkerManager.RECURSIONMARKER_ID, 438, 439));
       }
-      else if(testMarker(markerList.get(0), MarkerManager.CYCLEDETECTEDMARKER_ID, 446, 447)){
-         assertTrue(testMarker(markerList.get(1), MarkerManager.CYCLEDETECTEDMARKER_ID, 293, 294));
+      else if(testMarker(markerList.get(0), MarkerManager.RECURSIONMARKER_ID, 438, 439)){
+         assertTrue(testMarker(markerList.get(1), MarkerManager.RECURSIONMARKER_ID, 285, 286));
       }
       else{
          fail();
@@ -370,7 +370,7 @@ public class MarkerTests extends AbstractResourceTest {
       IFile javaFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("src").append("ProblemLoaderExceptionFile.java"));
       
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testProblemLoaderExceptionHandler", project.getFolder("src"));
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MarkerTests/testProblemLoaderExceptionHandler", project.getFolder("src"), true);
       
       KeY4EclipseResourcesTestUtil.build(project);
       

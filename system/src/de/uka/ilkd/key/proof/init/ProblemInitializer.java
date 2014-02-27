@@ -48,6 +48,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
@@ -59,7 +60,6 @@ import de.uka.ilkd.key.proof.io.LDTInput;
 import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
-import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleConfig;
 import de.uka.ilkd.key.rule.Rule;
@@ -85,18 +85,16 @@ public final class ProblemInitializer {
     private final ProgressMonitor progMon;
     private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
     private final ProblemInitializerListener listener;
-    private final boolean registerProof;
     //-------------------------------------------------------------------------
     //constructors
     //------------------------------------------------------------------------- 
     
     public ProblemInitializer(ProgressMonitor mon,
-	                      Services services, boolean registerProof,
+	                      Services services,
 	                      ProblemInitializerListener listener) {
 	this.services = services;
 	this.progMon = mon;
 	this.listener = listener;
-	this.registerProof = registerProof;
     }
   
     
@@ -104,7 +102,6 @@ public final class ProblemInitializer {
         assert profile != null;
         this.progMon    = null;
         this.listener   = null;
-        this.registerProof = false;
         this.services   = new Services(profile);
     }
     
@@ -285,7 +282,8 @@ public final class ProblemInitializer {
             if(searchPathList.find(javaPath) == null) {
                 searchPathList.add(javaPath);
             }
-            final String[] cus = getClasses(javaPath).toArray(new String[]{});
+        Vector<String> var = getClasses(javaPath);
+        final String[] cus = var.toArray(new String[var.size()]);
             r2k.readCompilationUnitsAsFiles(cus);
 	} else {
             reportStatus("Reading Java libraries");	    
@@ -408,12 +406,6 @@ public final class ProblemInitializer {
 	//init ruleConfig
 	RuleConfig ruleConfig = new RuleConfig(initConfig.getActivatedChoices());
 	env.setRuleConfig(ruleConfig);
-	
-	//register the proof environment
-	//if(main != null) {
-	 if(registerProof){
-	    GlobalProofMgt.getInstance().registerProofEnvironment(env);
-	}
     	               	
 	return initConfig;
     }
@@ -450,30 +442,32 @@ public final class ProblemInitializer {
      * Creates an initConfig / a proof environment and reads an EnvInput into it
      */
     public InitConfig prepare(EnvInput envInput) throws ProofInputException {
-	if(listener != null){
-	    listener.progressStarted(this);
-	}
-	alreadyParsed.clear();
+       synchronized (SchemaJavaParser.class) { // The synchronized statement is required for thread save parsing since all JavaCC parser are generated static. For our own parser (ProofJavaParser.jj and SchemaJavaParser.jj) it is possible to generate them non static which is done on branch "hentschelJavaCCInstanceNotStatic". But recoder still uses static methods and the synchronized statement can not be avoided for this reason.
+          InitConfig currentBaseConfig = baseConfig; // It is required to work with a copy to make this method thread save required by the Eclipse plug-ins.
+          if(listener != null){
+             listener.progressStarted(this);
+         }
+         alreadyParsed.clear();
 
-        //the first time, read in standard rules
-	Profile profile = envInput.getProfile();
-	if(baseConfig == null || profile != baseConfig.getProfile()) {            
-		InitConfig newBaseConfig = new InitConfig(services);
-			RuleSource tacletBase = profile.getStandardRules().getTacletBase();
-			if(tacletBase != null) {
-				KeYFile tacletBaseFile
-				= new KeYFile("taclet base", 
-						profile.getStandardRules().getTacletBase(),
-						progMon,
-						profile);
-				readEnvInput(tacletBaseFile, newBaseConfig);
-			}
-			// remove traces of the generic sorts within the base configuration
-			cleanupNamespaces(newBaseConfig);
-			baseConfig = newBaseConfig;
-	}
-	return prepare(envInput, baseConfig);
-	
+              //the first time, read in standard rules
+         Profile profile = envInput.getProfile();
+         if(currentBaseConfig == null || profile != currentBaseConfig.getProfile()) {            
+            currentBaseConfig = new InitConfig(services);
+               RuleSource tacletBase = profile.getStandardRules().getTacletBase();
+               if(tacletBase != null) {
+                  KeYFile tacletBaseFile
+                  = new KeYFile("taclet base", 
+                        profile.getStandardRules().getTacletBase(),
+                        progMon,
+                        profile);
+                  readEnvInput(tacletBaseFile, currentBaseConfig);
+               }
+               // remove traces of the generic sorts within the base configuration
+               cleanupNamespaces(currentBaseConfig);
+               baseConfig = currentBaseConfig;
+         }
+         return prepare(envInput, currentBaseConfig);
+       }
 	}
     
     public InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)throws ProofInputException{

@@ -21,6 +21,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
@@ -34,16 +35,17 @@ public class FontSizeAction extends MainWindowAction implements ConfigChangeList
 
     public static enum Mode { LARGER, SMALLER }
 
-    private Mode mode;;
+    private Mode mode;
 
     public FontSizeAction(MainWindow mainWindow, Mode mode) {
 	super(mainWindow);
 	this.mode = mode;
 	
 	setName(mode == Mode.LARGER ? "Larger" : "Smaller");
+        setIcon(mode == Mode.LARGER ? IconFactory.plus(16): IconFactory.minus(16));
 	
 	int downMask = getDownMask();
-	int key = mode == Mode.LARGER ? KeyEvent.VK_UP : KeyEvent.VK_DOWN;
+	int key = mode == Mode.LARGER ? KeyEvent.VK_PLUS : KeyEvent.VK_MINUS;
         setAcceleratorKey(KeyStroke.getKeyStroke(key, downMask));
 	
         Config.DEFAULT.addConfigChangeListener(this);

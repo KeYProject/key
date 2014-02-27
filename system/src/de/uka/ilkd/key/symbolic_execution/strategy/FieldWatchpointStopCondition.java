@@ -70,7 +70,8 @@ public class FieldWatchpointStopCondition extends
          if(firstElement instanceof FieldReference){
             PosInOccurrence pio = ruleApp.posInOccurrence();
             Term term = pio.subTerm();
-            term = TermBuilder.DF.goBelowUpdates(term);
+            getProof().getServices().getTermBuilder();
+            term = TermBuilder.goBelowUpdates(term);
             ExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
             ThisReference thisType = (ThisReference)realFirstElement;
             FieldReference fieldRef = (FieldReference)firstElement;

@@ -15,9 +15,8 @@
 package de.uka.ilkd.key.logic;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -27,12 +26,10 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 public class SingleRenamingTable extends RenamingTable{
 
     SourceElement oldVar,newVar;
-    LinkedList<SourceElement> ll= new LinkedList<SourceElement>();
 
     public SingleRenamingTable(SourceElement oldVar, SourceElement newVar){
 	this.oldVar = oldVar;
 	this.newVar = newVar;
-	ll.add(oldVar);
     }
 
     public SourceElement  getRenaming(SourceElement se){
@@ -41,13 +38,14 @@ public class SingleRenamingTable extends RenamingTable{
     }
 
     public Iterator<SourceElement> getRenamingIterator(){
-	return ll.listIterator(0);
+	return new SingleIterator(oldVar);
     }
     
     public String toString(){
         LocationVariable ov = (LocationVariable) oldVar;
         LocationVariable nv = (LocationVariable) newVar;
-	return ("SingleRenamingTable: "+oldVar+" id: "+ ov.id() +" -> "+newVar + " id: " + nv.id());
+	return ("SingleRenamingTable: "+oldVar+" id: "+ System.identityHashCode(ov) +" -> "+
+	                newVar + " id: " + System.identityHashCode(nv));
     }
     
     public HashMap<SourceElement, SourceElement> getHashMap(){
@@ -56,4 +54,30 @@ public class SingleRenamingTable extends RenamingTable{
         return hm;
     }
 
+    private static class SingleIterator implements Iterator<SourceElement> {
+
+        private SourceElement se;
+
+        public SingleIterator(SourceElement se) {
+            this.se = se;           
+        }
+
+        @Override
+        public boolean hasNext() {
+            return se != null;
+        }
+
+        @Override
+        public SourceElement next() {
+            final SourceElement next = se;
+            se = null;
+            return next;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+   }
+    
 }

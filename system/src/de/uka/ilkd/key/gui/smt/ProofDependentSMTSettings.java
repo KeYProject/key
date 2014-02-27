@@ -70,9 +70,9 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configurat
         private ProofDependentSMTSettings(){
  
                 supportedTaclets =  SupportedTaclets.REFERENCE;
-        };
+        }
 
-        private ProofDependentSMTSettings(ProofDependentSMTSettings data) {            
+    private ProofDependentSMTSettings(ProofDependentSMTSettings data) {
                 copy(data);                
         }
         

@@ -1,57 +1,42 @@
-# This file is part of KeY - Integrated Deductive Software Design
-# Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
-#                         Universitaet Koblenz-Landau, Germany
-#                         Chalmers University of Technology, Sweden
-#
-# The KeY system is protected by the GNU General Public License. 
-# See LICENSE.TXT for details.
-
-# This file lists all files that are known to the KeY system
-# without any additional classpath.
-
-# All files but Enum.java are created with Stubmaker
-# Enum.java is manually created!
-
-# java.lang.Object has been modified manually!
-
-java/lang/Object.java
-
-java/lang/annotation/Annotation.java
-java/lang/ArithmeticException.java
-java/lang/ArrayIndexOutOfBoundsException.java
-java/lang/ArrayStoreException.java
-java/lang/AssertionError.java
-java/lang/Class.java
-java/lang/ClassCastException.java
-java/lang/CloneNotSupportedException.java
-java/lang/Cloneable.java
-java/lang/Comparable.java
-java/lang/Enum.java
-java/lang/Error.java
-java/lang/Exception.java
-java/lang/ExceptionInInitializerError.java
-java/lang/IllegalArgumentException.java
-java/lang/IndexOutOfBoundsException.java
-java/lang/InterruptedException.java
-java/lang/Iterable.java
-java/lang/LinkageError.java
-java/lang/NegativeArraySizeException.java
-java/lang/NoClassDefFoundError.java
-java/lang/NullPointerException.java
-java/lang/NumberFormatException.java
-java/lang/VirtualMachineError.java
-java/lang/OutOfMemoryError.java
-java/lang/Runnable.java
-java/lang/RuntimeException.java
-java/lang/String.java
-java/lang/StringBuffer.java
-java/lang/Thread.java
-java/lang/Throwable.java
-java/util/Collection.java
-java/util/Iterator.java
-java/util/List.java
-java/util/ListIterator.java
-java/util/Map.java
-java/util/Set.java
-java/io/IOException.java
-java/io/Serializable.java
+java.lang.Object
+java.lang.annotation.Annotation
+java.lang.ArithmeticException
+java.lang.ArrayIndexOutOfBoundsException
+java.lang.ArrayStoreException
+java.lang.AssertionError
+java.lang.Class
+java.lang.ClassCastException
+java.lang.CloneNotSupportedException
+java.lang.Cloneable
+java.lang.Comparable
+java.lang.Enum
+java.lang.Error
+java.lang.Exception
+java.lang.ExceptionInInitializerError
+java.lang.IllegalArgumentException
+java.lang.IndexOutOfBoundsException
+java.lang.Integer
+java.lang.InterruptedException
+java.lang.Iterable
+java.lang.LinkageError
+java.lang.NegativeArraySizeException
+java.lang.NoClassDefFoundError
+java.lang.NullPointerException
+java.lang.Number
+java.lang.NumberFormatException
+java.lang.VirtualMachineError
+java.lang.OutOfMemoryError
+java.lang.Runnable
+java.lang.RuntimeException
+java.lang.String
+java.lang.StringBuffer
+java.lang.Thread
+java.lang.Throwable
+java.util.Collection
+java.util.Iterator
+java.util.List
+java.util.ListIterator
+java.util.Map
+java.util.Set
+java.io.IOException
+java.io.Serializable

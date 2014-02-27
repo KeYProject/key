@@ -14,8 +14,9 @@
 
 package de.uka.ilkd.key.strategy.termfeature;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
@@ -27,14 +28,14 @@ public abstract class BinaryTermFeature implements TermFeature {
     protected BinaryTermFeature () {}
     
     /** Constant that represents the boolean value true */
-    public static final RuleAppCost ZERO_COST = LongRuleAppCost.ZERO_COST;
+    public static final RuleAppCost ZERO_COST = NumberRuleAppCost.getZeroCost();
     /** Constant that represents the boolean value false */
     public static final RuleAppCost TOP_COST  = TopRuleAppCost.INSTANCE;
     
-    final public RuleAppCost compute ( Term term ) {
-        return filter ( term ) ? ZERO_COST : TOP_COST; 
+    final public RuleAppCost compute ( Term term, Services services ) {
+        return filter ( term, services ) ? ZERO_COST : TOP_COST; 
     }
     
-    protected abstract boolean filter ( Term term );
+    protected abstract boolean filter ( Term term, Services services );
 
 }

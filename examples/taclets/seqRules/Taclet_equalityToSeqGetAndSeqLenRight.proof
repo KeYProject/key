@@ -1,0 +1,64 @@
+\profile "Java Profile";
+
+\settings {
+"#Proof-Settings-Config-File
+#Mon Dec 16 15:26:43 MET 2013
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]RETREAT_MODE_OPTIONS_KEY=RETREAT_MODE_NONE
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_EXPAND
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=500
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=Strings-Strings\\:on , reach-reach\\:on , JavaCard-JavaCard\\:on , assertions-assertions\\:on , bigint-bigint\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , initialisation-initialisation\\:disableStaticInitialisation , modelFields-modelFields\\:showSatisfiability , sequences-sequences\\:on , integerSimplificationRules-integerSimplificationRules\\:full , runtimeExceptions-runtimeExceptions\\:ban , optimisedSelectRules-optimisedSelectRules\\:on
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+\proofObligation "#Proof Obligation Settings
+#Mon Dec 16 15:26:43 MET 2013
+name=equalityToSeqGetAndSeqLenRight
+class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
+";
+
+\proof {
+(keyLog "0" (keyUser "pschmitt" ) (keyVersion "cd4d244ec17586d37f1e609c330df9c3940650fc"))
+
+(autoModeTime "57")
+
+(branch "dummy ID"
+(rule "impRight" (formula "1") (userinteraction))
+(rule "andLeft" (formula "1") (userinteraction))
+(rule "equalityToSeqGetAndSeqLen" (formula "3") (inst "iv=iv") (userinteraction))
+(rule "eqSymm" (formula "2") (term "1,0"))
+(rule "eqSymm" (formula "1"))
+(rule "eqSymm" (formula "3") (term "1,0,1"))
+(rule "eqSymm" (formula "3") (term "0"))
+(rule "replace_known_left" (formula "3") (term "0") (ifseqformula "1"))
+(builtin "One Step Simplification" (formula "3"))
+(rule "close" (formula "3") (ifseqformula "2"))
+)
+
+}

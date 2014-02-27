@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -75,21 +76,21 @@ public class KeYWatchpointNonSymbolicStopCondition extends AbstractNonSymbolicCo
       if(suspendOnTrue){
          return super.conditionMet(ruleApp, proof, node);
       }else{
-         Term negatedCondition = TermBuilder.DF.not(getCondition());
+         Term negatedCondition = getProof().getServices().getTermBuilder().not(getCondition());
          //initialize values
          PosInOccurrence pio = ruleApp.posInOccurrence();
          Term term = pio.subTerm();
-         term = TermBuilder.DF.goBelowUpdates(term);
+         term = TermBuilder.goBelowUpdates(term);
          IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
          //put values into map which have to be replaced
          if(ec!=null){
             getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
          }
          //replace renamings etc.
-         OpReplacer replacer = new OpReplacer(getVariableNamingMap());
+         OpReplacer replacer = new OpReplacer(getVariableNamingMap(), getProof().getServices().getTermFactory());
          Term termForSideProof = replacer.replace(negatedCondition);
          //start side proof
-         Term toProof = TermBuilder.DF.equals(TermBuilder.DF.tt(), termForSideProof);
+         Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
          Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
          ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
          return !info.getProof().closed();

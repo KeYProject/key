@@ -45,7 +45,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofVisitor;
@@ -491,7 +490,7 @@ public class SymbolicExecutionTreeBuilder {
          // Check if the current node has branch conditions which should be added to the execution tree model
          if (!(parentToAddTo instanceof IExecutionStart) && // Ignore branch conditions before starting with code execution
              hasBranchCondition(visitedNode)) {
-            NodeIterator iter = visitedNode.childrenIterator();
+             Iterator<Node> iter = visitedNode.childrenIterator();
             while (iter.hasNext()) {
                Node childNode = iter.next();
                if (!keyNodeBranchConditionMapping.containsKey(childNode)) {
@@ -760,7 +759,7 @@ public class SymbolicExecutionTreeBuilder {
    
    protected boolean isNotInImpliciteMethod(Node node) {
       Term term = node.getAppliedRuleApp().posInOccurrence().subTerm();
-      term = TermBuilder.DF.goBelowUpdates(term);
+      term = TermBuilder.goBelowUpdates(term);
       Services services = proof.getServices();
       IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), services);
       IProgramMethod pm = ec.getMethodContext();
@@ -783,7 +782,7 @@ public class SymbolicExecutionTreeBuilder {
       MethodFrameCounterJavaASTVisitor newCounter = new MethodFrameCounterJavaASTVisitor(jb.program(), proof.getServices());
       int newCount = newCounter.run();
       Term oldModality = node.getAppliedRuleApp().posInOccurrence().subTerm();
-      oldModality = TermBuilder.DF.goBelowUpdates(oldModality);
+      oldModality = TermBuilder.goBelowUpdates(oldModality);
       MethodFrameCounterJavaASTVisitor oldCounter = new MethodFrameCounterJavaASTVisitor(oldModality.javaBlock().program(), proof.getServices());
       int oldCount = oldCounter.run();
       LinkedList<Node> currentMethodCallStack = getMethodCallStack(node.getAppliedRuleApp());
@@ -908,7 +907,7 @@ public class SymbolicExecutionTreeBuilder {
    protected boolean hasBranchCondition(Node node) {
       if (node.childrenCount() >= 2) { // Check if it is a possible branch statement, otherwise there is no need for complex computation to filter out not relevant branches
          int openChildrenCount = 0;
-         NodeIterator childIter = node.childrenIterator();
+         Iterator<Node> childIter = node.childrenIterator();
          while (childIter.hasNext()) {
             Node child = childIter.next();
             // Make sure that the branch is not closed

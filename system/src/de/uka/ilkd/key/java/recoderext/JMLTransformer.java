@@ -40,7 +40,6 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
-import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 
@@ -60,19 +59,19 @@ public final class JMLTransformer extends RecoderModelTransformer {
     private static final String JMR = "@*/";
 
     private static final ImmutableList<String> javaMods
-        = ImmutableSLList.<String>nil().prepend(new String[]{"abstract",
-                                                         "final", 
-                                                         "private", 
-                                                         "protected", 
-                                                         "public", 
-                                                         "static"});    
+        = ImmutableSLList.<String>nil().prepend("abstract",
+            "final",
+            "private",
+            "protected",
+            "public",
+            "static");
     
     private static ImmutableSet<PositionedString> warnings 
     	= DefaultImmutableSet.<PositionedString>nil();
 
-    private HashMap<TypeDeclaration, List<Method>> typeDeclaration2Methods;
+    private final HashMap<TypeDeclaration, List<Method>> typeDeclaration2Methods;
 
-    private HashMap<TypeDeclaration, List<? extends Constructor>> typeDeclaration2Constructores;
+    private final HashMap<TypeDeclaration, List<? extends Constructor>> typeDeclaration2Constructores;
     
 
     /**
@@ -223,8 +222,9 @@ public final class JMLTransformer extends RecoderModelTransformer {
         if(pe.getComments() == null) {
             return new Comment[0];
         }
-        
-        Comment[] result = pe.getComments().toArray(new Comment[0]);
+
+        ASTList<Comment> var = pe.getComments();
+        Comment[] result = var.toArray(new Comment[var.size()]);
         for (Comment aResult : result) {
             aResult.setParent(pe);
         }
@@ -455,7 +455,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
     }
         
         
-    private void transformClasslevelComments(TypeDeclaration td, 
+    private void transformClasslevelComments(TypeDeclaration td,
                                              String fileName) 
             throws SLTranslationException {
         //iterate over all pre-existing children
@@ -468,7 +468,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 comments = getCommentsAndSetParent(children[i]);
             } else if(td.getComments() != null) {
                 assert i > 0; //otherwise there wouldn't even be implicit fields
-                comments = td.getComments().toArray(new Comment[0]);
+                ASTList<Comment> var = td.getComments();
+                comments = var.toArray(new Comment[var.size()]);
                 for(Comment c : comments) {
                     c.setParent(children[i-1]);
                 }
@@ -676,22 +677,22 @@ public final class JMLTransformer extends RecoderModelTransformer {
                     transformClasslevelComments(td, fileName);
                     
                     //iterate over all pre-existing constructors
-                    for(int k = 0, o = constructorList.size(); k < o; k++) {
-                        if(constructorList.get(k) 
-                           instanceof ConstructorDeclaration) {
-                            ConstructorDeclaration cd 
-                                = (ConstructorDeclaration) 
-                                   constructorList.get(k);
+                    for (Constructor aConstructorList : constructorList) {
+                        if (aConstructorList
+                                instanceof ConstructorDeclaration) {
+                            ConstructorDeclaration cd
+                                    = (ConstructorDeclaration)
+                                    aConstructorList;
                             transformMethodlevelComments(cd, fileName);
                         }
                     }               
                                         
                     //iterate over all pre-existing methods
-                    for(int k = 0, o = methodList.size(); k < o; k++) {
-                        if(methodList.get(k) instanceof MethodDeclaration) { // might be ImplicitEnumMethod
-                            MethodDeclaration md 
-                                = (MethodDeclaration) 
-                                   methodList.get(k);
+                    for (Method aMethodList : methodList) {
+                        if (aMethodList instanceof MethodDeclaration) { // might be ImplicitEnumMethod
+                            MethodDeclaration md
+                                    = (MethodDeclaration)
+                                    aMethodList;
                             transformMethodlevelComments(md, fileName);
                         }
                     }               
@@ -722,7 +723,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
     
     private static class TypeDeclarationCollector extends SourceVisitor{
         
-        HashSet<TypeDeclaration> result = new LinkedHashSet<TypeDeclaration>();
+        final HashSet<TypeDeclaration> result = new LinkedHashSet<TypeDeclaration>();
                 
         public void walk(SourceElement s){
             s.accept(this);

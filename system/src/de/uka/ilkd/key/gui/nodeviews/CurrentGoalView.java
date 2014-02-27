@@ -10,11 +10,7 @@
 // The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
 // 
-
-
-
 package de.uka.ilkd.key.gui.nodeviews;
-
 
 import java.awt.*;
 import java.awt.dnd.Autoscroll;
@@ -26,21 +22,20 @@ import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Debug;
-import java.util.Vector;
+import java.util.LinkedList;
 
-/** 
- * This sequent view displays the sequent of an open goal and allows selection of
- * formulas as well as the application of rules. It offers services for highlighting 
- * formulas, selecting applicable rules (in particular taclets) and drag'n drop
- * instantiation of taclets.
+/**
+ * This sequent view displays the sequent of an open goal and allows selection
+ * of formulas as well as the application of rules. It offers services for
+ * highlighting formulas, selecting applicable rules (in particular taclets) and
+ * drag'n drop instantiation of taclets.
  */
 public class CurrentGoalView extends SequentView implements Autoscroll {
 
@@ -48,108 +43,107 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 
     public static final Color ADDITIONAL_HIGHLIGHT_COLOR = new Color(0, 0, 0, 38);
 
-    public static final Color UPDATE_HIGHLIGHT_COLOR = new Color(0, 150, 130, 38);
+    private static final Color UPDATE_HIGHLIGHT_COLOR = new Color(0, 150, 130, 38);
 
     public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
 
     // the mediator
-    private KeYMediator mediator;
+    private final KeYMediator mediator;
 
     // the mouse/mouseMotion listener
-    protected SequentViewListener listener;
-
-    // an object that detects opening and closing of an Taclet instantiation dialog
-    private GUIListener guiListener;
+    private final CurrentGoalViewListener listener;
 
     // enables this component to be a Drag Source
-    DragSource dragSource = null;
+    private DragSource dragSource = null;
 
-    private static final Insets autoScrollSensitiveRegion = new Insets(20,20,20,20);
-    private final Vector<Object> updateHighlights;
+    private static final Insets autoScrollSensitiveRegion = new Insets(20, 20, 20, 20);
+    private final LinkedList<Object> updateHighlights;
 
-
-    /** 
-     * creates a viewer for a sequent 
-     * @param mediator the KeYMediator allowing access to the
-     *  current system status
+    /**
+     * creates a viewer for a sequent
+     *
+     * @param mainWindow the MainWindow allowing access to the current system
+     * status
      */
-    public CurrentGoalView(KeYMediator mediator, MainWindow mainWindow) {
+    public CurrentGoalView(MainWindow mainWindow) {
         super(mainWindow);
-	setMediator(mediator);
+        this.mediator = mainWindow.getMediator();
         setBackground(Color.white);
-	// disables selection
-	setSelectionColor(getBackground());
-	listener = new SequentViewListener(this, getMediator());
-	
-	guiListener = new GUIListener(){
-		/** invoked if a frame that wants modal access is opened */
-		public void modalDialogOpened(GUIEvent e){
-		 
-		    // enable textual DnD in case that the opened model dialog
-		    // is the ApplyTacletDialog
-		    final boolean enableDnD = e.getSource() instanceof ApplyTacletDialog;
-		    listener.setModalDragNDropEnabled(enableDnD);
-		    refreshHighlightning = enableDnD;
-                    
-                    // disable drag and drop instantiation of taclets
-                    getDropTarget().setActive(false);
-		}
-		
-		/** invoked if a frame that wants modal access is closed */
-		public void modalDialogClosed(GUIEvent e){
-		    if (e.getSource() instanceof ApplyTacletDialog){
-			// disable drag'n'drop ...
-			listener.setModalDragNDropEnabled(false);
-		    } 
+        // disables selection
+        setSelectionColor(getBackground());
+        listener = new CurrentGoalViewListener(this, getMediator());
 
-		    refreshHighlightning = true;
-		    
-                    
-		    // enable drag and drop instantiation of taclets
-                    getDropTarget().setActive(true);
-		}
-		
-		/** invoked if the user wants to abort the proving session */
-		public void shutDown(GUIEvent e){
-		}	
-	    };
-		 
-	addMouseListener(listener);
-	addMouseMotionListener(listener);	
+        GUIListener guiListener = new GUIListener() {
+            /**
+             * invoked if a frame that wants modal access is opened
+             */
+            @Override
+            public void modalDialogOpened(GUIEvent e) {
 
-	// and here comes the drag'n'drop stuff that allows the user to copy
-	// the currently highlighted subterm/formula by mere drag'n'dop actions
-	
-	dragSource = new DragSource();
-	dragSource.createDefaultDragGestureRecognizer( this, 
-						       DnDConstants.ACTION_COPY,
-						       listener.getDragGestureListener() );
+                // enable textual DnD in case that the opened model dialog
+                // is the ApplyTacletDialog
+                final boolean enableDnD = e.getSource() instanceof ApplyTacletDialog;
+                listener.setModalDragNDropEnabled(enableDnD);
+                refreshHighlightning = enableDnD;
 
-	// And now the Drag'n'drop stuff ...
-	       
+                // disable drag and drop instantiation of taclets
+                getDropTarget().setActive(false);
+            }
+
+            /**
+             * invoked if a frame that wants modal access is closed
+             */
+            @Override
+            public void modalDialogClosed(GUIEvent e) {
+                if (e.getSource() instanceof ApplyTacletDialog) {
+                    // disable drag'n'drop ...
+                    listener.setModalDragNDropEnabled(false);
+                }
+
+                refreshHighlightning = true;
+
+                // enable drag and drop instantiation of taclets
+                getDropTarget().setActive(true);
+            }
+
+            /**
+             * invoked if the user wants to abort the proving session
+             */
+            @Override
+            public void shutDown(GUIEvent e) {
+            }
+        };
+
+        addMouseListener(listener);
+
+        // and here comes the drag'n'drop stuff that allows the user to copy
+        // the currently highlighted subterm/formula by mere drag'n'dop actions
+        dragSource = new DragSource();
+        dragSource.createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY, listener);
+
+        // And now the Drag'n'drop stuff ...
         final DragNDropInstantiator dragNDropInstantiator = new DragNDropInstantiator(this);
-        final DropTarget aDropTarget =  
-	    new DropTarget(this, 
-                    dragNDropInstantiator);
+        final DropTarget aDropTarget = new DropTarget(this, dragNDropInstantiator);
 
         this.setAutoscrolls(true);
-	this.setDropTarget(aDropTarget);
-                
-        
-	// add listener to KeY GUI events
+        this.setDropTarget(aDropTarget);
+
+        // add listener to KeY GUI events
         getMediator().addGUIListener(guiListener);
-        
-        updateHighlights = new Vector<Object>();
+
+        updateHighlights = new LinkedList<Object>();
 
     }
 
-     /**
-     * updates all updateHighlights. Firstly removes all displayed ones and
-     * then gets a new list of updates to highlight
+    /**
+     * updates all updateHighlights. Firstly removes all displayed ones and then
+     * gets a new list of updates to highlight
      */
-    public void updateUpdateHighlights() {
-        if (getLogicPrinter() == null) return;
-        
+    void updateUpdateHighlights() {
+        if (getLogicPrinter() == null) {
+            return;
+        }
+
         for (Object updateHighlight : updateHighlights) {
             removeHighlight(updateHighlight);
         }
@@ -160,22 +154,26 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         if (ranges != null) {
             for (Range range : ranges) {
                 Object tag = getColorHighlight(UPDATE_HIGHLIGHT_COLOR);
-                updateHighlights.addElement(tag);
+                updateHighlights.add(tag);
                 paintHighlight(range, tag);
             }
         }
     }
 
     protected DragSource getDragSource() {
-	return dragSource;
+        return dragSource;
     }
 
-    /** sets the text being printed */
+    /**
+     * sets the text being printed
+     */
+    @Override
     public synchronized void printSequent() {
         if (SwingUtilities.isEventDispatchThread()) {
             printSequentImmediately();
         } else {
             Runnable sequentUpdater = new Runnable() {
+                @Override
                 public void run() {
                     printSequentImmediately();
                 }
@@ -184,33 +182,33 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
     }
 
-    /** sets the text being printed */
-    public synchronized void printSequentImmediately() {
-	removeMouseMotionListener(listener);
-	removeMouseListener(listener);
-        
+    /**
+     * sets the text being printed
+     */
+    synchronized void printSequentImmediately() {
+        removeMouseListener(listener);
+
         setLineWidth(computeLineWidth());
-        
+
         if (getLogicPrinter() != null) {
             getLogicPrinter().update(filter, getLineWidth());
-	    boolean errorocc;
-	    do {
-	        errorocc = false;
-	        try {
-		    setText(getLogicPrinter().toString());
-			MainWindow.getInstance().sequentSearchBar.search();
-	        } catch (Error e) {
-		    System.err.println("Error occurred while printing Sequent!");
-		    errorocc = true;
-	        }
-	    } while (errorocc);
+            boolean errorocc;
+            do {
+                errorocc = false;
+                try {
+                    setText(getLogicPrinter().toString());
+                    MainWindow.getInstance().sequentViewSearchBar.search();
+                } catch (Error e) {
+                    System.err.println("Error occurred while printing Sequent!");
+                    errorocc = true;
+                }
+            } while (errorocc);
         }
-        
+
         updateUpdateHighlights();
-	restorePosition();
-        addMouseMotionListener(listener);
-	addMouseListener(listener);        
-	repaint();
+        restorePosition();
+        addMouseListener(listener);
+        repaint();
     }
 
     // last highlighted caret position
@@ -222,112 +220,112 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         lastHighlightedCaretPos = correctedViewToModel(p);
     }
 
-    /** makes the last caret position visible (if possible) */
-    public void restorePosition() {
-	int lastHighlightedCaretPosTmp = lastHighlightedCaretPos;
-        if (!(lastHighlightedCaretPosTmp < 0 || getDocument() == null || 
-	      lastHighlightedCaretPosTmp > getDocument().getLength())) {
-	    setCaretPosition(lastHighlightedCaretPosTmp);
-	}
-    }
-
-    /** sets the LogicPrinter to use in case there is no proof available.
-     * @param sp the LogicPrinter that is used
+    /**
+     * makes the last caret position visible (if possible)
      */
-    public void setPrinterNoProof() {
-        setLogicPrinter(new LogicPrinter(new ProgramPrinter(null), null, null));
+    void restorePosition() {
+        int lastHighlightedCaretPosTmp = lastHighlightedCaretPos;
+        if (!(lastHighlightedCaretPosTmp < 0 || getDocument() == null
+                || lastHighlightedCaretPosTmp > getDocument().getLength())) {
+            setCaretPosition(lastHighlightedCaretPosTmp);
+        }
     }
 
-    /** sets the LogicPrinter to use
-     * @param sp the LogicPrinter that is used
-     * @param f the SequentPrintFilter that is used
+    /**
+     * sets the LogicPrinter to use
      */
     public void setPrinter(Goal goal) {
         filter = new IdentitySequentPrintFilter(goal.sequent());
-        setLogicPrinter(new LogicPrinter(new ProgramPrinter(null),
-                        getMediator().getNotationInfo(),
-                        mediator.getServices()));
+        setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(null),
+                getMediator().getNotationInfo(),
+                mediator.getServices(),
+                getVisibleTermLabels()));
     }
 
     protected SequentPrintFilter getSequentPrintFilter() {
-    	return filter;
+        return filter;
     }
 
-    /** sets the mediator
-     * @param mediator the KeYMediator used to communicate with other
-     * components 
-     */
-    private void setMediator(KeYMediator mediator) {
-        Debug.assertTrue(mediator != null, "Mediator must be set");
-        this.mediator = mediator;
-    }
-
-    /** returns the mediator of this view
+    /**
+     * returns the mediator of this view
+     *
      * @return the KeYMediator
      */
-    public KeYMediator getMediator() {
-	return mediator;
+    public final KeYMediator getMediator() {
+        return mediator;
     }
 
-    /** selected rule to apply 
+    /**
+     * selected rule to apply
+     *
      * @param taclet the selected Taclet
-     * @param pos the PosInSequent describes the position where to apply the 
-     * rule 
+     * @param pos the PosInSequent describes the position where to apply the
+     * rule
      */
     void selectedTaclet(TacletApp taclet, PosInSequent pos) {
-    	getMediator().selectedTaclet(taclet, pos);
+        getMediator().selectedTaclet(taclet, pos);
     }
 
     /**
      * Enables drag'n'drop of highlighted subterms in the sequent window.
+     *
      * @param allowDragNDrop enables drag'n'drop iff set to true.
      */
-    public synchronized void setModalDragNDropEnabled(boolean allowDragNDrop){
+    public synchronized void setModalDragNDropEnabled(boolean allowDragNDrop) {
         listener.setModalDragNDropEnabled(allowDragNDrop);
     }
 
     /**
      * Checks whether drag'n'drop of highlighted subterms in the sequent window
      * currently is enabled..
+     *
      * @return true iff drag'n'drop is enabled.
-     */	
-    public synchronized boolean modalDragNDropEnabled(){
-	return listener.modalDragNDropEnabled();
+     */
+    public synchronized boolean modalDragNDropEnabled() {
+        return listener.modalDragNDropEnabled();
+    }
+
+    @Override
+    public String getHighlightedText() {
+        return getHighlightedText(getPosInSequent(getMousePosition()));
     }
 
     public PosInSequent getMousePosInSequent() {
-       return getPosInSequent(getMousePosition());
+        return getPosInSequent(getMousePosition());
     }
 
     /**
-     * used for autoscrolling when performing drag and drop actions.
-     * Computes the rectangle to be made visible. 
+     * used for autoscrolling when performing drag and drop actions. Computes
+     * the rectangle to be made visible.
      */
-    public void autoscroll(Point loc) {       
+    @Override
+    public void autoscroll(Point loc) {
         final Insets insets = getAutoscrollInsets();
         final Rectangle outer = getVisibleRect();
-        final Rectangle inner = new Rectangle(outer.x+insets.left, 
-                outer.y+insets.top, 
-                outer.width-(insets.left+insets.right), 
-                outer.height-(insets.top+insets.bottom));
-        
-        if (!inner.contains(loc))  {
-            Rectangle scrollRect = new Rectangle(loc.x-insets.left, 
-                    loc.y-insets.top, insets.left+insets.right, 
-                    insets.top+insets.bottom);            
+        final Rectangle inner = new Rectangle(outer.x + insets.left,
+                outer.y + insets.top,
+                outer.width - (insets.left + insets.right),
+                outer.height - (insets.top + insets.bottom));
+
+        if (!inner.contains(loc)) {
+            Rectangle scrollRect = new Rectangle(loc.x - insets.left,
+                    loc.y - insets.top, insets.left + insets.right,
+                    insets.top + insets.bottom);
             scrollRectToVisible(scrollRect);
         }
     }
 
     /**
-     * used to define the area in which autoscrolling will be
-     * initialized
+     * used to define the area in which autoscrolling will be initialized
      */
-    public Insets getAutoscrollInsets() {      
+    @Override
+    public Insets getAutoscrollInsets() {
         return autoScrollSensitiveRegion;
     }
 
+    @Override
     public String getTitle() {
         return "Current Goal";
     }
+
 }

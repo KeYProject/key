@@ -162,7 +162,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                
         
         if (applicableApps.isEmpty() && !targetPos.isSequent() &&
-                targetPos.getPosInOccurrence().posInTerm() != PosInTerm.TOP_LEVEL) {
+                targetPos.getPosInOccurrence().posInTerm() != PosInTerm.getTopLevel()) {
             // if no applicable taclet is found we relax the target position a bit
             applicableApps = 
                 getAllApplicableApps(sourcePos, 

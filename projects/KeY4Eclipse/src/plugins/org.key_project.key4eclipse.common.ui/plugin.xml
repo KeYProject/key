@@ -588,7 +588,7 @@
             contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
             default="false"
             extensions="proof, key"
-            icon="icons/logo16.gif"
+            icon="icons/prooffile16.png"
             id="org.key_project.key4eclipse.common.ui.keyTextEditor"
             name="KeY Text Editor">
       </editor>
@@ -599,5 +599,17 @@
             class="org.key_project.key4eclipse.common.ui.setup.TacletOptionsSetupParticipant">
       </participant>
    </extension>
-
+   <!--
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+       <file-association
+             content-type="org.eclipse.core.runtime.text"
+             file-extensions="proof">
+       </file-association>
+       <file-association
+             content-type="org.eclipse.core.runtime.text"
+             file-extensions="key">
+       </file-association>
+   </extension>
+   -->
 </plugin>

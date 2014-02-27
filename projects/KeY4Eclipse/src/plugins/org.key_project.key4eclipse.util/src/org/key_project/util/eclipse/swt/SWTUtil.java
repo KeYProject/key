@@ -32,6 +32,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
@@ -470,6 +471,25 @@ public final class SWTUtil {
                 viewer.setSelection(selection, reveal);
              }
           });
+       }
+    }
+    
+    /**
+     * Returns the new text which will be shown if {@link VerifyEvent#doit} is {@code true}.
+     * @param e The {@link VerifyEvent}.
+     * @return The new text.
+     */
+    public static String getNewText(VerifyEvent e) {
+       if (e.getSource() instanceof Text) {
+          String oldText = ((Text)e.widget).getText();
+          StringBuilder sb = new StringBuilder();
+          sb.append(oldText.substring(0, e.start));
+          sb.append(e.text);
+          sb.append(oldText.substring(e.end));
+          return sb.toString();
+       }
+       else {
+          throw new IllegalArgumentException("Widgets of type \"" + e.getSource().getClass() + " \" are not supported.");
        }
     }
 }

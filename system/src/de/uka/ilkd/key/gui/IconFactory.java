@@ -14,14 +14,20 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.Image;
+import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.MetalIconFactory.FolderIcon16;
 import javax.swing.plaf.metal.MetalIconFactory.TreeControlIcon;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -36,6 +42,7 @@ public class IconFactory {
     private static Image keyHoleClosed       = getImage("images/keyproved.gif");
     private static Image keyHoleInteractive     = getImage("images/keyinteractive.gif");
     private static Image keyLogo             = getImage("images/key-color.gif");
+    private static Image keyLogo22 = getImage("images/key22.gif");
     private static Image keyLogoSmall        = getImage("images/key-color-icon-square.png");
     private static Icon provedFolderIcon     = KeYFolderIcon.getKeYFolderIconClosed();
     private static Icon closableFolderIcon   = KeYFolderIcon.getKeYFolderIconClosable();
@@ -45,18 +52,12 @@ public class IconFactory {
     private static Icon expandedIcon   = KeYControlIcon.getKeYExpandedIcon();
     private static Icon collapsedIcon  = KeYControlIcon.getKeYCollapsedIcon();
 
-    private static Image reuse    = getImage("images/toolbar/ff.gif");
     private static Image prune		= getImage("images/toolbar/pruneProof.png");
     private static Image goalBack = getImage("images/toolbar/goalBack.png");
-    private static Image autoResume = getImage("images/toolbar/autoResume.png");
-    private static Image autoResumeDisabled = 
-	getImage("images/toolbar/autoResumeDisabled.png");
     private static Image autoModeStart =
         getImage("images/toolbar/autoModeStart.png");
     private static Image autoModeStop =
         getImage("images/toolbar/autoModeStop.png");
-    private static Image autoModeConfigArrow = 
-    getImage("images/toolbar/autoModeConfigArrow.png");
     private static Image decisionProcedureConfigArrow = 
 	    getImage("images/toolbar/decProcArrow.png");
 
@@ -71,7 +72,26 @@ public class IconFactory {
     private static Image saveFile = 
         getImage("images/toolbar/saveFile.png");
     private static Image editFile = 
-        getImage("images/toolbar/editFile.gif");    
+        getImage("images/toolbar/edit.png");    
+    private static Image abandonProof = getImage("images/toolbar/abandon.png");
+    private static Image configure = getImage("images/toolbar/config.png");
+    private static Image help = getImage("images/toolbar/help.png");
+    private static Image proofMgt = getImage("images/toolbar/mgt.png");
+    private static Image properties = getImage("images/toolbar/properties.png");
+    private static Image quit = getImage("images/toolbar/quit.png");
+    private static Image recentFiles = getImage("images/toolbar/recent.png");
+    private static Image search = getImage("images/toolbar/search.png");
+    private static Image search2 = getImage("images/toolbar/search2.png");
+    private static Image statistics = getImage("images/toolbar/statistics.png");
+    private static Image toolbox = getImage("images/toolbar/toolbox.png");
+
+    private static Image plus = getImage("images/toolbar/plus.png");
+    private static Image minus = getImage("images/toolbar/minus.png");
+    private static Image expandGoals = getImage("images/toolbar/expandGoals.png");
+
+    private static Image next = getImage("images/toolbar/go-next.png");
+    private static Image previous = getImage("images/toolbar/go-previous.png");
+    private static Image stop = getImage("images/toolbar/stop.png");
 
     private static Image interactiveAppLogo = 
         getImage("images/interactiveAppLogo.png");
@@ -86,6 +106,78 @@ public class IconFactory {
 	Image scaledim=im.getScaledInstance(x,y,Image.SCALE_SMOOTH);
 	return new ImageIcon(scaledim);
     }
+
+    public static ImageIcon abandon(int x) {
+        return scaleIcon(abandonProof ,x,x);
+    }
+
+    public static ImageIcon configure (int x) {
+        return scaleIcon(configure ,x,x);
+    }
+
+    public static ImageIcon help (int x) {
+        return scaleIcon(help ,x,x);
+    }
+
+    public static ImageIcon proofMgt (int x) {
+        return scaleIcon(proofMgt ,x,x);
+    }
+
+    public static ImageIcon properties (int x) {
+        return scaleIcon(properties ,x,x);
+    }
+
+    public static ImageIcon quit (int x) {
+        return scaleIcon(quit ,x,x);
+    }
+
+    public static ImageIcon recentFiles (int x) {
+        return scaleIcon(recentFiles ,x,x);
+    }
+
+    public static ImageIcon search (int x) {
+        return scaleIcon(search ,x,x);
+    }
+
+    public static ImageIcon search2 (int x) {
+        return scaleIcon(search2 ,x,x);
+    }
+
+    public static ImageIcon statistics(int x) {
+        return scaleIcon(statistics,x,x);
+    }
+
+
+    public static ImageIcon toolbox(int x) {
+        return scaleIcon(toolbox,x,x);
+    }
+
+
+    public static ImageIcon plus(int x) {
+        return scaleIcon(plus,x,x);
+    }
+
+    public static ImageIcon minus(int x) {
+        return scaleIcon(minus,x,x);
+    }
+
+    public static ImageIcon expandGoals(int x) {
+        return scaleIcon(expandGoals,x,x);
+    }
+
+    public static ImageIcon next(int x) {
+        return scaleIcon(next,x,x);
+    }
+
+    public static ImageIcon previous(int x) {
+        return scaleIcon(previous,x,x);
+    }
+
+
+    public static ImageIcon stop(int x) {
+        return scaleIcon(stop,x,x);
+    }
+
 
     public static ImageIcon keyHole(int x, int y) {
 	return scaleIcon(keyHole,x,y);
@@ -106,17 +198,24 @@ public class IconFactory {
     public static ImageIcon keyLogo(int x, int y) {
 	return  scaleIcon(keyLogo,x,y);
     }
+ 
+    public static ImageIcon key22Logo(int x, int y) {
+	return  scaleIcon(keyLogo22,x,y);
+    }
 
+    @Deprecated
     public static ImageIcon reuseLogo() {
-	return scaleIcon(reuse, 15, 15);
+	return null;
     }
 
+    @Deprecated
     public static ImageIcon resumeLogo(int size) {
-	return scaleIcon(autoResume, size, size);
+	return null;
     }
 
+    @Deprecated
     public static ImageIcon resumeDisabledLogo(int size) {
-	return scaleIcon(autoResumeDisabled, size, size);
+	return null;
     }
 
     public static ImageIcon autoModeStartLogo(int size) {
@@ -127,8 +226,9 @@ public class IconFactory {
         return scaleIcon(autoModeStop, size, size);
     }
 
+    @Deprecated
     public static ImageIcon selectStrategyArrow(int size) {
-        return scaleIcon(autoModeConfigArrow, size / 2, size);
+        return null;
     }
     
     public static ImageIcon selectDecProcArrow(int size) {
@@ -201,7 +301,7 @@ public class IconFactory {
     }
 
 
-    private static class KeYFolderIcon extends FolderIcon16 {
+    public static class KeYFolderIcon extends FolderIcon16 {
 
         private static final long serialVersionUID = 5120051888984645985L;
         private static final Icon closedIcon   = new KeYFolderIcon(Color.green.darker());
@@ -223,7 +323,7 @@ public class IconFactory {
         }
 
         public void paintIcon(Component c, Graphics g, int x, int y) {
-            GraphicsConfiguration gc = c.getGraphicsConfiguration();
+            GraphicsConfiguration gc = c != null ? c.getGraphicsConfiguration() : null;
             Image image;
             if (gc != null) {
                 image = gc.createCompatibleImage(getIconWidth(), 
@@ -349,5 +449,4 @@ public class IconFactory {
                     }
         }
     }
-
 }

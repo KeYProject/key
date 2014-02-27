@@ -17,7 +17,7 @@ import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.InterruptListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.SwingWorker;
+import de.uka.ilkd.key.gui.SwingWorker3;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.util.Debug;
 
@@ -27,7 +27,7 @@ import de.uka.ilkd.key.util.Debug;
  * It decouples proof macros from the GUI event thread.
  * It registers with the mediator to receive Stop-Button events
  */
-public class ProofMacroWorker extends SwingWorker implements InterruptListener {
+public class ProofMacroWorker extends SwingWorker3 implements InterruptListener {
 
     /**
      * The macro which is to be executed

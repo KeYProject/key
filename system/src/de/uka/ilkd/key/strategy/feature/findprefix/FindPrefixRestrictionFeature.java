@@ -64,7 +64,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
         public boolean getResult() {
             return checker.getResult();
         }
-    };
+    }
 
     public enum PositionModifier {
         // If the parent operator of the find term is an update application,

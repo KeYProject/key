@@ -15,12 +15,12 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.*;
+import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.util.LRUCache;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /** 
  * The TermFactory is the <em>only</em> way to create terms using constructors 
@@ -36,22 +36,17 @@ import de.uka.ilkd.key.util.LRUCache;
  */
 public final class TermFactory {
     
-    /** 
-     * The only instance of TermFactory. 
-     */
-    public static final TermFactory DEFAULT = new TermFactory();    
-
-    private static final Map<Term, Term> cache 
-    	= Collections.synchronizedMap(new LRUCache<Term, Term>(20000));
 
     private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<Term>();
+    private final Map<Term, Term> cache;
     
 
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
     
-    private TermFactory() {
+    public TermFactory(Map<Term, Term> cache) {
+        this.cache = cache;
     }
     
     

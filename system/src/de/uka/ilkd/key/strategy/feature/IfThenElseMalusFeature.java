@@ -15,15 +15,15 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.util.LRUCache;
 
 
 /**
@@ -33,17 +33,15 @@ import de.uka.ilkd.key.util.LRUCache;
  * -1 is added.
  */
 public class IfThenElseMalusFeature implements Feature {
-
-    private  static LRUCache<PosInOccurrence, RuleAppCost> cache = new LRUCache<PosInOccurrence, RuleAppCost>(1000); 
-
     public static final Feature INSTANCE = new IfThenElseMalusFeature ();
     
     private IfThenElseMalusFeature () {}
     
     public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
-        if ( pos == null ) return LongRuleAppCost.ZERO_COST;
+        if ( pos == null ) return NumberRuleAppCost.getZeroCost();
 
-        RuleAppCost resInt = cache.get ( pos );
+        ServiceCaches caches = goal.proof().getServices().getCaches();
+        RuleAppCost resInt = caches.getIfThenElseMalusCache().get ( pos );
         if ( resInt != null ) {
             return resInt;
         }
@@ -59,12 +57,8 @@ public class IfThenElseMalusFeature implements Feature {
             if ( t.op () instanceof IfThenElse) res = ind != 0 ? res + 1 : res - 1;           
         }
 
-        resInt = LongRuleAppCost.create ( res );
-        cache.put ( pos, resInt );
+        resInt = NumberRuleAppCost.create ( res );
+        caches.getIfThenElseMalusCache().put ( pos, resInt );
         return resInt;
-    }
-
-    public static void clearCache(){
-        cache.clear();
     }
 }

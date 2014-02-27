@@ -38,7 +38,6 @@ import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.declaration.SuperArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
@@ -49,7 +48,6 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -365,7 +363,7 @@ public final class JavaInfo {
 
 	if(name2KJTCache != null) {
       result = name2KJTCache.get(type.getName());
-  }
+	}
 	
 	if(result == null) {
 	    Name ldtName = type.getCorrespondingLDTName();
@@ -614,7 +612,7 @@ public final class JavaInfo {
 		if(offset >= pm.getHeapCount(services)) {
 			break;
 		}
-		subs[offset++] = TermBuilder.DF.var(heap);
+		subs[offset++] = services.getTermBuilder().var(heap);
 	}
 	if(!pm.isStatic()) {
 	  subs[offset++] = prefix;
@@ -629,7 +627,7 @@ public final class JavaInfo {
 					       +" in "+className+" must have"
 					       +" a non-void type.");
 	}
-	return TermBuilder.DF.tf().createTerm(pm, subs);
+	return services.getTermBuilder().tf().createTerm(pm, subs);
     }
 
 
@@ -859,7 +857,7 @@ public final class JavaInfo {
             Field field = field1;
             if (programName.equals(field.getProgramName())) {
                 return (ProgramVariable)
-                        ((FieldSpecification) field).getProgramVariable();
+                        field.getProgramVariable();
             }
         }
 	return null;
@@ -981,7 +979,7 @@ public final class JavaInfo {
 		if (f != null
 		        && (f.getName().equals(name) || f.getProgramName()
 		                .equals(name))) {
-		    return (ProgramVariable) ((VariableSpecification) f)
+		    return (ProgramVariable) f
 			    .getProgramVariable();
 		}
 	    }

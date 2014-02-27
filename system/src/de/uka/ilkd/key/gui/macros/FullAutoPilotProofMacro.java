@@ -13,11 +13,6 @@
 
 package de.uka.ilkd.key.gui.macros;
 
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
 /**
  * This class captures a proof macro which is meant to fully automise KeY proof
  * workflow.
@@ -62,11 +57,5 @@ public class FullAutoPilotProofMacro extends SequentialProofMacro {
                 new AutoPilotPrepareProofMacro(),
                 new TryCloseMacro(NUMBER_OF_TRY_STEPS)
         };
-    }
-
-
-    @Override
-    public KeyStroke getKeyStroke () {
-	return KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.SHIFT_DOWN_MASK);
     }
 }

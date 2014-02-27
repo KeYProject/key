@@ -37,8 +37,7 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -101,7 +100,6 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class Taclet implements Rule, Named {
     
     private static final String AUTONAME = "_taclet";
-    private static final TermBuilder TB = TermBuilder.DF;
 
     /** name of the taclet */
     private final Name name;
@@ -330,8 +328,7 @@ public abstract class Taclet implements Rule, Named {
      * @param v the bound variable to be searched 
      */
     protected boolean varIsBound(SchemaVariable v) {
-        return (v instanceof QuantifiableVariable) 
-        ? getBoundVariables().contains((QuantifiableVariable)v) : false;
+        return (v instanceof QuantifiableVariable) && getBoundVariables().contains((QuantifiableVariable) v);
     }
 
  
@@ -547,7 +544,7 @@ public abstract class Taclet implements Rule, Named {
 	        // if intended to match concrete label, match against schema label
 	        // and use an appropriate variable condition
 	        if (l instanceof SchemaVariable) {
-	            SchemaVariable schemaLabel = (SchemaVariable) l;
+	            final SchemaVariable schemaLabel = (SchemaVariable) l;
 	            final MatchConditions cond =
 	                    schemaLabel.match(term, matchCond, services);
 	            if (cond == null) {
@@ -623,7 +620,7 @@ public abstract class Taclet implements Rule, Named {
 	if (p_matchCond.getInstantiations().getUpdateContext().isEmpty())
 	    updateFormula = p_template;
 	else
-	    updateFormula = TB.applyUpdatePairsSequential(p_matchCond.getInstantiations()
+	    updateFormula = p_services.getTermBuilder().applyUpdatePairsSequential(p_matchCond.getInstantiations()
 		    .getUpdateContext(), p_template);
 
 	IfFormulaInstantiation cf;
@@ -909,7 +906,7 @@ public abstract class Taclet implements Rule, Named {
                     services, matchCond, applicationPosInOccurrence);
                 
         if (!svInst.getUpdateContext().isEmpty()) {
-            instantiatedFormula = TB.applyUpdatePairsSequential(svInst.getUpdateContext(), 
+            instantiatedFormula = services.getTermBuilder().applyUpdatePairsSequential(svInst.getUpdateContext(), 
             		           	             instantiatedFormula);         
 	     }
         
@@ -1202,14 +1199,15 @@ public abstract class Taclet implements Rule, Named {
 		    ifPart = inst.getConstrainedFormula ().formula ();
 
 		    // negate formulas of the if succedent
-		    if ( i <= 0 )
-			ifPart = TB.not(ifPart);		    
+		    final TermServices services = p_goal.proof().getServices();
+            if ( i <= 0 )
+			ifPart = services.getTermBuilder().not(ifPart);		    
 
 		    if ( res == null ) {
 			res   = p_goal.split( p_numberOfNewGoals + 1 );
 			ifObl = ifPart;
 		    } else
-			ifObl = TermFactory.DEFAULT.createTerm
+			ifObl = services.getTermFactory().createTerm
 			    ( Junctor.AND, ifObl, ifPart );
 		    
 		    // UGLY: We create a flat structure of the new

@@ -17,7 +17,7 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
 
@@ -36,7 +36,7 @@ public class FindDepthFeature implements Feature {
     public RuleAppCost compute ( RuleApp app, PosInOccurrence pos, Goal goal ) {
         //assert pos != null : "Feature is only applicable to rules with find";
 
-        return LongRuleAppCost.create ( pos == null ? 0 : pos.depth () );
+        return NumberRuleAppCost.create ( pos == null ? 0 : pos.depth () );
     }
 
 }

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel" driverId="de.hentschel.visualdbc.dataSource.key">
+  <types xsi:type="dbcmodel:DbcEnum" name="MyEnum" visibility="default">
+    <invariants name="JML class invariant nr 0 in MyEnum" condition="!MyEnum::select(heap, null, MyEnum::$A) = null"/>
+    <invariants name="JML class invariant nr 1 in MyEnum" condition="!MyEnum::select(heap, null, MyEnum::$B) = null"/>
+    <invariants name="JML class invariant nr 2 in MyEnum" condition="!MyEnum::select(heap, null, MyEnum::$C) = null"/>
+    <invariants name="JML class invariant nr 3 in MyEnum" condition="!MyEnum::select(heap, self, MyEnum::$previous) = null"/>
+    <methods signature="getValue()" returnType="int"/>
+    <methods signature="getPrevious()" returnType="MyEnum"/>
+    <methods signature="valueOf(string : java.lang.String)" static="true" returnType="MyEnum"/>
+    <methods signature="values()" static="true" returnType="MyEnum[]"/>
+    <methods signature="name()" returnType="java.lang.String"/>
+    <attributes name="previous" type="MyEnum" visibility="default"/>
+    <constructors signature="MyEnum(previous : MyEnum)" visibility="private"/>
+    <literals name="A"/>
+    <literals name="B"/>
+    <literals name="C"/>
+  </types>
+  <packages name="enumPackage">
+    <types xsi:type="dbcmodel:DbcInterface" name="IPackageEnum">
+      <methods signature="getValue()" returnType="int" abstract="true"/>
+    </types>
+    <types xsi:type="dbcmodel:DbcEnum" name="PackageEnum" visibility="default" implements="//@packages.0/@types.0">
+      <invariants name="JML class invariant nr 4 in PackageEnum" condition="!  enumPackage.PackageEnum::select(heap,&#xA;                                   null,&#xA;                                   enumPackage.PackageEnum::$RED)&#xA; = null"/>
+      <invariants name="JML class invariant nr 5 in PackageEnum" condition="!  enumPackage.PackageEnum::select(heap,&#xA;                                   null,&#xA;                                   enumPackage.PackageEnum::$GREEN)&#xA; = null"/>
+      <invariants name="JML class invariant nr 6 in PackageEnum" condition="!  enumPackage.PackageEnum::select(heap,&#xA;                                   null,&#xA;                                   enumPackage.PackageEnum::$BLUE)&#xA; = null"/>
+      <methods signature="getValue()" returnType="int"/>
+      <methods signature="valueOf(string : java.lang.String)" static="true" returnType="enumPackage.PackageEnum"/>
+      <methods signature="values()" static="true" returnType="enumPackage.PackageEnum[]"/>
+      <methods signature="name()" returnType="java.lang.String"/>
+      <constructors signature="PackageEnum()" visibility="default"/>
+      <implementsFullNames>enumPackage.IPackageEnum</implementsFullNames>
+      <literals name="RED"/>
+      <literals name="GREEN"/>
+      <literals name="BLUE"/>
+    </types>
+  </packages>
+  <connectionSettings key="location" value="D:\Forschung\Development\KeY_Master\junit-workspace\EnumTest_testEnumerations"/>
+  <connectionSettings key="packageManagement" value="FLAT_LIST"/>
+  <connectionSettings key="packageManagementType" value="de.hentschel.visualdbc.datasource.model.DSPackageManagement"/>
+  <connectionSettings key="locationType" value="java.io.File"/>
+</dbcmodel:DbcModel>

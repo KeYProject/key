@@ -5,10 +5,10 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
@@ -53,7 +53,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     * {@inheritDoc}
     */
    @Override
-   public RefactoringScope defineRefactoringScope(Services services,
+   public RefactoringScope defineRefactoringScope(TermServices services,
                                                   PosInOccurrence applicationPosInOccurrence,
                                                   Term applicationTerm,
                                                   Rule rule,
@@ -82,7 +82,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     * {@inheritDoc}
     */
    @Override
-   public void refactoreLabels(Services services,
+   public void refactoreLabels(TermServices services,
                                PosInOccurrence applicationPosInOccurrence,
                                Term applicationTerm,
                                Rule rule,Goal goal,

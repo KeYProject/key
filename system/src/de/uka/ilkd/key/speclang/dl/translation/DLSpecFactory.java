@@ -51,8 +51,6 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
  * specifications. For an example, see java_dl/DLContractChooser.
  */
 public final class DLSpecFactory {
-
-    private static final TermBuilder TB = TermBuilder.DF;
     private final Services services;
         
 
@@ -93,7 +91,7 @@ public final class DLSpecFactory {
 	    if(!(eu.lhs() instanceof ProgramVariable)) {
 		throw new ProofInputException("Program variable expected, "
 				              + "but found: " + eu.lhs());
-	    } else if(!update.sub(0).equals(TB.getBaseHeap(services))) {
+	    } else if(!update.sub(0).equals(services.getTermBuilder().getBaseHeap())) {
 		throw new ProofInputException("heap expected, "
 					      + "but found: " + update.sub(0));
 	    } else {
@@ -238,7 +236,7 @@ public final class DLSpecFactory {
     /**
      * Creates an operation contract from an implication formula of the form
      *  "pre -> {heapAtPre := heap}
-     *                [#catchAll(java.lang.Exception exc){m();}]post",
+     *                [#catchAll(java.lang.Throwable exc){m();}]post",
      * (where the update and/or the #catchAll may be omitted) and a modifies 
      * clause.
      */
@@ -282,8 +280,9 @@ public final class DLSpecFactory {
 	
 	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	//heapAtPre variable may be omitted
+	TermBuilder tb = services.getTermBuilder();
 	if(heapAtPreVar == null) {
-	    heapAtPreVar = TB.heapAtPreVar(services, heapLDT.getHeap() + "AtPre", heapLDT.getHeap().sort(), false);
+	    heapAtPreVar = tb.heapAtPreVar(heapLDT.getHeap() + "AtPre", heapLDT.getHeap().sort(), false);
 	}
         Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
         atPreVars.put(heapLDT.getHeap(), heapAtPreVar);
@@ -292,17 +291,17 @@ public final class DLSpecFactory {
 
 	//result variable may be omitted
 	if(resultVar == null && !pm.isVoid()) {
-	    resultVar = TB.resultVar(services, pm, false);
+	    resultVar = tb.resultVar(pm, false);
 	}
 
 	//exception variable may be omitted
 	if(excVar == null) {
-	    excVar = TB.excVar(services, pm, false);
-	    Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
+	    excVar = tb.excVar(pm, false);
+	    Term excNullTerm = tb.equals(tb.var(excVar), tb.NULL());
 	    if(modality == Modality.DIA) {
-		post = TB.and(post, excNullTerm);
+		post = tb.and(post, excNullTerm);
 	    } else if(modality == Modality.BOX) {
-		post = TB.or(post, TB.not(excNullTerm));
+		post = tb.or(post, tb.not(excNullTerm));
 	    } else {
 		throw new ProofInputException(
 		        "unknown semantics for exceptional termination: "
