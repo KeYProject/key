@@ -644,15 +644,19 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                          not( AnonHeapTermFeature.INSTANCE ) ) ) ),
                            longConst(-5500) ) );
         bindRuleSet ( d, "hide_auxiliary_eq",
-                      // hide auxiliary equation after the skolem constatns have
+                      // hide auxiliary equation after the skolem constants have
                       // been replaced by it's computed value
-                      add( or( applyTF( "auxiliarySK", IsSelectSkolemConstantTermFeature.INSTANCE),
-                               applyTF( "auxiliarySK",
-                                   add( IsHeapFunctionTermFeature.create(heapLDT),
-                                        not( PrimitiveHeapTermFeature.create(heapLDT) ),
-                                        not( AnonHeapTermFeature.INSTANCE ) ) ) ),
-                           applyTF( "result", rec( any(), add( SimplifiedSelectTermFeature.create(heapLDT),
-                                                               not( ff.ifThenElse ) ) ) ),
+                      add( or( // hide normal auxiliary equations
+                               add( applyTF( "auxiliarySK", IsSelectSkolemConstantTermFeature.INSTANCE),
+                                    applyTF( "result", rec( any(), add( SimplifiedSelectTermFeature.create(heapLDT),
+                                                                        not( ff.ifThenElse ) ) ) ) ),
+                               // hide equations h1<<anonHeap>> = h2 if h1 and h2 are
+                               // constant function symbols
+                               add( applyTF( "auxiliarySK",
+                                        add( IsHeapFunctionTermFeature.create(heapLDT),
+                                             not( PrimitiveHeapTermFeature.create(heapLDT) ),
+                                             not( AnonHeapTermFeature.INSTANCE ) ) ),
+                                    applyTF( "result", AnonHeapTermFeature.INSTANCE) ) ),
                            not( ContainsTermFeature.create( instOf("result"),
                                                             instOf("auxiliarySK") ) ),
                            longConst(-5400) ) );
@@ -2429,7 +2433,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                      add( SimplifiedSelectTermFeature.create(heapLDT),
                                           not( ff.ifThenElse ) ) ) ),
                    not( ContainsTermFeature.create( instOf("s"),
-                                                    instOf("t1") ) ) ) );
+                                                    instOf("t1") ) ),
+                   // apply equations h1<<anonHeap>> = h2 as auxiliary equations
+                   // (thus replace h2 by h1<<anonHeap>> if h1 and h2 are
+                   // constant function symbols)
+                   or( not( applyTF("t1",
+                                add( IsHeapFunctionTermFeature.create(heapLDT),
+                                     not( PrimitiveHeapTermFeature.create(heapLDT) ),
+                                     not( AnonHeapTermFeature.INSTANCE ) ) ) ),
+                       applyTF("s", AnonHeapTermFeature.INSTANCE) ) ) );
 
         return d;
     }
