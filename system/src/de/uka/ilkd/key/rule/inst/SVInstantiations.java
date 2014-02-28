@@ -74,9 +74,6 @@ public class SVInstantiations {
     /** additional conditions for the generic sorts */
     private final ImmutableList<GenericSortCondition> genericSortConditions;
 
-    /** integer to cache the hashcode */
-    private int hashcode = 0;
-
     /** creates a new SVInstantions object with an empty map */
     private SVInstantiations() {
 	genericSortConditions = ImmutableSLList.<GenericSortCondition>nil();
@@ -102,7 +99,6 @@ public class SVInstantiations {
              GenericSortInstantiations.EMPTY_INSTANTIATIONS,
              genericSortConditions);
     }
-
     
     private SVInstantiations(ImmutableMap<SchemaVariable,InstantiationEntry> map,
             ImmutableMap<SchemaVariable,InstantiationEntry> interesting,
@@ -672,18 +668,15 @@ public class SVInstantiations {
     }
 
     public int hashCode() {
-        if (hashcode == 0) {
-            int result = 37 * getUpdateContext().hashCode() + size();
-            final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it = 
+        int result = 37 * getUpdateContext().hashCode() + size();
+        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it = 
                 pairIterator();
-            while (it.hasNext()) {
-                final ImmutableMapEntry<SchemaVariable,InstantiationEntry> e = it.next(); 
-                result = 37 * result + e.value().getInstantiation().hashCode() + 
-                  e.key().hashCode();
-            }
-            hashcode = result == 0 ? 1 : result;
+        while (it.hasNext()) {
+            final ImmutableMapEntry<SchemaVariable,InstantiationEntry> e = it.next(); 
+            result = 37 * result + e.value().getInstantiation().hashCode() + 
+                    e.key().hashCode();
         }
-        return hashcode;
+        return result;
     }
 
     public SVInstantiations union(SVInstantiations other, Services services) {
