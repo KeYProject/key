@@ -70,7 +70,6 @@ import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
-import de.uka.ilkd.key.rule.inst.TermInstantiation;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -266,7 +265,7 @@ public abstract class TacletApp implements RuleApp {
 	    ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> pair = it.next();
 	    if (pair.key() instanceof VariableSV) {
 		SchemaVariable varSV = pair.key();
-		Term value = ((TermInstantiation) pair.value()).getInstantiation();
+		Term value = (Term) pair.value().getInstantiation();
 		if (!collMap.containsKey(value.op())) {
 		    collMap.put((LogicVariable) value.op(), varSV);
 		} else {
