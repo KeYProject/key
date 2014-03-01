@@ -161,12 +161,12 @@ public final class ProgVarReplacer {
     public SVInstantiations replace(SVInstantiations insts) {
    	SVInstantiations result = insts;
 
-    	Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it;
+    	Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it;
 	it = insts.pairIterator();
 	while(it.hasNext()) {
-	    ImmutableMapEntry<SchemaVariable,InstantiationEntry> e = it.next();
+	    ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> e = it.next();
 	    SchemaVariable sv     = e.key();
-	    InstantiationEntry ie = e.value();
+	    InstantiationEntry<?> ie = e.value();
 	    Object inst = ie.getInstantiation();
 
 	    if(ie instanceof ContextInstantiationEntry) {
@@ -214,7 +214,7 @@ public final class ProgVarReplacer {
 		    result = result.replace(sv, newT, services);
 		}
 	    } else {
-		assert false : "unexpected subtype of InstantiationEntry";
+		assert false : "unexpected subtype of InstantiationEntry<?>";
 	    }
 	}
 

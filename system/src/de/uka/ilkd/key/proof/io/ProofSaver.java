@@ -406,23 +406,23 @@ public class ProofSaver {
    public String getInteresting(SVInstantiations inst) {
 //System.err.println(inst);   
       String s = "";
-      Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> pairIt =
+      Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> pairIt =
          inst.interesting().entryIterator();
 
       while (pairIt.hasNext()) {
-         ImmutableMapEntry<SchemaVariable,InstantiationEntry> pair = pairIt.next();
+         ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> pair = pairIt.next();
          SchemaVariable var = pair.key();
 	 
          String singleInstantiation = var.name()+ "="; 
-	 Object value = pair.value();
+	 InstantiationEntry<?> value = pair.value();
 	 if (value instanceof TermInstantiation) {
-	     singleInstantiation += printTerm(((TermInstantiation) value).getTerm(), 
+	     singleInstantiation += printTerm(((TermInstantiation)value).getInstantiation(), 
 	                    proof.getServices());
 	 }
          else
 	 if (value instanceof ProgramInstantiation) {
 	     ProgramElement pe = 
-		 ((ProgramInstantiation) value).getProgramElement();
+		 ((ProgramInstantiation) value).getInstantiation();
 	     singleInstantiation += printProgramElement(pe);
 	 }
          else

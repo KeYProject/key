@@ -15,36 +15,22 @@ package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /**
  * 
  * 
  */
-public class TermLabelInstantiationEntry extends InstantiationEntry {
+public class TermLabelInstantiationEntry extends InstantiationEntry<ImmutableArray<TermLabel>> {
 
-    private final ImmutableArray<TermLabel> labels;
-
-    TermLabelInstantiationEntry(SchemaVariable sv, ImmutableArray<TermLabel> labels) {
-        super(sv);
-        this.labels = labels;
+    TermLabelInstantiationEntry(ImmutableArray<TermLabel> labels) {
+        super(labels);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override   
-    public Object getInstantiation() {
-        return labels;
-    }
-    
     /**
      * {@inheritDoc}
      */
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(getSchemaVariable());
-        sb.append(": ");
         sb.append(getInstantiation());
         sb.append('\n');
         return sb.toString();

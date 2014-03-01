@@ -41,7 +41,7 @@ public abstract class GenericSortCondition {
      * (no generic sorts) or never compatible (non generic sorts that
      * don't match)
      */
-    public static GenericSortCondition createCondition(
+    public static GenericSortCondition createCondition(SchemaVariable sv,
 	    				InstantiationEntry p_entry) {
 
         if (!( p_entry instanceof TermInstantiation)) {
@@ -49,11 +49,10 @@ public abstract class GenericSortCondition {
         }
 
         final TermInstantiation ti = (TermInstantiation)p_entry;
-        final SchemaVariable ssv = p_entry.getSchemaVariable ();
         
-        return createCondition ( ssv.sort (),
-                                 ti.getTerm ().sort (),
-                                 !subSortsAllowed ( ssv ) );
+        return createCondition ( sv.sort (),
+                                 ti.getInstantiation ().sort (),
+                                 !subSortsAllowed ( sv ) );
     }
 
     /**
