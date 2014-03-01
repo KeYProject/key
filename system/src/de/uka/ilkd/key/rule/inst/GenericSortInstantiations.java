@@ -19,7 +19,12 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.collection.DefaultImmutableMap;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -62,7 +67,7 @@ public final class GenericSortInstantiations {
      * solved
      */
     public static GenericSortInstantiations create
-	( Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> p_instantiations,
+	( Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> p_instantiations,
 	  ImmutableList<GenericSortCondition>                           p_conditions,
 	  Services                                             services) {
 
@@ -79,8 +84,9 @@ public final class GenericSortInstantiations {
 	    sorts = sorts.prepend ( it.next ().getGenericSort () );
 
 	while ( p_instantiations.hasNext () ) {
-	    c = GenericSortCondition.createCondition
-		( p_instantiations.next ().value () );
+	final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = p_instantiations.next ();
+        c = GenericSortCondition.createCondition
+		( entry.key(), entry.value () );
 	    if ( c != null ) {
 		p_conditions = p_conditions.prepend ( c );
 		sorts        = sorts       .prepend ( c.getGenericSort () );
@@ -119,17 +125,16 @@ public final class GenericSortInstantiations {
      * null if the sorts could (perhaps) be made correct by choosing
      * the right generic sort instantiations
      */
-    public Boolean checkSorts ( InstantiationEntry p_entry ) {
+    public Boolean checkSorts ( SchemaVariable sv, InstantiationEntry<?> p_entry ) {
 	if ( !( p_entry instanceof TermInstantiation ) ||
-	     p_entry.getSchemaVariable() instanceof ProgramSV )
+	        sv instanceof ProgramSV )
 	    return Boolean.TRUE;
 
 	final GenericSortCondition c =
-	    GenericSortCondition.createCondition ( p_entry );
+	    GenericSortCondition.createCondition ( sv, p_entry );
 	if ( c != null ) return checkCondition ( c );
 	
-	final SchemaVariable sv = p_entry.getSchemaVariable ();
-        final Term term = ( (TermInstantiation)p_entry ).getTerm ();
+        final Term term = ( (TermInstantiation)p_entry ).getInstantiation ();
         
         if(GenericSortCondition.subSortsAllowed(sv)) {
             return term.sort().extendsTrans(sv.sort());

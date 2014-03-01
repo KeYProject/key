@@ -76,10 +76,10 @@ public abstract class AbstractMonomialSmallerThanFeature
     }
 
     private boolean introducesSkolemSymbol(TacletApp tapp, Operator op) {
-        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it =
+        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it =
             tapp.instantiations().pairIterator();
         while ( it.hasNext () ) {
-            final ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry = it.next ();
+            final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> entry = it.next ();
             if ( !(entry.key () instanceof SkolemTermSV) ) continue;
             if ( op == ( (Term)entry.value ().getInstantiation () ).op () )
                 return true;

@@ -13,44 +13,16 @@
 
 package de.uka.ilkd.key.rule.inst;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /** This class is used to store the instantiation of a schemavarible
  * if it is a ProgramElement.
  */
-public class ProgramInstantiation extends InstantiationEntry {
-
-    /** the pe the schemavariable is instantiated with */
-    private final ProgramElement pe ;
-
+public class ProgramInstantiation extends InstantiationEntry<ProgramElement> {
    
     /** creates a new ContextInstantiationEntry 
-     * @param sv the SchemaVariable that is
-     * instantiated
      * @param pe the ProgramElement the SchemaVariable is instantiated with
      */
-    ProgramInstantiation(SchemaVariable sv, ProgramElement pe) {
-	super(sv);
-	this.pe = pe;
-    }
-
-
-    /** returns the ProgramElement the SchemaVariable is instantiated with
-     * @return the ProgramElement the SchemaVariable is instantiated with
-     */
-    public ProgramElement getProgramElement() {
-	return pe;
-    }
-
-    
-    @Override
-    public Object getInstantiation() {
-	return pe;
-    }
-    
-
-    @Override
-    public String toString() {
-	return "[" + getSchemaVariable() + ", " + getProgramElement() + "]";
+    ProgramInstantiation(ProgramElement pe) {
+	super(pe);
     }
 }
