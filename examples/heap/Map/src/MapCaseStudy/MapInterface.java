@@ -12,51 +12,51 @@ public interface MapInterface {
     // Method signatures and specifications
     // --------
     
-    /*@ public normal_behaviour
+    /*@ normal_behaviour
      @ ensures map == \dl_mapEmpty();
      @ assignable footprint;
      @*/
     public void clear();
 
-    /*@ public normal_behaviour
+    /*@ normal_behaviour
      @ ensures \result == \dl_inDomain(map, key);
      @ accessible footprint;
      @*/
     public /*@pure@*/ boolean containsKey(Object key);
 
-    /*@ public normal_behaviour
+    /*@ normal_behaviour
      @ ensures \result == (\exists Object key; \dl_inDomain(map,key); \dl_mapGet(map,key) == value);
      @ accessible footprint;
      @*/
     public /*@pure@*/ boolean containsValue(Object value);
 
-    /*@ public normal_behaviour
+    /*@ normal_behaviour
      @ ensures \result == (\dl_inDomain(map, key) ? \dl_mapGet(map, key) : null);
      @ accessible footprint;
      @*/
     public /*@pure nullable@*/ Object get(Object key);
 
-    /*@ public normal_behaviour
+    /*@ normal_behaviour
      @ ensures \result == (map == \dl_mapEmpty());
      @ accessible footprint; 
      @*/
     public /*@pure@*/ boolean isEmpty();
 
-    /*@ public normal_behaviour
+    /*@ normal_behaviour
      @ ensures map == \dl_mapUpdate(\old(map), key, value);
      @ ensures \result == (\dl_inDomain(\old(map), key) ? \dl_mapGet(\old(map), key) : null);
      @ assignable footprint;
      @*/
     public /*@nullable@*/ Object put(Object key, Object value);
 
-    /*@ public normal_behaviour
+    /*@ normal_behaviour
      @ ensures map == \dl_mapRemove(\old(map), key);
      @ ensures \result == (\dl_inDomain(\old(map), key) ? \dl_mapGet(\old(map), key) : null);
      @ assignable footprint;
      @*/
     public /*@nullable@*/ Object remove(Object key);
 
-    /*@ public normal_behaviour
+    /*@ normal_behaviour
      @ ensures \result == \dl_mapSize(map);
      @ accessible footprint;
      @*/
