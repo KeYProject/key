@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -80,7 +81,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     }
 
 
-    public PosInOccurrence step(Sequent seq, Services services) {
+    public PosInOccurrence step(Sequent seq, TermServices services) {
         return step;
     }
 

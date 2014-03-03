@@ -14,43 +14,17 @@
 package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /** This class is used to store the instantiation of a schemavarible
  * if it is an operator.
  */
-public class OperatorInstantiation extends InstantiationEntry {
+public class OperatorInstantiation extends InstantiationEntry<Operator> {
 
-    /** the term the schemavariable is instantiated with */
-    private final Operator op ;
-
-   
     /** creates a new ContextInstantiationEntry 
-     * @param sv the SchemaVariable that is
-     * instantiated
      * @param op the Operator the SchemaVariable is instantiated with
      */
-    OperatorInstantiation(SchemaVariable sv, Operator op) {
-	super(sv);
-	this.op = op;
+    OperatorInstantiation(Operator op) {
+	super(op);
     }
-
     
-    /** returns the Operator the SchemaVariable is instantiated with
-     */
-    public Operator getOperator() {
-	return op;
-    }
-
-    
-    @Override    
-    public Object getInstantiation() {
-	return op;
-    }
-
-    
-    @Override
-    public String toString() {
-	return "[" + getSchemaVariable() + ", " + getOperator() + "]";
-    }
 }

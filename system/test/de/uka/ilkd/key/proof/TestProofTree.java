@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.rule.TacletForTests;
 
 /** class tests the tree of proof
 */
@@ -45,7 +46,6 @@ public class TestProofTree extends TestCase {
     Node n5;
     Node n6;
     Node n7;
-    final static TermFactory tf=TermFactory.DEFAULT;
 
 
     public TestProofTree(String name) {
@@ -62,6 +62,8 @@ public class TestProofTree extends TestCase {
 	LogicVariable b6=new LogicVariable(new Name("b6"),s);
 	LogicVariable b7=new LogicVariable(new Name("b7"),s);
 
+	TermFactory tf = TacletForTests.services().getTermFactory();
+	
 	Term t_b1=tf.createTerm(Equality.EQUALS,
 		                tf.createTerm(b1),
 		                tf.createTerm(b1));

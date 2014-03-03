@@ -81,7 +81,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
                     	= services.getTypeConverter()
                     	          .getHeapLDT()
                     	          .getFieldSymbolForPV(et, services);
-                    recTerm = TB.dot(services, et.sort(), recTerm, fieldSymbol);
+                    recTerm = services.getTermBuilder().dot(et.sort(), recTerm, fieldSymbol);
                 }
             }else{
                 break;
@@ -105,7 +105,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
         Term[] subs = new Term[params.size() - pm.getHeapCount(services) + pm.getStateCount()*pm.getHeapCount(services) + (pm.isStatic() ? 0 : 1) ];
         for(LocationVariable heap : heaps ) {
           if(pm.getStateCount() >= 1) {
-            subs[i++] = TB.var(heap);
+            subs[i++] = services.getTermBuilder().var(heap);
             if(pm.getStateCount() == 2) {
               subs[i++] = params.head().getTerm();
             }
@@ -132,7 +132,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
             		"method \"" + methodName + "\" in specification expression.");
         }
         
-        return new SLExpression(TB.tf().createTerm(pm, subs), 
+        return new SLExpression(services.getTermBuilder().tf().createTerm(pm, subs), 
         	                pm.getReturnType());
     }
 

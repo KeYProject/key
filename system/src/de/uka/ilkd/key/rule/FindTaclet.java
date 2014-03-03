@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -100,7 +101,7 @@ public abstract class FindTaclet extends Taclet {
      * @return a pair of updated match conditions and the unwrapped term without the ignored updates (Which have been added to the update context in the match conditions)
      */
     private IgnoreUpdateMatchResult matchAndIgnoreUpdatePrefix(final Term term,
-            final Term template, MatchConditions matchCond, final Services services) {
+            final Term template, MatchConditions matchCond, final TermServices services) {
 
         final Operator sourceOp   = term.op ();
         final Operator templateOp = template.op ();

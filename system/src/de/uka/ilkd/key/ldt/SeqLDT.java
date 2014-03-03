@@ -19,11 +19,17 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.expression.operator.adt.*;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -49,7 +55,7 @@ public final class SeqLDT extends LDT {
     private final Function values;
     
     
-    public SeqLDT(Services services) {
+    public SeqLDT(TermServices services) {
 	super(NAME, services);
         seqGet        = addSortDependingFunction(services, "seqGet");
         seqLen        = addFunction(services, "seqLen");
@@ -64,7 +70,7 @@ public final class SeqLDT extends LDT {
     }
     
     
-    public Function getSeqGet(Sort instanceSort, Services services) {
+    public Function getSeqGet(Sort instanceSort, TermServices services) {
 	return seqGet.getInstanceFor(instanceSort, services);
     }
     
@@ -134,7 +140,7 @@ public final class SeqLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
 	    			 Term sub, 
-	    			 Services services, 
+	    			 TermServices services, 
 	    			 ExecutionContext ec) {
 	return op instanceof SeqSingleton
 	       || op instanceof SeqConcat
@@ -149,7 +155,7 @@ public final class SeqLDT extends LDT {
     @Override
     public Term translateLiteral(Literal lit, Services services) {
 	assert lit instanceof EmptySeqLiteral;
-	return TermBuilder.DF.func(seqEmpty);
+	return services.getTermBuilder().func(seqEmpty);
     }
     
 

@@ -201,7 +201,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                                                        false ) );
     }
 
-    private boolean sufficientlyCompleteApp(TacletApp app, Services services) {
+    private boolean sufficientlyCompleteApp(TacletApp app, TermServices services) {
         final ImmutableSet<SchemaVariable> needed = app.uninstantiatedVars ();
         if ( needed.size () == 0 ) return true;
         for (SchemaVariable aNeeded : needed) {

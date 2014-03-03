@@ -23,6 +23,8 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="extends" upperBound="-1"
         eType="#//DbcClass"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="anonymous" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="extendsFullNames" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="AbstractDbcProofContainer" abstract="true">
     <eStructuralFeatures xsi:type="ecore:EReference" name="proofs" upperBound="-1"
@@ -77,6 +79,8 @@
         eType="#//DbcConstructor" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="implements" upperBound="-1"
         eType="#//DbcInterface"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="implementsFullNames" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" defaultValueLiteral=""/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="AbstractDbcInterface" abstract="true"
       eSuperTypes="#//AbstractDbcType">
@@ -94,6 +98,8 @@
   <eClassifiers xsi:type="ecore:EClass" name="DbcInterface" eSuperTypes="#//AbstractDbcInterface">
     <eStructuralFeatures xsi:type="ecore:EReference" name="extends" upperBound="-1"
         eType="#//DbcInterface"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="extendsFullNames" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="AbstractDbcType" abstract="true" eSuperTypes="#//AbstractDbcTypeContainer #//IDbCProvable">
     <eOperations name="getInvariant" eType="#//DbcInvariant">

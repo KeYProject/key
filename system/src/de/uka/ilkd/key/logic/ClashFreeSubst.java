@@ -14,23 +14,23 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 public class ClashFreeSubst {
-    protected static final TermBuilder TB = TermBuilder.DF;
+    protected QuantifiableVariable v;
+    protected Term s;
+    protected ImmutableSet<QuantifiableVariable> svars;
+    protected final TermServices services;
 
-    QuantifiableVariable v;
-    Term s;
-    ImmutableSet<QuantifiableVariable> svars;
-
-    public ClashFreeSubst(QuantifiableVariable v,Term s) {
-	this.v = v;
-	this.s = s;
-	svars = s.freeVars();
+    public ClashFreeSubst(QuantifiableVariable v,Term s, TermServices services) {
+       this.services = services;
+       this.v = v;
+       this.s = s;
+       svars = s.freeVars();
     }
 
     protected QuantifiableVariable getVariable () {
@@ -97,7 +97,7 @@ public class ClashFreeSubst {
 	for ( int i=0; i<arity; i++ ) {
 	    applyOnSubterm ( t, i, newSubterms, newBoundVars );
         }
-	return TB.tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.javaBlock());
+	return services.getTermBuilder().tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.javaBlock());
     }
 
     /**
@@ -167,7 +167,7 @@ public class ClashFreeSubst {
 
 		// Substitute that for the old one.
 		newBoundVars[varInd] = qv1;
-		new ClashFreeSubst(qv, TB.var(qv1))
+		new ClashFreeSubst(qv, services.getTermBuilder().var(qv1), services)
 		    .applyOnSubterm1(varInd+1, boundVars, newBoundVars,
 				    subInd,subTerm,newSubterms);
 		// then continue recursively, on the result.

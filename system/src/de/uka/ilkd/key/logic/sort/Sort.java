@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 
@@ -73,17 +74,17 @@ public interface Sort extends Named {
     /**
      * returns the cast symbol of this Sort
      */
-    SortDependingFunction getCastSymbol(Services services);
+    SortDependingFunction getCastSymbol(TermServices services);
     
     /**
      * returns the instanceof symbol of this Sort
      */
-    SortDependingFunction getInstanceofSymbol(Services services);
+    SortDependingFunction getInstanceofSymbol(TermServices services);
     
     /**
      * returns the exactinstanceof symbol of this Sort
      */
-    SortDependingFunction getExactInstanceofSymbol(Services services);
+    SortDependingFunction getExactInstanceofSymbol(TermServices services);
 
     String declarationString();
 }

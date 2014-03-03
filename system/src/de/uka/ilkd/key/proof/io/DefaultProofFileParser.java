@@ -34,7 +34,6 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -385,14 +384,15 @@ public class DefaultProofFileParser implements IProofFileParser {
        }
 
        if (currContract != null) {
-        BuiltInRule useContractRule =
-              currContract instanceof OperationContract
-              ? UseOperationContractRule.INSTANCE
-                    : UseDependencyContractRule.INSTANCE;
-
-
-        ourApp = ((AbstractContractRuleApp)useContractRule.
-              createApp(pos)).setContract(currContract);
+          BuiltInRule useContractRule;
+          if (currContract instanceof OperationContract) {
+             useContractRule = UseOperationContractRule.INSTANCE;
+             ourApp = (((UseOperationContractRule)useContractRule).createApp(pos)).setContract(currContract);
+          }
+          else {
+             useContractRule = UseDependencyContractRule.INSTANCE;
+             ourApp = (((UseDependencyContractRule)useContractRule).createApp(pos)).setContract(currContract);
+          }
            currContract = null;
            if(builtinIfInsts != null) {
                ourApp = ourApp.setIfInsts(builtinIfInsts);
@@ -467,7 +467,7 @@ public class DefaultProofFileParser implements IProofFileParser {
                                     String value, Services services) {
        LogicVariable lv = new LogicVariable(new Name(value),
                                           app.getRealSort(sv, services));
-       Term instance = TermFactory.DEFAULT.createTerm(lv);
+       Term instance = services.getTermFactory().createTerm(lv);
        return app.addCheckedInstantiation(sv, instance, services,true);
    }
 

@@ -346,7 +346,7 @@ public class ProofDiffFrame extends JFrame {
                         proof.getServices(),
                         true);
 
-        node.sequent().prettyprint(logicPrinter);
+        logicPrinter.printSequent(node.sequent());
 
         return logicPrinter.result().toString();
     }

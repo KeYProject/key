@@ -40,7 +40,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -55,7 +54,7 @@ import de.uka.ilkd.key.util.Debug;
 
 public class TestMatchTaclet extends TestCase {
     
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static TermBuilder TB;
     
     FindTaclet if_addrule_conflict;
     FindTaclet find_addrule_conflict;
@@ -85,6 +84,7 @@ public class TestMatchTaclet extends TestCase {
         TacletForTests.parse();
     
         services = TacletForTests.services();
+        TB = services.getTermBuilder();
         
         all_left = (FindTaclet) TacletForTests.getTaclet(
                 "TestMatchTaclet_for_all").taclet();
@@ -565,8 +565,7 @@ public class TestMatchTaclet extends TestCase {
 					       DefaultImmutableSet.<Sort>nil()
 					      .add(osort2).add(osort3), false);
 	Function v4=new Function(new Name("v4"), osort4, new Sort[0]);	
-	TermFactory tf=TermFactory.DEFAULT;
-	Term match=tf.createTerm(v4);
+	Term match=TB.tf().createTerm(v4);
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet
 	    ("TestMatchTaclet_subsort_termSV").taclet();   
 	MatchConditions mc=taclet.match(match, 
@@ -584,10 +583,9 @@ public class TestMatchTaclet extends TestCase {
 	Sort osort4=new SortImpl(new Name("os4"), 
 					       DefaultImmutableSet.<Sort>nil()
 					      .add(osort2).add(osort3), false);	
-	TermFactory tf=TermFactory.DEFAULT;
 	Function aPred = (Function)TacletForTests.getFunctions().lookup(new Name("A"));
-	Term sub = tf.createTerm(aPred);
-	Term match=TermBuilder.DF.all(new LogicVariable(new Name("lv"), osort4), 
+	Term sub = TB.tf().createTerm(aPred);
+	Term match=TB.all(new LogicVariable(new Name("lv"), osort4), 
 					   sub);
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet
 	    ("TestMatchTaclet_subsort_variableSV").taclet();   
@@ -608,7 +606,6 @@ public class TestMatchTaclet extends TestCase {
     }
 
     public void testPrefixMatching() {
-	TermFactory tf=TermFactory.DEFAULT;
 	Term match = TacletForTests.parseTerm("\\<{return;}\\>true ");
 	StatementBlock prg = (StatementBlock)match.javaBlock().program();
 	ExecutionContext ec = new ExecutionContext

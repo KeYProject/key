@@ -12,6 +12,8 @@
 // 
 
 
+import java.util.HashMap;
+
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
@@ -166,6 +168,7 @@ public class TestKey extends TestSuite {
 
         return suite;
     }
+    
 
     public TestKey(String name) {
         super(name);

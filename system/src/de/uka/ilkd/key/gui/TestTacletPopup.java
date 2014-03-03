@@ -71,7 +71,7 @@ public class TestTacletPopup {
 
     static Sort nat = new SortImpl(new Name("Nat"));
 
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermBuilder TB = TacletForTests.services().getTermBuilder();
 
     public static Namespace var_ns=new Namespace();
     public static Namespace func_ns=new Namespace();
