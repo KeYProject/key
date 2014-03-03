@@ -110,26 +110,26 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         if ( !inst0.getUpdateContext ().equals ( inst1.getUpdateContext () ) )
             return false;
         
-        final ImmutableMap<SchemaVariable,InstantiationEntry> interesting0 =
+        final ImmutableMap<SchemaVariable,InstantiationEntry<?>> interesting0 =
             inst0.interesting ();
-        final ImmutableMap<SchemaVariable,InstantiationEntry> interesting1 =
+        final ImmutableMap<SchemaVariable,InstantiationEntry<?>> interesting1 =
             inst1.interesting ();
         return subset ( interesting0, interesting1 )
                && subset ( interesting1, interesting0 );
     }
     
-    private boolean subset(ImmutableMap<SchemaVariable,InstantiationEntry> insts0,
-                           ImmutableMap<SchemaVariable,InstantiationEntry> insts1) {
-        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it =
+    private boolean subset(ImmutableMap<SchemaVariable,InstantiationEntry<?>> insts0,
+                           ImmutableMap<SchemaVariable,InstantiationEntry<?>> insts1) {
+        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it =
             insts0.entryIterator ();
 
         while ( it.hasNext () ) {
-            final ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry0 = it.next ();
+            final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> entry0 = it.next ();
 
             if ( entry0.key () instanceof SkolemTermSV || entry0.key() instanceof VariableSV)
                 continue;
                 
-            final InstantiationEntry instEntry1 = insts1.get ( entry0.key () );
+            final InstantiationEntry<?> instEntry1 = insts1.get ( entry0.key () );
             
             if ( instEntry1 == null
                  || !entry0.value ().getInstantiation ()
