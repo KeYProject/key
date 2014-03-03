@@ -333,7 +333,7 @@ public final class NotationInfo {
 
         //seq operators
         final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
-        tbl.put(seqLDT.getSeqConcat(), new Notation.Infix(""+UnicodeHelper.SEQ_CONCAT, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(seqLDT.getSeqConcat(), new Notation.Infix(""+UnicodeHelper.SEQ_CONCAT, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK, PRIORITY_BELOW_ARITH_WEAK));
         tbl.put(seqLDT.getSeqEmpty(), new Notation.Constant(""+UnicodeHelper.SEQ_SINGLETON_L+UnicodeHelper.SEQ_SINGLETON_R, PRIORITY_BOTTOM));
         tbl.put(seqLDT.getSeqSingleton(), new Notation.SeqSingletonNotation(""+UnicodeHelper.SEQ_SINGLETON_L,""+UnicodeHelper.SEQ_SINGLETON_R));
 
