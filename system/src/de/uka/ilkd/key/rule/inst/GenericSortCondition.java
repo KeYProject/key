@@ -42,7 +42,7 @@ public abstract class GenericSortCondition {
      * don't match)
      */
     public static GenericSortCondition createCondition(SchemaVariable sv,
-	    				InstantiationEntry<?> p_entry) {
+													   InstantiationEntry<?> p_entry) {
 
         if (!( p_entry instanceof TermInstantiation)) {
             return null;

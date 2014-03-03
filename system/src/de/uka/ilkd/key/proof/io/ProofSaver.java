@@ -416,8 +416,8 @@ public class ProofSaver {
              throw new RuntimeException("Saving failed.\n"+
                          "FIXME: Unhandled instantiation type: " +  value.getClass());
          }
-             
-         StringBuffer singleInstantiation = 
+
+         StringBuffer singleInstantiation =
                  new StringBuffer(var.name().toString()).
                     append("=").append(printAnything(value, proof.getServices(), false));
 	
@@ -523,7 +523,7 @@ public class ProofSaver {
                 return printTerm((Term) val, services, shortAttrNotation);
             } else if (val instanceof Sequent) {
                 return printSequent((Sequent) val, services);
-            } else if (val instanceof Name) { 
+            } else if (val instanceof Name) {
                 return new StringBuffer(val.toString());
             } else if (val==null){
                     return null;

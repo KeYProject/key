@@ -161,7 +161,7 @@ public final class ProgVarReplacer {
     public SVInstantiations replace(SVInstantiations insts) {
    	SVInstantiations result = insts;
 
-    	Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it;
+    Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it;
 	it = insts.pairIterator();
 	while(it.hasNext()) {
 	    ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> e = it.next();

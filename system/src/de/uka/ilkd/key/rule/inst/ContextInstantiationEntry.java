@@ -19,7 +19,7 @@ import de.uka.ilkd.key.logic.PosInProgram;
 
 /** This class is used to store the information about a matched
  * context of a dl formula. (the pi and omega part)
- * TODO: Check if there is a need for ContextStatementBlockInstantiation or if it could be 
+ * TODO: Check if there is a need for ContextStatementBlockInstantiation or if it could be
  * unified with this class
  */
 public class ContextInstantiationEntry extends InstantiationEntry<ContextStatementBlockInstantiation> {

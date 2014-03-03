@@ -133,9 +133,9 @@ public class SVInstantiations {
      * @return SVInstantiations the new SVInstantiations containing the given
      *         pair
      */
-    public SVInstantiations add(SchemaVariable sv, 
-	    			Term subst, 
-	    			Services services) {        
+    public SVInstantiations add(SchemaVariable sv,
+								Term subst,
+								Services services) {
         return add(sv, new TermInstantiation(sv, subst), services);
     }
 
@@ -168,7 +168,7 @@ public class SVInstantiations {
             ImmutableArray<TermLabel> labels,
             Services services) {
         return add(sv, 
-                new TermLabelInstantiationEntry(labels), 
+                new TermLabelInstantiationEntry(labels),
                 services);
     }
 
@@ -310,9 +310,9 @@ public class SVInstantiations {
      * @return SVInstantiations the new SVInstantiations containing the given
      *         pair
      */
-    public SVInstantiations add(SchemaVariable sv, 
-	    			InstantiationEntry<?> entry,
-	    			Services services) {
+    public SVInstantiations add(SchemaVariable sv,
+								InstantiationEntry<?> entry,
+								Services services) {
         return new SVInstantiations(map.put(sv, entry), 
         			    interesting(),
                 		    getUpdateContext(), 
@@ -322,8 +322,8 @@ public class SVInstantiations {
     }
 
     public SVInstantiations addInteresting(SchemaVariable sv,
-            				   InstantiationEntry<?> entry,
-            				   Services services) {
+										   InstantiationEntry<?> entry,
+										   Services services) {
         return new SVInstantiations(map.put(sv, entry), 
         			    interesting().put(sv, entry), 
         			    getUpdateContext(), 
@@ -462,12 +462,12 @@ public class SVInstantiations {
 	    			    ExecutionContext activeStatementContext, 
 	    			    ProgramElement pe,
 	    			    Services services) {
-        return replace(CONTEXTSV, 
-        	       new ContextInstantiationEntry(prefix, 
-        		                             postfix, 
-        		                             activeStatementContext, 
-        		                             pe),
-        	       services);
+        return replace(CONTEXTSV,
+					   new ContextInstantiationEntry(prefix,
+													 postfix,
+													 activeStatementContext,
+													 pe),
+					   services);
     }
     
 
@@ -668,10 +668,10 @@ public class SVInstantiations {
 
     public int hashCode() {
         int result = 37 * getUpdateContext().hashCode() + size();
-        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it = 
+        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it =
                 pairIterator();
         while (it.hasNext()) {
-            final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> e = it.next(); 
+            final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> e = it.next();
             result = 37 * result + e.value().getInstantiation().hashCode() + 
                     e.key().hashCode();
         }
@@ -681,7 +681,7 @@ public class SVInstantiations {
     public SVInstantiations union(SVInstantiations other, Services services) {
         ImmutableMap<SchemaVariable,InstantiationEntry<?>> result = map;
 
-        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> 
+        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>>
 	    it = other.map.entryIterator();
         
         while (it.hasNext()) {
@@ -736,7 +736,7 @@ public class SVInstantiations {
     }
     
     public ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> lookupEntryForSV(Name name) {
-        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it = 
+        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it =
             map.entryIterator();
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> e = it.next();
@@ -746,13 +746,13 @@ public class SVInstantiations {
     }
     
     public SchemaVariable lookupVar(Name name) {
-	final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> e = 
+	final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> e =
             lookupEntryForSV(name);
 	return e == null ? null : e.key(); // handle this better!
     }
     
     public Object lookupValue(Name name) {
-        final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> e = 
+        final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> e =
             lookupEntryForSV(name);
         return e == null ? null : e.value().getInstantiation(); 
     }
