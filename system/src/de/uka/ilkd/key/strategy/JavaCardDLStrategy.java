@@ -349,6 +349,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                      ScaleFeature.createScaled ( FindDepthFeature.INSTANCE, 10.0 ) ) );        
         bindRuleSet ( d, "simplify", -4500 );        
         bindRuleSet ( d, "simplify_enlarging", -2000 );
+        bindRuleSet ( d, "simplify_ENLARGING", -1900 );
         bindRuleSet ( d, "simplify_expression", -100 );
         bindRuleSet ( d, "executeIntegerAssignment", -100 );
 
@@ -359,6 +360,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
 
         setupSelectSimplification(d);
+
+        bindRuleSet (d, "no_self_application", ifZero ( MatchedIfFeature.INSTANCE,
+                                                        NoSelfApplicationFeature.INSTANCE ) );
 
         bindRuleSet (d, "update_elim",
                 add( longConst(-8000), ScaleFeature.createScaled ( FindDepthFeature.INSTANCE, 10.0 ) ) ); 
