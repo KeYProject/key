@@ -168,7 +168,7 @@ public class JavaReduxFileCollection implements FileCollection {
         public DataLocation getCurrentDataLocation()
                 throws NoSuchElementException {
             if (currentURL == null)
-                throw new NoSuchElementException();
+                throw new NoSuchElementException("Location of "+current+" not found.");
 
             return new URLDataLocation(currentURL);
         }
@@ -203,10 +203,12 @@ public class JavaReduxFileCollection implements FileCollection {
             }
 
             current = iterator.next();
+            
+            final String currentFileName = current.replace('.', '/').concat(".java");
 
             // may be null!
             currentURL = KeYResourceManager.getManager().getResourceFile(
-                    Recoder2KeY.class, resourceLocation + "/" + current);
+                    Recoder2KeY.class, resourceLocation + "/" + currentFileName);
             
             return true;
         }

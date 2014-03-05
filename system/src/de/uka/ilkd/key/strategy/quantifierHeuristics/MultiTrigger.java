@@ -17,8 +17,8 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 class MultiTrigger implements Trigger {
@@ -37,7 +37,7 @@ class MultiTrigger implements Trigger {
     }
 
     public ImmutableSet<Substitution> getSubstitutionsFromTerms(
-	    ImmutableSet<Term> targetTerms, Services services) {
+	    ImmutableSet<Term> targetTerms, TermServices services) {
 	ImmutableSet<Substitution> res = DefaultImmutableSet.<Substitution> nil();
 	
 	ImmutableSet<Substitution> mulsubs = setMultiSubstitution(triggers.iterator(),
@@ -54,7 +54,7 @@ class MultiTrigger implements Trigger {
 
     /** help function for getMultiSubstitution */
     private ImmutableSet<Substitution> setMultiSubstitution(
-	    Iterator<? extends Trigger> ts, ImmutableSet<Term> terms, Services services) {
+	    Iterator<? extends Trigger> ts, ImmutableSet<Term> terms, TermServices services) {
 	ImmutableSet<Substitution> res = DefaultImmutableSet.<Substitution> nil();
 	if (ts.hasNext()) {
 	    ImmutableSet<Substitution> subi = ts.next().getSubstitutionsFromTerms(

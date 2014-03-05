@@ -14,8 +14,8 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.TermServices;
 
 
 /**
@@ -38,10 +38,10 @@ class UninstantiatedNoPosTacletApp extends NoPosTacletApp {
      */
     @Override
     protected MatchConditions setupMatchConditions (PosInOccurrence pos,
-                                                    Services services) {
+                                                    TermServices services) {
         if ( taclet() instanceof RewriteTaclet )
             return ((RewriteTaclet)taclet ()).checkPrefix
-            ( pos, MatchConditions.EMPTY_MATCHCONDITIONS, services );
+            ( pos, MatchConditions.EMPTY_MATCHCONDITIONS );
 
         return MatchConditions.EMPTY_MATCHCONDITIONS;
     }

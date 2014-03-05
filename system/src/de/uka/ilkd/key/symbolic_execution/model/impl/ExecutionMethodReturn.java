@@ -27,7 +27,6 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -40,8 +39,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
@@ -176,7 +175,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
       if (resultVar == null) {
          IProgramMethod pm = mbs.getProgramMethod(getServices());
          if (!pm.isVoid()) {
-            resultVar = new LocationVariable(new ProgramElementName(TermBuilder.DF.newName(getServices(), "TmpResultVar")), pm.getReturnType());
+            resultVar = new LocationVariable(new ProgramElementName(getServices().getTermBuilder().newName("TmpResultVar")), pm.getReturnType());
          }
       }
       if (resultVar != null) {
@@ -197,7 +196,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                   Goal goal = info.getProof().openGoals().head();
                   Term returnValue = SymbolicExecutionUtil.extractOperatorValue(goal, input.getOperator());
                   assert returnValue != null;
-                  returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), returnValue);
+                  returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), returnValue, getServices());
                   return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), returnValue, null)};
                }
                else {
@@ -206,7 +205,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                   for (Goal goal : info.getProof().openGoals()) {
                      Term returnValue = SymbolicExecutionUtil.extractOperatorValue(goal, input.getOperator());
                      assert returnValue != null;
-                     returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.node().sequent(), returnValue);
+                     returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.node().sequent(), returnValue, getServices());
                      List<Node> nodeList = valueNodeMap.get(returnValue);
                      if (nodeList == null) {
                         nodeList = new LinkedList<Node>();
@@ -228,7 +227,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                            Term condition = SymbolicExecutionUtil.computePathCondition(node, false, false);
                            conditions.add(condition);
                         }
-                        Term condition = TermBuilder.DF.or(conditions);
+                        Term condition = getServices().getTermBuilder().or(conditions);
                         condition = SymbolicExecutionUtil.simplify(info.getProof(), condition);
                         condition = SymbolicExecutionUtil.improveReadability(condition, info.getProof().getServices());
                         result[i] = new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), entry.getKey(), condition);

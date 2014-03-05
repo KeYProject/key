@@ -775,7 +775,7 @@ public class GoalList extends JList {
                                                  mediator ().getNotationInfo (),
                                                  mediator().getServices(),
                                                  true );
-            seq.prettyprint ( sp );
+            sp.printSequent(seq);
             res = sp.toString ().replace ( '\n', ' ' );
             res = res.substring ( 0, Math.min ( MAX_DISPLAYED_SEQUENT_LENGTH,
                                                 res.length () ) );

@@ -16,8 +16,8 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletTranslator;
@@ -28,7 +28,7 @@ import de.uka.ilkd.key.taclettranslation.TacletTranslator;
  * of the taclet.
  */
 public interface LemmaGenerator extends TacletTranslator {
-         public TacletFormula translate(Taclet taclet, Services services);
+         public TacletFormula translate(Taclet taclet, TermServices services);
 }
 
 class LemmaFormula implements TacletFormula {
@@ -46,7 +46,7 @@ class LemmaFormula implements TacletFormula {
         }
 
         @Override
-        public Term getFormula() {
+        public Term getFormula(TermServices services) {
                 return formula.getFirst();
         }
 

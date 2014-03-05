@@ -29,7 +29,7 @@ closedir(DIR);
 # subrutine to call key
 sub runAuto {
   my $filename = pop @_;
-  my $command = "'" . $path_to_key . "/bin/runProver' --auto-loadonly '$filename'";
+  my $command = "'" . $path_to_key . "/bin/key' --K-headless --auto-loadonly '$filename'";
    print "Command is: $command\n";
   my $result = system($command);
   return $result;

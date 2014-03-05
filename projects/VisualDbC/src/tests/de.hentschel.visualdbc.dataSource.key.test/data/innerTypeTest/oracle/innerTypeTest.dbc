@@ -1,0 +1,812 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel" driverId="de.hentschel.visualdbc.dataSource.key">
+  <types xsi:type="dbcmodel:DbcClass" name="ClassContainer">
+    <types xsi:type="dbcmodel:DbcClass" name="ClassContainer.591529881.660026820" visibility="default" anonymous="true">
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+    <types xsi:type="dbcmodel:DbcClass" name="DefaultChildClass" visibility="default">
+      <types xsi:type="dbcmodel:DbcClass" name="ClassContainer.DefaultChildClass.1583239795.661412094" visibility="default" anonymous="true">
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <methods signature="run()" returnType="void"/>
+      <attributes name="x" type="int" visibility="default"/>
+      <constructors signature="DefaultChildClass(x : int)"/>
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+    <types xsi:type="dbcmodel:DbcClass" name="PrivateChildClass" visibility="private" static="true">
+      <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+      <constructors signature="PrivateChildClass()" visibility="default"/>
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+    <types xsi:type="dbcmodel:DbcClass" name="ProtectedChildClass" visibility="protected" abstract="true">
+      <constructors signature="ProtectedChildClass()" visibility="default"/>
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+    <types xsi:type="dbcmodel:DbcClass" name="PublicChildClass" final="true">
+      <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+        <types xsi:type="dbcmodel:DbcClass" name="ClassContainer.PublicChildClass.InnerInnerClass.1577412535.362634484" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <methods signature="innerInnerRun()" returnType="void"/>
+        <constructors signature="InnerInnerClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <constructors signature="PublicChildClass()" visibility="default"/>
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+    <types xsi:type="dbcmodel:DbcInterface" name="DefaultChildInterface" visibility="default">
+      <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+        <types xsi:type="dbcmodel:DbcClass" name="ClassContainer.DefaultChildInterface.InnerInnerClass.1810768530.1989841081" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <methods signature="innerInnerRun()" returnType="void"/>
+        <constructors signature="InnerInnerClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+    </types>
+    <types xsi:type="dbcmodel:DbcInterface" name="PrivateChildInterface" visibility="default" static="true"/>
+    <types xsi:type="dbcmodel:DbcInterface" name="ProtectedChildInterface" visibility="default"/>
+    <types xsi:type="dbcmodel:DbcInterface" name="PublicChildInterface"/>
+    <types xsi:type="dbcmodel:DbcEnum" name="DefaultChildEnum" visibility="default">
+      <types xsi:type="dbcmodel:DbcClass" name="ClassContainer.DefaultChildEnum.359339165.1683210167" visibility="default" anonymous="true">
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <invariants name="JML class invariant nr 0 in DefaultChildEnum" condition="!  ClassContainer.DefaultChildEnum::select(heap,&#xA;                                           null,&#xA;                                           ClassContainer.DefaultChildEnum::$INSTANCE)&#xA; = null"/>
+      <methods signature="run()" returnType="void"/>
+      <methods signature="valueOf(string : java.lang.String)" static="true" returnType="ClassContainer.DefaultChildEnum"/>
+      <methods signature="values()" static="true" returnType="ClassContainer.DefaultChildEnum[]"/>
+      <methods signature="name()" returnType="java.lang.String"/>
+      <attributes name="x" type="int" visibility="default"/>
+      <constructors signature="DefaultChildEnum(x : int)" visibility="private"/>
+      <literals name="INSTANCE"/>
+    </types>
+    <types xsi:type="dbcmodel:DbcEnum" name="PrivateChildEnum" visibility="default">
+      <invariants name="JML class invariant nr 1 in PrivateChildEnum" condition="!  ClassContainer.PrivateChildEnum::select(heap,&#xA;                                           null,&#xA;                                           ClassContainer.PrivateChildEnum::$INSTANCE)&#xA; = null"/>
+      <methods signature="valueOf(string : java.lang.String)" static="true" returnType="ClassContainer.PrivateChildEnum"/>
+      <methods signature="values()" static="true" returnType="ClassContainer.PrivateChildEnum[]"/>
+      <methods signature="name()" returnType="java.lang.String"/>
+      <constructors signature="PrivateChildEnum()" visibility="default"/>
+      <literals name="INSTANCE"/>
+    </types>
+    <types xsi:type="dbcmodel:DbcEnum" name="ProtectedChildEnum" visibility="default">
+      <methods signature="valueOf(string : java.lang.String)" static="true" returnType="ClassContainer.ProtectedChildEnum"/>
+      <methods signature="values()" static="true" returnType="ClassContainer.ProtectedChildEnum[]"/>
+      <methods signature="name()" returnType="java.lang.String"/>
+      <constructors signature="ProtectedChildEnum()" visibility="default"/>
+    </types>
+    <types xsi:type="dbcmodel:DbcEnum" name="PublicChildEnum" visibility="default">
+      <invariants name="JML class invariant nr 2 in PublicChildEnum" condition="!  ClassContainer.PublicChildEnum::select(heap,&#xA;                                          null,&#xA;                                          ClassContainer.PublicChildEnum::$INSTANCE)&#xA; = null"/>
+      <methods signature="valueOf(string : java.lang.String)" static="true" returnType="ClassContainer.PublicChildEnum"/>
+      <methods signature="values()" static="true" returnType="ClassContainer.PublicChildEnum[]"/>
+      <methods signature="name()" returnType="java.lang.String"/>
+      <constructors signature="PublicChildEnum()" visibility="default"/>
+      <literals name="INSTANCE"/>
+    </types>
+    <methods signature="doContainer()" returnType="void"/>
+    <constructors signature="ClassContainer()" visibility="default"/>
+    <extendsFullNames>java.lang.Object</extendsFullNames>
+  </types>
+  <types xsi:type="dbcmodel:DbcInterface" name="InterfaceContainer">
+    <types xsi:type="dbcmodel:DbcClass" name="DefaultChildClass" visibility="default">
+      <types xsi:type="dbcmodel:DbcClass" name="InterfaceContainer.DefaultChildClass.1629529677.1292148191" visibility="default" anonymous="true">
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <methods signature="run()" returnType="void"/>
+      <attributes name="x" type="int" visibility="default"/>
+      <constructors signature="DefaultChildClass(x : int)"/>
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+    <types xsi:type="dbcmodel:DbcClass" name="PublicChildClass" final="true">
+      <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+        <types xsi:type="dbcmodel:DbcClass" name="InterfaceContainer.PublicChildClass.InnerInnerClass.915317910.572940792" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <methods signature="innerInnerRun()" returnType="void"/>
+        <constructors signature="InnerInnerClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <constructors signature="PublicChildClass()" visibility="default"/>
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+    <types xsi:type="dbcmodel:DbcInterface" name="DefaultChildInterface" visibility="default">
+      <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+        <types xsi:type="dbcmodel:DbcClass" name="InterfaceContainer.DefaultChildInterface.InnerInnerClass.707006819.1793418393" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <methods signature="innerInnerRun()" returnType="void"/>
+        <constructors signature="InnerInnerClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+    </types>
+    <types xsi:type="dbcmodel:DbcInterface" name="PublicChildInterface"/>
+    <types xsi:type="dbcmodel:DbcEnum" name="DefaultChildEnum" visibility="default">
+      <types xsi:type="dbcmodel:DbcClass" name="InterfaceContainer.DefaultChildEnum.372364820.1553105610" visibility="default" anonymous="true">
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <invariants name="JML class invariant nr 4 in DefaultChildEnum" condition="!  InterfaceContainer.DefaultChildEnum::select(heap,&#xA;                                               null,&#xA;                                               InterfaceContainer.DefaultChildEnum::$INSTANCE)&#xA; = null"/>
+      <methods signature="run()" returnType="void"/>
+      <methods signature="valueOf(string : java.lang.String)" static="true" returnType="InterfaceContainer.DefaultChildEnum"/>
+      <methods signature="values()" static="true" returnType="InterfaceContainer.DefaultChildEnum[]"/>
+      <methods signature="name()" returnType="java.lang.String"/>
+      <attributes name="x" type="int" visibility="default"/>
+      <constructors signature="DefaultChildEnum(x : int)" visibility="private"/>
+      <literals name="INSTANCE"/>
+    </types>
+    <types xsi:type="dbcmodel:DbcEnum" name="PublicChildEnum" visibility="default">
+      <invariants name="JML class invariant nr 5 in PublicChildEnum" condition="!  InterfaceContainer.PublicChildEnum::select(heap,&#xA;                                              null,&#xA;                                              InterfaceContainer.PublicChildEnum::$INSTANCE)&#xA; = null"/>
+      <methods signature="valueOf(string : java.lang.String)" static="true" returnType="InterfaceContainer.PublicChildEnum"/>
+      <methods signature="values()" static="true" returnType="InterfaceContainer.PublicChildEnum[]"/>
+      <methods signature="name()" returnType="java.lang.String"/>
+      <constructors signature="PublicChildEnum()" visibility="default"/>
+      <literals name="INSTANCE"/>
+    </types>
+  </types>
+  <types xsi:type="dbcmodel:DbcEnum" name="EnumContainer" visibility="default">
+    <types xsi:type="dbcmodel:DbcClass" name="EnumContainer.1089682910.550770621" visibility="default" anonymous="true">
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+    <types xsi:type="dbcmodel:DbcClass" name="DefaultChildClass" visibility="default">
+      <types xsi:type="dbcmodel:DbcClass" name="EnumContainer.DefaultChildClass.2055812419.438735039" visibility="default" anonymous="true">
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <methods signature="run()" returnType="void"/>
+      <attributes name="x" type="int" visibility="default"/>
+      <constructors signature="DefaultChildClass(x : int)"/>
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+    <types xsi:type="dbcmodel:DbcClass" name="PrivateChildClass" visibility="private" static="true">
+      <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+      <constructors signature="PrivateChildClass()" visibility="default"/>
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+    <types xsi:type="dbcmodel:DbcClass" name="ProtectedChildClass" visibility="protected" abstract="true">
+      <constructors signature="ProtectedChildClass()" visibility="default"/>
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+    <types xsi:type="dbcmodel:DbcClass" name="PublicChildClass" final="true">
+      <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+        <types xsi:type="dbcmodel:DbcClass" name="EnumContainer.PublicChildClass.InnerInnerClass.928812685.1109797361" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <methods signature="innerInnerRun()" returnType="void"/>
+        <constructors signature="InnerInnerClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <constructors signature="PublicChildClass()" visibility="default"/>
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+    <types xsi:type="dbcmodel:DbcInterface" name="DefaultChildInterface" visibility="default">
+      <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+        <types xsi:type="dbcmodel:DbcClass" name="EnumContainer.DefaultChildInterface.InnerInnerClass.395599563.66455756" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <methods signature="innerInnerRun()" returnType="void"/>
+        <constructors signature="InnerInnerClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+    </types>
+    <types xsi:type="dbcmodel:DbcInterface" name="PrivateChildInterface" visibility="default" static="true"/>
+    <types xsi:type="dbcmodel:DbcInterface" name="ProtectedChildInterface" visibility="default"/>
+    <types xsi:type="dbcmodel:DbcInterface" name="PublicChildInterface"/>
+    <invariants name="JML class invariant nr 3 in EnumContainer" condition="!  EnumContainer::select(heap,&#xA;                         null,&#xA;                         EnumContainer::$INSTANCE)&#xA; = null"/>
+    <methods signature="doContainer()" returnType="void"/>
+    <methods signature="valueOf(string : java.lang.String)" static="true" returnType="EnumContainer"/>
+    <methods signature="values()" static="true" returnType="EnumContainer[]"/>
+    <methods signature="name()" returnType="java.lang.String"/>
+    <constructors signature="EnumContainer()" visibility="default"/>
+    <literals name="INSTANCE"/>
+  </types>
+  <packages name="interfaces">
+    <types xsi:type="dbcmodel:DbcInterface" name="MyInterface"/>
+  </packages>
+  <packages name="packageA.B.C">
+    <types xsi:type="dbcmodel:DbcClass" name="ClassContainer">
+      <types xsi:type="dbcmodel:DbcClass" name="packageA.B.C.ClassContainer.216944274.739090040" visibility="default" anonymous="true">
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="DefaultChildClass" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="packageA.B.C.ClassContainer.DefaultChildClass.1728999712.290415394" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <methods signature="run()" returnType="void"/>
+        <attributes name="x" type="int" visibility="default"/>
+        <constructors signature="DefaultChildClass(x : int)"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="PrivateChildClass" visibility="private" static="true">
+        <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+        <constructors signature="PrivateChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="ProtectedChildClass" visibility="protected" abstract="true">
+        <constructors signature="ProtectedChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="PublicChildClass" final="true">
+        <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+          <types xsi:type="dbcmodel:DbcClass" name="packageA.B.C.ClassContainer.PublicChildClass.InnerInnerClass.1753745629.1655066726" visibility="default" anonymous="true">
+            <extendsFullNames>java.lang.Object</extendsFullNames>
+          </types>
+          <methods signature="innerInnerRun()" returnType="void"/>
+          <constructors signature="InnerInnerClass()" visibility="default"/>
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <constructors signature="PublicChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="DefaultChildInterface" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+          <types xsi:type="dbcmodel:DbcClass" name="packageA.B.C.ClassContainer.DefaultChildInterface.InnerInnerClass.9461434.476765624" visibility="default" anonymous="true">
+            <extendsFullNames>java.lang.Object</extendsFullNames>
+          </types>
+          <methods signature="innerInnerRun()" returnType="void"/>
+          <constructors signature="InnerInnerClass()" visibility="default"/>
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="PrivateChildInterface" visibility="default" static="true"/>
+      <types xsi:type="dbcmodel:DbcInterface" name="ProtectedChildInterface" visibility="default"/>
+      <types xsi:type="dbcmodel:DbcInterface" name="PublicChildInterface"/>
+      <types xsi:type="dbcmodel:DbcEnum" name="DefaultChildEnum" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="packageA.B.C.ClassContainer.DefaultChildEnum.2045016483.1306959493" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <invariants name="JML class invariant nr 7 in DefaultChildEnum" condition="!  packageA.B.C.ClassContainer.DefaultChildEnum::select(heap,&#xA;                                                        null,&#xA;                                                        packageA.B.C.ClassContainer.DefaultChildEnum::$INSTANCE)&#xA; = null"/>
+        <methods signature="run()" returnType="void"/>
+        <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.B.C.ClassContainer.DefaultChildEnum"/>
+        <methods signature="values()" static="true" returnType="packageA.B.C.ClassContainer.DefaultChildEnum[]"/>
+        <methods signature="name()" returnType="java.lang.String"/>
+        <attributes name="x" type="int" visibility="default"/>
+        <constructors signature="DefaultChildEnum(x : int)" visibility="private"/>
+        <literals name="INSTANCE"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcEnum" name="PrivateChildEnum" visibility="default">
+        <invariants name="JML class invariant nr 8 in PrivateChildEnum" condition="!  packageA.B.C.ClassContainer.PrivateChildEnum::select(heap,&#xA;                                                        null,&#xA;                                                        packageA.B.C.ClassContainer.PrivateChildEnum::$INSTANCE)&#xA; = null"/>
+        <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.B.C.ClassContainer.PrivateChildEnum"/>
+        <methods signature="values()" static="true" returnType="packageA.B.C.ClassContainer.PrivateChildEnum[]"/>
+        <methods signature="name()" returnType="java.lang.String"/>
+        <constructors signature="PrivateChildEnum()" visibility="default"/>
+        <literals name="INSTANCE"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcEnum" name="ProtectedChildEnum" visibility="default">
+        <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.B.C.ClassContainer.ProtectedChildEnum"/>
+        <methods signature="values()" static="true" returnType="packageA.B.C.ClassContainer.ProtectedChildEnum[]"/>
+        <methods signature="name()" returnType="java.lang.String"/>
+        <constructors signature="ProtectedChildEnum()" visibility="default"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcEnum" name="PublicChildEnum" visibility="default">
+        <invariants name="JML class invariant nr 9 in PublicChildEnum" condition="!  packageA.B.C.ClassContainer.PublicChildEnum::select(heap,&#xA;                                                       null,&#xA;                                                       packageA.B.C.ClassContainer.PublicChildEnum::$INSTANCE)&#xA; = null"/>
+        <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.B.C.ClassContainer.PublicChildEnum"/>
+        <methods signature="values()" static="true" returnType="packageA.B.C.ClassContainer.PublicChildEnum[]"/>
+        <methods signature="name()" returnType="java.lang.String"/>
+        <constructors signature="PublicChildEnum()" visibility="default"/>
+        <literals name="INSTANCE"/>
+      </types>
+      <methods signature="doContainer()" returnType="void"/>
+      <constructors signature="ClassContainer()" visibility="default"/>
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+    <types xsi:type="dbcmodel:DbcInterface" name="InterfaceContainer">
+      <types xsi:type="dbcmodel:DbcClass" name="DefaultChildClass" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="packageA.B.C.InterfaceContainer.DefaultChildClass.1593424881.579221443" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <methods signature="run()" returnType="void"/>
+        <attributes name="x" type="int" visibility="default"/>
+        <constructors signature="DefaultChildClass(x : int)"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="PublicChildClass" final="true">
+        <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+          <types xsi:type="dbcmodel:DbcClass" name="packageA.B.C.InterfaceContainer.PublicChildClass.InnerInnerClass.899855521.525791317" visibility="default" anonymous="true">
+            <extendsFullNames>java.lang.Object</extendsFullNames>
+          </types>
+          <methods signature="innerInnerRun()" returnType="void"/>
+          <constructors signature="InnerInnerClass()" visibility="default"/>
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <constructors signature="PublicChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="DefaultChildInterface" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+          <types xsi:type="dbcmodel:DbcClass" name="packageA.B.C.InterfaceContainer.DefaultChildInterface.InnerInnerClass.1891410141.1946165954" visibility="default" anonymous="true">
+            <extendsFullNames>java.lang.Object</extendsFullNames>
+          </types>
+          <methods signature="innerInnerRun()" returnType="void"/>
+          <constructors signature="InnerInnerClass()" visibility="default"/>
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="PublicChildInterface"/>
+      <types xsi:type="dbcmodel:DbcEnum" name="DefaultChildEnum" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="packageA.B.C.InterfaceContainer.DefaultChildEnum.899138927.964088996" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <invariants name="JML class invariant nr 11 in DefaultChildEnum" condition="!  packageA.B.C.InterfaceContainer.DefaultChildEnum::select(heap,&#xA;                                                            null,&#xA;                                                            packageA.B.C.InterfaceContainer.DefaultChildEnum::$INSTANCE)&#xA; = null"/>
+        <methods signature="run()" returnType="void"/>
+        <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.B.C.InterfaceContainer.DefaultChildEnum"/>
+        <methods signature="values()" static="true" returnType="packageA.B.C.InterfaceContainer.DefaultChildEnum[]"/>
+        <methods signature="name()" returnType="java.lang.String"/>
+        <attributes name="x" type="int" visibility="default"/>
+        <constructors signature="DefaultChildEnum(x : int)" visibility="private"/>
+        <literals name="INSTANCE"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcEnum" name="PublicChildEnum" visibility="default">
+        <invariants name="JML class invariant nr 12 in PublicChildEnum" condition="!  packageA.B.C.InterfaceContainer.PublicChildEnum::select(heap,&#xA;                                                           null,&#xA;                                                           packageA.B.C.InterfaceContainer.PublicChildEnum::$INSTANCE)&#xA; = null"/>
+        <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.B.C.InterfaceContainer.PublicChildEnum"/>
+        <methods signature="values()" static="true" returnType="packageA.B.C.InterfaceContainer.PublicChildEnum[]"/>
+        <methods signature="name()" returnType="java.lang.String"/>
+        <constructors signature="PublicChildEnum()" visibility="default"/>
+        <literals name="INSTANCE"/>
+      </types>
+    </types>
+    <types xsi:type="dbcmodel:DbcEnum" name="EnumContainer" visibility="default">
+      <types xsi:type="dbcmodel:DbcClass" name="packageA.B.C.EnumContainer.1552287929.1966546397" visibility="default" anonymous="true">
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="DefaultChildClass" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="packageA.B.C.EnumContainer.DefaultChildClass.1911554499.162360708" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <methods signature="run()" returnType="void"/>
+        <attributes name="x" type="int" visibility="default"/>
+        <constructors signature="DefaultChildClass(x : int)"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="PrivateChildClass" visibility="private" static="true">
+        <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+        <constructors signature="PrivateChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="ProtectedChildClass" visibility="protected" abstract="true">
+        <constructors signature="ProtectedChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="PublicChildClass" final="true">
+        <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+          <types xsi:type="dbcmodel:DbcClass" name="packageA.B.C.EnumContainer.PublicChildClass.InnerInnerClass.1532397701.307916144" visibility="default" anonymous="true">
+            <extendsFullNames>java.lang.Object</extendsFullNames>
+          </types>
+          <methods signature="innerInnerRun()" returnType="void"/>
+          <constructors signature="InnerInnerClass()" visibility="default"/>
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <constructors signature="PublicChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="DefaultChildInterface" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+          <types xsi:type="dbcmodel:DbcClass" name="packageA.B.C.EnumContainer.DefaultChildInterface.InnerInnerClass.311842561.143795092" visibility="default" anonymous="true">
+            <extendsFullNames>java.lang.Object</extendsFullNames>
+          </types>
+          <methods signature="innerInnerRun()" returnType="void"/>
+          <constructors signature="InnerInnerClass()" visibility="default"/>
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="PrivateChildInterface" visibility="default" static="true"/>
+      <types xsi:type="dbcmodel:DbcInterface" name="ProtectedChildInterface" visibility="default"/>
+      <types xsi:type="dbcmodel:DbcInterface" name="PublicChildInterface"/>
+      <invariants name="JML class invariant nr 10 in EnumContainer" condition="!  packageA.B.C.EnumContainer::select(heap,&#xA;                                      null,&#xA;                                      packageA.B.C.EnumContainer::$INSTANCE)&#xA; = null"/>
+      <methods signature="doContainer()" returnType="void"/>
+      <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.B.C.EnumContainer"/>
+      <methods signature="values()" static="true" returnType="packageA.B.C.EnumContainer[]"/>
+      <methods signature="name()" returnType="java.lang.String"/>
+      <constructors signature="EnumContainer()" visibility="default"/>
+      <literals name="INSTANCE"/>
+    </types>
+  </packages>
+  <packages name="packageA.B">
+    <types xsi:type="dbcmodel:DbcClass" name="ClassContainer">
+      <types xsi:type="dbcmodel:DbcClass" name="packageA.B.ClassContainer.221489535.1386909980" visibility="default" anonymous="true">
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="DefaultChildClass" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="packageA.B.ClassContainer.DefaultChildClass.1483910808.216983025" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <methods signature="run()" returnType="void"/>
+        <attributes name="x" type="int" visibility="default"/>
+        <constructors signature="DefaultChildClass(x : int)"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="PrivateChildClass" visibility="private" static="true">
+        <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+        <constructors signature="PrivateChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="ProtectedChildClass" visibility="protected" abstract="true">
+        <constructors signature="ProtectedChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="PublicChildClass" final="true">
+        <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+          <types xsi:type="dbcmodel:DbcClass" name="packageA.B.ClassContainer.PublicChildClass.InnerInnerClass.1043802977.88903879" visibility="default" anonymous="true">
+            <extendsFullNames>java.lang.Object</extendsFullNames>
+          </types>
+          <methods signature="innerInnerRun()" returnType="void"/>
+          <constructors signature="InnerInnerClass()" visibility="default"/>
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <constructors signature="PublicChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="DefaultChildInterface" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+          <types xsi:type="dbcmodel:DbcClass" name="packageA.B.ClassContainer.DefaultChildInterface.InnerInnerClass.1829295775.1786397957" visibility="default" anonymous="true">
+            <extendsFullNames>java.lang.Object</extendsFullNames>
+          </types>
+          <methods signature="innerInnerRun()" returnType="void"/>
+          <constructors signature="InnerInnerClass()" visibility="default"/>
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="PrivateChildInterface" visibility="default" static="true"/>
+      <types xsi:type="dbcmodel:DbcInterface" name="ProtectedChildInterface" visibility="default"/>
+      <types xsi:type="dbcmodel:DbcInterface" name="PublicChildInterface"/>
+      <types xsi:type="dbcmodel:DbcEnum" name="DefaultChildEnum" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="packageA.B.ClassContainer.DefaultChildEnum.1139794994.690465827" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <invariants name="JML class invariant nr 13 in DefaultChildEnum" condition="!  packageA.B.ClassContainer.DefaultChildEnum::select(heap,&#xA;                                                      null,&#xA;                                                      packageA.B.ClassContainer.DefaultChildEnum::$INSTANCE)&#xA; = null"/>
+        <methods signature="run()" returnType="void"/>
+        <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.B.ClassContainer.DefaultChildEnum"/>
+        <methods signature="values()" static="true" returnType="packageA.B.ClassContainer.DefaultChildEnum[]"/>
+        <methods signature="name()" returnType="java.lang.String"/>
+        <attributes name="x" type="int" visibility="default"/>
+        <constructors signature="DefaultChildEnum(x : int)" visibility="private"/>
+        <literals name="INSTANCE"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcEnum" name="PrivateChildEnum" visibility="default">
+        <invariants name="JML class invariant nr 14 in PrivateChildEnum" condition="!  packageA.B.ClassContainer.PrivateChildEnum::select(heap,&#xA;                                                      null,&#xA;                                                      packageA.B.ClassContainer.PrivateChildEnum::$INSTANCE)&#xA; = null"/>
+        <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.B.ClassContainer.PrivateChildEnum"/>
+        <methods signature="values()" static="true" returnType="packageA.B.ClassContainer.PrivateChildEnum[]"/>
+        <methods signature="name()" returnType="java.lang.String"/>
+        <constructors signature="PrivateChildEnum()" visibility="default"/>
+        <literals name="INSTANCE"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcEnum" name="ProtectedChildEnum" visibility="default">
+        <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.B.ClassContainer.ProtectedChildEnum"/>
+        <methods signature="values()" static="true" returnType="packageA.B.ClassContainer.ProtectedChildEnum[]"/>
+        <methods signature="name()" returnType="java.lang.String"/>
+        <constructors signature="ProtectedChildEnum()" visibility="default"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcEnum" name="PublicChildEnum" visibility="default">
+        <invariants name="JML class invariant nr 15 in PublicChildEnum" condition="!  packageA.B.ClassContainer.PublicChildEnum::select(heap,&#xA;                                                     null,&#xA;                                                     packageA.B.ClassContainer.PublicChildEnum::$INSTANCE)&#xA; = null"/>
+        <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.B.ClassContainer.PublicChildEnum"/>
+        <methods signature="values()" static="true" returnType="packageA.B.ClassContainer.PublicChildEnum[]"/>
+        <methods signature="name()" returnType="java.lang.String"/>
+        <constructors signature="PublicChildEnum()" visibility="default"/>
+        <literals name="INSTANCE"/>
+      </types>
+      <methods signature="doContainer()" returnType="void"/>
+      <constructors signature="ClassContainer()" visibility="default"/>
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+    <types xsi:type="dbcmodel:DbcInterface" name="InterfaceContainer">
+      <types xsi:type="dbcmodel:DbcClass" name="DefaultChildClass" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="packageA.B.InterfaceContainer.DefaultChildClass.1547730645.924575166" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <methods signature="run()" returnType="void"/>
+        <attributes name="x" type="int" visibility="default"/>
+        <constructors signature="DefaultChildClass(x : int)"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="PublicChildClass" final="true">
+        <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+          <types xsi:type="dbcmodel:DbcClass" name="packageA.B.InterfaceContainer.PublicChildClass.InnerInnerClass.1470373550.1844785141" visibility="default" anonymous="true">
+            <extendsFullNames>java.lang.Object</extendsFullNames>
+          </types>
+          <methods signature="innerInnerRun()" returnType="void"/>
+          <constructors signature="InnerInnerClass()" visibility="default"/>
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <constructors signature="PublicChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="DefaultChildInterface" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+          <types xsi:type="dbcmodel:DbcClass" name="packageA.B.InterfaceContainer.DefaultChildInterface.InnerInnerClass.1097826402.622918422" visibility="default" anonymous="true">
+            <extendsFullNames>java.lang.Object</extendsFullNames>
+          </types>
+          <methods signature="innerInnerRun()" returnType="void"/>
+          <constructors signature="InnerInnerClass()" visibility="default"/>
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="PublicChildInterface"/>
+      <types xsi:type="dbcmodel:DbcEnum" name="DefaultChildEnum" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="packageA.B.InterfaceContainer.DefaultChildEnum.1469416666.1273418920" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <invariants name="JML class invariant nr 17 in DefaultChildEnum" condition="!  packageA.B.InterfaceContainer.DefaultChildEnum::select(heap,&#xA;                                                          null,&#xA;                                                          packageA.B.InterfaceContainer.DefaultChildEnum::$INSTANCE)&#xA; = null"/>
+        <methods signature="run()" returnType="void"/>
+        <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.B.InterfaceContainer.DefaultChildEnum"/>
+        <methods signature="values()" static="true" returnType="packageA.B.InterfaceContainer.DefaultChildEnum[]"/>
+        <methods signature="name()" returnType="java.lang.String"/>
+        <attributes name="x" type="int" visibility="default"/>
+        <constructors signature="DefaultChildEnum(x : int)" visibility="private"/>
+        <literals name="INSTANCE"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcEnum" name="PublicChildEnum" visibility="default">
+        <invariants name="JML class invariant nr 18 in PublicChildEnum" condition="!  packageA.B.InterfaceContainer.PublicChildEnum::select(heap,&#xA;                                                         null,&#xA;                                                         packageA.B.InterfaceContainer.PublicChildEnum::$INSTANCE)&#xA; = null"/>
+        <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.B.InterfaceContainer.PublicChildEnum"/>
+        <methods signature="values()" static="true" returnType="packageA.B.InterfaceContainer.PublicChildEnum[]"/>
+        <methods signature="name()" returnType="java.lang.String"/>
+        <constructors signature="PublicChildEnum()" visibility="default"/>
+        <literals name="INSTANCE"/>
+      </types>
+    </types>
+    <types xsi:type="dbcmodel:DbcEnum" name="EnumContainer" visibility="default">
+      <types xsi:type="dbcmodel:DbcClass" name="packageA.B.EnumContainer.1910696297.719263437" visibility="default" anonymous="true">
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="DefaultChildClass" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="packageA.B.EnumContainer.DefaultChildClass.960813042.1231410057" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <methods signature="run()" returnType="void"/>
+        <attributes name="x" type="int" visibility="default"/>
+        <constructors signature="DefaultChildClass(x : int)"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="PrivateChildClass" visibility="private" static="true">
+        <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+        <constructors signature="PrivateChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="ProtectedChildClass" visibility="protected" abstract="true">
+        <constructors signature="ProtectedChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="PublicChildClass" final="true">
+        <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+          <types xsi:type="dbcmodel:DbcClass" name="packageA.B.EnumContainer.PublicChildClass.InnerInnerClass.781226824.203822411" visibility="default" anonymous="true">
+            <extendsFullNames>java.lang.Object</extendsFullNames>
+          </types>
+          <methods signature="innerInnerRun()" returnType="void"/>
+          <constructors signature="InnerInnerClass()" visibility="default"/>
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <constructors signature="PublicChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="DefaultChildInterface" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+          <types xsi:type="dbcmodel:DbcClass" name="packageA.B.EnumContainer.DefaultChildInterface.InnerInnerClass.1003026520.1490580213" visibility="default" anonymous="true">
+            <extendsFullNames>java.lang.Object</extendsFullNames>
+          </types>
+          <methods signature="innerInnerRun()" returnType="void"/>
+          <constructors signature="InnerInnerClass()" visibility="default"/>
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="PrivateChildInterface" visibility="default" static="true"/>
+      <types xsi:type="dbcmodel:DbcInterface" name="ProtectedChildInterface" visibility="default"/>
+      <types xsi:type="dbcmodel:DbcInterface" name="PublicChildInterface"/>
+      <invariants name="JML class invariant nr 16 in EnumContainer" condition="!  packageA.B.EnumContainer::select(heap,&#xA;                                    null,&#xA;                                    packageA.B.EnumContainer::$INSTANCE)&#xA; = null"/>
+      <methods signature="doContainer()" returnType="void"/>
+      <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.B.EnumContainer"/>
+      <methods signature="values()" static="true" returnType="packageA.B.EnumContainer[]"/>
+      <methods signature="name()" returnType="java.lang.String"/>
+      <constructors signature="EnumContainer()" visibility="default"/>
+      <literals name="INSTANCE"/>
+    </types>
+  </packages>
+  <packages name="packageA">
+    <types xsi:type="dbcmodel:DbcClass" name="ClassContainer">
+      <types xsi:type="dbcmodel:DbcClass" name="packageA.ClassContainer.1987880932.729874070" visibility="default" anonymous="true">
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="DefaultChildClass" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="packageA.ClassContainer.DefaultChildClass.228375588.1353132050" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <methods signature="run()" returnType="void"/>
+        <attributes name="x" type="int" visibility="default"/>
+        <constructors signature="DefaultChildClass(x : int)"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="PrivateChildClass" visibility="private" static="true">
+        <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+        <constructors signature="PrivateChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="ProtectedChildClass" visibility="protected" abstract="true">
+        <constructors signature="ProtectedChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="PublicChildClass" final="true">
+        <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+          <types xsi:type="dbcmodel:DbcClass" name="packageA.ClassContainer.PublicChildClass.InnerInnerClass.1527752119.520437029" visibility="default" anonymous="true">
+            <extendsFullNames>java.lang.Object</extendsFullNames>
+          </types>
+          <methods signature="innerInnerRun()" returnType="void"/>
+          <constructors signature="InnerInnerClass()" visibility="default"/>
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <constructors signature="PublicChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="DefaultChildInterface" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+          <types xsi:type="dbcmodel:DbcClass" name="packageA.ClassContainer.DefaultChildInterface.InnerInnerClass.1211814933.18678818" visibility="default" anonymous="true">
+            <extendsFullNames>java.lang.Object</extendsFullNames>
+          </types>
+          <methods signature="innerInnerRun()" returnType="void"/>
+          <constructors signature="InnerInnerClass()" visibility="default"/>
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="PrivateChildInterface" visibility="default" static="true"/>
+      <types xsi:type="dbcmodel:DbcInterface" name="ProtectedChildInterface" visibility="default"/>
+      <types xsi:type="dbcmodel:DbcInterface" name="PublicChildInterface"/>
+      <types xsi:type="dbcmodel:DbcEnum" name="DefaultChildEnum" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="packageA.ClassContainer.DefaultChildEnum.1905367448.1491674787" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <invariants name="JML class invariant nr 19 in DefaultChildEnum" condition="!  packageA.ClassContainer.DefaultChildEnum::select(heap,&#xA;                                                    null,&#xA;                                                    packageA.ClassContainer.DefaultChildEnum::$INSTANCE)&#xA; = null"/>
+        <methods signature="run()" returnType="void"/>
+        <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.ClassContainer.DefaultChildEnum"/>
+        <methods signature="values()" static="true" returnType="packageA.ClassContainer.DefaultChildEnum[]"/>
+        <methods signature="name()" returnType="java.lang.String"/>
+        <attributes name="x" type="int" visibility="default"/>
+        <constructors signature="DefaultChildEnum(x : int)" visibility="private"/>
+        <literals name="INSTANCE"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcEnum" name="PrivateChildEnum" visibility="default">
+        <invariants name="JML class invariant nr 20 in PrivateChildEnum" condition="!  packageA.ClassContainer.PrivateChildEnum::select(heap,&#xA;                                                    null,&#xA;                                                    packageA.ClassContainer.PrivateChildEnum::$INSTANCE)&#xA; = null"/>
+        <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.ClassContainer.PrivateChildEnum"/>
+        <methods signature="values()" static="true" returnType="packageA.ClassContainer.PrivateChildEnum[]"/>
+        <methods signature="name()" returnType="java.lang.String"/>
+        <constructors signature="PrivateChildEnum()" visibility="default"/>
+        <literals name="INSTANCE"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcEnum" name="ProtectedChildEnum" visibility="default">
+        <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.ClassContainer.ProtectedChildEnum"/>
+        <methods signature="values()" static="true" returnType="packageA.ClassContainer.ProtectedChildEnum[]"/>
+        <methods signature="name()" returnType="java.lang.String"/>
+        <constructors signature="ProtectedChildEnum()" visibility="default"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcEnum" name="PublicChildEnum" visibility="default">
+        <invariants name="JML class invariant nr 21 in PublicChildEnum" condition="!  packageA.ClassContainer.PublicChildEnum::select(heap,&#xA;                                                   null,&#xA;                                                   packageA.ClassContainer.PublicChildEnum::$INSTANCE)&#xA; = null"/>
+        <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.ClassContainer.PublicChildEnum"/>
+        <methods signature="values()" static="true" returnType="packageA.ClassContainer.PublicChildEnum[]"/>
+        <methods signature="name()" returnType="java.lang.String"/>
+        <constructors signature="PublicChildEnum()" visibility="default"/>
+        <literals name="INSTANCE"/>
+      </types>
+      <methods signature="doContainer()" returnType="void"/>
+      <constructors signature="ClassContainer()" visibility="default"/>
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+    <types xsi:type="dbcmodel:DbcInterface" name="InterfaceContainer">
+      <types xsi:type="dbcmodel:DbcClass" name="DefaultChildClass" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="packageA.InterfaceContainer.DefaultChildClass.1723364833.110710964" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <methods signature="run()" returnType="void"/>
+        <attributes name="x" type="int" visibility="default"/>
+        <constructors signature="DefaultChildClass(x : int)"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="PublicChildClass" final="true">
+        <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+          <types xsi:type="dbcmodel:DbcClass" name="packageA.InterfaceContainer.PublicChildClass.InnerInnerClass.636808511.523926406" visibility="default" anonymous="true">
+            <extendsFullNames>java.lang.Object</extendsFullNames>
+          </types>
+          <methods signature="innerInnerRun()" returnType="void"/>
+          <constructors signature="InnerInnerClass()" visibility="default"/>
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <constructors signature="PublicChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="DefaultChildInterface" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+          <types xsi:type="dbcmodel:DbcClass" name="packageA.InterfaceContainer.DefaultChildInterface.InnerInnerClass.16499438.494090143" visibility="default" anonymous="true">
+            <extendsFullNames>java.lang.Object</extendsFullNames>
+          </types>
+          <methods signature="innerInnerRun()" returnType="void"/>
+          <constructors signature="InnerInnerClass()" visibility="default"/>
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="PublicChildInterface"/>
+      <types xsi:type="dbcmodel:DbcEnum" name="DefaultChildEnum" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="packageA.InterfaceContainer.DefaultChildEnum.1245809609.6062368" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <invariants name="JML class invariant nr 23 in DefaultChildEnum" condition="!  packageA.InterfaceContainer.DefaultChildEnum::select(heap,&#xA;                                                        null,&#xA;                                                        packageA.InterfaceContainer.DefaultChildEnum::$INSTANCE)&#xA; = null"/>
+        <methods signature="run()" returnType="void"/>
+        <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.InterfaceContainer.DefaultChildEnum"/>
+        <methods signature="values()" static="true" returnType="packageA.InterfaceContainer.DefaultChildEnum[]"/>
+        <methods signature="name()" returnType="java.lang.String"/>
+        <attributes name="x" type="int" visibility="default"/>
+        <constructors signature="DefaultChildEnum(x : int)" visibility="private"/>
+        <literals name="INSTANCE"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcEnum" name="PublicChildEnum" visibility="default">
+        <invariants name="JML class invariant nr 24 in PublicChildEnum" condition="!  packageA.InterfaceContainer.PublicChildEnum::select(heap,&#xA;                                                       null,&#xA;                                                       packageA.InterfaceContainer.PublicChildEnum::$INSTANCE)&#xA; = null"/>
+        <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.InterfaceContainer.PublicChildEnum"/>
+        <methods signature="values()" static="true" returnType="packageA.InterfaceContainer.PublicChildEnum[]"/>
+        <methods signature="name()" returnType="java.lang.String"/>
+        <constructors signature="PublicChildEnum()" visibility="default"/>
+        <literals name="INSTANCE"/>
+      </types>
+    </types>
+    <types xsi:type="dbcmodel:DbcEnum" name="EnumContainer" visibility="default">
+      <types xsi:type="dbcmodel:DbcClass" name="packageA.EnumContainer.250464093.110861185" visibility="default" anonymous="true">
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="DefaultChildClass" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="packageA.EnumContainer.DefaultChildClass.1524518659.2032712698" visibility="default" anonymous="true">
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <methods signature="run()" returnType="void"/>
+        <attributes name="x" type="int" visibility="default"/>
+        <constructors signature="DefaultChildClass(x : int)"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="PrivateChildClass" visibility="private" static="true">
+        <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+        <constructors signature="PrivateChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="ProtectedChildClass" visibility="protected" abstract="true">
+        <constructors signature="ProtectedChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="PublicChildClass" final="true">
+        <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+          <types xsi:type="dbcmodel:DbcClass" name="packageA.EnumContainer.PublicChildClass.InnerInnerClass.832892727.215114575" visibility="default" anonymous="true">
+            <extendsFullNames>java.lang.Object</extendsFullNames>
+          </types>
+          <methods signature="innerInnerRun()" returnType="void"/>
+          <constructors signature="InnerInnerClass()" visibility="default"/>
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <constructors signature="PublicChildClass()" visibility="default"/>
+        <extendsFullNames>java.lang.Object</extendsFullNames>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="DefaultChildInterface" visibility="default">
+        <types xsi:type="dbcmodel:DbcClass" name="InnerInnerClass">
+          <types xsi:type="dbcmodel:DbcClass" name="packageA.EnumContainer.DefaultChildInterface.InnerInnerClass.150560074.434665134" visibility="default" anonymous="true">
+            <extendsFullNames>java.lang.Object</extendsFullNames>
+          </types>
+          <methods signature="innerInnerRun()" returnType="void"/>
+          <constructors signature="InnerInnerClass()" visibility="default"/>
+          <extendsFullNames>java.lang.Object</extendsFullNames>
+        </types>
+        <types xsi:type="dbcmodel:DbcInterface" name="InnerInnerInterface"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcInterface" name="PrivateChildInterface" visibility="default" static="true"/>
+      <types xsi:type="dbcmodel:DbcInterface" name="ProtectedChildInterface" visibility="default"/>
+      <types xsi:type="dbcmodel:DbcInterface" name="PublicChildInterface"/>
+      <invariants name="JML class invariant nr 22 in EnumContainer" condition="!  packageA.EnumContainer::select(heap,&#xA;                                  null,&#xA;                                  packageA.EnumContainer::$INSTANCE)&#xA; = null"/>
+      <methods signature="doContainer()" returnType="void"/>
+      <methods signature="valueOf(string : java.lang.String)" static="true" returnType="packageA.EnumContainer"/>
+      <methods signature="values()" static="true" returnType="packageA.EnumContainer[]"/>
+      <methods signature="name()" returnType="java.lang.String"/>
+      <constructors signature="EnumContainer()" visibility="default"/>
+      <literals name="INSTANCE"/>
+    </types>
+  </packages>
+  <connectionSettings key="location" value="D:\Forschung\Development\KeY_Master\junit-workspace\InnerTypeTest_testInnerTypes"/>
+  <connectionSettings key="packageManagement" value="FLAT_LIST"/>
+  <connectionSettings key="packageManagementType" value="de.hentschel.visualdbc.datasource.model.DSPackageManagement"/>
+  <connectionSettings key="locationType" value="java.io.File"/>
+</dbcmodel:DbcModel>

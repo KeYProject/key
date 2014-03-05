@@ -22,11 +22,9 @@ import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -60,13 +58,13 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         private HashMap<SchemaVariable, Term> mapping = new LinkedHashMap<SchemaVariable, Term>();
        
         @Override
-        public TacletFormula translate(Taclet taclet, Services services) {
+        public TacletFormula translate(Taclet taclet, TermServices services) {
                 String result = checkTaclet(taclet);
                 if(result != null){
                         throw new IllegalTacletException(result);
                 }
                 Term formula = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR
-                                .translate(taclet);
+                                .translate(taclet, services);
                 formula = rebuild(taclet, formula, services,
                                 new LinkedHashSet<QuantifiableVariable>());
                 result =   checkForIllegalOps(formula, taclet,false);
@@ -76,7 +74,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 return new LemmaFormula(taclet, formula);
         }
         
-        private Term replace(Taclet taclet, Term term, Services services) {
+        private Term replace(Taclet taclet, Term term, TermServices services) {
                 if (term.op() instanceof SchemaVariable) {
                         return getInstantiation(taclet,
                                         (SchemaVariable) term.op(), services);
@@ -148,7 +146,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * @return instantiation of the schema variable <code>var</code>.
          */
         protected final Term getInstantiation(Taclet owner, SchemaVariable var,
-                        Services services) {
+                        TermServices services) {
                 Term instantiation = mapping.get(var);
                 if (instantiation == null) {
                         instantiation = createInstantiation(owner, var,
@@ -170,7 +168,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * 
          */
         private Term getInstantation(Taclet owner, VariableSV var,
-                        Services services) {
+                        TermServices services) {
                 Term instantiation = mapping.get(var);
                 if (instantiation == null) {
                         instantiation = createInstantiation(owner, var,
@@ -181,7 +179,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         }
 
         private Term createInstantiation(Taclet owner, SchemaVariable sv,
-                        Services services) {
+                        TermServices services) {
                 if (sv instanceof VariableSV) {
                         return createInstantiation(owner, (VariableSV) sv,
                                         services);
@@ -216,11 +214,11 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          *         variable.
          */
         private Term createInstantiation(Taclet owner, VariableSV sv,
-                        Services services) {
+                        TermServices services) {
                 Name name = createUniqueName(services, "v_"+sv.name().toString());
                 Sort sort = replaceSort(sv.sort(), services);
                 LogicVariable variable = new LogicVariable(name, sort);
-                return TermFactory.DEFAULT.createTerm(variable);
+                return services.getTermFactory().createTerm(variable);
         }
 
         /**
@@ -229,7 +227,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * <code>sv</code>.
          */
         private Term createInstantiation(Taclet owner, TermSV sv,
-                        Services services) {
+                        TermServices services) {
                 return createSimpleInstantiation(owner, sv, services);
         }
 
@@ -239,7 +237,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * <code>sv</code>.
          */
         private Term createInstantiation(Taclet owner, FormulaSV sv,
-                        Services services) {
+                        TermServices services) {
                 return createSimpleInstantiation(owner, sv, services);
         }
 
@@ -251,7 +249,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * and Term schema variables.
          */
         private Term createSimpleInstantiation(Taclet owner, SchemaVariable sv,
-                        Services services) {
+                        TermServices services) {
                 ImmutableSet<SchemaVariable> prefix = owner.getPrefix(sv)
                                 .prefix();
 
@@ -260,14 +258,14 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 Name name = createUniqueName(services, "f_"+sv.name().toString());
 
                 Function function = new Function(name, replaceSort(sv.sort(), services), argSorts);
-                return TermBuilder.DF.func(function, args);
+                return services.getTermBuilder().func(function, args);
         }
 
-        private Name createUniqueName(Services services, String baseName) {
-                return new Name(TermBuilder.DF.newName(services, baseName));
+        private Name createUniqueName(TermServices services, String baseName) {
+                return new Name(services.getTermBuilder().newName(baseName));
         }
 
-        private Sort[] computeArgSorts(ImmutableSet<SchemaVariable> svSet, Services services) {
+        private Sort[] computeArgSorts(ImmutableSet<SchemaVariable> svSet, TermServices services) {
                 Sort[] argSorts = new Sort[svSet.size()];
                 int i = 0;
                 for (SchemaVariable sv : svSet) {
@@ -278,7 +276,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         }
 
         private Term[] computeArgs(Taclet owner,
-                        ImmutableSet<SchemaVariable> svSet, Services services) {
+                        ImmutableSet<SchemaVariable> svSet, TermServices services) {
                 Term[] args = new Term[svSet.size()];
                 int i = 0;
                 for (SchemaVariable sv : svSet) {
@@ -292,7 +290,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * Rebuilds a term recursively and replaces all schema variables with
          * skolem terms/variables. 
          *   */
-        private Term rebuild(Taclet taclet, Term term, Services services,
+        private Term rebuild(Taclet taclet, Term term, TermServices services,
                         HashSet<QuantifiableVariable> boundedVariables) {
                 Term[] newSubs = new Term[term.arity()];
                 int i = 0;
@@ -318,7 +316,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
                 Operator newOp = replaceOp(term.op(), services);
 
-                return TermFactory.DEFAULT
+                return services.getTermFactory()
                                 .createTerm(newOp,
                                                 newSubs,
                                                 new ImmutableArray<QuantifiableVariable>(
@@ -337,7 +335,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * @param services A services object for lookups
          * @return the replacement operator, not <code>null</code>
          */
-        protected Operator replaceOp(Operator op, Services services) {
+        protected Operator replaceOp(Operator op, TermServices services) {
             return op;
         }
 
@@ -352,7 +350,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * @param services A services object for lookups
          * @return the replacement sort, not <code>null</code>
          */
-        protected Sort replaceSort(Sort sort, Services services) {
+        protected Sort replaceSort(Sort sort, TermServices services) {
             return sort;
         }
 }

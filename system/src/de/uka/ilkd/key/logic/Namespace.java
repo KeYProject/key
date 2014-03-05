@@ -266,6 +266,7 @@ public class Namespace implements java.io.Serializable {
         }
     }
     
+    @SuppressWarnings("unchecked")
     public Namespace copy() {
 	Namespace copy;
 	if(protocol != null){

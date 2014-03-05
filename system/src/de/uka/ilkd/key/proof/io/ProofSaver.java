@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
 
+import javax.swing.event.EventListenerList;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -45,6 +47,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.event.ProofSaverEvent;
+import de.uka.ilkd.key.proof.io.event.ProofSaverListener;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -56,10 +60,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import de.uka.ilkd.key.rule.inst.NameInstantiationEntry;
-import de.uka.ilkd.key.rule.inst.ProgramInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.TermInstantiation;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -75,6 +76,17 @@ public class ProofSaver {
    final protected String internalVersion;
    
    LogicPrinter printer;
+   
+   /**
+    * <p>
+    * Contains all listener. 
+    * </p>
+    * <p>
+    * They are used for instance by the Eclipse integration to refresh the
+    * workspace when a proof file was saved.
+    * </p>.
+    */
+   private static final EventListenerList listeners = new EventListenerList();
    
    public ProofSaver(Proof proof, String filename, String internalVersion) {
       //this.main = main;
@@ -112,7 +124,9 @@ public class ProofSaver {
    }
    
    public String save() throws IOException {
-      return save(new FileOutputStream(filename));
+      String errorMsg = save(new FileOutputStream(filename));
+      fireProofSaved(new ProofSaverEvent(this, filename, errorMsg));
+      return errorMsg;
    }
    
    public String save(OutputStream out) throws IOException {
@@ -375,7 +389,7 @@ public class ProofSaver {
    
 
    public static String posInTerm2Proof(PosInTerm pos) {
-      if (pos == PosInTerm.TOP_LEVEL) return "";
+      if (pos == PosInTerm.getTopLevel()) return "";
       String s = " (term \"";
       String list = pos.integerList(pos.reverseIterator()); // cheaper to read in
       s = s + list.substring(1,list.length()-1); // chop off "[" and "]"
@@ -389,36 +403,25 @@ public class ProofSaver {
    public String getInteresting(SVInstantiations inst) {
 //System.err.println(inst);   
       String s = "";
-      Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> pairIt =
+      Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> pairIt =
          inst.interesting().entryIterator();
 
       while (pairIt.hasNext()) {
-         ImmutableMapEntry<SchemaVariable,InstantiationEntry> pair = pairIt.next();
+         ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> pair = pairIt.next();
          SchemaVariable var = pair.key();
 	 
-         String singleInstantiation = var.name()+ "="; 
-	 Object value = pair.value();
-	 if (value instanceof TermInstantiation) {
-	     singleInstantiation += printTerm(((TermInstantiation) value).getTerm(), 
-	                    proof.getServices());
-	 }
-         else
-	 if (value instanceof ProgramInstantiation) {
-	     ProgramElement pe = 
-		 ((ProgramInstantiation) value).getProgramElement();
-	     singleInstantiation += printProgramElement(pe);
-	 }
-         else
-	 if (value instanceof NameInstantiationEntry) {
-	     singleInstantiation += ((NameInstantiationEntry) value).getInstantiation();
-	 }
-         else 
-             throw new RuntimeException("Saving failed.\n"+
-           "FIXME: Unhandled instantiation type: " +  value.getClass());
+         final Object value = pair.value().getInstantiation();
 	 
-	 singleInstantiation = escapeCharacters(singleInstantiation);
+         if (!(value instanceof Term || value instanceof ProgramElement || value instanceof Name)) {
+             throw new RuntimeException("Saving failed.\n"+
+                         "FIXME: Unhandled instantiation type: " +  value.getClass());
+         }
+
+         StringBuffer singleInstantiation =
+                 new StringBuffer(var.name().toString()).
+                    append("=").append(printAnything(value, proof.getServices(), false));
 	
-	 s += " (inst \"" + singleInstantiation + "\")";
+	 s += " (inst \"" + escapeCharacters(singleInstantiation.toString()) + "\")";
       }
       
       return s;
@@ -477,13 +480,13 @@ public class ProofSaver {
 	return result;
     }
 
-    public static String printProgramElement(ProgramElement pe) {
+    public static StringBuffer printProgramElement(ProgramElement pe) {
         java.io.StringWriter sw = new java.io.StringWriter();
         ProgramPrinter prgPrinter = new ProgramPrinter(sw);
         try{
             pe.prettyPrint(prgPrinter);
         } catch(IOException ioe) {System.err.println(ioe);}
-        return sw.toString();
+        return sw.getBuffer();
     }
 
 
@@ -507,32 +510,36 @@ public class ProofSaver {
         return result;
     }
 
-
     public static String printAnything(Object val, Services services) {
+        return printAnything(val, services, true).toString();
+    }
+
+    public static StringBuffer printAnything(Object val, Services services, boolean shortAttrNotation) {
         if (val instanceof ProgramElement) {
             return printProgramElement((ProgramElement) val);
         }
         else
             if (val instanceof Term) {
-                return printTerm((Term) val, services, true).toString();
-            }
-            else if (val instanceof Sequent) {
+                return printTerm((Term) val, services, shortAttrNotation);
+            } else if (val instanceof Sequent) {
                 return printSequent((Sequent) val, services);
+            } else if (val instanceof Name) {
+                return new StringBuffer(val.toString());
             } else if (val==null){
                     return null;
             }
             else {
                 System.err.println("Don't know how to prettyprint "+val.getClass());
                 // try to String by chance
-                return val.toString();
+                return new StringBuffer(val.toString());
             }
     }
 
 
-    private static String printSequent(Sequent val, Services services) {
+    private static StringBuffer printSequent(Sequent val, Services services) {
         LogicPrinter printer = createLogicPrinter(services, services == null);
         printer.printSequent(val);
-        return printer.toString();
+        return printer.result();
     }
 
     private static LogicPrinter createLogicPrinter(Services serv, 
@@ -543,5 +550,36 @@ public class ProofSaver {
 
         p =  new LogicPrinter(new ProgramPrinter(null), ni, (shortAttrNotation ? serv : null), true);
         return p;
+    }
+    
+    /**
+     * Adds the {@link ProofSaverListener}.
+     * @param l The {@link ProofSaverListener} to add.
+     */
+    public static void addProofSaverListener(ProofSaverListener l) {
+       if (l != null) {
+          listeners.add(ProofSaverListener.class, l);
+       }
+    }
+    
+    /**
+     * Removes the {@link ProofSaverListener}.
+     * @param l The {@link ProofSaverListener} to remove.
+     */
+    public static void removeProofSaverListener(ProofSaverListener l) {
+       if (l != null) {
+          listeners.remove(ProofSaverListener.class, l);
+       }
+    }
+    
+    /**
+     * Informs all listener about the event {@link ProofSaverListener#proofSaved(ProofSaverEvent)}.
+     * @param e The event.
+     */
+    protected static void fireProofSaved(ProofSaverEvent e) {
+       ProofSaverListener[] toInform = listeners.getListeners(ProofSaverListener.class);
+       for (ProofSaverListener l : toInform) {
+          l.proofSaved(e);
+       }
     }
 }

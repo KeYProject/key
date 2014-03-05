@@ -78,7 +78,7 @@ public class KeYProjectWizard extends JavaProjectWizard {
          IProject project = getCreatedElement().getJavaProject().getProject();
          try {
             IProjectDescription description = project.getDescription();
-            String[] newNatures = ArrayUtil.add(description.getNatureIds(), KeYProjectNature.NATURE_ID);
+            String[] newNatures = ArrayUtil.insert(description.getNatureIds(), KeYProjectNature.NATURE_ID, 0);
             description.setNatureIds(newNatures);
             project.setDescription(description,null);
          }

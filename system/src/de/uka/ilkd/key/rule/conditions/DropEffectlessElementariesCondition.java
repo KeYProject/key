@@ -18,8 +18,14 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -28,9 +34,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public final class DropEffectlessElementariesCondition 
 						implements VariableCondition {
-    
-    private static final TermBuilder TB = TermBuilder.DF;
-    
     private final UpdateSV u;
     private final SchemaVariable x;
     private final SchemaVariable result;
@@ -46,7 +49,7 @@ public final class DropEffectlessElementariesCondition
     
     private static Term dropEffectlessElementariesHelper(
 	    				Term update, 
-	    				Set<LocationVariable> relevantVars) {
+	    				Set<LocationVariable> relevantVars, TermServices services) {
 	if(update.op() instanceof ElementaryUpdate) {
 	    ElementaryUpdate eu = (ElementaryUpdate) update.op();
 	    LocationVariable lhs = (LocationVariable) eu.lhs();
@@ -59,27 +62,27 @@ public final class DropEffectlessElementariesCondition
 //	        }
 		return null;
 	    } else {
-		return TB.skip();
+		return services.getTermBuilder().skip();
 	    }
 	} else if(update.op() == UpdateJunctor.PARALLEL_UPDATE) {
 	    Term sub0 = update.sub(0);
             Term sub1 = update.sub(1);
             // first descend to the second sub-update to keep relevantVars in
             // good order
-	    Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars);
-	    Term newSub0 = dropEffectlessElementariesHelper(sub0, relevantVars);
+	    Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars, services);
+	    Term newSub0 = dropEffectlessElementariesHelper(sub0, relevantVars, services);
 	    if(newSub0 == null && newSub1 == null) {
 		return null;
 	    } else {
 		newSub0 = newSub0 == null ? sub0 : newSub0;
 		newSub1 = newSub1 == null ? sub1 : newSub1;
-		return TB.parallel(newSub0, newSub1);
+		return services.getTermBuilder().parallel(newSub0, newSub1);
 	    }
 	} else if(update.op() == UpdateApplication.UPDATE_APPLICATION) {
 	    Term sub0 = update.sub(0);
 	    Term sub1 = update.sub(1);
-	    Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars);
-	    return newSub1 == null ? null : TB.apply(sub0, newSub1, null);
+	    Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars, services);
+	    return newSub1 == null ? null : services.getTermBuilder().apply(sub0, newSub1, null);
 	} else {
 	    return null;
 	}
@@ -94,10 +97,10 @@ public final class DropEffectlessElementariesCondition
 	target.execPostOrder(collector);
 	Set<LocationVariable> varsInTarget = collector.result();
 	Term simplifiedUpdate = dropEffectlessElementariesHelper(update, 
-							         varsInTarget); 
+							         varsInTarget, services); 
 	return simplifiedUpdate == null 
 	       ? null 
-	       : TB.apply(simplifiedUpdate, target, null); 
+	       : services.getTermBuilder().apply(simplifiedUpdate, target, null); 
     }
     
     

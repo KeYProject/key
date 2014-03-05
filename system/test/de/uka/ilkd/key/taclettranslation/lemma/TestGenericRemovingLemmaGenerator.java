@@ -26,7 +26,7 @@ public class TestGenericRemovingLemmaGenerator extends TestCase {
         TacletFormula result = g.translate(app.taclet(), TacletForTests.services());
 
         Set<Sort> sorts = new HashSet<Sort>();
-        collectSorts(result.getFormula(), sorts);
+        collectSorts(result.getFormula(TacletForTests.services()), sorts);
 
         Name nameG = new Name("G");
         boolean found = false;

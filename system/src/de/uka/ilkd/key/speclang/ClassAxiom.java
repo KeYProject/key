@@ -17,7 +17,6 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
@@ -33,9 +32,6 @@ import de.uka.ilkd.key.util.Pair;
  * (for performance reasons).
  */
 public abstract class ClassAxiom implements SpecificationElement {
-        
-
-    protected static final TermBuilder TB = TermBuilder.DF;
     protected String displayName;
     
     /**

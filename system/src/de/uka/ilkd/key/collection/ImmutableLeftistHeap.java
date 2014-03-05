@@ -434,7 +434,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	}
 
 	/**
-	 * throw an unsupported operation exception as leftiest heaps are immutable
+	 * throw an unsupported operation exception as leftist heaps are immutable
 	 */
 	public void remove() {
             throw new UnsupportedOperationException();

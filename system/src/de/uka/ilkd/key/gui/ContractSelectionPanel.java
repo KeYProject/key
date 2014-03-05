@@ -161,7 +161,11 @@ class ContractSelectionPanel extends JPanel {
 
 
     public void setContracts(Contract[] contracts, String title) {
-        if (contracts == null || contracts.length == 0) return;
+        if (contracts == null || contracts.length == 0) {
+            contractList.setListData(new Contract[0]);
+            updateUI();
+            return;
+        }
 
         //sort contracts by id (for the user's convenience)
         Arrays.sort(contracts, new Comparator<Contract> () {

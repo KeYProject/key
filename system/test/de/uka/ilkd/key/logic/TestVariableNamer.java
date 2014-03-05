@@ -48,7 +48,6 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
 
 public class TestVariableNamer extends TestCase {
     
-    private static final TermBuilder TB = TermBuilder.DF;
 
     private final Proof proof = new Proof(new Services(AbstractProfile.getDefaultProfile()));
     private final Services services = proof.getServices();
@@ -90,14 +89,14 @@ public class TestVariableNamer extends TestCase {
     	StatementBlock statementBlock = new StatementBlock(statement);
     	JavaBlock javaBlock = JavaBlock.createJavaBlock(statementBlock);
 
-	Term term = TB.dia(javaBlock, TB.tt());
+	Term term = services.getTermBuilder().dia(javaBlock, services.getTermBuilder().tt());
 
 	return new SequentFormula(term);
     }
 
     
     private PosInOccurrence constructPIO(SequentFormula formula) {
-    	return new PosInOccurrence(formula, PosInTerm.TOP_LEVEL, true);
+    	return new PosInOccurrence(formula, PosInTerm.getTopLevel(), true);
     }
 
 
@@ -134,7 +133,7 @@ public class TestVariableNamer extends TestCase {
     }
     
     private void addTacletApp(Goal goal, ProgramVariable containedVar) {
-	Term findTerm = TB.tt();
+	Term findTerm = services.getTermBuilder().tt();
    	AntecTacletBuilder builder = new AntecTacletBuilder();
 	builder.setFind(findTerm);
     	AntecTaclet taclet = builder.getAntecTaclet();
@@ -160,10 +159,10 @@ public class TestVariableNamer extends TestCase {
 
         for (NoPosTacletApp noPosTacletApp : noPosTacletApps) {
             SVInstantiations insts = noPosTacletApp.instantiations();
-            Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry>> it2;
+            Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it2;
             it2 = insts.pairIterator();
             while (it2.hasNext()) {
-                ImmutableMapEntry<SchemaVariable, InstantiationEntry> e = it2.next();
+                ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it2.next();
                 Object inst = e.value().getInstantiation();
                 if (inst instanceof PostIncrement
                         && ((PostIncrement) inst).getFirstElement() == containedVar) {

@@ -38,8 +38,6 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
@@ -868,11 +866,13 @@ public class LogicPrinter {
             startTerm(0);
             layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
         } else {
-            if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+            if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+					&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
                 layouter.print("(");
             }
-            notationInfo.getNotation(t.op(), services).print(t,this);
-            if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+            notationInfo.getNotation(t.op()).print(t,this);
+            if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+					&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
                 layouter.print(")");
             }
         }
@@ -967,11 +967,13 @@ public class LogicPrinter {
      *
      * @param t the Term to be printed */
     public void printTermContinuingBlock(Term t) throws IOException {
-       if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+       if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+				&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
            layouter.print("(");
        }
-       notationInfo.getNotation(t.op(), services).printContinuingBlock(t,this);
-       if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+       notationInfo.getNotation(t.op()).printContinuingBlock(t,this);
+       if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+				&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
            layouter.print(")");
        }
        if (t.hasLabels()) {
@@ -1043,7 +1045,7 @@ public class LogicPrinter {
     
     private boolean printEmbeddedHeapTerm(Term t) throws IOException {
 
-        Notation notation = notationInfo.getNotation(t.op(), services);
+        Notation notation = notationInfo.getNotation(t.op());
         if (notation instanceof HeapNotation) {
             HeapNotation heapNotation = (HeapNotation) notation;
             heapNotation.printEmbeddedHeap(t, this);
@@ -1104,6 +1106,10 @@ public class LogicPrinter {
         } else {
             printFunctionTerm(t.op().name().toString(), t);
         }
+    }
+    
+    public void printClassName (String className) throws IOException {
+        layouter.print(className);
     }
 
     public void printCreate(Term t, boolean closingBrace) throws IOException {
@@ -1232,7 +1238,7 @@ public class LogicPrinter {
                 layouter.print("{"); // ("\u27E6");
             }
 
-            if(objectTerm.equals(TermBuilder.DF.NULL(services))
+            if(objectTerm.equals(services.getTermBuilder().NULL())
                     && fieldTerm.op() instanceof Function
                     && ((Function)fieldTerm.op()).isUnique()) {
 
@@ -1246,7 +1252,7 @@ public class LogicPrinter {
                     markStartSub();
                     // "null" not printed
                     markEndSub();
-                    layouter.print(className);
+                    printClassName(className);
                 }
 
                 layouter.print(".");
@@ -1328,7 +1334,7 @@ public class LogicPrinter {
             markEndSub();
             }
 
-            if(objectTerm.equals(TermBuilder.DF.NULL(services))
+            if(objectTerm.equals(services.getTermBuilder().NULL())
                 && fieldTerm.op() instanceof Function
                 && ((Function)fieldTerm.op()).isUnique()) {
         	String className 
@@ -1342,7 +1348,7 @@ public class LogicPrinter {
         	    markStartSub();
         	    //"null" not printed
         	    markEndSub();
-        	    layouter.print(className);
+        	    printClassName(className);
         	}
         	
         	layouter.print(".");
@@ -1389,18 +1395,14 @@ public class LogicPrinter {
     }
     
     
-    public void printLength(Term t) throws IOException {
-	final HeapLDT heapLDT = services == null 
-        			? null 
-        			: services.getTypeConverter().getHeapLDT();
-	if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
-	    assert t.op() == heapLDT.getLength();
+    public void printPostfix(Term t, String postfix) throws IOException {
+	if(NotationInfo.PRETTY_SYNTAX) {
 	    startTerm(t.arity());
 	    
 	    markStartSub();
 	    printTerm(t.sub(0));
 	    markEndSub();
-	    layouter.print(".length");
+	    layouter.print(postfix);
 	} else {
 	    printFunctionTerm(t.op().name().toString(), t);            
 	}	
@@ -1741,14 +1743,15 @@ public class LogicPrinter {
         for(int j = 0; j != size; j++) {
             final QuantifiableVariable v = vars.get (j);
             if(v instanceof LogicVariable) {
-                Term t =
-                    TermFactory.DEFAULT.createTerm(v);
                 if (mode != QuantifiableVariablePrintMode.WITH_OUT_DECLARATION) {
                     // do not print declarations in taclets...
-                    layouter.print(v.sort().name().toString() + " ");
+                    printClassName(v.sort().name().toString());
+                    layouter.print(" ");
                 }
-                if(notationInfo.getAbbrevMap().containsTerm(t)) {
-                    layouter.print (notationInfo.getAbbrevMap().getAbbrev(t));
+                if(services != null && 
+                        notationInfo.getAbbrevMap().containsTerm(services.getTermFactory().createTerm(v))) {
+                    layouter.print (notationInfo.getAbbrevMap().
+                                        getAbbrev(services.getTermFactory().createTerm(v)));
                 } else {
                     layouter.print (v.name().toString());
                 }
@@ -1993,9 +1996,9 @@ public class LogicPrinter {
                     for (int i = 0; i < phi.arity(); i++) {
                         ta[i] = phi.sub(i);
                     }
-                    Term term = TermFactory.DEFAULT.
+                    Term term = services.getTermFactory().
 			createTerm((Modality)o, ta, phi.boundVars(), phi.javaBlock());
-                    notationInfo.getNotation((Modality)o, services).print(term, this);
+                    notationInfo.getNotation((Modality)o).print(term, this);
                     return;
                 }
 
@@ -2127,7 +2130,7 @@ public class LogicPrinter {
 	    t = (Term) instantiations.getInstantiation((SchemaVariable)t.op());
 	}
 	    
-	if (notationInfo.getNotation(t.op(), services).getPriority() < ass){	    
+	if (notationInfo.getNotation(t.op()).getPriority() < ass){
 	    markStartSub();
 	    layouter.print("(");   
 	    printTerm(t);	   
@@ -2135,7 +2138,7 @@ public class LogicPrinter {
 	    markEndSub();
 	} else {
 	    markStartSub();
-	    if (notationInfo.getNotation(t.op(), services).getPriority() == ass) {
+	    if (notationInfo.getNotation(t.op()).getPriority() == ass) {
 		printTermContinuingBlock(t);
 	    } else {
 		printTerm(t);

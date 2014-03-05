@@ -18,10 +18,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.CharListLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -154,6 +151,8 @@ public final class NotationInfo {
      */
     public static boolean UNICODE_ENABLED = false;
     
+    public static boolean HIDE_PACKAGE_PREFIX = false;
+    
     /** This maps operators and classes of operators to {@link
      * Notation}s.  The idea is that we first look whether the operator has
      * a Notation registered.  Otherwise, we see if there is one for the
@@ -278,7 +277,11 @@ public final class NotationInfo {
 	tbl.put(heapLDT.getMemset(), new Notation.MemsetNotation());
 	tbl.put(IObserverFunction.class, new Notation.ObserverNotation());
 	tbl.put(IProgramMethod.class, new Notation.ObserverNotation());
-	tbl.put(heapLDT.getLength(), new Notation.LengthNotation());
+	tbl.put(heapLDT.getLength(), new Notation.Postfix(".length"));
+
+        // sequence operators
+        final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
+	tbl.put(seqLDT.getSeqLen(), new Notation.Postfix(".length"));
 	
 	//set operators
 	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
@@ -287,7 +290,8 @@ public final class NotationInfo {
 	tbl.put(setLDT.getIntersect(), new Notation.Infix("\\cap", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
 	tbl.put(setLDT.getSetMinus(), new Notation.Infix("\\setMinus", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
 	tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation());
-    tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(setLDT.getAllFields(), new Notation.Postfix(".*"));
 	
 	//string operators
 	final CharListLDT charListLDT 
@@ -368,7 +372,7 @@ public final class NotationInfo {
     /** Get the Notation for a given Operator.  
      * If no notation is registered, a Function notation is returned.
      */
-    Notation getNotation(Operator op, Services services) {
+    Notation getNotation(Operator op) {
         Notation result = notationTable.get(op);
         if(result != null) {
             return result;

@@ -38,7 +38,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -69,7 +68,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 public class KeYMediator {
 
-	/** The user interface */
+    /** The user interface */
     private UserInterface ui;
 
     private InteractiveProver interactiveProver;
@@ -895,7 +894,6 @@ public class KeYMediator {
         });
     }
 
-
     /**
      * takes a notification event and informs the notification
      * manager
@@ -941,8 +939,6 @@ public class KeYMediator {
        }
        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
     }
-
-
 
 //    /**
 //     * returns the prover task listener of the main frame
