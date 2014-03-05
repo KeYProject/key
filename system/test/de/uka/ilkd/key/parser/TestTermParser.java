@@ -44,7 +44,9 @@ import de.uka.ilkd.key.util.DefaultExceptionHandler;
 
 public class TestTermParser extends TestCase {
     
-    private static final TermFactory tf = TermFactory.DEFAULT;
+    private static TermFactory tf;
+
+    private static TermBuilder tb;
 
     private static NamespaceSet nss;
 
@@ -65,12 +67,14 @@ public class TestTermParser extends TestCase {
 	super(name);
     }
 
-
+    @Override
     public void setUp() {
 	if(serv != null) {
 	    return;
 	}
 	serv = TacletForTests.services ();
+	tb = serv.getTermBuilder();
+	tf = tb.tf();
 	nss = serv.getNamespaces();
 	r2k = new Recoder2KeY(serv, nss);
 	r2k.parseSpecialClasses();	
@@ -307,8 +311,8 @@ public class TestTermParser extends TestCase {
 	LogicVariable l1 = (LogicVariable) t.sub(0).varsBoundHere(0)
 	    .get(0);
 
-	Term t1 = TermBuilder.DF.all(thisx,
-	     TermBuilder.DF.all(l1,
+	Term t1 = tb.all(thisx,
+	     tb.all(l1,
 	      tf.createTerm
 	      (Junctor.NOT,
 	       tf.createTerm(Equality.EQUALS,
@@ -354,7 +358,7 @@ public class TestTermParser extends TestCase {
 	LogicVariable thisx = (LogicVariable) t.varsBoundHere(0)
 	    .get(0);
 
-	Term t1 = TermBuilder.DF.ex(thisx,
+	Term t1 = tb.ex(thisx,
 	     tf.createTerm
 	     (Junctor.NOT,
 	      tf.createTerm(isempty,new Term[]{tf.createTerm(thisx)}, null, null)));

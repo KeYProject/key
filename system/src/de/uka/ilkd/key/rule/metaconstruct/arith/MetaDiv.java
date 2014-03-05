@@ -74,7 +74,7 @@ public final class MetaDiv extends AbstractTermTransformer {
 				     new Sort[0]);
 		services.getNamespaces().functions().add(undef);
 	    }
-	    return termFactory.createTerm(undef);
+	    return services.getTermFactory().createTerm(undef);
 	}
 	BigInteger remainder = bigIntArg1.remainder(bigIntArg2);
 	BigInteger bigIntResult = bigIntArg1.divide(bigIntArg2);

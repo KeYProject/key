@@ -18,6 +18,7 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -155,7 +156,7 @@ public final class SortDependingFunction extends Function {
     
     
     public static SortDependingFunction getFirstInstance(Name kind,
-	    					         Services services) {
+	    					         TermServices services) {
 	return (SortDependingFunction) 
 			services.getNamespaces()
 			        .functions()
@@ -164,7 +165,7 @@ public final class SortDependingFunction extends Function {
         
 
     public SortDependingFunction getInstanceFor(Sort sort, 
-	    				        Services services) {
+	    				        TermServices services) {
 	if(sort == this.sortDependingOn) {
 	    return this;
 	}

@@ -72,6 +72,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -1304,7 +1305,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	}
 
 	protected boolean allowed(ProgramElement pe, 
-				  Services services) {
+				  TermServices services) {
 	    final Name peName; 
 	    if (pe instanceof Named) {		
 		peName = ((Named)pe).name();		

@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
 /**
@@ -34,7 +34,7 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 public class FindRightishFeature implements Feature {
 
     private final Operator add; 
-    private final static RuleAppCost one = LongRuleAppCost.create ( 1 );
+    private final static RuleAppCost one = NumberRuleAppCost.create ( 1 );
     
     public static Feature create(IntegerLDT numbers) {
         return new FindRightishFeature ( numbers );
@@ -47,7 +47,7 @@ public class FindRightishFeature implements Feature {
     public RuleAppCost compute ( RuleApp app, PosInOccurrence pos, Goal goal ) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        RuleAppCost res = LongRuleAppCost.ZERO_COST;
+        RuleAppCost res = NumberRuleAppCost.getZeroCost();
         final PIOPathIterator it = pos.iterator ();
 
         while ( it.next () != -1 ) {

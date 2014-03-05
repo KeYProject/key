@@ -19,7 +19,7 @@
 [General]OneStepSimplification=true
 [Strategy]Timeout=-1
 [Strategy]MaximumNumberOfAutomaticApplications=10000
-[Choice]DefaultChoices=assertions-assertions\:on, intRules-intRules\:arithmeticSemanticsIgnoringOF,initialisation-initialisation\:disableStaticInitialisation,programRules-programRules\:Java,runtimeExceptions-runtimeExceptions\:ban
+[Choice]DefaultChoices=assertions-assertions\:on, intRules-intRules\:arithmeticSemanticsIgnoringOF,initialisation-initialisation\:disableStaticInitialisation,programRules-programRules\:Java,runtimeExceptions-runtimeExceptions\:ban,JavaCard-JavaCard\\:on , Strings-Strings\\:on , modelFields-modelFields\\:showSatisfiability , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , optimisedSelectRules-optimisedSelectRules\\:on , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off
 [DecisionProcedure]ActiveRule=_noname_
 [General]UseJML=true
 [View]HideClosedSubtrees=false

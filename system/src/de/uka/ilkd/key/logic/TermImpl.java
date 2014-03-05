@@ -37,7 +37,7 @@ class TermImpl implements Term {
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST
         = new ImmutableArray<TermLabel>();
     
-	private static int serialNumberCounter =0;
+    private static int serialNumberCounter =0;
 
     //content
     private final Operator op;
@@ -160,8 +160,8 @@ class TermImpl implements Term {
     @Override
     public Term subAt(PosInTerm pos) {
         Term sub = this;
-        for(final IntIterator it = pos.iterator(); it.hasNext(); ) {	
-            sub = sub.sub(it.next());
+        for(int i = 0; i<pos.depth(); i++) {	
+            sub = sub.sub(pos.getIndexAt(i));
         }
         return sub;
     }

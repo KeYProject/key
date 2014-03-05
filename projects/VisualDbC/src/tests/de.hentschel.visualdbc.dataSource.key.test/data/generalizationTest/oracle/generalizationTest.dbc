@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel" driverId="de.hentschel.visualdbc.dataSource.key">
+  <types xsi:type="dbcmodel:DbcClass" name="A">
+    <constructors signature="A()" visibility="default"/>
+    <extendsFullNames>java.lang.Object</extendsFullNames>
+  </types>
+  <types xsi:type="dbcmodel:DbcClass" name="B" implements="//@types.5" extends="//@types.0">
+    <constructors signature="B()" visibility="default"/>
+    <implementsFullNames>InterfaceB</implementsFullNames>
+    <extendsFullNames>A</extendsFullNames>
+  </types>
+  <types xsi:type="dbcmodel:DbcClass" name="CX" implements="//@types.6 //@types.7" extends="//@types.1">
+    <constructors signature="CX()" visibility="default"/>
+    <implementsFullNames>InterfaceC</implementsFullNames>
+    <implementsFullNames>InterfaceX</implementsFullNames>
+    <extendsFullNames>B</extendsFullNames>
+  </types>
+  <types xsi:type="dbcmodel:DbcClass" name="PackageClass" implements="//@packages.0/@types.1" extends="//@packages.1/@types.0">
+    <constructors signature="PackageClass()" visibility="default"/>
+    <implementsFullNames>a.InterfaceInA</implementsFullNames>
+    <extendsFullNames>b.ClassInB</extendsFullNames>
+  </types>
+  <types xsi:type="dbcmodel:DbcClass" name="X" implements="//@types.7">
+    <constructors signature="X()" visibility="default"/>
+    <implementsFullNames>InterfaceX</implementsFullNames>
+    <extendsFullNames>java.lang.Object</extendsFullNames>
+  </types>
+  <types xsi:type="dbcmodel:DbcInterface" name="InterfaceB"/>
+  <types xsi:type="dbcmodel:DbcInterface" name="InterfaceC" extends="//@types.5">
+    <extendsFullNames>InterfaceB</extendsFullNames>
+  </types>
+  <types xsi:type="dbcmodel:DbcInterface" name="InterfaceX"/>
+  <types xsi:type="dbcmodel:DbcInterface" name="PackageInterface" extends="//@packages.0/@types.1 //@types.5">
+    <extendsFullNames>a.InterfaceInA</extendsFullNames>
+    <extendsFullNames>InterfaceB</extendsFullNames>
+  </types>
+  <packages name="a">
+    <types xsi:type="dbcmodel:DbcClass" name="ClassInA">
+      <constructors signature="ClassInA()" visibility="default"/>
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+    <types xsi:type="dbcmodel:DbcInterface" name="InterfaceInA"/>
+  </packages>
+  <packages name="b">
+    <types xsi:type="dbcmodel:DbcClass" name="ClassInB" implements="//@packages.0/@types.1" extends="//@packages.0/@types.0">
+      <constructors signature="ClassInB()" visibility="default"/>
+      <implementsFullNames>a.InterfaceInA</implementsFullNames>
+      <extendsFullNames>a.ClassInA</extendsFullNames>
+    </types>
+    <types xsi:type="dbcmodel:DbcInterface" name="InterfaceInB" extends="//@packages.0/@types.1">
+      <extendsFullNames>a.InterfaceInA</extendsFullNames>
+    </types>
+  </packages>
+  <connectionSettings key="location" value="D:\Forschung\Development\KeY_Master\junit-workspace\GeneralizationTest_testExtendsAndImplements"/>
+  <connectionSettings key="packageManagement" value="FLAT_LIST"/>
+  <connectionSettings key="packageManagementType" value="de.hentschel.visualdbc.datasource.model.DSPackageManagement"/>
+  <connectionSettings key="locationType" value="java.io.File"/>
+</dbcmodel:DbcModel>

@@ -1,7 +1,9 @@
 All files in this subdirectory have been created using the "Stubmaker" tool
-(de.uka.ilkd.stubmaker)
+(de.uka.ilkd.stubmaker) and edited by hand.
 
-The generated classed correspond to the API provided by SUN's jdk version 1.6.
+The generated classed correspond to the API provided by SUN's JDK version 1.6.
+The JAR file to extract from is named rt.jar and can typically be found at
+/usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/rt.jar
 
 In addition some stubs of JUnit classes are included as far as they are needed
 for test generation.  
@@ -13,4 +15,4 @@ removed. This is why the some fields, methods or inheritances have not been
 included in these files.
 
 The following command line arguments where used:
-   -expand -list classes.txt rt.jar
+   -expand -hide JAVALANG.TXT rt.jar

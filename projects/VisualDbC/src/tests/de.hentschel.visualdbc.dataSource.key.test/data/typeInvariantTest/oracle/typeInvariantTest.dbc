@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel" driverId="de.hentschel.visualdbc.dataSource.key">
+  <types xsi:type="dbcmodel:DbcClass" name="ClassA">
+    <invariants name="JML class invariant nr 0 in ClassA" condition="gt(int::select(heap, self, ClassA::$limit), Z(0(#)))"/>
+    <attributes name="limit" type="int" visibility="default"/>
+    <constructors signature="ClassA()" visibility="default"/>
+    <extendsFullNames>java.lang.Object</extendsFullNames>
+  </types>
+  <types xsi:type="dbcmodel:DbcInterface" name="InterfaceA">
+    <invariants name="JML class invariant nr 2 in InterfaceA" condition="gt(InterfaceA::getLimit(heap, self), Z(0(#)))"/>
+    <methods signature="getLimit()" returnType="int" abstract="true"/>
+  </types>
+  <connectionSettings key="location" value="D:\Forschung\Development\KeY_Master\junit-workspace\InvariantTest_testClassAndInterfaceInvariants"/>
+  <connectionSettings key="packageManagement" value="FLAT_LIST"/>
+  <connectionSettings key="packageManagementType" value="de.hentschel.visualdbc.datasource.model.DSPackageManagement"/>
+  <connectionSettings key="locationType" value="java.io.File"/>
+</dbcmodel:DbcModel>

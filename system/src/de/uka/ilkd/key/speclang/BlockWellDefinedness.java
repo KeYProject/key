@@ -19,6 +19,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -35,9 +37,10 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     private BlockWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                  LocationVariable heap, OriginalVariables origVars,
                                  Condition requires, Term assignable, Term accessible,
-                                 Condition ensures, Term mby, Term rep, BlockContract block) {
+                                 Condition ensures, Term mby, Term rep, BlockContract block,
+                                 TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires,
-              assignable, accessible, ensures, mby, rep);
+              assignable, accessible, ensures, mby, rep, tb);
         this.block = block;
     }
 
@@ -55,11 +58,11 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
-    SequentFormula generateSequent(SequentTerms seq, Services services) {
+    SequentFormula generateSequent(SequentTerms seq, TermServices services) {
         // wd(pre) & (pre & wf(anon) -> wd(mod) & {anon^mod}(wd(post)))
         final Term imp = TB.imp(TB.and(seq.pre, seq.wfAnon),
                                 TB.and(seq.wdMod, seq.anonWdPost));
-        final Term wdPre = TB.wd(seq.pre, services);
+        final Term wdPre = TB.wd(seq.pre);
         return new SequentFormula(TB.apply(seq.context,
                                            TB.and(wdPre, imp)));
     }
@@ -78,7 +81,7 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
         return new BlockWellDefinedness(getName(), newId, type(), getTarget(), getHeap(),
                                         getOrigVars(), getRequires(), getAssignable(),
                                         getAccessible(), getEnsures(), getMby(),
-                                        getRepresents(), getStatement());
+                                        getRepresents(), getStatement(), TB);
     }
 
     @Override
@@ -86,7 +89,8 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
         return new BlockWellDefinedness(getName(), id(), type(), newPM, getHeap(),
                                         getOrigVars(), getRequires(), getAssignable(),
                                         getAccessible(), getEnsures(), getMby(),
-                                        getRepresents(), getStatement().setTarget(newKJT, newPM));
+                                        getRepresents(),
+                                        getStatement().setTarget(newKJT, newPM), TB);
     }
 
     @Override
@@ -105,7 +109,7 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
-    public BlockWellDefinedness combine(WellDefinednessCheck wdc, Services services) {
+    public BlockWellDefinedness combine(WellDefinednessCheck wdc, TermServices services) {
         assert wdc instanceof BlockWellDefinedness;
         final BlockWellDefinedness bwd = (BlockWellDefinedness)wdc;
         assert this.getStatement().getName().equals(bwd.getStatement().getName());

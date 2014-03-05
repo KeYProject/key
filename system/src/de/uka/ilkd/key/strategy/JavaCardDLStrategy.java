@@ -25,7 +25,7 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfThenElse;
@@ -55,8 +55,8 @@ import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
 import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
 import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
-import de.uka.ilkd.key.strategy.feature.ContainsTermFeature;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
+import de.uka.ilkd.key.strategy.feature.ContainsTermFeature;
 import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
 import de.uka.ilkd.key.strategy.feature.CountPosDPathFeature;
 import de.uka.ilkd.key.strategy.feature.DependencyContractFeature;
@@ -110,12 +110,12 @@ import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.AnonHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.PrimitiveHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsNonRigidTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsSelectSkolemConstantTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
 import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
+import de.uka.ilkd.key.strategy.termfeature.PrimitiveHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.SimplifiedSelectTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
@@ -177,7 +177,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }    
     
     
-    protected Feature setupGlobalF(Feature dispatcher, Proof p_proof) {//
+    protected Feature setupGlobalF(Feature dispatcher, Proof p_proof) {//        
         final Feature ifMatchedF = ifZero ( MatchedIfFeature.INSTANCE,
                                             longConst ( +1 ) );
         
@@ -259,18 +259,18 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
       //  final Feature smtF = smtFeature(inftyConst());
         
         return SumFeature.createSum (AutomatedRuleFeature.INSTANCE,
-                NonDuplicateAppFeature.INSTANCE,
+              NonDuplicateAppFeature.INSTANCE,
 //              splitF,
-//              strengthenConstraints,
-                AgeFeature.INSTANCE,
-                oneStepSimplificationF,
-                // smtF,
-                methodSpecF,
-                queryF,
-                depSpecF,
-                loopInvF,
-                blockFeature,
-                ifMatchedF,
+//              strengthenConstraints, 
+              AgeFeature.INSTANCE,
+              oneStepSimplificationF,
+             // smtF, 
+              methodSpecF, 
+              queryF,
+              depSpecF,
+              loopInvF,
+              blockFeature,
+              ifMatchedF,
                 dispatcher);
     }
     
@@ -334,7 +334,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 services.getTypeConverter().getLocSetLDT();
             
         final RuleSetDispatchFeature d = RuleSetDispatchFeature.create ();
-            
+           
+        bindRuleSet ( d, "semantics_blasting", inftyConst () );
+        
         bindRuleSet ( d, "closure", -15000 );
         bindRuleSet ( d, "alpha", -7000 );
         bindRuleSet ( d, "delta", -6000 );
@@ -526,9 +528,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             longConst ( 100 ) ) );
         
         //class axioms
-        final String classAxiomPrio = strategyProperties.getProperty(StrategyProperties.CLASS_AXIOM_PRIO);
+        final String classAxiomPrio = strategyProperties.getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
         final Feature classAxiomDefaultCost = longConst(-150);
-        if (StrategyProperties.CLASS_AXIOM_HIGH.equals(classAxiomPrio))
+        if (StrategyProperties.CLASS_AXIOM_FREE.equals(classAxiomPrio))
             // default as before
             bindRuleSet ( d, "classAxiom", classAxiomDefaultCost );
         else if (StrategyProperties.CLASS_AXIOM_DELAYED.equals(classAxiomPrio))
@@ -1035,11 +1037,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             // standard costs
                             longConst ( 10 )),
                       SumFeature.createSum (
-                              applyTF ( "cutFormula",
-                                ff.cutAllowedBelowQuantifier ),
-                              applyTF ( FocusFormulaProjection.INSTANCE,
-                                        ff.quantifiedClauseSet ),
-                              ifZero ( allowQuantifierSplitting (),
+                            applyTF ( "cutFormula",
+                                      ff.cutAllowedBelowQuantifier ),
+                            applyTF ( FocusFormulaProjection.INSTANCE,
+                                      ff.quantifiedClauseSet ),
+                            ifZero ( allowQuantifierSplitting (),
                                        longConst ( 0 ), longConst ( 100 ) )) ) } ) );
     }
 
@@ -1172,12 +1174,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 				      not ( opSub ( Quantifier.ALL, ff.orF ) ),
                                       EliminableQuantifierTF.INSTANCE ) ),
                       SumFeature.createSum (
-                              OnlyInScopeOfQuantifiersFeature.INSTANCE,
-                              SplittableQuantifiedFormulaFeature.INSTANCE,
-                              ifZero ( FocusInAntecFeature.INSTANCE,
-                                       applyTF ( FocusProjection.create ( 0 ),
-                                                 sub ( ff.andF ) ),
-                                       applyTF ( FocusProjection.create ( 0 ),
+                           OnlyInScopeOfQuantifiersFeature.INSTANCE,
+                           SplittableQuantifiedFormulaFeature.INSTANCE,
+                           ifZero ( FocusInAntecFeature.INSTANCE,
+                                    applyTF ( FocusProjection.create ( 0 ),
+                                              sub ( ff.andF ) ),
+                                    applyTF ( FocusProjection.create ( 0 ),
                                                  sub ( ff.orF ) ) )) ),
                  longConst ( -300 ) ) );
 
@@ -1554,14 +1556,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "polySimp_newSym",
            ifZero ( not ( isInstantiated ( "newSymDef" ) ),
               SumFeature.createSum (applyTF ( "newSymLeft", tf.atom ),
-                      applyTF ( "newSymLeftCoeff", tf.atLeastTwoLiteral ),
-                      applyTF ( "newSymRight", tf.polynomial ),
-                      instantiate ( "newSymDef",
-                                    MonomialColumnOp
-                                    .create(instOf("newSymLeftCoeff"),
+                applyTF ( "newSymLeftCoeff", tf.atLeastTwoLiteral ),
+                applyTF ( "newSymRight", tf.polynomial ),
+                instantiate ( "newSymDef",
+                              MonomialColumnOp
+                              .create ( instOf ( "newSymLeftCoeff" ),
                                             instOf("newSymRight")) )) ) );
-
-                                final TermBuffer divisor = new TermBuffer ();
+        
+        final TermBuffer divisor = new TermBuffer ();
         final TermBuffer dividend = new TermBuffer ();
 
         bindRuleSet ( d, "polySimp_applyEqPseudo",
@@ -1570,18 +1572,18 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
              applyTF ( "aePseudoTargetRight", tf.polynomial ),
              ifZero (MatchedIfFeature.INSTANCE,
                SumFeature.createSum (DiffFindAndIfFeature.INSTANCE,
-                       applyTF ( "aePseudoLeft", add ( tf.nonCoeffMonomial,
-                                                       not ( tf.atom ) ) ),
-                       applyTF ( "aePseudoLeftCoeff", tf.atLeastTwoLiteral ),
-                       applyTF ( "aePseudoRight", tf.polynomial ),
-                       MonomialsSmallerThanFeature.create ( instOf ( "aePseudoRight" ),
-                                                            instOf ( "aePseudoLeft" ),
-                                                            numbers ),
-                       let ( divisor, instOf ( "aePseudoLeft" ),
-                       let ( dividend, instOf ( "aePseudoTargetLeft" ),
-                       add ( ReducibleMonomialsFeature.createReducible ( dividend, divisor ),
-                             instantiate ( "aePseudoTargetFactor",
-                                           ReduceMonomialsProjection
+                  applyTF ( "aePseudoLeft", add ( tf.nonCoeffMonomial,
+                                                  not ( tf.atom ) ) ),
+                  applyTF ( "aePseudoLeftCoeff", tf.atLeastTwoLiteral ),
+                  applyTF ( "aePseudoRight", tf.polynomial ),
+                  MonomialsSmallerThanFeature.create ( instOf ( "aePseudoRight" ),
+                                                       instOf ( "aePseudoLeft" ),
+                                                       numbers ),
+                  let ( divisor, instOf ( "aePseudoLeft" ),
+                  let ( dividend, instOf ( "aePseudoTargetLeft" ),
+                  add ( ReducibleMonomialsFeature.createReducible ( dividend, divisor ),
+                        instantiate ( "aePseudoTargetFactor",
+                                      ReduceMonomialsProjection
                                            .create(dividend, divisor) ) ) ) )) ) ) );
     }
 
@@ -1596,7 +1598,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             MonomialsSmallerThanFeature
             .create ( instOf ( "newSymLeft" ),
                       subAt ( antecFor,
-                              PosInTerm.TOP_LEVEL.down ( 0 ).down ( 0 ) ), numbers );
+                              PosInTerm.getTopLevel().down ( 0 ).down ( 0 ) ), numbers );
         bindRuleSet ( d, "polySimp_newSym",
            add ( isInstantiated ( "newSymDef" ),
                  sum ( antecFor, SequentFormulasGenerator.antecedent (),
@@ -1816,9 +1818,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     instOf ( "subsumRightBigger" ) ) } ) );
                    
         final TermBuffer one = new TermBuffer ();
-        one.setContent ( TermBuilder.DF.zTerm ( p_proof.getServices (), "1" ) );
+        final TermServices services = p_proof.getServices ();
+      one.setContent ( services.getTermBuilder().zTerm ( "1" ) );
         final TermBuffer two = new TermBuffer ();
-        two.setContent ( TermBuilder.DF.zTerm ( p_proof.getServices (), "2" ) );
+        two.setContent ( services.getTermBuilder().zTerm ( "2" ) );
 
         bindRuleSet ( d, "inEqSimp_or_tautInEqs",
            SumFeature.createSum ( new Feature[] {
@@ -2051,7 +2054,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer intRel = new TermBuffer ();
         final TermBuffer atom = new TermBuffer ();
         final TermBuffer zero = new TermBuffer ();
-        zero.setContent ( TermBuilder.DF.zTerm ( p_proof.getServices (), "0" ) );
+        zero.setContent ( p_proof.getServices().getTermBuilder().zTerm ( "0" ) );
         final TermBuffer rootInf = new TermBuffer ();
 
         final Feature posNegSplitting =
@@ -2086,7 +2089,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature rootInferences =
             forEach ( intRel, SequentFormulasGenerator.antecedent (),
               add ( isRootInferenceProducer ( intRel ),
-                    forEach ( rootInf, RootsGenerator.create ( intRel ),
+                    forEach ( rootInf, RootsGenerator.create ( intRel, getProof().getServices() ),
                               add ( instantiate ( "cutFormula", rootInf ),
                                     ifZero ( applyTF ( rootInf, op ( Junctor.OR ) ),
                                              longConst ( 50 ) ),
@@ -2155,7 +2158,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             or ( not ( sum ( intRel, SequentFormulasGenerator.antecedent (),
                              ifZero ( isRootInferenceProducer ( intRel ),
                                       sum ( rootInf,
-                                            RootsGenerator.create ( intRel ),
+                                            RootsGenerator.create ( intRel, getProof().getServices() ),
                                             not ( eq ( instOf ( "cutFormula" ),
                                                        rootInf ) ) ) ) ) ),
                  ifZero ( applyTF ( "cutFormula",
@@ -2792,10 +2795,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                  new StrategyPropertyValueDefinition(StrategyProperties.NON_LIN_ARITH_COMPLETION, "Model Search", TOOL_TIP_ARITHMETIC_MODEL_SEARCH));
            OneOfStrategyPropertyDefinition quantifierTreatment = new OneOfStrategyPropertyDefinition(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, 
                  "Quantifier treatment",
-                 new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_NONE, "None", TOOL_TIP_QUANTIFIER_NONE),
-                 new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_NON_SPLITTING, "No Splits", TOOL_TIP_QUANTIFIER_NO_SPLITS),
-                 new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS, "No Splits with Progs", TOOL_TIP_QUANTIFIER_NO_SPLITS_WITH_PROGS),
-                 new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_INSTANTIATE, "Free", TOOL_TIP_QUANTIFIER_FREE));
+                 2,
+                 new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_NONE, "None", TOOL_TIP_QUANTIFIER_NONE, 2, 4),
+                 new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_NON_SPLITTING, "No Splits", TOOL_TIP_QUANTIFIER_NO_SPLITS, 6, 2),
+                 new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS, "No Splits with Progs", TOOL_TIP_QUANTIFIER_NO_SPLITS_WITH_PROGS, 2, 4),
+                 new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_INSTANTIATE, "Free", TOOL_TIP_QUANTIFIER_FREE, 6, 2));
+           OneOfStrategyPropertyDefinition classAxiom = new OneOfStrategyPropertyDefinition(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY, 
+                 "Class axiom rule",
+                 new StrategyPropertyValueDefinition(StrategyProperties.CLASS_AXIOM_FREE, "Free", TOOL_TIP_CLASSAXIOM_FREE),
+                 new StrategyPropertyValueDefinition(StrategyProperties.CLASS_AXIOM_DELAYED, "Delayed", TOOL_TIP_CLASSAXIOM_DELAYED),
+                 new StrategyPropertyValueDefinition(StrategyProperties.CLASS_AXIOM_OFF, "Off", TOOL_TIP_CLASSAXIOM_OFF));
            OneOfStrategyPropertyDefinition autoInduction = new OneOfStrategyPropertyDefinition(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, 
                  "Auto Induction",
                  new StrategyPropertyValueDefinition(StrategyProperties.AUTO_INDUCTION_LEMMA_ON, "On", TOOL_TIP_AUTO_INDUCTION_ON),
@@ -2805,28 +2814,37 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
            List<AbstractStrategyPropertyDefinition> props = new LinkedList<AbstractStrategyPropertyDefinition>();
            for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
               OneOfStrategyPropertyDefinition user = new OneOfStrategyPropertyDefinition(StrategyProperties.USER_TACLETS_OPTIONS_KEY(i), 
-                    i + ":",
-                    new StrategyPropertyValueDefinition(StrategyProperties.USER_TACLETS_OFF, "Off", TOOL_TIP_USER_OFF(i)),
-                    new StrategyPropertyValueDefinition(StrategyProperties.USER_TACLETS_LOW, "Low prior.", TOOL_TIP_USER_LOW(i)),
-                    new StrategyPropertyValueDefinition(StrategyProperties.USER_TACLETS_HIGH, "High prior.", TOOL_TIP_USER_HIGH(i)));
+                    i + ":  ",
+                    new StrategyPropertyValueDefinition(StrategyProperties.USER_TACLETS_OFF, "Off", TOOL_TIP_USER_OFF(i), 3, 1),
+                    new StrategyPropertyValueDefinition(StrategyProperties.USER_TACLETS_LOW, "Low prior.", TOOL_TIP_USER_LOW(i), 4, 2),
+                    new StrategyPropertyValueDefinition(StrategyProperties.USER_TACLETS_HIGH, "High prior.", TOOL_TIP_USER_HIGH(i), 6, 2));
               props.add(user);
            }
            OneOfStrategyPropertyDefinition userOptions = new OneOfStrategyPropertyDefinition(null, 
                  "User-specific taclet sets",
+                 "<html>" +
+                 "These options define whether user- and problem-specific taclet sets<br>" +
+                 "are applied automatically by the strategy. Problem-specific taclets<br>" +
+                 "can be defined in the \\rules-section of a .key-problem file. For<br>" +
+                 "automatic application, the taclets have to contain a clause<br>" +
+                 "\\heuristics(userTaclets1), \\heuristics(userTaclets2), etc." +
+                 "</html>",
+                 -1,
                  props.toArray(new AbstractStrategyPropertyDefinition[props.size()]));
            // Model
            return new StrategySettingsDefinition("Java DL Options", 
-                                            stopAt,
-                                            proofSplitting,
-                                            loopTreatment,
-                                            blockTreatment,
-                                            methodTreatment,
-                                            dependencyContracts,
-                                            queryTreatment,
-                                            arithmeticTreatment,
-                                            quantifierTreatment,
-                                            autoInduction,
-                                            userOptions);
+                                                 stopAt,
+                                                 proofSplitting,
+                                                 loopTreatment,
+                                                 blockTreatment,
+                                                 methodTreatment,
+                                                 dependencyContracts,
+                                                 queryTreatment,
+                                                 arithmeticTreatment,
+                                                 quantifierTreatment,
+                                                 classAxiom,
+                                                 autoInduction,
+                                                 userOptions );
         }
     }
 

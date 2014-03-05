@@ -677,6 +677,13 @@ public final class TestGenerationUtil {
          while (dsImplements.hasNext() && dbcImplements.hasNext()) {
             compareInterface(dsImplements.next(), dbcImplements.next(), false);
          }
+         // Compare implements full names
+         TestCase.assertEquals(dsEnum.getImplementsFullnames().size(), dbcEnum.getImplementsFullNames().size());
+         Iterator<String> dsImplementsNames = dsEnum.getImplementsFullnames().iterator();
+         Iterator<String> dbcImplementsNames = dbcEnum.getImplementsFullNames().iterator();
+         while (dsImplementsNames.hasNext() && dbcImplementsNames.hasNext()) {
+            TestCase.assertEquals(dsImplementsNames.next(), dbcImplementsNames.next());
+         }
          // Compare contained type invariants
          TestCase.assertEquals(dsEnum.getMethods().size(), dbcEnum.getMethods().size());
          Iterator<IDSInvariant> dsTypeInvariants = dsEnum.getInvariants().iterator();
@@ -731,6 +738,13 @@ public final class TestGenerationUtil {
          Iterator<DbcInterface> dbcExtends = dbcInterface.getExtends().iterator();
          while (dsExtends.hasNext() && dbcExtends.hasNext()) {
             compareInterface(dsExtends.next(), dbcExtends.next(), false);
+         }
+         // Compare extends full names
+         TestCase.assertEquals(dsInterface.getExtendsFullnames().size(), dbcInterface.getExtendsFullNames().size());
+         Iterator<String> dsExtendsNames = dsInterface.getExtendsFullnames().iterator();
+         Iterator<String> dbcExtendsNames = dbcInterface.getExtendsFullNames().iterator();
+         while (dsExtendsNames.hasNext() && dbcExtendsNames.hasNext()) {
+            TestCase.assertEquals(dsExtendsNames.next(), dbcExtendsNames.next());
          }
          // Compare contained type invariants
          TestCase.assertEquals(dsInterface.getMethods().size(), dbcInterface.getMethods().size());
@@ -798,12 +812,26 @@ public final class TestGenerationUtil {
          while (dsExtends.hasNext() && dbcExtends.hasNext()) {
             compareClass(dsExtends.next(), dbcExtends.next(), false);
          }
+         // Compare extends full names
+         TestCase.assertEquals(dsClass.getExtendsFullnames().size(), dbcClass.getExtendsFullNames().size());
+         Iterator<String> dsExtendsNames = dsClass.getExtendsFullnames().iterator();
+         Iterator<String> dbcExtendsNames = dbcClass.getExtendsFullNames().iterator();
+         while (dsExtendsNames.hasNext() && dbcExtendsNames.hasNext()) {
+            TestCase.assertEquals(dsExtendsNames.next(), dbcExtendsNames.next());
+         }
          // Compare implements
          TestCase.assertEquals(dsClass.getImplements().size(), dbcClass.getImplements().size());
          Iterator<IDSInterface> dsImplements = dsClass.getImplements().iterator();
          Iterator<DbcInterface> dbcImplements = dbcClass.getImplements().iterator();
          while (dsImplements.hasNext() && dbcImplements.hasNext()) {
             compareInterface(dsImplements.next(), dbcImplements.next(), false);
+         }
+         // Compare implements full names
+         TestCase.assertEquals(dsClass.getImplementsFullnames().size(), dbcClass.getImplementsFullNames().size());
+         Iterator<String> dsImplementsNames = dsClass.getImplementsFullnames().iterator();
+         Iterator<String> dbcImplementsNames = dbcClass.getImplementsFullNames().iterator();
+         while (dsImplementsNames.hasNext() && dbcImplementsNames.hasNext()) {
+            TestCase.assertEquals(dsImplementsNames.next(), dbcImplementsNames.next());
          }
          // Compare contained type invariants
          TestCase.assertEquals(dsClass.getMethods().size(), dbcClass.getMethods().size());

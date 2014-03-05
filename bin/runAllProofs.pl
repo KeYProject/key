@@ -382,7 +382,7 @@ sub runAuto {
   my $verbosity = "";
   if ($option{'silent'}) { $verbosity = "--verbose 0"; }
   if ($option{'verbose'}) { $verbosity = "--verbose 2"; }
-  my $command = "'" . $path_to_key . "/bin/runProver' --auto $verbosity $statisticsCmd '$dk'";
+  my $command = "'" . $path_to_key . "/bin/key' --K-headless --auto $verbosity $statisticsCmd '$dk'";
   print "Command is: $command\n" unless $option{'silent'};
   my $starttime = time();
   my $result = &system_timeout($time_limit, $command);
@@ -416,7 +416,7 @@ sub reloadFile {
 	return;
     }
 
-    my $command = "'" . $path_to_key . "/bin/runProver' --auto-loadonly '$dk'";
+    my $command = "'" . $path_to_key . "/bin/key' --K-headless --auto-loadonly '$dk'";
     # print "Command is: $command\n";
     my $result = &system_timeout($time_limit, $command);
 #    print "\nReturn value: $result\n";
@@ -476,7 +476,10 @@ sub calculateSummas {
     }
     close IN;
     
-    # extra handling of the average time per step (which should be in the last column)
+    # compute averages instead of sums
+    # extra handling of the average time per step and memory consumption 
+    # (which should be in the last two columns)
+    $sum[@sum-2] = $sum[@sum-2] / $countExamples;
     $sum[@sum-1] = $sum[@sum-1] / $countExamples;
     return @sum;
 }

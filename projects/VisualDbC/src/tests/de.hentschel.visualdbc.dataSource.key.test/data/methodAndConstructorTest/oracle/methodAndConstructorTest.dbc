@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel" driverId="de.hentschel.visualdbc.dataSource.key">
+  <types xsi:type="dbcmodel:DbcClass" name="MethodsAndConstructors" abstract="true" extends="//@types.1">
+    <methods signature="doSomething()" returnType="void"/>
+    <methods signature="doSomething(i : int)" returnType="int"/>
+    <methods signature="doSomethingElse(i : int[])" visibility="private" returnType="java.lang.String"/>
+    <methods signature="doSomethingElse(i : int[][])" visibility="private" returnType="java.lang.String"/>
+    <methods signature="doSomethingArray(sArray : java.lang.String[], myArray : MyClass[], boolArray : boolean[])" visibility="protected" returnType="java.lang.String[]"/>
+    <methods signature="doSomethingElse(i : int, c : MyClass)" visibility="default" returnType="double"/>
+    <methods signature="doStatic(i : int, c : MyClass)" visibility="default" static="true" returnType="double"/>
+    <methods signature="doStatic(x : java.lang.String)" static="true" returnType="void" final="true"/>
+    <methods signature="doAbstract(x : java.lang.String)" visibility="protected" returnType="MyClass" abstract="true"/>
+    <constructors signature="MethodsAndConstructors()"/>
+    <constructors signature="MethodsAndConstructors(c : MyClass)"/>
+    <constructors signature="MethodsAndConstructors(i : int)" visibility="private"/>
+    <constructors signature="MethodsAndConstructors(j : java.lang.String)" visibility="protected"/>
+    <constructors signature="MethodsAndConstructors(i : int, j : java.lang.String)" visibility="default"/>
+    <extendsFullNames>MethodsAndConstructorsParent</extendsFullNames>
+  </types>
+  <types xsi:type="dbcmodel:DbcClass" name="MethodsAndConstructorsParent">
+    <methods signature="staticParent()" visibility="protected" static="true" returnType="void"/>
+    <methods signature="doOnParent(i : int)" returnType="boolean"/>
+    <constructors signature="MethodsAndConstructorsParent()"/>
+    <extendsFullNames>java.lang.Object</extendsFullNames>
+  </types>
+  <types xsi:type="dbcmodel:DbcClass" name="MyClass">
+    <constructors signature="MyClass()" visibility="default"/>
+    <extendsFullNames>java.lang.Object</extendsFullNames>
+  </types>
+  <connectionSettings key="location" value="D:\Forschung\Development\KeY_Master\junit-workspace\MethodTest_testMethods"/>
+  <connectionSettings key="packageManagement" value="FLAT_LIST"/>
+  <connectionSettings key="packageManagementType" value="de.hentschel.visualdbc.datasource.model.DSPackageManagement"/>
+  <connectionSettings key="locationType" value="java.io.File"/>
+</dbcmodel:DbcModel>

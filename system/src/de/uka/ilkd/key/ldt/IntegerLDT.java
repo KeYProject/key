@@ -23,9 +23,28 @@ import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.LongLiteral;
-import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.expression.operator.BinaryAnd;
+import de.uka.ilkd.key.java.expression.operator.BinaryNot;
+import de.uka.ilkd.key.java.expression.operator.BinaryOr;
+import de.uka.ilkd.key.java.expression.operator.BinaryXOr;
+import de.uka.ilkd.key.java.expression.operator.Divide;
+import de.uka.ilkd.key.java.expression.operator.GreaterOrEquals;
+import de.uka.ilkd.key.java.expression.operator.GreaterThan;
+import de.uka.ilkd.key.java.expression.operator.LessOrEquals;
+import de.uka.ilkd.key.java.expression.operator.LessThan;
+import de.uka.ilkd.key.java.expression.operator.Minus;
+import de.uka.ilkd.key.java.expression.operator.Modulo;
+import de.uka.ilkd.key.java.expression.operator.Negative;
+import de.uka.ilkd.key.java.expression.operator.Plus;
+import de.uka.ilkd.key.java.expression.operator.ShiftLeft;
+import de.uka.ilkd.key.java.expression.operator.ShiftRight;
+import de.uka.ilkd.key.java.expression.operator.Times;
+import de.uka.ilkd.key.java.expression.operator.TypeCast;
+import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRight;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
@@ -483,7 +502,7 @@ public final class IntegerLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
 	                         Term sub, 
-	                         Services services, 
+	                         TermServices services, 
 	                         ExecutionContext ec) {
         if(sub != null && sub.sort().extendsTrans(targetSort())) {
             if(op instanceof Negative) {
@@ -507,7 +526,7 @@ public final class IntegerLDT extends LDT {
 
         char[] int_ch=null;
         assert sharp != null;
-        Term result = TermBuilder.DF.func(sharp);
+        Term result = services.getTermBuilder().func(sharp);
 
         Function identifier=numbers;
         if (lit instanceof CharLiteral) {
@@ -566,12 +585,12 @@ public final class IntegerLDT extends LDT {
         }
         
         for (int i = 0; i < length; i++) {
-            result = TermBuilder.DF.func(numberSymbol[int_ch[i]-'0'], result);
+            result = services.getTermBuilder().func(numberSymbol[int_ch[i]-'0'], result);
         }
         if (minusFlag) {
-            result = TermBuilder.DF.func(neglit, result);
+            result = services.getTermBuilder().func(neglit, result);
         }
-        result = TermBuilder.DF.func(identifier, result);
+        result = services.getTermBuilder().func(identifier, result);
 
         Debug.out("integerldt: result of translating literal (lit, result):", 
                   lit, result);

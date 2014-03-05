@@ -229,7 +229,7 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
                 for (TacletFormula tf : list) {
                         toStore += "//" + tf.getTaclet().name().toString()
                                         + "\n";
-                        toStore += convertTerm(tf.getFormula());
+                        toStore += convertTerm(tf.getFormula(services));
                         if (i != list.size() - 1)
                                 toStore += "\n\n& //and\n\n";
                         i++;

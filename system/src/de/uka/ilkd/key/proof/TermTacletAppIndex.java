@@ -637,10 +637,9 @@ public class TermTacletAppIndex {
                                    NewRuleListener listener ) {
         fireRulesAdded ( listener, localTacletApps, pos );
         
-        final Iterator<TermTacletAppIndex> it = subtermIndices.iterator ();
         int subterm = 0;
-        while ( it.hasNext () ) {
-            it.next ().reportTacletApps ( pos.down ( subterm ),
+        for (final TermTacletAppIndex appIndex : subtermIndices) {
+            appIndex.reportTacletApps ( pos.down ( subterm ),
                                           listener );
             ++subterm;
         }
@@ -680,7 +679,9 @@ public class TermTacletAppIndex {
                                        ImmutableList<NoPosTacletApp> taclets,
                                        PosInOccurrence pos) {
 
-        for (NoPosTacletApp taclet : taclets) listener.ruleAdded(taclet, pos);
+        for (NoPosTacletApp taclet : taclets) {
+            listener.ruleAdded(taclet, pos);
+        }
     }
 
 
@@ -691,11 +692,10 @@ public class TermTacletAppIndex {
                                                ImmutableList<NoPosTacletApp> taclets) {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 
-        while ( !taclets.isEmpty() ) {
-            final NoPosTacletApp app = taclets.head ();
-            taclets = taclets.tail ();
-            if ( p_filter.filter ( app.taclet () ) )
-            result = result.prepend ( app );
+        for (final NoPosTacletApp app :  taclets) {
+            if ( p_filter.filter ( app.taclet () ) ) {
+                result = result.prepend ( app );
+            }
         }
 
         return result;

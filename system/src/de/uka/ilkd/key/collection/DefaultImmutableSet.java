@@ -40,8 +40,6 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     }
 
 
-    private int hashCode = -1;
-
     protected DefaultImmutableSet() {
 	elementList = ImmutableSLList.<T>nil();
     }
@@ -175,13 +173,15 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     }
 
     public int hashCode() {
-	if ( hashCode == -1 ) {
-	    hashCode = elementList.hashCode() * 7;
-	    if (hashCode == -1) {
-		hashCode = 2;
-	    }
-	}
-	return hashCode;
+        int hashCode = 0;
+        ImmutableList<T> crt = this.elementList;
+
+        while (!crt.isEmpty()) {
+            final T element = crt.head();
+            hashCode = 17*(element == null ? 0 : element.hashCode()) + hashCode;                
+            crt = crt.tail();
+        }
+        return hashCode;
     }
 
 

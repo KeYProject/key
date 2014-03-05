@@ -94,7 +94,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
     }
 
 
-    private boolean containsModifier(Class type) {
+    private boolean containsModifier(Class<?> type) {
         int s = (modArray == null) ? 0 : modArray.size();
         for (int i = 0; i < s; i += 1) {
             if (type.isInstance(modArray.get(i))) {

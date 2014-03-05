@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
 /**
@@ -78,7 +78,7 @@ public class ConditionalFeature implements Feature {
             				     Feature    thenFeature) {
         return createConditional ( cond,
                                    thenFeature,
-                                   LongRuleAppCost.ZERO_COST );
+                                   NumberRuleAppCost.getZeroCost() );
     }
 
     /**

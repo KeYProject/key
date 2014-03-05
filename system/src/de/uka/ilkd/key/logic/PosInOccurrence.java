@@ -167,7 +167,7 @@ public final class PosInOccurrence {
     }
 
     public boolean isTopLevel () {
-	return posInTerm == PosInTerm.TOP_LEVEL;
+	return posInTerm == PosInTerm.getTopLevel();
     }
 
     /**
@@ -208,7 +208,7 @@ public final class PosInOccurrence {
         assert p_newFormula != null;
         final PIOPathIterator it = iterator ();
         Term newTerm = p_newFormula.formula ();
-        PosInTerm newPosInTerm = PosInTerm.TOP_LEVEL;
+        PosInTerm newPosInTerm = PosInTerm.getTopLevel();
 
         while ( true ) {
             final int subNr = it.next ();
@@ -244,7 +244,7 @@ public final class PosInOccurrence {
         if (isTopLevel()) {
             return this;
         }
-	return new PosInOccurrence(cfma, PosInTerm.TOP_LEVEL, 
+	return new PosInOccurrence(cfma, PosInTerm.getTopLevel(), 
 				   inAntec);    	
     }
 
@@ -282,17 +282,6 @@ public final class PosInOccurrence {
 	    currentPathIt = posInTerm ().iterator ();
 	}
 
-	private PosInTerm firstN ( PosInTerm p_pit,
-				   int       p_n ) {
-	    IntIterator it  = p_pit.iterator ();
-	    PosInTerm         res = PosInTerm.TOP_LEVEL;
-
-	    while ( p_n-- != 0 )
-		res = res.down ( it.next () );
-
-	    return res;
-	}
-
 	/**
 	 * @return the number of the next child on the path, or
 	 * <code>-1</code> if no further child exists (this is the number
@@ -312,7 +301,7 @@ public final class PosInOccurrence {
 
 	    final PosInOccurrence pio;	   
 	    pio = new PosInOccurrence ( cfma,
-		    firstN ( posInTerm, count - 1 ),
+		    posInTerm.firstN(count - 1),
 		    inAntec );            
 
         

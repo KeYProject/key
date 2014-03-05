@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -408,7 +409,7 @@ public class NoPosTacletApp extends TacletApp {
 
     
     protected MatchConditions setupMatchConditions(PosInOccurrence pos,
-		  				   Services services) {
+		  				   TermServices services) {
 	SVInstantiations svInst = taclet() instanceof NoFindTaclet ? 
                 instantiations   () : instantiations   ().clearUpdateContext ();
         
@@ -418,8 +419,7 @@ public class NoPosTacletApp extends TacletApp {
         
 	if ( taclet() instanceof RewriteTaclet ) {
 	    mc = ((RewriteTaclet)taclet ()).checkPrefix ( pos,
-								mc,
-								services );
+								mc );
 	    if (mc == null) {
                 Debug.out("NoPosTacletApp: Update prefix check failed.");
             }

@@ -19,6 +19,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.*;
@@ -75,7 +76,12 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
     public static class SMTRule implements BuiltInRule {
 	private Name name = new Name("SMTRule");
 
-	public RuleAppSMT createApp( PosInOccurrence pos ) {
+	  public RuleAppSMT createApp( PosInOccurrence pos) {
+	     return createApp(pos, null);
+	  }
+
+	@Override
+	public RuleAppSMT createApp( PosInOccurrence pos, TermServices services ) {
 		return new RuleAppSMT( this, pos );
 	}
 
