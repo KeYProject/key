@@ -37,7 +37,7 @@ class TermImpl implements Term {
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST
         = new ImmutableArray<TermLabel>();
     
-	private static int serialNumberCounter =0;
+    private static int serialNumberCounter =0;
 
     //content
     private final Operator op;

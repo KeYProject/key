@@ -298,7 +298,7 @@ public class SWTBotKeyOperationContractTest extends AbstractSetupTestCase {
    @Test
    public void testOpenInteractiveProof_ContractPO_withInitialReferences() {
       TestKeyUtil.testOpenProof("KeyOperationContract_testOpenInteractiveProof_EnsuresPost_withInitialReferences",
-                                "data/quicktour/paycard",
+                                "data/quicktour/test/paycard",
                                 new IDSProvableSelector() {
                                    @Override
                                    public IDSProvable getProvable(IDSConnection con) throws DSException {
@@ -325,7 +325,7 @@ public class SWTBotKeyOperationContractTest extends AbstractSetupTestCase {
    @Test
    public void testOpenInteractiveProof_ContractPO_noInitialReferences() {
       TestKeyUtil.testOpenProof("KeyOperationContract_testOpenInteractiveProof_EnsuresPost_noInitialReferences",
-                                "data/quicktour/paycard",
+                                "data/quicktour/test/paycard",
                                 new IDSProvableSelector() {
                                    @Override
                                    public IDSProvable getProvable(IDSConnection con) throws DSException {

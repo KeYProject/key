@@ -39,6 +39,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -64,7 +65,8 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
  */
 public class FunctionalOperationContractImpl implements FunctionalOperationContract {
 
-    protected static final TermBuilder TB = TermBuilder.DF;
+    protected final TermBuilder TB; // TODO: Rename into tb
+    private final TermServices services;
 
     final String baseName;
     final String name;
@@ -106,18 +108,19 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * Using this constructor is discouraged: it may change in the future.
      * Please use the factory methods in {@link de.uka.ilkd.key.speclang.ContractFactory}.
      * @param baseName base name of the contract (does not have to be unique)
-     * @param pm the IProgramMethod to which the contract belongs
-     * @param modality the modality of the contract
-     * @param pre the precondition of the contract
-     * @param mby the measured_by clause of the contract
-     * @param post the postcondition of the contract
-     * @param mod the modifies clause of the contract
-     * @param selfVar the variable used for the receiver object
-     * @param paramVars the variables used for the operation parameters
-     * @param resultVar the variables used for the operation result
-     * @param excVar the variable used for the thrown exception
-     * @param heapAtPreVar the variable used for the pre-heap
-     * @param globalDefs definitions for the whole contract
+    * @param pm the IProgramMethod to which the contract belongs
+    * @param modality the modality of the contract
+    * @param mby the measured_by clause of the contract
+    * @param selfVar the variable used for the receiver object
+    * @param paramVars the variables used for the operation parameters
+    * @param resultVar the variables used for the operation result
+    * @param excVar the variable used for the thrown exception
+    * @param globalDefs definitions for the whole contract
+    * @param services TODO
+    * @param pre the precondition of the contract
+    * @param post the postcondition of the contract
+    * @param mod the modifies clause of the contract
+    * @param heapAtPreVar the variable used for the pre-heap
      */
     FunctionalOperationContractImpl(String baseName,
                                     String name,
@@ -140,7 +143,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                     Term globalDefs,
                                     int id,
                                     boolean toBeSaved,
-                                    boolean transaction) {
+                                    boolean transaction, TermServices services) {
         assert !(name == null && baseName == null);
         assert kjt != null;
         assert pm != null;
@@ -159,6 +162,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         }
         assert pm.isModel() || excVar != null;
         assert atPreVars.size() != 0;
+        assert services != null;
+        this.services = services;
+        this.TB = services.getTermBuilder();
         this.baseName               = baseName;
         this.name = name != null
                 ? name
@@ -403,7 +409,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                                                null,
                                                                                atPreVars,
                                                                                services);
-        final OpReplacer or = new OpReplacer(replaceMap);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalPres.get(heap));
     }
 
@@ -450,7 +456,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 	                                                 null,
 	                                                 atPres,
 	                                                 services);
-	final OpReplacer or = new OpReplacer(replaceMap);
+	final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
 	return or.replace(originalPres.get(heap));
     }
 
@@ -519,7 +525,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 	                                                                       null,
 	                                                                       null,
 	                                                                       services);
-	final OpReplacer or = new OpReplacer(replaceMap);
+	final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
 	return or.replace(originalMby);
     }
 
@@ -541,7 +547,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 	                                                 null,
 	                                                 atPres,
 	                                                 services);
-	final OpReplacer or = new OpReplacer(replaceMap);
+	final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
 	return or.replace(originalMby);
     }
 
@@ -591,7 +597,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
        
        Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable,Term>();
        for(LocationVariable h : heapContext) {
-          heapTerms.put(h, TB.var(h));
+          heapTerms.put(h, services.getTermBuilder().var(h));
        }
        
        Term originalMby = contract.hasMby()
@@ -604,7 +610,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
        
        Map<LocationVariable,Term> originalMods = new HashMap<LocationVariable, Term>();
        for(LocationVariable heap : heapContext) {
-          Term m = contract.getMod(heap, TB.var(heap), contractSelf,contractParams, services);
+          Term m = contract.getMod(heap, services.getTermBuilder().var(heap), contractSelf,contractParams, services);
           originalMods.put(heap, m);
        }
        
@@ -876,7 +882,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         final Term update
         = TB.tf().createTerm(
                 ElementaryUpdate.getInstance(originalAtPreVars.get(baseHeap)),
-                TB.getBaseHeap(services));
+                TB.getBaseHeap());
         final Term modalityTerm
         = TB.tf().createTerm(modality,
                 new Term[]{originalPosts.get(baseHeap)},
@@ -939,7 +945,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 excVar,
                 atPreVars,
                 services);
-        final OpReplacer or = new OpReplacer(replaceMap);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalPosts.get(heap));
     }
 
@@ -991,7 +997,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                          excTerm,
                                                          atPres,
                                                          services);
-        final OpReplacer or = new OpReplacer(replaceMap);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalPosts.get(heap));
     }
 
@@ -1040,7 +1046,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 null,
                 atPreVars,
                 services);
-        final OpReplacer or = new OpReplacer(replaceMap);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalAxioms.get(heap));
     }
 
@@ -1072,7 +1078,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                excTerm,
                atPres,
                services);
-       final OpReplacer or = new OpReplacer(replaceMap);
+       final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
        return or.replace(originalAxioms.get(heap));
     }
 
@@ -1095,7 +1101,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                                                null,
                                                                                null,
                                                                                services);
-        final OpReplacer or = new OpReplacer(replaceMap);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(mod);
     }
 
@@ -1127,7 +1133,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                          null,
                                                          null,
                                                          services);
-        final OpReplacer or = new OpReplacer(replaceMap);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(mod);
     }
 
@@ -1170,7 +1176,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 }
             }
         }
-        OpReplacer or = new OpReplacer(map);
+        OpReplacer or = new OpReplacer(map, services.getTermFactory());
         return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
     }
 
@@ -1203,7 +1209,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 }
             }
         }
-        OpReplacer or = new OpReplacer(map);
+        OpReplacer or = new OpReplacer(map, services.getTermFactory());
         return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
     }
 
@@ -1226,7 +1232,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 selfTerm,
                 paramTerms,
                 services);
-        final OpReplacer or = new OpReplacer(replaceMap);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(globalDefs);
     }
 
@@ -1298,7 +1304,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                    globalDefs,
                                                    newId,
                                                    toBeSaved,
-                                                   transaction);
+                                                   transaction, 
+                                                   services);
     }
 
 
@@ -1327,7 +1334,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                    globalDefs,
                                                    id,
                                                    toBeSaved && newKJT.equals(kjt),
-                                                   transaction);
+                                                   transaction, services);
     }
 
 

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel" driverId="de.hentschel.visualdbc.dataSource.key">
+  <types xsi:type="dbcmodel:DbcClass" name="MyAbstractClass" abstract="true">
+    <constructors signature="MyAbstractClass()" visibility="default"/>
+    <extendsFullNames>java.lang.Object</extendsFullNames>
+  </types>
+  <types xsi:type="dbcmodel:DbcClass" name="MyDefaultClass" visibility="default">
+    <constructors signature="MyDefaultClass()" visibility="default"/>
+    <extendsFullNames>java.lang.Object</extendsFullNames>
+  </types>
+  <types xsi:type="dbcmodel:DbcClass" name="MyFinalClass" final="true">
+    <constructors signature="MyFinalClass()" visibility="default"/>
+    <extendsFullNames>java.lang.Object</extendsFullNames>
+  </types>
+  <types xsi:type="dbcmodel:DbcClass" name="MyPublicClass">
+    <constructors signature="MyPublicClass()" visibility="default"/>
+    <extendsFullNames>java.lang.Object</extendsFullNames>
+  </types>
+  <types xsi:type="dbcmodel:DbcInterface" name="MyDefaultInterface" visibility="default"/>
+  <types xsi:type="dbcmodel:DbcInterface" name="MyPublicInterface"/>
+  <connectionSettings key="location" value="D:\Forschung\Development\KeY_Master\junit-workspace\ClassTest_testClassFlags"/>
+  <connectionSettings key="packageManagement" value="NO_PACKAGES"/>
+  <connectionSettings key="packageManagementType" value="de.hentschel.visualdbc.datasource.model.DSPackageManagement"/>
+  <connectionSettings key="locationType" value="java.io.File"/>
+</dbcmodel:DbcModel>

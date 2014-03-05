@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -49,7 +50,7 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
     * @param label The {@link TermLabel} to decide if it should be kept or dropped.
     * @return {@code true} keep {@link TermLabel} and add it to the new {@link Term}. {@code false} drop {@link TermLabel} and do not need it to the new {@link Term}.
     */
-   public boolean isRuleApplicationSupported(Services services,
+   public boolean isRuleApplicationSupported(TermServices services,
                                              PosInOccurrence applicationPosInOccurrence,
                                              Term applicationTerm,
                                              Rule rule,
@@ -86,7 +87,7 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
     * @param label The {@link TermLabel} to decide if it should be kept or dropped.
     * @return {@code true} add {@link TermLabel} to new {@link Term}. {@code false} do not add {@link TermLabel} to new {@link Term}.
     */
-   public boolean addLabel(Services services,
+   public boolean addLabel(TermServices services,
                            PosInOccurrence applicationPosInOccurrence,
                            Term applicationTerm,
                            Rule rule,

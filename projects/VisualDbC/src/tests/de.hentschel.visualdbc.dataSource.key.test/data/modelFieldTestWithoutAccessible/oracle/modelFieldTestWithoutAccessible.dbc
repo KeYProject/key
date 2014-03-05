@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel" driverId="de.hentschel.visualdbc.dataSource.key">
+  <types xsi:type="dbcmodel:DbcClass" name="ModelFieldTest">
+    <axioms name="JML represents clause for ModelFieldTest::$f" definition="equals(ModelFieldTest::$f(heap,self),javaMulInt(Z(2(#)),int::select(heap,self,ModelFieldTest::$x)))"/>
+    <methods signature="doubleX()" returnType="int">
+      <operationContracts name="ModelFieldTest[ModelFieldTest::doubleX()].JML normal_behavior operation contract.0" proofObligations="//@proofObligations.0" pre="java.lang.Object::&lt;inv>(heap, self)" post="result = ModelFieldTest::$f(heap, self)&#xA;&amp; java.lang.Object::&lt;inv>(heap, self)&#xA;&amp; exc = null" modifies="mod[heap]: allLocs" termination="diamond"/>
+    </methods>
+    <attributes name="f" type="int" visibility="default"/>
+    <attributes name="x" type="int" visibility="default"/>
+    <constructors signature="ModelFieldTest()" visibility="default"/>
+    <extendsFullNames>java.lang.Object</extendsFullNames>
+  </types>
+  <connectionSettings key="location" value="D:\Forschung\Development\KeY_Master\junit-workspace\ModelFieldTest_testModelField_withoutAccessible"/>
+  <connectionSettings key="packageManagement" value="FLAT_LIST"/>
+  <connectionSettings key="packageManagementType" value="de.hentschel.visualdbc.datasource.model.DSPackageManagement"/>
+  <connectionSettings key="locationType" value="java.io.File"/>
+  <proofObligations obligation="ContractPO"/>
+</dbcmodel:DbcModel>

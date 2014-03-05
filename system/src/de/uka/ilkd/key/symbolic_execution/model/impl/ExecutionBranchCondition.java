@@ -19,7 +19,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
@@ -137,7 +136,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
       // Compute branch condition
       if (isMergedBranchCondition()) {
          // Add all merged branch conditions
-         branchCondition = TermBuilder.DF.and(getMergedBranchCondtions());
+         branchCondition = getServices().getTermBuilder().and(getMergedBranchCondtions());
          // Simplify merged branch conditions
          branchCondition = SymbolicExecutionUtil.simplify(getProof(), branchCondition);
          branchCondition = SymbolicExecutionUtil.improveReadability(branchCondition, getServices());
@@ -191,10 +190,10 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
          parentPath = getParent().getPathCondition();
       }
       else {
-         parentPath = TermBuilder.DF.tt();
+         parentPath = getServices().getTermBuilder().tt();
       }
       // Add current branch condition to path
-      pathCondition = TermBuilder.DF.and(parentPath, getBranchCondition());
+      pathCondition = getServices().getTermBuilder().and(parentPath, getBranchCondition());
       // Simplify path condition
       pathCondition = SymbolicExecutionUtil.simplify(getProof(), pathCondition);
       pathCondition = SymbolicExecutionUtil.improveReadability(pathCondition, getServices());

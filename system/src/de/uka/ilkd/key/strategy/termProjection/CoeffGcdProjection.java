@@ -20,7 +20,6 @@ import java.math.BigInteger;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
@@ -57,6 +56,6 @@ public class CoeffGcdProjection implements ProjectionToTerm {
         final Polynomial poly = Polynomial.create ( polyT, services );
 
         final BigInteger gcd = mono.getCoefficient ().gcd ( poly.coeffGcd () );
-        return TermBuilder.DF.zTerm ( services, gcd.abs ().toString () );
+        return services.getTermBuilder().zTerm ( gcd.abs ().toString () );
     }
 }

@@ -48,7 +48,7 @@ public class TestTacletParser extends TestCase {
     public NamespaceSet nss;
     public Services services;
 
-    TermFactory tf=TermFactory.DEFAULT;
+    TermFactory tf;
 
     public TestTacletParser(String name) {
 	super(name);
@@ -62,7 +62,7 @@ public class TestTacletParser extends TestCase {
     public void setUp() {
 	nss =new NamespaceSet();
 	services = TacletForTests.services();
-
+	tf = services.getTermFactory();
 	parseDecls("\\sorts { s; }\n" +
 		   "\\functions {\n" +
 		   "  s f(s);\n" +

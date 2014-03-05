@@ -35,7 +35,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -163,7 +163,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
             String name = rule.name().toString();
             if(ADMITTED_RULES_SET.contains(name)) {
-                return LongRuleAppCost.ZERO_COST;
+                return NumberRuleAppCost.getZeroCost();
             }
             
             // apply OSS to <inv>() calls.
@@ -172,7 +172,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
                 if(target.op() instanceof UpdateApplication) {
                     Operator updatedOp = target.sub(1).op();
                     if(updatedOp instanceof ObserverFunction) {
-                        return LongRuleAppCost.ZERO_COST;
+                        return NumberRuleAppCost.getZeroCost();
                     }
                 }
             }

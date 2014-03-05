@@ -56,7 +56,7 @@ public class SWTBotExampeForSwingBot extends AbstractSetupTestCase {
       try {
          // Create project and fill it with java files from KeY Quicktour
          IProject project = TestUtilsUtil.createProject("SWTBotForSwing");
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/quicktour/paycard", project);
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/quicktour/test/paycard", project);
          File location = ResourceUtil.getLocation(project); 
          // Open data source connection to KeY in interactive modus
          connection = TestKeyUtil.createKeyConnection(true, location);

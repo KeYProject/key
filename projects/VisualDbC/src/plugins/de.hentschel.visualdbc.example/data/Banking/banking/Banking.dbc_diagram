@@ -1,159 +1,165 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_tLVecI6AEeOnBJeKMlMgnQ" type="DbC" measurementUnit="Pixel">
-  <children xmi:type="notation:Shape" xmi:id="_tMFFUI6AEeOnBJeKMlMgnQ" type="2007" fontName="Segoe UI">
-    <children xmi:type="notation:DecorationNode" xmi:id="_tMFFUo6AEeOnBJeKMlMgnQ" type="5042"/>
-    <children xmi:type="notation:BasicCompartment" xmi:id="_tMFFU46AEeOnBJeKMlMgnQ" type="7034">
-      <children xmi:type="notation:Node" xmi:id="_tMFFVI6AEeOnBJeKMlMgnQ" type="3031">
-        <children xmi:type="notation:DecorationNode" xmi:id="_tMFFWY6AEeOnBJeKMlMgnQ" type="5048"/>
-        <children xmi:type="notation:BasicCompartment" xmi:id="_tMFFWo6AEeOnBJeKMlMgnQ" type="7050">
-          <children xmi:type="notation:Shape" xmi:id="_tMFFaI6AEeOnBJeKMlMgnQ" type="3009" fontName="Segoe UI">
-            <children xmi:type="notation:DecorationNode" xmi:id="_tMFFao6AEeOnBJeKMlMgnQ" type="5011"/>
-            <children xmi:type="notation:BasicCompartment" xmi:id="_tMFFa46AEeOnBJeKMlMgnQ" type="7011">
-              <children xmi:type="notation:Node" xmi:id="_tMFFeI6AEeOnBJeKMlMgnQ" type="3026">
-                <children xmi:type="notation:DecorationNode" xmi:id="_tMFFfY6AEeOnBJeKMlMgnQ" type="5035"/>
-                <children xmi:type="notation:DecorationNode" xmi:id="_tMFFfo6AEeOnBJeKMlMgnQ" type="5036"/>
-                <children xmi:type="notation:DecorationNode" xmi:id="_tMFFf46AEeOnBJeKMlMgnQ" type="5037"/>
-                <styles xmi:type="notation:DescriptionStyle" xmi:id="_tMFFeY6AEeOnBJeKMlMgnQ"/>
-                <styles xmi:type="notation:FontStyle" xmi:id="_tMFFeo6AEeOnBJeKMlMgnQ" fontName="Segoe UI"/>
-                <styles xmi:type="notation:LineStyle" xmi:id="_tMFFe46AEeOnBJeKMlMgnQ"/>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_e60vEJ5LEeOZWr8aiSI2Rw" type="DbC" measurementUnit="Pixel">
+  <children xmi:type="notation:Shape" xmi:id="_e7ak8J5LEeOZWr8aiSI2Rw" type="2007" fontName="Segoe UI">
+    <children xmi:type="notation:DecorationNode" xmi:id="_e7ak8p5LEeOZWr8aiSI2Rw" type="5042"/>
+    <children xmi:type="notation:BasicCompartment" xmi:id="_e7ak855LEeOZWr8aiSI2Rw" type="7034">
+      <children xmi:type="notation:Node" xmi:id="_e7ak9J5LEeOZWr8aiSI2Rw" type="3031">
+        <children xmi:type="notation:DecorationNode" xmi:id="_e7ak-Z5LEeOZWr8aiSI2Rw" type="5048"/>
+        <children xmi:type="notation:BasicCompartment" xmi:id="_e7ak-p5LEeOZWr8aiSI2Rw" type="7050">
+          <children xmi:type="notation:Shape" xmi:id="_e7alCJ5LEeOZWr8aiSI2Rw" type="3009" fontName="Segoe UI">
+            <children xmi:type="notation:DecorationNode" xmi:id="_e7alCp5LEeOZWr8aiSI2Rw" type="5011"/>
+            <children xmi:type="notation:BasicCompartment" xmi:id="_e7alC55LEeOZWr8aiSI2Rw" type="7011">
+              <children xmi:type="notation:Node" xmi:id="_e7alHZ5LEeOZWr8aiSI2Rw" type="3026">
+                <children xmi:type="notation:DecorationNode" xmi:id="_e7alIp5LEeOZWr8aiSI2Rw" type="5035"/>
+                <children xmi:type="notation:DecorationNode" xmi:id="_e7alI55LEeOZWr8aiSI2Rw" type="5036"/>
+                <children xmi:type="notation:DecorationNode" xmi:id="_e7kV8J5LEeOZWr8aiSI2Rw" type="5037"/>
+                <styles xmi:type="notation:DescriptionStyle" xmi:id="_e7alHp5LEeOZWr8aiSI2Rw"/>
+                <styles xmi:type="notation:FontStyle" xmi:id="_e7alH55LEeOZWr8aiSI2Rw" fontName="Segoe UI"/>
+                <styles xmi:type="notation:LineStyle" xmi:id="_e7alIJ5LEeOZWr8aiSI2Rw"/>
                 <element xmi:type="dbcmodel:DbcOperationContract" href="Banking.dbc#//@packages.0/@types.0/@methods.0/@operationContracts.0"/>
-                <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tMFFfI6AEeOnBJeKMlMgnQ" y="5"/>
+                <layoutConstraint xmi:type="notation:Bounds" xmi:id="_e7alIZ5LEeOZWr8aiSI2Rw" y="5"/>
               </children>
-              <children xmi:type="notation:Node" xmi:id="_tMO2UI6AEeOnBJeKMlMgnQ" type="3026">
-                <children xmi:type="notation:DecorationNode" xmi:id="_tMO2VY6AEeOnBJeKMlMgnQ" type="5035"/>
-                <children xmi:type="notation:DecorationNode" xmi:id="_tMO2Vo6AEeOnBJeKMlMgnQ" type="5036"/>
-                <children xmi:type="notation:DecorationNode" xmi:id="_tMO2V46AEeOnBJeKMlMgnQ" type="5037"/>
-                <styles xmi:type="notation:DescriptionStyle" xmi:id="_tMO2UY6AEeOnBJeKMlMgnQ"/>
-                <styles xmi:type="notation:FontStyle" xmi:id="_tMO2Uo6AEeOnBJeKMlMgnQ" fontName="Segoe UI"/>
-                <styles xmi:type="notation:LineStyle" xmi:id="_tMO2U46AEeOnBJeKMlMgnQ"/>
+              <children xmi:type="notation:Node" xmi:id="_e7kV8Z5LEeOZWr8aiSI2Rw" type="3026">
+                <children xmi:type="notation:DecorationNode" xmi:id="_e7kV9p5LEeOZWr8aiSI2Rw" type="5035"/>
+                <children xmi:type="notation:DecorationNode" xmi:id="_e7kV955LEeOZWr8aiSI2Rw" type="5036"/>
+                <children xmi:type="notation:DecorationNode" xmi:id="_e7kV-J5LEeOZWr8aiSI2Rw" type="5037"/>
+                <styles xmi:type="notation:DescriptionStyle" xmi:id="_e7kV8p5LEeOZWr8aiSI2Rw"/>
+                <styles xmi:type="notation:FontStyle" xmi:id="_e7kV855LEeOZWr8aiSI2Rw" fontName="Segoe UI"/>
+                <styles xmi:type="notation:LineStyle" xmi:id="_e7kV9J5LEeOZWr8aiSI2Rw"/>
                 <element xmi:type="dbcmodel:DbcOperationContract" href="Banking.dbc#//@packages.0/@types.0/@methods.0/@operationContracts.1"/>
-                <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tMO2VI6AEeOnBJeKMlMgnQ" x="495"/>
+                <layoutConstraint xmi:type="notation:Bounds" xmi:id="_e7kV9Z5LEeOZWr8aiSI2Rw" x="490" y="5"/>
               </children>
-              <children xmi:type="notation:Node" xmi:id="_4S_IUI6AEeOnBJeKMlMgnQ" type="3034">
-                <children xmi:type="notation:DecorationNode" xmi:id="_4S_IVY6AEeOnBJeKMlMgnQ" type="5052"/>
-                <styles xmi:type="notation:DescriptionStyle" xmi:id="_4S_IUY6AEeOnBJeKMlMgnQ"/>
-                <styles xmi:type="notation:FontStyle" xmi:id="_4S_IUo6AEeOnBJeKMlMgnQ" fontName="Segoe UI"/>
-                <styles xmi:type="notation:LineStyle" xmi:id="_4S_IU46AEeOnBJeKMlMgnQ"/>
+              <children xmi:type="notation:Node" xmi:id="_pA3yAJ5LEeOZWr8aiSI2Rw" type="3034">
+                <children xmi:type="notation:DecorationNode" xmi:id="_pA3yBZ5LEeOZWr8aiSI2Rw" type="5052"/>
+                <styles xmi:type="notation:DescriptionStyle" xmi:id="_pA3yAZ5LEeOZWr8aiSI2Rw"/>
+                <styles xmi:type="notation:FontStyle" xmi:id="_pA3yAp5LEeOZWr8aiSI2Rw" fontName="Segoe UI"/>
+                <styles xmi:type="notation:LineStyle" xmi:id="_pA3yA55LEeOZWr8aiSI2Rw"/>
                 <element xmi:type="dbcmodel:DbcProof" href="Banking.dbc#//@packages.0/@types.0/@methods.0/@proofs.0"/>
-                <layoutConstraint xmi:type="notation:Bounds" xmi:id="_4S_IVI6AEeOnBJeKMlMgnQ" x="70" y="265"/>
+                <layoutConstraint xmi:type="notation:Bounds" xmi:id="_pA3yBJ5LEeOZWr8aiSI2Rw" x="69" y="282"/>
               </children>
-              <children xmi:type="notation:Node" xmi:id="_4nmtcI6AEeOnBJeKMlMgnQ" type="3034">
-                <children xmi:type="notation:DecorationNode" xmi:id="_4nmtdY6AEeOnBJeKMlMgnQ" type="5052"/>
-                <styles xmi:type="notation:DescriptionStyle" xmi:id="_4nmtcY6AEeOnBJeKMlMgnQ"/>
-                <styles xmi:type="notation:FontStyle" xmi:id="_4nmtco6AEeOnBJeKMlMgnQ" fontName="Segoe UI"/>
-                <styles xmi:type="notation:LineStyle" xmi:id="_4nmtc46AEeOnBJeKMlMgnQ"/>
+              <children xmi:type="notation:Node" xmi:id="_pQ0SgJ5LEeOZWr8aiSI2Rw" type="3034">
+                <children xmi:type="notation:DecorationNode" xmi:id="_pQ0ShZ5LEeOZWr8aiSI2Rw" type="5052"/>
+                <styles xmi:type="notation:DescriptionStyle" xmi:id="_pQ0SgZ5LEeOZWr8aiSI2Rw"/>
+                <styles xmi:type="notation:FontStyle" xmi:id="_pQ0Sgp5LEeOZWr8aiSI2Rw" fontName="Segoe UI"/>
+                <styles xmi:type="notation:LineStyle" xmi:id="_pQ0Sg55LEeOZWr8aiSI2Rw"/>
                 <element xmi:type="dbcmodel:DbcProof" href="Banking.dbc#//@packages.0/@types.0/@methods.0/@proofs.1"/>
-                <layoutConstraint xmi:type="notation:Bounds" xmi:id="_4nmtdI6AEeOnBJeKMlMgnQ" x="310" y="300"/>
+                <layoutConstraint xmi:type="notation:Bounds" xmi:id="_pQ0ShJ5LEeOZWr8aiSI2Rw" x="292" y="312"/>
               </children>
             </children>
             <element xmi:type="dbcmodel:DbcMethod" href="Banking.dbc#//@packages.0/@types.0/@methods.0"/>
-            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tMFFaY6AEeOnBJeKMlMgnQ" y="6"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_e7alCZ5LEeOZWr8aiSI2Rw" y="6"/>
           </children>
-          <children xmi:type="notation:Shape" xmi:id="_tMFFbI6AEeOnBJeKMlMgnQ" type="3010" fontName="Segoe UI">
-            <children xmi:type="notation:DecorationNode" xmi:id="_tMFFbo6AEeOnBJeKMlMgnQ" type="5012"/>
-            <children xmi:type="notation:BasicCompartment" xmi:id="_tMFFb46AEeOnBJeKMlMgnQ" type="7012"/>
+          <children xmi:type="notation:Shape" xmi:id="_e7alDJ5LEeOZWr8aiSI2Rw" type="3010" fontName="Segoe UI">
+            <children xmi:type="notation:DecorationNode" xmi:id="_e7alDp5LEeOZWr8aiSI2Rw" type="5012"/>
+            <children xmi:type="notation:BasicCompartment" xmi:id="_e7alD55LEeOZWr8aiSI2Rw" type="7012"/>
             <element xmi:type="dbcmodel:DbcConstructor" href="Banking.dbc#//@packages.0/@types.0/@constructors.0"/>
-            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tMFFbY6AEeOnBJeKMlMgnQ" y="456"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_e7alDZ5LEeOZWr8aiSI2Rw" y="481"/>
           </children>
-          <children xmi:type="notation:Shape" xmi:id="_tMFFcI6AEeOnBJeKMlMgnQ" type="3035" fontName="Segoe UI">
-            <children xmi:type="notation:DecorationNode" xmi:id="_tMFFco6AEeOnBJeKMlMgnQ" type="5054"/>
-            <children xmi:type="notation:DecorationNode" xmi:id="_tMFFc46AEeOnBJeKMlMgnQ" type="5055"/>
+          <children xmi:type="notation:Shape" xmi:id="_e7alEJ5LEeOZWr8aiSI2Rw" type="3035" fontName="Segoe UI">
+            <children xmi:type="notation:DecorationNode" xmi:id="_e7alEp5LEeOZWr8aiSI2Rw" type="5054"/>
+            <children xmi:type="notation:DecorationNode" xmi:id="_e7alE55LEeOZWr8aiSI2Rw" type="5055"/>
             <element xmi:type="dbcmodel:DbcInvariant" href="Banking.dbc#//@packages.0/@types.0/@invariants.0"/>
-            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tMFFcY6AEeOnBJeKMlMgnQ" y="506"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_e7alEZ5LEeOZWr8aiSI2Rw" y="536"/>
           </children>
-          <children xmi:type="notation:Shape" xmi:id="_tMFFdI6AEeOnBJeKMlMgnQ" type="3035" fontName="Segoe UI">
-            <children xmi:type="notation:DecorationNode" xmi:id="_tMFFdo6AEeOnBJeKMlMgnQ" type="5054"/>
-            <children xmi:type="notation:DecorationNode" xmi:id="_tMFFd46AEeOnBJeKMlMgnQ" type="5055"/>
+          <children xmi:type="notation:Shape" xmi:id="_e7alFJ5LEeOZWr8aiSI2Rw" type="3035" fontName="Segoe UI">
+            <children xmi:type="notation:DecorationNode" xmi:id="_e7alFp5LEeOZWr8aiSI2Rw" type="5054"/>
+            <children xmi:type="notation:DecorationNode" xmi:id="_e7alF55LEeOZWr8aiSI2Rw" type="5055"/>
             <element xmi:type="dbcmodel:DbcInvariant" href="Banking.dbc#//@packages.0/@types.0/@invariants.1"/>
-            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tMFFdY6AEeOnBJeKMlMgnQ" y="561"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_e7alFZ5LEeOZWr8aiSI2Rw" y="596"/>
+          </children>
+          <children xmi:type="notation:Shape" xmi:id="_e7alGJ5LEeOZWr8aiSI2Rw" type="3036" fontName="Segoe UI">
+            <children xmi:type="notation:DecorationNode" xmi:id="_e7alGp5LEeOZWr8aiSI2Rw" type="5056"/>
+            <children xmi:type="notation:DecorationNode" xmi:id="_e7alG55LEeOZWr8aiSI2Rw" type="5060"/>
+            <children xmi:type="notation:BasicCompartment" xmi:id="_e7alHJ5LEeOZWr8aiSI2Rw" type="7064"/>
+            <element xmi:type="dbcmodel:DbcAxiom" href="Banking.dbc#//@packages.0/@types.0/@axioms.0"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_e7alGZ5LEeOZWr8aiSI2Rw" y="651"/>
           </children>
         </children>
-        <children xmi:type="notation:BasicCompartment" xmi:id="_tMFFW46AEeOnBJeKMlMgnQ" type="7051">
-          <styles xmi:type="notation:SortingStyle" xmi:id="_tMFFXI6AEeOnBJeKMlMgnQ"/>
-          <styles xmi:type="notation:FilteringStyle" xmi:id="_tMFFXY6AEeOnBJeKMlMgnQ"/>
+        <children xmi:type="notation:BasicCompartment" xmi:id="_e7ak-55LEeOZWr8aiSI2Rw" type="7051">
+          <styles xmi:type="notation:SortingStyle" xmi:id="_e7ak_J5LEeOZWr8aiSI2Rw"/>
+          <styles xmi:type="notation:FilteringStyle" xmi:id="_e7ak_Z5LEeOZWr8aiSI2Rw"/>
         </children>
-        <styles xmi:type="notation:DescriptionStyle" xmi:id="_tMFFVY6AEeOnBJeKMlMgnQ"/>
-        <styles xmi:type="notation:FontStyle" xmi:id="_tMFFVo6AEeOnBJeKMlMgnQ" fontName="Segoe UI"/>
-        <styles xmi:type="notation:LineStyle" xmi:id="_tMFFV46AEeOnBJeKMlMgnQ"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_e7ak9Z5LEeOZWr8aiSI2Rw"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_e7ak9p5LEeOZWr8aiSI2Rw" fontName="Segoe UI"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_e7ak955LEeOZWr8aiSI2Rw"/>
         <element xmi:type="dbcmodel:DbcClass" href="Banking.dbc#//@packages.0/@types.0"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tMFFWI6AEeOnBJeKMlMgnQ" y="425"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_e7ak-J5LEeOZWr8aiSI2Rw" x="30" y="475"/>
       </children>
-      <children xmi:type="notation:Node" xmi:id="_tMFFXo6AEeOnBJeKMlMgnQ" type="3031">
-        <children xmi:type="notation:DecorationNode" xmi:id="_tMFFY46AEeOnBJeKMlMgnQ" type="5048"/>
-        <children xmi:type="notation:BasicCompartment" xmi:id="_tMFFZI6AEeOnBJeKMlMgnQ" type="7050">
-          <children xmi:type="notation:Shape" xmi:id="_tMhxQI6AEeOnBJeKMlMgnQ" type="3009" fontName="Segoe UI">
-            <children xmi:type="notation:DecorationNode" xmi:id="_tMhxQo6AEeOnBJeKMlMgnQ" type="5011"/>
-            <children xmi:type="notation:BasicCompartment" xmi:id="_tMhxQ46AEeOnBJeKMlMgnQ" type="7011">
-              <children xmi:type="notation:Node" xmi:id="_tMhxSI6AEeOnBJeKMlMgnQ" type="3026">
-                <children xmi:type="notation:DecorationNode" xmi:id="_tMhxTY6AEeOnBJeKMlMgnQ" type="5035"/>
-                <children xmi:type="notation:DecorationNode" xmi:id="_tMhxTo6AEeOnBJeKMlMgnQ" type="5036"/>
-                <children xmi:type="notation:DecorationNode" xmi:id="_tMhxT46AEeOnBJeKMlMgnQ" type="5037"/>
-                <styles xmi:type="notation:DescriptionStyle" xmi:id="_tMhxSY6AEeOnBJeKMlMgnQ"/>
-                <styles xmi:type="notation:FontStyle" xmi:id="_tMhxSo6AEeOnBJeKMlMgnQ" fontName="Segoe UI"/>
-                <styles xmi:type="notation:LineStyle" xmi:id="_tMhxS46AEeOnBJeKMlMgnQ"/>
+      <children xmi:type="notation:Node" xmi:id="_e7ak_p5LEeOZWr8aiSI2Rw" type="3031">
+        <children xmi:type="notation:DecorationNode" xmi:id="_e7alA55LEeOZWr8aiSI2Rw" type="5048"/>
+        <children xmi:type="notation:BasicCompartment" xmi:id="_e7alBJ5LEeOZWr8aiSI2Rw" type="7050">
+          <children xmi:type="notation:Shape" xmi:id="_e8BB6p5LEeOZWr8aiSI2Rw" type="3009" fontName="Segoe UI">
+            <children xmi:type="notation:DecorationNode" xmi:id="_e8BB7J5LEeOZWr8aiSI2Rw" type="5011"/>
+            <children xmi:type="notation:BasicCompartment" xmi:id="_e8BB7Z5LEeOZWr8aiSI2Rw" type="7011">
+              <children xmi:type="notation:Node" xmi:id="_e8BB8p5LEeOZWr8aiSI2Rw" type="3026">
+                <children xmi:type="notation:DecorationNode" xmi:id="_e8BB955LEeOZWr8aiSI2Rw" type="5035"/>
+                <children xmi:type="notation:DecorationNode" xmi:id="_e8BB-J5LEeOZWr8aiSI2Rw" type="5036"/>
+                <children xmi:type="notation:DecorationNode" xmi:id="_e8BB-Z5LEeOZWr8aiSI2Rw" type="5037"/>
+                <styles xmi:type="notation:DescriptionStyle" xmi:id="_e8BB855LEeOZWr8aiSI2Rw"/>
+                <styles xmi:type="notation:FontStyle" xmi:id="_e8BB9J5LEeOZWr8aiSI2Rw" fontName="Segoe UI"/>
+                <styles xmi:type="notation:LineStyle" xmi:id="_e8BB9Z5LEeOZWr8aiSI2Rw"/>
                 <element xmi:type="dbcmodel:DbcOperationContract" href="Banking.dbc#//@packages.0/@types.1/@methods.0/@operationContracts.0"/>
-                <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tMhxTI6AEeOnBJeKMlMgnQ" y="5"/>
+                <layoutConstraint xmi:type="notation:Bounds" xmi:id="_e8BB9p5LEeOZWr8aiSI2Rw" x="8" y="9"/>
               </children>
             </children>
             <element xmi:type="dbcmodel:DbcMethod" href="Banking.dbc#//@packages.0/@types.1/@methods.0"/>
-            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tMhxQY6AEeOnBJeKMlMgnQ" x="1" y="5"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_e8BB655LEeOZWr8aiSI2Rw" y="4"/>
           </children>
-          <children xmi:type="notation:Shape" xmi:id="_tMhxRI6AEeOnBJeKMlMgnQ" type="3010" fontName="Segoe UI">
-            <children xmi:type="notation:DecorationNode" xmi:id="_tMhxRo6AEeOnBJeKMlMgnQ" type="5012"/>
-            <children xmi:type="notation:BasicCompartment" xmi:id="_tMhxR46AEeOnBJeKMlMgnQ" type="7012"/>
+          <children xmi:type="notation:Shape" xmi:id="_e8BB7p5LEeOZWr8aiSI2Rw" type="3010" fontName="Segoe UI">
+            <children xmi:type="notation:DecorationNode" xmi:id="_e8BB8J5LEeOZWr8aiSI2Rw" type="5012"/>
+            <children xmi:type="notation:BasicCompartment" xmi:id="_e8BB8Z5LEeOZWr8aiSI2Rw" type="7012"/>
             <element xmi:type="dbcmodel:DbcConstructor" href="Banking.dbc#//@packages.0/@types.1/@constructors.0"/>
-            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tMhxRY6AEeOnBJeKMlMgnQ" y="269"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_e8BB755LEeOZWr8aiSI2Rw" y="274"/>
           </children>
         </children>
-        <children xmi:type="notation:BasicCompartment" xmi:id="_tMFFZY6AEeOnBJeKMlMgnQ" type="7051">
-          <styles xmi:type="notation:SortingStyle" xmi:id="_tMFFZo6AEeOnBJeKMlMgnQ"/>
-          <styles xmi:type="notation:FilteringStyle" xmi:id="_tMFFZ46AEeOnBJeKMlMgnQ"/>
+        <children xmi:type="notation:BasicCompartment" xmi:id="_e7alBZ5LEeOZWr8aiSI2Rw" type="7051">
+          <styles xmi:type="notation:SortingStyle" xmi:id="_e7alBp5LEeOZWr8aiSI2Rw"/>
+          <styles xmi:type="notation:FilteringStyle" xmi:id="_e7alB55LEeOZWr8aiSI2Rw"/>
         </children>
-        <styles xmi:type="notation:DescriptionStyle" xmi:id="_tMFFX46AEeOnBJeKMlMgnQ"/>
-        <styles xmi:type="notation:FontStyle" xmi:id="_tMFFYI6AEeOnBJeKMlMgnQ" fontName="Segoe UI"/>
-        <styles xmi:type="notation:LineStyle" xmi:id="_tMFFYY6AEeOnBJeKMlMgnQ"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_e7ak_55LEeOZWr8aiSI2Rw"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_e7alAJ5LEeOZWr8aiSI2Rw" fontName="Segoe UI"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_e7alAZ5LEeOZWr8aiSI2Rw"/>
         <element xmi:type="dbcmodel:DbcClass" href="Banking.dbc#//@packages.0/@types.1"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tMFFYo6AEeOnBJeKMlMgnQ" x="290" y="10"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_e7alAp5LEeOZWr8aiSI2Rw" x="660" y="30"/>
       </children>
-      <children xmi:type="notation:Node" xmi:id="_2WHL8I6AEeOnBJeKMlMgnQ" type="3034">
-        <children xmi:type="notation:DecorationNode" xmi:id="_2WHL9Y6AEeOnBJeKMlMgnQ" type="5052"/>
-        <styles xmi:type="notation:DescriptionStyle" xmi:id="_2WHL8Y6AEeOnBJeKMlMgnQ"/>
-        <styles xmi:type="notation:FontStyle" xmi:id="_2WHL8o6AEeOnBJeKMlMgnQ" fontName="Segoe UI"/>
-        <styles xmi:type="notation:LineStyle" xmi:id="_2WHL846AEeOnBJeKMlMgnQ"/>
+      <children xmi:type="notation:Node" xmi:id="_nBPckJ5LEeOZWr8aiSI2Rw" type="3034">
+        <children xmi:type="notation:DecorationNode" xmi:id="_nBPclZ5LEeOZWr8aiSI2Rw" type="5052"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_nBPckZ5LEeOZWr8aiSI2Rw"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_nBPckp5LEeOZWr8aiSI2Rw" fontName="Segoe UI"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_nBPck55LEeOZWr8aiSI2Rw"/>
         <element xmi:type="dbcmodel:DbcProof" href="Banking.dbc#//@packages.0/@proofs.0"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_2WHL9I6AEeOnBJeKMlMgnQ" x="110" y="230"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_nBPclJ5LEeOZWr8aiSI2Rw" x="415" y="210"/>
       </children>
     </children>
     <element xmi:type="dbcmodel:DbcPackage" href="Banking.dbc#//@packages.0"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tMFFUY6AEeOnBJeKMlMgnQ" x="30" y="30" width="1081"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_e7ak8Z5LEeOZWr8aiSI2Rw" x="15" y="15" width="1806"/>
   </children>
-  <styles xmi:type="notation:DiagramStyle" xmi:id="_tLVecY6AEeOnBJeKMlMgnQ"/>
+  <styles xmi:type="notation:DiagramStyle" xmi:id="_e60vEZ5LEeOZWr8aiSI2Rw"/>
   <element xmi:type="dbcmodel:DbcModel" href="Banking.dbc#/"/>
-  <edges xmi:type="notation:Connector" xmi:id="_tM0sMI6AEeOnBJeKMlMgnQ" type="4003" source="_tMFFVI6AEeOnBJeKMlMgnQ" target="_tMFFXo6AEeOnBJeKMlMgnQ">
-    <styles xmi:type="notation:FontStyle" xmi:id="_tM0sMY6AEeOnBJeKMlMgnQ" fontName="Segoe UI"/>
+  <edges xmi:type="notation:Connector" xmi:id="_e8T80J5LEeOZWr8aiSI2Rw" type="4003" source="_e7ak9J5LEeOZWr8aiSI2Rw" target="_e7ak_p5LEeOZWr8aiSI2Rw">
+    <styles xmi:type="notation:FontStyle" xmi:id="_e8T80Z5LEeOZWr8aiSI2Rw" fontName="Segoe UI"/>
     <element xsi:nil="true"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_tM0sMo6AEeOnBJeKMlMgnQ" points="[0, 0, 0, 60]$[0, -60, 0, 0]"/>
-    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_uXP38I6AEeOnBJeKMlMgnQ" id="(0.5,0.0)"/>
-    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_uXP38Y6AEeOnBJeKMlMgnQ" id="(0.5,1.0)"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_e8T80p5LEeOZWr8aiSI2Rw" points="[0, 0, 0, 60]$[0, -60, 0, 0]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_fweksJ5LEeOZWr8aiSI2Rw" id="(0.49971894322653176,0.0)"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_fweksZ5LEeOZWr8aiSI2Rw" id="(0.5,1.0)"/>
   </edges>
-  <edges xmi:type="notation:Connector" xmi:id="_3KkHsI6AEeOnBJeKMlMgnQ" type="4001" source="_2WHL8I6AEeOnBJeKMlMgnQ" target="_tMhxSI6AEeOnBJeKMlMgnQ">
-    <styles xmi:type="notation:FontStyle" xmi:id="_3KkHsY6AEeOnBJeKMlMgnQ" fontName="Segoe UI"/>
+  <edges xmi:type="notation:Connector" xmi:id="_oPLPUJ5LEeOZWr8aiSI2Rw" type="4001" source="_nBPckJ5LEeOZWr8aiSI2Rw" target="_e8BB8p5LEeOZWr8aiSI2Rw">
+    <styles xmi:type="notation:FontStyle" xmi:id="_oPLPUZ5LEeOZWr8aiSI2Rw" fontName="Segoe UI"/>
     <element xsi:nil="true"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_3KkHso6AEeOnBJeKMlMgnQ" points="[51, 0, -187, -8]$[94, 0, -144, -8]$[150, 0, -88, -8]"/>
-    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_3KkHs46AEeOnBJeKMlMgnQ" id="(0.2018348623853211,0.7342995169082126)"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_oPLPUp5LEeOZWr8aiSI2Rw" points="[51, -1, -272, 0]$[222, -5, -101, -4]"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_oPLPU55LEeOZWr8aiSI2Rw" id="(0.231651376146789,0.4830917874396135)"/>
   </edges>
-  <edges xmi:type="notation:Connector" xmi:id="_4-2v0I6AEeOnBJeKMlMgnQ" type="4001" source="_4S_IUI6AEeOnBJeKMlMgnQ" target="_tMFFeI6AEeOnBJeKMlMgnQ">
-    <styles xmi:type="notation:FontStyle" xmi:id="_4-2v0Y6AEeOnBJeKMlMgnQ" fontName="Segoe UI"/>
+  <edges xmi:type="notation:Connector" xmi:id="_puxZ0J5LEeOZWr8aiSI2Rw" type="4001" source="_pQ0SgJ5LEeOZWr8aiSI2Rw" target="_e7kV8Z5LEeOZWr8aiSI2Rw">
+    <styles xmi:type="notation:FontStyle" xmi:id="_puxZ0Z5LEeOZWr8aiSI2Rw" fontName="Segoe UI"/>
     <element xsi:nil="true"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_4-2v0o6AEeOnBJeKMlMgnQ" points="[0, -8, -13, 107]$[-73, -71, -86, 44]"/>
-    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_4-2v046AEeOnBJeKMlMgnQ" id="(0.5098039215686274,0.2)"/>
-    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_4-2v1I6AEeOnBJeKMlMgnQ" id="(0.25833333333333336,0.7874396135265701)"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_puxZ0p5LEeOZWr8aiSI2Rw" points="[51, 0, -168, 0]$[147, 44, -72, 44]"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_puxZ055LEeOZWr8aiSI2Rw" id="(0.13740458015267176,0.7841726618705036)"/>
   </edges>
-  <edges xmi:type="notation:Connector" xmi:id="_6GPOoI6AEeOnBJeKMlMgnQ" type="4001" source="_4nmtcI6AEeOnBJeKMlMgnQ" target="_tMO2UI6AEeOnBJeKMlMgnQ">
-    <styles xmi:type="notation:FontStyle" xmi:id="_6GPOoY6AEeOnBJeKMlMgnQ" fontName="Segoe UI"/>
+  <edges xmi:type="notation:Connector" xmi:id="_qKu9EJ5LEeOZWr8aiSI2Rw" type="4001" source="_pA3yAJ5LEeOZWr8aiSI2Rw" target="_e7alHZ5LEeOZWr8aiSI2Rw">
+    <styles xmi:type="notation:FontStyle" xmi:id="_qKu9EZ5LEeOZWr8aiSI2Rw" fontName="Segoe UI"/>
     <element xsi:nil="true"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_6GPOoo6AEeOnBJeKMlMgnQ" points="[25, -1, -150, 0]$[108, 39, -67, 40]"/>
-    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_6GPOo46AEeOnBJeKMlMgnQ" id="(0.7549019607843137,0.5)"/>
-    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_6GPOpI6AEeOnBJeKMlMgnQ" id="(0.12786259541984732,0.7935323383084577)"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_qKu9Ep5LEeOZWr8aiSI2Rw" points="[-1, -8, 0, 106]$[-66, -78, -65, 36]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_qKu9E55LEeOZWr8aiSI2Rw" id="(0.5,0.2)"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_qKu9FJ5LEeOZWr8aiSI2Rw" id="(0.24791666666666667,0.8260869565217391)"/>
   </edges>
 </notation:Diagram>

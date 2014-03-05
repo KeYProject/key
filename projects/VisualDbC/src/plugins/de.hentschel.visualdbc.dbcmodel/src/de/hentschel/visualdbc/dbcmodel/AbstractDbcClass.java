@@ -31,6 +31,7 @@ import org.eclipse.emf.common.util.EList;
  * <ul>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.AbstractDbcClass#getConstructors <em>Constructors</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.AbstractDbcClass#getImplements <em>Implements</em>}</li>
+ *   <li>{@link de.hentschel.visualdbc.dbcmodel.AbstractDbcClass#getImplementsFullNames <em>Implements Full Names</em>}</li>
  * </ul>
  * </p>
  *
@@ -70,6 +71,22 @@ public interface AbstractDbcClass extends AbstractDbcInterface {
     * @generated
     */
    EList<DbcInterface> getImplements();
+
+   /**
+    * Returns the value of the '<em><b>Implements Full Names</b></em>' attribute list.
+    * The list contents are of type {@link java.lang.String}.
+    * <!-- begin-user-doc -->
+    * <p>
+    * If the meaning of the '<em>Implements Full Names</em>' attribute list isn't clear,
+    * there really should be more of a description here...
+    * </p>
+    * <!-- end-user-doc -->
+    * @return the value of the '<em>Implements Full Names</em>' attribute list.
+    * @see de.hentschel.visualdbc.dbcmodel.DbcmodelPackage#getAbstractDbcClass_ImplementsFullNames()
+    * @model default=""
+    * @generated
+    */
+   EList<String> getImplementsFullNames();
 
    /**
     * <!-- begin-user-doc -->

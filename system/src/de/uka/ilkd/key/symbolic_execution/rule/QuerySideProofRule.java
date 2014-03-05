@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -153,7 +154,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
     * {@inheritDoc}
     */
    @Override
-   public IBuiltInRuleApp createApp(PosInOccurrence pos) {
+   public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
       return new DefaultBuiltInRuleApp(this, pos);
    }
    
@@ -188,25 +189,26 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
          // Compute sequent for side proof to compute query in.
          Sequent sequentToProve = computeGeneralSequentToProve(goalSequent, equalitySF);
          Function newPredicate = createResultFunction(services, queryTerm.sort());
-         Term newTerm = TermBuilder.DF.func(newPredicate, queryTerm);
+         Term newTerm = services.getTermBuilder().func(newPredicate, queryTerm);
          sequentToProve = sequentToProve.addFormula(new SequentFormula(newTerm), false, false).sequent();
          // Compute results and their conditions
          Map<Term, Set<Term>> conditionsAndResultsMap = computeResultsAndConditions(services, goal, sequentToProve, newPredicate);
          // Create new single goal in which the query is replaced by the possible results
          ImmutableList<Goal> goals = goal.split(1);
          Goal resultGoal = goals.head();
+         final TermBuilder tb = services.getTermBuilder();
          resultGoal.removeFormula(pio);
          if (pio.isTopLevel() || queryConditionTerm != null) {
             for (Entry<Term, Set<Term>> conditionsAndResult : conditionsAndResultsMap.entrySet()) {
                for (Term conditionTerm : conditionsAndResult.getValue()) { // Combining the different conditions for the same value with an OR does not work well because the strategy then tries to establish CNF by splitting or ausmultiplizieren
                   Term newEqualityTerm = varFirst ? 
-                                         TermBuilder.DF.equals(varTerm, conditionsAndResult.getKey()) : 
-                                         TermBuilder.DF.equals(conditionsAndResult.getKey(), varTerm);
+                                         tb.equals(varTerm, conditionsAndResult.getKey()) : 
+                                         tb.equals(conditionsAndResult.getKey(), varTerm);
                   Term resultTerm = pio.isInAntec() ?
-                                    TermBuilder.DF.imp(conditionTerm, newEqualityTerm) :
-                                    TermBuilder.DF.and(conditionTerm, newEqualityTerm);
+                                    tb.imp(conditionTerm, newEqualityTerm) :
+                                    tb.and(conditionTerm, newEqualityTerm);
                   if (queryConditionTerm != null) {
-                     resultTerm = TermBuilder.DF.imp(queryConditionTerm, resultTerm);
+                     resultTerm = tb.imp(queryConditionTerm, resultTerm);
                   }
                   resultGoal.addFormula(new SequentFormula(resultTerm), pio.isInAntec(), false);
                }
@@ -214,11 +216,13 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
          }
          else {
             Function resultFunction = createResultConstant(services, varTerm.sort());
-            Term resultFunctionTerm = TermBuilder.DF.func(resultFunction);
-            resultGoal.addFormula(replace(pio, varFirst ? TermBuilder.DF.equals(resultFunctionTerm, varTerm) : TermBuilder.DF.equals(resultFunctionTerm, varTerm)), pio.isInAntec(), false);
+            Term resultFunctionTerm = tb.func(resultFunction);
+            resultGoal.addFormula(replace(pio, 
+                    varFirst ? tb.equals(resultFunctionTerm, varTerm) : tb.equals(resultFunctionTerm, varTerm),
+                    services), pio.isInAntec(), false);
             for (Entry<Term, Set<Term>> conditionsAndResult : conditionsAndResultsMap.entrySet()) {
                for (Term conditionTerm : conditionsAndResult.getValue()) { // Combining the different conditions for the same value with an OR does not work well because the strategy then tries to establish CNF by splitting or ausmultiplizieren
-                  Term resultTerm = TermBuilder.DF.imp(conditionTerm, varFirst ? TermBuilder.DF.equals(resultFunctionTerm, conditionsAndResult.getKey()) : TermBuilder.DF.equals(conditionsAndResult.getKey(), resultFunctionTerm));
+                  Term resultTerm = tb.imp(conditionTerm, varFirst ? tb.equals(resultFunctionTerm, conditionsAndResult.getKey()) : tb.equals(conditionsAndResult.getKey(), resultFunctionTerm));
                   resultGoal.addFormula(new SequentFormula(resultTerm), true, false);
                }
             }

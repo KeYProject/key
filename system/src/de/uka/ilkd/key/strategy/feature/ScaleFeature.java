@@ -17,7 +17,7 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.util.Debug;
@@ -151,8 +151,8 @@ public abstract class ScaleFeature implements Feature {
      * @param cost
      */
     private static long getValue (RuleAppCost cost) {
-        if ( !( cost instanceof LongRuleAppCost ) ) illegalCostError ( cost );
-        return ( (LongRuleAppCost)cost ).getValue ();
+        if ( !( cost instanceof NumberRuleAppCost ) ) illegalCostError ( cost );
+        return ( (NumberRuleAppCost)cost ).getValue ();
     }
 
     protected static void illegalCostError (final RuleAppCost cost) {
@@ -189,14 +189,14 @@ public abstract class ScaleFeature implements Feature {
                     costVal = 0;
                 else
                     return TopRuleAppCost.INSTANCE;
-            } else if ( cost instanceof LongRuleAppCost ) {
-                costVal = ( (LongRuleAppCost)cost ).getValue ();
+            } else if ( cost instanceof NumberRuleAppCost ) {
+                costVal = ( (NumberRuleAppCost)cost ).getValue ();
             } else {
                 illegalCostError ( cost );
                 return null;
             }
 
-            return LongRuleAppCost.create ( (long)( coeff * costVal ) + offset );
+            return NumberRuleAppCost.create ( (long)( coeff * costVal ) + offset );
         }
     }
     

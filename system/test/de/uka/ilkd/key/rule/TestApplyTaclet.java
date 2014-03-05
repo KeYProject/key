@@ -112,7 +112,7 @@ public class TestApplyTaclet extends TestCase{
     }
 
     public void setUp() {
-	TermBuilder tf=TermBuilder.DF;
+	
 
 	TacletForTests.setStandardFile(TacletForTests.testRules);
 	TacletForTests.parse();

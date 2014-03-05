@@ -16,12 +16,8 @@ package de.uka.ilkd.key.rule.inst;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
-public class ListInstantiation extends InstantiationEntry {
+public class ListInstantiation extends InstantiationEntry<ImmutableList<Object>> {
 
-    /** the pe the schemavariable is instantiated with */
-    private final ImmutableList<Object> list ;
-
-   
     /** creates a new ContextInstantiationEntry 
      * @param sv the SchemaVariable that is
      * instantiated
@@ -29,29 +25,6 @@ public class ListInstantiation extends InstantiationEntry {
      * SchemaVariable is instantiated with
      */
     ListInstantiation(SchemaVariable sv, ImmutableList<Object> pes) {
-        super(sv);
-        this.list = pes;
+        super(pes);
     }
-
- 
-    /** returns the intantiation of the SchemaVariable 
-     * @return  the intantiation of the SchemaVariable 
-     */
-    public Object getInstantiation() {
-        return list;
-    }
-
-    /** returns the intantiation of the SchemaVariable 
-     * @return  the intantiation of the SchemaVariable 
-     */
-    public ImmutableList<Object> getList() {
-        return list;
-    }
-
-    
-    /** toString */
-    public String toString() {
-        return "["+getSchemaVariable()+", "+getInstantiation()+"]";
-    }
-
 }

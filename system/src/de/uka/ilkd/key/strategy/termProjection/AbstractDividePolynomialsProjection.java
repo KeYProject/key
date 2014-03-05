@@ -19,7 +19,6 @@ import java.math.BigInteger;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.Goal;
@@ -59,7 +58,7 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
                                          services );
             final Term right = quotient ( monoCoeff, rightPoly.sub ( 1 ),
                                           services );
-            return TermBuilder.DF.func ( add, left, right );
+            return services.getTermBuilder().func ( add, left, right );
         }
         
         final Monomial rightMono = Monomial.create ( rightPoly, services );

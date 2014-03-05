@@ -17,7 +17,7 @@ package de.uka.ilkd.key.proof.mgt;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 
@@ -35,7 +35,7 @@ public class RuleJustificationInfo {
 	return rule2justif.get(r);
     }
 
-    public RuleJustification getJustification(RuleApp r, Services services) {
+    public RuleJustification getJustification(RuleApp r, TermServices services) {
 	RuleJustification just = getJustification(r.rule());
         if (just instanceof ComplexRuleJustification) {
             return ((ComplexRuleJustification) just).getSpecificJustification(r, services);

@@ -12,7 +12,7 @@
 // 
 
 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.gui;
 
 import java.util.Iterator;
 import java.util.Vector;
@@ -22,6 +22,15 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.IfMismatchException;
+import de.uka.ilkd.key.proof.MissingInstantiationException;
+import de.uka.ilkd.key.proof.ModelChangeListener;
+import de.uka.ilkd.key.proof.ModelEvent;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.SVInstantiationException;
+import de.uka.ilkd.key.proof.SVInstantiationParserException;
+import de.uka.ilkd.key.proof.SortMismatchException;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.SortException;

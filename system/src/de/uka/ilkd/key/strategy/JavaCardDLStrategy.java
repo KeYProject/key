@@ -25,7 +25,7 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfThenElse;
@@ -1818,9 +1818,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     instOf ( "subsumRightBigger" ) ) } ) );
                    
         final TermBuffer one = new TermBuffer ();
-        one.setContent ( TermBuilder.DF.zTerm ( p_proof.getServices (), "1" ) );
+        final TermServices services = p_proof.getServices ();
+      one.setContent ( services.getTermBuilder().zTerm ( "1" ) );
         final TermBuffer two = new TermBuffer ();
-        two.setContent ( TermBuilder.DF.zTerm ( p_proof.getServices (), "2" ) );
+        two.setContent ( services.getTermBuilder().zTerm ( "2" ) );
 
         bindRuleSet ( d, "inEqSimp_or_tautInEqs",
            SumFeature.createSum ( new Feature[] {
@@ -2053,7 +2054,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer intRel = new TermBuffer ();
         final TermBuffer atom = new TermBuffer ();
         final TermBuffer zero = new TermBuffer ();
-        zero.setContent ( TermBuilder.DF.zTerm ( p_proof.getServices (), "0" ) );
+        zero.setContent ( p_proof.getServices().getTermBuilder().zTerm ( "0" ) );
         final TermBuffer rootInf = new TermBuffer ();
 
         final Feature posNegSplitting =
@@ -2088,7 +2089,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature rootInferences =
             forEach ( intRel, SequentFormulasGenerator.antecedent (),
               add ( isRootInferenceProducer ( intRel ),
-                    forEach ( rootInf, RootsGenerator.create ( intRel ),
+                    forEach ( rootInf, RootsGenerator.create ( intRel, getProof().getServices() ),
                               add ( instantiate ( "cutFormula", rootInf ),
                                     ifZero ( applyTF ( rootInf, op ( Junctor.OR ) ),
                                              longConst ( 50 ) ),
@@ -2157,7 +2158,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             or ( not ( sum ( intRel, SequentFormulasGenerator.antecedent (),
                              ifZero ( isRootInferenceProducer ( intRel ),
                                       sum ( rootInf,
-                                            RootsGenerator.create ( intRel ),
+                                            RootsGenerator.create ( intRel, getProof().getServices() ),
                                             not ( eq ( instOf ( "cutFormula" ),
                                                        rootInf ) ) ) ) ) ),
                  ifZero ( applyTF ( "cutFormula",

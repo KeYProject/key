@@ -22,7 +22,6 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -51,7 +50,7 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 public class WindowUserInterface extends AbstractUserInterface {
 
-    private MainWindow mainWindow;
+	private MainWindow mainWindow;
 
 
     private LinkedList<InteractiveRuleApplicationCompletion> completions =
@@ -161,6 +160,8 @@ public class WindowUserInterface extends AbstractUserInterface {
 				mainWindow.displayResults(info.toString());
 			}
 		}
+	    // this seems to be a good place to free some memory
+	    Runtime.getRuntime().gc();
 	}
 
 	protected boolean inStopAtFirstUncloseableGoalMode(Proof proof) {
@@ -197,14 +198,13 @@ public class WindowUserInterface extends AbstractUserInterface {
 
 	@Override
 	public void notifyAutoModeBeingStarted() {
-	    mainWindow.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
-	    mainWindow.setActionsEnabled(false);
+		mainWindow.setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
 	}
 
 	@Override
 	public void notifyAutomodeStopped() {
-	    mainWindow.setCursor(java.awt.Cursor.getDefaultCursor());
-	    mainWindow.setActionsEnabled(true);
+		mainWindow
+		        .setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 	}
 
 	@Override

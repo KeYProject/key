@@ -1,10 +1,12 @@
 package de.uka.ilkd.key.java;
 
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TermTacletAppIndex;
@@ -89,6 +91,16 @@ public class ServiceCaches {
     * Map from  <code>Term</code>(allTerm) to <code>ClausesGraph</code> 
     */
    private final Map<Term, ClausesGraph> graphCache = new LRUCache<Term, ClausesGraph> (1000);
+
+   /**
+    * Cache used by the TermFactory to avoid unnecessary creation of terms
+    */
+   private final Map<Term, Term> termCache = new LRUCache<Term, Term>(20000);
+
+   /**
+    * Cache used by TypeComparisonCondition
+    */
+   private final Map<Sort,Map<Sort,Boolean>> disjointnessCache = new WeakHashMap<Sort,Map<Sort,Boolean>>();
    
    /**
     * Returns the cache used by {@link TermTacletAppIndexCacheSet} instances.
@@ -124,5 +136,13 @@ public class ServiceCaches {
 
    public Map<Term, ClausesGraph> getGraphCache() {
       return graphCache;
+   }
+
+   public Map<Term, Term> getTermFactoryCache() {
+       return termCache;
+   }
+
+   public Map<Sort, Map<Sort, Boolean>> getDisjointnessCache() {
+       return disjointnessCache;
    }
 }
