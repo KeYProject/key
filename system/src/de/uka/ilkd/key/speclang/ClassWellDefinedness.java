@@ -42,9 +42,10 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     private ClassWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                  LocationVariable heap, OriginalVariables origVars,
                                  Condition requires, Term assignable, Term accessible,
-                                 Condition ensures, Term mby, Term rep, ClassInvariant inv, TermServices services) {
+                                 Condition ensures, Term mby, Term rep, ClassInvariant inv,
+                                 TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires,
-              assignable, accessible, ensures, mby, rep, services);
+              assignable, accessible, ensures, mby, rep, tb);
         this.inv = inv;
     }
 
@@ -88,7 +89,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         final SchemaVariable sv =
                 SchemaVariableFactory.createTermSV(new Name("a"), kjt.getSort());
         final Term var = TB.var(sv);
-        final Term wdSelf = TB.wd(var, services);
+        final Term wdSelf = TB.wd(var);
         final Term[] heaps = new Term[] {TB.var(heapSV)};
         final Term staticInvTerm = TB.staticInv(heaps, kjt);
         final Term invTerm = TB.inv(heaps, var);
@@ -142,7 +143,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         return new ClassWellDefinedness(getName(), newId, type(), getTarget(), getHeap(),
                                         getOrigVars(), getRequires(), getAssignable(),
                                         getAccessible(), getEnsures(), getMby(),
-                                        getRepresents(), getInvariant(), services);
+                                        getRepresents(), getInvariant(), TB);
     }
 
     @Override
@@ -150,7 +151,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         return new ClassWellDefinedness(getName(), id(), type(), newPM, getHeap(),
                                         getOrigVars(), getRequires(), getAssignable(),
                                         getAccessible(), getEnsures(), getMby(),
-                                        getRepresents(), getInvariant().setKJT(newKJT), services);
+                                        getRepresents(), getInvariant().setKJT(newKJT), TB);
     }
 
     @Override

@@ -866,11 +866,13 @@ public class LogicPrinter {
             startTerm(0);
             layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
         } else {
-            if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+            if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+					&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
                 layouter.print("(");
             }
-            notationInfo.getNotation(t.op(), services).print(t,this);
-            if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+            notationInfo.getNotation(t.op()).print(t,this);
+            if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+					&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
                 layouter.print(")");
             }
         }
@@ -965,11 +967,13 @@ public class LogicPrinter {
      *
      * @param t the Term to be printed */
     public void printTermContinuingBlock(Term t) throws IOException {
-       if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+       if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+				&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
            layouter.print("(");
        }
-       notationInfo.getNotation(t.op(), services).printContinuingBlock(t,this);
-       if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+       notationInfo.getNotation(t.op()).printContinuingBlock(t,this);
+       if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+				&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
            layouter.print(")");
        }
        if (t.hasLabels()) {
@@ -1041,7 +1045,7 @@ public class LogicPrinter {
     
     private boolean printEmbeddedHeapTerm(Term t) throws IOException {
 
-        Notation notation = notationInfo.getNotation(t.op(), services);
+        Notation notation = notationInfo.getNotation(t.op());
         if (notation instanceof HeapNotation) {
             HeapNotation heapNotation = (HeapNotation) notation;
             heapNotation.printEmbeddedHeap(t, this);
@@ -1994,7 +1998,7 @@ public class LogicPrinter {
                     }
                     Term term = services.getTermFactory().
 			createTerm((Modality)o, ta, phi.boundVars(), phi.javaBlock());
-                    notationInfo.getNotation((Modality)o, services).print(term, this);
+                    notationInfo.getNotation((Modality)o).print(term, this);
                     return;
                 }
 
@@ -2126,7 +2130,7 @@ public class LogicPrinter {
 	    t = (Term) instantiations.getInstantiation((SchemaVariable)t.op());
 	}
 	    
-	if (notationInfo.getNotation(t.op(), services).getPriority() < ass){	    
+	if (notationInfo.getNotation(t.op()).getPriority() < ass){
 	    markStartSub();
 	    layouter.print("(");   
 	    printTerm(t);	   
@@ -2134,7 +2138,7 @@ public class LogicPrinter {
 	    markEndSub();
 	} else {
 	    markStartSub();
-	    if (notationInfo.getNotation(t.op(), services).getPriority() == ass) {
+	    if (notationInfo.getNotation(t.op()).getPriority() == ass) {
 		printTermContinuingBlock(t);
 	    } else {
 		printTerm(t);

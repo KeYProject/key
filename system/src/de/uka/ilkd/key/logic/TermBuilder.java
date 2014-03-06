@@ -1501,7 +1501,7 @@ public class TermBuilder {
     public static final Transformer WD_FORMULA =
             new Transformer(new Name("WD"), Sort.FORMULA);
 
-    public Term wd(Term t, TermServices services) {
+    public Term wd(Term t) {
         if(t.op() == Junctor.FALSE || t.op() == Junctor.TRUE) {
             return tt();
         } else if (t.sort().equals(Sort.FORMULA)) {
@@ -1514,7 +1514,7 @@ public class TermBuilder {
     public ImmutableList<Term> wd(Iterable<Term> l) {
         ImmutableList<Term> res = ImmutableSLList.<Term>nil();
         for (Term t: l) {
-            res = res.append(wd(t, services));
+            res = res.append(wd(t));
         }
         return res;
     }
@@ -1522,7 +1522,7 @@ public class TermBuilder {
     public Term[] wd(Term[] l) {
         Term[] res = new Term[l.length];
         for(int i = 0; i < l.length; i++) {
-            res[i] = wd(l[i], services);
+            res[i] = wd(l[i]);
         }
         return res;
     }

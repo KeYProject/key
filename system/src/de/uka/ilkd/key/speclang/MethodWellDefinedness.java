@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -57,9 +58,9 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                   LocationVariable heap, OriginalVariables origVars,
                                   Condition requires, Term assignable, Term accessible,
                                   Condition ensures, Term mby, Term rep, Contract contract,
-                                  Term globalDefs, Term axiom, boolean model, TermServices services) {
+                                  Term globalDefs, Term axiom, boolean model, TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, assignable, accessible,
-              ensures, mby, rep, services);
+              ensures, mby, rep, tb);
         this.contract = contract;
         this.globalDefs = globalDefs;
         this.axiom = axiom;
@@ -196,7 +197,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             return findExcNull(t.sub(0), exc) || findExcNull(t.sub(1), exc);
         } else if (t.op().equals(Equality.EQUALS)) {
             assert t.arity() == 2;
-            return t.sub(1).equals(services.getTermBuilder().NULL()) && t.sub(0).op().equals(exc);
+            return t.sub(1).equals(TB.NULL()) && t.sub(0).op().equals(exc);
         }
         return false;
     }
@@ -480,7 +481,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                          contract,
                                          globalDefs,
                                          axiom,
-                                         modelField(), services);
+                                         modelField(), TB);
     }
 
     @Override
@@ -500,7 +501,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                          contract.setTarget(newKJT, newPM),
                                          globalDefs,
                                          axiom,
-                                         modelField(), services);
+                                         modelField(),
+                                         TB);
     }
 
     @Override

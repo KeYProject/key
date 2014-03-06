@@ -159,10 +159,10 @@ public class TestVariableNamer extends TestCase {
 
         for (NoPosTacletApp noPosTacletApp : noPosTacletApps) {
             SVInstantiations insts = noPosTacletApp.instantiations();
-            Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry>> it2;
+            Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it2;
             it2 = insts.pairIterator();
             while (it2.hasNext()) {
-                ImmutableMapEntry<SchemaVariable, InstantiationEntry> e = it2.next();
+                ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it2.next();
                 Object inst = e.value().getInstantiation();
                 if (inst instanceof PostIncrement
                         && ((PostIncrement) inst).getFirstElement() == containedVar) {
