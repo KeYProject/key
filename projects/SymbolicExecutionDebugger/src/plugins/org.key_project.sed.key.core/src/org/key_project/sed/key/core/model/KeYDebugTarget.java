@@ -35,9 +35,9 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMethod;
-
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.debug.core.IJavaBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaExceptionBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaLineBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaMethodBreakpoint;
@@ -186,7 +186,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       }
    }
    
-   private IResourceChangeListener resourceListener = new ResourceChangeListener(this);
+   private final IResourceChangeListener resourceListener = new ResourceChangeListener(this);
 
    /**
     * The {@link SymbolicExecutionEnvironment} which provides all relevant
@@ -211,6 +211,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                          SymbolicExecutionEnvironment<?> environment,
                          KeYLaunchSettings launchSettings) throws DebugException {
       super(launch);
+      DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
       // Update references
       Assert.isNotNull(environment);
       Assert.isNotNull(environment.getBuilder());
@@ -232,7 +233,6 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun());
       addBreakpoints();
       ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
-
    }
 
    /**
@@ -385,6 +385,9 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    @Override
    public void terminate() throws DebugException {
       if (!isTerminated()) {
+         // Remove Eclipse listeners
+         ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceListener);
+         DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
          // Remove auto mode listener
          environment.getBuilder().getMediator().removeAutoModeListener(autoModeListener);
          // Suspend first to stop the automatic mode
@@ -409,7 +412,9 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    public void disconnect() throws DebugException {
       // Remove auto mode listener
       environment.getBuilder().getMediator().removeAutoModeListener(autoModeListener);
+      // Remove Eclipse listeners
       ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceListener);
+      DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
       // Inform UI that the process is disconnected
       super.disconnect();
    }
@@ -585,6 +590,13 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       }
    }
    
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean supportsBreakpoint(IBreakpoint breakpoint) {
+      return breakpoint instanceof IJavaBreakpoint;
+   }
 
    /**
     * {@inheritDoc}

@@ -17,7 +17,6 @@ import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
@@ -72,7 +71,7 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     * @param launch The {@link ILaunch} in that this {@link IDebugTarget} is used.
     */
    public AbstractSEDDebugTarget(ILaunch launch) {
-      super(null);DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
+      super(null);
       this.launch = launch;
       
    }
@@ -146,8 +145,7 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public boolean supportsBreakpoint(IBreakpoint breakpoint) {
-      
-      return true;
+      return false;
    }
 
    /**
