@@ -1,11 +1,11 @@
 package MapCaseStudy;
 
-final class AMapImplementation extends AbstractMap {
+final class MapImplementation extends AbstractMap {
 
     /*@ normal_behaviour
      @ ensures map == \dl_mapEmpty();
      @*/
-    public /*@pure@*/ AMapImplementation() {
+    public /*@pure@*/ MapImplementation() {
         entries = new MapEntry[0];
         //@ set map = \dl_mapEmpty();
         //@ set footprint = \set_union(\all_fields(this), \all_fields(entries));

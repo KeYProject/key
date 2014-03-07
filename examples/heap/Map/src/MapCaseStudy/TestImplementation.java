@@ -1,14 +1,14 @@
 package MapCaseStudy;
 
 /**
- * This is a simple test for {@link AMapImplementation}, to see if it works as
+ * This is a simple test for {@link MapImplementation}, to see if it works as
  * expected.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class TestImplementation {
 
-    static MapInterface map = new AMapImplementation();
+    static MapInterface map = new MapImplementation();
     static Object key = new Object();
     static Object value = new Object();
     static int errors = 0;
@@ -36,7 +36,7 @@ public class TestImplementation {
         if (errors == 0) {
             //System.out.println("The map works as expected.");
         } else {
-            //System.out.println("Unexpected map behaviour was observed.");
+            //System.out.println("Unexpected map behaviour.");
         }
     }
 

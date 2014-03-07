@@ -1,54 +1,54 @@
 Results for MapImplementation.java proofs.
 Unless otherwise mentioned, contracts were automatically proven.
 
-GIT repository commit hash: 803fdd2edad16477cecf11ac0251fee705930f3a
+GIT repository commit hash: ???
 Checkout this commit hash to verify the proofs.
 The automatic proofs were done with default settings.
 
-constructor(): automatic, 938 nodes
+constructor(): 
 
-clear(): automatic, 946 nodes
+clear(): 
 
-containsKey() accessible clause: automatic, 14187 nodes
-containsKey() normal behaviour: automatic, 2868 nodes
+containsKey() accessible clause: 
+containsKey() normal behaviour: 
 
-containsValue() accessible clause: automatic, 4573 nodes
-containsValue() normal behaviour: automatic, 2605 nodes
+containsValue() accessible clause: 
+containsValue() normal behaviour: 
 
-copyMapEntries(): 2 interactions, 2851 nodes
+copyMapEntries(): 
 
-get() accessible clause: automatic, 21909 nodes
-get() normal behaviour: automatic, 2874 nodes
+get() accessible clause: 
+get() normal behaviour: 
 
-getIndexOfKey() accessible clause: automatic, 5968 nodes
-getIndexOfKey() normal behaviour: automatic, 2543 nodes
+getIndexOfKey() accessible clause: 
+getIndexOfKey() normal behaviour: 
 
-isEmpty() accessible clause: automatic, 361 nodes
-isEmpty() normal behaviour: automatic, 1039 nodes
+isEmpty() accessible clause: 
+isEmpty() normal behaviour: 
 
-newMapEntry(): automatic, 1823 nodes
+newMapEntry(): 
 
-newMapEntryArray(): automatic, 483 nodes
+newMapEntryArray(): 
 
-put(): 20 interactions, 18759 nodes
+put(): 
 
-putExtendArray(): automatic, 15717 nodes
+putExtendArray(): 
 
-putInDomain(): automatic, 2523 nodes
+putInDomain(): 
 
-putNotInDomain(): 1 interacion, 8980 nodes
+putNotInDomain(): 
 
-remove(): 5 interactions, 277469 nodes
+remove(): 
 
-removeCopyOldEntries(): 26 interactions, 7807 nodes
+removeCopyOldEntries(): 
 
-removeInDomain(): 13 interactions, 12706 nodes
+removeInDomain(): 
 
-removeInDomainWithoutResult(): 23 interactions, 47947 nodes
+removeInDomainWithoutResult(): 
 
-setEnries(): 80 interactions, 34553 nodes
+setEnries(): 
 
-removeGetNewArray(): automatic, 7743 nodes
+removeGetNewArray(): 
 
-size() accessible clause: automatic, 357 nodes
-size() normal behaviour: automatic, 992 nodes
+size() accessible clause: 
+size() normal behaviour: 
