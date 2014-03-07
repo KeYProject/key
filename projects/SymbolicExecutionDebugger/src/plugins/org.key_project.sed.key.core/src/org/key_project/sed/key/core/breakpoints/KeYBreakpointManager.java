@@ -1,4 +1,4 @@
-package org.key_project.sed.key.core.model;
+package org.key_project.sed.key.core.breakpoints;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +15,8 @@ import org.eclipse.jdt.internal.debug.core.breakpoints.JavaLineBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaMethodBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaWatchpoint;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.sed.key.core.breakpoints.KeYWatchpoint;
+import org.key_project.sed.key.core.model.KeYDebugTarget;
+import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -31,9 +32,9 @@ import de.uka.ilkd.key.symbolic_execution.strategy.LineBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.MethodBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 
+// TODO: Document class
 @SuppressWarnings("restriction")
 public class KeYBreakpointManager {
-   
    /**
     * The {@link CompoundStopCondition} that holds all BreakpointsStopCOnditons for this {@link KeYDebugTarget}.
     */
@@ -61,7 +62,7 @@ public class KeYBreakpointManager {
     */
    public void keyWatchpointAdded(KeYWatchpoint watchpoint, SymbolicExecutionEnvironment<?> environment) throws CoreException, ProofInputException {
       IResource resource = watchpoint.getMarker().getResource();
-      if (resource.getFileExtension() != null && resource.getFileExtension().equalsIgnoreCase("java")) {
+      if (JDTUtil.isJavaFile(resource)) {
          JavaInfo javaInfo = environment.getServices().getJavaInfo();
          String containerTypeName = KeYUtil.getType(resource).getFullyQualifiedName();
          containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
@@ -88,7 +89,7 @@ public class KeYBreakpointManager {
     */
    public void methodBreakpointAdded(JavaMethodBreakpoint methodBreakpoint, SymbolicExecutionEnvironment<?> environment) throws CoreException, ProofInputException {
       IResource resource = methodBreakpoint.getMarker().getResource();
-      if (resource.getFileExtension() != null && resource.getFileExtension().equalsIgnoreCase("java")) {
+      if (JDTUtil.isJavaFile(resource)) {
          IMethod method = KeYUtil.getContainingMethodForMethodStart(methodBreakpoint.getCharStart(), resource);
          // Determine container type
          IType containerType = method.getDeclaringType();
@@ -122,7 +123,7 @@ public class KeYBreakpointManager {
     */
    public void javaWatchpointAdded(JavaWatchpoint javaWatchpoint, SymbolicExecutionEnvironment<?> environment) throws CoreException, ProofInputException {
       IResource resource = javaWatchpoint.getMarker().getResource();
-      if (resource.getFileExtension() != null && resource.getFileExtension().equalsIgnoreCase("java")) {
+      if (JDTUtil.isJavaFile(resource)) {
          JavaInfo javaInfo = environment.getServices().getJavaInfo();
          String containerTypeName = KeYUtil.getType(resource).getFullyQualifiedName();
          containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
@@ -164,7 +165,7 @@ public class KeYBreakpointManager {
     */
    public void lineBreakpointAdded(JavaLineBreakpoint lineBreakpoint, SymbolicExecutionEnvironment<?> environment) throws CoreException, ProofInputException {
       IResource resource = lineBreakpoint.getMarker().getResource();
-      if (resource.getFileExtension() != null && resource.getFileExtension().equalsIgnoreCase("java")) {
+      if (JDTUtil.isJavaFile(resource)) {
          IMethod method = KeYUtil.getContainingMethod(lineBreakpoint.getLineNumber(), resource);
          // Determine container type
          IType containerType = method.getDeclaringType();
