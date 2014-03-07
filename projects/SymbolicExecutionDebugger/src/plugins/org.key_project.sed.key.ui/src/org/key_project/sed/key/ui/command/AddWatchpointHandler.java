@@ -15,6 +15,7 @@ import org.key_project.key4eclipse.starter.core.util.LogUtil;
 import org.key_project.sed.key.core.breakpoints.KeYWatchpoint;
 import org.key_project.sed.key.ui.dialogs.AddKeYWatchpointDialog;
 import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.jdt.JDTUtil;
 
 /**
  * A class to handle the action of the Add KeY Watchpoint Button being pressed.
@@ -59,7 +60,7 @@ public class AddWatchpointHandler extends AbstractHandler {
     if(editor!=null&&editor instanceof ITextEditor){
        ITextEditor textEditor = (ITextEditor)editor;
        IResource resource = (IResource) textEditor.getEditorInput().getAdapter(IResource.class);
-       if(resource.getFileExtension().equals("java")){
+       if(JDTUtil.isJavaFile(resource)){
           String name = resource.getName();
           name = name.substring(0, name.length()-5);
           return name;

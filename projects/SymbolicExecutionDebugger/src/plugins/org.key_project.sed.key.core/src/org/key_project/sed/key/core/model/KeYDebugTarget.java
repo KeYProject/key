@@ -13,6 +13,7 @@
 
 package org.key_project.sed.key.core.model;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,10 +34,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.ui.DebugUITools;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.debug.core.IJavaBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaExceptionBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaLineBreakpoint;
@@ -55,19 +53,22 @@ import org.eclipse.swt.widgets.Shell;
 import org.key_project.key4eclipse.starter.core.util.ProofUserManager;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
 import org.key_project.sed.key.core.breakpoints.KeYWatchpoint;
 import org.key_project.sed.key.core.launch.KeYLaunchSettings;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -94,11 +95,10 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  */
 @SuppressWarnings("restriction")
 public class KeYDebugTarget extends SEDMemoryDebugTarget {
-   
    /**
     * The {@link KeYBreakpointManager} that manages breakpoints for this target.
     */
-   private KeYBreakpointManager breakpointManager = new KeYBreakpointManager();
+   private final KeYBreakpointManager breakpointManager = new KeYBreakpointManager();
   
    /**
     * The used model identifier.
@@ -108,17 +108,17 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    /**
     * The {@link KeYLaunchSettings} to use.
     */
-   private KeYLaunchSettings launchSettings;
+   private final KeYLaunchSettings launchSettings;
    
    /**
     * The only contained child thread.
     */
-   private KeYThread thread;
+   private final KeYThread thread;
    
    /**
     * Listens for changes on the auto mode of KeY Main Frame,.
     */
-   private AutoModeListener autoModeListener = new AutoModeListener() {
+   private final AutoModeListener autoModeListener = new AutoModeListener() {
       @Override
       public void autoModeStarted(ProofEvent e) {
          handleAutoModeStarted(e);
@@ -130,63 +130,15 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       }
    };
    
-   private class ResourceChangeListener implements IResourceChangeListener{
-      
-      private KeYDebugTarget target;
-      
-      private class ResourceDeltaVisitorForHotCodeReplace implements IResourceDeltaVisitor{
-         
-         private boolean binFlag = false;
-
-         @Override
-         public boolean visit(IResourceDelta delta) throws CoreException {
-            IResource resource = delta.getResource();
-            if(resource!=null && IResource.FOLDER==resource.getType()&&resource.toString().contains("bin")){
-               binFlag = true;
-               return false;
-            }
-            if(resource!=null && IResource.FILE==resource.getType()&&resource.getFileExtension().equalsIgnoreCase("java")&&!binFlag){
-               if((delta.getFlags() & IResourceDelta.CONTENT)==IResourceDelta.CONTENT){
-                  ICompilationUnit unit = (ICompilationUnit) JavaCore.create(resource);
-                  for(IType type : unit.getAllTypes()){
-                     String typeName = type.getFullyQualifiedName();
-                     typeName = typeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
-                     if(environment!=null&&environment.getBuilder()!=null&&environment.getBuilder().getProof()!=null&&environment.getBuilder().getProof().getJavaInfo()!=null){
-                        KeYJavaType KJT = environment.getBuilder().getProof().getJavaInfo().getTypeByClassName(typeName);
-                           if(KJT==null){
-                              return false;
-                           }else{
-                              openHotCodeReplaceDialog(target);
-                           }
-                     }
-                  }
-               }
-               return false;
-            }
-            return true;
-         }
-         
-      }
-      private ResourceDeltaVisitorForHotCodeReplace visitor = new ResourceDeltaVisitorForHotCodeReplace();
-      
-      public ResourceChangeListener(KeYDebugTarget target){
-         this.target=target;
-      }
-
+   /**
+    * Listens for changed resources.
+    */
+   private final IResourceChangeListener resourceListener = new IResourceChangeListener() {
       @Override
       public void resourceChanged(IResourceChangeEvent event) {
-         try {
-            IResourceDelta delta = event.getDelta();
-            delta.accept(visitor);
-            visitor.binFlag=false;
-         }
-         catch (CoreException e) {
-            LogUtil.getLogger().logError(e);
-         }
+         KeYDebugTarget.this.resourceChanged(event);
       }
-   }
-   
-   private final IResourceChangeListener resourceListener = new ResourceChangeListener(this);
+   };
 
    /**
     * The {@link SymbolicExecutionEnvironment} which provides all relevant
@@ -197,7 +149,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    /**
     * Maps an {@link IExecutionNode} to its representation in the debug model.
     */
-   private Map<IExecutionNode, IKeYSEDDebugNode<?>> executionToDebugMapping = new HashMap<IExecutionNode, IKeYSEDDebugNode<?>>();
+   private final Map<IExecutionNode, IKeYSEDDebugNode<?>> executionToDebugMapping = new HashMap<IExecutionNode, IKeYSEDDebugNode<?>>();
    
    /**
     * Constructor.
@@ -721,35 +673,37 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * 
     * @param target the target on which the replace failed
     */
-   private void openHotCodeReplaceDialog(final KeYDebugTarget target) {
-      final Shell shell = WorkbenchUtil.getActiveShell();
-      final IStatus status = new Status(IStatus.WARNING, JDIDebugUIPlugin.getUniqueIdentifier(), IStatus.WARNING, "Cannot replace any code in running proof", null);
-      final String preference= IJDIPreferencesConstants.PREF_ALERT_HCR_NOT_SUPPORTED;
-      final String alertMessage= DebugUIMessages.JDIDebugUIPlugin_3; 
-      final String title = DebugUIMessages.JDIDebugUIPlugin_Hot_code_replace_failed_1; 
-      String vmName;
-      try {
-         vmName = target.getName();
-      }
-      catch (DebugException e) {
-         vmName = DebugUITools.newDebugModelPresentation().getText(target);
-      }
-      ILaunchConfiguration config = target.getLaunch().getLaunchConfiguration();
-      final String launchName = (config != null ? config.getName() : DebugUIMessages.JavaHotCodeReplaceListener_0);
-      final String message =  "Code changes cannot be hot swapped into a running proof.\n\n" +
-      		"The current running proof ["+vmName+"] from launch ["+launchName+"] was unable to replace the running code with the code in the workspace.\n\n" +
-      		"It is safe to continue running the application, but you may notice discrepancies when debugging this application.";
-      
-      Runnable run = new Runnable() {
-         @Override
-         public void run() {
-            HotCodeReplaceErrorDialog dialog= new HotCodeReplaceErrorDialog(shell, title, message, status, preference, alertMessage, JDIDebugUIPlugin.getDefault().getPreferenceStore(), target);
-            dialog.setBlockOnOpen(true);
-            dialog.create();
-            dialog.open();
+   private void openHotCodeReplaceDialog() {
+      if (!isTerminated() &&
+          !isDisconnected() &&
+          JDIDebugUIPlugin.getDefault().getPreferenceStore().getBoolean(IJDIPreferencesConstants.PREF_ALERT_HCR_NOT_SUPPORTED)) {
+         final Shell shell = WorkbenchUtil.getActiveShell();
+         final IStatus status = new Status(IStatus.WARNING, JDIDebugUIPlugin.getUniqueIdentifier(), IStatus.WARNING, "Cannot replace any code in running proof", null);
+         final String preference= IJDIPreferencesConstants.PREF_ALERT_HCR_NOT_SUPPORTED;
+         final String alertMessage= DebugUIMessages.JDIDebugUIPlugin_3; 
+         final String title = DebugUIMessages.JDIDebugUIPlugin_Hot_code_replace_failed_1; 
+         String vmName;
+         try {
+            vmName = getName();
          }
-      };
-      if(!target.isTerminated()&&!target.isDisconnected()&&JDIDebugUIPlugin.getDefault().getPreferenceStore().getBoolean(IJDIPreferencesConstants.PREF_ALERT_HCR_NOT_SUPPORTED)){
+         catch (DebugException e) {
+            vmName = DebugUITools.newDebugModelPresentation().getText(this);
+         }
+         ILaunchConfiguration config = getLaunch().getLaunchConfiguration();
+         final String launchName = (config != null ? config.getName() : DebugUIMessages.JavaHotCodeReplaceListener_0);
+         final String message =  "Code changes cannot be hot swapped into a running proof.\n\n" +
+               "The current running proof ["+vmName+"] from launch ["+launchName+"] was unable to replace the running code with the code in the workspace.\n\n" +
+               "It is safe to continue running the application, but you may notice discrepancies when debugging this application.";
+         
+         Runnable run = new Runnable() {
+            @Override
+            public void run() {
+               HotCodeReplaceErrorDialog dialog = new HotCodeReplaceErrorDialog(shell, title, message, status, preference, alertMessage, JDIDebugUIPlugin.getDefault().getPreferenceStore(), KeYDebugTarget.this);
+               dialog.setBlockOnOpen(true);
+               dialog.create();
+               dialog.open();
+            }
+         };
          Display.getDefault().asyncExec(run); 
       }  
    }
@@ -799,5 +753,59 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    public CompoundStopCondition getBreakpointStopConditions() {
       return breakpointManager.getBreakpointStopConditions();
    } 
-  
+   
+   /**
+    * When an {@link IResource} has changed in the workspace.
+    * @param event The {@link IResourceChangeEvent}.
+    */
+   public void resourceChanged(IResourceChangeEvent event) {
+      try {
+         ContainsRelevantJavaFileDeltaVisitor visitor = new ContainsRelevantJavaFileDeltaVisitor();
+         IResourceDelta delta = event.getDelta();
+         delta.accept(visitor);
+         if (visitor.isContainsRelevantJavaFile()) {
+            openHotCodeReplaceDialog();
+         }
+      }
+      catch (CoreException e) {
+         LogUtil.getLogger().logError(e);
+      }
+   }
+   
+   /**
+    * Helper class used by {@link KeYDebugTarget#resourceChanged(IResourceChangeEvent)}.
+    * @author Martin Hentschel
+    */
+   private class ContainsRelevantJavaFileDeltaVisitor implements IResourceDeltaVisitor {
+      /**
+       * The computed result.
+       */
+      private boolean containsRelevantJavaFile = false;
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean visit(IResourceDelta delta) throws CoreException {
+         IResource resource = delta.getResource();
+         if (resource != null && JDTUtil.isJavaFile(resource)) {
+            File location = ResourceUtil.getLocation(resource);
+            if (location != null && 
+                (IOUtil.contains(launchSettings.getLocation(), location) ||
+                 IOUtil.contains(launchSettings.getClassPaths(), location) ||
+                 IOUtil.contains(launchSettings.getBootClassPath(), location))) {
+               containsRelevantJavaFile = true;
+            }
+         }
+         return !containsRelevantJavaFile;
+      }
+
+      /**
+       * Returns the computed result.
+       * @return The computed result.
+       */
+      public boolean isContainsRelevantJavaFile() {
+         return containsRelevantJavaFile;
+      }
+   }
 }
