@@ -788,7 +788,9 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       @Override
       public boolean visit(IResourceDelta delta) throws CoreException {
          IResource resource = delta.getResource();
-         if (resource != null && JDTUtil.isJavaFile(resource)) {
+         if (resource != null && 
+             delta.getFlags() != IResourceDelta.MARKERS &&
+             JDTUtil.isJavaFile(resource)) {
             File location = ResourceUtil.getLocation(resource);
             if (location != null && 
                 (IOUtil.contains(launchSettings.getLocation(), location) ||
