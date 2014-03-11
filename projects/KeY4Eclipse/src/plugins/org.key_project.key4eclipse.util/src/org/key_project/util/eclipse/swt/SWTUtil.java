@@ -37,6 +37,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -44,6 +46,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.key_project.util.java.StringUtil;
 
 /**
@@ -492,4 +495,30 @@ public final class SWTUtil {
           throw new IllegalArgumentException("Widgets of type \"" + e.getSource().getClass() + " \" are not supported.");
        }
     }
+
+   /**
+    * Searches a {@link Button} with the given text in the given {@link Widget}.
+    * @param widget The {@link Widget} to search in.
+    * @param text The text of the {@link Button} to search.
+    * @return The found {@link Button} or {@code null} if no {@link Button} with that text is available.
+    */
+   public static Button findButtonByText(Widget widget, String text) {
+      Button result = null;
+      if (widget instanceof Button) {
+         Button button = (Button)widget;
+         if (button.getText().equals(text)) {
+            result = button;
+         }
+      }
+      else if (widget instanceof Composite) {
+         Composite composite = (Composite)widget;
+         Control[] children = composite.getChildren();
+         int i = 0;
+         while (result == null && i < children.length) {
+            result = findButtonByText(children[i], text);
+            i++;
+         }
+      }
+      return result;
+   }
 }

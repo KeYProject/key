@@ -1,0 +1,961 @@
+<?xml version="1.0" encoding="ASCII"?>
+<pi:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:al="http://eclipse.org/graphiti/mm/algorithms" xmlns:pi="http://eclipse.org/graphiti/mm/pictograms" visible="true" gridUnit="10" diagramTypeId="symbolicExecutionTreeDiagram" name="Empty Diagram" snapToGrid="true" showGuides="true">
+  <properties key="independentObject" value="_f94c0240-572d-44e8-9c30-1adfd97f80a0"/>
+  <properties key="domainModelFile" value="platform:/resource/Evaluation/src/ex01/Middle.set"/>
+  <graphicsAlgorithm xsi:type="al:Rectangle" background="//@colors.1" foreground="//@colors.0" lineWidth="1" transparency="0.0" width="1000" height="1000"/>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_a1e58189-9604-4b33-8822-82e0cc47770b"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="803" y="10" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.0"/>
+    <children visible="true">
+      <properties key="independentObject" value="_a1e58189-9604-4b33-8822-82e0cc47770b"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.thread" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_a1e58189-9604-4b33-8822-82e0cc47770b"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="&lt;start>"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_fe961f13-ee1f-4416-8854-d0b5ca1cc13a"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="160" height="20" x="758" y="50" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.1" incomingConnections="//@connections.0"/>
+    <children visible="true">
+      <properties key="independentObject" value="_fe961f13-ee1f-4416-8854-d0b5ca1cc13a"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.methodCall" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_fe961f13-ee1f-4416-8854-d0b5ca1cc13a"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="129" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="ex01.Middle.middle(x,y,z);"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_613cfbed-2479-45fa-8898-4d24e481eb65"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="803" y="90" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.2 //@connections.18" incomingConnections="//@connections.1"/>
+    <children visible="true">
+      <properties key="independentObject" value="_613cfbed-2479-45fa-8898-4d24e481eb65"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.branchStatement" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_613cfbed-2479-45fa-8898-4d24e481eb65"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="if (y&lt;z)"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_87a5d152-f9a5-4641-8343-4a0aab583046"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="60" height="20" x="326" y="130" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.3" incomingConnections="//@connections.2"/>
+    <children visible="true">
+      <properties key="independentObject" value="_87a5d152-f9a5-4641-8343-4a0aab583046"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.branchCondition" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_87a5d152-f9a5-4641-8343-4a0aab583046"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="29" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="z >  y"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_5d43e210-9533-426f-9b03-6ae6370dac1d"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="321" y="170" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.4 //@connections.8" incomingConnections="//@connections.3"/>
+    <children visible="true">
+      <properties key="independentObject" value="_5d43e210-9533-426f-9b03-6ae6370dac1d"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.branchStatement" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_5d43e210-9533-426f-9b03-6ae6370dac1d"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="if (x&lt;y)"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_53ac03b5-277b-4262-9abb-4ec3328c0bdd"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="60" height="20" x="105" y="210" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.5" incomingConnections="//@connections.4"/>
+    <children visible="true">
+      <properties key="independentObject" value="_53ac03b5-277b-4262-9abb-4ec3328c0bdd"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.branchCondition" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_53ac03b5-277b-4262-9abb-4ec3328c0bdd"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="29" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="y >  x"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_42b7c6bc-6120-4143-b123-fd7d745c3056"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="80" height="20" x="95" y="250" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.6" incomingConnections="//@connections.5"/>
+    <children visible="true">
+      <properties key="independentObject" value="_42b7c6bc-6120-4143-b123-fd7d745c3056"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.statement" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_42b7c6bc-6120-4143-b123-fd7d745c3056"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="49" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="return y;"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_e0330ef0-ccbb-4958-b217-fd670f86614d"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="270" height="20" y="290" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.7" incomingConnections="//@connections.6"/>
+    <children visible="true">
+      <properties key="independentObject" value="_e0330ef0-ccbb-4958-b217-fd670f86614d"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.methodReturn" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_e0330ef0-ccbb-4958-b217-fd670f86614d"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="239" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="&lt;return y as result of ex01.Middle.middle(x,y,z);>"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_074e6949-c66b-4613-b6a0-46b2c2f2a383"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="100" y="330" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" incomingConnections="//@connections.7"/>
+    <children visible="true">
+      <properties key="independentObject" value="_074e6949-c66b-4613-b6a0-46b2c2f2a383"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.termination" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_074e6949-c66b-4613-b6a0-46b2c2f2a383"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="&lt;end>"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_7a9403f0-706a-4c90-ae35-6fd5d88904f4"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="537" y="210" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.9" incomingConnections="//@connections.8"/>
+    <children visible="true">
+      <properties key="independentObject" value="_7a9403f0-706a-4c90-ae35-6fd5d88904f4"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.branchCondition" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_7a9403f0-706a-4c90-ae35-6fd5d88904f4"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="y &lt;= x"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_3c1b6b4e-9024-4d90-80d5-e0a950b0bdaf"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="537" y="250" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.10 //@connections.14" incomingConnections="//@connections.9"/>
+    <children visible="true">
+      <properties key="independentObject" value="_3c1b6b4e-9024-4d90-80d5-e0a950b0bdaf"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.branchStatement" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_3c1b6b4e-9024-4d90-80d5-e0a950b0bdaf"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="if (x&lt;z)"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_780eb3ca-c593-461f-acec-262011721fdf"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="60" height="20" x="395" y="290" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.11" incomingConnections="//@connections.10"/>
+    <children visible="true">
+      <properties key="independentObject" value="_780eb3ca-c593-461f-acec-262011721fdf"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.branchCondition" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_780eb3ca-c593-461f-acec-262011721fdf"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="29" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="z >  x"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_eb7dec1b-6caf-457c-9d07-3c936584eba0"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="80" height="20" x="385" y="330" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.12" incomingConnections="//@connections.11"/>
+    <children visible="true">
+      <properties key="independentObject" value="_eb7dec1b-6caf-457c-9d07-3c936584eba0"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.statement" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_eb7dec1b-6caf-457c-9d07-3c936584eba0"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="49" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="return y;"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_12f9d266-5530-4ffb-a6bf-9ec562aa0334"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="270" height="20" x="290" y="370" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.13" incomingConnections="//@connections.12"/>
+    <children visible="true">
+      <properties key="independentObject" value="_12f9d266-5530-4ffb-a6bf-9ec562aa0334"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.methodReturn" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_12f9d266-5530-4ffb-a6bf-9ec562aa0334"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="239" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="&lt;return y as result of ex01.Middle.middle(x,y,z);>"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_5291d295-f244-4333-9069-9b511696234f"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="390" y="410" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" incomingConnections="//@connections.13"/>
+    <children visible="true">
+      <properties key="independentObject" value="_5291d295-f244-4333-9069-9b511696234f"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.termination" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_5291d295-f244-4333-9069-9b511696234f"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="&lt;end>"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_7e904ee3-8784-4ca9-9762-b60434b52334"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="680" y="290" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.15" incomingConnections="//@connections.14"/>
+    <children visible="true">
+      <properties key="independentObject" value="_7e904ee3-8784-4ca9-9762-b60434b52334"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.branchCondition" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_7e904ee3-8784-4ca9-9762-b60434b52334"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="z &lt;= x"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_205b4438-4eb3-4913-aa62-1113f7eaf31b"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="80" height="20" x="675" y="330" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.16" incomingConnections="//@connections.15"/>
+    <children visible="true">
+      <properties key="independentObject" value="_205b4438-4eb3-4913-aa62-1113f7eaf31b"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.statement" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_205b4438-4eb3-4913-aa62-1113f7eaf31b"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="49" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="return z;"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_78ac42c4-ed47-4375-bb97-b64322731e5a"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="270" height="20" x="580" y="370" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.17" incomingConnections="//@connections.16"/>
+    <children visible="true">
+      <properties key="independentObject" value="_78ac42c4-ed47-4375-bb97-b64322731e5a"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.methodReturn" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_78ac42c4-ed47-4375-bb97-b64322731e5a"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="239" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="&lt;return z as result of ex01.Middle.middle(x,y,z);>"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_95d39935-1576-44a2-aa3f-2acd17cd1261"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="680" y="410" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" incomingConnections="//@connections.17"/>
+    <children visible="true">
+      <properties key="independentObject" value="_95d39935-1576-44a2-aa3f-2acd17cd1261"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.termination" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_95d39935-1576-44a2-aa3f-2acd17cd1261"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="&lt;end>"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_523aa2a2-ec11-44b8-ada6-3384183a14cf"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="1191" y="130" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.19" incomingConnections="//@connections.18"/>
+    <children visible="true">
+      <properties key="independentObject" value="_523aa2a2-ec11-44b8-ada6-3384183a14cf"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.branchCondition" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_523aa2a2-ec11-44b8-ada6-3384183a14cf"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="z &lt;= y"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_1011e893-b985-47bd-b7ae-4ca777e4daca"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="1191" y="170" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.20 //@connections.24" incomingConnections="//@connections.19"/>
+    <children visible="true">
+      <properties key="independentObject" value="_1011e893-b985-47bd-b7ae-4ca777e4daca"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.branchStatement" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_1011e893-b985-47bd-b7ae-4ca777e4daca"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="if (x>y)"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_cdf015e2-7184-497b-a78a-4161c94e1f15"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="60" height="20" x="975" y="210" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.21" incomingConnections="//@connections.20"/>
+    <children visible="true">
+      <properties key="independentObject" value="_cdf015e2-7184-497b-a78a-4161c94e1f15"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.branchCondition" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_cdf015e2-7184-497b-a78a-4161c94e1f15"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="29" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="y &lt; x"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_fe058751-a3bc-4c75-ab84-cdd7b8cf35e1"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="80" height="20" x="965" y="250" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.22" incomingConnections="//@connections.21"/>
+    <children visible="true">
+      <properties key="independentObject" value="_fe058751-a3bc-4c75-ab84-cdd7b8cf35e1"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.statement" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_fe058751-a3bc-4c75-ab84-cdd7b8cf35e1"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="49" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="return y;"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_4e4134f7-e117-4d70-a2ee-592c90916a8e"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="270" height="20" x="870" y="290" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.23" incomingConnections="//@connections.22"/>
+    <children visible="true">
+      <properties key="independentObject" value="_4e4134f7-e117-4d70-a2ee-592c90916a8e"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.methodReturn" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_4e4134f7-e117-4d70-a2ee-592c90916a8e"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="239" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="&lt;return y as result of ex01.Middle.middle(x,y,z);>"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_f47856e9-e984-4e7b-9261-ada4b781751c"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="970" y="330" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" incomingConnections="//@connections.23"/>
+    <children visible="true">
+      <properties key="independentObject" value="_f47856e9-e984-4e7b-9261-ada4b781751c"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.termination" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_f47856e9-e984-4e7b-9261-ada4b781751c"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="&lt;end>"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_c6f134b0-260e-486b-8fe6-6c12f12befd9"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="1407" y="210" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.25" incomingConnections="//@connections.24"/>
+    <children visible="true">
+      <properties key="independentObject" value="_c6f134b0-260e-486b-8fe6-6c12f12befd9"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.branchCondition" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_c6f134b0-260e-486b-8fe6-6c12f12befd9"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="y >= x"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_8375d7e7-0bd2-4a8a-a27a-4cfd9b7521e7"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="1407" y="250" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.26 //@connections.30" incomingConnections="//@connections.25"/>
+    <children visible="true">
+      <properties key="independentObject" value="_8375d7e7-0bd2-4a8a-a27a-4cfd9b7521e7"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.branchStatement" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_8375d7e7-0bd2-4a8a-a27a-4cfd9b7521e7"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="if (x>z)"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_182a9d66-ff0f-49d2-bf99-c74191a98fbb"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="60" height="20" x="1265" y="290" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.27" incomingConnections="//@connections.26"/>
+    <children visible="true">
+      <properties key="independentObject" value="_182a9d66-ff0f-49d2-bf99-c74191a98fbb"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.branchCondition" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_182a9d66-ff0f-49d2-bf99-c74191a98fbb"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="29" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="z &lt; x"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_a1ec3c53-09e2-48c0-9f55-be10bf225076"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="80" height="20" x="1255" y="330" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.28" incomingConnections="//@connections.27"/>
+    <children visible="true">
+      <properties key="independentObject" value="_a1ec3c53-09e2-48c0-9f55-be10bf225076"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.statement" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_a1ec3c53-09e2-48c0-9f55-be10bf225076"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="49" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="return x;"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_bdb5746e-4926-4a14-a936-445a3869ba27"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="270" height="20" x="1160" y="370" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.29" incomingConnections="//@connections.28"/>
+    <children visible="true">
+      <properties key="independentObject" value="_bdb5746e-4926-4a14-a936-445a3869ba27"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.methodReturn" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_bdb5746e-4926-4a14-a936-445a3869ba27"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="239" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="&lt;return x as result of ex01.Middle.middle(x,y,z);>"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_f5f663ef-357d-4c18-ae9b-07e1758dfe7c"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="1260" y="410" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" incomingConnections="//@connections.29"/>
+    <children visible="true">
+      <properties key="independentObject" value="_f5f663ef-357d-4c18-ae9b-07e1758dfe7c"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.termination" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_f5f663ef-357d-4c18-ae9b-07e1758dfe7c"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="&lt;end>"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_94e6fabf-fbcd-4f43-9960-edf679b57cb7"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="1550" y="290" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.31" incomingConnections="//@connections.30"/>
+    <children visible="true">
+      <properties key="independentObject" value="_94e6fabf-fbcd-4f43-9960-edf679b57cb7"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.branchCondition" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_94e6fabf-fbcd-4f43-9960-edf679b57cb7"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="z >= x"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_16c72a65-7bff-488f-acb1-a2e054c5044d"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="80" height="20" x="1545" y="330" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.32" incomingConnections="//@connections.31"/>
+    <children visible="true">
+      <properties key="independentObject" value="_16c72a65-7bff-488f-acb1-a2e054c5044d"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.statement" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_16c72a65-7bff-488f-acb1-a2e054c5044d"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="49" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="return z;"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_a9c9e377-2fa4-42f0-9c6f-a2c28ccc39e4"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="270" height="20" x="1450" y="370" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.33" incomingConnections="//@connections.32"/>
+    <children visible="true">
+      <properties key="independentObject" value="_a9c9e377-2fa4-42f0-9c6f-a2c28ccc39e4"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.methodReturn" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_a9c9e377-2fa4-42f0-9c6f-a2c28ccc39e4"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="239" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="&lt;return z as result of ex01.Middle.middle(x,y,z);>"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_5fa9c144-c7b1-4e38-a0f2-f0cc764feef1"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="1550" y="410" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" incomingConnections="//@connections.33"/>
+    <children visible="true">
+      <properties key="independentObject" value="_5fa9c144-c7b1-4e38-a0f2-f0cc764feef1"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.termination" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_5fa9c144-c7b1-4e38-a0f2-f0cc764feef1"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.1" value="&lt;end>"/>
+    </children>
+  </children>
+  <styles foreground="//@colors.2" lineWidth="2" id="debugNode" font="//@fonts.0">
+    <styles foreground="//@colors.3" id="debugNodeText"/>
+    <styles foreground="//@colors.3" id="parentConnection"/>
+    <renderingStyle>
+      <adaptedGradientColoredAreas definedStyleId="blue-white-gloss" gradientType="0">
+        <adaptedGradientColoredAreas styleAdaption="0">
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="0">
+              <color red="248" green="251" blue="254"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="1">
+              <color red="248" green="251" blue="254"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="1">
+              <color red="237" green="245" blue="252"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="2">
+              <color red="237" green="245" blue="252"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="2">
+              <color red="222" green="237" blue="250"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="3">
+              <color red="222" green="237" blue="250"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="3">
+              <color red="212" green="231" blue="248"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="2">
+              <color red="250" green="251" blue="252"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="2">
+              <color red="226" green="229" blue="233"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="0">
+              <color red="226" green="229" blue="233"/>
+            </end>
+          </gradientColor>
+        </adaptedGradientColoredAreas>
+        <adaptedGradientColoredAreas styleAdaption="1">
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="0">
+              <color red="238" green="246" blue="253"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="1">
+              <color red="238" green="246" blue="253"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="1">
+              <color red="208" green="230" blue="249"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="2">
+              <color red="208" green="230" blue="249"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="2">
+              <color red="172" green="210" blue="244"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="3">
+              <color red="172" green="210" blue="244"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="3">
+              <color red="129" green="185" blue="234"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="2">
+              <color red="170" green="208" blue="242"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="2">
+              <color red="154" green="191" blue="224"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="0">
+              <color red="154" green="191" blue="224"/>
+            </end>
+          </gradientColor>
+        </adaptedGradientColoredAreas>
+        <adaptedGradientColoredAreas styleAdaption="2">
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="0">
+              <color red="245" green="249" blue="254"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="1">
+              <color red="245" green="249" blue="254"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="1">
+              <color red="226" green="239" blue="252"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="2">
+              <color red="226" green="239" blue="252"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="2">
+              <color red="203" green="227" blue="249"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="3">
+              <color red="203" green="227" blue="249"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="3">
+              <color red="187" green="218" blue="247"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="2">
+              <color red="197" green="224" blue="247"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="2">
+              <color red="178" green="205" blue="229"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="0">
+              <color red="178" green="205" blue="229"/>
+            </end>
+          </gradientColor>
+        </adaptedGradientColoredAreas>
+        <adaptedGradientColoredAreas styleAdaption="3">
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="0">
+              <color red="153" green="204"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="0">
+              <color red="51" green="153" blue="102"/>
+            </end>
+          </gradientColor>
+        </adaptedGradientColoredAreas>
+        <adaptedGradientColoredAreas styleAdaption="4">
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="0">
+              <color red="255" green="204"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="0">
+              <color red="255" green="102"/>
+            </end>
+          </gradientColor>
+        </adaptedGradientColoredAreas>
+      </adaptedGradientColoredAreas>
+    </renderingStyle>
+  </styles>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.0/@anchors.0" end="//@children.1/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.1/@anchors.0" end="//@children.2/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.2/@anchors.0" end="//@children.3/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.3/@anchors.0" end="//@children.4/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.4/@anchors.0" end="//@children.5/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.5/@anchors.0" end="//@children.6/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.6/@anchors.0" end="//@children.7/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.7/@anchors.0" end="//@children.8/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.4/@anchors.0" end="//@children.9/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.9/@anchors.0" end="//@children.10/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.10/@anchors.0" end="//@children.11/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.11/@anchors.0" end="//@children.12/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.12/@anchors.0" end="//@children.13/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.13/@anchors.0" end="//@children.14/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.10/@anchors.0" end="//@children.15/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.15/@anchors.0" end="//@children.16/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.16/@anchors.0" end="//@children.17/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.17/@anchors.0" end="//@children.18/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.2/@anchors.0" end="//@children.19/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.19/@anchors.0" end="//@children.20/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.20/@anchors.0" end="//@children.21/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.21/@anchors.0" end="//@children.22/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.22/@anchors.0" end="//@children.23/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.23/@anchors.0" end="//@children.24/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.20/@anchors.0" end="//@children.25/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.25/@anchors.0" end="//@children.26/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.26/@anchors.0" end="//@children.27/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.27/@anchors.0" end="//@children.28/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.28/@anchors.0" end="//@children.29/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.29/@anchors.0" end="//@children.30/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.26/@anchors.0" end="//@children.31/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.31/@anchors.0" end="//@children.32/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.32/@anchors.0" end="//@children.33/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.33/@anchors.0" end="//@children.34/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <colors red="227" green="238" blue="249"/>
+  <colors red="255" green="255" blue="255"/>
+  <colors red="67" green="106" blue="149"/>
+  <colors/>
+  <fonts name="Arial" size="10"/>
+  <fonts name="Arial" size="8"/>
+</pi:Diagram>
