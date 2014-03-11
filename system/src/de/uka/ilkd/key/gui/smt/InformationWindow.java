@@ -102,6 +102,9 @@ public class InformationWindow extends JDialog {
 	   if(solver.getType() != SolverType.Z3_CE_SOLVER){		   
 		   return;
 	   }
+	   if(solver.getType().getQuery()==null){
+		   return;
+	   }
 	   
 	   Model m = solver.getType().getQuery().getModel();
 	   this.model = m;

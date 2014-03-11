@@ -161,12 +161,12 @@ public final class ProgVarReplacer {
     public SVInstantiations replace(SVInstantiations insts) {
    	SVInstantiations result = insts;
 
-    	Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it;
+    Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it;
 	it = insts.pairIterator();
 	while(it.hasNext()) {
-	    ImmutableMapEntry<SchemaVariable,InstantiationEntry> e = it.next();
+	    ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> e = it.next();
 	    SchemaVariable sv     = e.key();
-	    InstantiationEntry ie = e.value();
+	    InstantiationEntry<?> ie = e.value();
 	    Object inst = ie.getInstantiation();
 
 	    if(ie instanceof ContextInstantiationEntry) {
@@ -214,7 +214,7 @@ public final class ProgVarReplacer {
 		    result = result.replace(sv, newT, services);
 		}
 	    } else {
-		assert false : "unexpected subtype of InstantiationEntry";
+		assert false : "unexpected subtype of InstantiationEntry<?>";
 	    }
 	}
 
@@ -286,7 +286,7 @@ public final class ProgVarReplacer {
         final ProgramVariable pv = (ProgramVariable) t.op();
         Object o = map.get(pv);
         if (o instanceof ProgramVariable) {
-            return TermFactory.DEFAULT.createTerm((ProgramVariable)o, t.getLabels());
+            return services.getTermFactory().createTerm((ProgramVariable)o, t.getLabels());
         } else if (o instanceof Term) {
             return (Term) o;
         }
@@ -320,7 +320,7 @@ public final class ProgVarReplacer {
         }
 
         if(changedSubTerm || newJb != jb) {                               
-            result = TermFactory.DEFAULT.createTerm(t.op(),
+            result = services.getTermFactory().createTerm(t.op(),
                     newSubTerms,
                     t.boundVars(),
                     newJb, t.getLabels());

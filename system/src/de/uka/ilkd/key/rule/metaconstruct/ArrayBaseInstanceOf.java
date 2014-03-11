@@ -20,7 +20,6 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -66,8 +65,7 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
         Debug.assertTrue(instanceofSymbol != null,
                 "Instanceof symbol not found for ", arrayElementSort);
         
-        return TermFactory.DEFAULT.createTerm(instanceofSymbol, 
-                element);
+        return services.getTermFactory().createTerm(instanceofSymbol, element);
     }
 
 }

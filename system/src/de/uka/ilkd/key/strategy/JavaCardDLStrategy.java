@@ -25,7 +25,7 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfThenElse;
@@ -55,8 +55,8 @@ import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
 import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
 import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
-import de.uka.ilkd.key.strategy.feature.ContainsTermFeature;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
+import de.uka.ilkd.key.strategy.feature.ContainsTermFeature;
 import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
 import de.uka.ilkd.key.strategy.feature.CountPosDPathFeature;
 import de.uka.ilkd.key.strategy.feature.DependencyContractFeature;
@@ -110,12 +110,12 @@ import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.AnonHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.PrimitiveHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsNonRigidTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsSelectSkolemConstantTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
 import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
+import de.uka.ilkd.key.strategy.termfeature.PrimitiveHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.SimplifiedSelectTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
@@ -1598,7 +1598,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             MonomialsSmallerThanFeature
             .create ( instOf ( "newSymLeft" ),
                       subAt ( antecFor,
-                              PosInTerm.TOP_LEVEL.down ( 0 ).down ( 0 ) ), numbers );
+                              PosInTerm.getTopLevel().down ( 0 ).down ( 0 ) ), numbers );
         bindRuleSet ( d, "polySimp_newSym",
            add ( isInstantiated ( "newSymDef" ),
                  sum ( antecFor, SequentFormulasGenerator.antecedent (),
@@ -1818,9 +1818,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     instOf ( "subsumRightBigger" ) ) } ) );
                    
         final TermBuffer one = new TermBuffer ();
-        one.setContent ( TermBuilder.DF.zTerm ( p_proof.getServices (), "1" ) );
+        final TermServices services = p_proof.getServices ();
+      one.setContent ( services.getTermBuilder().zTerm ( "1" ) );
         final TermBuffer two = new TermBuffer ();
-        two.setContent ( TermBuilder.DF.zTerm ( p_proof.getServices (), "2" ) );
+        two.setContent ( services.getTermBuilder().zTerm ( "2" ) );
 
         bindRuleSet ( d, "inEqSimp_or_tautInEqs",
            SumFeature.createSum ( new Feature[] {
@@ -2053,7 +2054,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer intRel = new TermBuffer ();
         final TermBuffer atom = new TermBuffer ();
         final TermBuffer zero = new TermBuffer ();
-        zero.setContent ( TermBuilder.DF.zTerm ( p_proof.getServices (), "0" ) );
+        zero.setContent ( p_proof.getServices().getTermBuilder().zTerm ( "0" ) );
         final TermBuffer rootInf = new TermBuffer ();
 
         final Feature posNegSplitting =
@@ -2088,7 +2089,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature rootInferences =
             forEach ( intRel, SequentFormulasGenerator.antecedent (),
               add ( isRootInferenceProducer ( intRel ),
-                    forEach ( rootInf, RootsGenerator.create ( intRel ),
+                    forEach ( rootInf, RootsGenerator.create ( intRel, getProof().getServices() ),
                               add ( instantiate ( "cutFormula", rootInf ),
                                     ifZero ( applyTF ( rootInf, op ( Junctor.OR ) ),
                                              longConst ( 50 ) ),
@@ -2157,7 +2158,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             or ( not ( sum ( intRel, SequentFormulasGenerator.antecedent (),
                              ifZero ( isRootInferenceProducer ( intRel ),
                                       sum ( rootInf,
-                                            RootsGenerator.create ( intRel ),
+                                            RootsGenerator.create ( intRel, getProof().getServices() ),
                                             not ( eq ( instOf ( "cutFormula" ),
                                                        rootInf ) ) ) ) ) ),
                  ifZero ( applyTF ( "cutFormula",
@@ -2794,10 +2795,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                  new StrategyPropertyValueDefinition(StrategyProperties.NON_LIN_ARITH_COMPLETION, "Model Search", TOOL_TIP_ARITHMETIC_MODEL_SEARCH));
            OneOfStrategyPropertyDefinition quantifierTreatment = new OneOfStrategyPropertyDefinition(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, 
                  "Quantifier treatment",
-                 new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_NONE, "None", TOOL_TIP_QUANTIFIER_NONE),
-                 new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_NON_SPLITTING, "No Splits", TOOL_TIP_QUANTIFIER_NO_SPLITS),
-                 new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS, "No Splits with Progs", TOOL_TIP_QUANTIFIER_NO_SPLITS_WITH_PROGS),
-                 new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_INSTANTIATE, "Free", TOOL_TIP_QUANTIFIER_FREE));
+                 2,
+                 new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_NONE, "None", TOOL_TIP_QUANTIFIER_NONE, 2, 4),
+                 new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_NON_SPLITTING, "No Splits", TOOL_TIP_QUANTIFIER_NO_SPLITS, 6, 2),
+                 new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS, "No Splits with Progs", TOOL_TIP_QUANTIFIER_NO_SPLITS_WITH_PROGS, 2, 4),
+                 new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_INSTANTIATE, "Free", TOOL_TIP_QUANTIFIER_FREE, 6, 2));
            OneOfStrategyPropertyDefinition classAxiom = new OneOfStrategyPropertyDefinition(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY, 
                  "Class axiom rule",
                  new StrategyPropertyValueDefinition(StrategyProperties.CLASS_AXIOM_FREE, "Free", TOOL_TIP_CLASSAXIOM_FREE),
@@ -2812,29 +2814,37 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
            List<AbstractStrategyPropertyDefinition> props = new LinkedList<AbstractStrategyPropertyDefinition>();
            for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
               OneOfStrategyPropertyDefinition user = new OneOfStrategyPropertyDefinition(StrategyProperties.USER_TACLETS_OPTIONS_KEY(i), 
-                    i + ":",
-                    new StrategyPropertyValueDefinition(StrategyProperties.USER_TACLETS_OFF, "Off", TOOL_TIP_USER_OFF(i)),
-                    new StrategyPropertyValueDefinition(StrategyProperties.USER_TACLETS_LOW, "Low prior.", TOOL_TIP_USER_LOW(i)),
-                    new StrategyPropertyValueDefinition(StrategyProperties.USER_TACLETS_HIGH, "High prior.", TOOL_TIP_USER_HIGH(i)));
+                    i + ":  ",
+                    new StrategyPropertyValueDefinition(StrategyProperties.USER_TACLETS_OFF, "Off", TOOL_TIP_USER_OFF(i), 3, 1),
+                    new StrategyPropertyValueDefinition(StrategyProperties.USER_TACLETS_LOW, "Low prior.", TOOL_TIP_USER_LOW(i), 4, 2),
+                    new StrategyPropertyValueDefinition(StrategyProperties.USER_TACLETS_HIGH, "High prior.", TOOL_TIP_USER_HIGH(i), 6, 2));
               props.add(user);
            }
            OneOfStrategyPropertyDefinition userOptions = new OneOfStrategyPropertyDefinition(null, 
                  "User-specific taclet sets",
+                 "<html>" +
+                 "These options define whether user- and problem-specific taclet sets<br>" +
+                 "are applied automatically by the strategy. Problem-specific taclets<br>" +
+                 "can be defined in the \\rules-section of a .key-problem file. For<br>" +
+                 "automatic application, the taclets have to contain a clause<br>" +
+                 "\\heuristics(userTaclets1), \\heuristics(userTaclets2), etc." +
+                 "</html>",
+                 -1,
                  props.toArray(new AbstractStrategyPropertyDefinition[props.size()]));
            // Model
            return new StrategySettingsDefinition("Java DL Options", 
-                                            stopAt,
-                                            proofSplitting,
-                                            loopTreatment,
-                                            blockTreatment,
-                                            methodTreatment,
-                                            dependencyContracts,
-                                            queryTreatment,
-                                            arithmeticTreatment,
-                                            quantifierTreatment,
-                                            classAxiom,
-                                            autoInduction,
-                                            userOptions);
+                                                 stopAt,
+                                                 proofSplitting,
+                                                 loopTreatment,
+                                                 blockTreatment,
+                                                 methodTreatment,
+                                                 dependencyContracts,
+                                                 queryTreatment,
+                                                 arithmeticTreatment,
+                                                 quantifierTreatment,
+                                                 classAxiom,
+                                                 autoInduction,
+                                                 userOptions );
         }
     }
 

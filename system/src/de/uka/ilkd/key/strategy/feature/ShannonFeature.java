@@ -17,7 +17,7 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
 
@@ -132,7 +132,7 @@ public class ShannonFeature implements Feature {
         return createConditional ( cond,
                                    trueCost,
                                    thenFeature,
-                                   LongRuleAppCost.ZERO_COST );
+                                   NumberRuleAppCost.getZeroCost() );
     }
 
     /**
@@ -269,7 +269,7 @@ public class ShannonFeature implements Feature {
         return createConditional ( cond,
                                    BinaryFeature.ZERO_COST,
                                    thenFeature,
-                                   LongRuleAppCost.ZERO_COST );
+                                   NumberRuleAppCost.getZeroCost() );
     }
 
 }

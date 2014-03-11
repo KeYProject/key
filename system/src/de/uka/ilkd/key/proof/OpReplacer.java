@@ -18,8 +18,13 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -31,7 +36,7 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
  * replace in java blocks.
  */
 public class OpReplacer {
-    private static final TermFactory TF = TermFactory.DEFAULT;
+    private TermFactory tf;
     
     private final Map<? extends SVSubstitute, ? extends SVSubstitute> map;
     
@@ -39,36 +44,40 @@ public class OpReplacer {
     /**
      * @param map mapping from the operators/terms to be replaced to the ones to 
      * replace them with
+     * @param tf TODO
+     * @param services TODO
      */
-    public OpReplacer(Map<? extends SVSubstitute, ? extends SVSubstitute> map) {
+    public OpReplacer(Map<? extends SVSubstitute, ? extends SVSubstitute> map, TermFactory tf) {
 	assert map != null;
         this.map = map;
+        this.tf = tf;
     }
     
     
-    public static Term replace(Term toReplace, Term with, Term in) {
+    public static Term replace(Term toReplace, Term with, Term in, TermFactory tf) {
 	Map<Term,Term> map = new LinkedHashMap<Term,Term>();
 	map.put(toReplace, with);
-	OpReplacer or = new OpReplacer(map);
+	OpReplacer or = new OpReplacer(map, tf);
 	return or.replace(in);
     }
     
     
     public static ImmutableList<Term> replace(Term toReplace, 
 	                                      Term with, 
-	                                      ImmutableList<Term> in) {
+	                                      ImmutableList<Term> in, 
+	                                      TermFactory tf) {
 	Map<Term,Term> map = new LinkedHashMap<Term,Term>();
 	map.put(toReplace, with);
-	OpReplacer or = new OpReplacer(map);
+	OpReplacer or = new OpReplacer(map, tf);
 	return or.replace(in);
     }    
     
     
     
-    public static Term replace(Operator toReplace, Operator with, Term in) {
+    public static Term replace(Operator toReplace, Operator with, Term in, TermFactory tf) {
 	Map<Operator,Operator> map = new LinkedHashMap<Operator,Operator>();
 	map.put(toReplace, with);
-	OpReplacer or = new OpReplacer(map);
+	OpReplacer or = new OpReplacer(map, tf);
 	return or.replace(in);
     }    
     
@@ -120,7 +129,7 @@ public class OpReplacer {
         if(newOp != term.op()  
            || changedSubTerm
            || newBoundVars != term.boundVars()) {
-            result = TF.createTerm(newOp,
+            result = tf.createTerm(newOp,
                                    newSubTerms,
                                    newBoundVars,
                                    term.javaBlock(),

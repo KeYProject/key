@@ -104,7 +104,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
     public void add(TacletApp app) {
         insertionTaclets.add(createListItem(app));
         final DefaultTacletMenuItem appItem = 
-            new DefaultTacletMenuItem(this, app, notInfo);
+            new DefaultTacletMenuItem(this, app, notInfo, services);
         appItem.addActionListener(new ActionListener() {
     
             public void actionPerformed(ActionEvent e) {

@@ -9,18 +9,19 @@
 
 Java assertions can be handled in three different ways in KeY:
 
-* If switched off, assert statements are skipped.
+* If switched 'off', assert statements are skipped.
 
-* If switched on, assertions are treated like Java would treat them:
+* If switched 'on', assertions are treated like Java would treat them:
   Asserted Statements are evaluated and an AssertionException is 
   raised if they turn out to be false.
 
-* If set to safe, the following proof obligations have to be shown:
+* If set to 'safe', the following proof obligations have to be shown:
   - The program with assertions removed must fulfill the specification
   - The asserted conditions must hold (without throwing an exception,
     and with termination)
   - The assertions do not have side effects influencing the post
     conditions.
+  This is the default option.
   Proofs with this option are typically harder.
 </entry>
 
@@ -29,7 +30,7 @@ JavaCard is a dialect of Java designed for the use in SmartCards.  It
 lacks floating point operations and concurrency, but provides stronger
 object persistence guarantees.
 
-There are two values for this option jcOn and jcOff. Switching
+There are two values for this option 'on' and 'off'. Switching
 on or off all taclets axiomatising JavaCard specific features like transac-
 tion.
 </entry>
@@ -43,42 +44,43 @@ difficult since class loading may take place at many places.
 </entry>
 
 <entry key="intRules">
-This option controls how integer numbers are modelled.
+This option controls how integer numbers are modeled.
 
-* Java semantics treat integers the same way java would treat them.
+* 'Java semantics' treat integers the same way Java would treat them.
   The different integer types operate within their respective value
-  ranges. The bitvector arithmetic is modelled in KeY using modulo
-  expressions. This is sound and complete (TODO! IS IT??). Proof
-  obligations tend to get more complex with this setting.
+  ranges. The bitvector arithmetic is modeled in KeY using modulo
+  expressions. This is sound and complete. Proof obligations tend 
+  to get more complex with this setting.
 
-* Arithmetic without overflow checking treats integers as pure
+* 'Arithmetic without overflow checking' treats integers as pure
   mathematical objects. The proof obligations are often easier to
   discharge. However, the model does not allow the verification of all
   properties which hold with Java semantics. Moreover, it allows the
   verification of properties which do not hold on Java's actual
-  semantics.
+  semantics. This is the default option.
 
-* Arithmetic with overflow checking also treats integers as
+* 'Arithmetic with overflow checking' also treats integers as
   mathematical objects, but ensures that no overflow occurs.  While
-  this model also has a completeness gap, it prevents the proof of
+  this model also has a completeness gap, it prevents proving
   incorrect properties.
 </entry>
 
 <entry key="programRules">
 Rules dealing Java language constructs can be turned off by setting
-this to None.
+this to 'None'.
 </entry>
 
-<entry key="runtimeExceptions">Treatment of runtime exceptions
+<entry key="runtimeExceptions">Treatment of implicit runtime exceptions
 
-* If set to allow, runtime exceptions are treated as specified in the
-  Java language specification.
+* If set to 'allow', implicit runtime exceptions are raised as specified 
+  in the Java language specification.
 
-* If set to ban, any occurrence of a runtime exception is considered
-  an irrecoverable program failure. For programs which do not raise 
-  runtime exceptions, this is usually easier to prove than 'allow'.
+* If set to 'ban', any occurrence of an implicit runtime exception is 
+  considered an unrecoverable program failure. For programs which do not 
+  raise implicit runtime exceptions, this is usually easier to prove than 
+  'allow'. This is the default option.
 
-* If set to ignore, it is assumed that no runtime exception occurs.
+* If set to 'ignore', it is assumed that no implicit runtime exception occurs.
   Warning: Reasoning with these rules is unsound.
 </entry>
 
@@ -87,18 +89,19 @@ this to None.
 JML model fields are given a semantics by represents clauses. This
 switch sets how the rules handle these clauses.
 
-* If set to treatAsAxiom, the representation is seen as an axiom,
+* If set to 'treatAsAxiom', the representation is seen as an axiom,
   satisfiability will not be checked. This may introduce inconsistent
   specifications, for example the following contradictory JML clause
   will not be rejected:
      //@ represents modelField == modelField + 1;
   
-* If set to showSatisfiability, for every expansion of the represents
+* If set to 'showSatisfiability', for every expansion of the represents
   clause, it must be shown that the definition is
   satisfiable. Cross-definition inconsistencies can still be
   formulated, however:
      //@ represents modelField1 == modelField2;
      //@ represents modelField2 == modelField1 + 1;
+  This is the default option.
 </entry>
 
 <entry key="Strings">
@@ -125,15 +128,15 @@ Not to be confused with intRules, which controls the semantics of the Java type 
 </entry>
 
 <entry key="optimisedSelectRules">
-The optimised select rules can be turned off by setting this option to off.
+The optimized select rules can be turned off by setting this option to off.
 
-The non-optimised rules use in-place rewriting for the evaluation of select terms. This may lead to heap terms growing exponentially in the number of anons/stores to be evaluated. However, in some rare cases the usage of the non-optimised rules may lead to more human-readable sequents.
+The unoptimized rules use inplace rewriting for the evaluation of select terms. This may lead to heap terms growing exponentially in the number of anons/stores to be evaluated. However, in some rare cases the usage of the unoptimized rules may lead to more human readable sequents.
 
-The optimised rules pull out select-terms before they evaluate them. Because other occurences of the same select-term are replaced by the skolem constant introduced by the pullout-rule (application of equalities), each select term has to be evaluated only once. Intelligent hiding of no longer needed auxiliary equations holds the sequent human-readable and increases performance. The result of the evaluation of a select term is stored such that it can be reapplied immediately if the same select term occurs again.
+The optimized rules pull out select terms before they evaluate them. Because other occurences of the same select term are replaced by the Skolem constant introduced by the pullout rule (application of equalities), each select term has to be evaluated only once. Intelligent hiding of no longer needed auxiliary equations holds the sequent human readable and increases performance. The result of the evaluation of a select term is stored such that it can be reapplied immediately if the same select term occurs again.
 </entry>
 
 <entry key="wdOperator">
-Treatment of formulas and terms for Well-Definedness checks:
+Treatment of formulas and terms for welldefinedness checks:
 
 * L-Operator:
      More intuitive for software developers and along the lines of
@@ -142,6 +145,7 @@ Treatment of formulas and terms for Well-Definedness checks:
      matters. It is based on McCarthy logic.
      Cf. "Are the Logical Foundations of Verifying Compiler
      Prototypes Matching User Expectations?" by Patrice Chalin.
+     This is the default option.
 
 * Y-Operator:
      Complete and along the lines of classical logic, where the
@@ -160,7 +164,7 @@ Treatment of formulas and terms for Well-Definedness checks:
 </entry>
 
 <entry key="wdChecks">
-Well-Definedness checks of JML specifications can be turned on/off. This includes class invariants, operation contracts, model fields as well as JML (annotation) statements as loop invariants and block contracts. The former ones are checked "on-the-fly", i.e. directly when they are applied in the code while proving an operation contract, since the context is needed.
+Welldefinedness checks of JML specifications can be turned on/off. This includes class invariants, operation contracts, model fields as well as JML (annotation) statements as loop invariants and block contracts. The former ones are checked "on-the-fly", i.e., directly when they are applied in the code while proving an operation contract, since the context is needed.
 </entry>
 </properties>
 

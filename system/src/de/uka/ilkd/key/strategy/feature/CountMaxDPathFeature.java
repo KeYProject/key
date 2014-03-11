@@ -17,7 +17,7 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
 
@@ -34,7 +34,7 @@ public class CountMaxDPathFeature extends AbstractBetaFeature {
     
     @Override
     protected RuleAppCost doComputation (PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
-        return LongRuleAppCost.create ( maxDPath ( findTerm, !pos.isInAntec (), caches ) );
+        return NumberRuleAppCost.create ( maxDPath ( findTerm, !pos.isInAntec (), caches ) );
     }
 
 }

@@ -24,7 +24,6 @@ import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.LexPathOrdering;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
@@ -209,7 +208,7 @@ public class Monomial {
         if ( it.hasNext () ) {
             res = it.next ();
             while ( it.hasNext () )
-                res = TermFactory.DEFAULT.createTerm ( mul, res,
+                res = services.getTermFactory().createTerm ( mul, res,
                                                                it.next () );
         }
         
@@ -219,7 +218,7 @@ public class Monomial {
         if ( res == null )
             res = cTerm;
         else if ( !BigInteger.ONE.equals ( coefficient ) )
-            res = TermFactory.DEFAULT.createTerm ( mul, res, cTerm );
+            res = services.getTermFactory().createTerm ( mul, res, cTerm );
         
         return res;        
     }

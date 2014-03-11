@@ -119,7 +119,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
 
     public Term programTerm() {
         if (posInOccurrence() != null) {
-            return TermBuilder.DF.goBelowUpdates(posInOccurrence().subTerm());
+            return TermBuilder.goBelowUpdates(posInOccurrence().subTerm());
         }
         return null;
     }

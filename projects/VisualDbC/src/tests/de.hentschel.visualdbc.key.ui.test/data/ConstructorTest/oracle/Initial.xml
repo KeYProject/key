@@ -3,7 +3,7 @@
   <proofs target="//@types.0/@constructors.0/@operationContracts.0" obligation="ContractPO"/>
   <types xsi:type="dbcmodel:DbcClass" name="ConstructorTest">
     <constructors signature="ConstructorTest(x : int, a : B)">
-      <operationContracts name="ConstructorTest[ConstructorTest::ConstructorTest(int,B)].JML operation contract.0" pre="!a = null" post="(exc = null -> self.&lt;inv>)&#xA;&amp; (   !exc = null&#xA;   ->   (   java.lang.Exception::instance(exc) = TRUE&#xA;         -> self.&lt;inv>)&#xA;      &amp;   java.lang.RuntimeException::instance(exc)&#xA;        = TRUE)" modifies="mod[heap]: allLocs" termination="diamond"/>
+      <operationContracts name="ConstructorTest[ConstructorTest::ConstructorTest(int,B)].JML operation contract.0" pre="!a = null" post="(exc = null -> self.&lt;inv>)&#xA;&amp; (   !exc = null&#xA;   ->   (   java.lang.Throwable::instance(exc) = TRUE&#xA;         -> self.&lt;inv>)&#xA;      &amp; (  java.lang.Error::instance(exc) = TRUE&#xA;         |   java.lang.RuntimeException::instance(exc)&#xA;           = TRUE))" modifies="mod[heap]: allLocs" termination="diamond"/>
     </constructors>
   </types>
 </dbcmodel:DbcModel>

@@ -19,8 +19,11 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -47,8 +50,8 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
 	    return true;
 	} else if(t1.sort().equals(setLDT.targetSort()) 
 		  && t2.sort().equals(setLDT.targetSort())) {
-	    final ImmutableSet<Term> t1set = TermBuilder.DF.unionToSet(t1, services);
-	    final ImmutableSet<Term> t2set = TermBuilder.DF.unionToSet(t2, services);
+	    final ImmutableSet<Term> t1set = services.getTermBuilder().unionToSet(t1);
+	    final ImmutableSet<Term> t2set = services.getTermBuilder().unionToSet(t2);
 
 	    ImmutableSet<Operator> t1Ops 
 	    	= DefaultImmutableSet.<Operator>nil();

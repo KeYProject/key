@@ -408,7 +408,7 @@ class TacletMenu extends JMenu {
                 !insSystemInvItem.isResponsible(taclet)) {
                 final DefaultTacletMenuItem item =
                     new DefaultTacletMenuItem(this, app,
-                        mediator.getNotationInfo());
+                        mediator.getNotationInfo(), mediator.getServices());
                 item.addActionListener(control);
                 boolean rareRule = false;
                 for (RuleSet rs : taclet.getRuleSets()) {

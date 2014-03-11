@@ -136,7 +136,7 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
          // Search final value of the exceptional variable which is used to check if the verified program terminates normally
          ImmutableArray<Term> value = null;
          for (SequentFormula f : getProofNode().sequent().succedent()) {
-            Pair<ImmutableList<Term>,Term> updates = TermBuilder.DF.goBelowUpdates2(f.formula());
+            Pair<ImmutableList<Term>,Term> updates = TermBuilder.goBelowUpdates2(f.formula());
             Iterator<Term> iter = updates.first.iterator();
             while (value == null && iter.hasNext()) {
                value = extractValueFromUpdate(iter.next(), exceptionVariable);

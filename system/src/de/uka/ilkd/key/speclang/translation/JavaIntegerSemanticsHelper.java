@@ -28,7 +28,7 @@ import de.uka.ilkd.key.logic.op.Function;
  */
 public class JavaIntegerSemanticsHelper {
 
-    private static final TermBuilder TB = TermBuilder.DF;
+    private final TermBuilder tb; 
 
     private final SLTranslationExceptionManager excManager;
     private final TypeConverter tc;
@@ -46,6 +46,7 @@ public class JavaIntegerSemanticsHelper {
 
 	this.excManager = excManager;
 	this.tc = services.getTypeConverter();
+	this.tb = services.getTermBuilder();
 	this.integerLDT = services.getTypeConverter().getIntegerLDT();
     }
     
@@ -113,7 +114,7 @@ public class JavaIntegerSemanticsHelper {
 	        raiseError("Bitwise operations are not allowed for \\bigint.");
 	    else
 	        or = integerLDT.getJavaBitwiseOrInt();
-	    return new SLExpression(TB.func(or, a.getTerm(), b.getTerm()), 
+	    return new SLExpression(tb.func(or, a.getTerm(), b.getTerm()), 
 		                    resultType);
 	} catch (RuntimeException e) {
             raiseError("Error in or-expression " + a + " | " + b + ".",e);
@@ -136,7 +137,7 @@ public class JavaIntegerSemanticsHelper {
             raiseError("Bitwise operations are not allowed for \\bigint.");
 	    else
 	        and = integerLDT.getJavaBitwiseAndInt();
-	    return new SLExpression(TB.func(and, a.getTerm(), b.getTerm()),
+	    return new SLExpression(tb.func(and, a.getTerm(), b.getTerm()),
 		                    resultType);
 	} catch (RuntimeException e) {
             raiseError("Error in and-expression " + a + " & " + b + ".",e);
@@ -159,7 +160,7 @@ public class JavaIntegerSemanticsHelper {
             raiseError("Bitwise operations are not allowed for \\bigint.");
 	    else
 	        xor = integerLDT.getJavaBitwiseXOrInt();
-	    return new SLExpression(TB.func(xor, a.getTerm(), b.getTerm()),
+	    return new SLExpression(tb.func(xor, a.getTerm(), b.getTerm()),
 		                    resultType);
 	} catch (RuntimeException e) {
             raiseError("Error in xor-expression " + a + " ^ " + b + ".",e);
@@ -175,7 +176,7 @@ public class JavaIntegerSemanticsHelper {
 	    if (isBigint(a.getType()))
 	        raiseError("Bitwise operations are not allowed for \\bigint.");
 	    Function neg = integerLDT.getJavaBitwiseNegation();
-	    return new SLExpression(TB.func(neg, a.getTerm()),
+	    return new SLExpression(tb.func(neg, a.getTerm()),
 		                    a.getType());
 	} catch (RuntimeException e) {
             raiseError("Error in neg-expression " + a + ".",e);
@@ -197,7 +198,7 @@ public class JavaIntegerSemanticsHelper {
                 add = integerLDT.getAdd();
             else
                 add = integerLDT.getJavaAddInt();
-            return new SLExpression(TB.func(add, a.getTerm(), b.getTerm()),
+            return new SLExpression(tb.func(add, a.getTerm(), b.getTerm()),
                     resultType);
         } catch (RuntimeException e) {
             raiseError("Error in additive expression " + a + " + " + b + ":",e);
@@ -219,7 +220,7 @@ public class JavaIntegerSemanticsHelper {
                 sub = integerLDT.getSub();
             else
                 sub = integerLDT.getJavaSubInt();
-            return new SLExpression(TB.func(sub, a.getTerm(), b.getTerm()),
+            return new SLExpression(tb.func(sub, a.getTerm(), b.getTerm()),
                     resultType);
         } catch (RuntimeException e) {
             raiseError("Error in subtract expression " + a + " - " + b + ".",e);
@@ -241,7 +242,7 @@ public class JavaIntegerSemanticsHelper {
                 mul = integerLDT.getMul();
             else
                 mul = integerLDT.getJavaMulInt();
-            return new SLExpression(TB.func(mul, a.getTerm(), b.getTerm()),
+            return new SLExpression(tb.func(mul, a.getTerm(), b.getTerm()),
                     resultType);
         } catch (RuntimeException e) {
             raiseError("Error in multiplicative expression " + a + " * "
@@ -263,7 +264,7 @@ public class JavaIntegerSemanticsHelper {
             else
                 div = integerLDT.getJavaDivInt();
 
-            return new SLExpression(TB.func(div, a.getTerm(), b.getTerm()),
+            return new SLExpression(tb.func(div, a.getTerm(), b.getTerm()),
                     resultType);
         } catch (RuntimeException e) {
             raiseError("Error in division expression " + a + " / " + b + ".",e);
@@ -279,9 +280,9 @@ public class JavaIntegerSemanticsHelper {
         try {
             KeYJavaType resultType = getPromotedType(a, b);
             if (isBigint(resultType))
-                return new SLExpression(TB.func(integerLDT.getMod(), a.getTerm(), b.getTerm()), resultType);
+                return new SLExpression(tb.func(integerLDT.getMod(), a.getTerm(), b.getTerm()), resultType);
             else
-                return new SLExpression(TB.func(integerLDT.getJavaMod(), a.getTerm(), b.getTerm()),
+                return new SLExpression(tb.func(integerLDT.getJavaMod(), a.getTerm(), b.getTerm()),
                         a.getType());
         } catch (RuntimeException e) {
             raiseError("Error in modulo expression " + a + " % " + b + ".",e);
@@ -304,7 +305,7 @@ public class JavaIntegerSemanticsHelper {
             } else {
                 shift = integerLDT.getJavaShiftRightInt();
             }
-            return new SLExpression(TB.func(shift, a.getTerm(), b.getTerm()),
+            return new SLExpression(tb.func(shift, a.getTerm(), b.getTerm()),
                     resultType);
         } catch (RuntimeException e) {
             raiseError("Error in shift-right expression " + a + " >> " 
@@ -326,7 +327,7 @@ public class JavaIntegerSemanticsHelper {
                 raiseError("Shift operation not allowed for \\bigint.");
             else
                 shift = integerLDT.getJavaShiftLeftInt();
-            return new SLExpression(TB.func(shift, a.getTerm(), b.getTerm()),
+            return new SLExpression(tb.func(shift, a.getTerm(), b.getTerm()),
                     resultType);
         } catch (RuntimeException e) {
             raiseError("Error in shift-left expression " + a + " << " 
@@ -350,7 +351,7 @@ public class JavaIntegerSemanticsHelper {
                 raiseError("Shift operation not allowed for \\bigint.");
             else
                 shift = integerLDT.getJavaUnsignedShiftRightInt();
-            return new SLExpression(TB.func(shift, a.getTerm(), b.getTerm()),
+            return new SLExpression(tb.func(shift, a.getTerm(), b.getTerm()),
                     resultType);
         } catch (RuntimeException e) {
             raiseError("Error in unsigned shift-right expression " + a + " >>> "
@@ -372,7 +373,7 @@ public class JavaIntegerSemanticsHelper {
                 minus = integerLDT.getNegativeNumberSign();
             else
                 minus = integerLDT.getJavaUnaryMinusInt();
-            return new SLExpression(TB.func(minus, a.getTerm()),
+            return new SLExpression(tb.func(minus, a.getTerm()),
                     resultType);
         } catch (RuntimeException e) {
             raiseError("Error in unary minus expression -" + a + ".",e);
@@ -394,7 +395,7 @@ public class JavaIntegerSemanticsHelper {
         try {
 	    Function cast = integerLDT.getJavaCast(resultType.getJavaType());
 	    if (cast != null)
-            return new SLExpression(TB.func(cast, a.getTerm()), resultType);
+            return new SLExpression(tb.func(cast, a.getTerm()), resultType);
 	    else { // there is no cast to \bigint
 	        if (! isBigint(resultType))
 	            raiseError("Cannot cast expression "+a+" to "+resultType+".");

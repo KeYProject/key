@@ -210,7 +210,7 @@ public class KeYLoopStatement extends AbstractSEDLoopStatement implements IKeYSE
    public boolean hasVariables() throws DebugException {
       try {
          return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
-                SymbolicExecutionUtil.canComputeVariables(executionNode) &&
+                SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
                 super.hasVariables();
       }
       catch (ProofInputException e) {

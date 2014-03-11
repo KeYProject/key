@@ -372,7 +372,7 @@ public final class NotationInfo {
     /** Get the Notation for a given Operator.  
      * If no notation is registered, a Function notation is returned.
      */
-    Notation getNotation(Operator op, Services services) {
+    Notation getNotation(Operator op) {
         Notation result = notationTable.get(op);
         if(result != null) {
             return result;

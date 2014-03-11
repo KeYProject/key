@@ -195,7 +195,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
     }
 
     private RuleAppCost c (long p) {
-        return LongRuleAppCost.create ( p );
+        return NumberRuleAppCost.create ( p );
     }
 
     private RuleAppCost infty () {
@@ -286,7 +286,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
     }
     
     protected ProjectionToTerm sub(ProjectionToTerm t, int index) {
-        return SubtermProjection.create ( t, PosInTerm.TOP_LEVEL.down ( index ) );
+        return SubtermProjection.create ( t, PosInTerm.getTopLevel().down ( index ) );
     }
     
     protected ProjectionToTerm opTerm(Operator op, ProjectionToTerm[] subTerms) {
@@ -396,7 +396,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
      * a particular rule app, zero is returned
      */
     protected Feature applyTFNonStrict(ProjectionToTerm term, TermFeature tf) {
-        return ApplyTFFeature.createNonStrict ( term, tf, LongRuleAppCost.ZERO_COST );
+        return ApplyTFFeature.createNonStrict ( term, tf, NumberRuleAppCost.getZeroCost() );
     }
 
     
