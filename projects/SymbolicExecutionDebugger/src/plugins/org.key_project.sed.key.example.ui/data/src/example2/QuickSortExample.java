@@ -3,7 +3,7 @@ package example2;
 import java.util.Random;
 
 /**
- * An example application using the sorting algorithm implemented in of class 
+ * An example application using the sorting algorithm implemented in class 
  * {@link QuickSort}. For more details, read the documentation of 
  * {@link QuickSort}. Have fun finding the bug!
  * <p>

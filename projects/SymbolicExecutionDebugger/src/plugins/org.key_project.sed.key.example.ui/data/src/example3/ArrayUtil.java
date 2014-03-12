@@ -8,7 +8,10 @@ package example3;
  * To debug method {@link #indexOf(Object[], Object, Comparator)} follow the 
  * instructions:
  * <ol>
- *    <li>Debug method {@link #indexOf(Object[], Object, Comparator)}</li>
+ *    <li>
+ *       Debug method {@link #indexOf(Object[], Object, Comparator)} via context 
+ *       menu item 'Debug As, Symbolic Execution Debugger (SED)'
+ *    </li>
  *    <li>Terminate the debug session</li>
  *    <li>
  *       Edit the debug configuration via main menu item 
@@ -19,7 +22,7 @@ package example3;
  *       available method contract
  *    </li>
  *    <li>
- *       Debug method {@link #indexOf(Object[], Object, Comparator)} again
+ *       Debug method {@link #indexOf(Object[], Object, Comparator)} as before
  *    </li>
  *    <li>
  *       Select method treatment 'Contract' in view 
@@ -28,27 +31,29 @@ package example3;
  *    <li>
  *       Select loop treatment 'Invariant' in view 'Symbolic Execution Settings'
  *    </li>
- *    <li>Resume execution</li>
+ *    <li>In view 'Debug', click on 'Resume' to start symbolic execution</li>
  * </ol>
- * Instead of unwinding the loop and inlining a specific implementation of the 
- * interface method 'equals', the loop invariant respective the method contract 
- * is applied. This achieves a finite symbolic execution tree which covers all
- * possible concrete execution paths as long as application is correct. 
- * Problematic applications are indicated by red crossed node icons. 
+ * Instead of unwinding the loop and inlining a specific implementation of 
+ * interface method {@link Comparator#equals(Object, Object)}, the loop 
+ * invariant respective the method contract is applied. This achieves a finite 
+ * symbolic execution tree which covers all possible concrete execution paths as 
+ * long as application is correct. Problematic applications are indicated by red 
+ * crossed node icons. 
  *<p>
  * The 'Body Preserves Invariant' branch represents an arbitrary loop iteration. 
  * The red crossed icon in one of its leaves indicates that the loop invariant 
  * might not be preserved. Further inspection reveals that the loop counter 
- * {@code i}is not increased in the then branch.
+ * variable {@code i} is not increased in the then branch.
  * <p>
  * The loop body calls method {@link Comparator#equals(Object, Object)}. Instead 
  * of inlining a specific implementation, the method contract is used. To apply 
  * a method contract, its precondition has to be checked. A failed check is 
- * indicated by a node marker.
+ * indicated by a red crossed node icon.
  *<p>
- * The 'Use Case' branch continues the symbolic execution in arbitrary state 
- * after loop. A closer look at the 'return' nodes exhibits yet another problem, 
- * namely, the loop counter 'i' is returned instead of variable 'index'.
+ * The 'Use Case' branch continues symbolic execution in an arbitrary state 
+ * after the loop. A closer look at the return nodes exhibits yet another 
+ * problem, namely, the loop counter variable {@code i} is returned instead of 
+ * the found index stored in variable {@code index}.
  */
 public class ArrayUtil {
 	/*@ normal_behavior

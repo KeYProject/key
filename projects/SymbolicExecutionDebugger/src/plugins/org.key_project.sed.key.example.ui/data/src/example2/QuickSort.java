@@ -14,8 +14,8 @@ import java.util.Arrays;
  *    </li>
  *    <li>Select the start node</li>
  *    <li>
- *       Perform 'Step Into' until a node representing an uncaught 
- *       {@link NullPointerException} appears (3 times)
+ *       In view 'Debug', Perform 'Step Into' until a node representing an 
+ *       uncaught {@link NullPointerException} appears (3 times)
  *    </li>
  * </ol>
  * The experienced {@link NullPointerException} is spurious as field 
@@ -28,18 +28,18 @@ import java.util.Arrays;
  *       'Run, Debug Configurations'
  *    </li>
  *    <li>Add {@code numbers != null & numbers.length >= 1} as precondition</li>
- *    <li>Launch method {@link #sort()} as before</li>
+ *    <li>Debug method {@link #sort()} as before</li>
  *    <li>Select the start node</li>
  *    <li>
- *       Perform 'Step Into' until the next statement after the if-statement is 
- *       reached (5 times)
+ *       In view 'Debug', Perform 'Step Into' until the next statement after the 
+ *       if-statement is reached (5 times)
  *    </li>
  * </ol>
  * Two observations: First, because of the precondition no spurious exceptions 
  * are shown any longer. Second, because of the if-statement one would expect 
- * two branches. That they are missing indicates a problem with the if-condition 
- * (which evaluates always to true). The if-condition needs to be corrected to 
- * {@code low < high}.
+ * two branches. That there is only one indicates a problem with the 
+ * if-condition (which evaluates always to true). The if-condition needs to be 
+ * corrected to {@code low < high}.
  * <p>
  * <b>Taken from:</b> <br>
  * Visual Interactive Debugger Based on Symbolic Execution
@@ -51,6 +51,8 @@ public class QuickSort {
 	private int[] numbers;
 
 	public QuickSort(int[] numbers) {
+	   assert numbers != null;
+	   assert numbers.length >= 1;
 		this.numbers = numbers;
 	}
 

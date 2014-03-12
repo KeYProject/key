@@ -10,15 +10,15 @@ package example1;
  *    </li>
  *    <li>Confirm switch to perspective 'Symbolic Debug'</li>
  *    <li>
- *       In view 'Debug', click on 'resume' to start symbolic execution 
+ *       In view 'Debug', click on 'Resume' to start symbolic execution 
  *       (stepwise symbolic execution and breakpoints are also supported)
  *    </li>
  * </ol>
  * <p>
- * After the symbolic execution has finished, a so called symbolic execution 
- * tree is shown in view 'Symbolic Execution Tree'. A symbolic execution tree 
- * contains all possible execution paths up to the reached depth. Each path may 
- * represent infinitely many concrete execution paths.
+ * After symbolic execution has finished, a so called symbolic execution tree is 
+ * shown in view 'Symbolic Execution Tree'. A symbolic execution tree contains 
+ * all possible execution paths up to the reached depth. Each path may represent 
+ * infinitely many concrete execution paths.
  * <p>
  * Selecting a node highlights the related source code. The 'Properties' view 
  * provides additional information like the symbolic method call stack or the 
