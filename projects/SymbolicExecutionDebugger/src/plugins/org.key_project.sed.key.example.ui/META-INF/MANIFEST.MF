@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Symbolic Execution Debugger (SED) KeY Examples
+Bundle-SymbolicName: org.key_project.sed.key.example.ui;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.sed.key.example.ui.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.jdt.core,
+ org.eclipse.jdt.ui,
+ org.key_project.util;bundle-version="1.0.0",
+ org.key_project.key4eclipse.starter.core;bundle-version="1.0.0",
+ org.key_project.key4eclipse.common.ui;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: KeY Project
+Export-Package: org.key_project.sed.key.example.ui.wizard

@@ -23,6 +23,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
+import org.key_project.sed.key.core.test.Activator;
 
 /**
  * Tests the defined contract in a launch configuration which
@@ -97,7 +98,7 @@ public class SWTBotContractTest extends AbstractKeYDebugTargetTestCase {
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
             // Do resume and test created tree
             resume(bot, item, target);
-            assertDebugTargetViaOracle(target, expectedModelPathInBundle, false, false);
+            assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false);
          }
       };
       doKeYDebugTargetTest(projectName, 

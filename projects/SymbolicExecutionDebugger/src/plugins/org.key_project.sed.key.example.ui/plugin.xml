@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.key_project.sed.key.example.ui.category"
+            name="Symbolic Execution Debugger (SED)"
+            parentCategory="org.eclipse.ui.Examples">
+      </category>
+      <wizard
+            category="org.eclipse.ui.Examples/org.key_project.sed.key.example.ui.category"
+            class="org.key_project.sed.key.example.ui.wizard.SEDExampleNewWizard"
+            finalPerspective="org.eclipse.jdt.ui.JavaPerspective"
+            icon="icons/logo16.gif"
+            id="org.key_project.sed.key.example.ui.SEDExampleNewWizard"
+            name="SED Examples"
+            project="true">
+         <description>
+            Create a new Java Project and fill it with examples for the Symbolic Execution Debugger (SED).
+         </description>
+      </wizard>
+   </extension>
+
+</plugin>

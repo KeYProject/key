@@ -78,7 +78,7 @@ public class SWTBotKeYLaunchConfigurationDelegateTest extends AbstractKeYDebugTa
          SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
          resume(bot, item, target);
          // Make sure that correct tree is created
-         assertDebugTargetViaOracle(target, "data/methodPartPOTest/oracle/MethodPartPOTest_methodName.xml", false, false);
+         assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/methodPartPOTest/oracle/MethodPartPOTest_methodName.xml", false, false);
       }
       finally {
          // Restore timeout
@@ -216,7 +216,7 @@ public class SWTBotKeYLaunchConfigurationDelegateTest extends AbstractKeYDebugTa
          SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
          resume(bot, item, target);
          // Make sure that correct tree is created
-         assertDebugTargetViaOracle(target, expectedModelPathInBundle, false, false);
+         assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false);
       }
       finally {
          // Restore timeout
