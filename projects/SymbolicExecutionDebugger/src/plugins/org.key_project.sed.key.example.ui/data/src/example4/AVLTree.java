@@ -28,7 +28,7 @@ package example4;
 public class AVLTree {
 	protected Node root;
 	
-	private void rotateLeft(Node current) {
+	protected void rotateLeft(Node current) {
 		Node newParent = current.right;
 		Node oldLeft = newParent.left;
 		newParent.left = current;
