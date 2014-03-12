@@ -5,24 +5,33 @@ public abstract class AbstractMap implements MapInterface {
     public MapEntry[] entries;
 
     /*@
-     @ public invariant entries.length == \dl_mapSize(map);
-     @
-     @ public invariant (\forall Object o;
-     @          (\exists int i; 0 <= i && i < entries.length; entries[i].key == o) <==> \dl_inDomain(map, o));
-     @
-     @ public invariant (\forall int i; 0 <= i && i < entries.length;
-     @                      \dl_mapGet(map, entries[i].key) == entries[i].value);     
-     @
-     @ public invariant (\forall int i1; 0 <= i1 && i1 < entries.length;
-     @                      (\forall int i2; i1 < i2 && i2 < entries.length;
-     @                          ( entries[i1].key != entries[i2].key )));
-     @
-     @ public invariant \typeof(entries) == \type(MapEntry[]);
-     @
-     @ public invariant footprint ==
-     @      \set_union(\infinite_union(int i; 0 <= i && i < entries.length;
-     @                          entries[i].*), this.*, entries.*);
-     @*/
+    @
+    @ public invariant entries.length == \dl_mapSize(map);
+    @
+    @ public invariant !\dl_inDomain(map,null);
+    @
+    @ public invariant (\forall int i; 0 <= i && i < entries.length; \dl_inDomain(map,entries[i].key));
+    @
+    @ public invariant (\forall Object o; \dl_inDomain(map,o);(
+    @       \exists int i; 0 <= i && i < entries.length; o == entries[i].key ));
+    @
+    @ public invariant (\forall int i; 0 <= i && i < entries.length;
+    @                      \dl_mapGet(map, entries[i].key) == entries[i].value);     
+    @
+    @ public invariant (\forall int i1; 0 <= i1 && i1 < entries.length;
+    @                      (\forall int i2; 0 <= i2 && i2 < entries.length && i2 != i1;
+    @                          ( entries[i1].key != entries[i2].key )));
+    @
+    @ public invariant \typeof(entries) == \type(MapEntry[]);
+    @
+    @ public invariant footprint ==
+    @      \set_union(\infinite_union(int i; 0 <= i && i < entries.length;
+    @                          entries[i].*), this.*, entries.*);
+    @
+    @ public invariant (\forall int i; 0 <= i && i < entries.length; entries[i].key != null);
+    @ public invariant (\forall int i; 0 <= i && i < entries.length; entries[i].value != null);
+    @
+    @*/
     
     /*@ normal_behaviour
      @ requires target != entries;
@@ -48,14 +57,14 @@ public abstract class AbstractMap implements MapInterface {
      @ ensures (\forall Object o; !\fresh(o));
      @ accessible footprint;
      @*/
-    abstract /*@strictly_pure@*/ int getIndexOfKey(Object key);
+    abstract /*@ strictly_pure */ int getIndexOfKey(Object key);
     
     /*@ normal_behavior
-     @   ensures \fresh(\result);
-     @   ensures \result.key == key;
-     @   ensures \result.value == value;
-     @*/
-    abstract /*@pure*/ MapEntry newMapEntry(Object key, Object value);
+    @ ensures \fresh(\result);
+    @ ensures \result.key == key;
+    @ ensures \result.value == value;
+    @*/
+    abstract /*@ pure */ MapEntry newMapEntry(Object key, Object value);
 
     /*@ normal_behavior
      @   requires l >= 0;
@@ -65,7 +74,7 @@ public abstract class AbstractMap implements MapInterface {
      @   ensures \result != null;
      @   ensures (\forall int i; 0 <= i && i < \result.length; \result[i] == null);
      @*/
-    abstract /*@pure nullable*/ MapEntry[] newMapEntryArray(int l);
+    abstract /*@ pure nullable */ MapEntry[] newMapEntryArray(int l);
     
     /*@ normal_behaviour
      @ ensures \result.length == entries.length + 1;
@@ -77,7 +86,7 @@ public abstract class AbstractMap implements MapInterface {
      @ ensures !\dl_inDomain(map, \result[entries.length]);
      @ ensures \typeof(\result) == \type(MapEntry[]);
      @*/
-    abstract /*@pure*/ MapEntry[] putExtendArray(Object key, Object value);
+    abstract /*@ pure */ MapEntry[] putExtendArray(Object key, Object value);
 
     /*@ normal_behaviour
      @ requires 0 <= index && index < entries.length;
@@ -95,7 +104,7 @@ public abstract class AbstractMap implements MapInterface {
      @ ensures \fresh(entries, entries[entries.length - 1]);
      @ assignable footprint;
      @*/
-    abstract /*@nullable*/ Object putNotInDomain(Object key, Object value);
+    abstract /*@ nullable */ Object putNotInDomain(Object key, Object value);
 
     /*@ normal_behaviour
      @ requires newEntries != null;
@@ -109,7 +118,7 @@ public abstract class AbstractMap implements MapInterface {
      @               newEntries[i] == ((i < index) ? entries[i] : entries[i + 1]));
      @ assignable newEntries[*];
      @*/
-    abstract void removeCopyOldEntries( /*@nullable*/ MapEntry[] newEntries, int index);
+    abstract void removeCopyOldEntries( /*@ nullable */ MapEntry[] newEntries, int index);
     
     /*@ normal_behaviour
      @ requires 0 <= index && index < entries.length;
@@ -119,7 +128,7 @@ public abstract class AbstractMap implements MapInterface {
      @               \result[i] == ((i < index) ? entries[i] : entries[i + 1]));
      @ ensures \fresh(\result);
      @*/
-    abstract /*@pure*/ MapEntry[] removeGetNewArray(int index);
+    abstract /*@ pure */ MapEntry[] removeGetNewArray(int index);
 
     /*@ normal_behaviour
      @ requires 0 <= index && index < entries.length;
