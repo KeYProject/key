@@ -44,6 +44,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
 import org.eclipse.jface.preference.PreferenceDialog;
@@ -1564,5 +1565,27 @@ public class TestUtilsUtil {
       while (!SetupStartup.isSetupDone()) {
          sleep(500);
       }
+   }
+
+   public static void openJavaPerspective() {
+      openPerspective(getPerspective(JavaUI.ID_PERSPECTIVE));
+   }
+   
+   /**
+    * Returns the perspective with the given ID.
+    * @param id The ID to search.
+    * @return The foudn perspective or {@code null} if no perspective was found.
+    */
+   public static IPerspectiveDescriptor getPerspective(String id) {
+      IPerspectiveDescriptor result = null;
+      IPerspectiveDescriptor[] perspectives = PlatformUI.getWorkbench().getPerspectiveRegistry().getPerspectives();
+      int i = 0;
+      while (result == null && i < perspectives.length) {
+         if (ObjectUtil.equals(perspectives[i].getId(), id)) {
+            result = perspectives[i];
+         }
+         i++;
+      }
+      return result;
    }
 }
