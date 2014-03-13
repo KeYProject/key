@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -12,15 +13,12 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
-public class TestExceptionBreakpointStopConditionWithHitCount extends
-      AbstractSymbolicExecutionTestCase {
-
-
+public class TestExceptionBreakpointStopConditionWithHitCount extends AbstractSymbolicExecutionTestCase {
    public void testBreakpointStopCondition() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      String originalRuntimeExceptions = null;
+      HashMap<String, String> originalTacletOptions = null;
+      boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = null;
       try {
          // Define test settings
@@ -29,14 +27,9 @@ public class TestExceptionBreakpointStopConditionWithHitCount extends
          final String methodFullName = "main";
          String oraclePathInkeyRepDirectoryFile = "examples/_testcase/set/exceptionBreakpointsWithHitCountTest/oracle/ClassCastAndNullpointerExceptions";
          String oracleFileExtension = ".xml";
-         // Store original settings of KeY which requires that at least one proof was instantiated.
-         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false);
-            env.dispose();
-         }
-         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
-         assertNotNull(originalRuntimeExceptions);
-         SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
+         // Store original settings of KeY
+         originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
+         setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
          env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false);
          // Make sure that initial tree is valid
@@ -59,10 +52,8 @@ public class TestExceptionBreakpointStopConditionWithHitCount extends
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
       }
       finally {
-         // Restore runtime option
-         if (originalRuntimeExceptions != null) {
-            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
-         }
+         setOneStepSimplificationEnabled(null, originalOneStepSimplification);
+         restoreTacletOptions(originalTacletOptions);
          if (env != null) {
             env.dispose();
          }

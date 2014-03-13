@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -14,20 +15,23 @@ import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
-public class TestMethodBreakpointWithConditions extends
-      AbstractSymbolicExecutionTestCase {
-   
+public class TestMethodBreakpointWithConditions extends AbstractSymbolicExecutionTestCase {
    public void testBreakpointStopCondition() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       SymbolicExecutionEnvironment<CustomConsoleUserInterface> envMain=null;
       SymbolicExecutionEnvironment<CustomConsoleUserInterface> envSomethingMain=null;
       SymbolicExecutionEnvironment<CustomConsoleUserInterface> envSomethingLocalMain=null;
+      HashMap<String, String> originalTacletOptions = null;
+      boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try{
-      // Define test settings
+         // Define test settings
          String javaPathInkeyRepDirectory = "examples/_testcase/set/methodBreakpointsWithConditionsTest/test/SimpleConditionExample.java";
          String containerTypeName = "SimpleConditionExample";
          final String methodFullName = "main";
          String oraclePathInkeyRepDirectoryFile = "examples/_testcase/set/methodBreakpointsWithConditionsTest/oracle/BreakpointStopConditionWithCondition";
          String oracleFileExtension = ".xml";
+         // Store original settings of KeY
+         originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
+         setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
          envMain = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false);
          // Make sure that initial tree is valid
@@ -100,7 +104,10 @@ public class TestMethodBreakpointWithConditions extends
          stepReturnWithBreakpoints(envSomethingLocalMain.getUi(), envSomethingLocalMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
          stepReturnWithBreakpoints(envSomethingLocalMain.getUi(), envSomethingLocalMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints); 
          stepReturnWithBreakpoints(envSomethingLocalMain.getUi(), envSomethingLocalMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints); 
-      }finally{
+      }
+      finally{
+         setOneStepSimplificationEnabled(null, originalOneStepSimplification);
+         restoreTacletOptions(originalTacletOptions);
          if(envMain!=null){
             envMain.dispose();
          }

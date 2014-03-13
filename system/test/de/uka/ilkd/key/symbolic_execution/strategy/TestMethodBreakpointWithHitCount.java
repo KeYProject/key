@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -14,10 +15,11 @@ import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
-public class TestMethodBreakpointWithHitCount extends
-      AbstractSymbolicExecutionTestCase {
+public class TestMethodBreakpointWithHitCount extends AbstractSymbolicExecutionTestCase {
    public void testBreakpointStopCondition() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       SymbolicExecutionEnvironment<CustomConsoleUserInterface> env=null;
+      HashMap<String, String> originalTacletOptions = null;
+      boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try{
          // Define test settings
          String javaPathInkeyRepDirectory = "examples/_testcase/set/methodBreakpointsWithHitcountTest/test/BreakpointStopCallerAndLoop.java";
@@ -25,6 +27,9 @@ public class TestMethodBreakpointWithHitCount extends
          final String methodFullName = "main";
          String oraclePathInkeyRepDirectoryFile = "examples/_testcase/set/methodBreakpointsWithHitcountTest/oracle/MethodBreakpointStop";
          String oracleFileExtension = ".xml";
+         // Store original settings of KeY
+         originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
+         setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
          env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false);
          // Make sure that initial tree is valid
@@ -61,7 +66,10 @@ public class TestMethodBreakpointWithHitCount extends
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);     
 
-      }finally{
+      }
+      finally{
+         setOneStepSimplificationEnabled(null, originalOneStepSimplification);
+         restoreTacletOptions(originalTacletOptions);
          if(env!=null){
             env.dispose();
          }
