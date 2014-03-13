@@ -384,15 +384,25 @@ public class DefaultProofFileParser implements IProofFileParser {
        }
 
        if (currContract != null) {
+          AbstractContractRuleApp contractApp = null;
+
           BuiltInRule useContractRule;
           if (currContract instanceof OperationContract) {
              useContractRule = UseOperationContractRule.INSTANCE;
-             ourApp = (((UseOperationContractRule)useContractRule).createApp(pos)).setContract(currContract);
+             contractApp = (((UseOperationContractRule)useContractRule).createApp(pos)).setContract(currContract);
           }
           else {
              useContractRule = UseDependencyContractRule.INSTANCE;
-             ourApp = (((UseDependencyContractRule)useContractRule).createApp(pos)).setContract(currContract);
+             contractApp = (((UseDependencyContractRule)useContractRule).createApp(pos)).setContract(currContract);
           }
+          
+          if (contractApp.check(currGoal.proof().getServices()) == null) {
+              throw new BuiltInConstructionException
+              ("Cannot apply contract: " + currContract);
+          } else {
+              ourApp = contractApp;
+          }
+          
            currContract = null;
            if(builtinIfInsts != null) {
                ourApp = ourApp.setIfInsts(builtinIfInsts);

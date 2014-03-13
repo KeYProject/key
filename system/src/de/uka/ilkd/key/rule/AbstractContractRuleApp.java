@@ -15,7 +15,9 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.Contract;
 
@@ -44,6 +46,15 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
         return instantiation;
     }
 		
+    public AbstractContractRuleApp check(Services services) {
+        if (instantiation != null) {
+            if (!instantiation.getTarget().equals(getObserverFunction(services))) {
+                return null;
+            }
+        }
+        return this;
+    }
+    
     @Override
     public abstract AbstractContractRuleApp tryToInstantiate(Goal goal);
 
@@ -53,6 +64,8 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
 	public boolean complete() {
     	return super.complete() && pio != null && instantiation != null;
     }
+
+    public abstract IObserverFunction getObserverFunction(Services services);
 
 
     
