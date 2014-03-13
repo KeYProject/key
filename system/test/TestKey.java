@@ -120,7 +120,21 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.symbolic_execution.util.TestJavaUtil.class,
         de.uka.ilkd.key.symbolic_execution.util.TestSymbolicExecutionUtil.class
     };
-
+    
+    static Class<? extends TestCase>[] breakpointTests = new Class[] {
+       de.uka.ilkd.key.symbolic_execution.strategy.TestExceptionBreakpointStopConditionCaughtOrUncaught.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestExceptionBreakpointStopConditionWithHitCount.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestExceptionBreakpointStopConditionWithSubclasses.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestJavaWatchpointStopConditionWithHitCount.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestLineBreakpointStopConditionSimpleWithConditions.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestLineBreakpointStopConditionSimpleWithHitCount.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestMethodBreakpointWithConditions.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestKeYWatchpointGlobalVariablesOnSatisfiable.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestKeYWatchpointGlobalVariablesOnTrueWithHitCount.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestKeYWatchpointMethodsOnSatisfiable.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestMethodBreakpointWithHitCount.class
+    };
+    
     static Class<? extends TestCase>[] proofReferencesTests = new Class[] {
         de.uka.ilkd.key.proof_references.TestKeYTypeUtil.class,
         de.uka.ilkd.key.proof_references.TestProofReferenceUtil.class,
@@ -150,8 +164,8 @@ public class TestKey extends TestSuite {
 
 
     public static junit.framework.Test suite() {
-        de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
-        de.uka.ilkd.key.gui.MainWindow.setVisibleMode(false);
+	de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
+	de.uka.ilkd.key.gui.MainWindow.setVisibleMode(false);
 
         TestSuite suite = new TestSuite();
         suite.addTest(createSuite(utilityTests, "Testing Utilities and Collections"));
@@ -162,6 +176,7 @@ public class TestKey extends TestSuite {
         suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
         suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
         suite.addTest(createSuite(smtTests, "Testing SMT backend"));
+        suite.addTest(createSuite(breakpointTests, "Testing breakpoints"));
         suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
         suite.addTest(createSuite(proofReferencesTests, "Testing Proof References"));
         suite.addTest(createSuite(new Class[]{de.uka.ilkd.key.util.DesignTests.class}, "Test Design Constraints"));

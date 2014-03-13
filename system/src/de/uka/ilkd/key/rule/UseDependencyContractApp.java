@@ -119,7 +119,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
         }
         return app;
     }
-
+    
     public UseDependencyContractApp tryToInstantiateContract(final Services services) {
         final Term focus = posInOccurrence().subTerm();
         if (! (focus.op() instanceof IObserverFunction))
@@ -159,6 +159,14 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
         return heapContext;
     }
 
+    @Override
+    public IObserverFunction getObserverFunction(Services services) {
+        return (IObserverFunction) (posInOccurrence().subTerm().op() instanceof IObserverFunction ?
+                posInOccurrence().subTerm().op() : null); 
+    }
+
+    
+    
     @Override
     public UseDependencyContractApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);

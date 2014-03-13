@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="SimpleConditionExample.somethingLocalMain();" pathCondition="true" pathConditionChanged="false">
+      <statement name="int y = 42;" pathCondition="true" pathConditionChanged="false">
+         <statement name="int x = somethingLocal(y);" pathCondition="true" pathConditionChanged="false">
+            <methodCall name="SimpleConditionExample.somethingLocal(x_2);" pathCondition="true" pathConditionChanged="false">
+               <statement name="int y = x_2*x_2;" pathCondition="true" pathConditionChanged="false">
+                  <statement name="return y_1;" pathCondition="true" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of SimpleConditionExample.somethingLocal(x_2);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                        <statement name="return somethingLocal(x);" pathCondition="true" pathConditionChanged="false">
+                           <methodCall name="SimpleConditionExample.somethingLocal(x_5);" pathCondition="true" pathConditionChanged="false">
+                              <statement name="int y = x_5*x_5;" pathCondition="true" pathConditionChanged="false">
+                                 <statement name="return y_2;" pathCondition="true" pathConditionChanged="false">
+                                    <methodReturn name="&lt;return of SimpleConditionExample.somethingLocal(x_5);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                       <methodReturn name="&lt;return of SimpleConditionExample.somethingLocalMain();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                          <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                          </termination>
+                                       </methodReturn>
+                                    </methodReturn>
+                                 </statement>
+                              </statement>
+                           </methodCall>
+                        </statement>
+                     </methodReturn>
+                  </statement>
+               </statement>
+            </methodCall>
+         </statement>
+      </statement>
+   </methodCall>
+</start>
