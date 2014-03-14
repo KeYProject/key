@@ -23,12 +23,15 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.util.MiscTools;
 
 public class UseDependencyContractApp extends AbstractContractRuleApp {
 
@@ -161,8 +164,8 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     @Override
     public IObserverFunction getObserverFunction(Services services) {
-        return (IObserverFunction) (posInOccurrence().subTerm().op() instanceof IObserverFunction ?
-                posInOccurrence().subTerm().op() : null); 
+        final Operator op = posInOccurrence().subTerm().op();
+        return (IObserverFunction) (op instanceof IObserverFunction ? op : null); 
     }
 
     
