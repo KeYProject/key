@@ -66,7 +66,7 @@
 
 
   <target name="hudsonUnitTest" depends="compile">
-     <junit printsummary="yes" haltonfailure="yes" fork="yes"  showoutput="true">
+     <junit printsummary="yes" haltonfailure="yes" fork="yes" enableTestListenerEvents="false" showoutput="true">
      <jvmarg value="-Xmx2048m"/>
      <sysproperty key="key.home" value="${env.KEY_HOME}"/>
     <classpath>
