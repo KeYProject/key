@@ -25,6 +25,7 @@ import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.util.EDataTypeUniqueEList;
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 
 import de.hentschel.visualdbc.dbcmodel.DbcClass;
@@ -41,6 +42,7 @@ import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcClassImpl#isFinal <em>Final</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcClassImpl#getExtends <em>Extends</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcClassImpl#isAnonymous <em>Anonymous</em>}</li>
+ *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcClassImpl#getExtendsFullNames <em>Extends Full Names</em>}</li>
  * </ul>
  * </p>
  *
@@ -118,6 +120,16 @@ public class DbcClassImpl extends AbstractDbcClassImpl implements DbcClass {
    protected boolean anonymous = ANONYMOUS_EDEFAULT;
 
    /**
+    * The cached value of the '{@link #getExtendsFullNames() <em>Extends Full Names</em>}' attribute list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getExtendsFullNames()
+    * @generated
+    * @ordered
+    */
+   protected EList<String> extendsFullNames;
+
+   /**
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
@@ -167,6 +179,18 @@ public class DbcClassImpl extends AbstractDbcClassImpl implements DbcClass {
       anonymous = newAnonymous;
       if (eNotificationRequired())
          eNotify(new ENotificationImpl(this, Notification.SET, DbcmodelPackage.DBC_CLASS__ANONYMOUS, oldAnonymous, anonymous));
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public EList<String> getExtendsFullNames() {
+      if (extendsFullNames == null) {
+         extendsFullNames = new EDataTypeUniqueEList<String>(String.class, this, DbcmodelPackage.DBC_CLASS__EXTENDS_FULL_NAMES);
+      }
+      return extendsFullNames;
    }
 
    /**
@@ -227,6 +251,8 @@ public class DbcClassImpl extends AbstractDbcClassImpl implements DbcClass {
             return getExtends();
          case DbcmodelPackage.DBC_CLASS__ANONYMOUS:
             return isAnonymous();
+         case DbcmodelPackage.DBC_CLASS__EXTENDS_FULL_NAMES:
+            return getExtendsFullNames();
       }
       return super.eGet(featureID, resolve, coreType);
    }
@@ -253,6 +279,10 @@ public class DbcClassImpl extends AbstractDbcClassImpl implements DbcClass {
          case DbcmodelPackage.DBC_CLASS__ANONYMOUS:
             setAnonymous((Boolean)newValue);
             return;
+         case DbcmodelPackage.DBC_CLASS__EXTENDS_FULL_NAMES:
+            getExtendsFullNames().clear();
+            getExtendsFullNames().addAll((Collection<? extends String>)newValue);
+            return;
       }
       super.eSet(featureID, newValue);
    }
@@ -277,6 +307,9 @@ public class DbcClassImpl extends AbstractDbcClassImpl implements DbcClass {
          case DbcmodelPackage.DBC_CLASS__ANONYMOUS:
             setAnonymous(ANONYMOUS_EDEFAULT);
             return;
+         case DbcmodelPackage.DBC_CLASS__EXTENDS_FULL_NAMES:
+            getExtendsFullNames().clear();
+            return;
       }
       super.eUnset(featureID);
    }
@@ -297,6 +330,8 @@ public class DbcClassImpl extends AbstractDbcClassImpl implements DbcClass {
             return extends_ != null && !extends_.isEmpty();
          case DbcmodelPackage.DBC_CLASS__ANONYMOUS:
             return anonymous != ANONYMOUS_EDEFAULT;
+         case DbcmodelPackage.DBC_CLASS__EXTENDS_FULL_NAMES:
+            return extendsFullNames != null && !extendsFullNames.isEmpty();
       }
       return super.eIsSet(featureID);
    }
@@ -317,6 +352,8 @@ public class DbcClassImpl extends AbstractDbcClassImpl implements DbcClass {
       result.append(final_);
       result.append(", anonymous: ");
       result.append(anonymous);
+      result.append(", extendsFullNames: ");
+      result.append(extendsFullNames);
       result.append(')');
       return result.toString();
    }

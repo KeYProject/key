@@ -480,9 +480,12 @@ public final class TestSedCoreUtil {
             }
             item.select();
             item.contextMenu("Terminate and Remove").click();
-            if (!terminated) {
-               SWTBotShell dialog = bot.shell("Terminate and Remove");
-               dialog.bot().button("Yes").click();
+            try{
+               if (!terminated) {
+                  SWTBotShell dialog = bot.shell("Terminate and Remove");
+                  dialog.bot().button("Yes").click();
+               }
+            }catch(Exception e){
             }
          }
          // Wait until all items are removed

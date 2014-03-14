@@ -44,6 +44,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
 import org.eclipse.jface.preference.PreferenceDialog;
@@ -184,6 +185,45 @@ public class TestUtilsUtil {
          TestCase.fail();
          return null;
       }
+   }
+
+   /**
+    * Creates a new {@link IJavaProject} that is an {@link IProject} with
+    * a JDT nature.
+    * @param name The project name.
+    * @return The created {@link IJavaProject}.
+    * @throws CoreException Occurred Exception.
+    * @throws InterruptedException Occurred Exception.
+    */
+   public static IJavaProject createJavaProjectNoBinSourceFolders(String name) throws CoreException, InterruptedException {
+      final IProject project = createProject(name);
+      final IJavaProject javaProject = JavaCore.create(project); 
+      IRunnableWithException run = new AbstractRunnableWithException() {
+         @Override
+         public void run() {
+            try {
+               JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
+               IClasspathEntry[] entries = new IClasspathEntry[] {JavaCore.newSourceEntry(project.getFullPath())};
+               entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
+               page.init(javaProject, project.getFullPath(), entries, false);
+               page.configureJavaProject(null);
+            }
+            catch (Exception e) {
+               setException(e);
+            }
+         }
+      };
+      Display.getDefault().syncExec(run);
+      if (run.getException() instanceof CoreException) {
+         throw (CoreException)run.getException();
+      }
+      else if (run.getException() instanceof InterruptedException) {
+         throw (InterruptedException)run.getException();
+      }
+      else if (run.getException() != null) {
+         throw new CoreException(new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(run.getException()));
+      }
+      return javaProject;
    }
 
    /**
@@ -1525,5 +1565,27 @@ public class TestUtilsUtil {
       while (!SetupStartup.isSetupDone()) {
          sleep(500);
       }
+   }
+
+   public static void openJavaPerspective() {
+      openPerspective(getPerspective(JavaUI.ID_PERSPECTIVE));
+   }
+   
+   /**
+    * Returns the perspective with the given ID.
+    * @param id The ID to search.
+    * @return The foudn perspective or {@code null} if no perspective was found.
+    */
+   public static IPerspectiveDescriptor getPerspective(String id) {
+      IPerspectiveDescriptor result = null;
+      IPerspectiveDescriptor[] perspectives = PlatformUI.getWorkbench().getPerspectiveRegistry().getPerspectives();
+      int i = 0;
+      while (result == null && i < perspectives.length) {
+         if (ObjectUtil.equals(perspectives[i].getId(), id)) {
+            result = perspectives[i];
+         }
+         i++;
+      }
+      return result;
    }
 }

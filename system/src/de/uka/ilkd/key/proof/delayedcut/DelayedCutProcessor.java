@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
@@ -207,11 +208,11 @@ public class DelayedCutProcessor implements Runnable {
         SequentFormula sf = getSequentFormula(goal, cut.isDecisionPredicateInAntecendet());
         
         
-        PosInOccurrence pio = new PosInOccurrence(sf,PosInTerm.TOP_LEVEL,
+        PosInOccurrence pio = new PosInOccurrence(sf,PosInTerm.getTopLevel(),
                 cut.isDecisionPredicateInAntecendet());
         
         ImmutableList<Goal> result= apply(getHideTacletName(cut), goal, pio);
-          cut.setHideApp(result.head().node().getLocalIntroducedRules().iterator().next());
+        cut.setHideApp(result.head().node().getLocalIntroducedRules().iterator().next());
         return result;
     }
     
@@ -300,7 +301,7 @@ public class DelayedCutProcessor implements Runnable {
      * @param app
      * @return
      */
-    private LinkedList<Goal> apply(Goal goal, RuleApp app, Services services){
+    private LinkedList<Goal> apply(Goal goal, RuleApp app, TermServices services){
         if(app instanceof TacletApp){
         	TacletApp tapp = (TacletApp) app;
         	final SVInstantiations insts = tapp.instantiations();
@@ -329,7 +330,7 @@ public class DelayedCutProcessor implements Runnable {
         return goals;
     }
     
-    private LinkedList<Goal> apply(Node oldNode, Goal goal, RuleApp app, Services services){
+    private LinkedList<Goal> apply(Node oldNode, Goal goal, RuleApp app, TermServices services){
     	 try{
     		return apply(goal, app, services);
     	}catch(Throwable e){
@@ -415,7 +416,7 @@ public class DelayedCutProcessor implements Runnable {
     }
     
     
-    private PosInOccurrence translate(NodeGoalPair pair,Services services){
+    private PosInOccurrence translate(NodeGoalPair pair,TermServices services){
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
         if(oldRuleApp == null ||oldRuleApp.posInOccurrence() == null){
             return null;

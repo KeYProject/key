@@ -21,18 +21,55 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
-import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.PIOPathIterator;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.RenameTable;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.op.FormulaSV;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.TacletInstantiationsTableModel;
 import de.uka.ilkd.key.proof.VariableNameProposer;
-import de.uka.ilkd.key.rule.inst.*;
+import de.uka.ilkd.key.rule.inst.GenericSortCondition;
+import de.uka.ilkd.key.rule.inst.GenericSortException;
+import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
+import de.uka.ilkd.key.rule.inst.InstantiationEntry;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -47,14 +84,11 @@ import de.uka.ilkd.key.util.Debug;
  * be completed using meta variables) complete, so that is can be applied.
  */
 public abstract class TacletApp implements RuleApp {
-
-    private static final TermBuilder TB = TermBuilder.DF;
-
     /** the taclet for which the application information is collected */
     private final Taclet taclet;
 
     /**
-     * contains the instantiations of the schemavarioables of the Taclet
+     * contains the instantiations of the schemavariables of the Taclet
      */
     protected final SVInstantiations instantiations;
 
@@ -225,13 +259,13 @@ public abstract class TacletApp implements RuleApp {
 
 	HashMap<LogicVariable, SchemaVariable> collMap = new LinkedHashMap<LogicVariable, SchemaVariable>();
 
-	final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it = insts
+	final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it = insts
 		.pairIterator();
 	while (it.hasNext()) {
-	    ImmutableMapEntry<SchemaVariable,InstantiationEntry> pair = it.next();
+	    ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> pair = it.next();
 	    if (pair.key() instanceof VariableSV) {
 		SchemaVariable varSV = pair.key();
-		Term value = ((TermInstantiation) pair.value()).getTerm();
+		Term value = (Term) pair.value().getInstantiation();
 		if (!collMap.containsKey(value.op())) {
 		    collMap.put((LogicVariable) value.op(), varSV);
 		} else {
@@ -336,7 +370,7 @@ public abstract class TacletApp implements RuleApp {
 		.getInstantiation(varSV)).op().name().toString()
 		+ "0"), ((Term) insts.getInstantiation(varSV)).sort());
 	// __CHANGE__ How to name the new variable? TODO
-	Term newVariableTerm = TB.var(newVariable);
+	Term newVariableTerm = services.getTermBuilder().var(newVariable);
 	return replaceInstantiation(insts, 
 				    term, 
 				    varSV, 
@@ -362,7 +396,7 @@ public abstract class TacletApp implements RuleApp {
 	if (t.op() instanceof SchemaVariable) {
 	    if (!(t.op() instanceof VariableSV)) {
 		SchemaVariable sv = (SchemaVariable) t.op();
-		ClashFreeSubst cfSubst = new ClashFreeSubst(x, y);
+		ClashFreeSubst cfSubst = new ClashFreeSubst(x, y, services);
 		result = result.replace(sv, 
 					cfSubst.apply((Term) insts.getInstantiation(sv)),
 					services);
@@ -396,12 +430,42 @@ public abstract class TacletApp implements RuleApp {
      */
     public ImmutableList<Goal> execute(Goal goal, Services services) {
 
+        
+        
 	if (!complete()) {
 	    throw new IllegalStateException("Tried to apply rule \n" + taclet
 		    + "\nthat is not complete.");
 	}
+	
+
+	if (!isExecutable(services)) {
+        throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " + this);
+	}
+    registerSkolemConstants(services);
 	goal.addAppliedRuleApp(this);
 	return taclet().apply(goal, services, this);
+    }
+
+    /*
+     * checks if application conditions are satisfied and returns <code>true</code> if this is the case
+     */
+    public boolean isExecutable(TermServices services) {
+        // bugfix #1336, see bugtracker
+        if (taclet instanceof RewriteTaclet) {
+            ImmutableList<UpdateLabelPair> oldUpdCtx = 
+                    matchConditions().getInstantiations().getUpdateContext();
+            MatchConditions newConditions = ((RewriteTaclet)taclet).checkPrefix(posInOccurrence(), 
+                    MatchConditions.EMPTY_MATCHCONDITIONS);
+            if(newConditions == null) {
+                return false;
+            }
+            ImmutableList<UpdateLabelPair> newUpdCtx =
+                    newConditions.getInstantiations().getUpdateContext();
+            if(!oldUpdCtx.equals(newUpdCtx)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -516,7 +580,7 @@ public abstract class TacletApp implements RuleApp {
      */
     public final TacletApp tryToInstantiate(Services services) {
 	final VariableNamer varNamer = services.getVariableNamer();
-	final TermBuilder tb = TermBuilder.DF;
+	final TermBuilder tb = services.getTermBuilder();
 
 	TacletApp app = this;
 	ImmutableList<String> proposals = ImmutableSLList.<String>nil();
@@ -530,8 +594,7 @@ public abstract class TacletApp implements RuleApp {
 		String proposal = varNamer
 			.getSuggestiveNameProposalForProgramVariable(sv, this,
 				services, proposals);
-		ProgramElement pe = TacletInstantiationsTableModel
-			.getProgramElement(app, proposal, sv, services);
+		ProgramElement pe = app.getProgramElement(proposal, sv, services);
 		app = app.addCheckedInstantiation(sv, pe, services, true);
 		proposals = proposals.append(proposal);
 	    } else if (sv.sort() == ProgramSVSort.LABEL) {
@@ -539,8 +602,7 @@ public abstract class TacletApp implements RuleApp {
 		do {
 		    String proposal = VariableNameProposer.DEFAULT.getProposal(
 			    this, sv, services, null, proposals);
-		    ProgramElement pe = TacletInstantiationsTableModel
-			    .getProgramElement(app, proposal, sv, services);
+		    ProgramElement pe = app.getProgramElement(proposal, sv, services);
 		    proposals = proposals.prepend(proposal);
 		    try {
 			app = app.addCheckedInstantiation(sv, pe, services,
@@ -628,7 +690,7 @@ public abstract class TacletApp implements RuleApp {
      * @return a fresh created collection of strings in which a freshly created
      *         variable name should not fall.
      */
-    private Collection<String> collectClashNames(SchemaVariable sv, Services services) {
+    private Collection<String> collectClashNames(SchemaVariable sv, TermServices services) {
         Collection<String> result = new LinkedHashSet<String>();
         VariableCollectVisitor vcv = new VariableCollectVisitor();
         Iterator<NotFreeIn> it = taclet().varsNotFreeIn();
@@ -714,7 +776,7 @@ public abstract class TacletApp implements RuleApp {
      * @throws GenericSortException
      *             iff p_s is a generic sort which is not yet instantiated
      */
-    public Sort getRealSort(SchemaVariable p_sv, Services services) {
+    public Sort getRealSort(SchemaVariable p_sv, TermServices services) {
 	return instantiations().getGenericSortInstantiations().getRealSort(
 		p_sv, services);
     }
@@ -745,11 +807,11 @@ public abstract class TacletApp implements RuleApp {
 	    				  Services services) {
 	final Function c 
 		= new Function(new Name(instantiation), sort, new Sort[0]);
-	return addInstantiation(sv, TB.func(c), interesting, services);
+	return addInstantiation(sv, services.getTermBuilder().func(c), interesting, services);
     }
     
     
-    public void registerSkolemConstants(Services services) {
+    public void registerSkolemConstants(TermServices services) {
 	final SVInstantiations insts = instantiations();
 	final Iterator<SchemaVariable> svIt = insts.svIterator();
 	while(svIt.hasNext()) {
@@ -1256,6 +1318,45 @@ public abstract class TacletApp implements RuleApp {
      */
     public boolean admissible(boolean interactive, ImmutableList<RuleSet> ruleSets) {
 	return taclet().admissible(interactive, ruleSets);
+    }
+
+    public ProgramElement getProgramElement(String instantiation,
+                                            SchemaVariable sv,
+                                            Services services) {
+        Sort svSort = sv.sort();
+        if (svSort == ProgramSVSort.LABEL) {
+            return VariableNamer.parseName(instantiation);
+        } else if (svSort == ProgramSVSort.VARIABLE ) {
+            NewVarcond nvc = taclet.varDeclaredNew(sv);
+            if (nvc != null) {
+        	KeYJavaType kjt;
+        	Object o = nvc.getTypeDefiningObject();
+        	JavaInfo javaInfo = services.getJavaInfo ();
+        	if (o instanceof SchemaVariable) {
+                    final TypeConverter tc = services.getTypeConverter();
+        	    final SchemaVariable peerSV = (SchemaVariable)o;
+        	    final Object peerInst = instantiations().getInstantiation(peerSV);
+                    if(peerInst instanceof TypeReference){
+                        kjt = ((TypeReference) peerInst).getKeYJavaType();
+                    } else {
+                        Expression peerInstExpr;
+                        if(peerInst instanceof Term) {
+                            peerInstExpr = tc.convertToProgramElement((Term)peerInst);
+                        } else {
+                            peerInstExpr = (Expression)peerInst;
+                        }
+                        kjt = tc.getKeYJavaType(peerInstExpr, 
+                        			instantiations().getContextInstantiation().activeStatementContext());
+                    }
+        	} else {
+        	    kjt = javaInfo.getKeYJavaType((Type)o);
+        	}
+                assert kjt != null : "could not find kjt for: " + o;
+        	return new LocationVariable
+        	    (VariableNamer.parseName(instantiation), kjt);
+            }
+        }
+        return null;
     }
 
     /**

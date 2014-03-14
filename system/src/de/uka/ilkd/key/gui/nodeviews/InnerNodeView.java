@@ -279,7 +279,7 @@ public class InnerNodeView extends SequentView {
             final IfFormulaInstSeq inst = (IfFormulaInstSeq) inst2;
             final PosInOccurrence pos
                     = new PosInOccurrence(inst.getConstrainedFormula(),
-                    PosInTerm.TOP_LEVEL,
+                    PosInTerm.getTopLevel(),
                     inst.inAntec());
             final Range r = highlightPos(pos, IF_FORMULA_HIGHLIGHTER);
         }

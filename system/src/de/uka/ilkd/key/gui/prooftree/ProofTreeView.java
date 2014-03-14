@@ -784,7 +784,7 @@ public class ProofTreeView extends JPanel {
         private static final long serialVersionUID = -8905927848074190941L;
         private JMenuItem expandAll   = new JMenuItem("Expand All", IconFactory.plus(ICON_SIZE));
 	private JMenuItem expandAllBelow   = new JMenuItem("Expand All Below");
-	private JMenuItem expandGoals = new JMenuItem("Expand Goals Only");
+	private JMenuItem expandGoals = new JMenuItem("Expand Goals Only", IconFactory.expandGoals(ICON_SIZE));
 	private JMenuItem expandGoalsBelow =
 		new JMenuItem("Expand Goals Only Below");
 	private JMenuItem collapseAll = new JMenuItem("Collapse All", IconFactory.minus(ICON_SIZE));

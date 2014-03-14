@@ -114,7 +114,7 @@ public class FormulaTagManager {
     private void addTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
         for (SequentFormula constrainedFormula : sci.addedFormulas(p_antec)) {
             final PosInOccurrence pio = new PosInOccurrence
-                    (constrainedFormula, PosInTerm.TOP_LEVEL, p_antec);
+                    (constrainedFormula, PosInTerm.getTopLevel(), p_antec);
             createNewTag(pio, p_goal);
         }
     }
@@ -122,11 +122,12 @@ public class FormulaTagManager {
     private void removeTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
         for (SequentFormula constrainedFormula : sci.removedFormulas(p_antec)) {
             final PosInOccurrence pio = new PosInOccurrence
-                    (constrainedFormula, PosInTerm.TOP_LEVEL, p_antec);
+                    (constrainedFormula, PosInTerm.getTopLevel(), p_antec);
             removeTag(pio);
         }	
     }
 
+    @SuppressWarnings("unchecked")
     public Object clone () {
     	return new FormulaTagManager
     	    ( (HashMap<FormulaTag, FormulaInfo>)tagToFormulaInfo.clone(), 
@@ -158,7 +159,7 @@ public class FormulaTagManager {
 
         for (Object s : ss) {
             final PosInOccurrence pio = new PosInOccurrence((SequentFormula) s,
-                    PosInTerm.TOP_LEVEL,
+                    PosInTerm.getTopLevel(),
                     p_antec);
             createNewTag(pio, p_goal);
         }
@@ -263,7 +264,7 @@ public class FormulaTagManager {
                                              long              p_age) {
 	    final PosInOccurrence newPIO =
 		new PosInOccurrence ( p_info.getNewFormula(),
-				      PosInTerm.TOP_LEVEL,
+				      PosInTerm.getTopLevel(),
 				      pio.isInAntec() );
 	    
 	    return new FormulaInfo ( newPIO,

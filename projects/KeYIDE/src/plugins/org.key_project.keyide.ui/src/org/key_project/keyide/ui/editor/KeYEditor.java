@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -47,6 +48,7 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.ProofUserManager;
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
+import org.key_project.keyide.ui.breakpoints.KeYBreakpointManager;
 import org.key_project.keyide.ui.editor.input.ProofEditorInput;
 import org.key_project.keyide.ui.editor.input.ProofOblInputEditorInput;
 import org.key_project.keyide.ui.propertyTester.AutoModePropertyTester;
@@ -142,6 +144,10 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * The provided {@link ProofTreeContentOutlinePage}.
     */
    private ProofTreeContentOutlinePage outlinePage;
+   
+   private KeYBreakpointManager breakpointManager;
+   
+   private boolean breakpointsActivated = true;
    
    /**
     * Contains the registered {@link IProofProviderListener}.
@@ -246,6 +252,9 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       if (viewerDecorator != null) {
          viewerDecorator.dispose();
       }
+      if(breakpointManager!=null){
+         DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(breakpointManager);
+      }
       if (getUI() != null) {
          getUI().removePropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
       }
@@ -305,6 +314,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             else {
                throw new CoreException(LogUtil.getLogger().createErrorStatus("Unsupported editor input \"" + input + "\"."));
             }
+            breakpointManager = new KeYBreakpointManager(environment, currentProof);
+            DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(breakpointManager);
             ProofUserManager.getInstance().addUser(currentProof, environment, this);
             this.environment.getMediator().setProof(currentProof);
             this.environment.getMediator().setMinimizeInteraction(true);
@@ -354,10 +365,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       firePropertyChange(PROP_SELECTED_POS_IN_SEQUENT, evt.getOldValue(), evt.getNewValue());
    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
    public boolean isEditable() {
       return false;
    }
@@ -601,6 +608,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       }
       else if (IProofProvider.class.equals(adapter)) {
          return this;
+      } else if (KeYBreakpointManager.class.equals(adapter)){
+         return getBreakpointManager();
       }
       else {
          return super.getAdapter(adapter);
@@ -676,6 +685,34 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       for (IProofProviderListener l : toInform) {
          l.currentProofsChanged(e);
       }
+   }
+
+   /**
+    * @return the breakpointManager
+    */
+   public KeYBreakpointManager getBreakpointManager() {
+      return breakpointManager;
+   }
+
+   /**
+    * @param breakpointManager the breakpointManager to set
+    */
+   public void setBreakpointManager(KeYBreakpointManager breakpointManager) {
+      this.breakpointManager = breakpointManager;
+   }
+
+   /**
+    * @return the breakpointsActivated
+    */
+   public boolean isBreakpointsActivated() {
+      return breakpointsActivated;
+   }
+
+   /**
+    * @param breakpointsActivated the breakpointsActivated to set
+    */
+   public void setBreakpointsActivated(boolean breakpointsActivated) {
+      this.breakpointsActivated = breakpointsActivated;
    }
 
    /**

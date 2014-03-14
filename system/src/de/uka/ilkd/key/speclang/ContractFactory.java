@@ -48,12 +48,13 @@ public class ContractFactory {
     private static final String UNKNOWN_CONTRACT_IMPLEMENTATION = "unknown contract implementation";
     private static final String CONTRACT_COMBINATION_MARKER = "#";
     private final Services services;
-    private final TermBuilder tb = TermBuilder.DF;
+    private final TermBuilder tb;
 
 
     public ContractFactory (Services services){
         assert services != null;
         this.services = services;
+        this.tb = services.getTermBuilder();
     }
 
     // PUBLIC INTERFACE
@@ -107,12 +108,12 @@ public class ContractFactory {
             foci.globalDefs,
             foci.id,
             foci.toBeSaved,
-            foci.transaction);
+            foci.transaction, services);
     }
 
     /** Add the specification contained in InitiallyClause as a postcondition. */
     public FunctionalOperationContract addPost(FunctionalOperationContract old, InitiallyClause ini) {
-        final ProgramVariable selfVar = tb.selfVar(services, ini.getKJT(), true);
+        final ProgramVariable selfVar = tb.selfVar(ini.getKJT(), true);
         return addPost(old, ini.getClause(selfVar, services), null, null, null, null, null);
     }
 
@@ -166,7 +167,7 @@ public class ContractFactory {
                                                    foci.originalMods.get(
                                                            services.getTypeConverter().getHeapLDT()
                                                            .getSavedHeap())
-                                                           != null
+                                                           != null, services
                                                    );
     }
 
@@ -187,7 +188,7 @@ public class ContractFactory {
                                                    foci.originalSelfVar, foci.originalParamVars,
                                                    foci.originalResultVar, foci.originalExcVar,
                                                    foci.originalAtPreVars, globalDefs, foci.id,
-                                                   foci.toBeSaved,foci.transaction);
+                                                   foci.toBeSaved,foci.transaction, services);
     }
 
     public DependencyContract dep(KeYJavaType containerType,
@@ -210,17 +211,17 @@ public class ContractFactory {
                                   Triple<IObserverFunction, Term, Term> dep,
                                   ProgramVariable selfVar) {
         final ImmutableList<ProgramVariable> paramVars =
-                tb.paramVars(services, dep.first, false);
+                tb.paramVars(dep.first, false);
         assert (selfVar == null) == dep.first.isStatic();
         Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable, Term>();
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
-                 selfVar == null ? tb.tt() : tb.inv(services, tb.var(selfVar)));
+                 selfVar == null ? tb.tt() : tb.inv(tb.var(selfVar)));
         Map<ProgramVariable,Term> accessibles = new LinkedHashMap<ProgramVariable, Term>();
         for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
         	if(heap == targetHeap) {
               accessibles.put(heap, dep.second);
         	}else{
-              accessibles.put(heap, TermBuilder.DF.allLocs(services));        		
+              accessibles.put(heap, tb.allLocs());        		
         	}
         }
         // TODO: insert static invariant??
@@ -286,7 +287,7 @@ public class ContractFactory {
                                                    hasMod, selfVar, paramVars, resultVar, excVar,
                                                    atPreVars, null, Contract.INVALID_ID, toBeSaved,
                                                    mods.get(services.getTypeConverter().getHeapLDT()
-                                                           .getSavedHeap()) != null);
+                                                           .getSavedHeap()) != null, services);
     }
 
     public FunctionalOperationContract func (String baseName,
@@ -324,7 +325,7 @@ public class ContractFactory {
                                                    progVars.selfVar, progVars.paramVars,
                                                    progVars.resultVar, progVars.excVar,
                                                    progVars.atPreVars, null,
-                                                   Contract.INVALID_ID, toBeSaved, transaction);
+                                                   Contract.INVALID_ID, toBeSaved, transaction, services);
     }
 
     /**
@@ -457,9 +458,8 @@ public class ContractFactory {
                             nm = m1;
                         } else {
                             Term ownPre = pres.get(h) == null ? pres.get(h) : tb.tt();
-                            nm = tb.intersect(services,
-                                    tb.ife(ownPre, m1, tb.allLocs(services)),
-                                    tb.ife(otherPre, m2, tb.allLocs(services)));
+                            nm = tb.intersect(tb.ife(ownPre, m1, tb.allLocs()),
+                                    tb.ife(otherPre, m2, tb.allLocs()));
                         }
                         mods.put(h, nm);
                     }
@@ -480,7 +480,7 @@ public class ContractFactory {
                     } else if(a2 == null) {
                         na = a1;
                     }else {
-                        na = tb.union(services, a1, a2);
+                        na = tb.union(a1, a2);
                     }
                     deps.put(h, na);
                 }
@@ -500,7 +500,7 @@ public class ContractFactory {
                         }else if(a2Pre == null) {
                             naPre = a1Pre;
                         }else{
-                            naPre = tb.union(services, a1Pre, a2Pre);
+                            naPre = tb.union(a1Pre, a2Pre);
                         }
                         deps.put(hPre, naPre);
                     }
@@ -529,7 +529,7 @@ public class ContractFactory {
                                                    t.globalDefs,
                                                    Contract.INVALID_ID,
                                                    t.toBeSaved,
-                                                   t.transaction);
+                                                   t.transaction, services);
     }
 
 
@@ -549,7 +549,7 @@ public class ContractFactory {
             map.put(tb.var(h), tb.var(atPreVars.get(h)));
           }
         }
-        return new OpReplacer(map).replace(t);
+        return new OpReplacer(map, services.getTermFactory()).replace(t);
     }
 
 
@@ -588,7 +588,7 @@ public class ContractFactory {
                 map.put(it1.next(), it2.next());
             }
         }
-        OpReplacer or = new OpReplacer(map);
+        OpReplacer or = new OpReplacer(map, services.getTermFactory());
         original = or.replace(original);
         return original;
     }

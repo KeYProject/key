@@ -290,7 +290,7 @@ public class SymbolicConfigurationExtractor {
             symbolicObjectsResultingInCurrentState.addAll(filterOutObjectsToIgnore(updateValueObjects, objectsToIgnore));
             symbolicObjectsResultingInCurrentState.addAll(collectObjectsFromSequent(node.sequent(), objectsToIgnore));
             symbolicObjectsResultingInCurrentState = sortTerms(symbolicObjectsResultingInCurrentState); // Sort terms alphabetically. This guarantees that in equivalence classes the representative term is for instance self.next and not self.next.next.
-            symbolicObjectsResultingInCurrentState.add(TermBuilder.DF.NULL(getServices())); // Add null because it can happen that a object is null and this option must be included in equivalence class computation
+            symbolicObjectsResultingInCurrentState.add(getServices().getTermBuilder().NULL()); // Add null because it can happen that a object is null and this option must be included in equivalence class computation
             // Compute a Sequent with the initial conditions of the proof without modality
             Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation(pathCondition);
             // Instantiate proof in which equivalent classes of symbolic objects are computed.
@@ -351,7 +351,7 @@ public class SymbolicConfigurationExtractor {
       // Add exception variable to the ignore list because it is not part of the source code.
       IProgramVariable excVar = SymbolicExecutionUtil.extractExceptionVariable(getProof());
       if (excVar instanceof ProgramVariable) {
-         result.add(TermBuilder.DF.var((ProgramVariable)excVar));
+         result.add(getServices().getTermBuilder().var((ProgramVariable)excVar));
       }
       // Add initial updates which are used as backup of the heap and method arguments. They are not part of the source code and should be ignored.
       Sequent sequent = getRoot().sequent();
@@ -366,7 +366,7 @@ public class SymbolicConfigurationExtractor {
                      if (subUpdate.op() instanceof ElementaryUpdate) {
                         ElementaryUpdate eu = (ElementaryUpdate)subUpdate.op();
                         if (eu.lhs() instanceof ProgramVariable) {
-                           result.add(TermBuilder.DF.var((ProgramVariable)eu.lhs()));
+                           result.add(getServices().getTermBuilder().var((ProgramVariable)eu.lhs()));
                         }
                      }
                   }
@@ -392,7 +392,7 @@ public class SymbolicConfigurationExtractor {
                newTerms.add(sub);
             }
          }
-         return TermBuilder.DF.and(newTerms);
+         return getServices().getTermBuilder().and(newTerms);
       }
       else {
          // Only one term in path condition
@@ -400,7 +400,7 @@ public class SymbolicConfigurationExtractor {
             return pathCondition;
          }
          else {
-            return TermBuilder.DF.tt();
+            return getServices().getTermBuilder().tt();
          }
       }
    }
@@ -472,9 +472,9 @@ public class SymbolicConfigurationExtractor {
       for (SequentFormula sf : originalSequent.succedent()) {
          Term term = sf.formula();
          if (Junctor.IMP.equals(term.op())) {
-            Term newImplication = TermBuilder.DF.imp(term.sub(0), TermBuilder.DF.ff());
+            Term newImplication = getServices().getTermBuilder().imp(term.sub(0), getServices().getTermBuilder().ff());
             newSuccedent = newSuccedent.insertLast(new SequentFormula(newImplication)).semisequent();
-            // Updates are not required, because TermBuilder.DF.apply(updates, true) is just true
+            // Updates are not required, because getServices().getTermBuilder().apply(updates, true) is just true
          }
          else {
             newSuccedent = newSuccedent.insertLast(sf).semisequent();
@@ -498,7 +498,7 @@ public class SymbolicConfigurationExtractor {
       int maxProofSteps = 8000;
       for (int i = 0; i < objectsCopy.size(); i++) {
          for (int j = i + 1; j < objectsCopy.size(); j++) {
-            Term equalTerm = TermBuilder.DF.equals(objectsCopy.get(i), objectsCopy.get(j));
+            Term equalTerm = getServices().getTermBuilder().equals(objectsCopy.get(i), objectsCopy.get(j));
             applyCut(starter, equalTerm, maxProofSteps);
          }
       }
@@ -579,7 +579,7 @@ public class SymbolicConfigurationExtractor {
             if ("CUT".equals(npta.taclet().name().toString().toUpperCase())) {
                Term inst = (Term) npta.instantiations().lookupEntryForSV(new Name("cutFormula")).value().getInstantiation();
                if (goalnode.child(1) == oldNode) {
-                  inst = TermBuilder.DF.not(inst);
+                  inst = getServices().getTermBuilder().not(inst);
                }
                result = result.add(inst);
             }
@@ -786,12 +786,12 @@ public class SymbolicConfigurationExtractor {
             final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
             ProgramVariable var = (ProgramVariable)eu.lhs();
             if (!SymbolicExecutionUtil.isHeap(var, heapLDT)) {
-               if (!isImplicitProgramVariable(var) && !objectsToIgnore.contains(TermBuilder.DF.var(var))) {
+               if (!isImplicitProgramVariable(var) && !objectsToIgnore.contains(getServices().getTermBuilder().var(var))) {
                   locationsToFill.add(new ExtractLocationParameter(var, true));
                }
                if (SymbolicExecutionUtil.hasReferenceSort(getServices(), updateTerm.sub(0))) {
                   Term objectTerm = updateTerm.sub(0);
-                  objectTerm = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), objectTerm);
+                  objectTerm = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), objectTerm, getServices());
                   updateValueObjectsToFill.add(objectTerm);
                }
             }
@@ -886,7 +886,7 @@ public class SymbolicConfigurationExtractor {
          }
          if (SymbolicExecutionUtil.hasReferenceSort(getServices(), term.sub(3)) && term.sub(3).op() instanceof ProgramVariable) {
             Term objectTerm = term.sub(3);
-            objectTerm = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), objectTerm);
+            objectTerm = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), objectTerm, getServices());
             updateValueObjectsToFill.add(objectTerm);
          }
          // Iterate over child heap modifications
@@ -894,7 +894,7 @@ public class SymbolicConfigurationExtractor {
       }
       else if (term.op() == heapLDT.getCreate()) {
          Term newObject = term.sub(1);
-         newObject = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), newObject);
+         newObject = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), newObject, getServices());
          updateCreatedObjectsToFill.add(newObject);
          // Iterate over child heap modifications
          collectLocationsFromHeapUpdate(term.sub(0), locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill);
@@ -935,9 +935,9 @@ public class SymbolicConfigurationExtractor {
          sorts[i] = arguments[i].sort();
       }
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(TermBuilder.DF.newName(getServices(), "ConfigurationPredicate")), Sort.FORMULA, sorts);
+      Function newPredicate = new Function(new Name(getServices().getTermBuilder().newName("ConfigurationPredicate")), Sort.FORMULA, sorts);
       // Create formula which contains the value interested in.
-      Term newTerm = TermBuilder.DF.func(newPredicate, arguments);
+      Term newTerm = getServices().getTermBuilder().func(newPredicate, arguments);
       return newTerm;
    }
 
@@ -1089,11 +1089,11 @@ public class SymbolicConfigurationExtractor {
       if (!locations.isEmpty()) {
          // Get original updates
          Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-         ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
+         ImmutableList<Term> originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
          // Combine configuration with original updates
-         Term configurationCondition = TermBuilder.DF.and(configuration);
+         Term configurationCondition = getServices().getTermBuilder().and(configuration);
          if (pathCondition != null) {
-            configurationCondition = TermBuilder.DF.and(configurationCondition, pathCondition);
+            configurationCondition = getServices().getTermBuilder().and(configurationCondition, pathCondition);
          }
          ImmutableList<Term> additionalUpdates = ImmutableSLList.nil();
          for (Term originalUpdate : originalUpdates) {
@@ -1110,7 +1110,7 @@ public class SymbolicConfigurationExtractor {
          for (ExtractLocationParameter evp : locations) {
             additionalUpdates = additionalUpdates.append(evp.createPreUpdate());
          }
-         ImmutableList<Term> newUpdates = ImmutableSLList.<Term>nil().append(TermBuilder.DF.parallel(additionalUpdates));
+         ImmutableList<Term> newUpdates = ImmutableSLList.<Term>nil().append(getServices().getTermBuilder().parallel(additionalUpdates));
          Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, configurationCondition, configurationTerm, newUpdates);
          // Instantiate and run proof
          ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequent, StrategyProperties.SPLITTING_NORMAL);
@@ -1553,8 +1553,8 @@ public class SymbolicConfigurationExtractor {
        * @return The created {@link Term} with the pre update.
        */
       public Term createPreUpdate() {
-         Term originalTerm = parentTerm != null ? parentTerm : TermBuilder.DF.var(programVariable);
-         return TermBuilder.DF.elementary(getServices(), preVariable, originalTerm);
+         Term originalTerm = parentTerm != null ? parentTerm : getServices().getTermBuilder().var(programVariable);
+         return getServices().getTermBuilder().elementary(preVariable, originalTerm);
       }
       
       /**
@@ -1562,7 +1562,7 @@ public class SymbolicConfigurationExtractor {
        * @return The {@link Term} to compute the parent object with help of the pre update.
        */
       public Term createPreParentTerm() {
-         return TermBuilder.DF.var(preVariable);
+         return getServices().getTermBuilder().var(preVariable);
       }
       
       /**
@@ -1572,28 +1572,28 @@ public class SymbolicConfigurationExtractor {
       public Term createPreValueTerm() {
          if (parentTerm != null) {
             if (isArrayIndex()) {
-               Term idx = TermBuilder.DF.zTerm(getServices(), "" + arrayIndex);
-               return TermBuilder.DF.dotArr(getServices(), parentTerm, idx);
+               Term idx = getServices().getTermBuilder().zTerm("" + arrayIndex);
+               return getServices().getTermBuilder().dotArr(parentTerm, idx);
             }
             else {
                if (getServices().getJavaInfo().getArrayLength() == programVariable) {
                   // Special handling for length attribute of arrays
                   Function function = getServices().getTypeConverter().getHeapLDT().getLength();
-                  return TermBuilder.DF.func(function, createPreParentTerm());
+                  return getServices().getTermBuilder().func(function, createPreParentTerm());
                }
                else {
                   Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)programVariable, getServices());
-                  return TermBuilder.DF.dot(getServices(), programVariable.sort(), createPreParentTerm(), function);
+                  return getServices().getTermBuilder().dot(programVariable.sort(), createPreParentTerm(), function);
                }
             }
          }
          else {
             if (programVariable.isStatic()) {
                Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)programVariable, getServices());
-               return TermBuilder.DF.staticDot(getServices(), programVariable.sort(), function);
+               return getServices().getTermBuilder().staticDot(programVariable.sort(), function);
             }
             else {
-               return TermBuilder.DF.var(programVariable);
+               return getServices().getTermBuilder().var(programVariable);
             }
          }
       }

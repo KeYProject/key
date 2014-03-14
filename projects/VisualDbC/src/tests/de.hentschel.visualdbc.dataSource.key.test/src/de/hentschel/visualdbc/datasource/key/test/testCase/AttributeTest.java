@@ -14,26 +14,26 @@
 package de.hentschel.visualdbc.datasource.key.test.testCase;
 
 import org.junit.Test;
-import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
-import de.hentschel.visualdbc.datasource.key.test.util.TestKeyUtil;
+import de.hentschel.visualdbc.datasource.key.test.Activator;
 import de.hentschel.visualdbc.datasource.model.DSPackageManagement;
 
 /**
  * Tests the handling of attributes in a {@link KeyConnection}.
  * @author Martin Hentschel
  */
-public class AttributeTest extends AbstractSetupTestCase {
+public class AttributeTest extends AbstractKeYTest {
    /**
     * Tests attributes.
     */
    @Test
    public void testAttributes() throws Exception {
-      TestKeyUtil.testKeyConnection("AttributeTest_testAttributes",
-                                    "data/attributeTest",
-                                    null,
-                                    DSPackageManagement.FLAT_LIST,
-                                    TestKeyUtil.createExpectedAttributeTestModel());
+      testKeyConnection("AttributeTest_testAttributes",
+                        "data/attributeTest/test",
+                        null,
+                        DSPackageManagement.FLAT_LIST,
+                        Activator.PLUGIN_ID,
+                        "data/attributeTest/oracle/attributeTest.dbc");
    }
 }

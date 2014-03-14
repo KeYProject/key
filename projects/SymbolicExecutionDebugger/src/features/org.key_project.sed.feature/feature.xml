@@ -14,7 +14,7 @@ For an optimal user experience it is recommended to use at least the following J
 -Xmx1024m 
 -XX:MaxPermSize=256m
 
-The current settings can be inspected in the configuration tab of the installation details available in the "About Eclipse" dialog. They can be changed in the "eclipse.ini" file or by starting Eclipse with the following additional parameters:
+The current settings can be inspected in the configuration tab of the installation details available in the &quot;About Eclipse&quot; dialog. They can be changed in the &quot;eclipse.ini&quot; file or by starting Eclipse with the following additional parameters:
 -vmargs -Xms128m -Xmx1024m -XX:MaxPermSize=256m
    </description>
 
@@ -185,6 +185,13 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
 
    <plugin
          id="org.key_project.sed.ui.visualization.model"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.key_project.sed.key.example.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"

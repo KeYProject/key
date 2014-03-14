@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -22,7 +23,6 @@ import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -98,8 +98,8 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
                              long timeout, 
                              Proof proof, 
                              IGoalChooser goalChooser) {
-      executedNumberOfSetNodesPerGoal.clear(); // Reset number of already detected symbolic execution tree nodes for all goals.
-      goalAllowedResultPerSetNode.clear(); // Remove no longer needed references.
+      getExecutedNumberOfSetNodesPerGoal().clear(); // Reset number of already detected symbolic execution tree nodes for all goals.
+      getGoalAllowedResultPerSetNode().clear(); // Remove no longer needed references.
       return 0; // Return unknown because there is no relation between applied rules and executed symbolic execution tree nodes.
    }
 
@@ -120,23 +120,23 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
          RuleApp ruleApp = goal.getRuleAppManager().peekNext();
          if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {
             // Check if the result for the current node was already computed.
-            Boolean value = goalAllowedResultPerSetNode.get(node);
+            Boolean value = getGoalAllowedResultPerSetNode().get(node);
             if (value == null) {
                // Get the number of executed set nodes on the current goal
-               Integer executedNumberOfSetNodes = executedNumberOfSetNodesPerGoal.get(goal);
+               Integer executedNumberOfSetNodes = getExecutedNumberOfSetNodesPerGoal().get(goal);
                if (executedNumberOfSetNodes == null) {
                   executedNumberOfSetNodes = Integer.valueOf(0);
                }
                // Check if limit of set nodes of the current goal is exceeded
                if (executedNumberOfSetNodes.intValue() + 1 > maximalNumberOfSetNodesToExecutePerGoal) {
-                  goalAllowedResultPerSetNode.put(node, Boolean.FALSE);
+                  getGoalAllowedResultPerSetNode().put(node, Boolean.FALSE);
                   return false; // Limit of set nodes of this goal exceeded
                }
                else {
                   // Increase number of set nodes on this goal and allow rule application
                   executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
-                  executedNumberOfSetNodesPerGoal.put(goal, executedNumberOfSetNodes);
-                  goalAllowedResultPerSetNode.put(node, Boolean.TRUE);
+                  getExecutedNumberOfSetNodesPerGoal().put(goal, executedNumberOfSetNodes);
+                  getGoalAllowedResultPerSetNode().put(node, Boolean.TRUE);
                   return true;
                }
             }
@@ -194,17 +194,17 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
          // Check if multiple branches where created.
          if (updatedNode.childrenCount() >= 2) {
             // If a number of executed set nodes is available for the goal it must be used for all other new created goals.
-            Integer executedValue = executedNumberOfSetNodesPerGoal.get(goal);
+            Integer executedValue = getExecutedNumberOfSetNodesPerGoal().get(goal);
             if (executedValue != null) {
                // Reuse number of set nodes for new created goals
-               NodeIterator childIter = updatedNode.childrenIterator();
+                Iterator<Node> childIter = updatedNode.childrenIterator();
                while (childIter.hasNext()) {
                   Node next = childIter.next();
                   Goal nextGoal = next.proof().getGoal(next);
                   // Check if the current goal is a new one
                   if (nextGoal != goal) {
                      // New goal found, use the number of set nodes for it.
-                     executedNumberOfSetNodesPerGoal.put(nextGoal, executedValue);
+                     getExecutedNumberOfSetNodesPerGoal().put(nextGoal, executedValue);
                   }
                }
             }
@@ -248,7 +248,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
     * @return {@code true} at least one symbolic execution tree node was executed, {@code false} no symbolic execution tree node was executed.
     */
    public boolean wasSetNodeExecuted() {
-      return !executedNumberOfSetNodesPerGoal.isEmpty();
+      return !getExecutedNumberOfSetNodesPerGoal().isEmpty();
    }
    
    /**
@@ -256,6 +256,24 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
     * @return The number of executed symbolic execution tree nodes per {@link Goal}.
     */
    public Map<Goal, Integer> getExectuedSetNodesPerGoal() {
+      return getExecutedNumberOfSetNodesPerGoal();
+   }
+
+   public Map<Node, Boolean> getGoalAllowedResultPerSetNode() {
+      return goalAllowedResultPerSetNode;
+   }
+
+   public void setGoalAllowedResultPerSetNode(
+         Map<Node, Boolean> goalAllowedResultPerSetNode) {
+      this.goalAllowedResultPerSetNode = goalAllowedResultPerSetNode;
+   }
+
+   public Map<Goal, Integer> getExecutedNumberOfSetNodesPerGoal() {
       return executedNumberOfSetNodesPerGoal;
+   }
+
+   public void setExecutedNumberOfSetNodesPerGoal(
+         Map<Goal, Integer> executedNumberOfSetNodesPerGoal) {
+      this.executedNumberOfSetNodesPerGoal = executedNumberOfSetNodesPerGoal;
    }
 }

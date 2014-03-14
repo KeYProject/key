@@ -263,7 +263,7 @@ public class PositionTable {
 	SequentFormula cfma = filterEntry.getOriginalFormula();
 
 	PosInOccurrence currentPos = 
-	    new PosInOccurrence ( cfma, PosInTerm.TOP_LEVEL,
+	    new PosInOccurrence ( cfma, PosInTerm.getTopLevel(),
 				  filter.getSequent ().antecedent().contains(cfma) );
 	
 	return child[cfmaNo].getTermPIS(filterEntry,tail,

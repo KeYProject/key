@@ -23,11 +23,16 @@ import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.InnerVariableNamer;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
@@ -39,9 +44,8 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
  * include information on the underlying Java model and a converter to
  * transform Java program elements to logic (where possible) and back.
  */
-public class Services{
-    
-    /**
+public class Services implements TermServices {
+   /**
      * the proof
      */
     private Proof proof;
@@ -84,15 +88,31 @@ public class Services{
     /**
      * specification repository
      */
-    private SpecificationRepository specRepos 
-    	= new SpecificationRepository(this);
+    private SpecificationRepository specRepos;
     
 
     private NameRecorder nameRecorder;
     
+    private ITermProgramVariableCollectorFactory factory = new ITermProgramVariableCollectorFactory(){
+      @Override
+      public TermProgramVariableCollector create(Services services) {
+         return new TermProgramVariableCollector(services);
+      }};
+
     private final Profile profile;
     
-    private ServiceCaches caches;
+    public ITermProgramVariableCollectorFactory getFactory() {
+      return factory;
+   }
+
+
+   public void setFactory(ITermProgramVariableCollectorFactory factory) {
+      this.factory = factory;
+   }
+   
+    private final ServiceCaches caches;
+    
+    private final TermBuilder termBuilder;
 
    /**
      * creates a new Services object with a new TypeConverter and a new
@@ -103,6 +123,8 @@ public class Services{
        this.profile = profile;
        this.counters = new LinkedHashMap<String, Counter>();
        this.caches = new ServiceCaches();
+       this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
+       this.specRepos = new SpecificationRepository(this);
 	cee = new ConstantExpressionEvaluator(this);
         typeconverter = new TypeConverter(this);
 	if(exceptionHandler == null){
@@ -130,6 +152,8 @@ public class Services{
    this.profile = profile;
    this.counters = counters;
    this.caches = caches;
+   this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
+   this.specRepos = new SpecificationRepository(this);
 	cee = new ConstantExpressionEvaluator(this);
 	typeconverter = new TypeConverter(this);
 	javainfo = new JavaInfo
@@ -297,6 +321,7 @@ public class Services{
      * returns the namespaces for functions, predicates etc.
      * @return the proof specific namespaces
      */
+    @Override
     public NamespaceSet getNamespaces() {
         return namespaces;
     }
@@ -318,6 +343,10 @@ public class Services{
     public Proof getProof() {
 	return proof;
     }
+    
+    public interface ITermProgramVariableCollectorFactory{
+       public TermProgramVariableCollector create(Services services);
+    }
 
     /**
      * Returns the sued {@link Profile}.
@@ -333,5 +362,23 @@ public class Services{
      */
     public ServiceCaches getCaches() {
         return caches;
+    }
+    
+    /**
+     * Returns the {@link TermBuilder} used to create {@link Term}s.
+     * @return The {@link TermBuilder} used to create {@link Term}s.
+     */
+    @Override
+    public TermBuilder getTermBuilder() {
+       return termBuilder;
+    }
+
+    /**
+     * Returns the {@link TermFactory} used to create {@link Term}s.
+     * @return The {@link TermFactory} used to create {@link Term}s.
+     */
+    @Override
+    public TermFactory getTermFactory() {
+        return termBuilder.tf();
     }
 }

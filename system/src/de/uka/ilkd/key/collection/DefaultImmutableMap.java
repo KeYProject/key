@@ -41,8 +41,6 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 
     private final int size;
     
-    private int hashCode = -1;
-
     /** only for use by NILMap */
     protected DefaultImmutableMap() {
 	entry       = null;
@@ -261,14 +259,12 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     }
 
     public int hashCode() {
-	if ( hashCode == -1 ) {
-	    final Iterator<ImmutableMapEntry<S,T>> p = entryIterator();
-	    while ( p.hasNext() ) {
-		hashCode += 7*p.next().hashCode();
-	    }
-	    hashCode = hashCode == -1 ? 2 : hashCode;
-	}
-	return hashCode;
+        int hashCode = 1;
+        final Iterator<ImmutableMapEntry<S,T>> p = entryIterator();
+        while ( p.hasNext() ) {
+            hashCode += 7*p.next().hashCode();
+        }
+        return hashCode;
     }
 
     /** the empty map */

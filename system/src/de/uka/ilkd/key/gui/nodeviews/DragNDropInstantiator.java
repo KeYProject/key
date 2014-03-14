@@ -162,7 +162,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                
         
         if (applicableApps.isEmpty() && !targetPos.isSequent() &&
-                targetPos.getPosInOccurrence().posInTerm() != PosInTerm.TOP_LEVEL) {
+                targetPos.getPosInOccurrence().posInTerm() != PosInTerm.getTopLevel()) {
             // if no applicable taclet is found we relax the target position a bit
             applicableApps = 
                 getAllApplicableApps(sourcePos, 
@@ -183,7 +183,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             // open a pop up menu for user selection
             SimpleTacletSelectionMenu menu = new SimpleTacletSelectionMenu(
                     applicableApps, seqView.getMediator().getNotationInfo(),
-                    new PopupListener());
+                    new PopupListener(), services);
 
             JPopupMenu pm = menu.getPopupMenu();
             pm.show(seqView, (int) dropLocation.getX(), (int) dropLocation

@@ -44,7 +44,7 @@ public class FIFOStrategy implements Strategy {
     public RuleAppCost computeCost ( RuleApp         app,
 	                             PosInOccurrence pio,
 	                             Goal            goal ) {
-	return LongRuleAppCost.create ( goal.getTime () );
+	return NumberRuleAppCost.create ( goal.getTime () );
     }
 
     /**

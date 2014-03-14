@@ -55,7 +55,7 @@ public class JavaProfile extends AbstractProfile {
      */
     public static JavaProfile defaultInstance; 
 
-    private final static StrategyFactory DEFAULT =
+    public final static StrategyFactory DEFAULT =
         new JavaCardDLStrategy.Factory();
 
     private OneStepSimplifier oneStepSimpilifier;

@@ -109,8 +109,11 @@ public class ProgressDialog extends JDialog{
                 buttonBox.add(Box.createHorizontalGlue());
                 buttonBox.add(getStopButton());
                 buttonBox.add(Box.createHorizontalStrut(5));
-                buttonBox.add(getApplyButton());
-                buttonBox.add(Box.createHorizontalStrut(5));
+                if(!counterexample){
+                	buttonBox.add(getApplyButton());
+                    buttonBox.add(Box.createHorizontalStrut(5));
+                }
+                
                 
                 GridBagConstraints constraints = new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, 
                         GridBagConstraints.CENTER, 
@@ -253,10 +256,12 @@ public class ProgressDialog extends JDialog{
                 switch(modus){
                 case discardModus:
                         stopButton.setText("Discard");
+                        if(applyButton!=null)
                         applyButton.setEnabled(true);
                         break;
                 case stopModus:
                         stopButton.setText("Stop");
+                        if(applyButton!=null)
                         applyButton.setEnabled(false);
                         break;
                         
