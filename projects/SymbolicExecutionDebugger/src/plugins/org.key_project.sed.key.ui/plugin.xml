@@ -134,6 +134,12 @@
             id="org.key_project.sed.key.ui.openProofCommand"
             name="Open Proof">
       </command>
+      <command
+            categoryId="org.eclipse.debug.ui.category.run"
+            description="Add a KeY Watchpoint."
+            id="org.key_project.sed.key.ui.addWatchpointCommand"
+            name="Add Watchpoint">
+      </command>
    </extension>
       <extension
             point="org.eclipse.ui.commandImages">
@@ -148,6 +154,10 @@
          <image
                commandId="org.key_project.sed.key.ui.visualizeConfigurationsCommand"
                icon="icons/configurations_object_diagram.gif">
+         </image>
+         <image
+               commandId="org.key_project.sed.key.ui.addWatchpointCommand"
+               icon="icons/watchpoint.gif">
          </image>
          <image
                commandId="org.key_project.sed.key.ui.openProofCommand"
@@ -240,6 +250,10 @@
                   </or>
                </iterate>
             </enabledWhen>
+         </handler>
+         <handler
+               class="org.key_project.sed.key.ui.command.AddWatchpointHandler"
+               commandId="org.key_project.sed.key.ui.addWatchpointCommand">
          </handler>
       </extension>
    <extension
@@ -469,6 +483,15 @@
                </visibleWhen>
             </command>
          </menuContribution>
+         <menuContribution
+               allPopups="false"
+               locationURI="toolbar:org.eclipse.debug.ui.BreakpointView?after=additions">
+            <command
+                  commandId="org.key_project.sed.key.ui.addWatchpointCommand"
+                  icon="icons/watchpoint.gif"
+                  style="push">
+            </command>
+         </menuContribution>
       </extension>
       <extension
             point="org.eclipse.core.expressions.propertyTesters">
@@ -544,5 +567,71 @@
                   id="org.key_project.sed.key.ui.view.SymbolicExecutionProofSearchStragyView">
             </viewShortcut>
          </perspectiveExtension>
+      </extension>
+      <extension
+            point="org.eclipse.core.expressions.definitions">
+         <definition
+               id="oneElementSelected">
+            <with
+                  variable="activeMenuSelection">
+               <count
+                     value="1">
+               </count>
+            </with>
+         </definition>
+      </extension>
+      <extension
+            point="org.eclipse.debug.core.breakpoints">
+         <breakpoint
+               class="org.key_project.sed.key.core.breakpoints.KeYWatchpoint"
+               id="org.key_project.sed.key.ui.breakpoints.watchpoint"
+               markerType="org.key_project.sed.key.ui.breakpointMarkers.watchpointMarker"
+               name="KeY Watchpoint">
+         </breakpoint>
+      </extension>
+      <extension
+            id="org.key_project.sed.key.ui.breakpointMarkers.watchpointMarker"
+            name="KeY Watchpoint"
+            point="org.eclipse.core.resources.markers">
+         <persistent
+               value="true">
+         </persistent>
+         <super
+               type="org.eclipse.debug.core.breakpointMarker">
+         </super>
+      </extension>
+      <extension
+            point="org.eclipse.debug.ui.detailPaneFactories">
+         <detailFactories
+               class="org.key_project.sed.key.ui.detailFactories.WatchpointDetailPaneFactory"
+               id="org.key_project.sed.key.ui.detailFactories.watchpointDetailPane">
+            <enablement>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.key_project.sed.key.core.breakpoints.KeYWatchpoint">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </enablement>
+         </detailFactories>
+      </extension>
+      <extension
+            point="org.eclipse.ui.propertyPages">
+         <page
+               class="org.key_project.sed.key.ui.propertyPages.WatchpointPropertyPage"
+               icon="icons/watchpoint.gif"
+               id="org.key_project.sed.key.ui.propertyPages.watchpointPropertyPage"
+               name="Watchpoint Properties">
+            <enabledWhen>
+               <instanceof
+                     value="org.key_project.sed.key.core.breakpoints.KeYWatchpoint">
+               </instanceof>
+            </enabledWhen>
+         </page>
       </extension>
 </plugin>

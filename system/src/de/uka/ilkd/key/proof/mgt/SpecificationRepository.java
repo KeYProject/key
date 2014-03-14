@@ -302,7 +302,7 @@ public final class SpecificationRepository {
         return result;
     }
 
-    private ImmutableSet<Pair<KeYJavaType, IObserverFunction>> getOverridingTargets(
+    public ImmutableSet<Pair<KeYJavaType, IObserverFunction>> getOverridingTargets(
             KeYJavaType kjt, IObserverFunction target) {
         if (target instanceof IProgramMethod) {
             return getOverridingMethods(kjt, (IProgramMethod) target);

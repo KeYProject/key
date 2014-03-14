@@ -361,6 +361,10 @@ public final class JavaInfo {
 	    result = type2KJTCache.get(type);
 	}
 
+	if(name2KJTCache != null) {
+      result = name2KJTCache.get(type.getName());
+	}
+	
 	if(result == null) {
 	    Name ldtName = type.getCorrespondingLDTName();
 	    final Namespace sorts = services.getNamespaces().sorts();

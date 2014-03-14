@@ -15,6 +15,7 @@ package org.key_project.sed.key.ui.test.suite.swtbot;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotAddKeYWatchpointTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotCustomizationTabTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotGraphitiCustomizationTabTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotGraphitiKeYTabTest;
@@ -37,6 +38,7 @@ import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotOpenProofTest;
    SWTBotKeYSourceCodeLookupTest.class,
    SWTBotKeYTabTest.class,
    SWTBotMainTabTest.class,
+   SWTBotAddKeYWatchpointTest.class,
    SWTBotOpenProofTest.class
 })
 public class SWTBotAllSEDKeYUITests {
