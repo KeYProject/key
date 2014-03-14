@@ -7,7 +7,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -40,24 +39,13 @@ public class TestLineBreakpointStopConditionSimpleWithHitCount extends AbstractS
          // Make sure that initial tree is valid
          int oracleIndex = 0;
          assertSetTreeAfterStep(env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory);
-         IProgramMethod callerMain=null;
-         IProgramMethod calleeMain=null;
-         IProgramMethod callerLoop=null;
-         for ( KeYJavaType kjt : env.getProof().getJavaInfo().getAllKeYJavaTypes()){
-            for(IProgramMethod pm : env.getProof().getJavaInfo().getAllProgramMethods(kjt)){
-               if(pm.getFullName().equals("main")&&pm.getBody().getParentClass().equals(keyRepDirectory+"\\examples\\_testcase\\set\\lineBreakpointsWithHitcountTest\\test\\BreakpointStopCallerAndLoop.java")){
-                  callerMain = pm;
-               }else if(pm.getFullName().equals("main")&&pm.getBody().getParentClass().equals(keyRepDirectory+"\\examples\\_testcase\\set\\lineBreakpointsWithHitcountTest\\test\\BreakpointStopCallee.java")){
-                  calleeMain = pm;
-               }else if(pm.getFullName().equals("loop")&&pm.getBody().getParentClass().equals(keyRepDirectory+"\\examples\\_testcase\\set\\lineBreakpointsWithHitcountTest\\test\\BreakpointStopCallerAndLoop.java")){
-                  callerLoop = pm;
-               }
-            } 
-         }
+         IProgramMethod callerMain = searchProgramMethod(env.getServices(), "BreakpointStopCallerAndLoop", "main");
+         IProgramMethod calleeMain = searchProgramMethod(env.getServices(), "BreakpointStopCallee", "main");
+         IProgramMethod callerLoop = searchProgramMethod(env.getServices(), "BreakpointStopCallerAndLoop", "loop");
          CompoundStopCondition allBreakpoints = new CompoundStopCondition();
-         LineBreakpointStopCondition firstBreakpoint = new LineBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\lineBreakpointsWithHitcountTest\\test\\BreakpointStopCallerAndLoop.java", 16, -1, callerMain, env.getBuilder().getProof(),null, true, false, 15, 21);
-         LineBreakpointStopCondition secondBreakpoint = new LineBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\lineBreakpointsWithHitcountTest\\test\\BreakpointStopCallerAndLoop.java", 10, 2, callerLoop, env.getBuilder().getProof(),null, true, false, 8, 13);
-         LineBreakpointStopCondition thirdBreakpoint = new LineBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\lineBreakpointsWithHitcountTest\\test\\BreakpointStopCallee.java", 7, -1, calleeMain, env.getBuilder().getProof(),null, true, false, 6, 9);
+         LineBreakpointStopCondition firstBreakpoint = new LineBreakpointStopCondition(callerMain.getPositionInfo().getFileName(), 16, -1, callerMain, env.getBuilder().getProof(),null, true, false, 15, 21);
+         LineBreakpointStopCondition secondBreakpoint = new LineBreakpointStopCondition(callerLoop.getPositionInfo().getFileName(), 10, 2, callerLoop, env.getBuilder().getProof(),null, true, false, 8, 13);
+         LineBreakpointStopCondition thirdBreakpoint = new LineBreakpointStopCondition(calleeMain.getPositionInfo().getFileName(), 7, -1, calleeMain, env.getBuilder().getProof(),null, true, false, 6, 9);
          allBreakpoints.addChildren(firstBreakpoint,secondBreakpoint,thirdBreakpoint);
          env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(allBreakpoints));
          // Do steps

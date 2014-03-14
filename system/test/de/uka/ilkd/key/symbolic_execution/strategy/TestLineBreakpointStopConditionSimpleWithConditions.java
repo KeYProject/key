@@ -7,7 +7,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -37,17 +36,10 @@ public class TestLineBreakpointStopConditionSimpleWithConditions extends Abstrac
          // Make sure that initial tree is valid
          int oracleIndex = 0;
          assertSetTreeAfterStep(envMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory);
-         IProgramMethod main=null;
+         IProgramMethod main = searchProgramMethod(envMain.getServices(), containerTypeName, "main");
          // Test  method main()
-         for ( KeYJavaType kjt : envMain.getProof().getJavaInfo().getAllKeYJavaTypes()){
-            for(IProgramMethod pm : envMain.getProof().getJavaInfo().getAllProgramMethods(kjt)){
-               if(pm.getFullName().equals("main")){
-                  main = pm;
-               }
-            } 
-         }
          CompoundStopCondition allBreakpoints = new CompoundStopCondition();
-         LineBreakpointStopCondition mainBreakpoint = new LineBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\lineBreakpointsWithConditionsTest\\test\\SimpleConditionExample.java", 9, -1, main, envMain.getBuilder().getProof(), "z==1", true, true,6,11);
+         LineBreakpointStopCondition mainBreakpoint = new LineBreakpointStopCondition(main.getPositionInfo().getFileName(), 9, -1, main, envMain.getBuilder().getProof(), "z==1", true, true,6,11);
          
          allBreakpoints.addChildren(mainBreakpoint);
          envMain.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(allBreakpoints));
@@ -58,20 +50,11 @@ public class TestLineBreakpointStopConditionSimpleWithConditions extends Abstrac
          
          //Test method somethingMain()
          envSomethingMain = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, "somethingMain", null, false, false, false, false, false, false);
-         IProgramMethod something=null;
-         IProgramMethod somethingMain=null;
-         for ( KeYJavaType kjt : envSomethingMain.getProof().getJavaInfo().getAllKeYJavaTypes()){
-            for(IProgramMethod pm : envSomethingMain.getProof().getJavaInfo().getAllProgramMethods(kjt)){
-               if(pm.getFullName().equals("something")){
-                  something = pm;
-               } else if(pm.getFullName().equals("somethingMain")){
-                  somethingMain = pm;
-               }
-            } 
-         }
+         IProgramMethod something = searchProgramMethod(envSomethingMain.getServices(), containerTypeName, "something");
+         IProgramMethod somethingMain = searchProgramMethod(envSomethingMain.getServices(), containerTypeName, "somethingMain");
          allBreakpoints = new CompoundStopCondition();
-         LineBreakpointStopCondition somethingMainBreakpoint = new LineBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\lineBreakpointsWithConditionsTest\\test\\SimpleConditionExample.java", 15, -1, somethingMain, envSomethingMain.getBuilder().getProof(),"a==2", true, true,13,17);
-         LineBreakpointStopCondition somethingBreakpoint = new LineBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\lineBreakpointsWithConditionsTest\\test\\SimpleConditionExample.java", 20, -1, something, envSomethingMain.getBuilder().getProof(),"b==3", true, true,19,21);
+         LineBreakpointStopCondition somethingMainBreakpoint = new LineBreakpointStopCondition(somethingMain.getPositionInfo().getFileName(), 15, -1, somethingMain, envSomethingMain.getBuilder().getProof(),"a==2", true, true,13,17);
+         LineBreakpointStopCondition somethingBreakpoint = new LineBreakpointStopCondition(something.getPositionInfo().getFileName(), 20, -1, something, envSomethingMain.getBuilder().getProof(),"b==3", true, true,19,21);
          allBreakpoints.addChildren(somethingBreakpoint, somethingMainBreakpoint);
          envSomethingMain.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(allBreakpoints));
          assertSetTreeAfterStep(envSomethingMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory);
@@ -82,20 +65,11 @@ public class TestLineBreakpointStopConditionSimpleWithConditions extends Abstrac
          
          //Test method somethingLocalMain()
          envSomethingLocalMain = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, "somethingLocalMain", null, false, false, false, false, false, false);
-         IProgramMethod somethingLocal=null;
-         IProgramMethod somethingLocalMain=null;
-         for ( KeYJavaType kjt : envSomethingLocalMain.getProof().getJavaInfo().getAllKeYJavaTypes()){
-            for(IProgramMethod pm : envSomethingLocalMain.getProof().getJavaInfo().getAllProgramMethods(kjt)){
-               if(pm.getFullName().equals("somethingLocal")){
-                  somethingLocal = pm;
-               } else if(pm.getFullName().equals("somethingLocalMain")){
-                  somethingLocalMain = pm;
-               }
-            } 
-         }
+         IProgramMethod somethingLocal = searchProgramMethod(envSomethingLocalMain.getServices(), containerTypeName, "somethingLocal");
+         IProgramMethod somethingLocalMain = searchProgramMethod(envSomethingLocalMain.getServices(), containerTypeName, "somethingLocalMain");
          allBreakpoints = new CompoundStopCondition();
-         LineBreakpointStopCondition somethingLocalBreakpoint = new LineBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\lineBreakpointsWithConditionsTest\\test\\SimpleConditionExample.java", 31, -1, somethingLocal, envSomethingLocalMain.getBuilder().getProof(),"y==42*42&&x==42", true, true,29,32);
-         LineBreakpointStopCondition somethingLocalMainBreakpoint = new LineBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\lineBreakpointsWithConditionsTest\\test\\SimpleConditionExample.java", 26, -1, somethingLocalMain, envSomethingLocalMain.getBuilder().getProof(),"x==42*42&&y==42", true, true,23,27);
+         LineBreakpointStopCondition somethingLocalBreakpoint = new LineBreakpointStopCondition(somethingLocal.getPositionInfo().getFileName(), 31, -1, somethingLocal, envSomethingLocalMain.getBuilder().getProof(),"y==42*42&&x==42", true, true,29,32);
+         LineBreakpointStopCondition somethingLocalMainBreakpoint = new LineBreakpointStopCondition(somethingLocalMain.getPositionInfo().getFileName(), 26, -1, somethingLocalMain, envSomethingLocalMain.getBuilder().getProof(),"x==42*42&&y==42", true, true,23,27);
          allBreakpoints.addChildren(somethingLocalBreakpoint, somethingLocalMainBreakpoint);
          envSomethingLocalMain.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(allBreakpoints));
          
