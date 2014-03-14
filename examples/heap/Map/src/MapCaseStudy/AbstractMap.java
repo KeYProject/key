@@ -30,6 +30,7 @@ public abstract class AbstractMap implements MapInterface {
     @
     @ public invariant (\forall int i; 0 <= i && i < entries.length; entries[i].key != null);
     @ public invariant (\forall int i; 0 <= i && i < entries.length; entries[i].value != null);
+    @ public invariant \dl_inDomainImpliesCreated(map);
     @
     @*/
     
