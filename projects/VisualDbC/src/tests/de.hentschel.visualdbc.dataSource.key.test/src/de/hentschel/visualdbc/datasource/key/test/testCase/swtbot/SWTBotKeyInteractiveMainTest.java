@@ -57,7 +57,7 @@ public class SWTBotKeyInteractiveMainTest extends AbstractSetupTestCase {
       try {
          // Create project and fill it with test data
          IProject project = TestUtilsUtil.createProject("SWTBotInteractiveKeyMainTest_testDisconnectingConnection");
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/quicktour/paycard", project);
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/quicktour/test/paycard", project);
          // Open connection
          File location = ResourceUtil.getLocation(project); 
          TestCase.assertNotNull(location);
@@ -104,7 +104,7 @@ public class SWTBotKeyInteractiveMainTest extends AbstractSetupTestCase {
       try {
          // Create project and fill it with test data
          IProject project = TestUtilsUtil.createProject("SWTBotInteractiveKeyMainTest_testClosingEvent");
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/quicktour/paycard", project);
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/quicktour/test/paycard", project);
          // Open connection
          File location = ResourceUtil.getLocation(project); 
          TestCase.assertNotNull(location);

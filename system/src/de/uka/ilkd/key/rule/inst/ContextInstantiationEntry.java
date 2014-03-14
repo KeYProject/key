@@ -16,21 +16,16 @@ package de.uka.ilkd.key.rule.inst;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.PosInProgram;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /** This class is used to store the information about a matched
  * context of a dl formula. (the pi and omega part)
+ * TODO: Check if there is a need for ContextStatementBlockInstantiation or if it could be
+ * unified with this class
  */
+public class ContextInstantiationEntry extends InstantiationEntry<ContextStatementBlockInstantiation> {
 
-public class ContextInstantiationEntry extends InstantiationEntry {
-
-    /** the prefix and suffix instantiation */
-    private ContextStatementBlockInstantiation inst;
-       
     /** 
      * creates a new ContextInstantiationEntry 
-     * @param ctxt the SchemaVariable that is
-     * instantiated
      * @param pi the PosInProgram describing the position
      * of the first statement after the prefix
      * @param omega the PosInProgram describing the position
@@ -39,21 +34,19 @@ public class ContextInstantiationEntry extends InstantiationEntry {
      * active statement
      * @param pe the ProgramElement the context positions are related to
      */
-    ContextInstantiationEntry(SchemaVariable ctxt, 
-			      PosInProgram pi,
+    ContextInstantiationEntry(PosInProgram pi,
 			      PosInProgram omega, 
 			      ExecutionContext activeStatementContext,
 			      ProgramElement pe) {
-	super(ctxt);
-	inst = new ContextStatementBlockInstantiation
-	    (pi, omega, activeStatementContext, pe);
+	super(new ContextStatementBlockInstantiation
+	        (pi, omega, activeStatementContext, pe));
     }
 
     /** returns the position of the first statement after the prefix
      * @return the position of the first statement after the prefix
      */
     public PosInProgram prefix() {
-	return inst.prefix();
+	return getInstantiation().prefix();
     }
 
 
@@ -63,7 +56,7 @@ public class ContextInstantiationEntry extends InstantiationEntry {
      * starts 
      */
     public PosInProgram suffix() {
-	return inst.suffix();
+	return getInstantiation().suffix();
     }
 
     /** 
@@ -71,7 +64,7 @@ public class ContextInstantiationEntry extends InstantiationEntry {
      * and suffix position
      */
     public ProgramElement contextProgram() {
-	return inst.programElement();
+	return getInstantiation().programElement();
     }
 
     /** 
@@ -79,20 +72,12 @@ public class ContextInstantiationEntry extends InstantiationEntry {
      * null if match is performed outer most
      */
     public ExecutionContext activeStatementContext() {
-	return inst.activeStatementContext();
-    }
-
-
-    /** returns the instantiation of the SchemaVariable 
-     * @return  the instantiation of the SchemaVariable 
-    */
-    public Object getInstantiation() {
-	return inst;
+	return getInstantiation().activeStatementContext();
     }
 
     /** toString */
     public String toString() {
-	return "["+getSchemaVariable()+",\npi:"+prefix()+"\nomega:"+suffix()+"\n]";
+	return "[\npi:"+prefix()+"\nomega:"+suffix()+"\n]";
     }
 
 }

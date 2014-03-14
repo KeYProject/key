@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_f94c0240-572d-44e8-9c30-1adfd97f80a0" name="middle(int, int, int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_a1e58189-9604-4b33-8822-82e0cc47770b" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_fe961f13-ee1f-4416-8854-d0b5ca1cc13a" name="ex01.Middle.middle(x,y,z);" pathCondition="true" lineNumber="-1" charStart="70" charEnd="76">
+            <sedBranchStatement xml:id="_613cfbed-2479-45fa-8898-4d24e481eb65" name="if (y&lt;z)" pathCondition="true" lineNumber="-1" charStart="103" charEnd="297">
+               <sedBranchCondition xml:id="_87a5d152-f9a5-4641-8343-4a0aab583046" name="z &gt;  y" pathCondition="z &gt;  y">
+                  <sedBranchStatement xml:id="_5d43e210-9533-426f-9b03-6ae6370dac1d" name="if (x&lt;y)" pathCondition="z &gt;  y" lineNumber="-1" charStart="120" charEnd="196">
+                     <sedBranchCondition xml:id="_53ac03b5-277b-4262-9abb-4ec3328c0bdd" name="y &gt;  x" pathCondition="y &gt;  x &amp; z &gt;  y">
+                        <sedStatement xml:id="_42b7c6bc-6120-4143-b123-fd7d745c3056" name="return y;" pathCondition="y &gt;  x &amp; z &gt;  y" lineNumber="-1" charStart="138" charEnd="147">
+                           <sedMethodReturn xml:id="_e0330ef0-ccbb-4958-b217-fd670f86614d" name="&lt;return y as result of ex01.Middle.middle(x,y,z);&gt;" pathCondition="y &gt;  x &amp; z &gt;  y" lineNumber="-1" charStart="70" charEnd="76">
+                              <sedTermination xml:id="_074e6949-c66b-4613-b6a0-46b2c2f2a383" name="&lt;end&gt;" pathCondition="y &gt;  x &amp; z &gt;  y" verified="true">
+                              </sedTermination>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedBranchCondition>
+                     <sedBranchCondition xml:id="_7a9403f0-706a-4c90-ae35-6fd5d88904f4" name="y &lt;= x" pathCondition="y &lt;= x &amp; z &gt;  y">
+                        <sedBranchStatement xml:id="_3c1b6b4e-9024-4d90-80d5-e0a950b0bdaf" name="if (x&lt;z)" pathCondition="y &lt;= x &amp; z &gt;  y" lineNumber="-1" charStart="120" charEnd="196">
+                           <sedBranchCondition xml:id="_780eb3ca-c593-461f-acec-262011721fdf" name="z &gt;  x" pathCondition="y &lt;= x &amp; z &gt;  x &amp; z &gt;  y">
+                              <sedStatement xml:id="_eb7dec1b-6caf-457c-9d07-3c936584eba0" name="return y;" pathCondition="y &lt;= x &amp; z &gt;  x &amp; z &gt;  y" lineNumber="-1" charStart="181" charEnd="190">
+                                 <sedMethodReturn xml:id="_12f9d266-5530-4ffb-a6bf-9ec562aa0334" name="&lt;return y as result of ex01.Middle.middle(x,y,z);&gt;" pathCondition="y &lt;= x &amp; z &gt;  x &amp; z &gt;  y" lineNumber="-1" charStart="70" charEnd="76">
+                                    <sedTermination xml:id="_5291d295-f244-4333-9069-9b511696234f" name="&lt;end&gt;" pathCondition="y &lt;= x &amp; z &gt;  x &amp; z &gt;  y" verified="true">
+                                    </sedTermination>
+                                 </sedMethodReturn>
+                              </sedStatement>
+                           </sedBranchCondition>
+                           <sedBranchCondition xml:id="_7e904ee3-8784-4ca9-9762-b60434b52334" name="z &lt;= x" pathCondition="y &lt;= x &amp; z &lt;= x &amp; z &gt;  y">
+                              <sedStatement xml:id="_205b4438-4eb3-4913-aa62-1113f7eaf31b" name="return z;" pathCondition="y &lt;= x &amp; z &lt;= x &amp; z &gt;  y" lineNumber="-1" charStart="301" charEnd="310">
+                                 <sedMethodReturn xml:id="_78ac42c4-ed47-4375-bb97-b64322731e5a" name="&lt;return z as result of ex01.Middle.middle(x,y,z);&gt;" pathCondition="y &lt;= x &amp; z &lt;= x &amp; z &gt;  y" lineNumber="-1" charStart="70" charEnd="76">
+                                    <sedTermination xml:id="_95d39935-1576-44a2-aa3f-2acd17cd1261" name="&lt;end&gt;" pathCondition="y &lt;= x &amp; z &lt;= x &amp; z &gt;  y" verified="true">
+                                    </sedTermination>
+                                 </sedMethodReturn>
+                              </sedStatement>
+                           </sedBranchCondition>
+                        </sedBranchStatement>
+                     </sedBranchCondition>
+                  </sedBranchStatement>
+               </sedBranchCondition>
+               <sedBranchCondition xml:id="_523aa2a2-ec11-44b8-ada6-3384183a14cf" name="z &lt;= y" pathCondition="z &lt;= y">
+                  <sedBranchStatement xml:id="_1011e893-b985-47bd-b7ae-4ca777e4daca" name="if (x&gt;y)" pathCondition="z &lt;= y" lineNumber="-1" charStart="216" charEnd="292">
+                     <sedBranchCondition xml:id="_cdf015e2-7184-497b-a78a-4161c94e1f15" name="y &lt; x" pathCondition="y &lt; x &amp; z &lt;= y">
+                        <sedStatement xml:id="_fe058751-a3bc-4c75-ab84-cdd7b8cf35e1" name="return y;" pathCondition="y &lt; x &amp; z &lt;= y" lineNumber="-1" charStart="234" charEnd="243">
+                           <sedMethodReturn xml:id="_4e4134f7-e117-4d70-a2ee-592c90916a8e" name="&lt;return y as result of ex01.Middle.middle(x,y,z);&gt;" pathCondition="y &lt; x &amp; z &lt;= y" lineNumber="-1" charStart="70" charEnd="76">
+                              <sedTermination xml:id="_f47856e9-e984-4e7b-9261-ada4b781751c" name="&lt;end&gt;" pathCondition="y &lt; x &amp; z &lt;= y" verified="true">
+                              </sedTermination>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedBranchCondition>
+                     <sedBranchCondition xml:id="_c6f134b0-260e-486b-8fe6-6c12f12befd9" name="y &gt;= x" pathCondition="y &gt;= x &amp; z &lt;= y">
+                        <sedBranchStatement xml:id="_8375d7e7-0bd2-4a8a-a27a-4cfd9b7521e7" name="if (x&gt;z)" pathCondition="y &gt;= x &amp; z &lt;= y" lineNumber="-1" charStart="216" charEnd="292">
+                           <sedBranchCondition xml:id="_182a9d66-ff0f-49d2-bf99-c74191a98fbb" name="z &lt; x" pathCondition="y &gt;= x &amp; z &lt; x &amp; z &lt;= y">
+                              <sedStatement xml:id="_a1ec3c53-09e2-48c0-9f55-be10bf225076" name="return x;" pathCondition="y &gt;= x &amp; z &lt; x &amp; z &lt;= y" lineNumber="-1" charStart="277" charEnd="286">
+                                 <sedMethodReturn xml:id="_bdb5746e-4926-4a14-a936-445a3869ba27" name="&lt;return x as result of ex01.Middle.middle(x,y,z);&gt;" pathCondition="y &gt;= x &amp; z &lt; x &amp; z &lt;= y" lineNumber="-1" charStart="70" charEnd="76">
+                                    <sedTermination xml:id="_f5f663ef-357d-4c18-ae9b-07e1758dfe7c" name="&lt;end&gt;" pathCondition="y &gt;= x &amp; z &lt; x &amp; z &lt;= y" verified="true">
+                                    </sedTermination>
+                                 </sedMethodReturn>
+                              </sedStatement>
+                           </sedBranchCondition>
+                           <sedBranchCondition xml:id="_94e6fabf-fbcd-4f43-9960-edf679b57cb7" name="z &gt;= x" pathCondition="y &gt;= x &amp; z &gt;= x &amp; z &lt;= y">
+                              <sedStatement xml:id="_16c72a65-7bff-488f-acb1-a2e054c5044d" name="return z;" pathCondition="y &gt;= x &amp; z &gt;= x &amp; z &lt;= y" lineNumber="-1" charStart="301" charEnd="310">
+                                 <sedMethodReturn xml:id="_a9c9e377-2fa4-42f0-9c6f-a2c28ccc39e4" name="&lt;return z as result of ex01.Middle.middle(x,y,z);&gt;" pathCondition="y &gt;= x &amp; z &gt;= x &amp; z &lt;= y" lineNumber="-1" charStart="70" charEnd="76">
+                                    <sedTermination xml:id="_5fa9c144-c7b1-4e38-a0f2-f0cc764feef1" name="&lt;end&gt;" pathCondition="y &gt;= x &amp; z &gt;= x &amp; z &lt;= y" verified="true">
+                                    </sedTermination>
+                                 </sedMethodReturn>
+                              </sedStatement>
+                           </sedBranchCondition>
+                        </sedBranchStatement>
+                     </sedBranchCondition>
+                  </sedBranchStatement>
+               </sedBranchCondition>
+            </sedBranchStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

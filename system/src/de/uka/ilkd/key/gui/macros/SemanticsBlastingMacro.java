@@ -40,7 +40,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -175,7 +175,7 @@ public class SemanticsBlastingMacro extends StrategyProofMacro {
 
 		Services services = mediator.getServices();
 		JavaInfo info = mediator.getJavaInfo();
-		TermBuilder tb = new TermBuilder();
+		TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
 		SpecificationRepository spec = services.getSpecificationRepository();
 
 		Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
@@ -204,7 +204,7 @@ public class SemanticsBlastingMacro extends StrategyProofMacro {
 
 			LogicVariable o = new LogicVariable(new Name("o"), kjt.getSort());
 
-			Term exactInstance = tb.exactInstance(services, kjt.getSort(), tb.var(o));
+			Term exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));
 
 
 			for(ClassAxiom c : spec.getClassAxioms(kjt)){
@@ -229,7 +229,7 @@ public class SemanticsBlastingMacro extends StrategyProofMacro {
 							Term[] heaps = new Term[1];
 							heaps[0] = tb.var(h);
 
-							Term inv = tb.inv(services, heaps, tb.var(o));
+							Term inv = tb.inv(heaps, tb.var(o));
 
 							if(left.op().name().equals(inv.op().name())){
 
@@ -328,16 +328,16 @@ public class SemanticsBlastingMacro extends StrategyProofMacro {
 				Goal goal) {
 
 			if(app.rule() instanceof OneStepSimplifier){
-				return LongRuleAppCost.ZERO_COST;
+				return NumberRuleAppCost.getZeroCost();
 			}
 			//			else if(app.rule().name().toString().equals("applyEq")){
 			//				return LongRuleAppCost.ZERO_COST;
 			//			}
 			else if(semanticsFilter.filter(app.rule())){
-				return LongRuleAppCost.create(1);
+				return NumberRuleAppCost.create(1);
 			}			
 			else if(equalityRuleFilter.filter(app.rule())){
-				return LongRuleAppCost.create(10);
+				return NumberRuleAppCost.create(10);
 			}
 			else if(app.rule().name().toString().equals("pullOut")){
 				Term t = pio.subTerm();
@@ -346,7 +346,7 @@ public class SemanticsBlastingMacro extends StrategyProofMacro {
 
 				if(t.op() instanceof Function){
 					if(allowedPullOut.contains(t.op().name().toString())){
-						return LongRuleAppCost.create(1000);
+						return NumberRuleAppCost.create(1000);
 					}
 				}
 

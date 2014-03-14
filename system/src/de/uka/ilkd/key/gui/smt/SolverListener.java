@@ -22,6 +22,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
@@ -235,55 +237,12 @@ public class SolverListener implements SolverLauncherListener {
                 }
        
                 
-                ProgressDialogListener listener = new ProgressDialogListener() {
-                        
-                        @Override
-                        public void infoButtonClicked(int column, int row) {
-                                InternSMTProblem problem = getProblem(column, row);
-                                showInformation(problem);
-                                
-                        }
-                        
-                        @Override
-                        public void stopButtonClicked() {
-                           
-                                stopEvent(launcher); 
-                        }
-                        
-                        @Override
-                        public void applyButtonClicked() {
-                                applyEvent(launcher);
-                                
-                        }
-
-                        @Override
-                        public void discardButtonClicked() {
-                                discardEvent(launcher);                                
-                        }
-
-                        @Override
-                        public void additionalInformationChosen(Object obj) {
-                        	  if(obj instanceof String){
-                        		  JOptionPane.showOptionDialog(progressDialog,
-                                          obj,
-                                          "Warning",
-                                          JOptionPane.DEFAULT_OPTION,
-                                          JOptionPane.WARNING_MESSAGE,
-                                          null,
-                                          null,
-                                          null);
-                          	  }else if(obj instanceof InternSMTProblem){
-                        		  showInformation((InternSMTProblem)obj);   
-                        	  }
-                        }
-                };
-                
                 boolean ce = solverTypes.contains(SolverType.Z3_CE_SOLVER);
                 
                     
 
                 progressDialog = new ProgressDialog(
-                                progressModel,listener,ce,RESOLUTION,smtproblems.size()*solverTypes.size(), new String[] {}, titles);
+                                progressModel,new ProgressDialogListenerImpl(launcher, ce),ce,RESOLUTION,smtproblems.size()*solverTypes.size(), new String[] {}, titles);
 
                 for(SolverType type : solverTypes){
                 	if(type.supportHasBeenChecked() && !type.isSupportedVersion()){
@@ -586,6 +545,70 @@ public class SolverListener implements SolverLauncherListener {
 				
 		
 		}
+		
+		private class ProgressDialogListenerImpl implements ProgressDialogListener {
+            
+			
+			
+            private SolverLauncher launcher;
+            private boolean counterexample;
+            
+            
+
+			public ProgressDialogListenerImpl(SolverLauncher launcher,
+					boolean counterexample) {
+				super();
+				this.launcher = launcher;
+				this.counterexample = counterexample;
+			}
+
+			@Override
+            public void infoButtonClicked(int column, int row) {
+                    InternSMTProblem problem = getProblem(column, row);
+                    showInformation(problem);
+                    
+            }
+            
+            @Override
+            public void stopButtonClicked() {
+               
+                    stopEvent(launcher); 
+            }
+            
+            @Override
+            public void applyButtonClicked() {
+                    applyEvent(launcher);
+                    
+            }
+
+            @Override
+            public void discardButtonClicked() {
+                    discardEvent(launcher);
+                    //remove semantics blasting proof for ce dialog
+                    if(counterexample){
+                    	MainWindow mw = MainWindow.getInstance();
+                        KeYMediator mediator = mw.getMediator();
+                    	mediator.getUI().removeProof(mediator.getSelectedProof());
+                    }
+                    
+            }
+
+            @Override
+            public void additionalInformationChosen(Object obj) {
+            	  if(obj instanceof String){
+            		  JOptionPane.showOptionDialog(progressDialog,
+                              obj,
+                              "Warning",
+                              JOptionPane.DEFAULT_OPTION,
+                              JOptionPane.WARNING_MESSAGE,
+                              null,
+                              null,
+                              null);
+              	  }else if(obj instanceof InternSMTProblem){
+            		  showInformation((InternSMTProblem)obj);   
+            	  }
+            }
+    };
 	
 
 

@@ -63,6 +63,10 @@ public class CompoundStopCondition implements IStopCondition {
    public void addChildren(IStopCondition... children) {
       Collections.addAll(this.children, children);
    }
+   
+   public void removeChild(IStopCondition child){
+      children.remove(child);
+   }
 
    /**
     * {@inheritDoc}
@@ -151,5 +155,9 @@ public class CompoundStopCondition implements IStopCondition {
       return lastShouldStopChild != null ?
              lastShouldStopChild.getStopMessage(maxApplications, timeout, proof, goalChooser, startTime, countApplied, singleRuleApplicationInfo) :
              null;
+   }
+
+   public List<IStopCondition> getChildren() {
+      return children;
    }
 }

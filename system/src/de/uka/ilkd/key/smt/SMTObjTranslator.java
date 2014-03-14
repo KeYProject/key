@@ -1573,6 +1573,13 @@ public class SMTObjTranslator implements SMTTranslator {
 			return sorts.get(SEQ_SORT);
 		}		
 		else {
+			
+			Sort obj = services.getJavaInfo().getJavaLangObject().getSort();
+			
+			if(!(s.equals(obj)|| s.extendsTrans(obj))){
+				throw new RuntimeException("Translation Failed: Unsupported Sort: "+s.name());
+			}
+			
 			//System.out.println("Found sort in PO: "+s);
 			javaSorts.add(s);
 			addTypePredicate(s);
@@ -2214,11 +2221,11 @@ public class SMTObjTranslator implements SMTTranslator {
 		children = children.not();			
 		KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sort);
 
-		boolean finalClass =  kjt.getJavaType() instanceof ClassDeclaration
+		boolean finalClass =  kjt!=null&&kjt.getJavaType() instanceof ClassDeclaration
 				&& ((ClassDeclaration) kjt.getJavaType()).isFinal();
 
 
-		if(kjt.getJavaType() instanceof ArrayDeclaration){
+		if(kjt!=null && kjt.getJavaType() instanceof ArrayDeclaration){
 			finalClass = true;
 		}
 

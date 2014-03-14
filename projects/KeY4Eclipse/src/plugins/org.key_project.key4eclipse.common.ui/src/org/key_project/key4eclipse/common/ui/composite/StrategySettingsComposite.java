@@ -93,9 +93,9 @@ public class StrategySettingsComposite extends Composite {
    };
    
    /**
-    * Maps a {@link Proof} to a {@link Map} which maps the strategy name to the {@link ScrolledForm} which is used to edit its settings.
+    * Maps the strategy name to the {@link ScrolledForm} which is used to edit its settings.
     */
-   private Map<Proof, Map<Name, ScrolledForm>> proofForms = new HashMap<Proof, Map<Name, ScrolledForm>>();
+   private Map<Name, ScrolledForm> proofForms = new HashMap<Name, ScrolledForm>();
    
    /**
     * The {@link StackLayout} used in this {@link Composite}.
@@ -210,18 +210,12 @@ public class StrategySettingsComposite extends Composite {
          StrategySettingsDefinition model = factory != null ? factory.getSettingsDefinition() : null;
          if (model != null) {
             // Show proof settings
-            Map<Name, ScrolledForm> forms = proofForms.get(proof);
-            
-            if (forms == null) {
-               forms = new HashMap<Name, ScrolledForm>();
-               proofForms.put(proof, forms);
-            }
-            ScrolledForm form = forms.get(strategyName);
+            ScrolledForm form = proofForms.get(strategyName);
             if (form == null) {
                FormToolkit toolkit = new FormToolkit(getDisplay());
                form = toolkit.createScrolledForm(this);
                createContent(toolkit, form, factory, model);
-               forms.put(strategyName, form);
+               proofForms.put(strategyName, form);
             }
             data = (FormData)form.getData();
             updateShownContent();
@@ -240,6 +234,7 @@ public class StrategySettingsComposite extends Composite {
          layout.topControl = errorLabel;
       }
       this.layout();
+      updateRestoreDefaultEnabled();
    }
 
    /**
@@ -250,7 +245,7 @@ public class StrategySettingsComposite extends Composite {
     * @param model The {@link StrategySettingsDefinition} which defines the user interface to create.
     */
    protected void createContent(FormToolkit toolkit, ScrolledForm form, StrategyFactory factory, StrategySettingsDefinition model) {
-      FormData data = new FormData();
+      FormData data = new FormData(model, factory);
       form.setData(data);
       form.getBody().setLayout(new GridLayout(1, false));
       if (model.isShowMaxRuleApplications()) {
@@ -266,10 +261,7 @@ public class StrategySettingsComposite extends Composite {
             @Override
             public void modifyText(ModifyEvent e) {
                try {
-                  String text = maxStepText.getText();
-                  int steps = !StringUtil.isTrimmedEmpty(text) ? 
-                              Integer.valueOf(text) : 
-                              0;
+                  int steps = getStepsFromText(maxStepText);
                   ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(steps);
                   proof.getSettings().getStrategySettings().setMaxSteps(steps);
                }
@@ -292,8 +284,28 @@ public class StrategySettingsComposite extends Composite {
             createStrategyProperty(data, toolkit, propertiesComposite, factory, true, property);
          }
       }
+      Button defaultButton = toolkit.createButton(form.getBody(), "Restore &Defaults", SWT.PUSH);
+      defaultButton.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            restoreDefaultValues();
+         }
+      });
+      data.setDefaultButton(defaultButton);
    }
-   
+
+   /**
+    * Returns the maximal steps defined by the given {@link Text}.
+    * @param maxStepText The {@link Text} which defines the maximal steps.
+    * @return The maximal steps.
+    */
+   protected int getStepsFromText(Text maxStepText) {
+      String text = maxStepText.getText();
+      return !StringUtil.isTrimmedEmpty(text) ? 
+             Integer.valueOf(text) : 
+             0;
+   }
+
    /**
     * Creates the user interface for the given {@link AbstractStrategyPropertyDefinition}.
     * @param data The {@link FormData} to fill.
@@ -313,7 +325,8 @@ public class StrategySettingsComposite extends Composite {
       if (property instanceof OneOfStrategyPropertyDefinition) {
          final OneOfStrategyPropertyDefinition op = (OneOfStrategyPropertyDefinition)property;
          if (topLevel || op.getValues().isEmpty()) {
-            toolkit.createLabel(parent, op.getName());
+            Label label = toolkit.createLabel(parent, op.getName());
+            label.setToolTipText(XMLUtil.replaceTags(op.getTooltip(), new XMLUtil.HTMLRendererReplacer()));
          }
          if (!op.getValues().isEmpty()) {
             Composite buttonComposite = toolkit.createComposite(parent);
@@ -365,6 +378,7 @@ public class StrategySettingsComposite extends Composite {
             button.setSelection(ObjectUtil.equals(button.getData(), value));
          }
       }
+      updateRestoreDefaultEnabled();
    }
    
    /**
@@ -413,6 +427,32 @@ public class StrategySettingsComposite extends Composite {
    }
    
    /**
+    * Updates the enabled state of the restore default values {@link Button}.
+    */
+   protected void updateRestoreDefaultEnabled() {
+      if (proof != null && data != null && data.getDefaultButton() != null) {
+         boolean defaultMaxRules = data.getMaxStepText() == null ||
+                                   getStepsFromText(data.getMaxStepText()) == data.getModel().getDefaultMaxRuleApplications();
+         boolean defaultProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties().equals(data.getModel().getDefaultPropertiesFactory().createDefaultStrategyProperties());
+         data.getDefaultButton().setEnabled(!defaultMaxRules || !defaultProperties);
+      }
+   }
+   
+   /**
+    * Restores the default values.
+    */
+   protected void restoreDefaultValues() {
+      if (proof != null && data != null) {
+         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(data.getModel().getDefaultMaxRuleApplications());
+         proof.getSettings().getStrategySettings().setMaxSteps(data.getModel().getDefaultMaxRuleApplications());
+         StrategyProperties sp = data.getModel().getDefaultPropertiesFactory().createDefaultStrategyProperties();
+         SymbolicExecutionUtil.updateStrategySettings(proof, sp);
+         Strategy strategy = data.getFactory().create(proof, sp);
+         proof.setActiveStrategy(strategy);
+      }
+   }
+   
+   /**
     * {@inheritDoc}
     */
    @Override
@@ -426,11 +466,8 @@ public class StrategySettingsComposite extends Composite {
       if (proof != null && !proof.isDisposed()) {
          proof.getSettings().getStrategySettings().removeSettingsListener(settingsListener);
       }
-      for (Map<Name, ScrolledForm> forms : proofForms.values()) {
-         for (ScrolledForm form : forms.values()) {
-            form.dispose();
-         }
-         forms.clear();
+      for (ScrolledForm form : proofForms.values()) {
+         form.dispose();
       }
       proofForms.clear();
       super.dispose();
@@ -443,6 +480,16 @@ public class StrategySettingsComposite extends Composite {
     */
    protected static class FormData {
       /**
+       * The {@link StrategySettingsDefinition} from which contained UI controls are created.
+       */
+      private final StrategySettingsDefinition model;
+      
+      /**
+       * The {@link StrategyFactory} which provides {@link #model}.
+       */
+      private final StrategyFactory factory;
+      
+      /**
        * The {@link Text} in which the maximal number of steps is edited.
        */
       private Text maxStepText;
@@ -451,6 +498,21 @@ public class StrategySettingsComposite extends Composite {
        * Maps a property key to the {@link Button}s which defines the values.
        */
       private Map<String, List<Button>> propertyButtons = new HashMap<String, List<Button>>();
+      
+      /**
+       * The default {@link Button}.
+       */
+      private Button defaultButton;
+
+      /**
+       * Constructor. 
+       * @param model The {@link StrategySettingsDefinition} from which contained UI controls are created.
+       * @param factory The {@link StrategyFactory} which provides the given {@link StrategySettingsDefinition}.
+       */
+      public FormData(StrategySettingsDefinition model, StrategyFactory factory) {
+         this.model = model;
+         this.factory = factory;
+      }
 
       /**
        * Returns the {@link Text} in which the maximal number of steps is edited.
@@ -488,6 +550,38 @@ public class StrategySettingsComposite extends Composite {
        */
       public Map<String, List<Button>> getPropertyButtons() {
          return propertyButtons;
+      }
+
+      /**
+       * Returns the default {@link Button}.
+       * @return The default {@link Button}.
+       */
+      public Button getDefaultButton() {
+         return defaultButton;
+      }
+
+      /**
+       * Sets the default {@link Button}.
+       * @param defaultButton The default {@link Button} to set.
+       */
+      public void setDefaultButton(Button defaultButton) {
+         this.defaultButton = defaultButton;
+      }
+
+      /**
+       * Returns the {@link StrategySettingsDefinition} from which contained UI controls are created.
+       * @return The {@link StrategySettingsDefinition} from which contained UI controls are created.
+       */
+      public StrategySettingsDefinition getModel() {
+         return model;
+      }
+
+      /**
+       * Returns the {@link StrategyFactory} which provides {@link #getModel()}.
+       * @return The {@link StrategyFactory} which provides {@link #getModel()}.
+       */
+      public StrategyFactory getFactory() {
+         return factory;
       }
    }
 }

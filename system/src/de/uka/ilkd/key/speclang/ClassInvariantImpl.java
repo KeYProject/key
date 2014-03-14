@@ -18,10 +18,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.OpCollector;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
@@ -88,7 +90,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     
     private Map<Operator, Operator> getReplaceMap(
                 ParsableVariable selfVar, 
-                Services services) {
+                TermServices services) {
         Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
         
         if(selfVar != null && originalSelfVar != null) {
@@ -124,12 +126,12 @@ public final class ClassInvariantImpl implements ClassInvariant {
     
     
     @Override
-    public Term getInv(ParsableVariable selfVar, Services services) {
+    public Term getInv(ParsableVariable selfVar, TermServices services) {
         final Map<Operator, Operator> replaceMap 
         	= getReplaceMap(selfVar, services);
-        final OpReplacer or = new OpReplacer(replaceMap);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         Term res = or.replace(originalInv);
-        res = TermBuilder.DF.convertToFormula(res, services);
+        res = services.getTermBuilder().convertToFormula(res);
         return res;
     }
 

@@ -167,6 +167,10 @@
             </with>
          </enabledWhen>
       </handler>
+      <handler
+            class="org.key_project.keyide.ui.handlers.BreakpointToggleHandler"
+            commandId="org.key_project.keyide.ui.commands.breakpointToggle">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -197,6 +201,22 @@
                        id="org.key_project.keyide.ui.commands.stopAutoModeCommand"
                        label="Stop Auto Mode"
                        style="push">
+                    <visibleWhen
+                          checkEnabled="false">
+                       <with
+                             variable="activeEditorId">
+                          <equals
+                                value="org.key_project.keyide.ui.editor">
+                          </equals>
+                       </with>
+                    </visibleWhen>
+                 </command>
+                 <command
+                       commandId="org.key_project.keyide.ui.commands.breakpointToggle"
+                       icon="icons/breakpoints.gif"
+                       id="org.key_project.keyide.ui.commands.breakpointToggle"
+                       label="Use Breakpoints"
+                       style="toggle">
                     <visibleWhen
                           checkEnabled="false">
                        <with
@@ -246,6 +266,54 @@
             class="org.key_project.keyide.ui.editor.TacletContextMenu"
             locationURI="popup:#KeYEditorContext?before=group.undo">
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="Starts a new proof"
+            id="org.key_project.keyide.ui.commands.startProofCommand"
+            name="Start Proof">
+      </command>
+      <category
+            description="Contains all commands which are provided by the KeY Eclipse integration."
+            id="org.key_project.keyide.ui.commands.category"
+            name="KeY">
+      </category>
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="Starts the proof auto mode with the current specification."
+            id="org.key_project.keyide.ui.commands.startAutoModeCommand"
+            name="Start Auto Mode">
+      </command>
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="Stops the automode."
+            id="org.key_project.keyide.ui.commands.stopAutoModeCommand"
+            name="Stop Auto Mode">
+      </command>
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="Prunes the current prove at the selected position."
+            id="org.key_project.keyide.ui.commands.pruneProof"
+            name="Prune Proof">
+      </command>
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="Applies a Rule"
+            id="org.key_project.keyide.ui.commands.applyrule"
+            name="Apply Rule">
+      </command>
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="Controls wether to suspend on breakpoints or ignore them."
+            id="org.key_project.keyide.ui.commands.breakpointToggle"
+            name="Breakpoint Toggle">
+         <state
+               class="org.eclipse.ui.handlers.RegistryToggleState:true"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">

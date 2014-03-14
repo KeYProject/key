@@ -31,9 +31,9 @@ import de.uka.ilkd.key.logic.op.Operator;
  */
 public class PredictCostProver {
 
-    private final static TermBuilder tb = TermBuilder.DF;
+    private final TermBuilder tb;
 
-    private final static Term trueT = tb.tt(), falseT = tb.ff();
+    private final Term trueT, falseT;
 
     /** assume that all literal in <code>assertLiterals</code> are true */
     private ImmutableSet<Term> assertLiterals;
@@ -41,12 +41,15 @@ public class PredictCostProver {
     /** clauses from <code>instance</code> of CNF */
     private Set<Clause> clauses = new LinkedHashSet<Clause>();
 
-    private Services services;
+    private final Services services;
 
     private PredictCostProver(Term instance, ImmutableSet<Term> assertList,
 	    Services services) {
 	this.assertLiterals = assertList;
 	this.services = services;
+	this.tb = services.getTermBuilder(); 
+	this.trueT = tb.tt();
+	this.falseT = tb.ff();
 	initClauses(instance);
     }
 

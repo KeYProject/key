@@ -32,10 +32,9 @@ public class GeneralSettings implements Settings, Cloneable {
     private static final String ONE_STEP_SIMPLIFICATION_KEY 
     	= "[General]OneStepSimplification";    
     private static final String USE_JML_KEY = "[General]UseJML";
-    private static final String USE_OCL_KEY = "[General]UseOCL";
     private static final String RIGHT_CLICK_MACROS_KEY = "[General]RightClickMacros";
     
-    /** if true then JML/OCL specifications are globally disabled 
+    /** if true then JML specifications are globally disabled 
      * in this run of KeY, regardless of the regular settings 
      */
     public static boolean disableSpecs = false;
@@ -54,9 +53,6 @@ public class GeneralSettings implements Settings, Cloneable {
 
     /** JML is active by default */
     private boolean useJML = true;
-    
-    /** OCL is not active by default */
-    private boolean useOCL = false;
 
     private LinkedList<SettingsListener> listenerList = 
         new LinkedList<SettingsListener>();
@@ -81,11 +77,6 @@ public class GeneralSettings implements Settings, Cloneable {
     
     public boolean useJML() {
         return useJML && !disableSpecs;
-    }
-    
-    
-    public boolean useOCL() {
-        return useOCL && !disableSpecs;
     }
     
 
@@ -128,16 +119,6 @@ public class GeneralSettings implements Settings, Cloneable {
         }
     }
     
-    
-    public void setUseOCL(boolean b) {
-        if (useOCL != b) {
-            useOCL = b;
-          fireSettingsChanged();
-        }
-    }
-
-
-    
     /** gets a Properties object and has to perform the necessary
      * steps in order to change this object in a way that it
      * represents the stored settings
@@ -166,12 +147,7 @@ public class GeneralSettings implements Settings, Cloneable {
         val = props.getProperty(USE_JML_KEY);
         if (val != null) {
             useJML = Boolean.valueOf(val).booleanValue();
-        }         
-        
-        val = props.getProperty(USE_OCL_KEY);
-        if (val != null) {
-            useOCL = Boolean.valueOf(val).booleanValue();
-        }                 
+        }                    
     }
 
 
@@ -186,7 +162,6 @@ public class GeneralSettings implements Settings, Cloneable {
         props.setProperty(ONE_STEP_SIMPLIFICATION_KEY, "" + oneStepSimplification);
         props.setProperty(RIGHT_CLICK_MACROS_KEY, "" + rightClickMacros);
         props.setProperty(USE_JML_KEY, "" + useJML);
-        props.setProperty(USE_OCL_KEY, "" + useOCL);
     }
 
     /** sends the message that the state of this setting has been

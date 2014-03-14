@@ -1,0 +1,242 @@
+#!/bin/sh
+
+resolve_symlink  ()
+{ 
+   TARGET=`ls -l "$1"| awk '/\ ->\ /{print $NF}'`
+
+   if [ -n "$TARGET" ] ; then
+      RESULT="$TARGET"
+      case "$RESULT" in
+         /*) break ;;				# absolute symlink
+         *)  RESULT=`dirname "$0"`/"$RESULT" ;;	# relative symlink
+      esac
+   else
+      RESULT=$1
+   fi
+
+   echo "$RESULT"
+}
+
+UNAME=`uname -s 2>/dev/null | tr '[:upper:]' '[:lower:]'`
+ARCH=`uname -pm 2>/dev/null | tr '[:upper:]' '[:lower:]' | tr ' ' '-'`
+
+if [ -z "$JAVA_HOME" ] ; then
+    JAVA=`which java`
+    if [ -z "$JAVA" ] ; then
+	echo "Cannot find JAVA. Please set your PATH or \$JAVA_HOME."
+	exit 1
+    fi
+else
+    echo "Using JDK installation from:      $JAVA_HOME"
+    if [ "$UNAME" = "darwin" ] ; then
+	JRE=$JAVA_HOME/Home
+	JAVA=$JRE/bin/java
+# other OS
+    else
+	JRE=$JAVA_HOME/jre
+	JAVA=$JRE/bin/java
+    fi
+fi
+
+
+# For debugging reasons disable JIT (otherwise strace doesn't work)
+JAVA_OPTIONS=""
+#JAVA_OPTIONS=-classic
+
+# Uncomment the following definition for remote debugging on port 1234
+#JAVA_OPTIONS='-DKeyDebugFlag=on -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1234'
+
+#
+# Now $KEY_HOME  
+#
+
+if [ -z "$KEY_HOME" ] ; then
+   KEY_HOME=`resolve_symlink "$0"`	# resolve symlink name
+   KEY_HOME=`dirname "$KEY_HOME"`		# strip executable filename
+   KEY_HOME=`cd "$KEY_HOME";pwd`	# and now expand the path to full
+   KEY_HOME=`dirname "$KEY_HOME"`		# strip bin/ sirectory
+fi
+echo "Using KeY installation from:      $KEY_HOME"
+
+
+if [ -z "$KEY_LIB" ] ; then
+   KEY_LIB="$KEY_HOME/key-ext-jars"
+else
+echo "Using libraries from:             $KEY_LIB"
+fi
+
+
+#
+# KeY CLASSPATH
+#
+
+key_ext_jars="antlr.jar recoderKey.jar"
+
+keyclasspath="$KEY_HOME/system/binary/"
+
+for i in $key_ext_jars ; do
+    current_jar="$KEY_LIB/$i"
+    if [ ! -f "$current_jar" ]
+    then
+       echo Cannot find $current_jar. 
+       echo Copy or link the file into the
+       echo $KEY_LIB directory.
+       exit 1
+    else
+       keyclasspath="${keyclasspath}:$current_jar"
+    fi
+done
+
+
+
+#
+#Function prints help message
+#
+
+list_help(){
+  echo "Runscript for the KeY system\n"
+  echo "Usage: ./runProver [technical options] [options for KeY prover] [filename]\n"
+  echo "\nOptions for using this script"
+  echo "  --J-option: pass option to the JVM following the -J option convention of javac\n"
+  echo "Debugging:\n"
+  echo "  --K-keydebug: turn debugging on"
+  echo "  --K-headless: use awt headless mode"
+  echo "  --K-debugclassloader: switch the Debugclassloadflag on to load classes for debugging"
+  echo "  --K-debugprefix <debugclass>: send debug output of debugclass to stadard out"
+  echo "  --K-remotedebug [wait] <port>: turn remote debugging on;"
+  echo "                parameter for listening port, wait for connection if 'wait' specified"
+  echo "  --K-assertionflag: switch assertionflag on, s.t. debug assertions are used\n"
+  echo "Other:\n"
+  echo "  --K-server:  switches Java -server on "
+  echo "  --K-help, -Kh	: prints this help message"
+  echo "  --help	: prints help message of the KeY prover"
+
+}
+
+#
+# KeY-specific command line options
+#
+
+
+keysysprops=""
+keyoptions=""
+
+#default values for Java Options Xmx and Xms
+javaOptionXmx="-Xmx2048m";
+javaOptionXms="-Xms256m";
+
+while [ $# -ne 0 ]; do
+    case $1 in
+#     -K options for configuration options of KeY, such as debugmode, flags,
+# remote debugging
+	--Kh)
+# 	    set ${1} #removes the minus from the option, s.t. it can be passed to key as option
+	    list_help
+	    exit;;
+
+	--K-help)
+# 	    set ${1#--} #removes the minus from the option, s.t. it can be passed to key as option
+	    list_help
+	    exit;;
+
+        --K-headless) 
+            keysysprops="${keysysprops}-Djava.awt.headless=true "
+            shift
+            continue;;
+
+        --K-keydebug) 
+            keysysprops="${keysysprops}-DKeyDebugFlag=on "
+            shift
+            continue;;
+
+        --K-debugclassloader)
+            keysysprops="${keysysprops}-DKeyDebugClassLoader=on "
+            shift
+            continue;;
+
+	--K-debugprefix) keysysprops="${keysysprops}-Dkey.debug.prefix=${2} "
+	    shift
+	    shift
+	    continue;;
+
+	--K-assertionflag) keysysprops="${keysysprops}-DKeyAssertionFlag=true "
+	    shift
+	    continue;;
+
+
+	--K-remotedebug)
+            if [ ${2} = "wait" ]
+            then 
+                wait="y"
+                shift
+            else 
+                wait="n"
+            fi
+            JAVA_OPTIONS="${JAVA_OPTIONS} -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=${wait},address=${2}"
+	    shift
+	    shift
+	    continue;;
+
+
+	--K-server) keysysprops="${keysysprops}-server "
+            shift
+            continue;;
+
+        # -J options following conventions of Java for -J options
+        #special treatment of the options which are also set with deafult 
+        #values: xms and Xmx
+	--J-Xms*)
+	    option=${1#--J}
+	    javaOptionXms=${option}
+	    xms = true;
+	    shift
+	    continue;;
+	    
+	--J-Xmx*)
+	    option=${1#--J}
+	    javaOptionXmx=${option}
+	    shift
+	    continue;;
+
+	--J*)
+	    option=${1#--J}
+	    JAVA_OPTIONS="${JAVA_OPTIONS} ${option}"
+	    shift
+	    continue;;
+	    
+
+         # key options beginning with a minus or filenames  
+         *) break;;
+
+    esac
+done	
+
+
+if [ ! -d "$HOME/.key" ]
+then
+mkdir "$HOME/.key"
+fi
+
+
+# Fallback for KeY-specific binaries
+PATH=${PATH}:$KEY_LIB
+export PATH
+
+
+
+#
+# This command actually runs KeY
+#
+#-server \
+#-XX:CompileThreshold=1500 \
+# -ea:de.uka.ilkd.key... -Xms64m -Xmx2048m \
+
+
+$JAVA $JAVA_OPTIONS $keysysprops \
+-ea:de.uka.ilkd.key... $javaOptionXms $javaOptionXmx \
+-Dkey.home="$KEY_HOME" \
+-Dkey.simplify.logdir="$KEY_SIMPLIFY_LOG_DIR" \
+-Dkey.ics.logdir="$KEY_ICS_LOG_DIR" \
+-Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler \
+-splash:"$KEY_HOME/system/resources/de/uka/ilkd/key/gui/images/key22.gif" \
+-classpath "$keyclasspath" de.uka.ilkd.key.gui.Main "$@"

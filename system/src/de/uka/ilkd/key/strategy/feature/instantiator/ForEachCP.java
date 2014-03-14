@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
@@ -81,7 +81,7 @@ public class ForEachCP implements Feature {
         if ( var.getContent() != null )
             res = body.compute ( app, pos, goal );
         else
-            res = LongRuleAppCost.ZERO_COST;
+            res = NumberRuleAppCost.getZeroCost();
         
         var.setContent ( outerVarContent );
         return res;

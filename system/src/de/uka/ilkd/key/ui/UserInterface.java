@@ -17,10 +17,10 @@ import java.io.File;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
-import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;

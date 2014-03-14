@@ -141,4 +141,17 @@
              file-extensions="meta">
        </file-association>
    </extension>
+   <extension
+         point="org.eclipse.ui.decorators">
+      <decorator
+            adaptable="true"
+            class="org.key_project.key4eclipse.resources.decorator.ProofFolderLightweightLabelDecorator"
+            icon="icons/projectIcon.png"
+            id="org.key_project.key4eclipse.resources.proofFolderDecorator"
+            label="Proof Folders"
+            lightweight="true"
+            objectClass="org.eclipse.core.resources.IFolder"
+            state="true">
+      </decorator>
+   </extension>
 </plugin>

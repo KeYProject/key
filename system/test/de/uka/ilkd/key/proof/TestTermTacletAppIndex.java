@@ -125,7 +125,7 @@ public class TestTermTacletAppIndex extends TestCase{
         Term term = TacletForTests.parseTerm ( "f(f(f(zero)))=one" );
         SequentFormula cfma = new SequentFormula ( term );
 
-        PosInOccurrence pio = new PosInOccurrence ( cfma, PosInTerm.TOP_LEVEL,
+        PosInOccurrence pio = new PosInOccurrence ( cfma, PosInTerm.getTopLevel(),
                                                     false );
 
         TermTacletAppIndex termIdx =
@@ -146,7 +146,7 @@ public class TestTermTacletAppIndex extends TestCase{
         Term term2 = TacletForTests.parseTerm ( "f(f(zero))=one" );
         SequentFormula cfma2 = new SequentFormula ( term2 );
         PosInOccurrence pio2 = new PosInOccurrence ( cfma2,
-                                                     PosInTerm.TOP_LEVEL, false );
+                                                     PosInTerm.getTopLevel(), false );
 
         termIdx = termIdx.update ( pio2.down ( 0 ).down ( 0 ).down ( 0 ), serv,
                                    ruleIdx, NullNewRuleListener.INSTANCE,

@@ -23,6 +23,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -56,9 +58,9 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                   LocationVariable heap, OriginalVariables origVars,
                                   Condition requires, Term assignable, Term accessible,
                                   Condition ensures, Term mby, Term rep, Contract contract,
-                                  Term globalDefs, Term axiom, boolean model) {
+                                  Term globalDefs, Term axiom, boolean model, TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, assignable, accessible,
-              ensures, mby, rep);
+              ensures, mby, rep, tb);
         this.contract = contract;
         this.globalDefs = globalDefs;
         this.axiom = axiom;
@@ -120,10 +122,10 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable, Term>();
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
                  rep.getOrigVars().self == null ?
-                         TB.tt() : TB.inv(services, TB.var(rep.getOrigVars().self)));
+                         TB.tt() : TB.inv(TB.var(rep.getOrigVars().self)));
         Map<ProgramVariable,Term> deps = new LinkedHashMap<ProgramVariable, Term>();
         for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
-            deps.put(heap, TB.allLocs(services));
+            deps.put(heap, TB.allLocs());
         }
         this.contract =
                 new DependencyContractImpl("JML model field",
@@ -163,9 +165,9 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @param params schema variables for the parameters
      * @return the term array of arguments used to construct the method term
      */
-    private static Term[] getArgs(SchemaVariable sv, ParsableVariable heap,
-                                  ParsableVariable heapAtPre, boolean isStatic, boolean twoState,
-                                  ImmutableList<ParsableVariable> params) {
+    private Term[] getArgs(SchemaVariable sv, ParsableVariable heap,
+                           ParsableVariable heapAtPre, boolean isStatic, boolean twoState,
+                           ImmutableList<ParsableVariable> params) {
         Term[] args = new Term[params.size() + (isStatic ? 1 : 2) + (twoState ? 1 : 0)];
         int i = 0;
         args[i++] = TB.var(heap);
@@ -185,18 +187,17 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     /**
      * Finds an -on top level- conjuncted term of the form (exc = null) in the given term.
      * @param t the term to be searched in
-     * @param exc the exception variable
-     * @param services
+    * @param exc the exception variable
      * @return true if the term guarantees exc to be equal to null
      */
-    private static boolean findExcNull(Term t, ProgramVariable exc, Services services) {
+    private boolean findExcNull(Term t, ProgramVariable exc) {
         assert t != null;
         if (t.op().equals(Junctor.AND)) {
             assert t.arity() == 2;
-            return findExcNull(t.sub(0), exc, services) || findExcNull(t.sub(1), exc, services);
+            return findExcNull(t.sub(0), exc) || findExcNull(t.sub(1), exc);
         } else if (t.op().equals(Equality.EQUALS)) {
             assert t.arity() == 2;
-            return t.sub(1).equals(TB.NULL(services)) && t.sub(0).op().equals(exc);
+            return t.sub(1).equals(TB.NULL()) && t.sub(0).op().equals(exc);
         }
         return false;
     }
@@ -218,7 +219,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     @Override
     Function generateMbyAtPreFunc(Services services) {
         return hasMby() ?
-                new Function(new Name(TB.newName(services, "mbyAtPre")),
+                new Function(new Name(TB.newName("mbyAtPre")),
                              services.getTypeConverter().getIntegerLDT().targetSort()) :
                 null;
     }
@@ -292,7 +293,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final boolean twoState = target.getStateCount() == 2;
         final LocationVariable heap = getHeap();
         final LocationVariable heapAtPre;
-        if (getOrigVars().atPres.get(heap) != null) {
+        if (getOrigVars().atPres != null && getOrigVars().atPres.get(heap) != null) {
             heapAtPre = (LocationVariable) getOrigVars().atPres.get(heap);
         } else {
             heapAtPre = heap;
@@ -317,8 +318,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                     selfSV, heapSV, paramsSV, true, services).term;
             final Term wdArgs =
                     TB.and(TB.wd(getArgs(selfSV, heapSV, heapAtPreSV, isStatic || isConstructor,
-                                         twoState, paramsSV),
-                                 services));
+                                         twoState, paramsSV)));
             return createTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps,
                                 TB.var(selfSV), TB.func(target, args),
                                 TB.and(wdArgs, pre), isStatic || isConstructor, services);
@@ -336,7 +336,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return the combined taclet
      */
-    public RewriteTaclet combineTaclets(RewriteTaclet t1, RewriteTaclet t2, Services services) {
+    public RewriteTaclet combineTaclets(RewriteTaclet t1, RewriteTaclet t2, TermServices services) {
         assert t1.goalTemplates().size() == 1;
         assert t2.goalTemplates().size() == 1;
         final Term rw1 = ((RewriteTacletGoalTemplate)t1.goalTemplates().head()).replaceWith();
@@ -378,14 +378,14 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * is a model field/method and can thus not throw any exception.
      * @return true for either normal behaviour or model fields
      */
-    public boolean isNormal(Services services) {
+    public boolean isNormal(TermServices services) {
         if (modelField() || isModel()) {
             return true;
         }
         final Term post = getEnsures().implicit.equals(TB.tt()) ?
                 getEnsures().explicit : getEnsures().implicit;
         final ProgramVariable exc = getOrigVars().exception;
-        return findExcNull(post, exc, services);
+        return findExcNull(post, exc);
     }
 
     /**
@@ -422,7 +422,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public MethodWellDefinedness combine(WellDefinednessCheck wdc, Services services) {
+    public MethodWellDefinedness combine(WellDefinednessCheck wdc, TermServices services) {
         assert wdc instanceof MethodWellDefinedness;
         final MethodWellDefinedness mwd = (MethodWellDefinedness)wdc;
         assert getMethodContract() instanceof FunctionalOperationContract ?
@@ -481,7 +481,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                          contract,
                                          globalDefs,
                                          axiom,
-                                         modelField());
+                                         modelField(), TB);
     }
 
     @Override
@@ -501,7 +501,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                          contract.setTarget(newKJT, newPM),
                                          globalDefs,
                                          axiom,
-                                         modelField());
+                                         modelField(),
+                                         TB);
     }
 
     @Override

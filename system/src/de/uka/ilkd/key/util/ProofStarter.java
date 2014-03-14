@@ -229,14 +229,8 @@ public class ProofStarter {
            }
 
            boolean stopMode = strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY).equals(StrategyProperties.STOPMODE_NONCLOSE);
-           boolean retreatMode = strategyProperties.getProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY).equals(StrategyProperties.RETREAT_MODE_RETREAT);
            ApplyStrategy.ApplyStrategyInfo result;
-           if (retreatMode) {
-              result = prover.startRetreat(proof, goals, maxSteps, timeout, stopMode);
-           } 
-           else {
-              result = prover.start(proof, goals, maxSteps, timeout, stopMode);
-           }
+           result = prover.start(proof, goals, maxSteps, timeout, stopMode);
            
            if (result.isError()) {
                throw new RuntimeException("Proof attempt failed due to exception:"+result.getException(),
