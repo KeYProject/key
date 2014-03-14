@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
@@ -92,8 +93,23 @@ public class Services implements TermServices {
 
     private NameRecorder nameRecorder;
     
+    private ITermProgramVariableCollectorFactory factory = new ITermProgramVariableCollectorFactory(){
+      @Override
+      public TermProgramVariableCollector create(Services services) {
+         return new TermProgramVariableCollector(services);
+      }};
+
     private final Profile profile;
     
+    public ITermProgramVariableCollectorFactory getFactory() {
+      return factory;
+   }
+
+
+   public void setFactory(ITermProgramVariableCollectorFactory factory) {
+      this.factory = factory;
+   }
+   
     private final ServiceCaches caches;
     
     private final TermBuilder termBuilder;
@@ -326,6 +342,10 @@ public class Services implements TermServices {
      */
     public Proof getProof() {
 	return proof;
+    }
+    
+    public interface ITermProgramVariableCollectorFactory{
+       public TermProgramVariableCollector create(Services services);
     }
 
     /**

@@ -133,6 +133,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          createOracleFile(oracleDirectory, target, expectedModelPathInBundle, saveVariables, saveCallStack);
       }
    }
+
    
    /**
     * Creates a new oracle file for the given {@link ISEDDebugTarget}.
@@ -158,6 +159,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       // Print message to the user.
       printOracleDirectory();
    }
+   
    
    /**
     * Prints {@link #oracleDirectory} to the user via {@link System#out}.
@@ -243,6 +245,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          TestSedCoreUtil.compareDebugTarget(expectedDebugTarget, target, false, includeVariables, includeCallStack);
       }
    }
+   
    
    /**
     * Makes sure that one test step is correctly done.
@@ -525,7 +528,8 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            timeoutFactor, 
                            executor);
    }
-   
+
+
    /**
     * Performs a test on a {@link KeYDebugTarget}. This methods setups
     * the environment an the real test is done in the given {@link IKeYDebugTargetTestExecutor}.

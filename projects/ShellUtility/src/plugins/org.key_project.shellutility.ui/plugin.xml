@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="KeY Utility"
+            id="org.key_project.shellutility.ui.commands.category">
+      </category>
+      <command
+            name="Update Size and Location"
+            categoryId="org.key_project.shellutility.ui.commands.category"
+            id="org.key_project.shellutility.ui.updateSzeAndLocationCommand">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="org.key_project.shellutility.ui.updateSzeAndLocationCommand"
+            class="org.key_project.shellutility.ui.handlers.UpdateSizeAndLocationHandler">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.key_project.shellutility.ui.updateSzeAndLocationCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+0"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+   </extension>
+
+</plugin>

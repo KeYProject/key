@@ -195,6 +195,45 @@ public class TestUtilsUtil {
     * @throws CoreException Occurred Exception.
     * @throws InterruptedException Occurred Exception.
     */
+   public static IJavaProject createJavaProjectNoBinSourceFolders(String name) throws CoreException, InterruptedException {
+      final IProject project = createProject(name);
+      final IJavaProject javaProject = JavaCore.create(project); 
+      IRunnableWithException run = new AbstractRunnableWithException() {
+         @Override
+         public void run() {
+            try {
+               JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
+               IClasspathEntry[] entries = new IClasspathEntry[] {JavaCore.newSourceEntry(project.getFullPath())};
+               entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
+               page.init(javaProject, project.getFullPath(), entries, false);
+               page.configureJavaProject(null);
+            }
+            catch (Exception e) {
+               setException(e);
+            }
+         }
+      };
+      Display.getDefault().syncExec(run);
+      if (run.getException() instanceof CoreException) {
+         throw (CoreException)run.getException();
+      }
+      else if (run.getException() instanceof InterruptedException) {
+         throw (InterruptedException)run.getException();
+      }
+      else if (run.getException() != null) {
+         throw new CoreException(new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(run.getException()));
+      }
+      return javaProject;
+   }
+
+   /**
+    * Creates a new {@link IJavaProject} that is an {@link IProject} with
+    * a JDT nature.
+    * @param name The project name.
+    * @return The created {@link IJavaProject}.
+    * @throws CoreException Occurred Exception.
+    * @throws InterruptedException Occurred Exception.
+    */
    public static IJavaProject createJavaProject(String name) throws CoreException, InterruptedException {
       IProject project = createProject(name);
       final IFolder bin = project.getFolder("bin");
