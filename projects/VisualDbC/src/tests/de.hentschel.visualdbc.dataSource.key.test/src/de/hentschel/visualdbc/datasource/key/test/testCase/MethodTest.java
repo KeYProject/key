@@ -14,26 +14,26 @@
 package de.hentschel.visualdbc.datasource.key.test.testCase;
 
 import org.junit.Test;
-import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
-import de.hentschel.visualdbc.datasource.key.test.util.TestKeyUtil;
+import de.hentschel.visualdbc.datasource.key.test.Activator;
 import de.hentschel.visualdbc.datasource.model.DSPackageManagement;
 
 /**
  * Tests the handling of methods and constructors in a {@link KeyConnection}.
  * @author Martin Hentschel
  */
-public class MethodTest extends AbstractSetupTestCase {
+public class MethodTest extends AbstractKeYTest {
    /**
     * Tests methods and constructors.
     */
    @Test
    public void testMethods() throws Exception {
-      TestKeyUtil.testKeyConnection("MethodTest_testMethods",
-                                    "data/methodAndConstructorTest",
-                                    null,
-                                    DSPackageManagement.FLAT_LIST,
-                                    TestKeyUtil.createExpectedMehtodAndConstructorTestModel());
+      testKeyConnection("MethodTest_testMethods",
+                        "data/methodAndConstructorTest/test",
+                        null,
+                        DSPackageManagement.FLAT_LIST,
+                        Activator.PLUGIN_ID,
+                        "data/methodAndConstructorTest/oracle/methodAndConstructorTest.dbc");
    }
 }

@@ -13,7 +13,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -88,7 +88,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
               return false;
           }
           Term term = pio.subTerm();
-          term = TermBuilder.DF.goBelowUpdates(term);
+          term = TermBuilder.goBelowUpdates(term);
           if (term.op() instanceof Modality
                   && SymbolicExecutionUtil.getSymbolicExecutionLabel(term) == null) {
               Term equalityTerm = term.sub(0);
@@ -108,7 +108,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
     * {@inheritDoc}
     */
    @Override
-   public IBuiltInRuleApp createApp(PosInOccurrence pos) {
+   public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
       return new DefaultBuiltInRuleApp(this, pos);
    }
 
@@ -121,7 +121,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
          // Extract required Terms from goal
          PosInOccurrence pio = ruleApp.posInOccurrence();
          Term topLevelTerm = pio.subTerm();
-         Pair<ImmutableList<Term>,Term> updatesAndTerm = TermBuilder.DF.goBelowUpdates2(topLevelTerm);
+         Pair<ImmutableList<Term>,Term> updatesAndTerm = TermBuilder.goBelowUpdates2(topLevelTerm);
          Term modalityTerm = updatesAndTerm.second;
          ImmutableList<Term> updates = updatesAndTerm.first;
          Term equalityTerm = modalityTerm.sub(0);
@@ -141,9 +141,10 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
          // Compute sequent for side proof to compute query in.
          Sequent sequentToProve = computeGeneralSequentToProve(goal.sequent(), pio.constrainedFormula());
          Function newPredicate = createResultFunction(services, varTerm.sort());
-         Term newTerm = TermBuilder.DF.func(newPredicate, varTerm);
-         Term newModalityTerm = TermFactory.DEFAULT.createTerm(modalityTerm.op(), new ImmutableArray<Term>(newTerm), modalityTerm.boundVars(), modalityTerm.javaBlock(), modalityTerm.getLabels());
-         Term newModalityWithUpdatesTerm = TermBuilder.DF.applySequential(updates, newModalityTerm);
+         final TermBuilder tb = services.getTermBuilder();
+         Term newTerm = tb.func(newPredicate, varTerm);
+         Term newModalityTerm = services.getTermFactory().createTerm(modalityTerm.op(), new ImmutableArray<Term>(newTerm), modalityTerm.boundVars(), modalityTerm.javaBlock(), modalityTerm.getLabels());
+         Term newModalityWithUpdatesTerm = tb.applySequential(updates, newModalityTerm);
          sequentToProve = sequentToProve.addFormula(new SequentFormula(newModalityWithUpdatesTerm), false, false).sequent();
          // Compute results and their conditions
          Map<Term, Set<Term>> conditionsAndResultsMap = computeResultsAndConditions(services, goal, sequentToProve, newPredicate);
@@ -152,13 +153,13 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
          Goal resultGoal = goals.head();
          resultGoal.removeFormula(pio);
          for (Entry<Term, Set<Term>> conditionsAndResult : conditionsAndResultsMap.entrySet()) {
-            Term conditionTerm = TermBuilder.DF.and(conditionsAndResult.getValue());
+            Term conditionTerm = tb.and(conditionsAndResult.getValue());
             Term resultEqualityTerm = varFirst ?
-                                      TermBuilder.DF.equals(conditionsAndResult.getKey(), otherTerm) :
-                                      TermBuilder.DF.equals(otherTerm, conditionsAndResult.getKey());
+                                      tb.equals(conditionsAndResult.getKey(), otherTerm) :
+                                      tb.equals(otherTerm, conditionsAndResult.getKey());
             Term resultTerm = pio.isInAntec() ?
-                              TermBuilder.DF.imp(conditionTerm, resultEqualityTerm) :
-                              TermBuilder.DF.and(conditionTerm, resultEqualityTerm);
+                              tb.imp(conditionTerm, resultEqualityTerm) :
+                              tb.and(conditionTerm, resultEqualityTerm);
             resultGoal.addFormula(new SequentFormula(resultTerm), pio.isInAntec(), false);
          }
          return goals;

@@ -22,6 +22,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JMenu;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.rule.PosTacletApp;
 
@@ -54,10 +55,10 @@ public class SimpleTacletSelectionMenu extends JMenu {
      * menu item 
      */
     public SimpleTacletSelectionMenu(ImmutableList<PosTacletApp> apps, 
-            NotationInfo info, ActionListener listener) {
+            NotationInfo info, ActionListener listener, Services services) {
         super("Select Rule to Apply");        
                     
-        addMenuEntries(apps, info, listener);           
+        addMenuEntries(apps, info, listener, services);
     }
 
     /**
@@ -69,10 +70,10 @@ public class SimpleTacletSelectionMenu extends JMenu {
      * menu item 
      */
     private void addMenuEntries(ImmutableList<PosTacletApp> apps, 
-            NotationInfo info, ActionListener listener) {
+            NotationInfo info, ActionListener listener, Services services) {
         for (PosTacletApp app : apps) {
             final DefaultTacletMenuItem item =
-                    new DefaultTacletMenuItem(this, app, info);
+                    new DefaultTacletMenuItem(this, app, info, services);
             item.addActionListener(listener);
             add(item);
         }

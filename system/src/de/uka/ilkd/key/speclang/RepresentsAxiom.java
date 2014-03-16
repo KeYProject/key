@@ -27,12 +27,12 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.Taclet;
@@ -107,11 +107,6 @@ public final class RepresentsAxiom extends ClassAxiom {
 		           .op().equals(originalSelfVar));
     }
     
-    private Term instance(boolean finalClass, SchemaVariable selfSV, Services services){
-        return target.isStatic() || finalClass || VisibilityModifier.allowsInheritance(visibility)
-        ? TB.tt() :TB.exactInstance(services, kjt.getSort(), TB.var(selfSV));
-    }
-    
     public Term getAxiom(ParsableVariable heapVar,
                          ParsableVariable selfVar,
                          Services services) {
@@ -123,7 +118,7 @@ public final class RepresentsAxiom extends ClassAxiom {
 	if(selfVar != null) {
 	    map.put(originalSelfVar, selfVar);
 	}
-	final OpReplacer or = new OpReplacer(map);
+	final OpReplacer or = new OpReplacer(map, services.getTermFactory());
 	return or.replace(originalRep);
     }
     
@@ -231,19 +226,20 @@ public final class RepresentsAxiom extends ClassAxiom {
      *  An exception is thrown if the targets or types are different.
      *  <b>Known issue</b>: public clauses in subclasses are hidden by protected clauses in superclasses;
      *  this only applies to observers outside the package of the subclass (whenever package-privacy is implemented).
+    * @param tb TODO
      */
-    public RepresentsAxiom conjoin (RepresentsAxiom ax) {
+    public RepresentsAxiom conjoin (RepresentsAxiom ax, TermBuilder tb) {
         if (!target.equals(ax.target) || !kjt.equals(ax.kjt)){
             throw new RuntimeException("Tried to conjoin incompatible represents axioms.");
         }
         VisibilityModifier minVisibility = visibility == null ?
                 (VisibilityModifier.isPrivate(ax.visibility) ? ax.visibility : null)
                         : (visibility.compareTo(ax.visibility) >= 0 ? visibility : ax.visibility);
-        Term newRep = TB.and(originalRep, ax.originalRep);
+        Term newRep = tb.and(originalRep, ax.originalRep);
         Term newPre = null;
         if(originalPre == null) newPre = ax.originalPre;
         else if(ax.originalPre == null) newPre = originalPre;
-        else newPre = TB.and(originalPre, ax.originalPre);
+        else newPre = tb.and(originalPre, ax.originalPre);
         return new RepresentsAxiom(name, displayName, target, kjt, minVisibility, newPre,
                                    newRep, originalSelfVar, originalParamVars, atPreVars);
     }

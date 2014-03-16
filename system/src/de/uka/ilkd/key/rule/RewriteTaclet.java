@@ -18,8 +18,22 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.IntIterator;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PIOPathIterator;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IfThenElse;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.ModalOperatorSV;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.Transformer;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.util.TermHelper;
 import de.uka.ilkd.key.proof.Goal;
@@ -255,7 +269,7 @@ public final class RewriteTaclet extends FindTaclet {
 		}
 	    }
 
-	    return TermFactory.DEFAULT.createTerm(term.op(),
+	    return services.getTermFactory().createTerm(term.op(),
                                                   subs,
                                                   term.boundVars(),
                                                   term.javaBlock(),
@@ -267,7 +281,7 @@ public final class RewriteTaclet extends FindTaclet {
 	// FIXME: Labeling should be done by somehow using {@link label.ITermLabelWorker}
 
 	if(!with.sort().extendsTrans(maxSort)) {
-	    with = TermBuilder.DF.cast(services, maxSort, with);
+	    with = services.getTermBuilder().cast(services, maxSort, with);
 	}
 
 	return with;

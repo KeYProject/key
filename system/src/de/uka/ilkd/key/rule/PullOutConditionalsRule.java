@@ -27,10 +27,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
 
-
+//TODO: delete me
 /*
  * At the moment this rule is unsound and not used. I am not sure if it only forgot to
- *  add the update context or if more needs to be checked. One slighlty worrying thing is 
+ *  add the update context or if more needs to be checked. One slightly worrying thing is 
  *  that it is applied also behind diamond and box modalities. 
  */
 public final class PullOutConditionalsRule implements BuiltInRule {
@@ -39,7 +39,6 @@ public final class PullOutConditionalsRule implements BuiltInRule {
                                             = new PullOutConditionalsRule();
     
     private static final Name NAME = new Name("Pull Out Conditionals");
-    private static final TermBuilder TB = TermBuilder.DF;
     
     private final List<List<Term>> equivalenceClasses 
     	= new LinkedList<List<Term>>();
@@ -167,10 +166,9 @@ public final class PullOutConditionalsRule implements BuiltInRule {
 	final Map<Term,Term> map = new LinkedHashMap<Term,Term>();
 	for(List<Term> equivalenceClass : equivalenceClasses) {	    
 	    if(equivalenceClass.size() > 1) {
-		final Function f = new Function(new Name(TB.newName(services, 
-								    "cond")), 
+		final Function f = new Function(new Name(services.getTermBuilder().newName("cond")), 
 		                                equivalenceClass.get(0).sort());
-		final Term fTerm = TB.func(f);
+		final Term fTerm = services.getTermBuilder().func(f);
 		services.getNamespaces().functions().addSafely(f);
 		for(Term t : equivalenceClass) {
 		    map.put(t, fTerm);
@@ -179,7 +177,7 @@ public final class PullOutConditionalsRule implements BuiltInRule {
 	}
 	
 	//replace
-	final OpReplacer or = new OpReplacer(map);
+	final OpReplacer or = new OpReplacer(map, services.getTermFactory());
 	final SequentFormula newCF 
 		= new SequentFormula(or.replace(focus));
 	result.head().changeFormula(newCF, ruleApp.posInOccurrence());
@@ -191,11 +189,11 @@ public final class PullOutConditionalsRule implements BuiltInRule {
 	    final Term abbrev = entry.getValue();
 	    if(!alreadyDefined.contains(abbrev)) {	    
 		alreadyDefined.add(abbrev);
-		final Term term2 = TB.ife(or.replace(term.sub(0)), 
+		final Term term2 = services.getTermBuilder().ife(or.replace(term.sub(0)), 
 		                      	  or.replace(term.sub(1)),
 		                      	  or.replace(term.sub(2)));
 		final SequentFormula defCF 
-	    		= new SequentFormula(TB.equals(term2, abbrev));
+	    		= new SequentFormula(services.getTermBuilder().equals(term2, abbrev));
 		result.head().addFormula(defCF, true, false);
 	    }
 	}
@@ -224,7 +222,7 @@ public final class PullOutConditionalsRule implements BuiltInRule {
 
 
 	@Override
-    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos) {
+    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
 	    return new DefaultBuiltInRuleApp(this, pos);
     }    
 }

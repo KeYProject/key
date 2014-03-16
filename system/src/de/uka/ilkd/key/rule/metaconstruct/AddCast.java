@@ -17,18 +17,14 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 public final class AddCast extends AbstractTermTransformer {
     
-    private static final TermBuilder TB = TermBuilder.DF;
-    
-
     public AddCast() {
         super(new Name("#addCast"), 2);
     }
@@ -43,6 +39,6 @@ public final class AddCast extends AbstractTermTransformer {
 	
 	return sub.sort().extendsTrans(sort) 
 	       ? sub 
-	       : TB.cast(services, sort, sub);
+	       : services.getTermBuilder().cast(services, sort, sub);
     }
 }

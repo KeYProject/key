@@ -57,13 +57,11 @@ import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import de.uka.ilkd.key.rule.inst.NameInstantiationEntry;
-import de.uka.ilkd.key.rule.inst.ProgramInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.TermInstantiation;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -306,6 +304,7 @@ public class ProofSaver {
       	tree.append("\"");        
         tree.append(posInOccurrence2Proof(node.sequent(), 
                                           appliedRuleApp.posInOccurrence()));
+                
         tree.append(newNames2Proof(node));
         tree.append(builtinRuleIfInsts(node, 
         	                       ((IBuiltInRuleApp)appliedRuleApp).ifInsts()));
@@ -392,7 +391,7 @@ public class ProofSaver {
    
 
    public static String posInTerm2Proof(PosInTerm pos) {
-      if (pos == PosInTerm.TOP_LEVEL) return "";
+      if (pos == PosInTerm.getTopLevel()) return "";
       String s = " (term \"";
       String list = pos.integerList(pos.reverseIterator()); // cheaper to read in
       s = s + list.substring(1,list.length()-1); // chop off "[" and "]"
@@ -406,36 +405,25 @@ public class ProofSaver {
    public String getInteresting(SVInstantiations inst) {
 //System.err.println(inst);   
       String s = "";
-      Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> pairIt =
+      Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> pairIt =
          inst.interesting().entryIterator();
 
       while (pairIt.hasNext()) {
-         ImmutableMapEntry<SchemaVariable,InstantiationEntry> pair = pairIt.next();
+         ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> pair = pairIt.next();
          SchemaVariable var = pair.key();
 	 
-         String singleInstantiation = var.name()+ "="; 
-	 Object value = pair.value();
-	 if (value instanceof TermInstantiation) {
-	     singleInstantiation += printTerm(((TermInstantiation) value).getTerm(), 
-	                    proof.getServices());
-	 }
-         else
-	 if (value instanceof ProgramInstantiation) {
-	     ProgramElement pe = 
-		 ((ProgramInstantiation) value).getProgramElement();
-	     singleInstantiation += printProgramElement(pe);
-	 }
-         else
-	 if (value instanceof NameInstantiationEntry) {
-	     singleInstantiation += ((NameInstantiationEntry) value).getInstantiation();
-	 }
-         else 
-             throw new RuntimeException("Saving failed.\n"+
-           "FIXME: Unhandled instantiation type: " +  value.getClass());
+         final Object value = pair.value().getInstantiation();
 	 
-	 singleInstantiation = escapeCharacters(singleInstantiation);
+         if (!(value instanceof Term || value instanceof ProgramElement || value instanceof Name)) {
+             throw new RuntimeException("Saving failed.\n"+
+                         "FIXME: Unhandled instantiation type: " +  value.getClass());
+         }
+
+         StringBuffer singleInstantiation =
+                 new StringBuffer(var.name().toString()).
+                    append("=").append(printAnything(value, proof.getServices(), false));
 	
-	 s += " (inst \"" + singleInstantiation + "\")";
+	 s += " (inst \"" + escapeCharacters(singleInstantiation.toString()) + "\")";
       }
       
       return s;
@@ -494,13 +482,13 @@ public class ProofSaver {
 	return result;
     }
 
-    public static String printProgramElement(ProgramElement pe) {
+    public static StringBuffer printProgramElement(ProgramElement pe) {
         java.io.StringWriter sw = new java.io.StringWriter();
         ProgramPrinter prgPrinter = new ProgramPrinter(sw);
         try{
             pe.prettyPrint(prgPrinter);
         } catch(IOException ioe) {System.err.println(ioe);}
-        return sw.toString();
+        return sw.getBuffer();
     }
 
 
@@ -524,32 +512,36 @@ public class ProofSaver {
         return result;
     }
 
-
     public static String printAnything(Object val, Services services) {
+        return printAnything(val, services, true).toString();
+    }
+
+    public static StringBuffer printAnything(Object val, Services services, boolean shortAttrNotation) {
         if (val instanceof ProgramElement) {
             return printProgramElement((ProgramElement) val);
         }
         else
             if (val instanceof Term) {
-                return printTerm((Term) val, services, true).toString();
-            }
-            else if (val instanceof Sequent) {
+                return printTerm((Term) val, services, shortAttrNotation);
+            } else if (val instanceof Sequent) {
                 return printSequent((Sequent) val, services);
+            } else if (val instanceof Name) {
+                return new StringBuffer(val.toString());
             } else if (val==null){
                     return null;
             }
             else {
                 System.err.println("Don't know how to prettyprint "+val.getClass());
                 // try to String by chance
-                return val.toString();
+                return new StringBuffer(val.toString());
             }
     }
 
 
-    private static String printSequent(Sequent val, Services services) {
+    private static StringBuffer printSequent(Sequent val, Services services) {
         LogicPrinter printer = createLogicPrinter(services, services == null);
         printer.printSequent(val);
-        return printer.toString();
+        return printer.result();
     }
 
     private static LogicPrinter createLogicPrinter(Services serv, 

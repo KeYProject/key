@@ -16,8 +16,8 @@ package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.TermServices;
 
 /**
  * Wraps a list of expressions.
@@ -46,7 +46,7 @@ public final class SLParameters {
     }
     
     
-    public ImmutableList<KeYJavaType> getSignature(Services services) {           
+    public ImmutableList<KeYJavaType> getSignature(TermServices services) {           
         ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
         for(SLExpression expr : parameters) {
             result = result.append(expr.getType());

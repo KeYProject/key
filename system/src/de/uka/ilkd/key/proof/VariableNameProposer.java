@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
@@ -205,7 +206,7 @@ public class VariableNameProposer implements InstantiationProposer {
      */
     private String getNameProposalForVariableSV(TacletApp app,
 						SchemaVariable var,
-						Services services,
+						TermServices services,
 						ImmutableList<String> previousProposals) {
 
         String baseName = var.name().toString();

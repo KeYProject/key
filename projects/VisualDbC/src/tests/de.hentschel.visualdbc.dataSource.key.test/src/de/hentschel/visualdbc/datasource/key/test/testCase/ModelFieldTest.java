@@ -14,27 +14,27 @@
 package de.hentschel.visualdbc.datasource.key.test.testCase;
 
 import org.junit.Test;
-import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
-import de.hentschel.visualdbc.datasource.key.test.util.TestKeyUtil;
+import de.hentschel.visualdbc.datasource.key.test.Activator;
 import de.hentschel.visualdbc.datasource.model.DSPackageManagement;
 
 /**
  * Tests the handling of model field clauses in a {@link KeyConnection}.
  * @author Martin Hentschel
  */
-public class ModelFieldTest extends AbstractSetupTestCase {
+public class ModelFieldTest extends AbstractKeYTest {
    /**
     * Tests model field.
     */
    @Test
    public void testModelField_withoutAccessible() throws Exception {
-      TestKeyUtil.testKeyConnection("ModelFieldTest_testModelField_withoutAccessible",
-                                    "data/modelFieldTestWithoutAccessible",
-                                    null,
-                                    DSPackageManagement.FLAT_LIST,
-                                    TestKeyUtil.createExpectedModelFieldTestModel(false));
+      testKeyConnection("ModelFieldTest_testModelField_withoutAccessible",
+                        "data/modelFieldTestWithoutAccessible/test",
+                        null,
+                        DSPackageManagement.FLAT_LIST,
+                        Activator.PLUGIN_ID,
+                        "data/modelFieldTestWithoutAccessible/oracle/modelFieldTestWithoutAccessible.dbc");
    }
    
    /**
@@ -42,10 +42,11 @@ public class ModelFieldTest extends AbstractSetupTestCase {
     */
    @Test
    public void testModelField() throws Exception {
-      TestKeyUtil.testKeyConnection("ModelFieldTest_testModelField",
-                                    "data/modelFieldTest",
-                                    null,
-                                    DSPackageManagement.FLAT_LIST,
-                                    TestKeyUtil.createExpectedModelFieldTestModel(true));
+      testKeyConnection("ModelFieldTest_testModelField",
+                        "data/modelFieldTest/test",
+                        null,
+                        DSPackageManagement.FLAT_LIST,
+                        Activator.PLUGIN_ID,
+                        "data/modelFieldTest/oracle/modelFieldTest.dbc");
    }
 }

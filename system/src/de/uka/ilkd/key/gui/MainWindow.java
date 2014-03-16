@@ -20,12 +20,12 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagLayout;
 import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -58,7 +58,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
@@ -110,7 +109,6 @@ import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
-import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.gui.nodeviews.EmptySequent;
 import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
@@ -399,7 +397,7 @@ public final class MainWindow extends JFrame  {
         getContentPane().setLayout(new BorderLayout());
 
         // default size
-        setSize(1000, 750);
+        setPreferredSize(new Dimension(1000, 750));
 
         // FIXME FIXME
         recentFiles = new RecentFileMenu(new ActionListener() {
@@ -415,7 +413,6 @@ public final class MainWindow extends JFrame  {
         // minimize interaction
         final boolean stupidMode =
         		  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
-//            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().tacletFilter();
         mediator.setMinimizeInteraction(stupidMode);
 
         // set up actions
@@ -505,14 +502,6 @@ public final class MainWindow extends JFrame  {
         pane.setSelectedIndex(0);
         pane.setPreferredSize(new java.awt.Dimension(250, 440));
 
-        // change some key mappings which collide with font settings.
-	pane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-	        .getParent().remove(
-	                KeyStroke.getKeyStroke(KeyEvent.VK_UP, Toolkit
-	                        .getDefaultToolkit().getMenuShortcutKeyMask()));
-	pane.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(
-	        KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit
-	                .getDefaultToolkit().getMenuShortcutKeyMask()));
 	pane.setName("leftTabbed");
 
 	return pane;
@@ -578,7 +567,7 @@ public final class MainWindow extends JFrame  {
 	smtComponent= new ComplexButton(TOOLBAR_ICON_SIZE);
 	smtComponent.setEmptyItem("No solver available","<html>No SMT solver is applicable for KeY.<br><br>If a solver is installed on your system," +
 		"<br>please configure the KeY-System accordingly:\n" +
-		"<br>Options|SMT Solvers</html>");
+		"<br>Options | SMT Solvers</html>");
 
 	smtComponent.setPrefix("Run ");
 
@@ -699,15 +688,6 @@ public final class MainWindow extends JFrame  {
     }
 
     /**
-     * Return a list of aspects compiled into the system, one by line. The idea is that the aspects
-     * will advise this method to add themselves to the list.
-     */
-    public String compiledAspects() {
-        return "";
-    }
-
-
-    /**
      * create the goal list, proof tree, proof list. Add to their respective
      * containers.
      */
@@ -741,8 +721,6 @@ public final class MainWindow extends JFrame  {
         menuBar.add(createOptionsMenu());
         menuBar.add(Box.createHorizontalGlue());
         menuBar.add(createHelpMenu());
-        if (Debug.ENABLE_DEBUG)
-            menuBar.add(createDebugMenu());
         return menuBar;
     }
 
@@ -781,7 +759,6 @@ public final class MainWindow extends JFrame  {
 
         JMenuItem laf = new JCheckBoxMenuItem("Use system look and feel (experimental)");
         laf.setToolTipText("If checked KeY tries to appear in the look and feel of your window manager, if not in the default Java LaF (aka Metal).");
-//        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofSettings.DEFAULT_SETTINGS.getViewSettings();
         final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         laf.setSelected(vs.useSystemLaF());
         laf.addActionListener(new ActionListener() {
@@ -853,14 +830,6 @@ public final class MainWindow extends JFrame  {
 
     }
 
-
-    private JMenu createDebugMenu() {
-        JMenu debug = new JMenu("Debug");
-        debug.setMnemonic(KeyEvent.VK_D);
-        // please note: this is doubled in proof menu
-        debug.add(showActiveSettingsAction);
-        return debug;
-    }
 
     private JMenu createHelpMenu() {
         JMenu help = new JMenu("About");
@@ -940,7 +909,6 @@ public final class MainWindow extends JFrame  {
         ButtonGroup group = new ButtonGroup();
         GeneralSettings gs
         =ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
 
         JRadioButtonMenuItem jmlButton
             = new JRadioButtonMenuItem("Source File Comments Are JML", gs.useJML());
@@ -950,26 +918,20 @@ public final class MainWindow extends JFrame  {
         jmlButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                GeneralSettings gs
-                =ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-//                    = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+                GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
                 gs.setUseJML(true);
-                gs.setUseOCL(false);
             }
         });
 
         JRadioButtonMenuItem noneButton
-        	= new JRadioButtonMenuItem("Source File Comments Are Ignored", !gs.useJML() && !gs.useOCL());
+        	= new JRadioButtonMenuItem("Source File Comments Are Ignored", !gs.useJML());
         result.add(noneButton);
         group.add(noneButton);
         noneButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-        	GeneralSettings gs
-        	=ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-    //    	= ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+        	GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
         	gs.setUseJML(false);
-        	gs.setUseOCL(false);
             }
     });
 
@@ -1034,7 +996,6 @@ public final class MainWindow extends JFrame  {
 
 	private void setToolBarDisabled() {
 	    assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
-	    //assert doNotReenable == null : "toolbar disabled w/o prior enable";
 	    doNotReenable = new LinkedHashSet<Component>();
 	    Component[] cs = controlToolBar.getComponents();
 	    for (int i = 0; i < cs.length; i++) {
@@ -1054,7 +1015,6 @@ public final class MainWindow extends JFrame  {
 
         private void setToolBarEnabled() {
             assert EventQueue.isDispatchThread() : "toolbar enabled from wrong thread";
-            //assert doNotReenable != null : "toolbar enabled w/o prior disable";
             if (doNotReenable == null) return; // XXX ignore this problem for the moment XXX
 
             Component[] cs = controlToolBar.getComponents();
@@ -1491,7 +1451,6 @@ public final class MainWindow extends JFrame  {
             if (!(message instanceof Component)) {
                 throw new InternalError("only messages of type " + Component.class + " supported, yet");
             }
-            // JFrame dlg = new JDialog(mainFrame(),title, modal);
             JFrame dlg = new JFrame(title);
             dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             dlg.getContentPane().add((Component) message);

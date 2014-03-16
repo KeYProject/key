@@ -22,33 +22,26 @@ package de.uka.ilkd.key.logic;
  * It wraps a string object. To save memory and to speed up equality checks, the
  * wrapped strings are stored in their {@linkplain String#intern() interned}
  * representation.
- * 
- * <p>
- * TODO Reconsider hash caching: 
- * This implementation precalculates and caches
- * the string's hashvalue. Since {@link String#hashCode()} itself also caches
- * the value, there is no immediate need to do this here a second time.
  */
 public class Name implements Comparable<Name> {
 
     private static final String NONAME = "_noname_";
 
     private final /*@Interned*/ String nameString;
-
-    private final int hashCode;
-
+    
     /**
      * creates a name object
      */
     public Name(String n) {
 	nameString = (n == null ? NONAME : n).intern();
-	hashCode = nameString.hashCode();
     }
 
+    @Override
     public String toString() {
 	return nameString;
     }
 
+    @Override
     public boolean equals(Object o) {
 	if (!(o instanceof Name)) {
 	    return false;
@@ -58,12 +51,14 @@ public class Name implements Comparable<Name> {
 	return nameString == ((Name) o).nameString;
     }
 
+    @Override
     public int compareTo(Name o) {
 	return nameString.compareTo(o.nameString);
     }
-
+    
+    @Override
     public int hashCode() {
-	return hashCode;
+	return nameString.hashCode();
     }
 
 }

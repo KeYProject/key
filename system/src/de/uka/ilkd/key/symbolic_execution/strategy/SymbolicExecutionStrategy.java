@@ -24,6 +24,7 @@ import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.definition.IDefaultStrategyPropertiesFactory;
 import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
@@ -48,6 +49,16 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     * The {@link Name} of the symbolic execution {@link Strategy}.
     */
    public static final Name name = new Name("Symbolic Execution Strategy");
+   
+   /**
+    * The default factory.
+    */
+   public static IDefaultStrategyPropertiesFactory DEFAULT_FACTORY = new IDefaultStrategyPropertiesFactory() {
+      @Override
+      public StrategyProperties createDefaultStrategyProperties() {
+          return SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false, false, false, false);
+      }
+   };
    
    /**
     * Constructor.
@@ -300,12 +311,14 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
                new StrategyPropertyValueDefinition(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY, ALIAS_CHECK_IMMEDIATELY, null));
          // Model
          return new StrategySettingsDefinition(false, 
-                                          null, 
-                                          "Symbolic Execution Options",
-                                          methodTreatment,
-                                          loopTreatment,
-                                          branchHiding,
-                                          aliasChecks);
+                                               null, 
+                                               1000,
+                                               "Symbolic Execution Options",
+                                               SymbolicExecutionStrategy.DEFAULT_FACTORY,
+                                               methodTreatment,
+                                               loopTreatment,
+                                               branchHiding,
+                                               aliasChecks);
       }
    }
 }

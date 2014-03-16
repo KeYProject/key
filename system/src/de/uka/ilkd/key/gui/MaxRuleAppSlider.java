@@ -30,12 +30,13 @@ public class MaxRuleAppSlider extends JSlider {
      */
     private static final long serialVersionUID = 5810499328583797609L;
     private static final int MAX_RULE_APPS_LOG10 = 6;
-    private final static String TEXT = "Max. Rule Applications: ";
+    private final String text;
     private KeYMediator mediator;
     private static LinkedList<MaxRuleAppSlider> allInstances = new LinkedList<MaxRuleAppSlider>();
 
-    public MaxRuleAppSlider(KeYMediator mediator) {
+    public MaxRuleAppSlider(KeYMediator mediator, String text) {
         super(SwingConstants.HORIZONTAL, 0, MAX_RULE_APPS_LOG10*9, 0);
+        this.text = text;
 
         this.mediator = mediator;
         
@@ -92,7 +93,7 @@ public class MaxRuleAppSlider extends JSlider {
     }
     
     private void setTitle(int maxRuleApps) {
-        setBorder(BorderFactory.createTitledBorder(TEXT+maxRuleApps));
+       setBorder(BorderFactory.createTitledBorder(text + ": " + maxRuleApps));
     }
     
     public void refresh() {

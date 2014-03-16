@@ -112,7 +112,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
         if (!isStatic) {
             replaceVars = replaceVars.append(originalSelfVar);
         }
-        Term rep = TB.convertToFormula(originalRep, services);
+        Term rep = services.getTermBuilder().convertToFormula(originalRep);
         TacletGenerator TG = TacletGenerator.getInstance();
         DefaultImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
         final int c = services.getCounter("classAxiom").getCountPlusPlus();

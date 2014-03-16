@@ -13,14 +13,12 @@
 
 package de.uka.ilkd.key.proof.join;
 
-import java.io.StringReader;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -46,7 +44,7 @@ public interface PredicateEstimator {
 class StdPredicateEstimator implements PredicateEstimator{
     
     @Override
-    public Result estimate(ProspectivePartner partner, Proof proof){
+    public Result estimate(ProspectivePartner partner, final Proof proof){
            final Node node = getFirstDifferentNode(partner);
            String branchLabel = node.getNodeInfo().getBranchLabel();
            if(branchLabel != null && (branchLabel.endsWith("TRUE") || branchLabel.endsWith("FALSE") )){
@@ -69,7 +67,7 @@ class StdPredicateEstimator implements PredicateEstimator{
                     @Override
                     public Term getPredicate() {
                         if(!positive){
-                            return TermBuilder.DF.not(term);
+                            return proof.getServices().getTermBuilder().not(term);
                         }
                         return term;
                     }

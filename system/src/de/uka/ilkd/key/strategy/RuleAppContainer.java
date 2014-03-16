@@ -24,8 +24,7 @@ import de.uka.ilkd.key.util.Debug;
 
 /**
  * Container for RuleApp instances with cost as determined by 
- * a given Strategy.
- * Instances of this class are immutable
+ * a given Strategy. Instances of this class are immutable.
  */
 public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
 

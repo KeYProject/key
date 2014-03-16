@@ -130,7 +130,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     public PosInOccurrence toPosInOccurrence () {
         if (pioCache == null)
             pioCache = new PosInOccurrence ( getConstrainedFormula (),
-                                             PosInTerm.TOP_LEVEL,
+                                             PosInTerm.getTopLevel(),
                                              inAntec () );
         return pioCache;
     }

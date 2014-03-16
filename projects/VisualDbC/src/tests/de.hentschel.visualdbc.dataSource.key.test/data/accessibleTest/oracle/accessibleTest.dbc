@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel" driverId="de.hentschel.visualdbc.dataSource.key">
+  <packages name="test">
+    <types xsi:type="dbcmodel:DbcClass" name="B" visibility="default">
+      <invariants name="JML class invariant nr 1 in B" condition="java.lang.Object::&lt;inv>(heap,&#xA;                        test.Test::select(heap,&#xA;                                          self,&#xA;                                          test.B::$c))"/>
+      <axioms name="Class invariant axiom for test.B" definition="equiv(java.lang.Object::&lt;inv>(heap,self),java.lang.Object::&lt;inv>(heap,test.Test::select(heap,self,test.B::$c)))">
+        <axiomContracts name="test.B[java.lang.Object::&lt;inv>()].JML accessible clause.0" proofObligations="//@proofObligations.0" pre="[heap] java.lang.Object::&lt;inv>(heap, self)" dep="[heap] union(allFields(self),&#xA;      allFields(test.Test::select(heap,&#xA;                                  self,&#xA;                                  test.B::$c)))"/>
+      </axioms>
+      <attributes name="c" type="test.Test" visibility="default"/>
+      <constructors signature="B(x : int)" visibility="default"/>
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+    <types xsi:type="dbcmodel:DbcClass" name="Test">
+      <attributes name="x" type="int" visibility="default"/>
+      <constructors signature="Test(x : int)"/>
+      <extendsFullNames>java.lang.Object</extendsFullNames>
+    </types>
+  </packages>
+  <connectionSettings key="location" value="D:\Forschung\Development\KeY_Master\junit-workspace\AccessibleTest_testAccessible"/>
+  <connectionSettings key="packageManagement" value="FLAT_LIST"/>
+  <connectionSettings key="packageManagementType" value="de.hentschel.visualdbc.datasource.model.DSPackageManagement"/>
+  <connectionSettings key="locationType" value="java.io.File"/>
+  <proofObligations obligation="ContractPO"/>
+</dbcmodel:DbcModel>

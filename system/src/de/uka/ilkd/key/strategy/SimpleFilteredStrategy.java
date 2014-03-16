@@ -73,7 +73,7 @@ public class SimpleFilteredStrategy implements Strategy {
 	     !((TacletApp)app).ifInstsComplete() )
 	    cost += IF_NOT_MATCHED_MALUS;
 
-	return LongRuleAppCost.create ( cost );
+	return NumberRuleAppCost.create ( cost );
     }
 
     /**

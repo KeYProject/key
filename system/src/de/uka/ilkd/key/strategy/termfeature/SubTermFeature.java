@@ -16,7 +16,7 @@ package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
@@ -51,7 +51,7 @@ public class SubTermFeature implements TermFeature {
     public RuleAppCost compute(Term term, Services services) {
         if ( term.arity () != features.length ) return arityMismatchCost;
         
-        RuleAppCost res = LongRuleAppCost.ZERO_COST;
+        RuleAppCost res = NumberRuleAppCost.getZeroCost();
 
         for ( int i = 0; i < features.length
                          && !( res instanceof TopRuleAppCost ); i++ )

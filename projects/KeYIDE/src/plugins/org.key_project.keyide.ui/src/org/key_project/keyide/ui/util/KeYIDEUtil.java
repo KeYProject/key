@@ -96,7 +96,6 @@ public final class KeYIDEUtil {
                           SWTUtil.checkCanceled(monitor);
                           monitor.beginTask("Loading Proof Environment", IProgressMonitor.UNKNOWN);
                           final KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
-
                           if (environment.getInitConfig() != null) {
                              // Get method to proof in KeY
                              final IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getJavaInfo());

@@ -42,7 +42,7 @@ import de.uka.ilkd.key.util.ExtList;
 
 public final class TypeConverter {
 
-    private static final TermBuilder TB = TermBuilder.DF;
+    private final TermBuilder tb;
 
     private final Services services;
 
@@ -61,7 +61,8 @@ public final class TypeConverter {
 
 
     TypeConverter(Services s){
-        services = s;
+        this.services = s;
+        this.tb = services.getTermBuilder();
     }
 
 
@@ -175,7 +176,7 @@ public final class TypeConverter {
 	if(op instanceof Singleton) {
 	    assert heapLDT.getSortOfSelect(subs[0].op()) != null
 	           : "unexpected argument of \\singleton: " + subs[0];
-	    return TB.singleton(services, subs[0].sub(1), subs[0].sub(2));
+	    return tb.singleton(subs[0].sub(1), subs[0].sub(2));
 	}
 
 	LDT responsibleLDT = null;
@@ -193,26 +194,26 @@ public final class TypeConverter {
 	    responsibleLDT = charListLDT;
     	} else if(op instanceof Equals) {
 	    assert subs.length == 2;
-	    return TB.equals(subs[0], subs[1]);
+	    return tb.equals(subs[0], subs[1]);
     	} else if(op instanceof NotEquals) {
 	    assert subs.length == 2;
-	    return TB.not(TB.equals(subs[0], subs[1]));
+	    return tb.not(tb.equals(subs[0], subs[1]));
 	} else if(op instanceof Conditional) {
 	    assert subs.length == 3;
-	    return TB.ife(subs[0], subs[1], subs[2]);
+	    return tb.ife(subs[0], subs[1], subs[2]);
 	} else if(op instanceof DLEmbeddedExpression) {
 	    DLEmbeddedExpression emb = (DLEmbeddedExpression) op;
-	    return emb.makeTerm(heapLDT.getHeap(), subs);
+	    return emb.makeTerm(heapLDT.getHeap(), subs, services);
 	} else if(op instanceof TypeCast) {
 	    TypeCast tc = (TypeCast) op;
-	    return TB.cast(services, tc.getKeYJavaType(services).getSort(), subs[0]);
+	    return tb.cast(services, tc.getKeYJavaType(services).getSort(), subs[0]);
 	} else {
 	    Debug.out("typeconverter: no data type model "+
 		      "available to convert:", op, op.getClass());
 	    throw new IllegalArgumentException("TypeConverter could not handle"
 					       +" this operator: " + op);
 	}
-	return TB.func(responsibleLDT.getFunctionFor(op, services, ec), subs);
+	return tb.func(responsibleLDT.getFunctionFor(op, services, ec), subs);
     }
 
 
@@ -229,11 +230,11 @@ public final class TypeConverter {
 					       +" this");
 	} else 	if (prefix instanceof ProgramVariable) {
 	    // the base case: the leftmost item is a local variable
-	    return TB.var((ProgramVariable)prefix);
+	    return tb.var((ProgramVariable)prefix);
 	} else 	if (prefix instanceof VariableReference) {
 	    Debug.out("typeconverter: "+
 		      "variablereference:", (((VariableReference)prefix).getProgramVariable()));
-	    return TB.var(((VariableReference)prefix).getProgramVariable());
+	    return tb.var(((VariableReference)prefix).getProgramVariable());
 	}  else if (prefix instanceof ArrayReference) {
 	    return convertArrayReference((ArrayReference)prefix, ec);
 	} else if (prefix instanceof ThisReference) {
@@ -281,7 +282,7 @@ public final class TypeConverter {
                        ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
             final Function fieldSymbol
             	= heapLDT.getFieldSymbolForPV(inst, services);
-            result = TB.dot(services, inst.sort(), result, fieldSymbol);
+            result = tb.dot(inst.sort(), result, fieldSymbol);
             context = inst.getKeYJavaType();
         }
         return result;
@@ -301,13 +302,13 @@ public final class TypeConverter {
     		  if(h == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
     			  continue;
     		  }
-        	  argTerms[index++] = TB.var(h);
+        	  argTerms[index++] = tb.var(h);
     	  }
     	  argTerms[index++] = p;
     	  for(Expression e : args) {
     	       argTerms[index++] = convertToLogicElement(e, ec);
     	  }
-    	  return TB.func(pm, argTerms);
+    	  return tb.func(pm, argTerms);
     	}
     	throw new IllegalArgumentException ("TypeConverter could not handle this");
     }
@@ -318,30 +319,29 @@ public final class TypeConverter {
 	final ReferencePrefix prefix = fr.getReferencePrefix();
 	final ProgramVariable var = fr.getProgramVariable();
 	if(var instanceof ProgramConstant) {
-	    return TB.var(var);
+	    return tb.var(var);
 	} else if(var == services.getJavaInfo().getArrayLength()) {
-	    return TB.dotLength(services, convertReferencePrefix(prefix, ec));
+	    return tb.dotLength(convertReferencePrefix(prefix, ec));
 	} else if(var.isStatic()) {
 	    final Function fieldSymbol
 	    	= heapLDT.getFieldSymbolForPV((LocationVariable)var, services);
-	    return TB.staticDot(services, var.sort(), fieldSymbol);
+	    return tb.staticDot(var.sort(), fieldSymbol);
 	} else if(prefix == null) {
 	    if(var.isMember()) {
 		final Function fieldSymbol
 			= heapLDT.getFieldSymbolForPV((LocationVariable)var,
 						      services);
-		return TB.dot(services,
-			      var.sort(),
+		return tb.dot(var.sort(),
 			      findThisForSort(var.getContainerType().getSort(),
 				              ec),
 			      fieldSymbol);
 	    } else {
-		return TB.var(var);
+		return tb.var(var);
 	    }
 	} else if (!(prefix instanceof PackageReference) ) {
 	    final Function fieldSymbol
 	    	= heapLDT.getFieldSymbolForPV((LocationVariable)var, services);
-	    return TB.dot(services, var.sort(), convertReferencePrefix(prefix, ec), fieldSymbol);
+	    return tb.dot(var.sort(), convertReferencePrefix(prefix, ec), fieldSymbol);
 	}
 	Debug.out("typeconverter: Not supported reference type (fr, class):",
 		  fr, fr.getClass());
@@ -359,7 +359,7 @@ public final class TypeConverter {
                 convertToLogicElement(ar.getDimensionExpressions().get(i), ec);
         }
         assert index.length == 1 : "multi-dimensional arrays not implemented";
-        return TB.dotArr(services, t, index[0]);
+        return tb.dotArr(t, index[0]);
     }
 
     private Term convertToInstanceofTerm(Instanceof io,
@@ -373,8 +373,8 @@ public final class TypeConverter {
 	// in JavaDL S::instance(o) is also true if o (for reference types S)
 	// is null in opposite to Java
 	// we create here if (obj = null) then FALSE else S::instance(obj)
-	return TB.ife(TB.equals(obj, TB.NULL(services)), TB.FALSE(services),
-                TB.func(instanceOfSymbol, obj));
+	return tb.ife(tb.equals(obj, tb.NULL()), tb.FALSE(),
+                tb.func(instanceOfSymbol, obj));
     }
 
 
@@ -387,7 +387,7 @@ public final class TypeConverter {
 				      ExecutionContext ec) {
 	Debug.out("typeconverter: called for:", pe, pe.getClass());
 	if (pe instanceof ProgramVariable) {
-	    return TB.var((ProgramVariable)pe);
+	    return tb.var((ProgramVariable)pe);
 	} else if (pe instanceof FieldReference) {
 	    return convertVariableReference((FieldReference)pe, ec);
 	} else if (pe instanceof MethodReference) {
@@ -450,7 +450,7 @@ public final class TypeConverter {
         if (lit instanceof BooleanLiteral) {
             return booleanLDT.translateLiteral(lit, services);
         } else if (lit instanceof NullLiteral) {
-            return TB.NULL(services);
+            return tb.NULL();
         } else if (lit instanceof IntLiteral) {
             return integerLDT.translateLiteral(lit, services);
         } else if (lit instanceof CharLiteral) {

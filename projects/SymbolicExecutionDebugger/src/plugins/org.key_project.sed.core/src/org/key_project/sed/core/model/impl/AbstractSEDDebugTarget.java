@@ -34,6 +34,8 @@ import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
  */
 @SuppressWarnings("restriction")
 public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement implements ISEDDebugTarget {
+
+   
    /**
     * The {@link ILaunch} in that this {@link IDebugTarget} is used.
     */
@@ -71,6 +73,7 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
    public AbstractSEDDebugTarget(ILaunch launch) {
       super(null);
       this.launch = launch;
+      
    }
    
    /**

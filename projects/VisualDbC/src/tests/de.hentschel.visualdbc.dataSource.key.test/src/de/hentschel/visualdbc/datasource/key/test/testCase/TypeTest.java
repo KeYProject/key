@@ -14,26 +14,26 @@
 package de.hentschel.visualdbc.datasource.key.test.testCase;
 
 import org.junit.Test;
-import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
-import de.hentschel.visualdbc.datasource.key.test.util.TestKeyUtil;
+import de.hentschel.visualdbc.datasource.key.test.Activator;
 import de.hentschel.visualdbc.datasource.model.DSPackageManagement;
 
 /**
  * Tests the handling of classes in a {@link KeyConnection}.
  * @author Martin Hentschel
  */
-public class TypeTest extends AbstractSetupTestCase {
+public class TypeTest extends AbstractKeYTest {
    /**
     * Tests the flags of classes.
     */
    @Test
    public void testClassFlags() throws Exception {
-      TestKeyUtil.testKeyConnection("ClassTest_testClassFlags",
-                                    "data/typeTest",
-                                    null,
-                                    DSPackageManagement.NO_PACKAGES,
-                                    TestKeyUtil.createExpectedTypeTestModel());
+      testKeyConnection("ClassTest_testClassFlags",
+                        "data/typeTest/test",
+                        null,
+                        DSPackageManagement.NO_PACKAGES,
+                        Activator.PLUGIN_ID,
+                        "data/typeTest/oracle/typeTest.dbc");
    }
 }

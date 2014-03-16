@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
+import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -83,10 +84,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Do run
                resume(bot, item, target);
                if (usePrettyPrinting) {
-                  assertDebugTargetViaOracle(target, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/PrettyPrintSimpleTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/PrettyPrintSimpleTest.xml", false, false);
                }
                else {
-                  assertDebugTargetViaOracle(target, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/NotPrettyPrintedPrettyPrintSimpleTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/NotPrettyPrintedPrettyPrintSimpleTest.xml", false, false);
                }
             }
          };
@@ -159,10 +160,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Do run
                resume(bot, item, target);
                if (mergeBranchConditions) {
-                  assertDebugTargetViaOracle(target, "data/switchCaseTest/oracleMergeBranchConditions/MergedSwitchCaseTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/switchCaseTest/oracleMergeBranchConditions/MergedSwitchCaseTest.xml", false, false);
                }
                else {
-                  assertDebugTargetViaOracle(target, "data/switchCaseTest/oracleMergeBranchConditions/NotMergedSwitchCaseTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/switchCaseTest/oracleMergeBranchConditions/NotMergedSwitchCaseTest.xml", false, false);
                }
             }
          };
@@ -395,7 +396,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Do resume and test created tree
                String expectedModelPathInBundle = showMethodReturnValuesInDebugNodes ? "data/simpleIf/oracle/SimpleIf.xml" : "data/simpleIf/oracle_noMethodReturnValues/SimpleIf.xml";
                resume(bot, item, target);
-               assertDebugTargetViaOracle(target, expectedModelPathInBundle, false, false);
+               assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false);
             }
          };
          doKeYDebugTargetTest(projectName,

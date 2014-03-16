@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.collection;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -28,8 +29,6 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     private static final long serialVersionUID = -9041545065066866250L;
 
     private final S[] content;
-
-    private int hashCode = -1;
 
     /** creates an empty new <S>Array
      */
@@ -108,15 +107,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     }    
 
     public int hashCode() {
-	if (hashCode == -1) {
-        for (S aContent : content) {
-            hashCode += 17 * aContent.hashCode();
-        }
-	    if(hashCode == -1) {
-		hashCode = -2;
-	    }
-	}
-	return hashCode;
+	return Arrays.hashCode(content);
     }
 
     @SuppressWarnings("unchecked")
