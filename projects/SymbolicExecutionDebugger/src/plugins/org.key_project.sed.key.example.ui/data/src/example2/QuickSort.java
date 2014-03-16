@@ -3,7 +3,7 @@ package example2;
 import java.util.Arrays;
 
 /**
- * This example explains how to find the origin of a bug with help of the 
+ * This example explains how to find the origin of a bug with the help of the 
  * Symbolic Execution Debugger (SED). 
  * <p>
  * The debugging session starts directly with the method of interest:
@@ -18,9 +18,9 @@ import java.util.Arrays;
  *       uncaught {@link NullPointerException} appears (3 times)
  *    </li>
  * </ol>
- * The experienced {@link NullPointerException} is spurious as field 
+ * The encountered {@link NullPointerException} is spurious as field 
  * {@link #numbers} cannot be {@code null}. This kind of knowledge can be added 
- * by providing preconditions:
+ * by providing a precondition:
  * <ol> 
  *    <li>Terminate the debug session</li>
  *    <li>
@@ -37,8 +37,8 @@ import java.util.Arrays;
  * </ol>
  * Two observations: First, because of the precondition no spurious exceptions 
  * are shown any longer. Second, because of the if-statement one would expect 
- * two branches. That there is only one indicates a problem with the 
- * if-condition (which evaluates always to true). The if-condition needs to be 
+ * two branches. The fact that there is only one indicates a problem with the 
+ * if-guard (which evaluates always to true). The guard needs to be 
  * corrected to {@code low < high}.
  * <p>
  * <b>Taken from:</b> <br>
