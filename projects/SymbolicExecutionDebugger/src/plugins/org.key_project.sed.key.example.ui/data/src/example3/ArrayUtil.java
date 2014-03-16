@@ -35,25 +35,26 @@ package example3;
  * </ol>
  * Instead of unwinding the loop and inlining a specific implementation of 
  * interface method {@link Comparator#equals(Object, Object)}, the loop 
- * invariant respective the method contract is applied. This achieves a finite 
+ * invariant and the method contract is applied. This achieves a finite 
  * symbolic execution tree which covers all possible concrete execution paths as 
- * long as application is correct. Problematic applications are indicated by red 
- * crossed node icons. 
+ * long as the loop invariant holds and the contract is applicable. 
+ * Potential problems with invariants and contracts are indicated by node icons 
+ * with a red cross. 
  *<p>
  * The 'Body Preserves Invariant' branch represents an arbitrary loop iteration. 
- * The red crossed icon in one of its leaves indicates that the loop invariant 
- * might not be preserved. Further inspection reveals that the loop counter 
- * variable {@code i} is not increased in the then branch.
+ * The icon crossed in red in one of its leaves indicates that the loop 
+ * invariant might not be preserved. Further inspection reveals that the loop 
+ * counter variable {@code i} is not increased in the then branch.
  * <p>
  * The loop body calls method {@link Comparator#equals(Object, Object)}. Instead 
- * of inlining a specific implementation, the method contract is used. To apply 
- * a method contract, its precondition has to be checked. A failed check is 
- * indicated by a red crossed node icon.
+ * of inlining a specific method implementation, the method contract is used. 
+ * To apply a method contract, its precondition has to be checked. A failed 
+ * check is indicated by a node icon with a red cross.
  *<p>
- * The 'Use Case' branch continues symbolic execution in an arbitrary state 
+ * The 'Use Case' branch continues symbolic execution in an unknown state 
  * after the loop. A closer look at the return nodes exhibits yet another 
  * problem, namely, the loop counter variable {@code i} is returned instead of 
- * the found index stored in variable {@code index}.
+ * the found index stored in the variable {@code index}.
  */
 public class ArrayUtil {
 	/*@ normal_behavior
