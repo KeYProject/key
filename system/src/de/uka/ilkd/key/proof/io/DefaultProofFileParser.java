@@ -391,7 +391,7 @@ public class DefaultProofFileParser implements IProofFileParser {
               ? UseOperationContractRule.INSTANCE
                     : UseDependencyContractRule.INSTANCE;
 
-
+        
         ourApp = ((AbstractContractRuleApp)useContractRule.
               createApp(pos)).setContract(currContract);
            currContract = null;

@@ -125,14 +125,14 @@ public class ProofMetaFileReader {
                      //check subType format
                      NodeList typeNodeList = type.getChildNodes();
                      for(int j = 0; j < typeNodeList.getLength(); j++){
-                        Node subType = typeNodeList.item(i);
-                        if(!"subType".equals(type.getNodeName())){
+                        Node subType = typeNodeList.item(j);
+                        if(!"subType".equals(subType.getNodeName())){
                            throw new ProofMetaFileContentException("Invalid subType entry. Found " + subType.getNodeName() + " | Expected subType");
                         }
                      }
                   }
                   else{
-                     throw new ProofMetaFileContentException("Invalid subType entry. Found " + type.getNodeName() + " | Expected type");
+                     throw new ProofMetaFileContentException("Invalid type entry. Found " + type.getNodeName() + " | Expected type");
                   }
                }
             }

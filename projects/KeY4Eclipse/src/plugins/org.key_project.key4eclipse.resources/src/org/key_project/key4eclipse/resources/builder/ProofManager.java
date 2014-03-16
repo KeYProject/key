@@ -449,7 +449,7 @@ public class ProofManager {
    private void restoreOldMarkerForRemovedCycles() throws CoreException{
       for(ProofElement pe : proofElements){
          if(pe.getMarker().isEmpty()){
-            markerManager.setMarker(pe); //TODO restore whole message!
+            markerManager.setMarker(pe);
          }
       }
    }
@@ -684,7 +684,7 @@ public class ProofManager {
          proof = createProof(pe);
       }
       else {
-//         proof = loadProof(pe); //TODO: Wait for BugFix
+         proof = loadProof(pe); //TODO: Wait for BugFix
          if(proof == null){
             proof = createProof(pe);
          }
@@ -722,7 +722,7 @@ public class ProofManager {
          
          OneStepSimplifier oss = MiscTools.findOneStepSimplifier(proof);
          if (oss != null) {
-            oss.refresh(null);
+            oss.refresh(proof);
          }
          return proof;
    }
@@ -734,18 +734,22 @@ public class ProofManager {
     */
    private Proof loadProof(ProofElement pe){
       Proof proof = null;
+      File file = pe.getProofFile().getLocation().toFile();
+      Profile profile = pe.getKeYEnvironment().getInitConfig().getProfile();
+      KeYEnvironment<CustomConsoleUserInterface> loadEnv = null;
+      boolean error = false;
       try{
-         File file = pe.getProofFile().getLocation().toFile();
-         Profile profile = pe.getKeYEnvironment().getInitConfig().getProfile();
-         KeYEnvironment<CustomConsoleUserInterface> loadEnv = KeYEnvironment.load(profile, file, null, null);
+         loadEnv = KeYEnvironment.load(profile, file, null, null);
+      } catch(ProblemLoaderException e){
+         error = true;
+      }
+      if(loadEnv != null){
          proof = loadEnv.getLoadedProof();
-         if (proof != null) {
-//            if (!proof.closed()){
-//               loadEnv.getUi().startAndWaitForAutoMode(proof);
-//            }
+         if (proof != null){
+            if(error) {
+               loadEnv.getUi().startAndWaitForAutoMode(proof);
+            }
          }
-      }catch(Exception e){
-         LogUtil.getLogger().logError(e);
       }
       return proof;
    }
@@ -765,8 +769,13 @@ public class ProofManager {
       sb.append(newLine);
       if(!proof.closed()){
          boolean uncloseable = false;
-         for(Goal goal : proof.openEnabledGoals()){
-            if(false){//goal uncloseable //TODO ask martin for missing SymbolicExecutionUtil.hasApplicableRules(next)
+         OneStepSimplifier oss = MiscTools.findOneStepSimplifier(proof);
+         if (oss != null) {
+            oss.refresh(proof);
+         }
+         for(Goal goal : proof.openGoals()){
+            
+            if(!SymbolicExecutionUtil.hasApplicableRules(goal)){
                uncloseable = true;
                break;
             }
@@ -774,7 +783,7 @@ public class ProofManager {
          if(uncloseable){
             sb.append("Reason: Goal can't be closed automatically");
             sb.append(newLine);
-            sb.append("Hint: Check code and specifications for bugs or continue proof");
+            sb.append("Hint: Check code and specifications for bugs or continue proof interactively");
             sb.append(newLine);
             sb.append(newLine);
          }
