@@ -11,12 +11,11 @@ public abstract class AbstractMap implements MapInterface {
     @ public invariant !\dl_inDomain(map,null);
     @
     @ public invariant (\forall int i; 0 <= i && i < entries.length; \dl_inDomain(map,entries[i].key));
+    @ public invariant (\forall int i; 0 <= i && i < entries.length;
+    @                      \dl_mapGet(map, entries[i].key) == entries[i].value);
     @
     @ public invariant (\forall Object o; \dl_inDomain(map,o);(
     @       \exists int i; 0 <= i && i < entries.length; o == entries[i].key ));
-    @
-    @ public invariant (\forall int i; 0 <= i && i < entries.length;
-    @                      \dl_mapGet(map, entries[i].key) == entries[i].value);     
     @
     @ public invariant (\forall int i1; 0 <= i1 && i1 < entries.length;
     @                      (\forall int i2; 0 <= i2 && i2 < entries.length && i2 != i1;
