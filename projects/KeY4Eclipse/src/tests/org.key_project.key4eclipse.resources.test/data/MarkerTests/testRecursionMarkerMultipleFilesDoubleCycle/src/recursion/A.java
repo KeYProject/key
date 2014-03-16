@@ -1,12 +1,9 @@
 package recursion;
 
 public class A {
-	
-	static int i = 0;
-	
-    //@ public normal_behavior requires i>=0 && i<=2; ensures true;
-    public static void a() {
-        if (i>=0) B.b();
-        i--;
-    }
+   
+   //@ public normal_behavior ensures \result == 0;
+   public static int a() {
+      return 0 + B.b();
+   }
 }
