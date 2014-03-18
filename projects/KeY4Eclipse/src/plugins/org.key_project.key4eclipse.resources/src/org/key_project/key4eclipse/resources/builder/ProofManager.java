@@ -64,10 +64,12 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -79,6 +81,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -97,6 +100,7 @@ public class ProofManager {
    private MarkerManager markerManager;
    private IFolder mainProofFolder;
    private IProject project;
+   private LinkedList<ProofElement> proofElements;
    private LinkedList<IFile> changedJavaFiles;
    private List<ProofElement> proofsToDo = Collections.synchronizedList(new LinkedList<ProofElement>());
    private List<Pair<ByteArrayOutputStream, ProofElement>> proofsToSave = Collections.synchronizedList(new LinkedList<Pair<ByteArrayOutputStream, ProofElement>>());
@@ -152,18 +156,18 @@ public class ProofManager {
     * @throws Exception
     */
    public void runProofs(LinkedList<IFile> changedJavaFiles, IProgressMonitor monitor) throws Exception{
-      LinkedList<ProofElement> proofElements = getAllProofElements();
+      markerManager.deleteKeYMarkerByType(project, IResource.DEPTH_ZERO, MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID);
+      
+      proofElements = getAllProofElements();
       
       this.changedJavaFiles = changedJavaFiles;
-      markerManager.deleteKeYMarker(project, IResource.DEPTH_ZERO);
-      markerManager.deleteKeYMarkerByType(project, MarkerManager.RECURSIONMARKER_ID, IResource.DEPTH_INFINITE);
       //set up monitor
       monitor.beginTask("Build all proofs", proofElements.size());
-      initThreads(proofElements, changedJavaFiles, monitor);
-      checkContractRecursion(proofElements);
-      cleanMarker(proofElements);
+      initThreads(changedJavaFiles, monitor);
+      checkContractRecursion();
+      cleanMarker();
       if(KeYProjectProperties.isAutoDeleteProofFiles(project)){
-         cleanProofFolder(getAllFiles(proofElements), mainProofFolder);
+         cleanProofFolder(getAllFiles(), mainProofFolder);
       }
       monitor.done();
    }
@@ -216,7 +220,10 @@ public class ProofManager {
             ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(type, target);
             for (Contract contract : contracts) {
                IFolder proofFolder = getProofFolder(javaFile);
-               proofElements.add(new ProofElement(javaFile, scl, environment, proofFolder, contract));
+               IFile proofFile = getProofFile(contract.getName(), proofFolder.getFullPath());
+               IFile metaFile = getProofMetaFile(proofFile);
+               LinkedHashSet<IMarker> oldMarker = markerManager.getOldProofMarker(javaFile, scl, proofFile);
+               proofElements.add(new ProofElement(javaFile, scl, environment, proofFolder, proofFile, metaFile, oldMarker, contract));
             }
          }
       }
@@ -264,8 +271,8 @@ public class ProofManager {
     * @param monitor
     * @throws Exception 
     */
-   private void initThreads(LinkedList<ProofElement> proofElements, LinkedList<IFile> changedJavaFiles, IProgressMonitor monitor) throws Exception {
-      proofsToDo = Collections.synchronizedList(cloneLinkedList(proofElements));
+   private void initThreads(LinkedList<IFile> changedJavaFiles, IProgressMonitor monitor) throws Exception {
+      proofsToDo = Collections.synchronizedList(KeYResourcesUtil.cloneLinkedList(proofElements));
 
       int numOfThreads = KeYProjectProperties.getNumberOfThreads(project);
       int numOfProofs = proofElements.size();
@@ -295,20 +302,6 @@ public class ProofManager {
          run.run();
          saveProofsFormList();
       }
-   }
-   
-   
-   /**
-    * Clones the given {@link LinkedList} of {@link ProofElement}s.
-    * @param proofElements - the {@link LinkedList} to clone
-    * @return the cloned {@link LinkedList}
-    */
-   private LinkedList<ProofElement> cloneLinkedList(LinkedList<ProofElement> proofElements){
-      LinkedList<ProofElement> clone = new LinkedList<ProofElement>();
-      for(ProofElement pe : proofElements){
-         clone.add(pe);
-      }
-      return clone;
    }
    
    
@@ -429,7 +422,7 @@ public class ProofManager {
     * @param proofElements - the {@link ProofElement}s to use
     * @return a {@link LinkedList} with all proof- and meta{@link IFile}s
     */
-   private LinkedList<IFile> getAllFiles(LinkedList<ProofElement> proofElements){
+   private LinkedList<IFile> getAllFiles(){
       LinkedList<IFile> proofFiles = new LinkedList<IFile>();
       for(ProofElement pe : proofElements){
          proofFiles.add(pe.getProofFile());
@@ -444,30 +437,79 @@ public class ProofManager {
     * @param proofElements - the {@link ProofElement} to check
     * @throws CoreException
     */
-   private void checkContractRecursion(LinkedList<ProofElement> proofElements) throws CoreException{
-      RecursionGraph graph = new RecursionGraph(proofElements);
-      LinkedHashSet<LinkedList<ProofElement>> cycles = graph.findCycles();
+   private void checkContractRecursion() throws CoreException{
+      findCycles();
+      removeAllRecursiveMarker();
       for(LinkedList<ProofElement> cycle : cycles){
          markerManager.setRecursionMarker(cycle);
+      }
+      restoreOldMarkerForRemovedCycles();
+   }
+   
+   private void restoreOldMarkerForRemovedCycles() throws CoreException{
+      for(ProofElement pe : proofElements){
+         if(pe.getMarker().isEmpty()){
+            markerManager.setMarker(pe);
+         }
+      }
+   }
+   
+   private LinkedHashSet<LinkedList<ProofElement>> cycles;
+   private void findCycles(){
+      cycles = new LinkedHashSet<LinkedList<ProofElement>>();
+      for(ProofElement pe : proofElements){
+         LinkedList<ProofElement> cycle = new LinkedList<ProofElement>();
+         cycle.add(pe);
+         searchCycle(cycle);
+      }
+   }
+   
+   private void searchCycle(LinkedList<ProofElement> cycle){
+      LinkedList<ProofElement> succs = cycle.getLast().getUsedContracts();
+      for(ProofElement pe : succs){
+         if(pe.equals(cycle.getFirst())){
+            //cycle found
+            cycles.add(cycle);
+         }
+         else if(cycle.contains(pe)){
+            return;
+         }
+         else{
+            LinkedList<ProofElement> tmpCycle = KeYResourcesUtil.cloneLinkedList(cycle);
+            tmpCycle.add(pe);
+            searchCycle(tmpCycle); 
+         }
       }
    }
    
    
-   private void cleanMarker(LinkedList<ProofElement> proofElements) throws CoreException{
-      LinkedList<IMarker> peMarker = new LinkedList<IMarker>();
+   private void removeAllRecursiveMarker() throws CoreException{
       for(ProofElement pe : proofElements){
-         if(pe.getMarker() == null){
-            IMarker marker = markerManager.getOldProofMarkerForPe(pe);
-            if(marker != null){
-               pe.setMarker(marker);
-               peMarker.add(marker);
+         LinkedHashSet<IMarker> peMarker = pe.getMarker();
+         LinkedList<IMarker> toBeRemoved = new LinkedList<IMarker>();
+         for(IMarker marker : peMarker){
+            if(marker != null && MarkerManager.RECURSIONMARKER_ID.equals(marker.getType())){
+               toBeRemoved.add(marker);
             }
          }
-         else {
-            peMarker.add(pe.getMarker());
+         while(!toBeRemoved.isEmpty()){
+            IMarker marker = toBeRemoved.removeFirst();
+            pe.removeMarker(marker);
+            marker.delete();
          }
       }
-      LinkedList<IMarker> allMarker = markerManager.getKeYMarkerByType(project, IResource.DEPTH_INFINITE, MarkerManager.CLOSEDMARKER_ID, MarkerManager.NOTCLOSEDMARKER_ID);
+      markerManager.deleteKeYMarkerByType(project, IResource.DEPTH_INFINITE, MarkerManager.RECURSIONMARKER_ID);
+   }
+   
+   
+   private void cleanMarker() throws CoreException{
+      LinkedList<IMarker> peMarker = new LinkedList<IMarker>();
+      for(ProofElement pe : proofElements){
+         if(pe.getMarker() != null){
+            peMarker.addAll(pe.getMarker());
+         }
+      }
+      LinkedList<IMarker> allMarker = markerManager.getAllKeYMarker(project, IResource.DEPTH_INFINITE);
       for(IMarker marker : allMarker){
          if(!peMarker.contains(marker)){
             marker.delete();
@@ -510,39 +552,35 @@ public class ProofManager {
     */
    private void handleProblemLoaderException(ProblemLoaderException e) throws CoreException{
       //remove all KeYMarker in the whole project
-      markerManager.deleteKeYMarker(project, IResource.DEPTH_ZERO);
-      LinkedList<IFile> allFiles = collectAllJavaFilesForProject();
-      for(IFile file : allFiles){
-         markerManager.deleteKeYMarker(file, IResource.DEPTH_ZERO);
-      }
+      markerManager.deleteAllKeYMarker(project, IResource.DEPTH_INFINITE);
       //add the ProblemExceptionMarker
       markerManager.setProblemLoaderExceptionMarker(project, e.getMessage());
    }
    
    
-   /**
-    * Collects all Java{@link IFile}s of the {@link IProject}.
-    * @return the {@link LinkedList} with all Java{@link IFile}s
-    * @throws JavaModelException
-    */
-   private LinkedList<IFile> collectAllJavaFilesForProject() throws JavaModelException{
-      IJavaProject javaProject = JavaCore.create(project);
-      LinkedList<IFile> javaFiles = new LinkedList<IFile>();
-      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      IPath sourcePath = project.getFullPath().append("src");
-      IPackageFragment[] packageFragments = javaProject.getPackageFragments();
-      for(IPackageFragment packageFragment : packageFragments){
-         ICompilationUnit[] units = packageFragment.getCompilationUnits();
-         for(ICompilationUnit unit : units){            
-            IPath filePath = unit.getResource().getFullPath();
-            IFile javaFile = root.getFile(unit.getResource().getFullPath());
-            if(!javaFiles.contains(javaFile) && sourcePath.isPrefixOf(filePath)){
-               javaFiles.add(javaFile);
-            }
-         }
-      }
-      return javaFiles;
-   }
+//   /**
+//    * Collects all Java{@link IFile}s of the {@link IProject}.
+//    * @return the {@link LinkedList} with all Java{@link IFile}s
+//    * @throws JavaModelException
+//    */
+//   private LinkedList<IFile> collectAllJavaFilesForProject() throws JavaModelException{
+//      IJavaProject javaProject = JavaCore.create(project);
+//      LinkedList<IFile> javaFiles = new LinkedList<IFile>();
+//      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+//      IPath sourcePath = project.getFullPath().append("src");
+//      IPackageFragment[] packageFragments = javaProject.getPackageFragments();
+//      for(IPackageFragment packageFragment : packageFragments){
+//         ICompilationUnit[] units = packageFragment.getCompilationUnits();
+//         for(ICompilationUnit unit : units){            
+//            IPath filePath = unit.getResource().getFullPath();
+//            IFile javaFile = root.getFile(unit.getResource().getFullPath());
+//            if(!javaFiles.contains(javaFile) && sourcePath.isPrefixOf(filePath)){
+//               javaFiles.add(javaFile);
+//            }
+//         }
+//      }
+//      return javaFiles;
+//   }
    
    
    /**
@@ -624,7 +662,7 @@ public class ProofManager {
     */
    private IFile getProofMetaFile(IFile proofFile){
       IPath proofFilePath = proofFile.getFullPath();
-      IPath proofMetaFilePath = proofFilePath.addFileExtension(KeYResourcesUtil.META_FILE_EXTENSION);
+      IPath proofMetaFilePath = proofFilePath.removeFileExtension().addFileExtension(KeYResourcesUtil.META_FILE_EXTENSION);
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
       IFile proofMetaFile = root.getFile(proofMetaFilePath);
       return proofMetaFile;
@@ -639,19 +677,24 @@ public class ProofManager {
     * @throws Exception
     */
    private void processProof(ProofElement pe) throws Exception{
+      long proofStart = System.currentTimeMillis();
       IFile file = pe.getProofFile();
       Proof proof = null;
       if(!file.exists()){
          proof = createProof(pe);
       }
       else {
-         proof = loadProof(pe);
+         proof = loadProof(pe); //TODO: Wait for BugFix
          if(proof == null){
             proof = createProof(pe);
          }
       }
-      
+      long proofDuration = System.currentTimeMillis()-proofStart;
       if(proof != null){
+         pe.setProofClosed(proof.closed());
+         pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
+         pe.setUsedContracts(KeYResourcesUtil.getUsedContractsProofElements(pe, proofElements));
+         pe.setMarkerMsg(generateProofMarkerMessage(pe, proof, proofDuration));
          markerManager.setMarker(pe);
          ByteArrayOutputStream out = generateSaveProof(proof, pe.getProofFile());
          proofsToSave.add(new Pair<ByteArrayOutputStream, ProofElement>(out, pe));
@@ -667,18 +710,20 @@ public class ProofManager {
     * @throws ProofInputException 
     */
    private Proof createProof(ProofElement pe) throws ProofInputException{
-         Proof proof = pe.getKeYEnvironment().createProof(pe.getProofObl());
+         Proof proof = pe.getKeYEnvironment().createProof(pe.getProofObl());   
+         
+         StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+         strategyProperties.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_NONCLOSE);         
+         proof.getSettings().getStrategySettings().setActiveStrategyProperties(strategyProperties);
          
          ProofStarter ps = new ProofStarter(false);
          ps.init(new SingleProof(proof, pe.getProofObl().name()));
-         
          ps.start();
+         
          OneStepSimplifier oss = MiscTools.findOneStepSimplifier(proof);
          if (oss != null) {
-            oss.refresh(null);
+            oss.refresh(proof);
          }
-         pe.setProofClosed(proof.closed());
-         pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
          return proof;
    }
    
@@ -689,21 +734,76 @@ public class ProofManager {
     */
    private Proof loadProof(ProofElement pe){
       Proof proof = null;
+      File file = pe.getProofFile().getLocation().toFile();
+      Profile profile = pe.getKeYEnvironment().getInitConfig().getProfile();
+      KeYEnvironment<CustomConsoleUserInterface> loadEnv = null;
+      boolean error = false;
       try{
-         File file = pe.getProofFile().getLocation().toFile();
-         KeYEnvironment<CustomConsoleUserInterface> loadEnv = KeYEnvironment.load(file, null, null);
+         loadEnv = KeYEnvironment.load(profile, file, null, null);
+      } catch(ProblemLoaderException e){
+         error = true;
+      }
+      if(loadEnv != null){
          proof = loadEnv.getLoadedProof();
-         if (proof != null) {
-//            if (!proof.closed()){
-//               loadEnv.getUi().startAndWaitForAutoMode(proof);
-//            }
-            pe.setProofClosed(proof.closed());
-            pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
+         if (proof != null){
+            if(error) {
+               loadEnv.getUi().startAndWaitForAutoMode(proof);
+            }
          }
-      }catch(Exception e){
-         LogUtil.getLogger().logError(e);
       }
       return proof;
+   }
+   
+   
+
+   
+   private String generateProofMarkerMessage(ProofElement pe, Proof proof, long time){
+      StringBuffer sb = new StringBuffer();
+      boolean closed = pe.getProofClosed();
+      String newLine ="\n";
+      
+      sb.append(closed? "Closed Proof:" : "Open Proof:");
+      sb.append(newLine);
+      sb.append(pe.getContract().getName());
+      sb.append(newLine);
+      sb.append(newLine);
+      if(!proof.closed()){
+         boolean uncloseable = false;
+         OneStepSimplifier oss = MiscTools.findOneStepSimplifier(proof);
+         if (oss != null) {
+            oss.refresh(proof);
+         }
+         for(Goal goal : proof.openGoals()){
+            
+            if(!SymbolicExecutionUtil.hasApplicableRules(goal)){
+               uncloseable = true;
+               break;
+            }
+         }
+         if(uncloseable){
+            sb.append("Reason: Goal can't be closed automatically");
+            sb.append(newLine);
+            sb.append("Hint: Check code and specifications for bugs or continue proof interactively");
+            sb.append(newLine);
+            sb.append(newLine);
+         }
+         else{
+            sb.append("Reason: Max. Rule Applications reached");
+            sb.append(newLine);
+            sb.append("Hint: Continue proof automatic- or interactively");
+            sb.append(newLine);
+            sb.append(newLine);
+         }
+      }
+      
+      sb.append("Time: " + time / 1000 + "." + time % 1000 + " s");
+      sb.append(newLine);
+      sb.append("Nodes: " + proof.countNodes());
+      sb.append(newLine);
+      sb.append("Branches: " + proof.countBranches());
+      sb.append(newLine);
+      
+      return sb.toString();
    }
    
    
@@ -891,7 +991,6 @@ public class ProofManager {
       return null;
    }
 
-
    
    /**
     * Inner class to process the proofs in threads.
@@ -899,8 +998,8 @@ public class ProofManager {
     */
    private class ProofRunnable implements Runnable {
       
-      private KeYEnvironment<CustomConsoleUserInterface> environment;
-      private IProgressMonitor monitor;
+      private final KeYEnvironment<CustomConsoleUserInterface> environment;
+      private final IProgressMonitor monitor;
       
       public ProofRunnable(KeYEnvironment<CustomConsoleUserInterface> environment, IProgressMonitor monitor){
          this.environment = environment;
@@ -912,11 +1011,8 @@ public class ProofManager {
          try{
             ProofElement pe;
             while ((pe = getProofToDo()) != null) {
-
                pe.setKeYEnvironment(environment);
                pe.setProofObl(pe.getContract().createProofObl(environment.getInitConfig(), pe.getContract()));
-               pe.setProofFile(getProofFile(pe.getProofObl().name(), pe.getProofFolder().getFullPath()));
-               pe.setMetaFile(getProofMetaFile(pe.getProofFile()));
                
                monitor.subTask("Building " + pe.getProofObl().name());
                
@@ -925,12 +1021,20 @@ public class ProofManager {
                }
                else{
                   IFile metaFile = getProofMetaFile(pe.getProofFile());
-                  if(metaFile.exists()){
+                  if(pe.getMarker().isEmpty()){
+                     processProof(pe);
+                  }
+                  else if(metaFile.exists()){
                      try{
                         ProofMetaFileReader pmfr = new ProofMetaFileReader(metaFile);
                         LinkedList<IType> javaTypes = collectAllJavaITypes();
                         if(MD5changed(pe.getProofFile(), pmfr) || typeOrSubTypeChanged(pe, pmfr, javaTypes) || superTypeChanged(pe, changedJavaFiles, javaTypes)){
                            processProof(pe);
+                        }
+                        else{
+                           pe.setProofClosed(pmfr.getProofClosed());
+                           pe.setMarkerMsg(pmfr.getMarkerMessage());
+                           pe.setUsedContracts(KeYResourcesUtil.getProofElementsByProofFiles(pmfr.getUsedContracts(), proofElements));
                         }
                      } catch (Exception e) {
                         LogUtil.getLogger().logError(e);
