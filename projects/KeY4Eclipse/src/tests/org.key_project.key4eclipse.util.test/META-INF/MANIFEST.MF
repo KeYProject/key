@@ -22,7 +22,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.graphiti.ui;bundle-version="[0.10.0,0.11.0)",
  org.eclipse.emf.transaction;bundle-version="1.4.0",
  org.eclipse.ui.views.properties.tabbed;bundle-version="3.5.200",
- org.eclipse.gef;bundle-version="3.7.1"
+ org.eclipse.gef;bundle-version="3.7.1",
+ org.eclipse.e4.ui.workbench.renderers.swt
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
