@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.Pair;
 
@@ -50,11 +51,16 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
 		
     public AbstractContractRuleApp check(Services services) {
         if (instantiation != null && posInOccurrence() != null) {
-            final IObserverFunction target = instantiation.getTarget();            
-            final IObserverFunction observerFunctionAtPos = getObserverFunction(services);                       
+            IObserverFunction target = instantiation.getTarget();            
+            IObserverFunction observerFunctionAtPos = getObserverFunction(services);                       
+            final SpecificationRepository specRepo = services.getSpecificationRepository();
             
-            if (!target.equals(observerFunctionAtPos)) {                
-                if (!services.getSpecificationRepository().
+            target = specRepo.unlimitObs(target);
+            observerFunctionAtPos = specRepo.unlimitObs(observerFunctionAtPos);
+            
+            if (!target.equals(observerFunctionAtPos)) {
+                
+                if (!specRepo.
                         getOverridingTargets(observerFunctionAtPos.getContainerType(), observerFunctionAtPos).
                             contains(new Pair<KeYJavaType, IObserverFunction>(target.getContainerType(), target))){
                     return null;

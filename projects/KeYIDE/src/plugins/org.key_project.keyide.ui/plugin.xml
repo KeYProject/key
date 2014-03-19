@@ -169,7 +169,7 @@
       </handler>
       <handler
             class="org.key_project.keyide.ui.handlers.BreakpointToggleHandler"
-            commandId="org.key_project.keyide.ui.commands.breakpointToggle">
+            commandId="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand">
       </handler>
    </extension>
    <extension
@@ -178,7 +178,8 @@
             allPopups="false"
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
             <toolbar
-               id="org.key_project.keyide.ui.toolbar">
+                  id="org.key_project.keyide.ui.toolbar"
+                  label="KeY Editor">
                  <command
                        commandId="org.key_project.keyide.ui.commands.startAutoModeCommand"
                        icon="icons/nav_go.gif"
@@ -212,10 +213,10 @@
                     </visibleWhen>
                  </command>
                  <command
-                       commandId="org.key_project.keyide.ui.commands.breakpointToggle"
+                       commandId="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand"
                        icon="icons/breakpoints.gif"
-                       id="org.key_project.keyide.ui.commands.breakpointToggle"
-                       label="Use Breakpoints"
+                       id="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand"
+                       label="Stop at Breakpoints"
                        style="toggle">
                     <visibleWhen
                           checkEnabled="false">
@@ -306,13 +307,23 @@
       </command>
       <command
             categoryId="org.key_project.keyide.ui.commands.category"
-            description="Controls wether to suspend on breakpoints or ignore them."
-            id="org.key_project.keyide.ui.commands.breakpointToggle"
-            name="Breakpoint Toggle">
+            description="If selected auto mode will stop at breakpoints and ignore them otherwise."
+            id="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand"
+            name="Stop at Breakpoints">
          <state
-               class="org.eclipse.ui.handlers.RegistryToggleState:true"
                id="org.eclipse.ui.commands.toggleState">
-         </state>
+            <class
+                  class="org.eclipse.ui.handlers.RegistryToggleState">
+               <parameter
+                     name="default"
+                     value="false">
+               </parameter>
+               <parameter
+                     name="persisted"
+                     value="true">
+               </parameter>
+            </class>
+         </state>            
       </command>
    </extension>
    <extension

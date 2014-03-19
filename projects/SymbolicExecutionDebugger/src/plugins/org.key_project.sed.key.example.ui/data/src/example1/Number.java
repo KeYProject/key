@@ -1,10 +1,10 @@
 package example1;
 
 /**
- * To debug method {@link #eq(Number)} symbolically with the 
+ * To debug method {@link #equals(Number)} symbolically with the 
  * Symbolic Execution Debugger (SED) follow the steps below:
  * <ol>
- *    <li>Select method {@link #eq(Number)}</li>
+ *    <li>Select method {@link #equals(Number)}</li>
  *    <li>
  *       Select context menu item 'Debug As, Symbolic Execution Debugger (SED)'
  *    </li>
@@ -29,14 +29,14 @@ package example1;
  * during symbolic execution are listed.
  */
 public class Number {
-   private int value;
-	
-   public boolean eq(Number n) {
-      if (value == n.value) {
-         return true;
-      }
-      else {
-         return false;
-      }
-   }
+	private int value;
+
+	public boolean equals(Number n) {
+		if (value == n.value) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 }

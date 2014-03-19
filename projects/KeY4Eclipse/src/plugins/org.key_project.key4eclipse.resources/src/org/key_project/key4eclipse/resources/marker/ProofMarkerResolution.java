@@ -100,14 +100,8 @@ public class ProofMarkerResolution implements IMarkerResolution2{
    }
    
    private IFile getProofFile(IMarker marker) throws CoreException{
-      StringBuffer sb = new StringBuffer((String) marker.getAttribute(IMarker.MESSAGE));
-      if(marker.getType().equals(MarkerManager.CLOSEDMARKER_ID)){
-         sb.delete(0, 15);
-      }
-      else if(marker.getType().equals(MarkerManager.NOTCLOSEDMARKER_ID)){
-         sb.delete(0, 19);
-      }
-      IPath proofFilePath = new Path(sb.toString());
+      String str = (String) marker.getAttribute(IMarker.SOURCE_ID);
+      IPath proofFilePath = new Path(str);
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
       IFile proofFile = root.getFile(proofFilePath);
       return proofFile;
