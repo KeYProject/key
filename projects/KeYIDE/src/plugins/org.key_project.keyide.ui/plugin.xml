@@ -178,7 +178,8 @@
             allPopups="false"
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
             <toolbar
-               id="org.key_project.keyide.ui.toolbar">
+                  id="org.key_project.keyide.ui.toolbar"
+                  label="KeY Editor">
                  <command
                        commandId="org.key_project.keyide.ui.commands.startAutoModeCommand"
                        icon="icons/nav_go.gif"
