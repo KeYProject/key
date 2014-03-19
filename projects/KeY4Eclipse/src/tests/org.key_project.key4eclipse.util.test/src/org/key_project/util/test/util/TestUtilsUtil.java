@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.e4.ui.workbench.renderers.swt.HandledContributionItem;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
@@ -47,6 +48,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -78,8 +80,14 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarPushButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarRadioButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarSeparatorButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarToggleButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveDescriptor;
@@ -131,6 +139,7 @@ import de.uka.ilkd.key.util.KeYResourceManager;
  * Provides static methods that make testing easier.
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public class TestUtilsUtil {
    /**
     * Forbid instances.
@@ -1587,5 +1596,61 @@ public class TestUtilsUtil {
          i++;
       }
       return result;
+   }
+
+   /**
+    * Searches the {@link SWTBotToolbarButton} with the given ID.
+    * @param view The {@link SWTBotView} to search toolbar button in.
+    * @param id The ID of the toolbar item to search.
+    * @return The found {@link SWTBotToolbarButton}.
+    * @throws Exception Occurred Exception.
+    */
+   public static SWTBotToolbarButton getToolbarButtonWithId(final SWTBotView view, final String id) throws Exception {
+      IRunnableWithResult<IContributionItem> run = new AbstractRunnableWithResult<IContributionItem>() {
+         @Override
+         public void run() {
+            IViewPart viewPart = view.getReference().getView(true);
+            IActionBars bar = viewPart.getViewSite().getActionBars();
+            IContributionItem[] items = bar.getToolBarManager().getItems();
+            IContributionItem item = ArrayUtil.search(items, new org.key_project.util.java.IFilter<IContributionItem>() {
+               @Override
+               public boolean select(IContributionItem element) {
+                  return ObjectUtil.equals(id, element.getId());
+               }
+            });
+            setResult(item);
+         }
+      };
+      view.bot().getDisplay().syncExec(run);
+      if (run.getException() != null) {
+         throw run.getException();
+      }
+      IContributionItem item = run.getResult();
+      if (!(item instanceof HandledContributionItem)) {
+         throw new IllegalStateException("HandledContributionItem expected, but is: " + item);
+      }
+      Widget widget = ((HandledContributionItem)item).getWidget();
+      if (!(widget instanceof ToolItem)) {
+         throw new IllegalStateException("ToolItem expected, but is: " + widget);
+      }
+      ToolItem toolItem = (ToolItem)widget;
+      if (SWTUtils.hasStyle(toolItem, SWT.PUSH)) {
+         return new SWTBotToolbarPushButton(toolItem);
+      }
+      else if(SWTUtils.hasStyle(toolItem, SWT.CHECK)) {
+         return new SWTBotToolbarToggleButton(toolItem);
+      }
+      else if(SWTUtils.hasStyle(toolItem, SWT.RADIO)) {
+         return new SWTBotToolbarRadioButton(toolItem);
+      }
+      else if(SWTUtils.hasStyle(toolItem, SWT.DROP_DOWN)) {
+         return new SWTBotToolbarDropDownButton(toolItem);
+      }
+      else if(SWTUtils.hasStyle(toolItem, SWT.SEPARATOR)) {
+         return new SWTBotToolbarSeparatorButton(toolItem);
+      }
+      else {
+         throw new IllegalStateException("Unsupported tool item: " + toolItem);
+      }
    }
 }
