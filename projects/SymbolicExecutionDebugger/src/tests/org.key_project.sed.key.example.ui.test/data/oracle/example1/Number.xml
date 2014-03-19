@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_2322a5ce-f912-41c4-aa41-f4aae4a9eee6" name="eq(example1.Number)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_eee8309a-37bd-4af5-9f9f-4ffa1b78581b" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_e8dfb21e-0c5a-432f-85cf-e5834187c3b9" name="self.eq(n);" pathCondition="true" lineNumber="-1" charStart="1388" charEnd="1390">
-            <sedBranchStatement xml:id="_1e6beee7-d2f3-42ad-8d8c-edcc5f4dcf60" name="if (this.value==n.value)" pathCondition="true" lineNumber="-1" charStart="1410" charEnd="1512">
-               <sedBranchCondition xml:id="_745e659f-df7d-4226-882a-06f3647ad0ca" name="not(equals(n,null))" pathCondition="not(equals(n,null))">
-                  <sedBranchCondition xml:id="_a59aeff6-7161-421c-91bc-636bec92d287" name="equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value))" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value)))">
-                     <sedStatement xml:id="_29390642-249f-4a1f-9297-c15f399a6dae" name="return true;" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value)))" lineNumber="-1" charStart="1444" charEnd="1456">
-                        <sedMethodReturn xml:id="_809c1e0a-3a65-4237-a494-6f3b2b130ce4" name="&lt;return of self.eq(n);&gt;" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value)))" lineNumber="-1" charStart="1388" charEnd="1390">
-                           <sedTermination xml:id="_e986ecb7-580b-4785-bae6-689df85cf131" name="&lt;end&gt;" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value)))" verified="true">
+   <sedTarget xml:id="_0bf7c2e1-c3bb-4f7f-bc7d-a40d84988bba" name="equals(example1.Number)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_94d38637-bece-4b70-b4bf-fcd5ae7b9b5b" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_7351083e-e6e0-4112-9ec3-59b981be37c9" name="self.equals(n);" pathCondition="true" lineNumber="-1" charStart="1358" charEnd="1364">
+            <sedBranchStatement xml:id="_da15c0e8-0f5f-4525-919d-ff357d1ea263" name="if (this.value==n.value)" pathCondition="true" lineNumber="-1" charStart="1379" charEnd="1452">
+               <sedBranchCondition xml:id="_51fd4984-556a-4010-ab06-5489424ddf09" name="not(equals(n,null))" pathCondition="not(equals(n,null))">
+                  <sedBranchCondition xml:id="_ac6529d8-9cb9-4fa3-9874-24de2974fcae" name="equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value))" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value)))">
+                     <sedStatement xml:id="_ad3b5510-e55f-4e50-8b0a-7ba0f3b221ae" name="return true;" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value)))" lineNumber="-1" charStart="1406" charEnd="1418">
+                        <sedMethodReturn xml:id="_af82b9d1-04d1-4254-8d9c-f674f8ee2f53" name="&lt;return of self.equals(n);&gt;" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value)))" lineNumber="-1" charStart="1358" charEnd="1364">
+                           <sedTermination xml:id="_9703fa0c-04d6-4e2c-925f-372393435782" name="&lt;end&gt;" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value)))" verified="true">
                            </sedTermination>
                         </sedMethodReturn>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_9656fe70-b24d-424b-8344-84fd37328ba4" name="not(equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value)))" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value))))">
-                     <sedStatement xml:id="_fb2c93b3-ecd1-4d2c-9c66-1a3278ca5e3e" name="return false;" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value))))" lineNumber="-1" charStart="1490" charEnd="1503">
-                        <sedMethodReturn xml:id="_816823b7-57cb-414f-a277-7fb75bc5e994" name="&lt;return of self.eq(n);&gt;" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value))))" lineNumber="-1" charStart="1388" charEnd="1390">
-                           <sedTermination xml:id="_a9b1484e-868f-4661-9dbc-b7568bbb77b2" name="&lt;end&gt;" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value))))" verified="true">
+                  <sedBranchCondition xml:id="_7e34bd1c-d0a9-4b24-a7d5-bce637cb9a63" name="not(equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value)))" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value))))">
+                     <sedStatement xml:id="_668cb35a-7423-41c6-9b93-7d8cd97e4b8a" name="return false;" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value))))" lineNumber="-1" charStart="1435" charEnd="1448">
+                        <sedMethodReturn xml:id="_0a6c2bd5-51bc-4b72-8353-7d2f1dc69a10" name="&lt;return of self.equals(n);&gt;" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value))))" lineNumber="-1" charStart="1358" charEnd="1364">
+                           <sedTermination xml:id="_bc548604-1efd-4cbe-aafd-18483d179e37" name="&lt;end&gt;" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,example1.Number::$value),int::select(heap,n,example1.Number::$value))))" verified="true">
                            </sedTermination>
                         </sedMethodReturn>
                      </sedStatement>
                   </sedBranchCondition>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_a0524146-326f-429e-9017-9a30dd7768b2" name="equals(n,null)" pathCondition="equals(n,null)">
-                  <sedExceptionalTermination xml:id="_108af157-8f7a-4266-9e54-32cc154e8f50" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(n,null)" verified="true">
+               <sedBranchCondition xml:id="_d47378f6-dcad-426a-8c4c-830941240e0d" name="equals(n,null)" pathCondition="equals(n,null)">
+                  <sedExceptionalTermination xml:id="_3b58ce67-7218-4be4-8e3e-0ef8f9bf4bf1" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(n,null)" verified="true">
                   </sedExceptionalTermination>
                </sedBranchCondition>
             </sedBranchStatement>

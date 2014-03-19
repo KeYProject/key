@@ -26,11 +26,13 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.junit.Test;
+import org.key_project.sed.key.core.test.util.TestBreakpointsUtil;
 import org.key_project.sed.key.ui.test.Activator;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 public class SWTBotAddKeYWatchpointTest extends TestCase {
+   public static final String ADD_WATCHPOINT_TOOLTIP = "Add a KeY Watchpoint.";
 
    private static boolean projectExists = false;
 
@@ -40,9 +42,8 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       if (!projectExists) {
          initializeProject();
       }
-      TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
-      TestUtilsUtil.clickDirectly(bot
-            .toolbarButtonWithTooltip("Add a KeY Watchpoint."));
+      TestBreakpointsUtil.openBreakpointView(bot);
+      TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip(ADD_WATCHPOINT_TOOLTIP));
       SWTBotShell addWatchpointShell = bot.activeShell();
       assertEquals("Add KeY Watchpoint", addWatchpointShell.getText());
       TestUtilsUtil.clickDirectly(bot, "Cancel");
@@ -60,7 +61,7 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       }
       TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
       TestUtilsUtil.clickDirectly(bot
-            .toolbarButtonWithTooltip("Add a KeY Watchpoint."));
+            .toolbarButtonWithTooltip(ADD_WATCHPOINT_TOOLTIP));
       bot.text(0).setText("invalidType");
       assertFalse(bot.button("OK").isEnabled());
       assertFalse(bot.styledText().isEnabled());
@@ -79,7 +80,7 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       }
       TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
       TestUtilsUtil.clickDirectly(bot
-            .toolbarButtonWithTooltip("Add a KeY Watchpoint."));
+            .toolbarButtonWithTooltip(ADD_WATCHPOINT_TOOLTIP));
       bot.text(0).setText("EmptyTestClass");
       assertFalse(bot.button("OK").isEnabled());
       assertTrue(bot.styledText().isEnabled());
@@ -98,7 +99,7 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       }
       TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
       TestUtilsUtil.clickDirectly(bot
-            .toolbarButtonWithTooltip("Add a KeY Watchpoint."));
+            .toolbarButtonWithTooltip(ADD_WATCHPOINT_TOOLTIP));
       bot.text(0).setText("EmptyTestClass");
       SWTBotStyledText styledText = bot.styledText(0);
       styledText.setText("     ");
@@ -117,7 +118,7 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
          initializeProject();
       }
       TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
-      TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Add a KeY Watchpoint."));
+      TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip(ADD_WATCHPOINT_TOOLTIP));
       bot.text(0).setText("EmptyTestClass");
       SWTBotStyledText styledText = bot.styledText(0);
       styledText.setText("anyNonEmptyCondition");
@@ -139,7 +140,7 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       IFile classFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(classPath);
       TestUtilsUtil.openEditor(classFile);
       TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
-      TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Add a KeY Watchpoint."));
+      TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip(ADD_WATCHPOINT_TOOLTIP));
       SWTBotShell addWatchpointShell = bot.activeShell();
       assertEquals("EmptyTestClass", bot.text().getText());
       SWTBotStyledText styledText = bot.styledText();
@@ -164,7 +165,7 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
          initializeProject();
       }
       TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
-      TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Add a KeY Watchpoint."));
+      TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip(ADD_WATCHPOINT_TOOLTIP));
       SWTBotShell addWatchpointShell = bot.activeShell();
       TestUtilsUtil.clickDirectly(bot, "Browse");
       SWTBotShell dialogShell = bot.activeShell();
@@ -198,7 +199,7 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       }
       TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
       assertFalse(bot.tree().hasItems());
-      TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Add a KeY Watchpoint."));
+      TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip(ADD_WATCHPOINT_TOOLTIP));
       bot.text().setText("EmptyTestClass");
       SWTBotStyledText styledText = bot.styledText(0);
       styledText.setText("anyNonEmptyCondition");
