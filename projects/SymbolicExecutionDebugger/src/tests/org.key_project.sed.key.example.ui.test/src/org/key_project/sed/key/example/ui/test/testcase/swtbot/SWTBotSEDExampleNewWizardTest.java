@@ -21,7 +21,6 @@ import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.test.testcase.swtbot.AbstractKeYDebugTargetTestCase;
-import org.key_project.sed.key.core.test.testcase.swtbot.AbstractKeYDebugTargetTestCase.IMethodSelector;
 import org.key_project.sed.key.example.ui.test.Activator;
 import org.key_project.sed.key.example.ui.wizard.SEDExampleNewWizard;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -195,6 +194,8 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
          IJavaProject javaProject = JavaCore.create(project);
          assertNotNull(javaProject);
          assertTrue(javaProject.exists());
+         // Unify line breaks
+         TestUtilsUtil.unifyLineBreaks(project, "java");
          // Test opened editor
          SWTBotEditor editor = bot.activeEditor();
          assertEquals(project.getFile(new Path("src/example1/Number.java")), editor.getReference().getEditorInput().getAdapter(IFile.class));
