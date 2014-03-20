@@ -32,6 +32,8 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -109,6 +111,7 @@ import org.key_project.util.eclipse.Logger;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.setup.SetupStartup;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
@@ -1583,7 +1586,7 @@ public class TestUtilsUtil {
    /**
     * Returns the perspective with the given ID.
     * @param id The ID to search.
-    * @return The foudn perspective or {@code null} if no perspective was found.
+    * @return The found perspective or {@code null} if no perspective was found.
     */
    public static IPerspectiveDescriptor getPerspective(String id) {
       IPerspectiveDescriptor result = null;
@@ -1651,6 +1654,34 @@ public class TestUtilsUtil {
       }
       else {
          throw new IllegalStateException("Unsupported tool item: " + toolItem);
+      }
+   }
+   
+   /**
+    * Unifies all line breaks of files with the given extensions in the given {@link IProject}.
+    * @param project The {@link IProject} to operate on.
+    * @param fileExtensions The file extensions of files to modify.
+    * @throws CoreException Occurred Exception.
+    */
+   public static void unifyLineBreaks(IProject project, final String... fileExtensions) throws CoreException {
+      if (project != null) {
+         project.accept(new IResourceVisitor() {
+            @Override
+            public boolean visit(IResource resource) throws CoreException {
+               try {
+                  if (resource instanceof IFile &&
+                      ArrayUtil.contains(fileExtensions, resource.getFileExtension())) {
+                     IFile file = (IFile)resource;
+                     file.setContents(IOUtil.unifyLineBreaks(file.getContents()), true, true, null);
+                  }
+                  return true;
+               }
+               catch (IOException e) {
+                  throw new CoreException(new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(e));
+               }
+            }
+         }, IResource.DEPTH_INFINITE, IResource.FILE);
+         waitForBuild();
       }
    }
 }
