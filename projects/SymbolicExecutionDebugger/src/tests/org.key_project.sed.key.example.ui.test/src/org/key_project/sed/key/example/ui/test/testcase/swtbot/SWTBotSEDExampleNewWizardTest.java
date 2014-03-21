@@ -76,9 +76,9 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
    @Test
    public void testExample3() throws Exception {
       doExampleResumeTest("SWTBotSEDExampleNewWizardTest_testExample3",
-                          createMethodSelector("example3.ArrayUtil", "indexOf", "[QObject;", "QSelector;"),
+                          createMethodSelector("example3.ArrayUtil", "indexOf", "[QObject;", "QFilter;"),
                           true,
-                          "example3.ArrayUtil[example3.ArrayUtil::indexOf([Ljava.lang.Object,example3.ArrayUtil.Selector)].JML normal_behavior operation contract.0",
+                          "example3.ArrayUtil[example3.ArrayUtil::indexOf([Ljava.lang.Object,example3.ArrayUtil.Filter)].JML normal_behavior operation contract.0",
                           "data/oracle/example3/ArrayUtil.xml",
                           true,
                           true);
