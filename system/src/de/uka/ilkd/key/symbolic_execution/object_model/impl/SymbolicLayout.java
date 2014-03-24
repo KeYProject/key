@@ -16,16 +16,16 @@ package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 
 /**
- * Default implementation of {@link ISymbolicConfiguration}.
+ * Default implementation of {@link ISymbolicLayout}.
  * @author Martin Hentschel
  */
-public class SymbolicConfiguration extends AbstractElement implements ISymbolicConfiguration {
+public class SymbolicLayout extends AbstractElement implements ISymbolicLayout {
    /**
     * The contained {@link ISymbolicEquivalenceClass}.
     */
@@ -46,7 +46,7 @@ public class SymbolicConfiguration extends AbstractElement implements ISymbolicC
     * @param equivalenceClasses The provided equivalence classes.
     * @param settings The {@link IModelSettings} to use.
     */
-   public SymbolicConfiguration(IModelSettings settings, 
+   public SymbolicLayout(IModelSettings settings, 
                                 ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses) {
       super(settings);
       assert equivalenceClasses != null;

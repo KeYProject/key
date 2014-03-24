@@ -14,31 +14,31 @@
 package de.uka.ilkd.key.symbolic_execution.object_model;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.symbolic_execution.SymbolicConfigurationExtractor;
-import de.uka.ilkd.key.symbolic_execution.SymbolicConfigurationReader;
-import de.uka.ilkd.key.symbolic_execution.SymbolicConfigurationWriter;
-import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicConfiguration;
+import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutExtractor;
+import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader;
+import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutWriter;
+import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicLayout;
 
 /**
  * <p>
- * This interface represents the root element of a symbolic configuration.
+ * This interface represents the root element of a symbolic memory layout.
  * </p>
  * <p>
- * A symbolic configuration defines how a heap and stack looks like and which objects
- * are the same (equivalent classes). Such configurations can be created
- * automatically via a {@link SymbolicConfigurationExtractor} and saved/loaded
- * via {@link SymbolicConfigurationWriter}/{@link SymbolicConfigurationReader}.
+ * A symbolic memory layout defines how a heap and stack looks like and which objects
+ * are the same (equivalent classes). Such memory layouts can be created
+ * automatically via a {@link SymbolicLayoutExtractor} and saved/loaded
+ * via {@link SymbolicLayoutWriter}/{@link SymbolicLayoutReader}.
  * </p>
  * <p>
- * The default implementation is {@link SymbolicConfiguration}.
+ * The default implementation is {@link SymbolicLayout}.
  * </p>
  * @author Martin Hentschel
- * @see SymbolicConfigurationExtractor
- * @see SymbolicConfigurationWriter
- * @see SymbolicConfigurationReader
- * @see SymbolicConfiguration
+ * @see SymbolicLayoutExtractor
+ * @see SymbolicLayoutWriter
+ * @see SymbolicLayoutReader
+ * @see SymbolicLayout
  */
-public interface ISymbolicConfiguration extends ISymbolicElement {
+public interface ISymbolicLayout extends ISymbolicElement {
    /**
     * Returns the equivalence classes. 
     * @return The equivalence classes.

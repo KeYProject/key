@@ -27,38 +27,38 @@ import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.SymbolicConfigurationReader.KeYlessAssociation;
-import de.uka.ilkd.key.symbolic_execution.SymbolicConfigurationReader.KeYlessEquivalenceClass;
-import de.uka.ilkd.key.symbolic_execution.SymbolicConfigurationReader.KeYlessConfiguration;
-import de.uka.ilkd.key.symbolic_execution.SymbolicConfigurationReader.KeYlessObject;
-import de.uka.ilkd.key.symbolic_execution.SymbolicConfigurationReader.KeYlessState;
-import de.uka.ilkd.key.symbolic_execution.SymbolicConfigurationReader.KeYlessValue;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
+import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.KeYlessAssociation;
+import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.KeYlessEquivalenceClass;
+import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.KeYlessLayout;
+import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.KeYlessObject;
+import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.KeYlessState;
+import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.KeYlessValue;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 
 /**
- * Tests {@link SymbolicConfigurationWriter} and {@link SymbolicConfigurationReader}
+ * Tests {@link SymbolicLayoutWriter} and {@link SymbolicLayoutReader}
  * @author Martin Hentschel
  */
-public class TestSymbolicConfigurationWriterAndReader extends TestCase {
+public class TestSymbolicLayoutWriterAndReader extends TestCase {
    /**
-    * Tests the writing and reading of an {@link ISymbolicConfiguration}.
+    * Tests the writing and reading of an {@link ISymbolicLayout}.
     */
    public void testWritingAndReading() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
       // Create model
-      ISymbolicConfiguration expectedNode = createModel();
+      ISymbolicLayout expectedNode = createModel();
       // Serialize model to XML string
-      SymbolicConfigurationWriter writer = new SymbolicConfigurationWriter();
+      SymbolicLayoutWriter writer = new SymbolicLayoutWriter();
       String xml = writer.toXML(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING);
       // Read from XML string
-      SymbolicConfigurationReader reader = new SymbolicConfigurationReader();
-      ISymbolicConfiguration currentNode = reader.read(new ByteArrayInputStream(xml.getBytes(Charset.forName(ExecutionNodeWriter.DEFAULT_ENCODING))));
-      TestSymbolicConfigurationExtractor.assertModel(expectedNode, currentNode);
+      SymbolicLayoutReader reader = new SymbolicLayoutReader();
+      ISymbolicLayout currentNode = reader.read(new ByteArrayInputStream(xml.getBytes(Charset.forName(ExecutionNodeWriter.DEFAULT_ENCODING))));
+      TestSymbolicLayoutExtractor.assertModel(expectedNode, currentNode);
       // Serialize model to output stream
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, out);
       // Read from input stream
       currentNode = reader.read(new ByteArrayInputStream(out.toByteArray()));
-      TestSymbolicConfigurationExtractor.assertModel(expectedNode, currentNode);
+      TestSymbolicLayoutExtractor.assertModel(expectedNode, currentNode);
       // Serialize model to temporary file
       File tempFile = File.createTempFile("TestExecutionNodeWriterAndReader", "testWritingAndReading");
       try {
@@ -67,7 +67,7 @@ public class TestSymbolicConfigurationWriterAndReader extends TestCase {
          assertTrue(tempFile.isFile());
          // Read from temporary file
          currentNode = reader.read(tempFile);
-         TestSymbolicConfigurationExtractor.assertModel(expectedNode, currentNode);
+         TestSymbolicLayoutExtractor.assertModel(expectedNode, currentNode);
       }
       finally {
          tempFile.delete();
@@ -78,8 +78,8 @@ public class TestSymbolicConfigurationWriterAndReader extends TestCase {
     * Creates an example model.
     * @return The root of the example model.
     */
-   protected ISymbolicConfiguration createModel() {
-      KeYlessConfiguration model = new KeYlessConfiguration();
+   protected ISymbolicLayout createModel() {
+      KeYlessLayout model = new KeYlessLayout();
       model.addEquivalenceClass(new KeYlessEquivalenceClass(ImmutableSLList.<String>nil().append("A", "B", "C"), "A"));
       model.addEquivalenceClass(new KeYlessEquivalenceClass(ImmutableSLList.<String>nil().append("1", "2", "3"), "63"));
       // state

@@ -23,21 +23,21 @@ import java.util.Map;
 
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
- * Allows to persistent selected properties of {@link ISymbolicConfiguration}s
- * as XML file. Such files can be read via a {@link SymbolicConfigurationReader} instance.
+ * Allows to persistent selected properties of {@link ISymbolicLayout}s
+ * as XML file. Such files can be read via a {@link SymbolicLayoutReader} instance.
  * @author Martin Hentschel
- * @see SymbolicConfigurationReader
+ * @see SymbolicLayoutReader
  */
-public class SymbolicConfigurationWriter extends AbstractWriter {
+public class SymbolicLayoutWriter extends AbstractWriter {
    /**
-    * Tag name to store {@link ISymbolicConfiguration}s.
+    * Tag name to store {@link ISymbolicLayout}s.
     */
    public static final String TAG_MODEL = "model";
    
@@ -127,26 +127,26 @@ public class SymbolicConfigurationWriter extends AbstractWriter {
    public static final String ATTRIBUTE_ARRAY_INDEX = "arrayIndex";
 
    /**
-    * Writes the given {@link ISymbolicConfiguration} as XML file.
-    * @param model The {@link ISymbolicConfiguration} to save.
+    * Writes the given {@link ISymbolicLayout} as XML file.
+    * @param model The {@link ISymbolicLayout} to save.
     * @param encoding The encoding to use.
     * @param file The {@link File} to save to.
     * @throws IOException Occurred Exception.
     */
-   public void write(ISymbolicConfiguration model, 
+   public void write(ISymbolicLayout model, 
                      String encoding, 
                      File file) throws IOException {
       write(model, encoding, new FileOutputStream(file));
    }
    
    /**
-    * Writes the given {@link ISymbolicConfiguration} into the {@link OutputStream}.
-    * @param node The {@link ISymbolicConfiguration} to save.
+    * Writes the given {@link ISymbolicLayout} into the {@link OutputStream}.
+    * @param node The {@link ISymbolicLayout} to save.
     * @param encoding The encoding to use.
     * @param out The {@link OutputStream} to save to. The {@link OutputStream} will be closed by this method.
     * @throws IOException Occurred Exception.
     */
-   public void write(ISymbolicConfiguration model, 
+   public void write(ISymbolicLayout model, 
                      String encoding, 
                      OutputStream out) throws IOException {
       if (out != null) {
@@ -162,12 +162,12 @@ public class SymbolicConfigurationWriter extends AbstractWriter {
    }
    
    /**
-    * Converts the given {@link ISymbolicConfiguration} into XML.
-    * @param node The {@link ISymbolicConfiguration} to convert.
+    * Converts the given {@link ISymbolicLayout} into XML.
+    * @param node The {@link ISymbolicLayout} to convert.
     * @param encoding The encoding to use.
     * @return The created XML content.
     */
-   public String toXML(ISymbolicConfiguration model, 
+   public String toXML(ISymbolicLayout model, 
                        String encoding){
       StringBuffer sb = new StringBuffer();
       appendXmlHeader(encoding, sb);
@@ -176,12 +176,12 @@ public class SymbolicConfigurationWriter extends AbstractWriter {
    }
 
    /**
-    * Appends the given {@link ISymbolicConfiguration} with its children to the given {@link StringBuffer}.
+    * Appends the given {@link ISymbolicLayout} with its children to the given {@link StringBuffer}.
     * @param level The level to use.
-    * @param model The {@link ISymbolicConfiguration} to append.
+    * @param model The {@link ISymbolicLayout} to append.
     * @param sb The {@link StringBuffer} to append to.
     */
-   protected void appendModel(int level, ISymbolicConfiguration model, StringBuffer sb) {
+   protected void appendModel(int level, ISymbolicLayout model, StringBuffer sb) {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       appendStartTag(level, TAG_MODEL, attributeValues, sb);
       for (ISymbolicEquivalenceClass ec : model.getEquivalenceClasses()) {
@@ -215,11 +215,11 @@ public class SymbolicConfigurationWriter extends AbstractWriter {
    /**
     * Appends the given {@link ISymbolicState} with its children to the given {@link StringBuffer}.
     * @param level The level to use.
-    * @param model The {@link ISymbolicConfiguration} which provides all objects.
+    * @param model The {@link ISymbolicLayout} which provides all objects.
     * @param state The {@link ISymbolicState} to append.
     * @param sb The {@link StringBuffer} to append to.
     */
-   protected void appendState(int level, ISymbolicConfiguration model, ISymbolicState state, StringBuffer sb) {
+   protected void appendState(int level, ISymbolicLayout model, ISymbolicState state, StringBuffer sb) {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, state.getName());
       appendStartTag(level, TAG_STATE, attributeValues, sb);
@@ -235,11 +235,11 @@ public class SymbolicConfigurationWriter extends AbstractWriter {
    /**
     * Appends the given {@link ISymbolicObject} with its children to the given {@link StringBuffer}.
     * @param level The level to use.
-    * @param model The {@link ISymbolicConfiguration} which provides all objects.
+    * @param model The {@link ISymbolicLayout} which provides all objects.
     * @param object The {@link ISymbolicObject} to append.
     * @param sb The {@link StringBuffer} to append to.
     */
-   protected void appendObject(int level, ISymbolicConfiguration model, ISymbolicObject object, StringBuffer sb) {
+   protected void appendObject(int level, ISymbolicLayout model, ISymbolicObject object, StringBuffer sb) {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_XML_ID, computeObjectId(model, object));
       attributeValues.put(ATTRIBUTE_NAME, object.getNameString());
@@ -277,11 +277,11 @@ public class SymbolicConfigurationWriter extends AbstractWriter {
    /**
     * Appends the given {@link ISymbolicAssociation} with its children to the given {@link StringBuffer}.
     * @param level The level to use.
-    * @param model The {@link ISymbolicConfiguration} which provides all objects.
+    * @param model The {@link ISymbolicLayout} which provides all objects.
     * @param association The {@link ISymbolicAssociation} to append.
     * @param sb The {@link StringBuffer} to append to.
     */
-   protected void appendAssociation(int level, ISymbolicConfiguration model, ISymbolicAssociation association, StringBuffer sb) {
+   protected void appendAssociation(int level, ISymbolicLayout model, ISymbolicAssociation association, StringBuffer sb) {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, association.getName());
       attributeValues.put(ATTRIBUTE_PROGRAM_VARIABLE, association.getProgramVariableString());
@@ -296,11 +296,11 @@ public class SymbolicConfigurationWriter extends AbstractWriter {
 
    /**
     * Computes a unique ID for the given object in the given model.
-    * @param model The {@link ISymbolicConfiguration} which provides all objects.
+    * @param model The {@link ISymbolicLayout} which provides all objects.
     * @param object The {@link ISymbolicObject} to compute its unique ID.
     * @return The unique ID.
     */
-   protected String computeObjectId(ISymbolicConfiguration model, ISymbolicObject object) {
+   protected String computeObjectId(ISymbolicLayout model, ISymbolicObject object) {
       int i = 0;
       int index = -1;
       Iterator<ISymbolicObject> iter = model.getObjects().iterator();

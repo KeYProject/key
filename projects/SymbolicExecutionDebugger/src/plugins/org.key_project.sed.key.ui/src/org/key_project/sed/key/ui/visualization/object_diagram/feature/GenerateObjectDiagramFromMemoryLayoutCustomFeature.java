@@ -37,30 +37,30 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 
 /**
  * An {@link ICustomFeature} that generates an object diagram based
- * on the state provided via an {@link ISymbolicConfiguration}.
- * The {@link ISymbolicConfiguration} is specified via property {@link #PROPERTY_SYMBOLIC_CONFIGURATION} 
+ * on the state provided via an {@link ISymbolicLayout}.
+ * The {@link ISymbolicLayout} is specified via property {@link #PROPERTY_MEMORY_LAYOUT} 
  * of the given {@link ICustomContext}.
  * @author Martin Hentschel
  */
-public class GenerateObjectDiagramFromSymbolicConfigurationCustomFeature extends AbstractGenerateObjectDiagramCustomFeature {
+public class GenerateObjectDiagramFromMemoryLayoutCustomFeature extends AbstractGenerateObjectDiagramCustomFeature {
    /**
-    * Property for an {@link ISymbolicConfiguration} instance which provides
+    * Property for an {@link ISymbolicLayout} instance which provides
     * the state to visualize as object diagram.
     */
-   public static final String PROPERTY_SYMBOLIC_CONFIGURATION = "symbolicConfiguration";
+   public static final String PROPERTY_MEMORY_LAYOUT = "memoryLayout";
    
    /**
     * Constructor.
     * @param fp The {@link IFeatureProvider} which provides this {@link ICustomFeature}.
     */
-   public GenerateObjectDiagramFromSymbolicConfigurationCustomFeature(IFeatureProvider fp) {
+   public GenerateObjectDiagramFromMemoryLayoutCustomFeature(IFeatureProvider fp) {
       super(fp);
    }
 
@@ -73,20 +73,20 @@ public class GenerateObjectDiagramFromSymbolicConfigurationCustomFeature extends
       IProgressMonitor monitor = GraphitiUtil.getProgressMonitor(context);
       SWTUtil.checkCanceled(monitor);
       // Get node
-      ISymbolicConfiguration configuration = null;
-      Object contextNode = context.getProperty(PROPERTY_SYMBOLIC_CONFIGURATION);
-      if (contextNode instanceof ISymbolicConfiguration) {
-         configuration = (ISymbolicConfiguration)contextNode;
+      ISymbolicLayout layout = null;
+      Object contextNode = context.getProperty(PROPERTY_MEMORY_LAYOUT);
+      if (contextNode instanceof ISymbolicLayout) {
+         layout = (ISymbolicLayout)contextNode;
       }
       // Generate model and diagram if possible
       try {
-         if (configuration != null) {
+         if (layout != null) {
             // Get model
             ODModel model = ObjectDiagramUtil.getModel(getDiagram());
             // Clean diagram
             cleanModel(model);
             // Create new model
-            PictogramElement statePE = createModelAndDiagram(model, configuration, monitor);
+            PictogramElement statePE = createModelAndDiagram(model, layout, monitor);
             // Improve diagram layout
             improveLayout(model, monitor);
             // Select statePE
@@ -104,14 +104,14 @@ public class GenerateObjectDiagramFromSymbolicConfigurationCustomFeature extends
    /**
     * Creates the model and diagram.
     * @param model The {@link ODModel} to fill.
-    * @param configuration The {@link ISymbolicConfiguration} to show.
+    * @param layout The {@link ISymbolicLayout} to show.
     * @param monitor The {@link IProgressMonitor} to use.
     * @return The created {@link PictogramElement} of the root {@link ODState}.
     */
-   protected PictogramElement createModelAndDiagram(ODModel model, ISymbolicConfiguration configuration, IProgressMonitor monitor) {
-      if (configuration != null) {
+   protected PictogramElement createModelAndDiagram(ODModel model, ISymbolicLayout layout, IProgressMonitor monitor) {
+      if (layout != null) {
          // Create state
-         ODState state = createState(configuration.getState());
+         ODState state = createState(layout.getState());
          PictogramElement statePE = null;
          if (state != null) {
             model.getStates().add(state);
@@ -120,7 +120,7 @@ public class GenerateObjectDiagramFromSymbolicConfigurationCustomFeature extends
          // Create objects
          Map<ISymbolicObject, ODObject> objectMapping = new HashMap<ISymbolicObject, ODObject>();
          Map<ISymbolicObject, PictogramElement> objectPEMapping = new HashMap<ISymbolicObject, PictogramElement>();
-         for (ISymbolicObject symbolicObject : configuration.getObjects()) {
+         for (ISymbolicObject symbolicObject : layout.getObjects()) {
             ODObject object = createObject(symbolicObject);
             if (object != null) {
                model.getObjects().add(object);
@@ -131,9 +131,9 @@ public class GenerateObjectDiagramFromSymbolicConfigurationCustomFeature extends
          }
          // Create associations
          if (state != null) {
-            fillValueContainerWithAssociations(state, statePE, configuration.getState().getAssociations(), objectMapping, objectPEMapping);
+            fillValueContainerWithAssociations(state, statePE, layout.getState().getAssociations(), objectMapping, objectPEMapping);
          }
-         for (ISymbolicObject symbolicObject : configuration.getObjects()) {
+         for (ISymbolicObject symbolicObject : layout.getObjects()) {
             ODObject object = objectMapping.get(symbolicObject);
             Assert.isNotNull(object);
             PictogramElement objectPE = objectPEMapping.get(symbolicObject);
