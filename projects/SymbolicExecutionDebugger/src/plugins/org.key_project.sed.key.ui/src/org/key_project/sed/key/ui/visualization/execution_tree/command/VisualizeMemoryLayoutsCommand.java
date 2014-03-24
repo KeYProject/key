@@ -23,7 +23,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.ui.util.LogUtil;
-import org.key_project.sed.key.ui.visualization.object_diagram.editor.ConfigurationObjectDiagramEditor;
+import org.key_project.sed.key.ui.visualization.object_diagram.editor.MemoryLayoutDiagramEditor;
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
@@ -32,10 +32,10 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 
 /**
- * This {@link IHandler} visualizes the configurations of selected {@link IKeYSEDDebugNode}s.
+ * This {@link IHandler} visualizes the memory layouts of selected {@link IKeYSEDDebugNode}s.
  * @author Martin Hentschel
  */
-public class VisualizeConfigurationsCommand extends AbstractHandler {
+public class VisualizeMemoryLayoutsCommand extends AbstractHandler {
    /**
     * {@inheritDoc}
     */
@@ -46,14 +46,14 @@ public class VisualizeConfigurationsCommand extends AbstractHandler {
          Object[] elements = SWTUtil.toArray(selection);
          for (Object element : elements) {
             if (canVisualize(element)) {
-               visualizeConfigurations((IKeYSEDDebugNode<?>)element,
-                              HandlerUtil.getActivePart(event).getSite().getPage());
+               visualizeMemoryLayouts((IKeYSEDDebugNode<?>)element,
+                                      HandlerUtil.getActivePart(event).getSite().getPage());
             }
          }
          return null;
       }
       catch (Exception e) {
-         throw new ExecutionException("Can't visualize configurations.", e);
+         throw new ExecutionException("Can't visualize memory layouts.", e);
       }
    }
    
@@ -81,18 +81,18 @@ public class VisualizeConfigurationsCommand extends AbstractHandler {
    }
 
    /**
-    * Visualizes the configurations of the given {@link IKeYSEDDebugNode}.
+    * Visualizes the memory layouts of the given {@link IKeYSEDDebugNode}.
     * @param node The {@link IKeYSEDDebugNode} to visualize.
     * @param activePage The active {@link IWorkbenchPage}.
     * @throws Exception Occurred Exception.
     */
-   public static void visualizeConfigurations(IKeYSEDDebugNode<?> node,
-                                              IWorkbenchPage activePage) throws Exception {
+   public static void visualizeMemoryLayouts(IKeYSEDDebugNode<?> node,
+                                             IWorkbenchPage activePage) throws Exception {
       // Open editor
-      ConfigurationObjectDiagramEditor configurationsEditor = ConfigurationObjectDiagramEditor.openEditor(activePage, node.getName(), node.getId() + "_configurations");
+      MemoryLayoutDiagramEditor editor = MemoryLayoutDiagramEditor.openEditor(activePage, node.getName(), node.getId() + "_layouts");
       // Generate object diagram if not already available
-      if (!ObjectDiagramUtil.hasModel(configurationsEditor.getDiagramTypeProvider().getDiagram())) {
-         configurationsEditor.generateConfigurationsDiagram(node);
+      if (!ObjectDiagramUtil.hasModel(editor.getDiagramTypeProvider().getDiagram())) {
+         editor.generateMemoryLayoutsDiagram(node);
       }
    }
 }

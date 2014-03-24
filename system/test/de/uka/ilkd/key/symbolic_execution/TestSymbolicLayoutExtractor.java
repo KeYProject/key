@@ -26,7 +26,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
@@ -36,10 +36,10 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
- * Tests {@link SymbolicConfigurationExtractor}.
+ * Tests {@link SymbolicLayoutExtractor}.
  * @author Martin Hentschel
  */
-public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutionTestCase {
+public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCase {
 //   public void testSimpleLinkedOjbectsWithAdditionalInstances() throws Exception {
 //      doTest("examples/_testcase/set/configurationExtractorSimpleLinkedOjbectsWithAdditionalInstances/test/SimpleLinkedOjbectsWithAdditionalInstances.java",
 //             "SimpleLinkedOjbectsWithAdditionalInstances",
@@ -566,10 +566,10 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
     * @param containerTypeName The class name.
     * @param oraclePathInBaseDir The path to the oracle directory.
     * @param symbolicExecutionOracleFileName File name of the symbolic execution oracle file.
-    * @param initialStatesOraclePrefix Prefix for initial configuration oracles.
-    * @param initialStatesOracleFileExtension Initial configuration oracle file extension.
-    * @param currentStatesOraclePrefix Prefix for current configuration oracles.
-    * @param currentStatesOracleFileExtension Current configuration oracle file extension.
+    * @param initialStatesOraclePrefix Prefix for initial memory layout oracles.
+    * @param initialStatesOracleFileExtension Initial memory layout oracle file extension.
+    * @param currentStatesOraclePrefix Prefix for current memory layout oracles.
+    * @param currentStatesOracleFileExtension Current memory layout oracle file extension.
     * @param precondition An optional precondition.
     * @param useOperationContracts Use operation contracts?
     * @throws Exception Occurred Exception.
@@ -584,7 +584,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
                          String currentStatesOracleFileExtension,
                          String precondition,
                          int numberOfReturnNodeInMostLeftBranch,
-                         int expectedNumberOfConfigurations,
+                         int expectedNumberOfLayouts,
                          boolean useOperationContracts) throws Exception {
       doTest(javaPathInkeyRepDirectory,
              containerTypeName,
@@ -596,7 +596,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              currentStatesOracleFileExtension,
              precondition,
              numberOfReturnNodeInMostLeftBranch,
-             expectedNumberOfConfigurations,
+             expectedNumberOfLayouts,
              useOperationContracts,
              true);
    }
@@ -607,10 +607,10 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
     * @param containerTypeName The class name.
     * @param oraclePathInBaseDir The path to the oracle directory.
     * @param symbolicExecutionOracleFileName File name of the symbolic execution oracle file.
-    * @param initialStatesOraclePrefix Prefix for initial configuration oracles.
-    * @param initialStatesOracleFileExtension Initial configuration oracle file extension.
-    * @param currentStatesOraclePrefix Prefix for current configuration oracles.
-    * @param currentStatesOracleFileExtension Current configuration oracle file extension.
+    * @param initialStatesOraclePrefix Prefix for initial memory layout oracles.
+    * @param initialStatesOracleFileExtension Initial memory layout oracle file extension.
+    * @param currentStatesOraclePrefix Prefix for current memory layout oracles.
+    * @param currentStatesOracleFileExtension Current memory layout oracle file extension.
     * @param precondition An optional precondition.
     * @param useOperationContracts Use operation contracts?
     * @throws Exception Occurred Exception.
@@ -625,7 +625,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
                          String currentStatesOracleFileExtension,
                          String precondition,
                          int numberOfReturnNodeInMostLeftBranch,
-                         int expectedNumberOfConfigurations,
+                         int expectedNumberOfLayouts,
                          boolean useOperationContracts,
                          boolean onReturnStatementNode) throws Exception {
       HashMap<String, String> originalTacletOptions = null;
@@ -669,46 +669,46 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
             nodeToTest = returnNode;
          }
          // Extract possible heaps
-         SymbolicConfigurationExtractor extractor = new SymbolicConfigurationExtractor(nodeToTest.getProofNode(), false);
+         SymbolicLayoutExtractor extractor = new SymbolicLayoutExtractor(nodeToTest.getProofNode(), false);
          extractor.analyse();
-         // Test the initial configurations (first time with lazy computation)
-         List<ISymbolicConfiguration> initialConfigurationsFirstTime = new ArrayList<ISymbolicConfiguration>(extractor.getConfigurationsCount());
-         assertEquals(expectedNumberOfConfigurations, extractor.getConfigurationsCount());
-         for (int i = 0; i < extractor.getConfigurationsCount(); i++) {
-            ISymbolicConfiguration current = extractor.getInitialConfiguration(i);
-            initialConfigurationsFirstTime.add(current);
+         // Test the initial memory layouts (first time with lazy computation)
+         List<ISymbolicLayout> initialLayoutsFirstTime = new ArrayList<ISymbolicLayout>(extractor.getLayoutsCount());
+         assertEquals(expectedNumberOfLayouts, extractor.getLayoutsCount());
+         for (int i = 0; i < extractor.getLayoutsCount(); i++) {
+            ISymbolicLayout current = extractor.getInitialLayout(i);
+            initialLayoutsFirstTime.add(current);
             String oracleFile = oraclePathInBaseDir + initialStatesOraclePrefix + i + initialStatesOracleFileExtension;
             createOracleFile(current, oracleFile);
             if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
-               SymbolicConfigurationReader reader = new SymbolicConfigurationReader();
-               ISymbolicConfiguration expected = reader.read(new File(keyRepDirectory, oracleFile));
+               SymbolicLayoutReader reader = new SymbolicLayoutReader();
+               ISymbolicLayout expected = reader.read(new File(keyRepDirectory, oracleFile));
                assertNotNull(expected);
                assertModel(expected, current);
             }
          }
-         // Test the initial configurations (second time with same configurations)
-         for (int i = 0; i < extractor.getConfigurationsCount(); i++) {
-            ISymbolicConfiguration current = extractor.getInitialConfiguration(i);
-            assertSame(initialConfigurationsFirstTime.get(i), current);
+         // Test the initial memory layouts (second time with same memory layouts)
+         for (int i = 0; i < extractor.getLayoutsCount(); i++) {
+            ISymbolicLayout current = extractor.getInitialLayout(i);
+            assertSame(initialLayoutsFirstTime.get(i), current);
          }
-         // Test the current configurations (first time with lazy computation)
-         List<ISymbolicConfiguration> currentConfigurationsFirstTime = new ArrayList<ISymbolicConfiguration>(extractor.getConfigurationsCount());
-         for (int i = 0; i < extractor.getConfigurationsCount(); i++) {
-            ISymbolicConfiguration current = extractor.getCurrentConfiguration(i);
-            currentConfigurationsFirstTime.add(current);
+         // Test the current memory layouts (first time with lazy computation)
+         List<ISymbolicLayout> currentLayoutsFirstTime = new ArrayList<ISymbolicLayout>(extractor.getLayoutsCount());
+         for (int i = 0; i < extractor.getLayoutsCount(); i++) {
+            ISymbolicLayout current = extractor.getCurrentLayout(i);
+            currentLayoutsFirstTime.add(current);
             String oracleFile = oraclePathInBaseDir + currentStatesOraclePrefix + i + currentStatesOracleFileExtension;
             createOracleFile(current, oracleFile);
             if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
-               SymbolicConfigurationReader reader = new SymbolicConfigurationReader();
-               ISymbolicConfiguration expected = reader.read(new File(keyRepDirectory, oracleFile));
+               SymbolicLayoutReader reader = new SymbolicLayoutReader();
+               ISymbolicLayout expected = reader.read(new File(keyRepDirectory, oracleFile));
                assertNotNull(expected);
                assertModel(expected, current);
             }
          }
-         // Test the current configurations (second time with same configurations)
-         for (int i = 0; i < extractor.getConfigurationsCount(); i++) {
-            ISymbolicConfiguration current = extractor.getCurrentConfiguration(i);
-            assertSame(currentConfigurationsFirstTime.get(i), current);
+         // Test the current memory layouts (second time with same memory layouts)
+         for (int i = 0; i < extractor.getLayoutsCount(); i++) {
+            ISymbolicLayout current = extractor.getCurrentLayout(i);
+            assertSame(currentLayoutsFirstTime.get(i), current);
          }
       }
       finally {
@@ -722,25 +722,25 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
    }
    
    /**
-    * Compares the given {@link ISymbolicConfiguration}s.
+    * Compares the given {@link ISymbolicLayout}s.
     * @param expected The expected instance.
     * @param current The current instance.
     */
-   protected static void createOracleFile(ISymbolicConfiguration model, 
+   protected static void createOracleFile(ISymbolicLayout model, 
                                           String oraclePathInBaseDirFile) throws IOException, ProofInputException {
       if (tempNewOracleDirectory != null && tempNewOracleDirectory.isDirectory()) {
          // Create sub folder structure
          File oracleFile = new File(tempNewOracleDirectory, oraclePathInBaseDirFile);
          oracleFile.getParentFile().mkdirs();
          // Create oracle file
-         SymbolicConfigurationWriter writer = new SymbolicConfigurationWriter();
-         writer.write(model, SymbolicConfigurationWriter.DEFAULT_ENCODING, oracleFile);
+         SymbolicLayoutWriter writer = new SymbolicLayoutWriter();
+         writer.write(model, SymbolicLayoutWriter.DEFAULT_ENCODING, oracleFile);
          // Print message to the user.
          printOracleDirectory();
       }
    }
    
-   public static void assertModel(ISymbolicConfiguration expected, ISymbolicConfiguration current) {
+   public static void assertModel(ISymbolicLayout expected, ISymbolicLayout current) {
       if (expected != null) {
          assertNotNull(current);
          assertState(expected.getState(), current.getState());

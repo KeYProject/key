@@ -18,15 +18,15 @@ import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.key_project.sed.ui.visualization.util.ICustomFeatureFactory;
 
 /**
- * Instantiates {@link DebugNodeVisualizeConfigurationsFeature}s.
+ * Instantiates {@link DebugNodeVisualizeMemoryLayoutsFeature}s.
  * @author Martin Hentschel
  */
-public class DebugNodeVisualizeConfigurationsFeatureFactory implements ICustomFeatureFactory {
+public class DebugNodeVisualizeMemoryLayoutsFeatureFactory implements ICustomFeatureFactory {
    /**
     * {@inheritDoc}
     */
    @Override
    public ICustomFeature createFeature(IFeatureProvider fp) {
-      return new DebugNodeVisualizeConfigurationsFeature(fp);
+      return new DebugNodeVisualizeMemoryLayoutsFeature(fp);
    }
 }

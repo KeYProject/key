@@ -60,14 +60,14 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.AbstractSymbolicAssociationValueContainer;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.ModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicAssociation;
-import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicConfiguration;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicEquivalenceClass;
+import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicValue;
@@ -78,14 +78,14 @@ import de.uka.ilkd.key.util.ProofStarter;
 
 /**
  * <p>
- * Instances of this class can be used to compute all possible memory configurations
+ * Instances of this class can be used to compute memory layouts
  * (objects with values and associations to other objects on the heap together
  * with objects and associations to objects on the current state of the stack)
  * which a given {@link Node} of KeY's proof tree can have based on 
  * equivalence classes (aliasing) of objects.
- * Such configurations are named <i>current configurations</i>. It is also possible
+ * Such memory layouts are named <i>current memory layouts</i>. It is also possible
  * to compute how the heap and stack was when the proof was started. Such
- * configurations are named <i>initial configurations</i>. 
+ * memory layouts are named <i>initial memory layouts</i>. 
  * </p>
  * <p>
  * Example program:
@@ -103,7 +103,7 @@ import de.uka.ilkd.key.util.ProofStarter;
  * }
  * </code></pre>
  * If the symbolic execution stops at the return statement, 
- * two possible configurations are possible. In the first case refers
+ * two memory layouts are possible. In the first case refers
  * {@code e} and {@code e.next} to different objects (result is {@code 3}). 
  * In the second case refers both to the same object (result is {@code 4}).
  * That both objects can't be {@code null} is ensured by the path condition from root to the current node in KeY's proof tree.
@@ -111,12 +111,12 @@ import de.uka.ilkd.key.util.ProofStarter;
  * <p>
  * The following code snippet shows how to use this class:
  * <pre><code>
- * SymbolicConfigurationExtractor e = new SymbolicConfigurationExtractor(node);
+ * SymbolicLayoutExtractor e = new SymbolicLayoutExtractor(node);
  * e.analyse();
- * for (int i = 0; i < e.getConfigurationsCount(); i++) {
+ * for (int i = 0; i < e.getLayoutsCount(); i++) {
  *    ImmutableList&lt;ISymbolicEquivalenceClass&gt; equivalenceClasses = e.getEquivalenceClasses(i);
- *    ISymbolicConfiguration initial = e.getInitialConfiguration(i);
- *    ISymbolicConfiguration current = e.getCurrentConfiguration(i);
+ *    ISymbolicLayout initial = e.getInitialLayout(i);
+ *    ISymbolicLayout current = e.getCurrentLayout(i);
  * }
  * </code></pre>
  * </p>
@@ -124,13 +124,13 @@ import de.uka.ilkd.key.util.ProofStarter;
  * Rough description of the implemented algorithm:
  * <ol>
  *    <li>
- *       Compute possible equivalence classes which leads to different configurations via {@link #analyse()}.
+ *       Compute possible equivalence classes which leads to different memory layouts via {@link #analyse()}.
  *       <ol>
  *          <li>
- *             Compute path condition from root to the node for which configurations should be build.
+ *             Compute path condition from root to the node for which memory layouts should be build.
  *          </li>
  *          <li>
- *             Compute locations (values/associations of objects and state) to show later in initial and current configurations.
+ *             Compute locations (values/associations of objects and state) to show later in initial and current memory layouts.
  *             Initial locations are extracted from path condition and conditions of node's sequent.
  *             Current locations are all initial locations plus locations defined in updates of node's sequent.
  *             The location of the exc variable and backup of initial method arguments and the heap of the initial proof obligation are ignored.
@@ -144,42 +144,42 @@ import de.uka.ilkd.key.util.ProofStarter;
  *             Create a site proof which starts in a modified version of the root node. 
  *             It contains the given path condition as additional antecedent and the modality with he java code is removed.
  *             Cut rules are applied to this sequent for each possible combination of two different objects. 
- *             Each goal represents a configuration and the applied cuts in each goal represents the equality classes.
+ *             Each goal represents a memory layout and the applied cuts in each goal represents the equality classes.
  *          </li>
  *          <li>
- *             Create a predicate which is used to compute the objects, values and associations of an initial/a current configuration.
- *             Objects are represented as expressions like {@code e} or {@code e.next}. The problem is that in a current configuration the
- *             object structure might have changed and {@code e.next} is a different object compared to the initial configuration. 
+ *             Create a predicate which is used to compute the objects, values and associations of an initial/a current memory layout.
+ *             Objects are represented as expressions like {@code e} or {@code e.next}. The problem is that in a current memory layout the
+ *             object structure might have changed and {@code e.next} is a different object compared to the initial memory layout. 
  *             To solve this issue is an additional update is used which stores each object in a temporary program variable, e.g.
- *             {@code pre0 = e}, {@code pre1 = e.next}. This makes sure that the objects are the same in initial and current configurations.
+ *             {@code pre0 = e}, {@code pre1 = e.next}. This makes sure that the objects are the same in initial and current memory layouts.
  *          </li>
  *       </ol>
  *    </li>
  *    <li>
- *       Compute a concrete initial or current configuration when they are requested the first time via {@link #lazyComputeConfiguration(Node, ImmutableSet, Term, Set, ImmutableList, Term, String)}.
+ *       Compute a concrete initial or current memory layout when they are requested the first time via {@link #lazyComputeLayout(Node, ImmutableSet, Term, Set, ImmutableList, Term, String)}.
  *       <ol>
  *          <li>
- *             Start side proof based on node's sequent for a current configuration or root's sequent for an initial configuration.
- *             The sequent is modified by adding the pre updates and on initial configurations also the path condition.
+ *             Start side proof based on node's sequent for a current memory layout or root's sequent for an initial memory layout.
+ *             The sequent is modified by adding the pre updates and on initial memory layouts also the path condition.
  *             The equivalence classes are added and the modality is replaced with the predicate to compute objects, values and associations.
  *          </li>
  *          <li>
  *             Extract values from the predicate.
  *          </li>
  *          <li>
- *             Create new {@link ISymbolicConfiguration} and fill it with objects, values and associations from the extracted values of the side proof.
+ *             Create new {@link ISymbolicLayout} and fill it with objects, values and associations from the extracted values of the side proof.
  *          </li>
  *       </ol>
  *    </li>
  * </ol>
  * </p>
  * @author Martin Hentschel
- * @see ISymbolicConfiguration
- * @see ExecutionNodeSymbolicConfigurationExtractor
+ * @see ISymbolicLayout
+ * @see ExecutionNodeSymbolicLayoutExtractor
  */
-public class SymbolicConfigurationExtractor {
+public class SymbolicLayoutExtractor {
    /**
-    * Contains the {@link Node} of KeY's proof tree to compute configurations for.
+    * Contains the {@link Node} of KeY's proof tree to compute memory layouts for.
     */
    private final Node node;
    
@@ -189,48 +189,48 @@ public class SymbolicConfigurationExtractor {
    private final IModelSettings settings;
    
    /**
-    * Contains the applied cuts of each possible configuration.
+    * Contains the applied cuts of each possible memory layout.
     * An applied cut is represented as {@link Term} of the from
     * {@code equals(obj1, obj2)} or {@code not(equals(obj1, obj2))}.
     */
-   private List<ImmutableSet<Term>> appliedCutsPerConfiguration;
+   private List<ImmutableSet<Term>> appliedCutsPerLayout;
    
    /**
-    * Contains the current configurations accessible via {@link #getCurrentConfiguration(int)}.
+    * Contains the current memory layouts accessible via {@link #getCurrentLayout(int)}.
     */
-   private Map<Integer, ISymbolicConfiguration> currentConfigurations;
+   private Map<Integer, ISymbolicLayout> currentLayouts;
    
    /**
-    * The {@link ExtractLocationParameter} instances used to compute a current configuration.
+    * The {@link ExtractLocationParameter} instances used to compute a current memory layout.
     */
    private Set<ExtractLocationParameter> currentLocations;
    
    /**
     * The term with the result predicate used to compute the values of locations
-    * shown in a current configuration.
+    * shown in a current memory layout.
     */
    private Term currentLocationTerm;
    
    /**
-    * Contains the initial configurations accessible via {@link #getInitialConfiguration(int)}.
+    * Contains the initial memory layouts accessible via {@link #getInitialLayout(int)}.
     */
-   private Map<Integer, ISymbolicConfiguration> initialConfigurations;
+   private Map<Integer, ISymbolicLayout> initialLayouts;
    
    /**
-    * The {@link ExtractLocationParameter} instances used to compute an initial configuration.
+    * The {@link ExtractLocationParameter} instances used to compute an initial memory layout.
     */
    private Set<ExtractLocationParameter> initialLocations;
    
    /**
     * The term with the result predicate used to compute the values of locations
-    * shown in an initial configuration.
+    * shown in an initial memory layout.
     */
    private Term initialLocationTerm;
    
    /**
     * Contains the equivalent classes accessible via {@link #getEquivalenceClasses(int)}.
     */
-   private Map<Integer, ImmutableList<ISymbolicEquivalenceClass>> configurationsEquivalentClasses;
+   private Map<Integer, ImmutableList<ISymbolicEquivalenceClass>> layoutsEquivalentClasses;
    
    /**
     * An incremented number used to give each pre value an unique name.
@@ -250,9 +250,9 @@ public class SymbolicConfigurationExtractor {
    
    /**
     * Constructor.
-    * @param node The {@link Node} of KeY's proof tree to compute configurations for.
+    * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
     */
-   public SymbolicConfigurationExtractor(Node node, boolean usePrettyPrinting) {
+   public SymbolicLayoutExtractor(Node node, boolean usePrettyPrinting) {
       assert node != null;
       this.node = node;
       this.settings = new ModelSettings(usePrettyPrinting);
@@ -260,7 +260,7 @@ public class SymbolicConfigurationExtractor {
 
    /**
     * <p>
-    * Computes the possible configurations.
+    * Computes the possible memory layouts.
     * </p>
     * <p>
     * This is the prerequisite to access equivalence classes, initial
@@ -274,7 +274,7 @@ public class SymbolicConfigurationExtractor {
             // Get path condition
             pathCondition = SymbolicExecutionUtil.computePathCondition(node, true, false);
             pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
-            // Compute all locations used in path conditions and updates. The values of the locations will be later computed in the state computation (and finally shown in a symbolic configuration).
+            // Compute all locations used in path conditions and updates. The values of the locations will be later computed in the state computation (and finally shown in a memory layout).
             Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractLocationParameter>();
             objectsToIgnore = computeInitialObjectsToIgnore(); // Contains all objects which should be ignored, like exc of the proof obligation and created objects during symbolic execution
             Set<Term> updateCreatedObjects = new LinkedHashSet<Term>(); // Contains all objects which are created during symbolic execution
@@ -300,15 +300,15 @@ public class SymbolicConfigurationExtractor {
                applyCutRules(equivalentClassesProofStarter, symbolicObjectsResultingInCurrentState);
                // Finish proof automatically
                SymbolicExecutionUtil.startSideProof(getProof(), equivalentClassesProofStarter, StrategyProperties.SPLITTING_NORMAL);
-               // Compute the available instance configurations via the opened goals of the equivalent proof.
-               appliedCutsPerConfiguration = extractAppliedCutsFromGoals(equivalentClassesProofStarter.getProof());
+               // Compute the available instance memory layout via the opened goals of the equivalent proof.
+               appliedCutsPerLayout = extractAppliedCutsFromGoals(equivalentClassesProofStarter.getProof());
                // Create predicate required for state computation
                initialLocationTerm = createLocationPredicateAndTerm(initialLocations);
                currentLocationTerm = createLocationPredicateAndTerm(currentLocations);
-               // Create configuration maps which are filled lazily
-               initialConfigurations = new LinkedHashMap<Integer, ISymbolicConfiguration>(appliedCutsPerConfiguration.size());
-               currentConfigurations = new LinkedHashMap<Integer, ISymbolicConfiguration>(appliedCutsPerConfiguration.size());
-               configurationsEquivalentClasses = new LinkedHashMap<Integer, ImmutableList<ISymbolicEquivalenceClass>>();
+               // Create memory layout maps which are filled lazily
+               initialLayouts = new LinkedHashMap<Integer, ISymbolicLayout>(appliedCutsPerLayout.size());
+               currentLayouts = new LinkedHashMap<Integer, ISymbolicLayout>(appliedCutsPerLayout.size());
+               layoutsEquivalentClasses = new LinkedHashMap<Integer, ImmutableList<ISymbolicEquivalenceClass>>();
             }
             finally {
                equivalentClassesProofStarter.getProof().dispose();
@@ -537,16 +537,16 @@ public class SymbolicConfigurationExtractor {
 
    /**
     * <p>
-    * Extracts the possible configurations from the given side proof.
-    * Each open {@link Goal} of the proof results in its own configuration.
+    * Extracts the possible memory layouts from the given side proof.
+    * Each open {@link Goal} of the proof results in its own memory layout.
     * </p>
     * <p>
-    * The applied cuts per configuration are represented as {@link Term} 
+    * The applied cuts per memory layout are represented as {@link Term} 
     * stored in the {@link ImmutableSet}s. Each {@link Term} has the form
     * {@code equals(obj1, obj2)} or {@code not(equals(obj1, obj2))}
     * </p>
-    * @param proof The {@link Proof} which provides the {@link Goal}s to extract configurations from.
-    * @return Each entry in the list represents a equivalence class configuration. For each object pair checked via cut rules application exists one entry in the {@link Set} of the form {@code equals(obj1, obj2)} or {@code not(equals(obj1, obj2))}.
+    * @param proof The {@link Proof} which provides the {@link Goal}s to extract memory layouts from.
+    * @return Each entry in the list represents a equivalence class memory layout. For each object pair checked via cut rules application exists one entry in the {@link Set} of the form {@code equals(obj1, obj2)} or {@code not(equals(obj1, obj2))}.
     * @throws ProofInputException Occurred Exception.
     */
    protected List<ImmutableSet<Term>> extractAppliedCutsFromGoals(Proof proof) throws ProofInputException {
@@ -935,7 +935,7 @@ public class SymbolicConfigurationExtractor {
          sorts[i] = arguments[i].sort();
       }
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(getServices().getTermBuilder().newName("ConfigurationPredicate")), Sort.FORMULA, sorts);
+      Function newPredicate = new Function(new Name(getServices().getTermBuilder().newName("LayoutPredicate")), Sort.FORMULA, sorts);
       // Create formula which contains the value interested in.
       Term newTerm = getServices().getTermBuilder().func(newPredicate, arguments);
       return newTerm;
@@ -947,44 +947,44 @@ public class SymbolicConfigurationExtractor {
     */
    public boolean isAnalysed() {
       synchronized (this) {
-         return initialConfigurations != null && currentConfigurations != null;
+         return initialLayouts != null && currentLayouts != null;
       }
    }
 
    /**
     * <p>
-    * Returns the number of available configurations.
+    * Returns the number of available memory layouts.
     * </p>
     * <p>
     * <b>Attention:</b> Requires that {@link #analyse()} was executed. 
     * </p>
-    * @return The number of available configurations.
+    * @return The number of available memory layouts.
     */
-   public int getConfigurationsCount() {
+   public int getLayoutsCount() {
       synchronized (this) {
          assert isAnalysed();
-         return appliedCutsPerConfiguration.size();
+         return appliedCutsPerLayout.size();
       }
    }
    
    /**
     * <p>
-    * Returns the initial configuration at the given index.
+    * Returns the initial memory layout at the given index.
     * </p>
     * <p>
     * <b>Attention:</b> Requires that {@link #analyse()} was executed. 
     * </p>
-    * @param configurationIndex The index of the initial configuration.
-    * @return The initial configuration at the given index. 
+    * @param layoutIndex The index of the initial memory layout.
+    * @return The initial memory layout at the given index. 
     * @throws ProofInputException Occurred Exception
     */
-   public ISymbolicConfiguration getInitialConfiguration(int configurationIndex) throws ProofInputException {
-      return getConfiguration(getRoot(), initialConfigurations, configurationIndex, initialLocationTerm, initialLocations, pathCondition, computeInitialStateName());
+   public ISymbolicLayout getInitialLayout(int layoutIndex) throws ProofInputException {
+      return getLayout(getRoot(), initialLayouts, layoutIndex, initialLocationTerm, initialLocations, pathCondition, computeInitialStateName());
    }
 
    /**
-    * Computes the state name of an initial configuration.
-    * @return The state name of an initial configuration.
+    * Computes the state name of an initial memory layout.
+    * @return The state name of an initial memory layout.
     */
    protected String computeInitialStateName() {
       return getRoot().name() + " resulting in " + computeCurrentStateName();
@@ -992,58 +992,58 @@ public class SymbolicConfigurationExtractor {
 
    /**
     * <p>
-    * Returns the current configuration at the given index.
+    * Returns the current memory layout at the given index.
     * </p>
     * <p>
     * <b>Attention:</b> Requires that {@link #analyse()} was executed. 
     * </p>
-    * @param configurationIndex The index of the current configuration.
-    * @return The current configuration at the given index. 
+    * @param layoutIndex The index of the current memory layout.
+    * @return The current memory layout at the given index. 
     * @throws ProofInputException Occurred Exception
     */
-   public ISymbolicConfiguration getCurrentConfiguration(int configurationIndex) throws ProofInputException {
-      return getConfiguration(node, currentConfigurations, configurationIndex, currentLocationTerm, currentLocations, pathCondition, computeCurrentStateName());
+   public ISymbolicLayout getCurrentLayout(int layoutIndex) throws ProofInputException {
+      return getLayout(node, currentLayouts, layoutIndex, currentLocationTerm, currentLocations, pathCondition, computeCurrentStateName());
    }
    
    /**
-    * Computes the state name of a current configuration.
-    * @return The state name of a current configuration.
+    * Computes the state name of a current memory layout.
+    * @return The state name of a current memory layout.
     */
    protected String computeCurrentStateName() {
       return node.name();
    }
 
    /**
-    * Helper method of {@link #getInitialConfiguration(int)} and
-    * {@link #getCurrentConfiguration(int)} to lazily compute and get a configuration.
+    * Helper method of {@link #getInitialLayout(int)} and
+    * {@link #getCurrentLayout(int)} to lazily compute and get a memory layout.
     * @param node The {@link Node} which provides the state.
-    * @param confiurationsMap The map which contains already computed configurations.
-    * @param configurationIndex The index of the configuration to lazily compute and return.
-    * @param configurationTerm The result term to use in side proof.
+    * @param confiurationsMap The map which contains already computed memory layouts.
+    * @param layoutIndex The index of the memory layout to lazily compute and return.
+    * @param layoutTerm The result term to use in side proof.
     * @param locations The locations to compute in side proof.
     * @param pathCondition An optional path condition to include in the side proof.
     * @param stateName The name of the state.
-    * @return The lazily computed configuration.
+    * @return The lazily computed memory layout.
     * @throws ProofInputException Occurred Exception.
     */
-   protected ISymbolicConfiguration getConfiguration(Node node,
-                                                     Map<Integer, ISymbolicConfiguration> confiurationsMap, 
-                                                     int configurationIndex,
-                                                     Term configurationTerm,
-                                                     Set<ExtractLocationParameter> locations,
-                                                     Term pathCondition,
-                                                     String stateName) throws ProofInputException {
+   protected ISymbolicLayout getLayout(Node node,
+                                              Map<Integer, ISymbolicLayout> confiurationsMap, 
+                                              int layoutIndex,
+                                              Term layoutTerm,
+                                              Set<ExtractLocationParameter> locations,
+                                              Term pathCondition,
+                                              String stateName) throws ProofInputException {
       synchronized (this) {
-         assert configurationIndex >= 0;
-         assert configurationIndex < appliedCutsPerConfiguration.size();
+         assert layoutIndex >= 0;
+         assert layoutIndex < appliedCutsPerLayout.size();
          assert isAnalysed();
-         ISymbolicConfiguration result = confiurationsMap.get(Integer.valueOf(configurationIndex));
+         ISymbolicLayout result = confiurationsMap.get(Integer.valueOf(layoutIndex));
          if (result == null) {
-            // Get configuration
-            ImmutableSet<Term> configuration = appliedCutsPerConfiguration.get(configurationIndex);
-            ImmutableList<ISymbolicEquivalenceClass> equivalentClasses = getEquivalenceClasses(configurationIndex);
-            result = lazyComputeConfiguration(node, configuration, configurationTerm, locations, equivalentClasses, pathCondition, stateName);
-            confiurationsMap.put(Integer.valueOf(configurationIndex), result);
+            // Get memory layout
+            ImmutableSet<Term> layout = appliedCutsPerLayout.get(layoutIndex);
+            ImmutableList<ISymbolicEquivalenceClass> equivalentClasses = getEquivalenceClasses(layoutIndex);
+            result = lazyComputeLayout(node, layout, layoutTerm, locations, equivalentClasses, pathCondition, stateName);
+            confiurationsMap.put(Integer.valueOf(layoutIndex), result);
          }
          return result;
       }
@@ -1051,13 +1051,13 @@ public class SymbolicConfigurationExtractor {
    
    /**
     * <p>
-    * Computes a configuration lazily when it is first time requested via 
-    * {@link #getConfiguration(Node, Map, int, Term, Set, Term, String)}.
+    * Computes a memory layout lazily when it is first time requested via 
+    * {@link #getLayout(Node, Map, int, Term, Set, Term, String)}.
     * </p>
     * <p>
     * The method starts a side proof with the given arguments to compute
-    * the values and objects of the requested configuration. The
-    * {@link ExecutionVariableValuePair} together with the configuration term
+    * the values and objects of the requested memory layout. The
+    * {@link ExecutionVariableValuePair} together with the memory layout term
     * defines how to access the side proof result.
     * </p>
     * <p>
@@ -1066,34 +1066,34 @@ public class SymbolicConfigurationExtractor {
     * instance defines a value or association of a parent object or the state itself.
     * </p>
     * <p>
-    * Finally, the last step is to create the {@link ISymbolicConfiguration} instance
+    * Finally, the last step is to create the {@link ISymbolicLayout} instance
     * and to fill it with the values/associations defined by {@link ExecutionVariableValuePair} instances.
     * </p>
     * @param node The {@link Node} which provides the state.
-    * @param configuration The configuration terms.
-    * @param configurationTerm The result term to use in side proof.
+    * @param layout The memory layout terms.
+    * @param layoutTerm The result term to use in side proof.
     * @param locations The locations to compute in side proof.
-    * @param equivalentClasses The equivalence classes defined by the configuration terms.
+    * @param equivalentClasses The equivalence classes defined by the memory layout terms.
     * @param pathCondition An optional path condition to include in the side proof.
     * @param stateName The name of the state.
-    * @return The created configuration.
+    * @return The created memory layout.
     * @throws ProofInputException Occurred Exception.
     */
-   protected ISymbolicConfiguration lazyComputeConfiguration(Node node,
-                                                             ImmutableSet<Term> configuration, 
-                                                             Term configurationTerm,
-                                                             Set<ExtractLocationParameter> locations,
-                                                             ImmutableList<ISymbolicEquivalenceClass> equivalentClasses,
-                                                             Term pathCondition,
-                                                             String stateName) throws ProofInputException {
+   protected ISymbolicLayout lazyComputeLayout(Node node,
+                                               ImmutableSet<Term> layout, 
+                                               Term layoutTerm,
+                                               Set<ExtractLocationParameter> locations,
+                                               ImmutableList<ISymbolicEquivalenceClass> equivalentClasses,
+                                               Term pathCondition,
+                                               String stateName) throws ProofInputException {
       if (!locations.isEmpty()) {
          // Get original updates
          Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
          ImmutableList<Term> originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
-         // Combine configuration with original updates
-         Term configurationCondition = getServices().getTermBuilder().and(configuration);
+         // Combine memory layout with original updates
+         Term layoutCondition = getServices().getTermBuilder().and(layout);
          if (pathCondition != null) {
-            configurationCondition = getServices().getTermBuilder().and(configurationCondition, pathCondition);
+            layoutCondition = getServices().getTermBuilder().and(layoutCondition, pathCondition);
          }
          ImmutableList<Term> additionalUpdates = ImmutableSLList.nil();
          for (Term originalUpdate : originalUpdates) {
@@ -1111,7 +1111,7 @@ public class SymbolicConfigurationExtractor {
             additionalUpdates = additionalUpdates.append(evp.createPreUpdate());
          }
          ImmutableList<Term> newUpdates = ImmutableSLList.<Term>nil().append(getServices().getTermBuilder().parallel(additionalUpdates));
-         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, configurationCondition, configurationTerm, newUpdates);
+         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, layoutCondition, layoutTerm, newUpdates);
          // Instantiate and run proof
          ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequent, StrategyProperties.SPLITTING_NORMAL);
          try {
@@ -1119,7 +1119,7 @@ public class SymbolicConfigurationExtractor {
             Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();
             int goalCount = info.getProof().openGoals().size();
             for (Goal goal : info.getProof().openGoals()) {
-               Term resultTerm = SymbolicExecutionUtil.extractOperatorTerm(goal, configurationTerm.op());
+               Term resultTerm = SymbolicExecutionUtil.extractOperatorTerm(goal, layoutTerm.op());
                Term condition = goalCount == 1 ? null : SymbolicExecutionUtil.computePathCondition(goal.node(), true, true);
                for (ExtractLocationParameter param : locations) {
                   ExecutionVariableValuePair pair;
@@ -1132,16 +1132,16 @@ public class SymbolicConfigurationExtractor {
                   pairs.add(pair);
                }
             }
-            // Create symbolic configuration
-            return createConfigurationFromExecutionVariableValuePairs(equivalentClasses, pairs, stateName);
+            // Create memory layout
+            return createLayoutFromExecutionVariableValuePairs(equivalentClasses, pairs, stateName);
          }
          finally {
             info.getProof().dispose();
          }
       }
       else {
-         // Create empty symbolic configuration
-         return createConfigurationFromExecutionVariableValuePairs(equivalentClasses, new LinkedHashSet<ExecutionVariableValuePair>(), stateName);
+         // Create empty memory layout
+         return createLayoutFromExecutionVariableValuePairs(equivalentClasses, new LinkedHashSet<ExecutionVariableValuePair>(), stateName);
       }
    }
 
@@ -1189,21 +1189,21 @@ public class SymbolicConfigurationExtractor {
    
    /**
     * <p>
-    * Returns the equivalence class of the configuration defined by the index.
+    * Returns the equivalence class of the memory layout defined by the index.
     * </p>
     * <p>
     * <b>Attention:</b> Requires that {@link #analyse()} was executed. 
     * </p>
-    * @param configurationIndex The index of the configuration to get its equivalence classes.
-    * @return The equivalence classes of the configuration at the given index.
+    * @param layoutIndex The index of the memory layout to get its equivalence classes.
+    * @return The equivalence classes of the memory layout at the given index.
     */
-   public ImmutableList<ISymbolicEquivalenceClass> getEquivalenceClasses(int configurationIndex) {
+   public ImmutableList<ISymbolicEquivalenceClass> getEquivalenceClasses(int layoutIndex) {
       synchronized (this) {
-         ImmutableList<ISymbolicEquivalenceClass> equivalentClasses = configurationsEquivalentClasses.get(Integer.valueOf(configurationIndex));
+         ImmutableList<ISymbolicEquivalenceClass> equivalentClasses = layoutsEquivalentClasses.get(Integer.valueOf(layoutIndex));
          if (equivalentClasses == null) {
-            ImmutableSet<Term> appliedCuts = appliedCutsPerConfiguration.get(configurationIndex);
+            ImmutableSet<Term> appliedCuts = appliedCutsPerLayout.get(layoutIndex);
             equivalentClasses = lazyComputeEquivalenzClasses(appliedCuts);
-            configurationsEquivalentClasses.put(Integer.valueOf(configurationIndex), equivalentClasses);
+            layoutsEquivalentClasses.put(Integer.valueOf(layoutIndex), equivalentClasses);
          }
          return equivalentClasses;
       }
@@ -1270,18 +1270,18 @@ public class SymbolicConfigurationExtractor {
    }
    
    /**
-    * Creates an {@link ISymbolicConfiguration} which shows the objects,
+    * Creates an {@link ISymbolicLayout} which shows the objects,
     * values and associations defined by the given {@link ExecutionVariableValuePair}s.
-    * @param equivalentClasses The used {@link ISymbolicEquivalenceClass} instances of the configuration.
+    * @param equivalentClasses The used {@link ISymbolicEquivalenceClass} instances of the memory layout.
     * @param pairs Provides the available objects, their values and associations together with the variables and association of the state.
     * @param stateName The name of the state.
-    * @return The created {@link ISymbolicConfiguration} with the given content.
+    * @return The created {@link ISymbolicLayout} with the given content.
     * @throws ProofInputException Occurred Exception.
     */
-   protected ISymbolicConfiguration createConfigurationFromExecutionVariableValuePairs(ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, 
-                                                                                       Set<ExecutionVariableValuePair> pairs,
-                                                                                       String stateName) throws ProofInputException {
-      SymbolicConfiguration result = new SymbolicConfiguration(settings, equivalentClasses);
+   protected ISymbolicLayout createLayoutFromExecutionVariableValuePairs(ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, 
+                                                                         Set<ExecutionVariableValuePair> pairs,
+                                                                         String stateName) throws ProofInputException {
+      SymbolicLayout result = new SymbolicLayout(settings, equivalentClasses);
       // Create state
       SymbolicState state = new SymbolicState(stateName, settings);
       result.setState(state);
@@ -1371,12 +1371,12 @@ public class SymbolicConfigurationExtractor {
     * Creates for the object defined by the given {@link Term} an {@link SymbolicObject} instance if not already available.
     * @param objects The already available {@link SymbolicObject}s.
     * @param equivalentClasses The available {@link ISymbolicEquivalenceClass}.
-    * @param result The {@link SymbolicConfiguration} to add the {@link SymbolicObject} to.
+    * @param result The {@link SymbolicLayout} to add the {@link SymbolicObject} to.
     * @param objectTerm The {@link Term} which represents the {@link Object} a {@link SymbolicObject} should be created for.
     */
    protected void createObjectForTerm(Map<Term, SymbolicObject> objects,
                                       ImmutableList<ISymbolicEquivalenceClass> equivalentClasses,
-                                      SymbolicConfiguration result,
+                                      SymbolicLayout result,
                                       Term objectTerm) {
       if (objectTerm != null && SymbolicExecutionUtil.hasReferenceSort(getServices(), objectTerm)) {
          ISymbolicEquivalenceClass equivalentClass = findEquivalentClass(equivalentClasses, objectTerm);
@@ -1437,9 +1437,9 @@ public class SymbolicConfigurationExtractor {
     * to compute a location (value or association of a given object/state).
     * </p>
     * <p>
-    * Instances of this class can be used to compute the values in each configuration.
+    * Instances of this class can be used to compute the values in each memory layout.
     * So they are instantiated during the analyzation phase 
-    * {@link SymbolicConfigurationExtractor#analyse()} once for initial and current configurations.
+    * {@link SymbolicLayoutExtractor#analyse()} once for initial and current memory layout.
     * </p>
     * @author Martin Hentschel
     */
@@ -1693,13 +1693,13 @@ public class SymbolicConfigurationExtractor {
    /**
     * <p>
     * Represents a location (value or association of a given object/state) 
-    * in a concrete configuration of the initial or current state.
+    * in a concrete memory layout of the initial or current state.
     * </p>
     * <p>
-    * They are instantiated lazily when a concrete configuration is requested
+    * They are instantiated lazily when a concrete memory layout is requested
     * the first during lazily computation 
-    * {@link SymbolicConfigurationExtractor#lazyComputeConfiguration(Node, ImmutableSet, Term, Set, ImmutableList, Term, String)}.
-    * The instances exists only temporary until the concrete {@link ISymbolicConfiguration} was created from them.
+    * {@link SymbolicLayoutExtractor#lazyComputeLayout(Node, ImmutableSet, Term, Set, ImmutableList, Term, String)}.
+    * The instances exists only temporary until the concrete {@link ISymbolicLayout} was created from them.
     * </p>
     * @author Martin Hentschel
     */

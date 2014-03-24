@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.Term;
 
 /**
  * An equivalence class which defines which {@link Term}s represent
- * the same {@link ISymbolicObject} in an {@link ISymbolicConfiguration}.
+ * the same {@link ISymbolicObject} in an {@link ISymbolicLayout}.
  * @author Martin Hentschel
  */
 public interface ISymbolicEquivalenceClass extends ISymbolicElement {

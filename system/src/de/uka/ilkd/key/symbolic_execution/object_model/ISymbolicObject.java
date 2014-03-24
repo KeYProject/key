@@ -19,7 +19,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicObject;
 
 /**
  * <p>
- * Represents a symbolic object in an {@link ISymbolicConfiguration}.
+ * Represents a symbolic object in an {@link ISymbolicLayout}.
  * </p>
  * <p>
  * The default implementation is {@link SymbolicObject}.

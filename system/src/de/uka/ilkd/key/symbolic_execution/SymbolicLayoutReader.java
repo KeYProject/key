@@ -41,18 +41,18 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociationValueContainer;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicElement;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 
 /**
  * Allows to read XML files which contains an object model
- * written via an {@link SymbolicConfigurationWriter}.
+ * written via an {@link SymbolicLayoutWriter}.
  * @author Martin Hentschel
- * @see SymbolicConfigurationWriter
+ * @see SymbolicLayoutWriter
  */
-public class SymbolicConfigurationReader {
+public class SymbolicLayoutReader {
    /**
     * Reads the given {@link File}.
     * @param file The {@link File} to read.
@@ -61,7 +61,7 @@ public class SymbolicConfigurationReader {
     * @throws SAXException Occurred Exception.
     * @throws IOException Occurred Exception.
     */
-   public ISymbolicConfiguration read(File file) throws ParserConfigurationException, SAXException, IOException {
+   public ISymbolicLayout read(File file) throws ParserConfigurationException, SAXException, IOException {
       return read(new FileInputStream(file));
    }
    
@@ -73,7 +73,7 @@ public class SymbolicConfigurationReader {
     * @throws SAXException Occurred Exception.
     * @throws IOException Occurred Exception.
     */
-   public ISymbolicConfiguration read(InputStream in) throws ParserConfigurationException, SAXException, IOException {
+   public ISymbolicLayout read(InputStream in) throws ParserConfigurationException, SAXException, IOException {
       if (in != null) {
          try {
             // Parse XML file
@@ -83,7 +83,7 @@ public class SymbolicConfigurationReader {
             SEDSAXHandler handler = new SEDSAXHandler();
             saxParser.parse(in, handler);
             // Get root 
-            ISymbolicConfiguration root = handler.getRoot();
+            ISymbolicLayout root = handler.getRoot();
             // Return result
             return root;
          }
@@ -104,7 +104,7 @@ public class SymbolicConfigurationReader {
       /**
        * The root of the model.
        */
-      private ISymbolicConfiguration root;
+      private ISymbolicLayout root;
       
       /**
        * The hierarchy in building phase.
@@ -129,7 +129,7 @@ public class SymbolicConfigurationReader {
          Object parent = parentStack.peekFirst();
          if (isModel(uri, localName, qName)) {
             if (root == null) {
-               root = new KeYlessConfiguration();
+               root = new KeYlessLayout();
                parentStack.addFirst(root);
             }
             else {
@@ -137,22 +137,22 @@ public class SymbolicConfigurationReader {
             }
          }
          else if (isState(uri, localName, qName)) {
-            if (!(parent instanceof KeYlessConfiguration)) {
+            if (!(parent instanceof KeYlessLayout)) {
                throw new SAXException("Found state in wrong hierarchy.");
             }
             KeYlessState state = new KeYlessState(getName(attributes));
-            if (((KeYlessConfiguration)parent).getState() != null) {
+            if (((KeYlessLayout)parent).getState() != null) {
                throw new SAXException("State found a second time.");
             }
-            ((KeYlessConfiguration)parent).setState(state);
+            ((KeYlessLayout)parent).setState(state);
             parentStack.addFirst(state);
          }
          else if (isObject(uri, localName, qName)) {
-            if (!(parent instanceof KeYlessConfiguration)) {
+            if (!(parent instanceof KeYlessLayout)) {
                throw new SAXException("Found object in wrong hierarchy.");
             }
             KeYlessObject object = new KeYlessObject(getName(attributes), getTypeString(attributes));
-            ((KeYlessConfiguration)parent).addObject(object);
+            ((KeYlessLayout)parent).addObject(object);
             parentStack.addFirst(object);
             objectIdMapping.put(getId(attributes), object);
          }
@@ -174,11 +174,11 @@ public class SymbolicConfigurationReader {
             associationTargetMapping.put(association, getTarget(attributes));
          }
          else if (isEquivalenceClass(uri, localName, qName)) {
-            if (!(parent instanceof KeYlessConfiguration)) {
+            if (!(parent instanceof KeYlessLayout)) {
                throw new SAXException("Found equivalence class in wrong hierarchy.");
             }
             KeYlessEquivalenceClass ec = new KeYlessEquivalenceClass(getRepresentativeTerm(attributes));
-            ((KeYlessConfiguration)parent).addEquivalenceClass(ec);
+            ((KeYlessLayout)parent).addEquivalenceClass(ec);
             parentStack.addFirst(ec);
          }
          else if (isTerm(uri, localName, qName)) {
@@ -221,20 +221,20 @@ public class SymbolicConfigurationReader {
        * Returns the root of the model.
        * @return The root of the model.
        */
-      public ISymbolicConfiguration getRoot() {
+      public ISymbolicLayout getRoot() {
          return root;
       }
    }
 
    /**
-    * Checks if the currently parsed tag represents an {@link ISymbolicConfiguration}.
+    * Checks if the currently parsed tag represents an {@link ISymbolicLayout}.
     * @param uri The URI.
     * @param localName THe local name.
     * @param qName The qName.
-    * @return {@code true} represents an {@link ISymbolicConfiguration}, {@code false} is something else.
+    * @return {@code true} represents an {@link ISymbolicLayout}, {@code false} is something else.
     */
    protected boolean isModel(String uri, String localName, String qName) {
-      return SymbolicConfigurationWriter.TAG_MODEL.equals(qName);
+      return SymbolicLayoutWriter.TAG_MODEL.equals(qName);
    }
 
    /**
@@ -245,7 +245,7 @@ public class SymbolicConfigurationReader {
     * @return {@code true} represents an {@link ISymbolicAssociation}, {@code false} is something else.
     */
    protected boolean isAssociation(String uri, String localName, String qName) {
-      return SymbolicConfigurationWriter.TAG_ASSOCIATION.equals(qName);
+      return SymbolicLayoutWriter.TAG_ASSOCIATION.equals(qName);
    }
 
    /**
@@ -256,7 +256,7 @@ public class SymbolicConfigurationReader {
     * @return {@code true} represents an {@link ISymbolicValue}, {@code false} is something else.
     */
    protected boolean isValue(String uri, String localName, String qName) {
-      return SymbolicConfigurationWriter.TAG_VALUE.equals(qName);
+      return SymbolicLayoutWriter.TAG_VALUE.equals(qName);
    }
 
    /**
@@ -267,7 +267,7 @@ public class SymbolicConfigurationReader {
     * @return {@code true} represents an {@link ISymbolicObject}, {@code false} is something else.
     */
    protected boolean isObject(String uri, String localName, String qName) {
-      return SymbolicConfigurationWriter.TAG_OBJECT.equals(qName);
+      return SymbolicLayoutWriter.TAG_OBJECT.equals(qName);
    }
 
    /**
@@ -278,7 +278,7 @@ public class SymbolicConfigurationReader {
     * @return {@code true} represents an {@link ISymbolicState}, {@code false} is something else.
     */
    protected boolean isState(String uri, String localName, String qName) {
-      return SymbolicConfigurationWriter.TAG_STATE.equals(qName);
+      return SymbolicLayoutWriter.TAG_STATE.equals(qName);
    }
 
    /**
@@ -289,7 +289,7 @@ public class SymbolicConfigurationReader {
     * @return {@code true} represents an {@link ISymbolicEquivalenceClass}, {@code false} is something else.
     */
    protected boolean isEquivalenceClass(String uri, String localName, String qName) {
-      return SymbolicConfigurationWriter.TAG_EQUIVALENCE_CLASS.equals(qName);
+      return SymbolicLayoutWriter.TAG_EQUIVALENCE_CLASS.equals(qName);
    }
 
    /**
@@ -300,7 +300,7 @@ public class SymbolicConfigurationReader {
     * @return {@code true} represents a term, {@code false} is something else.
     */
    protected boolean isTerm(String uri, String localName, String qName) {
-      return SymbolicConfigurationWriter.TAG_TERM.equals(qName);
+      return SymbolicLayoutWriter.TAG_TERM.equals(qName);
    }
 
    /**
@@ -309,7 +309,7 @@ public class SymbolicConfigurationReader {
     * @return The value.
     */
    protected String getValueString(Attributes attributes) {
-      return attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_VALUE);
+      return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_VALUE);
    }
 
    /**
@@ -318,7 +318,7 @@ public class SymbolicConfigurationReader {
     * @return The value.
     */
    protected String getConditionString(Attributes attributes) {
-      return attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_CONDITION);
+      return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_CONDITION);
    }
 
    /**
@@ -327,7 +327,7 @@ public class SymbolicConfigurationReader {
     * @return The value.
     */
    protected String getTypeString(Attributes attributes) {
-      return attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_TYPE);
+      return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_TYPE);
    }
 
    /**
@@ -336,7 +336,7 @@ public class SymbolicConfigurationReader {
     * @return The value.
     */
    protected String getProgramVariableString(Attributes attributes) {
-      return attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_PROGRAM_VARIABLE);
+      return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_PROGRAM_VARIABLE);
    }
 
    /**
@@ -345,7 +345,7 @@ public class SymbolicConfigurationReader {
     * @return The value.
     */
    protected String getName(Attributes attributes) {
-      return attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_NAME);
+      return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_NAME);
    }
    
    /**
@@ -354,7 +354,7 @@ public class SymbolicConfigurationReader {
     * @return The value.
     */
    protected int getArrayIndex(Attributes attributes) {
-      return Integer.parseInt(attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_ARRAY_INDEX));
+      return Integer.parseInt(attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_ARRAY_INDEX));
    }
 
    /**
@@ -363,7 +363,7 @@ public class SymbolicConfigurationReader {
     * @return The value.
     */
    protected boolean isArrayIndex(Attributes attributes) {
-      return Boolean.parseBoolean(attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_IS_ARRAY_INDEX));
+      return Boolean.parseBoolean(attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_IS_ARRAY_INDEX));
    }
 
    /**
@@ -372,7 +372,7 @@ public class SymbolicConfigurationReader {
     * @return The value.
     */
    protected String getId(Attributes attributes) {
-      return attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_XML_ID);
+      return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_XML_ID);
    }
 
    /**
@@ -381,7 +381,7 @@ public class SymbolicConfigurationReader {
     * @return The value.
     */
    protected String getTarget(Attributes attributes) {
-      return attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_TARGET);
+      return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_TARGET);
    }
 
    /**
@@ -390,7 +390,7 @@ public class SymbolicConfigurationReader {
     * @return The value.
     */
    protected String getRepresentativeTerm(Attributes attributes) {
-      return attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_REPRESENTATIVE);
+      return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_REPRESENTATIVE);
    }
 
    /**
@@ -399,7 +399,7 @@ public class SymbolicConfigurationReader {
     * @return The value.
     */
    protected String getTerm(Attributes attributes) {
-      return attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_TERM);
+      return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_TERM);
    }
 
    
@@ -419,11 +419,11 @@ public class SymbolicConfigurationReader {
    }
 
    /**
-    * An implementation of {@link ISymbolicConfiguration} which is independent
+    * An implementation of {@link ISymbolicLayout} which is independent
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessConfiguration extends AbstractKeYlessElement implements ISymbolicConfiguration {
+   public static class KeYlessLayout extends AbstractKeYlessElement implements ISymbolicLayout {
       /**
        * The state.
        */

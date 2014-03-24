@@ -18,20 +18,20 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Special {@link SymbolicConfigurationExtractor} for {@link IExecutionNode}s.
+ * Special {@link SymbolicLayoutExtractor} for {@link IExecutionNode}s.
  * @author Martin Hentschel
  */
-public class ExecutionNodeSymbolicConfigurationExtractor extends SymbolicConfigurationExtractor {
+public class ExecutionNodeSymbolicLayoutExtractor extends SymbolicLayoutExtractor {
    /**
-    * The {@link IExecutionNode} to extract configurations from.
+    * The {@link IExecutionNode} to extract memory layouts from.
     */
    private final IExecutionNode executionNode;
 
    /**
     * Constructor.
-    * @param executionNode The {@link IExecutionNode} to extract configurations from.
+    * @param executionNode The {@link IExecutionNode} to extract memory layouts from.
     */
-   public ExecutionNodeSymbolicConfigurationExtractor(IExecutionNode executionNode) {
+   public ExecutionNodeSymbolicLayoutExtractor(IExecutionNode executionNode) {
       super(executionNode.getProofNode(), executionNode.getSettings().isUsePrettyPrinting());
       this.executionNode = executionNode;
    }
