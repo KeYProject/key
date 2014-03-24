@@ -40,7 +40,7 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.ide.IDE;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.ui.util.LogUtil;
-import org.key_project.sed.key.ui.visualization.object_diagram.feature.GenerateObjectDiagramFromSymbolicConfigurationCustomFeature;
+import org.key_project.sed.key.ui.visualization.object_diagram.feature.GenerateObjectDiagramFromMemoryLayoutCustomFeature;
 import org.key_project.sed.ui.visualization.object_diagram.editor.ObjectDiagramEditor;
 import org.key_project.sed.ui.visualization.object_diagram.editor.ReadonlyObjectDiagramEditor;
 import org.key_project.sed.ui.visualization.object_diagram.perspective.StateVisualizationPerspectiveFactory;
@@ -56,51 +56,51 @@ import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 
 /**
- * Read-only {@link ObjectDiagramEditor} specialized to show configurations.
+ * Read-only {@link ObjectDiagramEditor} specialized to show memory layouts.
  * @author Martin Hentschel
  */
-public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEditor {
+public class MemoryLayoutDiagramEditor extends ReadonlyObjectDiagramEditor {
    /**
     * The ID of this editor.
     */
-   public static final String EDITOR_ID = "org.key_project.sed.key.ui.ConfigurationObjectDiagramEditor";
+   public static final String EDITOR_ID = "org.key_project.sed.key.ui.MemoryLayoutDiagramEditor";
    /**
-    * Radio {@link Button} to show initial configurations.
+    * Radio {@link Button} to show initial memory layouts.
     */
-   private Button initialConfiguration;
+   private Button initialLayoutButton;
    
    /**
-    * Radio {@link Button} to show current configurations.
+    * Radio {@link Button} to show current memory layouts.
     */
-   private Button currentConfiguration;
+   private Button currentLayoutButton;
 
    /**
-    * Slider to select configurations.
+    * Slider to select memory layouts.
     */
    private Slider slider;
    
    /**
-    * {@link Button} to open a dialog to select a configuration.
+    * {@link Button} to open a dialog to select a memory layout.
     */
-   private Button selectConfigurationButton;
+   private Button selectLayoutButton;
    
    /**
-    * Shows the equivalence classes of the current configuration.
+    * Shows the equivalence classes of the current memory layout.
     */
    private Text equivalenceClassesText;
    
    /**
-    * The {@link IExecutionStateNode} which provides the configurations.
+    * The {@link IExecutionStateNode} which provides the memory layouts.
     */
    private IExecutionStateNode<?> node;
    
    /**
-    * The currently shown {@link ISymbolicConfiguration}.
+    * The currently shown {@link ISymbolicLayout}.
     */
-   private ISymbolicConfiguration shownConfiguration;
+   private ISymbolicLayout shownLayout;
    
    /**
     * {@inheritDoc}
@@ -115,78 +115,78 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
       diagramComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
       diagramComposite.setLayout(new FillLayout());
       super.createPartControl(diagramComposite);
-      // Create configurations controls
-      Composite configurationComposite = new Composite(root, SWT.NONE);  
-      configurationComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-      configurationComposite.setLayout(new GridLayout(5, false));
-      initialConfiguration = new Button(configurationComposite, SWT.RADIO);
-      initialConfiguration.setText("&Initial");
-      initialConfiguration.addSelectionListener(new SelectionAdapter() {
+      // Create layout controls
+      Composite layoutComposite = new Composite(root, SWT.NONE);  
+      layoutComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      layoutComposite.setLayout(new GridLayout(5, false));
+      initialLayoutButton = new Button(layoutComposite, SWT.RADIO);
+      initialLayoutButton.setText("&Initial");
+      initialLayoutButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
-            if (initialConfiguration.getSelection()){
-               showConfiguration(slider.getSelection(), true);
+            if (initialLayoutButton.getSelection()){
+               showLayout(slider.getSelection(), true);
             }
          }
       });
-      currentConfiguration = new Button(configurationComposite, SWT.RADIO);
-      currentConfiguration.setText("&Current");
-      currentConfiguration.setSelection(true);
-      currentConfiguration.addSelectionListener(new SelectionAdapter() {
+      currentLayoutButton = new Button(layoutComposite, SWT.RADIO);
+      currentLayoutButton.setText("&Current");
+      currentLayoutButton.setSelection(true);
+      currentLayoutButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
-            if (currentConfiguration.getSelection()){
-               showConfiguration(slider.getSelection(), false);
+            if (currentLayoutButton.getSelection()){
+               showLayout(slider.getSelection(), false);
             }
          }
       });
-      slider = new Slider(configurationComposite, SWT.HORIZONTAL);
+      slider = new Slider(layoutComposite, SWT.HORIZONTAL);
       slider.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
-            showConfiguration(slider.getSelection(), initialConfiguration.getSelection());
+            showLayout(slider.getSelection(), initialLayoutButton.getSelection());
          }
       });
-      selectConfigurationButton = new Button(configurationComposite, SWT.PUSH);
-      selectConfigurationButton.setText("&...");
-      selectConfigurationButton.addSelectionListener(new SelectionAdapter() {
+      selectLayoutButton = new Button(layoutComposite, SWT.PUSH);
+      selectLayoutButton.setText("&...");
+      selectLayoutButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
-            openSelectConfigurationsDialog();
+            openSelectLayoutsDialog();
          }
       });
-      equivalenceClassesText = new Text(configurationComposite, SWT.BORDER);
+      equivalenceClassesText = new Text(layoutComposite, SWT.BORDER);
       equivalenceClassesText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       equivalenceClassesText.setEditable(false);
-      setConfigurationControlsEnabled(false);
+      setLayoutControlsEnabled(false);
    }
 
    /**
-    * Enables or disables the configuration controls.
+    * Enables or disables the layout controls.
     * @param enabled {@code true} set enabled, {@code false} set disabled.
     */
-   protected void setConfigurationControlsEnabled(boolean enabled) {
-      initialConfiguration.setEnabled(enabled);
-      currentConfiguration.setEnabled(enabled);
+   protected void setLayoutControlsEnabled(boolean enabled) {
+      initialLayoutButton.setEnabled(enabled);
+      currentLayoutButton.setEnabled(enabled);
       slider.setEnabled(enabled);
-      selectConfigurationButton.setEnabled(enabled);
+      selectLayoutButton.setEnabled(enabled);
    }
    
    /**
-    * Generates an object diagram for the first configuration of the given {@link IKeYSEDDebugNode}.
-    * @param node {@link IKeYSEDDebugNode} to generate configuration for.
+    * Generates an object diagram for the first layout of the given {@link IKeYSEDDebugNode}.
+    * @param node {@link IKeYSEDDebugNode} to generate layout for.
     */
-   public void generateConfigurationsDiagram(IKeYSEDDebugNode<?> node) {
-      setConfigurationControlsEnabled(false);
+   public void generateMemoryLayoutsDiagram(IKeYSEDDebugNode<?> node) {
+      setLayoutControlsEnabled(false);
       SWTUtil.setText(equivalenceClassesText, null);
       if (node != null && node.getExecutionNode() instanceof IExecutionStateNode<?>) {
          this.node = (IExecutionStateNode<?>)node.getExecutionNode();
-         new AbstractWorkbenchPartJob("Computing configurations.", this) {
+         new AbstractWorkbenchPartJob("Computing memory layouts.", this) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                try {
                   SWTUtil.checkCanceled(monitor);
-                  initConfigurationControls();
+                  initLayoutControls();
                   return Status.OK_STATUS;
                }
                catch (OperationCanceledException e) {
@@ -204,47 +204,47 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
    }
    
    /**
-    * Initializes the configuration controls with the content provided by the {@link IExecutionStateNode}.
+    * Initializes the layout controls with the content provided by the {@link IExecutionStateNode}.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void initConfigurationControls() throws ProofInputException {
-      final int configurationsCount = this.node.getConfigurationsCount();
-      if (configurationsCount >= 1 && !slider.isDisposed()) {
+   protected void initLayoutControls() throws ProofInputException {
+      final int layoutsCount = this.node.getLayoutsCount();
+      if (layoutsCount >= 1 && !slider.isDisposed()) {
          slider.getDisplay().syncExec(new Runnable() {
             @Override
             public void run() {
-               initialConfiguration.setSelection(false);
-               currentConfiguration.setSelection(true);
-               slider.setValues(0, 0, configurationsCount, 1, 1, 1);
-               setConfigurationControlsEnabled(true);
-               showConfiguration(0, false);
+               initialLayoutButton.setSelection(false);
+               currentLayoutButton.setSelection(true);
+               slider.setValues(0, 0, layoutsCount, 1, 1, 1);
+               setLayoutControlsEnabled(true);
+               showLayout(0, false);
             }
          });
       }
    }
    
    /**
-    * Shows the configuration at the given index in the given mode.
-    * @param index The configuration index.
-    * @param initial The configuration mode ({@code true} = initial, {@code false} = current).
+    * Shows the memory layout at the given index in the given mode.
+    * @param index The memory layout index.
+    * @param initial The memory layout mode ({@code true} = initial, {@code false} = current).
     */
-   protected void showConfiguration(final int index, final boolean initial) {
-      new AbstractWorkbenchPartJob("Show " + (initial ? "initial" : "current") + " configuration " + index + ".", this) {
+   protected void showLayout(final int index, final boolean initial) {
+      new AbstractWorkbenchPartJob("Show " + (initial ? "initial" : "current") + " memory layout " + index + ".", this) {
          @Override
          protected IStatus run(IProgressMonitor monitor) {
             try {
                SWTUtil.checkCanceled(monitor);
-               final ISymbolicConfiguration toShow = initial ? 
-                                                     node.getInitialConfiguration(index) : 
-                                                     node.getCurrentConfiguration(index);
-               if (shownConfiguration != toShow) {
-                  shownConfiguration = toShow;
+               final ISymbolicLayout toShow = initial ? 
+                                                     node.getInitialLayout(index) : 
+                                                     node.getCurrentLayout(index);
+               if (shownLayout != toShow) {
+                  shownLayout = toShow;
                   if (!equivalenceClassesText.isDisposed()) {
                      equivalenceClassesText.getDisplay().syncExec(new Runnable() {
                         @Override
                         public void run() {
-                           initialConfiguration.setSelection(initial);
-                           currentConfiguration.setSelection(!initial);
+                           initialLayoutButton.setSelection(initial);
+                           currentLayoutButton.setSelection(!initial);
                            slider.setSelection(index);
                            if (toShow != null && toShow.getEquivalenceClasses() != null) {
                               SWTUtil.setText(equivalenceClassesText, toShow.getEquivalenceClasses().toString());
@@ -255,10 +255,10 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
                         }
                      });
                   }
-                  GenerateObjectDiagramFromSymbolicConfigurationCustomFeature feature = new GenerateObjectDiagramFromSymbolicConfigurationCustomFeature(getDiagramTypeProvider().getFeatureProvider());
+                  GenerateObjectDiagramFromMemoryLayoutCustomFeature feature = new GenerateObjectDiagramFromMemoryLayoutCustomFeature(getDiagramTypeProvider().getFeatureProvider());
                   ICustomContext context = new CustomContext();
                   context.putProperty(GraphitiUtil.CONTEXT_PROPERTY_MONITOR, monitor);
-                  context.putProperty(GenerateObjectDiagramFromSymbolicConfigurationCustomFeature.PROPERTY_SYMBOLIC_CONFIGURATION, toShow);
+                  context.putProperty(GenerateObjectDiagramFromMemoryLayoutCustomFeature.PROPERTY_MEMORY_LAYOUT, toShow);
                   getDiagramBehavior().executeFeature(feature, context);
                }
                return Status.OK_STATUS;
@@ -274,25 +274,25 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
    }
 
    /**
-    * Opens a dialog to select configurations.
+    * Opens a dialog to select memory layouts.
     */
-   public void openSelectConfigurationsDialog() {
+   public void openSelectLayoutsDialog() {
       try {
-         // Collect equivalence classes of configurations.
-         Object[] elements = new Object[node.getConfigurationsCount()];
+         // Collect equivalence classes of memory layouts.
+         Object[] elements = new Object[node.getLayoutsCount()];
          for (int i = 0; i < elements.length; i++) {
-            elements[i] = node.getConfigurationsEquivalenceClasses(i);
+            elements[i] = node.getLayoutsEquivalenceClasses(i);
          }
          // Open dialog
          ElementListSelectionDialog dialog = new ElementListSelectionDialog(getSite().getShell(), new LabelProvider());
-         dialog.setTitle("Configuration Selection");
-         dialog.setMessage("Select a configuration.");
+         dialog.setTitle("Memory Layout Selection");
+         dialog.setMessage("Select a memory layout.");
          dialog.setElements(elements);
          if (ElementListSelectionDialog.OK == dialog.open()) {
             Object result = dialog.getFirstResult();
             int index = ArrayUtil.indexOf(elements, result);
             slider.setSelection(index);
-            showConfiguration(index, initialConfiguration.getSelection());
+            showLayout(index, initialLayoutButton.getSelection());
          }
       }
       catch (Exception e) {
@@ -302,24 +302,24 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
    }
 
    /**
-    * Opens a {@link ConfigurationObjectDiagramEditor}.
+    * Opens a {@link MemoryLayoutDiagramEditor}.
     * @param page The {@link IWorkbenchPage} to open editor in..
     * @param diagramName The name of the diagram.
     * @param uniqueId A unique ID to identify the opened file.
-    * @return The opened {@link ConfigurationObjectDiagramEditor} or the returned one if a file with the given ID is already opened.
+    * @return The opened {@link MemoryLayoutDiagramEditor} or the returned one if a file with the given ID is already opened.
     * @throws PartInitException Occurred Exception.
     */
-   public static ConfigurationObjectDiagramEditor openEditor(IWorkbenchPage page, String diagramName, String uniqueId) throws PartInitException {
+   public static MemoryLayoutDiagramEditor openEditor(IWorkbenchPage page, String diagramName, String uniqueId) throws PartInitException {
       URI uri = URI.createGenericURI(EmptyDiagramPersistencyBehavior.SCHEME, uniqueId + ObjectDiagramUtil.DIAGRAM_AND_MODEL_FILE_EXTENSION_WITH_DOT, null);
       IEditorInput input = new NonPersistableDiagramEditorInput(uri, ObjectDiagramTypeProvider.PROVIDER_ID);
       // Open editor
       IEditorPart editorPart = IDE.openEditor(page, 
                                               input, 
-                                              ConfigurationObjectDiagramEditor.EDITOR_ID);
+                                              MemoryLayoutDiagramEditor.EDITOR_ID);
       if (ObjectDiagramUtil.shouldSwitchToStateVisualizationPerspective(page)) {
          WorkbenchUtil.openPerspective(StateVisualizationPerspectiveFactory.PERSPECTIVE_ID);
       }
-      Assert.isTrue(editorPart instanceof ConfigurationObjectDiagramEditor);
-      return (ConfigurationObjectDiagramEditor)editorPart;
+      Assert.isTrue(editorPart instanceof MemoryLayoutDiagramEditor);
+      return (MemoryLayoutDiagramEditor)editorPart;
    }
 }

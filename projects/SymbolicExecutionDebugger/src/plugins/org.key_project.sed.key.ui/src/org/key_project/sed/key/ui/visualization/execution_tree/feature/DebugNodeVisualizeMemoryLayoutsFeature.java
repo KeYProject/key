@@ -21,22 +21,22 @@ import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
-import org.key_project.sed.key.ui.visualization.execution_tree.command.VisualizeConfigurationsCommand;
+import org.key_project.sed.key.ui.visualization.execution_tree.command.VisualizeMemoryLayoutsCommand;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
  * An {@link ICustomFeature} which executes 
- * {@link VisualizeConfigurationsCommand#visualizeConfigurations(ISEDDebugNode, org.eclipse.ui.IWorkbenchPage)}
+ * {@link VisualizeMemoryLayoutsCommand#visualizeMemoryLayouts(ISEDDebugNode, org.eclipse.ui.IWorkbenchPage)}
  * on selected business objects.
  * @author Martin Hentschel
  */
-public class DebugNodeVisualizeConfigurationsFeature extends AbstractCustomFeature {
+public class DebugNodeVisualizeMemoryLayoutsFeature extends AbstractCustomFeature {
    /**
     * Constructor.
     * @param fp The {@link IFeatureProvider} to use.
     */
-   public DebugNodeVisualizeConfigurationsFeature(IFeatureProvider fp) {
+   public DebugNodeVisualizeMemoryLayoutsFeature(IFeatureProvider fp) {
       super(fp);
    }
 
@@ -52,7 +52,7 @@ public class DebugNodeVisualizeConfigurationsFeature extends AbstractCustomFeatu
             int i = 0;
             while (i < pes.length && !canExecute) {
                Object businessObject = getBusinessObjectForPictogramElement(pes[i]);
-               canExecute = VisualizeConfigurationsCommand.canVisualize(businessObject);
+               canExecute = VisualizeMemoryLayoutsCommand.canVisualize(businessObject);
                i++;
             }
          }
@@ -74,8 +74,8 @@ public class DebugNodeVisualizeConfigurationsFeature extends AbstractCustomFeatu
          if (pes != null) {
             for (PictogramElement pe : pes) {
                Object businessObject = getBusinessObjectForPictogramElement(pe);
-               if (VisualizeConfigurationsCommand.canVisualize(businessObject)) {
-                  VisualizeConfigurationsCommand.visualizeConfigurations((IKeYSEDDebugNode<?>)businessObject, WorkbenchUtil.getActivePage());
+               if (VisualizeMemoryLayoutsCommand.canVisualize(businessObject)) {
+                  VisualizeMemoryLayoutsCommand.visualizeMemoryLayouts((IKeYSEDDebugNode<?>)businessObject, WorkbenchUtil.getActivePage());
                }
             }
          }

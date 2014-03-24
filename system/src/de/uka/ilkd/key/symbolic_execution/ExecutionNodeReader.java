@@ -74,7 +74,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.Terminatio
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 
 /**
@@ -1165,7 +1165,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public int getConfigurationsCount() throws ProofInputException {
+      public int getLayoutsCount() throws ProofInputException {
          return 0;
       }
 
@@ -1173,7 +1173,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public ISymbolicConfiguration getInitialConfiguration(int configurationIndex) throws ProofInputException {
+      public ISymbolicLayout getInitialLayout(int configurationIndex) throws ProofInputException {
          return null;
       }
 
@@ -1181,7 +1181,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public ISymbolicConfiguration getCurrentConfiguration(int configurationIndex) throws ProofInputException {
+      public ISymbolicLayout getCurrentLayout(int configurationIndex) throws ProofInputException {
          return null;
       }
 
@@ -1189,7 +1189,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public ImmutableList<ISymbolicEquivalenceClass> getConfigurationsEquivalenceClasses(int configurationIndex) throws ProofInputException {
+      public ImmutableList<ISymbolicEquivalenceClass> getLayoutsEquivalenceClasses(int configurationIndex) throws ProofInputException {
          return null;
       }
    }
