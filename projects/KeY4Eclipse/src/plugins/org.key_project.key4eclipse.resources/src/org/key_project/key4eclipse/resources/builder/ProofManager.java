@@ -44,6 +44,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileTypeElement;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
+import org.key_project.key4eclipse.resources.log.KeYResourceLogger;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
@@ -104,7 +105,13 @@ public class ProofManager {
    private LinkedList<IFile> changedJavaFiles;
    private List<ProofElement> proofsToDo = Collections.synchronizedList(new LinkedList<ProofElement>());
    private List<Pair<ByteArrayOutputStream, ProofElement>> proofsToSave = Collections.synchronizedList(new LinkedList<Pair<ByteArrayOutputStream, ProofElement>>());
-
+   //Log
+   private List<Integer> logList = Collections.synchronizedList(new LinkedList<Integer>());
+   private long parseTimeStart;
+   private long parseTimeEnd;
+   private long proofTimeStart;
+   private long proofTimeEnd;
+   
    
    /**
     * The Constructor that loads the {@link KeYEnvironment}. If that fails the problemLoaderException will be set.
@@ -116,6 +123,9 @@ public class ProofManager {
       markerManager = new MarkerManager();
       mainProofFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(project.getFullPath().append(KeYResourcesUtil.PROOF_FOLDER_NAME));
       this.project = project;
+      //Log
+      parseTimeStart = System.currentTimeMillis();
+      //      
       try {
          File location = KeYUtil.getSourceLocation(project);
          File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
@@ -126,6 +136,9 @@ public class ProofManager {
          handleProblemLoaderException(e);
          throw e;
       }
+      //Log
+      parseTimeEnd = System.currentTimeMillis();
+      //
    }
    
    
@@ -156,16 +169,21 @@ public class ProofManager {
     * @throws Exception
     */
    public void runProofs(LinkedList<IFile> changedJavaFiles, IProgressMonitor monitor) throws Exception{
+      //Log
+      proofTimeStart = System.currentTimeMillis();
+      //
       markerManager.deleteKeYMarkerByType(project, IResource.DEPTH_ZERO, MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID);
-      
       proofElements = getAllProofElements();
-      
       this.changedJavaFiles = changedJavaFiles;
       //set up monitor
       monitor.beginTask("Build all proofs", proofElements.size());
       initThreads(changedJavaFiles, monitor);
       checkContractRecursion();
       cleanMarker();
+      //Log
+      proofTimeEnd = System.currentTimeMillis();
+      KeYResourceLogger.logBuild(project, proofElements.size(), logList, parseTimeStart, parseTimeEnd, proofTimeStart, proofTimeEnd);
+      //
       if(KeYProjectProperties.isAutoDeleteProofFiles(project)){
          cleanProofFolder(getAllFiles(), mainProofFolder);
       }
@@ -222,7 +240,7 @@ public class ProofManager {
                IFolder proofFolder = getProofFolder(javaFile);
                IFile proofFile = getProofFile(contract.getName(), proofFolder.getFullPath());
                IFile metaFile = getProofMetaFile(proofFile);
-               LinkedHashSet<IMarker> oldMarker = markerManager.getOldProofMarker(javaFile, scl, proofFile);
+               LinkedList<IMarker> oldMarker = markerManager.getOldProofMarker(javaFile, scl, proofFile);
                proofElements.add(new ProofElement(javaFile, scl, environment, proofFolder, proofFile, metaFile, oldMarker, contract));
             }
          }
@@ -291,7 +309,7 @@ public class ProofManager {
             thread.start();
          }
          while(threadsAlive(threads)){
-            ObjectUtil.sleep(1000);
+            ObjectUtil.sleep(100);
             saveProofsFormList();
          }
          saveProofsFormList();
@@ -485,7 +503,7 @@ public class ProofManager {
    
    private void removeAllRecursiveMarker() throws CoreException{
       for(ProofElement pe : proofElements){
-         LinkedHashSet<IMarker> peMarker = pe.getMarker();
+         LinkedList<IMarker> peMarker = pe.getMarker();
          LinkedList<IMarker> toBeRemoved = new LinkedList<IMarker>();
          for(IMarker marker : peMarker){
             if(marker != null && MarkerManager.RECURSIONMARKER_ID.equals(marker.getType())){
@@ -684,7 +702,7 @@ public class ProofManager {
          proof = createProof(pe);
       }
       else {
-         proof = loadProof(pe); //TODO: Wait for BugFix
+         proof = loadProof(pe);
          if(proof == null){
             proof = createProof(pe);
          }
@@ -1009,6 +1027,9 @@ public class ProofManager {
       @Override
       public void run() {
          try{
+            //Log
+            int i = 0;
+            //
             ProofElement pe;
             while ((pe = getProofToDo()) != null) {
                pe.setKeYEnvironment(environment);
@@ -1018,11 +1039,17 @@ public class ProofManager {
                
                if(!KeYProjectProperties.isEnableBuildRequiredProofsOnly(project)){
                   processProof(pe);
+                  //Log
+                  i++;
+                  //
                }
                else{
                   IFile metaFile = getProofMetaFile(pe.getProofFile());
                   if(pe.getMarker().isEmpty()){
                      processProof(pe);
+                     //Log
+                     i++;
+                     //
                   }
                   else if(metaFile.exists()){
                      try{
@@ -1030,6 +1057,9 @@ public class ProofManager {
                         LinkedList<IType> javaTypes = collectAllJavaITypes();
                         if(MD5changed(pe.getProofFile(), pmfr) || typeOrSubTypeChanged(pe, pmfr, javaTypes) || superTypeChanged(pe, changedJavaFiles, javaTypes)){
                            processProof(pe);
+                           //Log
+                           i++;
+                           //
                         }
                         else{
                            pe.setProofClosed(pmfr.getProofClosed());
@@ -1039,16 +1069,25 @@ public class ProofManager {
                      } catch (Exception e) {
                         LogUtil.getLogger().logError(e);
                         processProof(pe);
+                        //Log
+                        i++;
+                        //
                      }
                   }
                   else{
                      processProof(pe);
+                     //Log
+                     i++;
+                     //
                   }
                }
                
                monitor.worked(1);
             }
             environment.dispose();
+            //Log
+            logList.add(i);
+            //
          } catch(Exception e){
             LogUtil.getLogger().logError(e);
          }

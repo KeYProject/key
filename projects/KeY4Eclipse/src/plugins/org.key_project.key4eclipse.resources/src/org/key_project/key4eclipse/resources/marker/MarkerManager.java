@@ -13,7 +13,6 @@
 
 package org.key_project.key4eclipse.resources.marker;
 
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
@@ -44,14 +43,15 @@ public class MarkerManager {
     * @throws CoreException
     */
    public void setMarker(ProofElement pe) throws CoreException {
-      LinkedHashSet<IMarker> oldMarker = pe.getMarker();
+      LinkedList<IMarker> oldMarker = pe.getMarker();
+      LinkedList<IMarker> toBeRemoved = new LinkedList<IMarker>();
       for(IMarker marker : oldMarker){
          if(marker != null){
-            pe.removeMarker(marker);
-            marker.delete();
+            toBeRemoved.add(marker);
          }
       }
-      pe.setMarker(new LinkedHashSet<IMarker>());
+      removeMarker(toBeRemoved, pe);
+      pe.setMarker(new LinkedList<IMarker>());
       SourceLocation scl = pe.getSourceLocation();
       if(scl != null){
          if (pe.getProofClosed()) {
@@ -91,13 +91,14 @@ public class MarkerManager {
     */
    public void setRecursionMarker(LinkedList<ProofElement> cycle) throws CoreException{
       ProofElement pe = cycle.get(0);
-      LinkedHashSet<IMarker> oldMarker = pe.getMarker();
+      LinkedList<IMarker> oldMarker = pe.getMarker();
+      LinkedList<IMarker> toBeRemoved = new LinkedList<IMarker>();
       for(IMarker marker : oldMarker){
          if(marker != null && !RECURSIONMARKER_ID.equals(marker.getType()) && !OLDPROOFMARKER_ID.equals(marker.getType())){
-            pe.removeMarker(marker);
-            marker.delete();
+            toBeRemoved.add(marker);
          }
       }
+      removeMarker(toBeRemoved, pe);
       IMarker marker = pe.getJavaFile().createMarker(RECURSIONMARKER_ID);
       if (marker.exists()) {
          marker.setAttribute(IMarker.MESSAGE, generateCycleDetectedMarkerMessage(cycle));
@@ -127,6 +128,21 @@ public class MarkerManager {
       return sb.toString();
    }
    
+   private void removeMarker(LinkedList<IMarker> toBeRemoved, ProofElement pe) throws CoreException{
+      while(!toBeRemoved.isEmpty()){
+         IMarker marker = toBeRemoved.getFirst();
+         if(marker != null){
+            pe.removeMarker(marker);
+            marker.delete();
+            toBeRemoved.remove(marker);
+         }
+         else{
+            pe.removeMarker(0);
+            toBeRemoved.remove(0);
+         }
+      }
+   }
+   
    
    /**
     * Creates the ProofLoaderException{@link IMarker} for the given {@link IResource}.
@@ -148,34 +164,14 @@ public class MarkerManager {
     * @return the {@link IMarker} if found. null otherwise
     * @throws CoreException
     */
-   public LinkedHashSet<IMarker> getOldProofMarker(IFile javaFile, SourceLocation scl, IFile proofFile) throws CoreException{
-      LinkedHashSet<IMarker> oldMarker = new LinkedHashSet<IMarker>();
+   public LinkedList<IMarker> getOldProofMarker(IFile javaFile, SourceLocation scl, IFile proofFile) throws CoreException{
+      LinkedList<IMarker> oldMarker = new LinkedList<IMarker>();
       LinkedList<IMarker> allFileKeYMarker = getAllkeYMarkerForScl(javaFile, scl);
       for(IMarker marker : allFileKeYMarker){
          String source = marker.getAttribute(IMarker.SOURCE_ID, "");
          if(source.equals(proofFile.getFullPath().toString())){
             oldMarker.add(marker);
          }
-//         if(CLOSEDMARKER_ID.equals(marker.getType())){
-//            if(message.equals("Proof closed: " + proofFile.getFullPath())){
-//               oldMarker.add(marker);
-//            }
-//         }
-//         else if(NOTCLOSEDMARKER_ID.equals(marker.getType())){
-//            if(message.equals("Proof not closed: " + proofFile.getFullPath())){
-//               oldMarker.add(marker);
-//            }
-//         }
-//         else if(RECURSIONMARKER_ID.equals(marker.getType())){
-//            if(message.startsWith("Cycle detected:" + StringUtil.NEW_LINE + proofFile.getFullPath())){
-//               oldMarker.add(marker);
-//            }
-//         }
-//         else if(OLDPROOFMARKER_ID.equals(marker.getType())){
-//            if(message.equals("Outdated proof: " + proofFile.getFullPath())){
-//               oldMarker.add(marker);
-//            }
-//         }
       }
       return oldMarker;
    }

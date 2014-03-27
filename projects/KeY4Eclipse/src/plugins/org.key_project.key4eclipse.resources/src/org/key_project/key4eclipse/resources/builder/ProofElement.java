@@ -35,7 +35,7 @@ public class ProofElement {
 
    private IFile javaFile;
    private SourceLocation scl;
-   private LinkedHashSet<IMarker> marker;
+   private LinkedList<IMarker> marker;
    private String markerMsg;
    
    private IFolder proofFolder;
@@ -61,10 +61,10 @@ public class ProofElement {
       return scl;
    }
    
-   public LinkedHashSet<IMarker> getMarker(){
+   public LinkedList<IMarker> getMarker(){
       return marker;
    }
-   public void setMarker(LinkedHashSet<IMarker> marker){
+   public void setMarker(LinkedList<IMarker> marker){
       this.marker = marker;
    }
    public void addMarker(IMarker marker){
@@ -72,6 +72,9 @@ public class ProofElement {
    }
    public void removeMarker(IMarker marker){
       this.marker.remove(marker);
+   }
+   public void removeMarker(int index){
+      this.marker.remove(index);
    }
    
    public String getMarkerMsg() {
@@ -131,7 +134,7 @@ public class ProofElement {
       this.usedContracts = usedContracts;
    }
    
-   public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<CustomConsoleUserInterface> environment, IFolder proofFolder, IFile proofFile, IFile metaFile, LinkedHashSet<IMarker> marker, Contract contract){
+   public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<CustomConsoleUserInterface> environment, IFolder proofFolder, IFile proofFile, IFile metaFile, LinkedList<IMarker> marker, Contract contract){
       this.javaFile = javaFile;
       this.scl = scl;
       this.marker = marker;

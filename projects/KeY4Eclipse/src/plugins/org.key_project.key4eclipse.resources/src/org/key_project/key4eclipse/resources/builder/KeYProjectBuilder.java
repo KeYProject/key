@@ -30,6 +30,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.key_project.key4eclipse.resources.log.KeYResourceLogger;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
@@ -54,6 +55,10 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
       IProject project = getProject();
       IResourceDelta delta = getDelta(project);
+      //Log
+      long buildTimeStart = System.currentTimeMillis();
+      KeYResourceLogger.logNeWBuild(project, delta);
+      //
       ProofManager proofManager = null;
       try{
          if(kind == IncrementalProjectBuilder.FULL_BUILD){
@@ -80,6 +85,9 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
          if (proofManager != null) {
             proofManager.dispose();
          }
+         //Log
+         KeYResourceLogger.logBuildTime(project, System.currentTimeMillis()-buildTimeStart);
+         //
       }
       return null;
    }
