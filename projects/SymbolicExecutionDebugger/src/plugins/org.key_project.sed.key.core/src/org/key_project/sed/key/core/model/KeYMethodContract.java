@@ -42,7 +42,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
    /**
     * The {@link IExecutionMethodContract} to represent by this debug node.
     */
-   private IExecutionOperationContract executionNode;
+   private final IExecutionOperationContract executionNode;
 
    /**
     * The contained children.

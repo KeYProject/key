@@ -56,7 +56,7 @@ public class SEDMemoryValue extends AbstractSEDValue {
    /**
     * The contained variables.
     */
-   private List<IVariable> variables = new LinkedList<IVariable>();
+   private final List<IVariable> variables = new LinkedList<IVariable>();
    
    /**
     * Constructor.

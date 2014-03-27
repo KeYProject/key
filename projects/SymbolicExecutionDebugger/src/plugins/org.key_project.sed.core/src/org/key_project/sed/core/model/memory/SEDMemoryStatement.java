@@ -33,12 +33,12 @@ public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemo
    /**
     * The contained child nodes.
     */
-   private List<ISEDDebugNode> children = new LinkedList<ISEDDebugNode>();
+   private final List<ISEDDebugNode> children = new LinkedList<ISEDDebugNode>();
    
    /**
     * The contained variables.
     */
-   private List<IVariable> variables = new LinkedList<IVariable>();
+   private final List<IVariable> variables = new LinkedList<IVariable>();
    
    /**
     * The name of this debug node.

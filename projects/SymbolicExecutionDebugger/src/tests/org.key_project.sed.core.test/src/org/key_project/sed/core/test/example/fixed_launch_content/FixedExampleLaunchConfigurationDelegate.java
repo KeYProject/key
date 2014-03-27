@@ -92,7 +92,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
                        String mode, 
                        ILaunch launch, 
                        IProgressMonitor monitor) throws CoreException {
-       SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(launch);
+       SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(launch, false);
        target.setName("Fixed Example Target");
        target.setModelIdentifier(MODEL_IDENTIFIER);
        launch.addDebugTarget(target);

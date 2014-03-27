@@ -83,7 +83,7 @@ public class ExecutionTreeUtilTest extends AbstractSetupTestCase {
       targets = ExecutionTreeUtil.getAllDebugTargets(typeProvider);
       assertDebugTargets(targets);
       // Test one linked debug target
-      SEDMemoryDebugTarget firstTarget = new SEDMemoryDebugTarget(null);
+      SEDMemoryDebugTarget firstTarget = new SEDMemoryDebugTarget(null, false);
       final ISEDDebugTarget[] expectedTargetsOne = {firstTarget};
       domain.getCommandStack().execute(new RecordingCommand(domain) {
          @Override
@@ -94,7 +94,7 @@ public class ExecutionTreeUtilTest extends AbstractSetupTestCase {
       targets = ExecutionTreeUtil.getAllDebugTargets(typeProvider);
       assertDebugTargets(targets, firstTarget);
       // Test two linked debug targets
-      SEDMemoryDebugTarget secondTarget = new SEDMemoryDebugTarget(null);
+      SEDMemoryDebugTarget secondTarget = new SEDMemoryDebugTarget(null, false);
       final ISEDDebugTarget[] expectedTargetsTwo = {firstTarget, secondTarget};
       domain.getCommandStack().execute(new RecordingCommand(domain) {
          @Override
