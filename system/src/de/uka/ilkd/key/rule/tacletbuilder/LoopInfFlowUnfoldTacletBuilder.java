@@ -23,6 +23,7 @@ public class LoopInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacletB
 
     private LoopInvariant loopInv;
     private ExecutionContext executionContext;
+    private Term guard;
 
 
     public LoopInfFlowUnfoldTacletBuilder(Services services) {
@@ -40,6 +41,11 @@ public class LoopInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacletB
     }
 
 
+    public void setGuard(Term guard) {
+        this.guard = guard;
+    }
+
+
     @Override
     Name getTacletName() {
         return MiscTools.toValidTacletName("unfold computed formula " +
@@ -54,6 +60,7 @@ public class LoopInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacletB
                 POSnippetFactory.getInfFlowFactory(loopInv,
                                                    ifVars.c1, ifVars.c2,
                                                    executionContext,
+                                                   guard,
                                                    services);
         return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
     }

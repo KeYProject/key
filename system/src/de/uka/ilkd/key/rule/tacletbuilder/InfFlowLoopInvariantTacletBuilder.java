@@ -30,6 +30,7 @@ public final class InfFlowLoopInvariantTacletBuilder
     
     private LoopInvariant loopinvariant;    
     private ExecutionContext executionContext;
+    private Term guard;
 
     public InfFlowLoopInvariantTacletBuilder(final Services services) {
         super(services);
@@ -42,6 +43,11 @@ public final class InfFlowLoopInvariantTacletBuilder
 
     public void setExecutionContext(ExecutionContext context) {
         this.executionContext = context;
+    }
+
+
+    public void setGuard(Term guard) {
+        this.guard = guard;
     }
 
 
@@ -58,6 +64,7 @@ public final class InfFlowLoopInvariantTacletBuilder
                 POSnippetFactory.getBasicFactory(loopinvariant,
                                                  schemaDataAssumes,
                                                  executionContext,
+                                                 guard,
                                                  services);
         return fAssumes.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
     }
@@ -69,6 +76,7 @@ public final class InfFlowLoopInvariantTacletBuilder
                 POSnippetFactory.getBasicFactory(loopinvariant,
                                                  schemaDataFind,
                                                  executionContext,
+                                                 guard,
                                                  services);
         return fFind.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
     }
@@ -79,6 +87,7 @@ public final class InfFlowLoopInvariantTacletBuilder
                 POSnippetFactory.getBasicFactory(loopinvariant,
                                                  appData,
                                                  executionContext,
+                                                 guard,
                                                  services);
         return f.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
     }
@@ -94,7 +103,8 @@ public final class InfFlowLoopInvariantTacletBuilder
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(ifContract, contAppData,
                                                    contAppData2,
-                                                   executionContext, services);
+                                                   executionContext,
+                                                   guard, services);
         Term contractApplication =
                 f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_LOOP_INVARIANT_APPL);
 

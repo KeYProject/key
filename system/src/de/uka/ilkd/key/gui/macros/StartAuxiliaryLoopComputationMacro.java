@@ -5,6 +5,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -63,12 +64,14 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
         if (ifVars == null) {
             return false;
         }
+        final ExecutionContext executionContext =
+                loopInvRuleApp.getExecutionContext();
+        final Term guardTerm = loopInvRuleApp.getGuard();
 
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(loopInv, ifVars.c1,
-                                                   ifVars.c2,
-                                                   loopInvRuleApp.getExecutionContext(),
-                                                   services);
+                                                   ifVars.c2, executionContext,
+                                                   guardTerm, services);
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
 
@@ -90,16 +93,21 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
         if (!(app instanceof LoopInvariantBuiltInRuleApp)) {
             return;
         }
-        final LoopInvariantBuiltInRuleApp loopInvRuleApp = (LoopInvariantBuiltInRuleApp) app;
+        final LoopInvariantBuiltInRuleApp loopInvRuleApp =
+                (LoopInvariantBuiltInRuleApp) app;
         final LoopInvariant loopInv = loopInvRuleApp.getInvariant();
-        final IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
+        final IFProofObligationVars ifVars =
+                loopInvRuleApp.getInformationFlowProofObligationVars();
+        final ExecutionContext executionContext =
+                loopInvRuleApp.getExecutionContext();
+        final Term guardTerm = loopInvRuleApp.getGuard();
 
 
         LoopInvExecutionPO loopInvExecPO =
                 new LoopInvExecutionPO(initConfig, loopInv,
                                        ifVars.symbExecVars.labelHeapAtPreAsAnonHeapFunc(),
-                                       goal,
-                                       loopInvRuleApp.getExecutionContext(),
+                                       goal, executionContext,
+                                       guardTerm,
                                        proof.getServices());
         ProblemInitializer pi =
                 new ProblemInitializer(mediator.getUI(),

@@ -32,10 +32,9 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
 
         if (poVars.pre.guard != null) {
             final JavaBlock guardJb = buildJavaBlock(d).second;
-            Term origGuard = d.tb.var((LocationVariable) inv.getGuard().op());
             posts = posts.append(d.tb.box(guardJb,
                                           d.tb.equals(poVars.post.guard,
-                                                      origGuard)));
+                                                      d.origVars.guard)));
         }
         Iterator<Term> localVars = d.origVars.localVars.iterator();
         Iterator<Term> localVarsAtPost = poVars.post.localVars.iterator();
@@ -77,7 +76,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
                                                   d.tb.TRUE(services));
         final Term guardPreFalseTerm = d.tb.equals(vs.pre.guard,
                                                    d.tb.FALSE(services));
-        final Term guardPreEqTerm = d.tb.equals(d.tb.var((LocationVariable) inv.getGuard().op()),
+        final Term guardPreEqTerm = d.tb.equals(d.origVars.guard,
                                                 vs.pre.guard);
         final Term guardPreTerm = tb.prog(modality, jb.second, guardPreEqTerm);
         final Term bodyTerm = tb.prog(symbExecMod, jb.first, postTerm);
@@ -106,7 +105,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         StatementBlock sb = (StatementBlock) inv.getLoop().getBody();
 
         final Assignment guardVarDecl =
-                new CopyAssignment((LocationVariable)inv.getGuard().op(),
+                new CopyAssignment((LocationVariable)d.origVars.guard.op(),
                                    inv.getLoop().getGuardExpression());
         final Statement guardVarMethodFrame =
                 context == null ?

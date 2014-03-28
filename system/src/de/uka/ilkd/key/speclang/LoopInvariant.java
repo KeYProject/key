@@ -42,10 +42,6 @@ public interface LoopInvariant extends SpecificationElement {
      */
     public IProgramMethod getTarget();
 
-    public boolean hasGuard();
-
-    public Term getGuard();
-
     /** Returns the invariant formula. */
     public Term getInvariant(LocationVariable heap, Term selfTerm,
                              Map<LocationVariable,Term> atPres, Services services);
@@ -151,8 +147,6 @@ public interface LoopInvariant extends SpecificationElement {
     public LoopInvariant setLoop(LoopStatement loop);
 
     public LoopInvariant setTarget(IProgramMethod newPM);
-
-    public LoopInvariant setGuard(Term guardTerm, Services services);
 
     /**
      * Returns a new loop invariant where the invariant formula has been
