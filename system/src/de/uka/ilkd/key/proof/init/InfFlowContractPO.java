@@ -26,7 +26,7 @@ import java.util.Properties;
  * @author christoph
  */
 public class InfFlowContractPO extends AbstractOperationPO
-        implements ContractPO, InfFlowRelatedPO {
+        implements ContractPO, InfFlowLeavePO {
 
     private final InformationFlowContract contract;
 
@@ -49,8 +49,21 @@ public class InfFlowContractPO extends AbstractOperationPO
         final IProgramMethod pm = contract.getTarget();
         symbExecVars =
                 new ProofObligationVars(pm, contract.getKJT(), services);
+
         assert (symbExecVars.pre.self == null) == (pm.isStatic());
         ifVars = new IFProofObligationVars(symbExecVars, services);
+
+        // add new information flow symbols
+        // (by the way: why only formal parameters?)
+        for (Term formalParam : symbExecVars.formalParams) {
+            addIFSymbol(formalParam);
+        }
+        for (Term formalParam : ifVars.c1.formalParams) {
+            addIFSymbol(formalParam);
+        }
+        for (Term formalParam : ifVars.c2.formalParams) {
+            addIFSymbol(formalParam);
+        }
     }
 
     @Override
@@ -170,7 +183,7 @@ public class InfFlowContractPO extends AbstractOperationPO
     }
 
     @Override
-    public void addIFSymbol(Term t) {
+    public final void addIFSymbol(Term t) {
         assert t != null;
         infFlowSymbols.add(t);
     }
@@ -208,6 +221,14 @@ public class InfFlowContractPO extends AbstractOperationPO
         // information flow contracts do not have global defs
         return null;
     }
+
+
+
+    @Override
+    public IFProofObligationVars getLeaveIFVars() {
+        return getIFVars();
+    }
+
 
     // the following code is legacy code
     @Override

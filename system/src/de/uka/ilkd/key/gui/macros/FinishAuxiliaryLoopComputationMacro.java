@@ -7,9 +7,9 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.LoopInvExecutionPO;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -32,8 +32,8 @@ public class FinishAuxiliaryLoopComputationMacro extends
         if (services == null) {
             return false;
         }
-        final ContractPO poForProof =
-                services.getSpecificationRepository().getPOForProof(proof);
+        final ProofOblInput poForProof =
+                services.getSpecificationRepository().getProofOblInput(proof);
         return poForProof instanceof LoopInvExecutionPO;
     }
 
@@ -45,8 +45,8 @@ public class FinishAuxiliaryLoopComputationMacro extends
         if (proof == null) {
             return;
         }
-        final ContractPO poForProof =
-                proof.getServices().getSpecificationRepository().getPOForProof(proof);
+        final ProofOblInput poForProof =
+                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
         if (!(poForProof instanceof LoopInvExecutionPO)) {
             return;
         }

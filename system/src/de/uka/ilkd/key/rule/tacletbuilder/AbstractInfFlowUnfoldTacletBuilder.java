@@ -78,6 +78,10 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 	final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars);
 	schemaFind = or.replace(schemaFind);
 
+        // replace information flow variables by schema variables in the
+        // replacewith term, too
+        Term schemaReplaceWith = replace(replacewith, ifVars, schemaVars);
+	schemaReplaceWith = or.replace(schemaReplaceWith);
 
         //create taclet
         final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
@@ -85,7 +89,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         tacletBuilder.setFind(schemaFind);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
         final RewriteTacletGoalTemplate goal =
-                new RewriteTacletGoalTemplate(replacewith);
+                new RewriteTacletGoalTemplate(schemaReplaceWith);
         tacletBuilder.addTacletGoalTemplate(goal);
         tacletBuilder.addRuleSet(new RuleSet(new Name("concrete")));
         tacletBuilder.setSurviveSmbExec(true);

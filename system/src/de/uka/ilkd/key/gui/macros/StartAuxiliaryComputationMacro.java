@@ -17,10 +17,10 @@ public class StartAuxiliaryComputationMacro extends AlternativeProofMacro {
     }
 
     @Override
-    protected ProofMacro[] createProofMacroArray() {
-        return new ProofMacro[] {new StartAuxiliaryMethodComputationMacro(),
-                                 new StartAuxiliaryLoopComputationMacro(),
-                                 new StartAuxiliaryBlockComputationMacro()};
+    protected ExtendedProofMacro[] createProofMacroArray() {
+        return new ExtendedProofMacro[] {new StartAuxiliaryMethodComputationMacro(),
+                                         new StartAuxiliaryLoopComputationMacro(),
+                                         new StartAuxiliaryBlockComputationMacro()};
     }
 
 }

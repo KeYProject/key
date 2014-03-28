@@ -38,8 +38,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
-import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
@@ -212,7 +212,7 @@ public class BlockContractRule implements BuiltInRule {
 
         Services services = goal.proof().getServices();
         Proof proof = goal.proof();
-        ContractPO po = services.getSpecificationRepository().getPOForProof(proof);
+        ProofOblInput po = services.getSpecificationRepository().getProofOblInput(proof);
         if (po instanceof SymbolicExecutionPO) {
             Goal initiatingGoal = ((SymbolicExecutionPO)po).getInitiatingGoal();
             return contractApplied(contract, initiatingGoal);
@@ -253,7 +253,7 @@ public class BlockContractRule implements BuiltInRule {
         boolean isOriginalIF =
                 (goal.getStrategyInfo(ifProp) != null && goal.getStrategyInfo(ifProp));
         // For loaded proofs, InfFlowCheckInfo is not correct without the following
-        boolean isLoadedIF = stratProps.getProperty(ifStrat).equals(ifTrue);
+        boolean isLoadedIF = false; //stratProps.getProperty(ifStrat).equals(ifTrue);
         return isOriginalIF || isLoadedIF;
     }
 

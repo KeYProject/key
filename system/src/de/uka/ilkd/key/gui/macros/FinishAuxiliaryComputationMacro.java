@@ -13,10 +13,13 @@ public class FinishAuxiliaryComputationMacro extends AlternativeProofMacro {
     }
 
     @Override
-    protected ProofMacro[] createProofMacroArray() {
-        return new ProofMacro[] { new FinishAuxiliaryMethodComputationMacro(),
-                                  new FinishAuxiliaryLoopComputationMacro(),
-                                  new FinishAuxiliaryBlockComputationMacro()};
+    protected ExtendedProofMacro[] createProofMacroArray() {
+        return new ExtendedProofMacro[] { new ProofMacroWrapper(
+                                              new FinishAuxiliaryMethodComputationMacro()),
+                                          new ProofMacroWrapper(
+                                              new FinishAuxiliaryLoopComputationMacro()),
+                                          new ProofMacroWrapper(
+                                              new FinishAuxiliaryBlockComputationMacro())};
     }
 
 }

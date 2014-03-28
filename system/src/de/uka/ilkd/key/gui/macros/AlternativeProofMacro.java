@@ -22,15 +22,16 @@ import javax.swing.KeyStroke;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.Goal;
 
-public abstract class AlternativeProofMacro implements ProofMacro {
+public abstract class AlternativeProofMacro implements ExtendedProofMacro {
 
     /**
      * The proof macro alternatives in their order according to their priority.
      *
      * This array is created on demand using {@link #createProofMacroArray()}.
      */
-    private ProofMacro[] proofMacros = null;
+    private ExtendedProofMacro[] proofMacros = null;
 
     /**
      * Creates the proof macro array.
@@ -40,7 +41,7 @@ public abstract class AlternativeProofMacro implements ProofMacro {
      *
      * @return a non-null array which should not be altered afterwards.
      */
-    protected abstract ProofMacro[] createProofMacroArray();
+    protected abstract ExtendedProofMacro[] createProofMacroArray();
 
     /**
      * {@inheritDoc}
@@ -51,9 +52,29 @@ public abstract class AlternativeProofMacro implements ProofMacro {
      */
     @Override
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        List<ProofMacro> macros = getProofMacros();
+        List<ExtendedProofMacro> macros = getProofMacros();
         for (int i = 0; i < macros.size(); i++) {
             if (macros.get(i).canApplyTo(mediator, posInOcc)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>
+     * This compound macro is applicable if and only if any one of the macros is applicable.
+     * If there is no first macro, this is not applicable.
+     */
+    @Override
+    public boolean canApplyTo(KeYMediator mediator,
+                              Goal goal,
+                              PosInOccurrence posInOcc) {
+        List<ExtendedProofMacro> macros = getProofMacros();
+        for (int i = 0; i < macros.size(); i++) {
+            if (macros.get(i).canApplyTo(mediator, goal, posInOcc)) {
                 return true;
             }
         }
@@ -82,11 +103,33 @@ public abstract class AlternativeProofMacro implements ProofMacro {
     }
 
     /**
+     * {@inheritDoc}
+     *
+     * <p>
+     * This launches the first applicable macro of {@link #getProofMacros()}.
+     *
+     * @throws InterruptedException
+     *             if the macro is interrupted.
+     */
+    @Override
+    public void applyTo(KeYMediator mediator,
+                        Goal goal,
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) throws InterruptedException {
+        for (ExtendedProofMacro macro : getProofMacros()) {
+            if(macro.canApplyTo(mediator, goal, posInOcc)) {
+                macro.applyTo(mediator, goal, posInOcc, listener);
+                return;
+            }
+        }
+    }
+
+    /**
      * Gets the proof macros.
      *
      * @return the proofMacros as an unmodifiable list.
      */
-    public List<ProofMacro> getProofMacros() {
+    public List<ExtendedProofMacro> getProofMacros() {
         if(proofMacros == null) {
             this.proofMacros = createProofMacroArray();
             assert proofMacros != null;

@@ -459,7 +459,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         boolean isOriginalIF =
                 (goal.getStrategyInfo(ifProp) != null && goal.getStrategyInfo(ifProp));
         // For loaded proofs, InfFlowCheckInfo is not correct without the following
-        boolean isLoadedIF = stratProps.getProperty(ifStrat).equals(ifTrue);
+        boolean isLoadedIF = false; //stratProps.getProperty(ifStrat).equals(ifTrue);
         return isOriginalIF || isLoadedIF;
     }
 
@@ -838,22 +838,33 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    reachableState = TB.and(reachableState,
 		                    TB.reachableValue(services, arg, argKJT));
 	}
-	final ContractPO po
-		= services.getSpecificationRepository()
-		          .getPOForProof(goal.proof());
-	final Term mbyOk;
-	if(po != null && po.getMbyAtPre() != null && mby != null ) {
-//    	mbyOk = TB.and(TB.leq(TB.zero(services), mby, services), 
-//    			       TB.lt(mby, po.getMbyAtPre(), services));
-	    mbyOk = TB.prec(mby, po.getMbyAtPre(), services);
-	} else {
-	    mbyOk = TB.tt();
-	}
-        final Term finalPreTerm =
-                TB.applySequential(new Term[]{inst.u, atPreUpdates},
-        	                                   TB.and(new Term[]{pre,
-        	                                	   	     reachableState,
-        	                                	   	     mbyOk}));
+
+        Term finalPreTerm;
+        if(!isInfFlow(goal)) {
+            final ContractPO po
+                    = services.getSpecificationRepository()
+                              .getContractPOForProof(goal.proof());
+
+            final Term mbyOk;
+            if(po != null && po.getMbyAtPre() != null && mby != null ) {
+                mbyOk = TB.prec(mby, po.getMbyAtPre(), services);
+            } else {
+                mbyOk = TB.tt();
+            }
+            finalPreTerm =
+                    TB.applySequential(new Term[]{inst.u, atPreUpdates},
+                                       TB.and(new Term[]{pre,
+                                                         reachableState,
+                                                         mbyOk}));
+        } else {
+            // termination has already been shown in the functional proof,
+            // thus we do not need to show it again in information flow proofs.
+            finalPreTerm =
+                    TB.applySequential(new Term[]{inst.u, atPreUpdates},
+                                                  TB.and(new Term[]{pre,
+                                                                    reachableState}));
+        }
+
         preGoal.changeFormula(new SequentFormula(finalPreTerm),
                               ruleApp.posInOccurrence());
         if (TermLabelWorkerManagement.hasInstantiators(services)) {

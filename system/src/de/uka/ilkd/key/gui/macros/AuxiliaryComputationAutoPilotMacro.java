@@ -10,64 +10,87 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 package de.uka.ilkd.key.gui.macros;
+
 
 /**
  *
  * @author christoph scheben
  */
-public class AuxiliaryComputationAutoPilotMacro extends SequentialOnLastGoalProofMacro {
-
-    /**
-     * The number of proof steps that should be run by the {@link TryCloseMacro}
-     * before retracting. This overrides the strategy setting.
-     */
-    private static final int NUMBER_OF_TRY_STEPS =
-            Integer.getInteger("key.autopilot.closesteps", 1000);
+public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
 
     @Override
     public String getName() {
         return "Auxiliary Computation Auto Pilot";
     }
 
+
     @Override
     public String getDescription() {
         return "<html><ol><li>Start auxiliary computation" +
-                "<li>Finish symbolic execution" +
-                "<li>Try to close as many goals as possible</ol>";
+               "<li>Finish symbolic execution" +
+               "<li>Try to close as many goals as possible</ol>";
     }
 
+
     @Override
-    protected ProofMacro[] createProofMacroArray() {
-        // The FinishSymbolicExecutionMacro and the TryCloseMacro shall be
-        // started at the same node. Therefore they are encapsulated in an
-        // own (anonymous) SequentialProofMacro.
-        SequentialProofMacro finishSymbExecAndTryToClose =
-                new SequentialProofMacro() {
-            @Override
-            protected ProofMacro[] createProofMacroArray() {
-                return new ProofMacro[]{
-                    new FinishSymbolicExecutionMacro(),
-                    new TryCloseMacro(NUMBER_OF_TRY_STEPS)
-                };
-            }
+    ExtendedProofMacro getProofMacro() {
+        return new SequentialOnLastGoalProofMacro() {
+            /**
+             * The number of proof steps that should be run by the
+             * {@link TryCloseMacro} before retracting. This overrides the
+             * strategy setting.
+             */
+            private final int NUMBER_OF_TRY_STEPS =
+                    Integer.getInteger("key.autopilot.closesteps", 1000);
 
 
             @Override
             public String getName() {
-                return "Anonymous Macro";
+                return "Auxiliary Computation Auto Pilot";
             }
 
 
             @Override
             public String getDescription() {
-                return "Anonymous Macro";
+                return "<html><ol><li>Start auxiliary computation" +
+                       "<li>Finish symbolic execution" +
+                       "<li>Try to close as many goals as possible</ol>";
             }
-        };
-        return new ProofMacro[]{
-            new StartAuxiliaryComputationMacro(),
-            finishSymbExecAndTryToClose,
+
+
+            @Override
+            protected ExtendedProofMacro[] createProofMacroArray() {
+                // The FinishSymbolicExecutionMacro and the TryCloseMacro shall be
+                // started at the same node. Therefore they are encapsulated in an
+                // own (anonymous) SequentialProofMacro.
+                SequentialProofMacro finishSymbExecAndTryToClose =
+                        new SequentialProofMacro() {
+                    @Override
+                    protected ExtendedProofMacro[] createProofMacroArray() {
+                        return new ExtendedProofMacro[]{
+                            new FinishSymbolicExecutionMacro(),
+                            new ProofMacroWrapper(
+                                new TryCloseMacro(NUMBER_OF_TRY_STEPS))
+                        };
+                    }
+
+
+                    @Override
+                    public String getName() {
+                        return "Anonymous Macro";
+                    }
+
+
+                    @Override
+                    public String getDescription() {
+                        return "Anonymous Macro";
+                    }
+                };
+                return new ExtendedProofMacro[]{
+                    new StartAuxiliaryComputationMacro(),
+                    finishSymbExecAndTryToClose,};
+            }
         };
     }
 }

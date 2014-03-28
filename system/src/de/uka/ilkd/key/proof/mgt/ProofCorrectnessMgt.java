@@ -93,7 +93,7 @@ public final class ProofCorrectnessMgt {
      */
     public boolean isContractApplicable(Contract contract) {
         //get the contract which is being verified in our current proof
-	final ContractPO po = specRepos.getPOForProof(proof);
+	final ContractPO po = specRepos.getContractPOForProof(proof);
         if(po == null) {
             return true;
         }

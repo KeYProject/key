@@ -38,20 +38,12 @@ public class FullInformationFlowAutoPilotMacro implements ProofMacro {
     }
 
     private ProofMacro createProofMacro() {
-        final ExhaustiveProofMacro exhaustiveAutoPilotMacro =
-                new ExhaustiveProofMacro() {
-                    @Override
-                    public String getName() { return "Anonymous Macro"; }
-                    @Override
-                    public String getDescription() { return "Anonymous Macro"; }
-                    @Override
-                    ProofMacro getProofMacro() { return new AuxiliaryComputationAutoPilotMacro(); }
-        };
         final SequentialProofMacro stateExpansionAndCloseMacro = new SequentialProofMacro() {
             @Override
-            protected ProofMacro[] createProofMacroArray() {
-                return new ProofMacro[] {new StateExpansionAndInfFlowContractApplicationMacro(),
-                                         new TryCloseMacro(NUMBER_OF_TRY_STEPS)};
+            protected ExtendedProofMacro[] createProofMacroArray() {
+                return new ExtendedProofMacro[] { new StateExpansionAndInfFlowContractApplicationMacro(),
+                                                  new ProofMacroWrapper(
+                                                      new TryCloseMacro(NUMBER_OF_TRY_STEPS)) };
             }
             @Override
             public String getName() { return "Anonymous Macro"; }
@@ -61,9 +53,9 @@ public class FullInformationFlowAutoPilotMacro implements ProofMacro {
         final SequentialProofMacro finishMainCompMacro =
                 new SequentialOnLastGoalProofMacro() {
             @Override
-            protected ProofMacro[] createProofMacroArray() {
-                return new ProofMacro[] {new FinishAuxiliaryComputationMacro(),
-                                         stateExpansionAndCloseMacro};}
+            protected ExtendedProofMacro[] createProofMacroArray() {
+                return new ExtendedProofMacro[] { new FinishAuxiliaryComputationMacro(),
+                                                  stateExpansionAndCloseMacro};}
             @Override
             public String getName() { return "Anonymous Macro"; }
             @Override
@@ -76,9 +68,10 @@ public class FullInformationFlowAutoPilotMacro implements ProofMacro {
                     @Override
                     public String getDescription() { return "Anonymous Macro"; }
                     @Override
-                    protected ProofMacro[] createProofMacroArray() {
-                        return new ProofMacro[] {exhaustiveAutoPilotMacro,
-                                                 finishMainCompMacro};}
+                    protected ExtendedProofMacro[] createProofMacroArray() {
+                        return new ExtendedProofMacro[] { new ProofMacroWrapper(
+                                                              new AuxiliaryComputationAutoPilotMacro()),
+                                                          finishMainCompMacro}; }
         };
         return new DoWhileElseMacro(alternativesMacro, NUMBER_OF_TRY_STEPS);
     }

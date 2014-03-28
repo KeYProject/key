@@ -555,8 +555,8 @@ public final class ProblemInitializer {
 	        listener.proofCreated(this, pa);
 	    }
 	    Proof p = pa.getProofs()[proofNum];
-	    if (po instanceof InfFlowRelatedPO) {
-	        p.unionIFSymbols(((InfFlowRelatedPO)po).getIFSymbols());
+	    if (po instanceof InfFlowPO) {
+	        p.unionIFSymbols(((InfFlowPO)po).getIFSymbols());
 	    }
 	    return p;
 

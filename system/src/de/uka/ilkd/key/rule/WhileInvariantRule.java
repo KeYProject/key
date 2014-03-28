@@ -58,7 +58,10 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
+import de.uka.ilkd.key.proof.init.InfFlowPO;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
@@ -98,6 +101,14 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term baseHeap = anonUpdateData.loopHeapAtPre;
         final Term guardTerm = TB.var(guardVar);
         final Term selfTerm = inst.selfTerm;
+
+        Proof proof = services.getProof();
+        ProofOblInput poi =
+                services.getSpecificationRepository().getProofOblInput(proof);
+        assert poi instanceof InfFlowPO;
+        InfFlowPO po = (InfFlowPO)poi;
+        IFProofObligationVars leaveIFVars = po.getLeaveIFVars();
+
         services.getSpecificationRepository().addLoopInvariant(inv);
         ruleApp.setLoopInvariant(inv);
         instantiate(ruleApp, services);
@@ -458,7 +469,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         boolean isOriginalIF =
                 (goal.getStrategyInfo(ifProp) != null && goal.getStrategyInfo(ifProp));
         // For loaded proofs, InfFlowCheckInfo is not correct without the following
-        boolean isLoadedIF = stratProps.getProperty(ifStrat).equals(ifTrue);
+        boolean isLoadedIF = false; //stratProps.getProperty(ifStrat).equals(ifTrue);
         return isOriginalIF || isLoadedIF;
     }
 
@@ -765,43 +776,44 @@ public final class WhileInvariantRule implements BuiltInRule {
         bodyGoal.setBranchLabel("Body Preserves Invariant");
         useGoal.setBranchLabel("Use Case");
 
-        if (!isInfFlowProof(inst, goal, services)) {
-            // set up bodyGoal
+        // set up bodyGoal
+        Term bodyTerm = wir.transform(this,
+                                      bodyGoal,
+                                      applicationSequent,
+                                      ruleApp.posInOccurrence(),
+                                      inst.progPost,
+                                      TB.and(new Term[]{invTerm2, frameCondition, variantPO}),
+                                      svInst,
+                                      services);
+        final Term guardTrueBody = TB.imp(TB.box(guardJb,guardTrueTerm), bodyTerm);
 
-            Term bodyTerm = wir.transform(this,
-	                                  bodyGoal,
-	                                  applicationSequent,
-	                                  ruleApp.posInOccurrence(),
-	                                  inst.progPost,
-	                                  TB.and(new Term[]{invTerm2, frameCondition, variantPO}),
-	                                  svInst,
-	                                  services);
-            final Term guardTrueBody = TB.imp(TB.box(guardJb,guardTrueTerm), bodyTerm);
+        //"Body Preserves Invariant":
+        // \replacewith (==>  #atPreEqs(anon1)
+        //                       -> #introNewAnonUpdate(
+        //                                  #modifies,
+        //                                  #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post)
+        //                          & inv ->
+        //                         (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
+        //                          #whileInvRule(\[{.. while (#e) #s ...}\]post,
+        //                               #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post)
+        //                                  & inv)),
+        //                          anon1));
+        bodyGoal.addFormula(new SequentFormula(wellFormedAnon),
+                true,
+                false);
 
-            //"Body Preserves Invariant":
-            // \replacewith (==>  #atPreEqs(anon1)
-            //                       -> #introNewAnonUpdate(
-            //                                  #modifies,
-            //                                  #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post)
-            //                          & inv ->
-            //                         (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
-            //                          #whileInvRule(\[{.. while (#e) #s ...}\]post,
-            //                               #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post)
-            //                                  & inv)),
-            //                          anon1));
-            bodyGoal.addFormula(new SequentFormula(wellFormedAnon),
-                    true,
-                    false);
+        bodyGoal.addFormula(new SequentFormula(uAnonInvVariantNonNeg),
+                true,
+                false);
 
-            bodyGoal.addFormula(new SequentFormula(uAnonInvVariantNonNeg),
-                    true,
-                    false);
+        bodyGoal.changeFormula(new SequentFormula(TB.applySequential(
+                uBeforeLoopDefAnonVariant,
+                guardTrueBody)),
+                ruleApp.posInOccurrence());
 
-            bodyGoal.changeFormula(new SequentFormula(TB.applySequential(
-                    uBeforeLoopDefAnonVariant,
-                    guardTrueBody)),
-                    ruleApp.posInOccurrence());
-        } else {
+        if (isInfFlowProof(inst, goal, services)) {
+            // reset validiy branch
+
             bodyGoal.setBranchLabel("Information Flow Validity");
 
             // clear goal

@@ -16,6 +16,7 @@ package de.uka.ilkd.key.gui.macros;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.Goal;
 
 /**
  *
@@ -46,4 +47,28 @@ public abstract class SequentialOnLastGoalProofMacro extends SequentialProofMacr
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>
+     * The macros are always started on the last active goal (in contrast
+     * to the same goal as it is done in the SequentialProofMacro).
+     *
+     * @throws InterruptedException
+     *             if one of the wrapped macros is interrupted.
+     */
+    @Override
+    public void applyTo(KeYMediator mediator,
+                        Goal goal,
+                        PosInOccurrence posInOcc,
+            ProverTaskListener listener) throws InterruptedException {
+
+        for (ExtendedProofMacro macro : getProofMacros()) {
+            // (here we do not reverse to original node)
+            macro.applyTo(mediator, goal, posInOcc, listener);
+            // after the first macro the posInOcc does not match any more,
+            // because we changed the goal / node
+            posInOcc = null;
+        }
+    }
 }
