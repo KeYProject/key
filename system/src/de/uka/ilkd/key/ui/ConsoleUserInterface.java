@@ -269,7 +269,8 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        super.applyMacro();
        // TODO: execute macro
        ProofMacroWorker worker = new ProofMacroWorker(autoMacro, mediator, null);
-       System.out.println("Apply it ... NOW!");
+       System.out.println("Apply macro: " + autoMacro.getName());
+       assert autoMacro.canApplyTo(mediator, null);
        worker.start();
    }
 

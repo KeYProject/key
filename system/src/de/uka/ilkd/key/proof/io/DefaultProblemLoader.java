@@ -131,18 +131,20 @@ public class DefaultProblemLoader {
    public ProblemLoaderException load(boolean registerProof)
            throws ProblemLoaderException {
       try {
-         // Read environment
-      boolean oneStepSimplifier = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
-      ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
-         envInput = createEnvInput();
-         problemInitializer = createProblemInitializer(registerProof);
-         initConfig = createInitConfig();
-         // Read proof obligation settings
-         LoadedPOContainer poContainer = createProofObligationContainer();
-         try {
+          // Read environment
+          boolean oneStepSimplifier =
+                  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+          ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
+          envInput = createEnvInput();
+          problemInitializer = createProblemInitializer(registerProof);
+          initConfig = createInitConfig();
+          // Read proof obligation settings
+          LoadedPOContainer poContainer = createProofObligationContainer();
+          try {
             if (poContainer == null) {
                return selectProofObligation();
             }
+            System.out.println("PO container: " + poContainer.getProofOblInput().name());
             // Create proof and apply rules again if possible
             proof = createProof(poContainer);
             if (proof != null) {
@@ -151,14 +153,14 @@ public class DefaultProblemLoader {
             mediator.getUI().applyMacro();
             // this message is propagated to the top level in console mode
             return null; // Everything fine
-         }
-         finally {
-    	  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(oneStepSimplifier);
-            getMediator().resetNrGoalsClosedByHeuristics();
-            if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
-               ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
-            }
-         }
+          }
+          finally {
+              ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(oneStepSimplifier);
+              getMediator().resetNrGoalsClosedByHeuristics();
+              if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
+                  ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
+              }
+          }
       }
       catch (ProblemLoaderException e) {
           throw(e);
@@ -244,65 +246,65 @@ public class DefaultProblemLoader {
       final String chooseContract;
       final String proofObligation;
       if (envInput instanceof KeYFile) {
-         KeYFile keyFile = (KeYFile)envInput;
-         chooseContract = keyFile.chooseContract();
-         proofObligation = keyFile.getProofObligation();
+          KeYFile keyFile = (KeYFile)envInput;
+          chooseContract = keyFile.chooseContract();
+          proofObligation = keyFile.getProofObligation();
       }
       else {
-         chooseContract = null;
-         proofObligation = null;
+          chooseContract = null;
+          proofObligation = null;
       }
       // Instantiate proof obligation
       if (envInput instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
-         return new LoadedPOContainer((ProofOblInput)envInput);
+          return new LoadedPOContainer((ProofOblInput)envInput);
       }
       else if (chooseContract != null && chooseContract.length() > 0) {
-         int proofNum = 0;
-         String baseContractName = null;
-         int ind = -1;
-         for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
-            ind = chooseContract.indexOf("." + tag);
-            if (ind > 0) {
-               break;
-            }
-            proofNum++;
-         }
-         if (ind == -1) {
-            baseContractName = chooseContract;
-            proofNum = 0;
-         }
-         else {
-            baseContractName = chooseContract.substring(0, ind);
-         }
-         final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
-         if (contract == null) {
-            throw new RuntimeException("Contract not found: " + baseContractName);
-         }
-         else {
-            return new LoadedPOContainer(contract.createProofObl(initConfig), proofNum);
-         }
+          int proofNum = 0;
+          String baseContractName = null;
+          int ind = -1;
+          for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
+              ind = chooseContract.indexOf("." + tag);
+              if (ind > 0) {
+                  break;
+              }
+              proofNum++;
+          }
+          if (ind == -1) {
+              baseContractName = chooseContract;
+              proofNum = 0;
+          }
+          else {
+              baseContractName = chooseContract.substring(0, ind);
+          }
+          final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
+          if (contract == null) {
+              throw new RuntimeException("Contract not found: " + baseContractName);
+          }
+          else {
+              return new LoadedPOContainer(contract.createProofObl(initConfig), proofNum);
+          }
       }
       else if (proofObligation != null && proofObligation.length() > 0) {
-         // Load proof obligation settings
-         Properties properties = new Properties();
-         properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
-         properties.put(IPersistablePO.PROPERTY_FILENAME, file.getAbsolutePath());
-         String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
-         if (poClass == null || poClass.isEmpty()) {
-            throw new IOException("Proof obligation class property \"" + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
-         }
-         try {
-            // Try to instantiate proof obligation by calling static method: public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException
-            Class<?> poClassInstance = Class.forName(poClass);
-            Method loadMethod = poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
-            return (LoadedPOContainer)loadMethod.invoke(null, initConfig, properties);
-         }
-         catch (Exception e) {
-            throw new IOException("Can't call static factory method \"loadFrom\" on class \"" + poClass + "\".", e);
-         }
+          // Load proof obligation settings
+          Properties properties = new Properties();
+          properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
+          properties.put(IPersistablePO.PROPERTY_FILENAME, file.getAbsolutePath());
+          String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
+          if (poClass == null || poClass.isEmpty()) {
+              throw new IOException("Proof obligation class property \"" + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
+          }
+          try {
+              // Try to instantiate proof obligation by calling static method: public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException
+              Class<?> poClassInstance = Class.forName(poClass);
+              Method loadMethod = poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
+              return (LoadedPOContainer)loadMethod.invoke(null, initConfig, properties);
+          }
+          catch (Exception e) {
+              throw new IOException("Can't call static factory method \"loadFrom\" on class \"" + poClass + "\".", e);
+          }
       }
       else {
-         return null;
+          return null;
       }
    }
 

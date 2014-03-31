@@ -68,7 +68,10 @@ public abstract class AbstractUserInterface implements UserInterface {
      * {@inheritDoc}
      */
     @Override
-    public DefaultProblemLoader load(Profile profile, File file, List<File> classPath, File bootClassPath) throws ProblemLoaderException {
+    public DefaultProblemLoader load(Profile profile,
+                                     File file,
+                                     List<File> classPath,
+                                     File bootClassPath) throws ProblemLoaderException {
        DefaultProblemLoader loader = null;
        try {
           getMediator().stopInterface(true);
