@@ -144,7 +144,6 @@ public class DefaultProblemLoader {
             if (poContainer == null) {
                return selectProofObligation();
             }
-            System.out.println("PO container: " + poContainer.getProofOblInput().name());
             // Create proof and apply rules again if possible
             proof = createProof(poContainer);
             if (proof != null) {

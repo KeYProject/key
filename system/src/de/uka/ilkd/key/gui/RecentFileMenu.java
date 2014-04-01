@@ -271,12 +271,12 @@ public class RecentFileMenu {
             try {
                 if (fin != null) fin.close();
             } catch (IOException e) {
-                System.out.println("CLosing streams failed.");
+                System.out.println("Closing streams failed.");
             }
             try {
                 if (fout != null) fout.close();
             } catch (IOException e) {
-                System.out.println("CLosing streams failed.");
+                System.out.println("Closing streams failed.");
             }
         }
     }

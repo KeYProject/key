@@ -70,7 +70,13 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
             getMediator().startInterface(true);
             final Object msg = get();
             if (ptl != null) {
-               final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, msg, getProof(), time, (getProof() != null ? getProof().countNodes() : 0), (getProof() != null ? getProof().countBranches() - getProof().openGoals().size() : 0));
+               final TaskFinishedInfo tfi =
+                       new DefaultTaskFinishedInfo(ProblemLoader.this, msg, getProof(), time,
+                                                   (getProof() != null ?
+                                                           getProof().countNodes() : 0),
+                                                   (getProof() != null ?
+                                                           getProof().countBranches()
+                                                               - getProof().openGoals().size() : 0));
                ptl.taskFinished(tfi);
             }
          }
