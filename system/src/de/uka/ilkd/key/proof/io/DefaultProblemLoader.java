@@ -149,12 +149,13 @@ public class DefaultProblemLoader {
             if (proof != null) {
                replayProof(proof);
             }
-            mediator.getUI().applyMacro();
+
             // this message is propagated to the top level in console mode
             return null; // Everything fine
           }
           finally {
-              ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(oneStepSimplifier);
+              ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                                  .setOneStepSimplification(oneStepSimplifier);
               getMediator().resetNrGoalsClosedByHeuristics();
               if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
                   ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
@@ -325,7 +326,8 @@ public class DefaultProblemLoader {
     * @throws ProofInputException Occurred Exception.
     */
    protected Proof createProof(LoadedPOContainer poContainer) throws ProofInputException {
-      return problemInitializer.startProver(initConfig, poContainer.getProofOblInput(), poContainer.getProofNum());
+       return problemInitializer.startProver(initConfig, poContainer.getProofOblInput(),
+                                             poContainer.getProofNum());
    }
 
    protected void replayProof(Proof proof) throws ProofInputException {

@@ -25,7 +25,6 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
     @Override
     public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        LoopInvariant inv = (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
         ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
         if (poVars.post.self != null)
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
@@ -57,7 +56,6 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
             throw new UnsupportedOperationException("Tried to produce a " +
                                                     "program-term for a loop without modality.");
         }
-        LoopInvariant inv = (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
         Services services = d.tb.getServices();
 
         //create java block

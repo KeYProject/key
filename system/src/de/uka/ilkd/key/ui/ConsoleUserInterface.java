@@ -23,7 +23,6 @@ import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.KeYMediator;
 import static de.uka.ilkd.key.gui.Main.Verbosity.*;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
-import de.uka.ilkd.key.gui.macros.ProofMacroWorker;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
@@ -119,6 +118,9 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             // has to be notified that we work in auto mode (CS)
             mediator.setInteractive(false);
 
+            if (macroChosen()) {
+                applyMacro();
+            }
             final Object result = ps.start();
             if (verbosity >= HIGH) {
             	System.out.println(result);
@@ -265,19 +267,27 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    }
 
    @Override
-   public void applyMacro() {
-       super.applyMacro();
-       // TODO: execute macro
-       ProofMacroWorker worker = new ProofMacroWorker(autoMacro, mediator, null);
-       System.out.println("Apply macro: " + autoMacro.getName());
-       assert autoMacro.canApplyTo(mediator, null);
-       worker.start();
+   public boolean applyMacro() {
+       assert macroChosen();
+       if (autoMacro.canApplyTo(mediator, null)) {
+           System.out.println("[ APPLY " + autoMacro.getClass().getSimpleName() + " ]");
+           try {
+               autoMacro.applyTo(mediator, null, mediator.getUI());
+           } catch(InterruptedException ex) {
+               Debug.out("Proof macro has been interrupted:");
+               Debug.out(ex);
+           }
+           return true;
+       } else {
+           System.out.println(autoMacro.getClass().getSimpleName() + " not applicable!");
+       }
+       return false;
    }
 
-	@Override
-    public void openExamples() {
-		System.out.println("Open Examples not suported by console UI.");
-    }
+   @Override
+   public void openExamples() {
+       System.out.println("Open Examples not suported by console UI.");
+   }
 
    @Override
    public ProblemInitializer createProblemInitializer(Profile profile) {

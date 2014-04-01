@@ -62,10 +62,8 @@ public abstract class AbstractUserInterface implements UserInterface {
         return this.autoMacro;
     }
 
-    public void applyMacro() {
-        if (autoMacro instanceof DummyProofMacro) {
-            return;
-        }
+    public boolean macroChosen() {
+        return !(getMacro() instanceof DummyProofMacro);
     }
 
     /**

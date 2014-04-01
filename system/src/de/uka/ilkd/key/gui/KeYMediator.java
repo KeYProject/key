@@ -314,33 +314,33 @@ public class KeYMediator {
 
 
     private void setProofHelper(Proof newProof) {
-      Proof oldProof = getSelectedProof();
-      if (oldProof != null) {
-         oldProof.removeProofTreeListener(proofTreeListener);
-         oldProof.removeRuleAppListener(proofListener);
-      }
-      if (newProof != null) {
-         notationInfo.setAbbrevMap(newProof.abbreviations());
-      }
-      if (newProof != null) {
-         newProof.addProofTreeListener(proofTreeListener);
-         newProof.addRuleAppListener(proofListener);
-      }
-      
-      // moved from layout main here; but does not actually belong here at all;
-      // we should get that rule to behave like a normal built-in rule
-      OneStepSimplifier newSimplifier = MiscTools.findOneStepSimplifier(newProof);
-      if (currentOneStepSimplifier != newSimplifier) {
-         if (currentOneStepSimplifier != null) {
-            removeKeYSelectionListener(currentOneStepSimplifier);
-         }
-         currentOneStepSimplifier = newSimplifier;
-         if (currentOneStepSimplifier != null) {
-            addKeYSelectionListener(currentOneStepSimplifier);
-         }
-      }
-      
-      keySelectionModel.setSelectedProof(newProof);
+        Proof oldProof = getSelectedProof();
+        if (oldProof != null) {
+            oldProof.removeProofTreeListener(proofTreeListener);
+            oldProof.removeRuleAppListener(proofListener);
+        }
+        if (newProof != null) {
+            notationInfo.setAbbrevMap(newProof.abbreviations());
+        }
+        if (newProof != null) {
+            newProof.addProofTreeListener(proofTreeListener);
+            newProof.addRuleAppListener(proofListener);
+        }
+
+        // moved from layout main here; but does not actually belong here at all;
+        // we should get that rule to behave like a normal built-in rule
+        OneStepSimplifier newSimplifier = MiscTools.findOneStepSimplifier(newProof);
+        if (currentOneStepSimplifier != newSimplifier) {
+            if (currentOneStepSimplifier != null) {
+                removeKeYSelectionListener(currentOneStepSimplifier);
+            }
+            currentOneStepSimplifier = newSimplifier;
+            if (currentOneStepSimplifier != null) {
+                addKeYSelectionListener(currentOneStepSimplifier);
+            }
+        }
+
+        keySelectionModel.setSelectedProof(newProof);
     }
 
 

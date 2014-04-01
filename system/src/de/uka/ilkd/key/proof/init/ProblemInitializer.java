@@ -545,6 +545,7 @@ public final class ProblemInitializer {
 
 	    //read problem
 	    reportStatus("Loading problem \"" + po.name() + "\"");
+
 	    po.readProblem();
 	    ProofAggregate pa = po.getPO();
 	    //final work
@@ -560,21 +561,21 @@ public final class ProblemInitializer {
 	    }
 	    return p;
 
-        } catch (ProofInputException e) {    
+        } catch (ProofInputException e) {
             if(listener != null){
         	listener.reportException(this, po, e);
             }
-           
-            throw e;            
+
+            throw e;
         } finally {
-            if(listener != null){
+            if(listener != null) {
         	listener.progressStopped(this);
             }
-                   
-        }    
+
+        }
     }
-    
-    
+
+
     public void startProver(ProofEnvironment env, ProofOblInput po) 
     		throws ProofInputException {
 	assert env.getInitConfig().getProofEnv() == env;

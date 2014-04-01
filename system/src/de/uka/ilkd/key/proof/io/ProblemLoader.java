@@ -59,10 +59,10 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
 
          @Override
          public Object construct() {
-            time = System.currentTimeMillis();
-            Object res = doWork();
-            time = System.currentTimeMillis() - time;
-            return res;
+             time = System.currentTimeMillis();
+             Object res = doWork();
+             time = System.currentTimeMillis() - time;
+             return res;
          }
 
          @Override
@@ -104,7 +104,8 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
          }
       }
       catch (ExceptionHandlerException ex) {
-         String errorMessage = "Failed to load " + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
+         String errorMessage =
+                 "Failed to load " + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
          getMediator().getUI().notify(new ExceptionFailureEvent(errorMessage, ex));
          getMediator().getUI().reportStatus(this, errorMessage);
          status = ex;

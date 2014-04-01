@@ -17,6 +17,7 @@ package de.uka.ilkd.key.gui;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.List;
+import java.util.ServiceLoader;
 
 import de.uka.ilkd.key.gui.RecentFileMenu.RecentFileEntry;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
@@ -25,7 +26,6 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
 import de.uka.ilkd.key.gui.macros.DummyProofMacro;
-import de.uka.ilkd.key.gui.macros.FullInformationFlowAutoPilotMacro;
 import de.uka.ilkd.key.gui.macros.ProofMacro;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
@@ -56,7 +56,6 @@ public final class Main {
     private static final String EXPERIMENTAL = "--experimental";
     private static final String DEBUG = "--debug";
     private static final String MACRO = "--macro";
-    private static final String INF_FLOW = "inf-flow";
     private static final String NO_DEBUG = "--no_debug";
     private static final String ASSERTION = "--assertion";
     private static final String NO_ASSERTION = "--no-assertion";
@@ -197,8 +196,8 @@ public final class Main {
     public static void loadCommandLineFile(UserInterface ui) {
         if (Main.getFileNameOnStartUp() != null) {
             final File fnos = new File(Main.getFileNameOnStartUp());
-            ui.loadProblem(fnos);
             ui.setMacro(autoMacro);
+            ui.loadProblem(fnos);
         } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
             ui.openExamples();
         }
@@ -360,14 +359,24 @@ public final class Main {
             Debug.ENABLE_DEBUG = true;
         }
 
-        // TODO: check here for (auto-)macros
         if (cl.isSet(MACRO)) {
             String macro = cl.getString(MACRO, "");
-            if (macro.equals(INF_FLOW)) {
-                // memorize macro for later
-                autoMacro = new FullInformationFlowAutoPilotMacro();
-            } else {
-                // auto-macro option without macro
+            for (ProofMacro m: ServiceLoader.load(ProofMacro.class)) {
+                if (macro.equals(m.getClass().getSimpleName())) {
+                    // memorize macro for later
+                    try {
+                        autoMacro = m.getClass().newInstance();
+                    } catch (InstantiationException e) {
+                        System.err.println("Automatic proof macro can not be instantiated!");
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        System.err.println("Automatic proof macro can not be accessed!");
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+            }
+            if (macro.equals("") || autoMacro instanceof DummyProofMacro) {
                 System.err.println("No automatic proof macro specified.");
             }
         }

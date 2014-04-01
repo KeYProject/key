@@ -126,9 +126,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term selfAtPost = buildAtPostVar(selfTerm, "LOOP", services);
         // The set of local variables which are read in the loop body.
         final ImmutableList<Term> localInTerms = MiscTools.toTermList(localIns);
-        // The set of local vairables which are written in the loop body.
+        // The set of local variables which are written in the loop body.
         final ImmutableList<Term> localOutTerms = MiscTools.toTermList(localOuts);
-        // For every local variable which is written we need a pre and a post varible.
+        // For every local variable which is written we need a pre and a post variable.
         final ImmutableList<Term> localOutsAtPre = buildLocalOutsAtPre(localOutTerms, services);
         final ImmutableList<Term> localOutsAtPost = buildLocalOutsAtPost(localOutTerms, services);
         // For every local variable which is read only, we need only a pre

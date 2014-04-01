@@ -69,15 +69,15 @@ public final class GuiUtilities {
         if (SwingUtilities.isEventDispatchThread()) runner.run();
         else {
             try{
-               SwingUtilities.invokeAndWait(runner);
+                SwingUtilities.invokeAndWait(runner);
             } catch(InterruptedException e) {
                 System.err.println(e);
                 e.printStackTrace();
             } catch(InvocationTargetException ite) {
-               Throwable targetExc = ite.getTargetException();
-               System.err.println(targetExc);
-               targetExc.printStackTrace();
-               ite.printStackTrace();
+                Throwable targetExc = ite.getTargetException();
+                System.err.println(targetExc);
+                targetExc.printStackTrace();
+                ite.printStackTrace();
             }
         }
     }
