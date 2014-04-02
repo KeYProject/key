@@ -278,17 +278,15 @@ public class KeYMediator {
 
     private void finishSetBack(final Proof proof){
         this.ui.taskFinished(
-                        new DefaultTaskFinishedInfo(this, null,
-                                        proof, 0,
-                                        0, getNrGoalsClosedByAutoMode()){
-                                @Override
-                                public String toString() {
-
-                                        return "Proof has been pruned: "+(proof.openGoals().size() == 1?
-                                                        "one open goal remains." :
-                                                        (proof.openGoals().size()+" open goals remain."));
-                                }
-                        });
+                new DefaultTaskFinishedInfo(this, null, proof, 0, 0,
+                                            getNrGoalsClosedByAutoMode()) {
+                    @Override
+                    public String toString() {
+                        return "Proof has been pruned: "+(proof.openGoals().size() == 1 ?
+                                "one open goal remains." :
+                                    (proof.openGoals().size()+" open goals remain."));
+                    }
+                });
         if (!proof.isDisposed()) {
            proof.getServices().getCaches().getTermTacletAppIndexCache().clear();
         }

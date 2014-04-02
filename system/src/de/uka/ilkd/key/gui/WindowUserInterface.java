@@ -36,7 +36,6 @@ import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractUserInterface;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 /**
@@ -79,27 +78,6 @@ public class WindowUserInterface extends AbstractUserInterface {
 	}
 
 	@Override
-	public boolean applyMacro() {
-	    assert macroChosen();
-	    if (autoMacro.canApplyTo(getMediator(), null)) {
-	        try {
-	            getMediator().stopInterface(true);
-	            getMediator().setInteractive(false);
-	            autoMacro.applyTo(getMediator(), null, this);
-                    getMediator().setInteractive(true);
-                    getMediator().startInterface(true);
-	        } catch(InterruptedException ex) {
-	            Debug.out("Proof macro has been interrupted:");
-	            Debug.out(ex);
-	        }
-	        return true;
-	    } else {
-	        System.out.println(autoMacro.getClass().getSimpleName() + " not applicable!");
-	    }
-	    return false;
-	}
-
-	@Override
 	public void progressStarted(Object sender) {
 		mainWindow.getMediator().stopInterface(
 		        true);
@@ -138,6 +116,10 @@ public class WindowUserInterface extends AbstractUserInterface {
 	@Override
 	public void resetStatus(Object sender) {
 		mainWindow.setStandardStatusLine();
+	}
+
+	public void finish(TaskFinishedInfo info, boolean attemptProof) {
+	    // do nothing
 	}
 
 	@Override

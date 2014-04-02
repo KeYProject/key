@@ -172,8 +172,8 @@ public class TryCloseMacro implements ProofMacro {
             int appliedRules, int closedGoals) {
         if(listener != null) {
             listener.taskFinished(
-                    new DefaultTaskFinishedInfo(this, null, proof, 
-                            time, appliedRules, closedGoals));
+                    new DefaultTaskFinishedInfo(this, null, proof, time,
+                                                appliedRules, closedGoals));
         }
     }
 

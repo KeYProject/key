@@ -17,13 +17,13 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.util.List;
 
+import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.SwingWorker;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
-import de.uka.ilkd.key.gui.WindowUserInterface;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -82,8 +82,12 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
                                                             getProof().countBranches()
                                                                 - getProof().openGoals().size() : 0));
                 ptl.taskFinished(tfi);
-                if (ui.macroChosen() && ui instanceof WindowUserInterface) {
+                if (ui.macroChosen()) {
                     ui.applyMacro();
+                }
+                if (ptl instanceof UserInterface
+                        && tfi.getSource() instanceof ApplyStrategy) {
+                    ((UserInterface)ptl).finish(tfi, true);
                 }
             }
          }

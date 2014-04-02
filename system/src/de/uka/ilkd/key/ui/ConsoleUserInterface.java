@@ -20,12 +20,10 @@ import java.io.File;
 import java.util.List;
 
 import de.uka.ilkd.key.gui.ApplyStrategy;
-import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import static de.uka.ilkd.key.gui.Main.Verbosity.*;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.gui.macros.DummyProofMacro;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
@@ -73,74 +71,70 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        this(batchMode, useAutoSaver, verbose? DEBUG: NORMAL);
    }
 
-    public void taskFinished(TaskFinishedInfo info) {
-        progressMax = 0; // reset progress bar marker
-        final Proof proof = info.getProof();
-        if (proof==null) {
-            if (verbosity > SILENT) System.out.println("Proof loading failed");
-            return;
-        }
-        final int openGoals = proof.openGoals().size();
-        final Object result2 = info.getResult();
-        if (info.getSource() instanceof ApplyStrategy) {
-            if (verbosity >= HIGH) {
-                System.out.println("]"); // end progress bar
-            }
-            if (verbosity > SILENT) {
-                System.out.println("[ DONE  ... rule application ]");
-                if (verbosity >= HIGH) {
-                    System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ " ==");
-                    final Proof.Statistics stat = info.getProof().statistics();
-                    System.out.println("Proof steps: "+stat.nodes);
-                    System.out.println("Branches: "+stat.branches);
-                    System.out.println("Automode Time: "+stat.autoModeTime+"ms");
-                }
-                System.out.println("Number of goals remaining open: " +
-                        openGoals);
-                System.out.flush();
-            }
-            batchMode.finishedBatchMode ( result2, info.getProof() );
-            Debug.fail ( "Control flow should not reach this point." );
-        } else if (info.getSource() instanceof ProblemLoader) {
-            if (verbosity > SILENT) System.out.println("[ DONE ... loading ]");
-            if (result2 != null) {
-                if (verbosity > SILENT) System.out.println(result2);
-                if (verbosity >= HIGH && result2 instanceof Throwable) {
-                    ((Throwable) result2).printStackTrace();
-                }
-                System.exit(-1);
-            }
-            if(batchMode.isLoadOnly() ||  openGoals==0) {
-                if (verbosity > SILENT)
-                System.out.println("Number of open goals after loading: " +
-                        openGoals);
-                System.exit(0);
-            }
+   public void finish(TaskFinishedInfo info, boolean attemptProof) {
+       assert info != null;
+       // setInteractive(false) has to be called because the ruleAppIndex
+       // has to be notified that we work in auto mode (CS)
+       mediator.setInteractive(false);
+       if (attemptProof) {
+           Object result = ps.start();
+           if (verbosity >= HIGH) {
+               System.out.println(result);
+           }
+       }
+       mediator.getSelectionModel().fireSelectedProofChanged();
+       batchMode.finishedBatchMode ( info.getResult(), info.getProof() );
+       Debug.fail ( "Control flow should not reach this point." );
+   }
 
-            final Object result;
-            if (macroChosen()) {
-                applyMacro();
-                result = new ApplyStrategyInfo("", proof, null, mediator.getSelectedGoal(),
-                                               proof.statistics().time,
-                                               proof.statistics().totalRuleApps,
-                                               proof.countBranches() - proof.openGoals().size());
-                taskFinished(new DefaultTaskFinishedInfo(result, "", proof, proof.statistics().time,
-                                                         (proof != null ?
-                                                                 proof.countNodes() : 0),
-                                                         (proof != null ?
-                                                                 proof.countBranches()
-                                                                     - proof.openGoals().size() : 0)));
-            } else {
-                // setInteractive(false) has to be called because the ruleAppIndex
-                // has to be notified that we work in auto mode (CS)
-                mediator.setInteractive(false);
-                result = ps.start();
-            }
-            if (verbosity >= HIGH) {
-            	System.out.println(result);
-            }
-        }
-    }
+   public void taskFinished(TaskFinishedInfo info) {
+       progressMax = 0; // reset progress bar marker
+       final Proof proof = info.getProof();
+       if (proof==null) {
+           if (verbosity > SILENT) System.out.println("Proof loading failed");
+           return;
+       }
+       final int openGoals = proof.openGoals().size();
+       final Object result2 = info.getResult();
+       if (info.getSource() instanceof ApplyStrategy) {
+           if (verbosity >= HIGH) {
+               System.out.println("]"); // end progress bar
+           }
+           if (verbosity > SILENT) {
+               System.out.println("[ DONE  ... rule application ]");
+               if (verbosity >= HIGH) {
+                   System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ " ==");
+                   final Proof.Statistics stat = info.getProof().statistics();
+                   System.out.println("Proof steps: "+stat.nodes);
+                   System.out.println("Branches: "+stat.branches);
+                   System.out.println("Automode Time: "+stat.autoModeTime+"ms");
+               }
+               System.out.println("Number of goals remaining open: " +
+                       openGoals);
+               System.out.flush();
+           }
+           resetStatus(this);
+           ApplyStrategy.ApplyStrategyInfo result = (ApplyStrategyInfo) info.getResult();
+           if (verbosity >= HIGH) {
+               System.out.println(result);
+           }
+       } else if (info.getSource() instanceof ProblemLoader) {
+           if (verbosity > SILENT) System.out.println("[ DONE ... loading ]");
+           if (result2 != null) {
+               if (verbosity > SILENT) System.out.println(result2);
+               if (verbosity >= HIGH && result2 instanceof Throwable) {
+                   ((Throwable) result2).printStackTrace();
+               }
+               System.exit(-1);
+           }
+           if(batchMode.isLoadOnly() ||  openGoals==0) {
+               if (verbosity > SILENT)
+               System.out.println("Number of open goals after loading: " +
+                       openGoals);
+               System.exit(0);
+           }
+       }
+   }
 
    @Override
     public void progressStarted(Object sender) {
@@ -265,42 +259,19 @@ public class ConsoleUserInterface extends AbstractUserInterface {
         }
     }
 
-	@Override
+    @Override
     public boolean confirmTaskRemoval(String string) {
-	    return true;
+        return true;
     }
 
-	@Override
+    @Override
     public void loadProblem(File file) {
-		super.loadProblem(file, null, null, mediator);
-	}
+        super.loadProblem(file, null, null, mediator);
+    }
 
    @Override
    public void loadProblem(File file, List<File> classPath, File bootClassPath) {
       super.loadProblem(file, classPath, bootClassPath, mediator);
-   }
-
-   @Override
-   public boolean applyMacro() {
-       assert macroChosen();
-       if (autoMacro.canApplyTo(mediator, null)) {
-           System.out.println("[ APPLY " + autoMacro.getClass().getSimpleName() + " ]");
-           try {
-               mediator.stopInterface(true);
-               mediator.setInteractive(false);
-               autoMacro.applyTo(mediator, null, this);
-               mediator.setInteractive(true);
-               mediator.startInterface(true);
-           } catch(InterruptedException ex) {
-               Debug.out("Proof macro has been interrupted:");
-               Debug.out(ex);
-           }
-           this.autoMacro = new DummyProofMacro(); // reset macro to avoid loops
-           return true;
-       } else {
-           System.out.println(autoMacro.getClass().getSimpleName() + " not applicable!");
-       }
-       return false;
    }
 
    @Override

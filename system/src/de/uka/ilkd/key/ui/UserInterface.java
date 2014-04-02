@@ -19,6 +19,7 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.macros.ProofMacro;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
@@ -68,6 +69,8 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @return true if removal has been granted
      */
     boolean confirmTaskRemoval(String message);
+
+    void finish(TaskFinishedInfo info, boolean attemptProof);
 
     /**
      * loads the problem or proof from the given file
