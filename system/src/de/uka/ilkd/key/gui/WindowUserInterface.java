@@ -36,6 +36,7 @@ import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractUserInterface;
+import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 /**
@@ -79,8 +80,21 @@ public class WindowUserInterface extends AbstractUserInterface {
 
 	@Override
 	public boolean applyMacro() {
-	    if (macroChosen()) {
-	        System.err.println("Automatic macro option not applicable in graphic mode.");
+	    assert macroChosen();
+	    if (autoMacro.canApplyTo(getMediator(), null)) {
+	        try {
+	            getMediator().stopInterface(true);
+	            getMediator().setInteractive(false);
+	            autoMacro.applyTo(getMediator(), null, this);
+                    getMediator().setInteractive(true);
+                    getMediator().startInterface(true);
+	        } catch(InterruptedException ex) {
+	            Debug.out("Proof macro has been interrupted:");
+	            Debug.out(ex);
+	        }
+	        return true;
+	    } else {
+	        System.out.println(autoMacro.getClass().getSimpleName() + " not applicable!");
 	    }
 	    return false;
 	}

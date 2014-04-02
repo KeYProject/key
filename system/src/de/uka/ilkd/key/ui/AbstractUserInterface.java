@@ -36,7 +36,7 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 public abstract class AbstractUserInterface implements UserInterface {
 
-    ProofMacro autoMacro = new DummyProofMacro();
+    protected ProofMacro autoMacro = new DummyProofMacro();
 
 	public void loadProblem(File file, List<File> classPath,
 	        File bootClassPath, KeYMediator mediator) {

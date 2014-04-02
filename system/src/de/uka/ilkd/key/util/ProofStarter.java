@@ -139,7 +139,6 @@ public class ProofStarter {
       }
     }
 
-
     /**
      * creates a new proof object for formulaToProve and registers it in the given environment
      *
