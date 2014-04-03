@@ -44,7 +44,6 @@ import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -529,9 +528,6 @@ public class ApplyStrategy {
     private synchronized void fireTaskFinished (TaskFinishedInfo info) {
         for (ProverTaskListener ptl : proverTaskObservers) {
             ptl.taskFinished(info);
-            if (ptl instanceof UserInterface) {
-                ((UserInterface)ptl).finish(info, true);
-            }
         }
     }
 

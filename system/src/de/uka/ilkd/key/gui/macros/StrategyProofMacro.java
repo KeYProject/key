@@ -130,7 +130,7 @@ public abstract class StrategyProofMacro implements ExtendedProofMacro {
         // find the relevant goals
         // and start
         ImmutableList<Goal> goals = proof.getSubtreeEnabledGoals(mediator.getSelectedNode());
-        
+
         try {
             applyStrategy.start(proof, goals);
         } finally {
