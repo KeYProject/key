@@ -23,6 +23,7 @@ import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -173,15 +174,16 @@ public class TryCloseMacro implements ProofMacro {
     private void fireStop(ProverTaskListener listener, Proof proof, long time, 
             int appliedRules, int closedGoals) {
         if(listener != null) {
-            listener.taskFinished(
-                    new DefaultTaskFinishedInfo(this, null, proof, time,
-                                                appliedRules, closedGoals));
+            TaskFinishedInfo info = new DefaultTaskFinishedInfo(this, null, proof, time,
+                                                                appliedRules, closedGoals);
+            listener.taskFinished(info);
         }
     }
 
     private void fireStart(ProverTaskListener ptl, int numberGoals) {
         if(ptl != null) {
-            ptl.taskStarted("Trying to close " + numberGoals +" open goals", numberGoals);
+            ptl.taskStarted("Trying to close " + numberGoals
+                            + " open goal" + (numberGoals != 1 ? "s" : ""), numberGoals);
         }
     }
 

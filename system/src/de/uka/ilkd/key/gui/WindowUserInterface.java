@@ -118,7 +118,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 		mainWindow.setStandardStatusLine();
 	}
 
-	public void finish(TaskFinishedInfo info, boolean attemptProof) {
+	public void finish() {
 	    // do nothing
 	}
 

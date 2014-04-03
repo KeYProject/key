@@ -16,7 +16,6 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.util.List;
 
-import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
@@ -70,30 +69,30 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
          public void finished() {
              KeYMediator mediator = getMediator();
              UserInterface ui = mediator.getUI();
-             mediator.startInterface(true);
-            final Object msg = get();
-            if (ptl != null) {
-                final TaskFinishedInfo tfi =
-                        new DefaultTaskFinishedInfo(ProblemLoader.this, msg, getProof(), time,
-                                                    (getProof() != null ?
-                                                            getProof().countNodes() : 0),
-                                                    (getProof() != null ?
-                                                            getProof().countBranches()
-                                                                - getProof().openGoals().size() : 0));
-                ptl.taskFinished(tfi);
-                if (ui.macroChosen()) {
-                    ui.applyMacro();
-                }
-                if (ptl instanceof UserInterface
-                        && tfi.getSource() instanceof ApplyStrategy) {
-                    ((UserInterface)ptl).finish(tfi, true);
-                }
-            }
+             getMediator().startInterface(true);
+             final Object msg = get();
+             if (ptl != null) {
+                 final TaskFinishedInfo tfi =
+                         new DefaultTaskFinishedInfo(ProblemLoader.this, msg, getProof(), time,
+                                 (getProof() != null ?
+                                         getProof().countNodes() : 0),
+                                         (getProof() != null ?
+                                                 getProof().countBranches()
+                                                 - getProof().openGoals().size() : 0));
+                 ptl.taskFinished(tfi);
+                 if (ui.macroChosen()) {
+                     ui.applyMacro();
+                 }
+                 if (ptl instanceof UserInterface) {
+                     ((UserInterface)ptl).finish();
+                 }
+             }
          }
       };
+
       getMediator().stopInterface(true);
       if (ptl != null) {
-         ptl.taskStarted("Loading problem ...", 0);
+          ptl.taskStarted("Loading problem ...", 0);
       }
       worker.start();
    }

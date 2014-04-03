@@ -24,7 +24,6 @@ import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.gui.KeYMediator;
 import static de.uka.ilkd.key.gui.Main.Verbosity.*;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
-import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
@@ -71,20 +70,15 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        this(batchMode, verbose? DEBUG: NORMAL);
    }
 
-   public void finish(TaskFinishedInfo info, boolean attemptProof) {
-       assert info != null;
+   public void finish() {
        // setInteractive(false) has to be called because the ruleAppIndex
        // has to be notified that we work in auto mode (CS)
        mediator.setInteractive(false);
-       if (attemptProof) {
-           Object result = ps.start();
-           if (verbosity >= HIGH) {
-               System.out.println(result);
-           }
+
+       final Object result = ps.start();
+       if (verbosity >= HIGH) {
+           System.out.println(result);
        }
-       mediator.getSelectionModel().fireSelectedProofChanged();
-       batchMode.finishedBatchMode ( info.getResult(), info.getProof() );
-       Debug.fail ( "Control flow should not reach this point." );
    }
 
    public void taskFinished(TaskFinishedInfo info) {
@@ -113,11 +107,8 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                        openGoals);
                System.out.flush();
            }
-           resetStatus(this);
-           ApplyStrategy.ApplyStrategyInfo result = (ApplyStrategyInfo) info.getResult();
-           if (verbosity >= HIGH) {
-               System.out.println(result);
-           }
+           batchMode.finishedBatchMode ( result2, info.getProof() );
+           Debug.fail ( "Control flow should not reach this point." );
        } else if (info.getSource() instanceof ProblemLoader) {
            if (verbosity > SILENT) System.out.println("[ DONE ... loading ]");
            if (result2 != null) {
@@ -129,8 +120,8 @@ public class ConsoleUserInterface extends AbstractUserInterface {
            }
            if(batchMode.isLoadOnly() ||  openGoals==0) {
                if (verbosity > SILENT)
-               System.out.println("Number of open goals after loading: " +
-                       openGoals);
+                   System.out.println("Number of open goals after loading: " +
+                           openGoals);
                System.exit(0);
            }
        }
