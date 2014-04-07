@@ -472,6 +472,7 @@ TOKEN :
 | < INTERFACE: "interface" >
 | < LOCSET: "\\locset">
 | < LONG: "long" >
+| < MAP: "\\map" >
 | < METHODFRAME: "method-frame" >
 | < NATIVE: "native" >
 | < NEW: "new" >
@@ -1983,6 +1984,7 @@ TypeReference PrimitiveType() :
   | "\\locset"
   | "\\seq"
   | "\\free"
+  | "\\map"
   )
   {
     Identifier id = factory.createIdentifier(token.image);

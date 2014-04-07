@@ -105,6 +105,7 @@ LOCKSET_LT: "<#";
 LOCKSET_LEQ: "<#=";
 LOGICALAND : "&&";
 LOGICALOR : "||";
+MAP : "\\map";
 MAX_SPACE : "\\max_space"; //KeY extension, not official JML
 MEASURED_BY : "\\measured_by";
 MEMORY_AREA : "\\memoryArea"; //KeY extension, not official JML
