@@ -34,7 +34,7 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDeb
    /**
     * The {@link IExecutionTermination} to represent by this debug node.
     */
-   private IExecutionTermination executionNode;
+   private final IExecutionTermination executionNode;
 
    /**
     * The contained children.

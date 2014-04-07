@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
+import org.key_project.sed.ui.visualization.execution_tree.wizard.page.ModelFileSaveOptionsWizardPage;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
@@ -43,6 +44,14 @@ public class SaveAsExecutionTreeDiagramWizard extends AbstractExecutionTreeDiagr
    public SaveAsExecutionTreeDiagramWizard(IDiagramTypeProvider diagramTypeProvider) {
       super();
       this.diagramTypeProvider = diagramTypeProvider;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected ModelFileSaveOptionsWizardPage createModelFileSaveOptionsWizardPage(String pageName) {
+      return new ModelFileSaveOptionsWizardPage(pageName);
    }
 
    /**

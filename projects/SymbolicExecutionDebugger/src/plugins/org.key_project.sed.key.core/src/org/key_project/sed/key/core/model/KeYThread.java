@@ -33,7 +33,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    /**
     * The {@link IExecutionStart} to represent by this debug node.
     */
-   private IExecutionStart executionNode;
+   private final IExecutionStart executionNode;
 
    /**
     * The contained children.

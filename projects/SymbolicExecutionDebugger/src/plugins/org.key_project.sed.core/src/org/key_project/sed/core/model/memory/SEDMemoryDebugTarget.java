@@ -32,14 +32,15 @@ public class SEDMemoryDebugTarget extends AbstractSEDDebugTarget implements ISED
    /**
     * The contained {@link ISEDThread}s.
     */
-   private List<ISEDThread> threads = new LinkedList<ISEDThread>();
+   private final List<ISEDThread> threads = new LinkedList<ISEDThread>();
    
    /**
     * Constructor.
     * @param launch The {@link ILaunch} in that this {@link IDebugTarget} is used.
+    * @param executable {@code true} Support suspend, resume, etc.; {@code false} Do not support suspend, resume, etc.
     */
-   public SEDMemoryDebugTarget(ILaunch launch) {
-      super(launch);
+   public SEDMemoryDebugTarget(ILaunch launch, boolean executable) {
+      super(launch, executable);
    }
 
    /**

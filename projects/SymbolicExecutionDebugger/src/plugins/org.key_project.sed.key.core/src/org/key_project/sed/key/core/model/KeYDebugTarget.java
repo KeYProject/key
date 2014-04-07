@@ -162,7 +162,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    public KeYDebugTarget(ILaunch launch,
                          SymbolicExecutionEnvironment<?> environment,
                          KeYLaunchSettings launchSettings) throws DebugException {
-      super(launch);
+      super(launch, true);
       DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
       // Update references
       Assert.isNotNull(environment);

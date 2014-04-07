@@ -15,6 +15,7 @@ package org.key_project.sed.core.test.util;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.eclipse.debug.core.model.ITerminate;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
 import org.eclipse.debug.internal.ui.DebugUIPlugin;
 import org.eclipse.debug.internal.ui.DelegatingModelPresentation;
 import org.eclipse.debug.internal.ui.InstructionPointerManager;
@@ -84,8 +86,8 @@ import org.key_project.sed.core.model.ISEDLoopCondition;
 import org.key_project.sed.core.model.ISEDLoopInvariant;
 import org.key_project.sed.core.model.ISEDLoopStatement;
 import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDMethodContract;
+import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
@@ -744,6 +746,29 @@ public final class TestSedCoreUtil {
       String expectedId = presentation.getEditorId(expectedInput, frame);
       TestCase.assertEquals(expectedId, currentEditorPart.getEditorSite().getId());
       TestCase.assertEquals(expectedResource, currentEditorPart.getEditorInput().getAdapter(IResource.class));
+   }
+
+   /**
+    * Makes sure that the correct {@link IEditorPart} was opened by the 
+    * Eclipse Debug API.
+    * @param currentEditorPart The current {@link IEditorPart} to test.
+    * @param expectedFile The expected {@link File}.
+    * @param target The {@link IDebugTarget} to use.
+    * @param frame The {@link IStackFrame} to test.
+    * @throws PartInitException Occurred Exception.
+    */
+   public static void assertDebugEditor(IEditorPart currentEditorPart, 
+                                        File expectedFile,
+                                        IDebugTarget target, 
+                                        IStackFrame frame) {
+      IDebugModelPresentation presentation = ((DelegatingModelPresentation)DebugUIPlugin.getModelPresentation()).getPresentation(target.getModelIdentifier());
+      Object sourceElement = target.getLaunch().getSourceLocator().getSourceElement(frame);
+      TestCase.assertTrue(sourceElement instanceof LocalFileStorage);
+      TestCase.assertEquals(expectedFile, ((LocalFileStorage)sourceElement).getFile());
+      IEditorInput expectedInput = presentation.getEditorInput(sourceElement);
+      TestCase.assertEquals(expectedInput, currentEditorPart.getEditorInput());
+      String expectedId = presentation.getEditorId(expectedInput, frame);
+      TestCase.assertEquals(expectedId, currentEditorPart.getEditorSite().getId());
    }
    
    /**
