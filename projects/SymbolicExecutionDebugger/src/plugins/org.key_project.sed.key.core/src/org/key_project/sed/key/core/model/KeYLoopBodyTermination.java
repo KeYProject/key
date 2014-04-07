@@ -34,7 +34,7 @@ public class KeYLoopBodyTermination extends AbstractSEDLoopBodyTermination imple
    /**
     * The {@link IExecutionTermination} to represent by this debug node.
     */
-   private IExecutionTermination executionNode;
+   private final IExecutionTermination executionNode;
 
    /**
     * The contained children.

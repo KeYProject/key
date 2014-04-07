@@ -34,12 +34,16 @@ import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
  */
 @SuppressWarnings("restriction")
 public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement implements ISEDDebugTarget {
-
+   /**
+    * Is this {@link ISEDDebugTarget} executable meaning that
+    * suspend, resume, step operations and disconnect are supported?;
+    */
+   private final boolean executable;
    
    /**
     * The {@link ILaunch} in that this {@link IDebugTarget} is used.
     */
-   private ILaunch launch;
+   private final ILaunch launch;
    
    /**
     * Indicates that the connection to the process is disconnected or not.
@@ -69,9 +73,11 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
    /**
     * Constructor.
     * @param launch The {@link ILaunch} in that this {@link IDebugTarget} is used.
+    * @param executable {@code true} Support suspend, resume, etc.; {@code false} Do not support suspend, resume, etc.
     */
-   public AbstractSEDDebugTarget(ILaunch launch) {
+   public AbstractSEDDebugTarget(ILaunch launch, boolean executable) {
       super(null);
+      this.executable = executable;
       this.launch = launch;
       
    }
@@ -186,7 +192,7 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public boolean canResume() {
-      return isSuspended() && !isTerminated() && !isDisconnected();
+      return executable && isSuspended() && !isTerminated() && !isDisconnected();
    }
 
    /**
@@ -194,7 +200,7 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public boolean canSuspend() {
-      return !isSuspended() && !isTerminated() && !isDisconnected();
+      return executable && !isSuspended() && !isTerminated() && !isDisconnected();
    }
 
    /**
@@ -249,7 +255,7 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public boolean canDisconnect() {
-      return !isDisconnected() && !isTerminated();
+      return executable && !isDisconnected() && !isTerminated();
    }
 
    /**
