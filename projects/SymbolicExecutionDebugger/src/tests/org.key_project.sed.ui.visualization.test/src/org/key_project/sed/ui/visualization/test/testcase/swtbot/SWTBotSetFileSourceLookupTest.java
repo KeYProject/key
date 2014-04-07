@@ -38,7 +38,7 @@ public class SWTBotSetFileSourceLookupTest extends AbstractSWTBotSetFileTest {
          @Override
          public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
             // Select statement in debug tree
-            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 0, 0, 0);
+            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0, 1, 0, 0, 0);
             // Get statement that should be selected in opened editor.
             ISEDStatement statement = (ISEDStatement)TestUtilsUtil.getTreeItemData(item);
             // Make sure that an editor is opened
