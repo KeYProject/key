@@ -3403,6 +3403,7 @@ Literal Literal() :
 | result = NullLiteral()
 | result = EmptySetLiteral()
 | result = EmptySeqLiteral()
+| result = EmptyMapLiteral()
 
 )
   {
@@ -3470,6 +3471,18 @@ EmptySeqLiteral EmptySeqLiteral() :
   }
 }
 
+EmptyMapLiteral EmptyMapLiteral() :
+{
+    EmptyMapLiteral result;
+}
+{
+  "\\map_empty"
+  {
+      result = EmptyMapLiteral.INSTANCE;
+      setPrefixInfo(result);
+      return result;
+  }
+}
 
 ASTList<Expression> Arguments() :
 {

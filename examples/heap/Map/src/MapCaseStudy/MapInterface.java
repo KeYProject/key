@@ -13,7 +13,7 @@ public interface MapInterface {
     // --------
     
     /*@ normal_behaviour
-     @ ensures map == \dl_mapEmpty();
+     @ ensures map == \map_empty;
      @ assignable footprint;
      @*/
     public void clear();
@@ -37,7 +37,7 @@ public interface MapInterface {
     public /*@ pure nullable @*/ Object get(Object key);
 
     /*@ normal_behaviour
-     @ ensures \result == (map == \dl_mapEmpty());
+     @ ensures \result == (map == \map_empty);
      @ accessible footprint; 
      @*/
     public /*@ pure @*/ boolean isEmpty();

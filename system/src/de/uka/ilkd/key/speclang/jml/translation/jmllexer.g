@@ -179,6 +179,7 @@ SEQREPLACE : "\\seq_put";
 INDEXOF : "\\seq_indexOf";
 SEQDEF : "\\seq_def";
 
+MAPEMPTY : "\\map_empty";
 
 FROM : "\\from";
 TO : "\\to";

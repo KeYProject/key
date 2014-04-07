@@ -126,6 +126,10 @@ public final class MapLDT extends LDT {
         return null;
     }
 
+    public Function getMapEmpty() {
+        return mapEmpty;
+    }
+
     public abstract class MapConstructor extends Operator {
 
         final Function function;

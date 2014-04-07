@@ -1805,6 +1805,12 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
             final Term put = tb.seqConcat(ante, tb.seqConcat(insert, post));
             result = new SLExpression(put);
         }
+        
+    |   MAPEMPTY
+        {
+            result = new SLExpression(tb.seqEmpty());
+        }
+        
     |   (tk2: SEQCONCAT{tk=tk2;} | tk3: SEQGET{tk=tk3;} | tk4: INDEXOF{tk=tk4;})
         LPAREN e1=expression COMMA e2=expression RPAREN
         {

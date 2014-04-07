@@ -3,17 +3,17 @@ package MapCaseStudy;
 final class MapImplementation extends AbstractMap {
 
     /*@ normal_behaviour
-     @ ensures map == \dl_mapEmpty();
+     @ ensures map == \map_empty;
      @*/
     public /*@pure@*/ MapImplementation() {
         entries = new MapEntry[0];
-        //@ set map = \dl_mapEmpty();
+        //@ set map = \map_empty;
         //@ set footprint = \set_union(\all_fields(this), \all_fields(entries));
     }
     
     public void clear() {
         entries = new MapEntry[0];
-        //@ set map = \dl_mapEmpty();
+        //@ set map = \map_empty;
         //@ set footprint = \set_union(\all_fields(this), \all_fields(entries));
     }
     

@@ -52,6 +52,7 @@ public final class TypeConverter {
     private HeapLDT heapLDT;
     private SeqLDT seqLDT;
     private FreeLDT genLDT;
+    private MapLDT mapLDT;
     private FloatLDT floatLDT;
     private DoubleLDT doubleLDT;
     private RealLDT realLDT;
@@ -80,6 +81,8 @@ public final class TypeConverter {
             this.heapLDT = (HeapLDT) ldt;
         } else if (ldt instanceof SeqLDT) {
             this.seqLDT = (SeqLDT) ldt;
+        } else if (ldt instanceof MapLDT) {
+            this.mapLDT = (MapLDT) ldt;
         } else if (ldt instanceof FreeLDT){
             this.genLDT = (FreeLDT) ldt;
         } else if (ldt instanceof FloatLDT ) {
@@ -106,7 +109,6 @@ public final class TypeConverter {
     public ImmutableList<LDT> getModels() {
         return models;
     }
-
 
     public LDT getModelFor(Sort s) {
 	for(LDT ldt : models) {
@@ -145,6 +147,10 @@ public final class TypeConverter {
 
     public FreeLDT getGenLDT(){
         return genLDT;
+    }
+    
+    public MapLDT getMapLDT() {
+	return mapLDT;
     }
 
     public CharListLDT getCharListLDT() {
@@ -188,6 +194,8 @@ public final class TypeConverter {
 	    responsibleLDT = locSetLDT;
 	} else if(seqLDT.isResponsible(op, subs, services, ec)) {
 	    responsibleLDT = seqLDT;
+	} else if(mapLDT.isResponsible(op, subs, services, ec)) {
+	    responsibleLDT = mapLDT;
 	} else if(genLDT.isResponsible(op, subs, services, ec)) {
 	    responsibleLDT = genLDT;
 	} else if(charListLDT.isResponsible(op, subs, services, ec)) {
@@ -471,6 +479,8 @@ public final class TypeConverter {
             return locSetLDT.translateLiteral(lit, services);
         } else if (lit instanceof EmptySeqLiteral) {
             return seqLDT.translateLiteral(lit, services);
+        } else if (lit instanceof EmptyMapLiteral) {
+            return mapLDT.translateLiteral(lit, services);
         } else {
             Debug.fail("Unknown literal type", lit);
             return null;
