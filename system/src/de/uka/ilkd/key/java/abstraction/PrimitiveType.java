@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
@@ -35,6 +36,7 @@ import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.ldt.FreeLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.MapLDT;
 import de.uka.ilkd.key.ldt.RealLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -80,6 +82,8 @@ public final class PrimitiveType implements Type {
 	new PrimitiveType("\\seq", EmptySeqLiteral.INSTANCE, SeqLDT.NAME);
     public static final PrimitiveType JAVA_FREE_ADT =
             new PrimitiveType("\\free", FreeLiteral.INSTANCE, FreeLDT.NAME);
+    public static final PrimitiveType JAVA_MAP =
+            new PrimitiveType("\\map", EmptyMapLiteral.INSTANCE, MapLDT.NAME);
 
     public static final PrimitiveType PROGRAM_SV   = new PrimitiveType("SV", null, null);
 
@@ -113,10 +117,12 @@ public final class PrimitiveType implements Type {
        Returns the name of this type.
        @return the name of this type.
      */
+    @Override
     public String getName() {
 	return name;
     }
 
+    @Override
     public boolean equals(Object o) {
 	if (o instanceof PrimitiveType &&
 	    ((PrimitiveType)o).getName().equals(name)) {
@@ -125,6 +131,7 @@ public final class PrimitiveType implements Type {
 	return false;
     }
 
+    @Override
     public int hashCode() {
 	return getName().hashCode();
     }
@@ -137,6 +144,7 @@ public final class PrimitiveType implements Type {
      * @return the default value of the given type
      * according to JLS ???4.5.5
      */
+    @Override
     public Literal getDefaultValue() {
 	return defaultValue;
     }
@@ -145,6 +153,7 @@ public final class PrimitiveType implements Type {
        Returns the name of type.
        @return the full name of this program model element.
      */
+    @Override
     public String getFullName() {
 	return name;
     }
@@ -153,6 +162,7 @@ public final class PrimitiveType implements Type {
        Returns the name of type.
        @return the full name of this program model element.
      */
+    @Override
     public String toString() {
 	return name;
     }

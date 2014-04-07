@@ -44,6 +44,7 @@ import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
@@ -152,6 +153,7 @@ import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.ldt.MapLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -480,5 +482,9 @@ public interface Visitor {
     void performActionOnSeqGet(SeqGet seqGet);
     
     void performActionOnTransactionStatement(TransactionStatement transSt);
+
+    public void performActionOnMapConstructor(MapLDT.MapConstructor aThis);
+
+    public void performActionOnEmptyMapLiteral(EmptyMapLiteral aThis);
 
 }
