@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ThisReference;
+import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -66,17 +67,12 @@ public class FieldWatchpointStopCondition extends
       if (activeStatement != null && activeStatement instanceof Assignment) {
          Assignment assignment = (Assignment) activeStatement;
          SourceElement firstElement = assignment.getChildAt(0);
-         SourceElement realFirstElement = assignment.getFirstElement();
          if(firstElement instanceof FieldReference){
             PosInOccurrence pio = ruleApp.posInOccurrence();
             Term term = pio.subTerm();
             getProof().getServices().getTermBuilder();
             term = TermBuilder.goBelowUpdates(term);
-            ExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
-            ThisReference thisType = (ThisReference)realFirstElement;
-            FieldReference fieldRef = (FieldReference)firstElement;
-            KeYJavaType containerType = thisType.getKeYJavaType(proof.getServices(), ec);
-            if(containerType!=null&&containerType.equals(containerKJT)&&fieldName.equals(fieldRef.toString())&&isModification&&hitcountExceeded(node)){
+            if(((FieldReference) firstElement).getProgramVariable().name().toString().equals(fullFieldName)&&isModification&&hitcountExceeded(node)){
                return super.isBreakpointHit(activeStatement, ruleApp, proof, node);
             }
          }
@@ -97,7 +93,8 @@ public class FieldWatchpointStopCondition extends
          Assignment assignment = (Assignment) sourceElement;
          for (int i = 1; i < assignment.getChildCount(); i++) {
             SourceElement childElement = assignment.getChildAt(i);
-            if (childElement.toString().equals(fieldName)&& childElement instanceof FieldReference) {
+            if (childElement instanceof FieldReference
+                  && ((FieldReference) childElement).getProgramVariable().name().toString().equals(fullFieldName)) {
                FieldReference field = (FieldReference) childElement;
                ProgramVariable progVar = field.getProgramVariable();
                if (fullFieldName.equals(progVar.toString())) {
@@ -113,7 +110,8 @@ public class FieldWatchpointStopCondition extends
          NonTerminalProgramElement programElement = (NonTerminalProgramElement) sourceElement;
          for (int i = 0; i < programElement.getChildCount(); i++) {
             SourceElement childElement = programElement.getChildAt(i);
-            if (childElement.toString().equals(fieldName)&& childElement instanceof FieldReference) {
+            if (childElement instanceof FieldReference
+                  && ((FieldReference) childElement).getProgramVariable().name().toString().equals(fullFieldName)) {
                FieldReference field = (FieldReference) childElement;
                ProgramVariable progVar = field.getProgramVariable();
                if (fullFieldName.equals(progVar.toString())) {
