@@ -3,7 +3,7 @@ package MapCaseStudy;
 public interface MapInterface {
 
     //@ public ghost instance \locset footprint;
-    //@ public ghost instance \free map;
+    //@ public ghost instance \map map;
     //@ public instance invariant \subset(\singleton(this.map), footprint);
     //@ public instance invariant \subset(\singleton(this.footprint), footprint);
     //@ public instance invariant \dl_isFinite(map);
