@@ -36,8 +36,8 @@ public class HideMetaFilesTests extends AbstractResourceTest {
             project.getFullPath().append("proofs").append("hideMetaFiles").append("HideMeta.java").append("hideMetaFiles_HideMeta[hideMetaFiles_HideMeta__add(int,int)]_JML_operation_contract_0.proof"));
       IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("hideMetaFiles").append("HideMeta.java").append("hideMetaFiles_HideMeta[hideMetaFiles_HideMeta__sub(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().addFileExtension("meta"));
-      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().addFileExtension("meta"));
+      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
    
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/HideMetaFilesTests/testHideMetaFiles", project.getFolder("src"));
       
@@ -70,8 +70,8 @@ public class HideMetaFilesTests extends AbstractResourceTest {
             project.getFullPath().append("proofs").append("showMetaFiles").append("ShowMeta.java").append("showMetaFiles_ShowMeta[showMetaFiles_ShowMeta__add(int,int)]_JML_operation_contract_0.proof"));
       IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("showMetaFiles").append("ShowMeta.java").append("showMetaFiles_ShowMeta[showMetaFiles_ShowMeta__sub(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().addFileExtension("meta"));
-      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().addFileExtension("meta"));
+      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
    
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/HideMetaFilesTests/testShowMetaFiles", project.getFolder("src"));
       

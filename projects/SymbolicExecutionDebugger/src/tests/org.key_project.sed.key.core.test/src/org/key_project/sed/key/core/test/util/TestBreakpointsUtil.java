@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.IBreakpoint;
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaExceptionBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaLineBreakpoint;
@@ -17,6 +18,7 @@ import org.eclipse.jdt.internal.debug.core.breakpoints.JavaMethodBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaWatchpoint;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -77,8 +79,8 @@ public final class TestBreakpointsUtil {
    
    public static boolean removeBrakpoint(SWTWorkbenchBot bot, String breakpointTableName){
       try {
-         TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
-         SWTBotTree tree = bot.tree();
+         SWTBotView view = openBreakpointView(bot);
+         SWTBotTree tree = view.bot().tree();
          SWTBotTreeItem treeItem = tree.getTreeItem(breakpointTableName);
          Object treeItemData = TestUtilsUtil.getTreeItemData(treeItem);
          if(treeItemData instanceof IBreakpoint){
@@ -95,8 +97,8 @@ public final class TestBreakpointsUtil {
 
    public static boolean changeHitCount(SWTWorkbenchBot bot, String breakpointTableName, int newHitCount){
       try {
-         TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
-         SWTBotTree tree = bot.tree();
+         SWTBotView view = openBreakpointView(bot);
+         SWTBotTree tree = view.bot().tree();
          SWTBotTreeItem treeItem = tree.getTreeItem(breakpointTableName);
          Object treeItemData = TestUtilsUtil.getTreeItemData(treeItem);
          if(treeItemData instanceof JavaBreakpoint){
@@ -225,8 +227,8 @@ public final class TestBreakpointsUtil {
    public static boolean changeEnabled(SWTWorkbenchBot bot, String breakpointTableName,
          boolean enabled) {
       try {
-         TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
-         SWTBotTree tree = bot.tree();
+         SWTBotView view = openBreakpointView(bot);
+         SWTBotTree tree = view.bot().tree();
          SWTBotTreeItem treeItem = tree.getTreeItem(breakpointTableName);
          Object treeItemData = TestUtilsUtil.getTreeItemData(treeItem);
          if(treeItemData instanceof JavaBreakpoint){
@@ -285,8 +287,8 @@ public final class TestBreakpointsUtil {
    public static boolean changeCondition(SWTWorkbenchBot bot, String breakpointTableName,
          String condition) {
       try {
-         TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
-         SWTBotTree tree = bot.tree();
+         SWTBotView view = openBreakpointView(bot);
+         SWTBotTree tree = view.bot().tree();
          SWTBotTreeItem treeItem = tree.getTreeItem(breakpointTableName);
          Object treeItemData = TestUtilsUtil.getTreeItemData(treeItem);
          if(treeItemData instanceof JavaLineBreakpoint){
@@ -359,8 +361,8 @@ public final class TestBreakpointsUtil {
    public static boolean changeAccessAndModification(SWTWorkbenchBot bot,
          String breakpointTableName, boolean access, boolean modification) {
       try {
-         TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
-         SWTBotTree tree = bot.tree();
+         SWTBotView view = openBreakpointView(bot);
+         SWTBotTree tree = view.bot().tree();
          SWTBotTreeItem treeItem = tree.getTreeItem(breakpointTableName);
          Object treeItemData = TestUtilsUtil.getTreeItemData(treeItem);
          if(treeItemData instanceof JavaWatchpoint){
@@ -374,13 +376,18 @@ public final class TestBreakpointsUtil {
          return false;
       }
          return false;
-      }
+   }
+   
+   public static SWTBotView openBreakpointView(SWTWorkbenchBot bot) throws Exception {
+      TestUtilsUtil.openView(IDebugUIConstants.ID_BREAKPOINT_VIEW);
+      return bot.viewById(IDebugUIConstants.ID_BREAKPOINT_VIEW);
+   }
 
    public static boolean changeEntryAndExit(SWTWorkbenchBot bot,
          String breakpointTableName, boolean entry, boolean exit) {
       try {
-         TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
-         SWTBotTree tree = bot.tree();
+         SWTBotView view = openBreakpointView(bot);
+         SWTBotTree tree = view.bot().tree();
          SWTBotTreeItem treeItem = tree.getTreeItem(breakpointTableName);
          Object treeItemData = TestUtilsUtil.getTreeItemData(treeItem);
          if(treeItemData instanceof JavaMethodBreakpoint){
@@ -467,8 +474,8 @@ public final class TestBreakpointsUtil {
    public static boolean changeCaughtUncaughtSubclass(SWTWorkbenchBot bot,
          String breakpointTableName, boolean caught, boolean uncaught, boolean subclass) {
       try {
-         TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
-      SWTBotTree tree = bot.tree();
+         SWTBotView view = openBreakpointView(bot);
+         SWTBotTree tree = view.bot().tree();
          SWTBotTreeItem treeItem = tree.getTreeItem(breakpointTableName);
          Object treeItemData = TestUtilsUtil.getTreeItemData(treeItem);
          if(treeItemData instanceof JavaExceptionBreakpoint){

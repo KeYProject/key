@@ -13,7 +13,7 @@ package example4;
  *       operation on the current AVL tree
  *    </li>
  *    <li>In view 'Debug', click on 'Resume' to start symbolic execution</li>
- *    <li>Select most left method return node</li>
+ *    <li>Select leftmost method return node</li>
  *    <li>Click on context menu item 'Visualize Configurations'</li>
  * </ol>
  * The displayed memory configuration in the opened editor shows one possible 
@@ -22,8 +22,8 @@ package example4;
  * that a {@link Node#parent} field points to itself, which indicates that the 
  * rotate operation invalidates the parent relationship.
  * <p> 
- * If wanted, the AVL tree shape before the rotation can be shown by selecting 
- * radio button 'Initial'.
+ * If of interest, the AVL tree shape before the method was called can be shown 
+ * by selecting radio button 'Initial'.
  */
 public class AVLTree {
 	protected Node root;

@@ -37,7 +37,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
    @Test
    public void testExample1() throws Exception {
       doExampleResumeTest("SWTBotSEDExampleNewWizardTest_testExample1",
-                          createMethodSelector("example1.Number", "eq", "QNumber;"),
+                          createMethodSelector("example1.Number", "equals", "QNumber;"),
                           false,
                           null,
                           "data/oracle/example1/Number.xml",
@@ -77,9 +77,9 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
    @Test
    public void testExample3() throws Exception {
       doExampleResumeTest("SWTBotSEDExampleNewWizardTest_testExample3",
-                          createMethodSelector("example3.ArrayUtil", "indexOf", "[QObject;", "QObject;", "QComparator;"),
+                          createMethodSelector("example3.ArrayUtil", "indexOf", "[QObject;", "QSelector;"),
                           true,
-                          "example3.ArrayUtil[example3.ArrayUtil::indexOf([Ljava.lang.Object,java.lang.Object,example3.ArrayUtil.Comparator)].JML normal_behavior operation contract.0",
+                          "example3.ArrayUtil[example3.ArrayUtil::indexOf([Ljava.lang.Object,example3.ArrayUtil.Selector)].JML normal_behavior operation contract.0",
                           "data/oracle/example3/ArrayUtil.xml",
                           true,
                           true);
