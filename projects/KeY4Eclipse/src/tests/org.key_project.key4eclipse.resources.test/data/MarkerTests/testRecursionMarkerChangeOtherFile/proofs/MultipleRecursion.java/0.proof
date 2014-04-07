@@ -1,0 +1,87 @@
+\profile "Java Profile";
+
+\settings {
+"#Proof-Settings-Config-File
+#Mon Feb 03 14:34:09 CET 2014
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_EXPAND
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_INSTANTIATE
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]RETREAT_MODE_OPTIONS_KEY=RETREAT_MODE_NONE
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_EXPAND
+[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_RESTRICTED
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=1000
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=Strings-Strings\\:on , reach-reach\\:on , JavaCard-JavaCard\\:on , assertions-assertions\\:on , bigint-bigint\\:on , programRules-programRules\\:Java , intRules-intRules\\:arithmeticSemanticsIgnoringOF , initialisation-initialisation\\:disableStaticInitialisation , modelFields-modelFields\\:showSatisfiability , sequences-sequences\\:on , integerSimplificationRules-integerSimplificationRules\\:full , runtimeExceptions-runtimeExceptions\\:allow , optimisedSelectRules-optimisedSelectRules\\:on , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+\javaSource "../../src";
+
+\proofObligation "#Proof Obligation Settings
+#Mon Feb 03 14:34:09 CET 2014
+name=MultipleRecursion[MultipleRecursion\\:\\:a()].JML normal_behavior operation contract.0
+contract=MultipleRecursion[MultipleRecursion\\:\\:a()].JML normal_behavior operation contract.0
+class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
+";
+
+\proof {
+(keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+(keyLog "1" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+(keyLog "2" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+(keyLog "3" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+(keyLog "4" (keyUser "Stefan" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+
+(autoModeTime "32")
+
+(branch "dummy ID"
+(rule "assignment" (formula "1") (term "1,1") (userinteraction))
+(rule "methodBodyExpand" (formula "1") (term "1,1,1") (newnames "heapBefore_a,savedHeapBefore_a") (userinteraction))
+(builtin "One Step Simplification" (formula "1"))
+(rule "impRight" (formula "1") (userinteraction))
+(builtin "Use Operation Contract" (formula "2") (newnames "heapBefore_b,exc_0,heapAfter_b,anon_heap_b") (contract "MultipleRecursion[MultipleRecursion::b()].JML normal_behavior operation contract.0"))
+(branch "Post (b)"
+   (builtin "One Step Simplification" (formula "3"))
+   (rule "closeFalse" (formula "3"))
+)
+(branch "Exceptional Post (b)"
+   (builtin "One Step Simplification" (formula "3"))
+   (rule "closeFalse" (formula "3"))
+)
+(branch "Pre (b)"
+   (builtin "One Step Simplification" (formula "2"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "notLeft" (formula "2"))
+   (rule "replace_known_left" (formula "7") (term "1") (ifseqformula "1"))
+   (builtin "One Step Simplification" (formula "7") (ifInst ""  (formula "5")))
+   (rule "closeTrue" (formula "7"))
+)
+)
+
+}

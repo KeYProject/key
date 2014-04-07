@@ -1334,7 +1334,11 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
 	    	result = lookupIdentifier(fullyQualifiedName + "." + lookupName, null, null, id);
 	    }
 	}
-    |
+    | tr:TRANSIENT
+    {
+        result = lookupIdentifier("<transient>", receiver, null, tr);
+    }
+    |    
      THIS
     {
     	result = new SLExpression(
