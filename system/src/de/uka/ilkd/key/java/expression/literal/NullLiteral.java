@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.Name;
 
 /**
  *  Null literal.
@@ -28,7 +29,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 public class NullLiteral extends Literal {
 
-    public static final NullLiteral NULL=new NullLiteral(); 
+    public static final NullLiteral NULL = new NullLiteral();
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
@@ -52,6 +53,11 @@ public class NullLiteral extends Literal {
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
 	return javaServ.getJavaInfo().getNullType();
+    }
+
+    @Override
+    public Name getLDTName() {
+        throw new UnsupportedOperationException("No LDT is linked to the null literal.");
     }
 
 }

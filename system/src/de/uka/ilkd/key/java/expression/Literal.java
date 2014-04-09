@@ -17,6 +17,7 @@ package de.uka.ilkd.key.java.expression;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -96,8 +97,6 @@ public abstract class Literal extends JavaProgramElement implements Expression, 
     /*
     * Return the Name of the LDT, which this Literal belongs to.
     */
-    public final Name getLDTName(){
-        throw new UnsupportedOperationException();
-    }
+    public abstract Name getLDTName();
 
 }

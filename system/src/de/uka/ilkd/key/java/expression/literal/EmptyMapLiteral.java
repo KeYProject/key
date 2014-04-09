@@ -20,6 +20,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.ldt.MapLDT;
+import de.uka.ilkd.key.logic.Name;
 
 public class EmptyMapLiteral extends Literal {
 
@@ -47,6 +49,11 @@ public class EmptyMapLiteral extends Literal {
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_MAP);
+    }
+
+    @Override
+    public Name getLDTName() {
+        return MapLDT.NAME;
     }
 
 }

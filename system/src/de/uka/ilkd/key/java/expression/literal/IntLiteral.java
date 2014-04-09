@@ -23,6 +23,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -128,6 +130,11 @@ public class IntLiteral extends Literal {
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
 	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+    }
+
+    @Override
+    public Name getLDTName() {
+        return IntegerLDT.NAME;
     }
 
 }

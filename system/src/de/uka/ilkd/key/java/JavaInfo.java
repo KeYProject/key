@@ -400,9 +400,9 @@ public final class JavaInfo {
      */
     public KeYJavaType getKeYJavaType(String fullName) {
         KeYJavaType result = getPrimitiveKeYJavaType(fullName);
-        return (result == null ?
-            getTypeByClassName(fullName) :
-            result);
+        return (result == null
+                ? getTypeByClassName(fullName)
+                : result);
     }
 
 
