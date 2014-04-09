@@ -1808,7 +1808,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         
     |   MAPEMPTY
         {
-            result = new SLExpression(tb.seqEmpty());
+            result = new SLExpression(tb.mapEmpty());
         }
         
     |   (tk2: SEQCONCAT{tk=tk2;} | tk3: SEQGET{tk=tk3;} | tk4: INDEXOF{tk=tk4;})

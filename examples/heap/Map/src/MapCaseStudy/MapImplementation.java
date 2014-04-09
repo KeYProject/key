@@ -147,7 +147,7 @@ final class MapImplementation extends AbstractMap {
     
     void removeInDomainWithoutResult(int index) {
         removeSetEnries(removeGetNewArray(index), index);
-    }
+    }    
     
     public void removeSetEnries(MapEntry[] newEntries, int index){
         //@ set map = \dl_mapRemove(map, entries[index].key);

@@ -29,6 +29,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.MapLDT;
 import de.uka.ilkd.key.ldt.RealLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.proof.init.Includes;
@@ -164,6 +165,7 @@ public class LDTInput implements EnvInput {
                         	.prepend(new FloatLDT(services))
                         	.prepend(new DoubleLDT(services))
                         	.prepend(new RealLDT(services))
+                                .prepend(new MapLDT(services))
                         	;
         initConfig.getServices().getTypeConverter().init(ldts);
     }

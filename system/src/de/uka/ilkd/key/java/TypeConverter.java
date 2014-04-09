@@ -65,45 +65,42 @@ public final class TypeConverter {
         this.services = s;
         this.tb = services.getTermBuilder();
     }
-
-
-    /**
-     * initializes the type converter with an LDT
-     */
-    public void init(LDT ldt) {
-        if (ldt instanceof IntegerLDT) {
-            this.integerLDT = (IntegerLDT) ldt;
-        } else if (ldt instanceof BooleanLDT) {
-            this.booleanLDT = (BooleanLDT) ldt;
-        } else if (ldt instanceof LocSetLDT) {
-            this.locSetLDT = (LocSetLDT) ldt;
-        } else if (ldt instanceof HeapLDT) {
-            this.heapLDT = (HeapLDT) ldt;
-        } else if (ldt instanceof SeqLDT) {
-            this.seqLDT = (SeqLDT) ldt;
-        } else if (ldt instanceof MapLDT) {
-            this.mapLDT = (MapLDT) ldt;
-        } else if (ldt instanceof FreeLDT){
-            this.genLDT = (FreeLDT) ldt;
-        } else if (ldt instanceof FloatLDT ) {
-            this.floatLDT = (FloatLDT) ldt;
-        } else if (ldt instanceof DoubleLDT) {
-            this.doubleLDT = (DoubleLDT) ldt;
-        } else if (ldt instanceof RealLDT) {
-            this.realLDT = (RealLDT) ldt;
-        } else if (ldt instanceof CharListLDT) {
-            this.charListLDT = (CharListLDT) ldt;
-        }
-
-        this.models = this.models.prepend(ldt);
-        Debug.out("Initialize LDTs: ", ldt);
+    
+    TypeConverter(Services s, ImmutableList<LDT> modelsLocal){
+        this(s);
+        init(modelsLocal);
     }
 
-
     public void init(ImmutableList<LDT> ldts) {
+
         for (LDT ldt : ldts) {
-            init(ldt);
-	}
+            if (ldt instanceof IntegerLDT) {
+                this.integerLDT = (IntegerLDT) ldt;
+            } else if (ldt instanceof BooleanLDT) {
+                this.booleanLDT = (BooleanLDT) ldt;
+            } else if (ldt instanceof LocSetLDT) {
+                this.locSetLDT = (LocSetLDT) ldt;
+            } else if (ldt instanceof HeapLDT) {
+                this.heapLDT = (HeapLDT) ldt;
+            } else if (ldt instanceof SeqLDT) {
+                this.seqLDT = (SeqLDT) ldt;
+            } else if (ldt instanceof MapLDT) {
+                this.mapLDT = (MapLDT) ldt;
+            } else if (ldt instanceof FreeLDT) {
+                this.genLDT = (FreeLDT) ldt;
+            } else if (ldt instanceof FloatLDT) {
+                this.floatLDT = (FloatLDT) ldt;
+            } else if (ldt instanceof DoubleLDT) {
+                this.doubleLDT = (DoubleLDT) ldt;
+            } else if (ldt instanceof RealLDT) {
+                this.realLDT = (RealLDT) ldt;
+            } else if (ldt instanceof CharListLDT) {
+                this.charListLDT = (CharListLDT) ldt;
+            }
+
+            this.models = this.models.prepend(ldt);
+            Debug.out("Initialize LDTs: ", ldt);
+        }
     }
 
     public ImmutableList<LDT> getModels() {
@@ -1078,8 +1075,6 @@ public final class TypeConverter {
 
 
     public TypeConverter copy(Services services) {
-	final TypeConverter tc = new TypeConverter(services);
-	tc.init(models);
-	return tc;
+        return new TypeConverter(services, models);
     }
 }
