@@ -72,7 +72,10 @@ public class FileHeaderChecker {
             }
          };
          // Write settings into console
-         System.out.println("Working Directories: " + workingDirs);
+         System.out.println("Working Directories: ");
+         for (File workingDir : workingDirs) {
+            System.out.println("   - " + workingDir);
+         }
          System.out.println("New Header File: " + headerFile);
          System.out.println();
          // List files to check
