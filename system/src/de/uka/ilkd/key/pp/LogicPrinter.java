@@ -1071,6 +1071,7 @@ public class LogicPrinter {
 
         if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
             startTerm(t.arity());
+
             final Term heapTerm = t.sub(0);
             final String opName = t.op().name().toString();
 
@@ -1088,7 +1089,6 @@ public class LogicPrinter {
 
             layouter.print("[" + opName + "(").beginC(0);
 
-            markStartSub();
             for(int i = 1; i < t.arity(); i++) {
                 if(i > 1) {
                     layouter.print(",").brk(1,0);
@@ -1239,7 +1239,6 @@ public class LogicPrinter {
             }
 
             startTerm(3);
-
 
             final Term heapTerm = t.sub(0);
             final Term objectTerm = t.sub(1);
@@ -2396,13 +2395,13 @@ public class LogicPrinter {
             //
             // I (MG) prefer it this way.
             //
-            // MU refactored this using enums which makes it a littl eless ugly
+            // MU refactored this using enums which makes it a little less ugly
             // and more flexible.
             switch(markType) {
             case MARK_START_SUB:
                 if(parameter == -1) {
                     // no parameter means subterms in normal order
-                posTbl.setStart(count()-pos);
+                    posTbl.setStart(count()-pos);
                 } else {
                     // parameter means a particular subterm has been chosen
                     posTbl.setStart(parameter, count()-pos);
