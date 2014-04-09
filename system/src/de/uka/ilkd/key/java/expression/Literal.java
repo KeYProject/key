@@ -18,6 +18,7 @@ package de.uka.ilkd.key.java.expression;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
@@ -90,6 +91,13 @@ public abstract class Literal extends JavaProgramElement implements Expression, 
             Debug.out("Program match failed (pattern, source)", this, src);
             return null;
         }        
+    }
+    
+    /*
+    * Return the Name of the LDT, which this Literal belongs to.
+    */
+    public final Name getLDTName(){
+        throw new UnsupportedOperationException();
     }
 
 }

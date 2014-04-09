@@ -27,6 +27,7 @@ import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.ldt.*;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -34,88 +35,36 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
-
-// TODO Make LDTs in this class less hard-coded.
-// Every time a new LDT is introduced, this must be touched.
-// Perhaps a map going from Class<T extends LDT> to T would make
-// this more flexible.   (MU)
+import java.util.Map;
 
 public final class TypeConverter {
 
     private final TermBuilder tb;
 
     private final Services services;
+    
+    private final Map<Name,LDT> LDTs;
+    private final ImmutableList<LDT> models;
+    
+    private final HeapLDT heapLDT;
+    private final IntegerLDT integerLDT;
+    
+    TypeConverter(Services s) {
+        this(s, LDT.getNewLDTInstances(s));
+    }
 
-    private IntegerLDT integerLDT;
-    private BooleanLDT booleanLDT;
-    private LocSetLDT locSetLDT;
-    private HeapLDT heapLDT;
-    private SeqLDT seqLDT;
-    private FreeLDT genLDT;
-    private MapLDT mapLDT;
-    private FloatLDT floatLDT;
-    private DoubleLDT doubleLDT;
-    private RealLDT realLDT;
-    private CharListLDT charListLDT;
-
-    private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
-
-    TypeConverter(Services s){
+    TypeConverter(Services s, Map<Name, LDT> map) {
         this.services = s;
         this.tb = services.getTermBuilder();
-    }
-    
-    TypeConverter(Services s, ImmutableList<LDT> modelsLocal){
-        this(s);
-        init(modelsLocal);
-    }
-    
-    public void init() {
-        ImmutableList<LDT> ldts = ImmutableSLList.<LDT>nil()
-                .prepend(new IntegerLDT(services))
-                .prepend(new BooleanLDT(services))
-                .prepend(new LocSetLDT(services))
-                .prepend(new HeapLDT(services))
-                .prepend(new SeqLDT(services))
-                .prepend(new FreeLDT(services))
-                .prepend(new CharListLDT(services))
-                .prepend(new FloatLDT(services))
-                .prepend(new DoubleLDT(services))
-                .prepend(new RealLDT(services))
-                .prepend(new MapLDT(services));
-        init(ldts);
-    }
-
-    public void init(ImmutableList<LDT> ldts) {
-
-        for (LDT ldt : ldts) {
-            if (ldt instanceof IntegerLDT) {
-                this.integerLDT = (IntegerLDT) ldt;
-            } else if (ldt instanceof BooleanLDT) {
-                this.booleanLDT = (BooleanLDT) ldt;
-            } else if (ldt instanceof LocSetLDT) {
-                this.locSetLDT = (LocSetLDT) ldt;
-            } else if (ldt instanceof HeapLDT) {
-                this.heapLDT = (HeapLDT) ldt;
-            } else if (ldt instanceof SeqLDT) {
-                this.seqLDT = (SeqLDT) ldt;
-            } else if (ldt instanceof MapLDT) {
-                this.mapLDT = (MapLDT) ldt;
-            } else if (ldt instanceof FreeLDT) {
-                this.genLDT = (FreeLDT) ldt;
-            } else if (ldt instanceof FloatLDT) {
-                this.floatLDT = (FloatLDT) ldt;
-            } else if (ldt instanceof DoubleLDT) {
-                this.doubleLDT = (DoubleLDT) ldt;
-            } else if (ldt instanceof RealLDT) {
-                this.realLDT = (RealLDT) ldt;
-            } else if (ldt instanceof CharListLDT) {
-                this.charListLDT = (CharListLDT) ldt;
-            }
-
-            this.models = this.models.prepend(ldt);
-            Debug.out("Initialize LDTs: ", ldt);
+        this.LDTs = map;
+        ImmutableList<LDT> tmpModels = ImmutableSLList.<LDT>nil();
+        for (LDT ldt : LDTs.values()) {
+            tmpModels = tmpModels.prepend(ldt);
         }
+        models = tmpModels;
+        
+        heapLDT = getHeapLDT();
+        integerLDT = getIntegerLDT();
     }
 
     public ImmutableList<LDT> getModels() {
@@ -132,108 +81,71 @@ public final class TypeConverter {
         return null;
     }
 
-
     public IntegerLDT getIntegerLDT() {
-        return integerLDT;
+        return (IntegerLDT)LDTs.get(IntegerLDT.NAME);
     }
-
 
     public BooleanLDT getBooleanLDT() {
-	return booleanLDT;
+	return (BooleanLDT)LDTs.get(BooleanLDT.NAME);
     }
-
 
     public LocSetLDT getLocSetLDT() {
-	return locSetLDT;
+	return (LocSetLDT)LDTs.get(LocSetLDT.NAME);
     }
-
 
     public HeapLDT getHeapLDT() {
-	return heapLDT;
+	return (HeapLDT)LDTs.get(HeapLDT.NAME);
     }
-
 
     public SeqLDT getSeqLDT() {
-	return seqLDT;
-    }
-
-    public FreeLDT getGenLDT(){
-        return genLDT;
+	return (SeqLDT)LDTs.get(SeqLDT.NAME);
     }
     
     public MapLDT getMapLDT() {
-	return mapLDT;
+	return (MapLDT)LDTs.get(MapLDT.NAME);
     }
 
     public CharListLDT getCharListLDT() {
-	return charListLDT;
+	return (CharListLDT)LDTs.get(CharListLDT.NAME);
     }
 
-    public FloatLDT getFloatLDT() {
-        return floatLDT;
-    }
+    private Term translateOperator(de.uka.ilkd.key.java.expression.Operator op, ExecutionContext ec) {
 
-    public RealLDT getRealLDT () {
-        return realLDT;
-    }
+        final Term[] subs = new Term[op.getArity()];
+        for (int i = 0, n = op.getArity(); i < n; i++) {
+            subs[i] = convertToLogicElement(op.getExpressionAt(i), ec);
+        }
 
-    public DoubleLDT getDoubleLDT() {
-        return doubleLDT;
-    }
+        //hack: convert object singleton to location singleton
+        if (op instanceof Singleton) {
+            assert heapLDT.getSortOfSelect(subs[0].op()) != null : "unexpected argument of \\singleton: " + subs[0];
+            return tb.singleton(subs[0].sub(1), subs[0].sub(2));
+        }
 
-
-    private Term translateOperator
-	(de.uka.ilkd.key.java.expression.Operator op, ExecutionContext ec) {
-
-	final Term[] subs  = new Term[op.getArity()];
-	for(int i = 0, n = op.getArity(); i < n; i++) {
-	    subs[i] = convertToLogicElement(op.getExpressionAt(i), ec);
-	}
-
-	//hack: convert object singleton to location singleton
-	if(op instanceof Singleton) {
-	    assert heapLDT.getSortOfSelect(subs[0].op()) != null
-	           : "unexpected argument of \\singleton: " + subs[0];
-	    return tb.singleton(subs[0].sub(1), subs[0].sub(2));
-	}
-
-	LDT responsibleLDT = null;
-	if (integerLDT.isResponsible(op, subs, services, ec)) {
-	    responsibleLDT = integerLDT;
-	} else if (booleanLDT.isResponsible(op, subs, services, ec)) {
-	    responsibleLDT = booleanLDT;
-	} else if (locSetLDT.isResponsible(op, subs, services, ec)) {
-	    responsibleLDT = locSetLDT;
-	} else if(seqLDT.isResponsible(op, subs, services, ec)) {
-	    responsibleLDT = seqLDT;
-	} else if(mapLDT.isResponsible(op, subs, services, ec)) {
-	    responsibleLDT = mapLDT;
-	} else if(genLDT.isResponsible(op, subs, services, ec)) {
-	    responsibleLDT = genLDT;
-	} else if(charListLDT.isResponsible(op, subs, services, ec)) {
-	    responsibleLDT = charListLDT;
-    	} else if(op instanceof Equals) {
-	    assert subs.length == 2;
-	    return tb.equals(subs[0], subs[1]);
-    	} else if(op instanceof NotEquals) {
-	    assert subs.length == 2;
-	    return tb.not(tb.equals(subs[0], subs[1]));
-	} else if(op instanceof Conditional) {
-	    assert subs.length == 3;
-	    return tb.ife(subs[0], subs[1], subs[2]);
-	} else if(op instanceof DLEmbeddedExpression) {
-	    DLEmbeddedExpression emb = (DLEmbeddedExpression) op;
-	    return emb.makeTerm(heapLDT.getHeap(), subs, services);
-	} else if(op instanceof TypeCast) {
-	    TypeCast tc = (TypeCast) op;
-	    return tb.cast(services, tc.getKeYJavaType(services).getSort(), subs[0]);
-	} else {
-	    Debug.out("typeconverter: no data type model "+
-		      "available to convert:", op, op.getClass());
-	    throw new IllegalArgumentException("TypeConverter could not handle"
-					       +" this operator: " + op);
-	}
-	return tb.func(responsibleLDT.getFunctionFor(op, services, ec), subs);
+        LDT responsibleLDT = getResponsibleLDT(op, subs, services, ec);
+        if (responsibleLDT != null) {
+            return tb.func(responsibleLDT.getFunctionFor(op, services, ec), subs);
+        } else if (op instanceof Equals) {
+            assert subs.length == 2;
+            return tb.equals(subs[0], subs[1]);
+        } else if (op instanceof NotEquals) {
+            assert subs.length == 2;
+            return tb.not(tb.equals(subs[0], subs[1]));
+        } else if (op instanceof Conditional) {
+            assert subs.length == 3;
+            return tb.ife(subs[0], subs[1], subs[2]);
+        } else if (op instanceof DLEmbeddedExpression) {
+            DLEmbeddedExpression emb = (DLEmbeddedExpression) op;
+            return emb.makeTerm(heapLDT.getHeap(), subs, services);
+        } else if (op instanceof TypeCast) {
+            TypeCast tc = (TypeCast) op;
+            return tb.cast(services, tc.getKeYJavaType(services).getSort(), subs[0]);
+        } else {
+            Debug.out("typeconverter: no data type model "
+                    + "available to convert:", op, op.getClass());
+            throw new IllegalArgumentException("TypeConverter could not handle"
+                    + " this operator: " + op);
+        }
     }
 
 
@@ -467,38 +379,18 @@ public final class TypeConverter {
      * @return the Term representing <tt>lit</tt> in the logic
      */
     private Term convertLiteralExpression(Literal lit) {
-        if (lit instanceof BooleanLiteral) {
-            return booleanLDT.translateLiteral(lit, services);
-        } else if (lit instanceof NullLiteral) {
+        if (lit instanceof NullLiteral) {
             return tb.NULL();
-        } else if (lit instanceof IntLiteral) {
-            return integerLDT.translateLiteral(lit, services);
-        } else if (lit instanceof CharLiteral) {
-            return integerLDT.translateLiteral(lit, services);
-        } else if (lit instanceof LongLiteral) {
-            return integerLDT.translateLiteral(lit, services);
-        } else if (lit instanceof RealLiteral) {
-            return realLDT.translateLiteral(lit, services);
-        } else if (lit instanceof FloatLiteral) {
-            return floatLDT.translateLiteral(lit, services);
-        } else if (lit instanceof DoubleLiteral) {
-            return doubleLDT.translateLiteral(lit, services);
-        } else if (lit instanceof BigintLiteral) {
-            return integerLDT.translateLiteral(lit,services);
-        } else if (lit instanceof StringLiteral) {
-            return charListLDT.translateLiteral(lit, services);
-        } else if (lit instanceof EmptySetLiteral) {
-            return locSetLDT.translateLiteral(lit, services);
-        } else if (lit instanceof EmptySeqLiteral) {
-            return seqLDT.translateLiteral(lit, services);
-        } else if (lit instanceof EmptyMapLiteral) {
-            return mapLDT.translateLiteral(lit, services);
         } else {
-            Debug.fail("Unknown literal type", lit);
-            return null;
+            LDT ldt = LDTs.get(lit.getLDTName());
+            if (ldt != null) {
+                return ldt.translateLiteral(lit, services);
+            } else {
+                Debug.fail("Unknown literal type", lit);
+                return null;
+            }
         }
     }
-
 
     public static boolean isArithmeticOperator
 	(de.uka.ilkd.key.java.expression.Operator op) {
@@ -1088,8 +980,17 @@ public final class TypeConverter {
 	    t == PrimitiveType.JAVA_BOOLEAN;
     }
 
-
     public TypeConverter copy(Services services) {
-        return new TypeConverter(services, models);
+        return new TypeConverter(services, this.LDTs);
     }
+
+    private LDT getResponsibleLDT(de.uka.ilkd.key.java.expression.Operator op, Term[] subs, Services services, ExecutionContext ec) {
+        for (LDT ldt : LDTs.values()) {
+            if (ldt.isResponsible(op, subs, services, ec)) {
+                return ldt;
+            }
+        }
+        return null;
+    }
+
 }

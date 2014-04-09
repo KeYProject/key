@@ -17,21 +17,6 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.util.List;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.CharListLDT;
-import de.uka.ilkd.key.ldt.DoubleLDT;
-import de.uka.ilkd.key.ldt.FloatLDT;
-import de.uka.ilkd.key.ldt.FreeLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.MapLDT;
-import de.uka.ilkd.key.ldt.RealLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -152,8 +137,6 @@ public class LDTInput implements EnvInput {
 	    keyFiles[i].readRulesAndProblem();
 	}
 
-	//create LDT objects
-        initConfig.getServices().getTypeConverter().init();
     }
 
 

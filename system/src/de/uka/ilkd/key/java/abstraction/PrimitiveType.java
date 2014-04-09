@@ -51,10 +51,10 @@ public final class PrimitiveType implements Type {
 
     // must be first in file.
     private static final Map<String,PrimitiveType> typeMap = 
-            new LinkedHashMap<String, PrimitiveType>(); 
+            new LinkedHashMap<String, PrimitiveType>();
     // must be first in file.
     private static final Map<Name,PrimitiveType> ldtMap = 
-            new LinkedHashMap<Name, PrimitiveType>(); 
+            new LinkedHashMap<Name, PrimitiveType>();
 
     public static final PrimitiveType JAVA_BYTE  =
 	new PrimitiveType("byte", new IntLiteral(0), IntegerLDT.NAME);
@@ -85,7 +85,7 @@ public final class PrimitiveType implements Type {
     public static final PrimitiveType JAVA_MAP =
             new PrimitiveType("\\map", EmptyMapLiteral.INSTANCE, MapLDT.NAME);
 
-    public static final PrimitiveType PROGRAM_SV   = new PrimitiveType("SV", null, null);
+    public static final PrimitiveType PROGRAM_SV = new PrimitiveType("SV", null, null);
 
     private ProgramElementName arrayElementName = null;
 
@@ -100,7 +100,7 @@ public final class PrimitiveType implements Type {
 
     private final String name;
     private final Literal defaultValue;
-    private Name ldtName;
+    private final Name ldtName;
 
     private PrimitiveType(String name, Literal defaultValue, Name ldtName) {
 	this.defaultValue = defaultValue;
