@@ -60,7 +60,6 @@ public final class TypeConverter {
 
     private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
 
-
     TypeConverter(Services s){
         this.services = s;
         this.tb = services.getTermBuilder();
@@ -69,6 +68,22 @@ public final class TypeConverter {
     TypeConverter(Services s, ImmutableList<LDT> modelsLocal){
         this(s);
         init(modelsLocal);
+    }
+    
+    public void init() {
+        ImmutableList<LDT> ldts = ImmutableSLList.<LDT>nil()
+                .prepend(new IntegerLDT(services))
+                .prepend(new BooleanLDT(services))
+                .prepend(new LocSetLDT(services))
+                .prepend(new HeapLDT(services))
+                .prepend(new SeqLDT(services))
+                .prepend(new FreeLDT(services))
+                .prepend(new CharListLDT(services))
+                .prepend(new FloatLDT(services))
+                .prepend(new DoubleLDT(services))
+                .prepend(new RealLDT(services))
+                .prepend(new MapLDT(services));
+        init(ldts);
     }
 
     public void init(ImmutableList<LDT> ldts) {

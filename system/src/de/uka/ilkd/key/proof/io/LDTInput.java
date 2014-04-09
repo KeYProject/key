@@ -153,21 +153,7 @@ public class LDTInput implements EnvInput {
 	}
 
 	//create LDT objects
-        Services services = initConfig.getServices();
-        ImmutableList<LDT> ldts = ImmutableSLList.<LDT>nil()
-                        	.prepend(new IntegerLDT(services))
-                        	.prepend(new BooleanLDT(services))
-                        	.prepend(new LocSetLDT(services))
-                        	.prepend(new HeapLDT(services))
-                        	.prepend(new SeqLDT(services))
-                        	.prepend(new FreeLDT(services))
-                        	.prepend(new CharListLDT(services))
-                        	.prepend(new FloatLDT(services))
-                        	.prepend(new DoubleLDT(services))
-                        	.prepend(new RealLDT(services))
-                                .prepend(new MapLDT(services))
-                        	;
-        initConfig.getServices().getTypeConverter().init(ldts);
+        initConfig.getServices().getTypeConverter().init();
     }
 
 
