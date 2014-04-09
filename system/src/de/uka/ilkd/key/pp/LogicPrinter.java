@@ -32,22 +32,20 @@ import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -57,7 +55,8 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.pp.Notation.HeapNotation;
+import de.uka.ilkd.key.pp.Notation.HeapConstructorNotation;
+import de.uka.ilkd.key.pp.Notation.ObserverNotation;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.NewDependingOn;
@@ -1048,8 +1047,8 @@ public class LogicPrinter {
     private boolean printEmbeddedHeapConstructorTerm(Term t) throws IOException {
 
         Notation notation = notationInfo.getNotation(t.op());
-        if (notation instanceof HeapNotation) {
-            HeapNotation heapNotation = (HeapNotation) notation;
+        if (notation instanceof HeapConstructorNotation) {
+            HeapConstructorNotation heapNotation = (HeapConstructorNotation) notation;
             heapNotation.printEmbeddedHeap(t, this);
             return true;
         } else {
@@ -1087,19 +1086,19 @@ public class LogicPrinter {
                 layouter.beginC(0);
             }
 
-            layouter.print("[" + opName + "(");
+            layouter.print("[" + opName + "(").beginC(0);
 
             markStartSub();
             for(int i = 1; i < t.arity(); i++) {
                 if(i > 1) {
-                    layouter.print(", ");
+                    layouter.print(",").brk(1,0);
                 }
                 markStartSub();
                 printTerm(t.sub(i));
                 markEndSub();
             }
 
-            layouter.print(")]");
+            layouter.print(")]").end();
 
             if(closingBrace) {
                 layouter.end();
@@ -1210,7 +1209,7 @@ public class LogicPrinter {
 
     private void printEmbeddedObserver(final Term heapTerm, final Term objectTerm)
             throws IOException {
-        Notation notation = notationInfo.getNotation(objectTerm.op(), services);
+        Notation notation = notationInfo.getNotation(objectTerm.op());
         if(notation instanceof ObserverNotation) {
             ObserverNotation obsNotation = (ObserverNotation)notation;
             Term innerheap = objectTerm.sub(0);
@@ -1236,7 +1235,7 @@ public class LogicPrinter {
         if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
 
             if(tacitHeap == null) {
-                tacitHeap = TermFactory.DEFAULT.createTerm(heapLDT.getHeap());
+                tacitHeap = services.getTermFactory().createTerm(heapLDT.getHeap());
             }
 
             startTerm(3);
@@ -1303,7 +1302,7 @@ public class LogicPrinter {
             } else {
         	printFunctionTerm(t.op().name().toString(), t);
             }
-
+            //only print heap term if it is not the standard heap
             final boolean printHeap = !heapTerm.equals(tacitHeap);
 
             if (printHeap) {
@@ -1318,7 +1317,7 @@ public class LogicPrinter {
                 // heap not printed
                 markEndSub();
             }
-            layouter.end();
+    //        layouter.end();
 
         } else {
             printFunctionTerm(t.op().name().toString(), t);
@@ -1367,7 +1366,7 @@ public class LogicPrinter {
         if(printFancy) {
 
             if(tacitHeap == null) {
-                tacitHeap = TermFactory.DEFAULT.createTerm(heapLDT.getHeap());
+                tacitHeap = services.getTermFactory().createTerm(heapLDT.getHeap());
             }
 
             // this needs not be 1 in general:
