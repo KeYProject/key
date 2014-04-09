@@ -137,8 +137,9 @@ public class LDTInput implements EnvInput {
 	    keyFiles[i].readRulesAndProblem();
 	}
 
+        //create LDT objects
+        initConfig.getServices().getTypeConverter().init();
     }
-
 
     @Override
     public boolean equals(Object o){
@@ -176,7 +177,6 @@ public class LDTInput implements EnvInput {
 	}
 	return result;
     }
-
 
     @Override
     public String toString() {

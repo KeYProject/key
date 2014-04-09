@@ -43,26 +43,27 @@ public final class TypeConverter {
 
     private final Services services;
     
-    private final Map<Name,LDT> LDTs;
-    private final ImmutableList<LDT> models;
+    private Map<Name,LDT> LDTs = null;
+    private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
     
-    private final HeapLDT heapLDT;
-    private final IntegerLDT integerLDT;
+    private HeapLDT heapLDT = null;
+    private IntegerLDT integerLDT = null;
     
     TypeConverter(Services s) {
-        this(s, LDT.getNewLDTInstances(s));
-    }
-
-    TypeConverter(Services s, Map<Name, LDT> map) {
         this.services = s;
         this.tb = services.getTermBuilder();
-        this.LDTs = map;
-        ImmutableList<LDT> tmpModels = ImmutableSLList.<LDT>nil();
+    }
+    
+    public void init(){
+        init(LDT.getNewLDTInstances(services));
+    }
+    
+    private void init(Map<Name, LDT> map){
+        LDTs = map;
+        models = ImmutableSLList.<LDT>nil();
         for (LDT ldt : LDTs.values()) {
-            tmpModels = tmpModels.prepend(ldt);
+            models = models.prepend(ldt);
         }
-        models = tmpModels;
-        
         heapLDT = getHeapLDT();
         integerLDT = getIntegerLDT();
     }
@@ -981,7 +982,9 @@ public final class TypeConverter {
     }
 
     public TypeConverter copy(Services services) {
-        return new TypeConverter(services, this.LDTs);
+        TypeConverter TC = new TypeConverter(services);
+        TC.init(LDTs);
+        return TC;
     }
 
     private LDT getResponsibleLDT(de.uka.ilkd.key.java.expression.Operator op, Term[] subs, Services services, ExecutionContext ec) {
