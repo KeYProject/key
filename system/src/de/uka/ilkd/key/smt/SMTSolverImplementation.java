@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
+import de.uka.ilkd.key.testgen.TestCaseGenerator;
 
 interface SolverListener {
         void processStarted(SMTSolver solver, SMTProblem problem);
@@ -415,6 +416,12 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         			if(m!=null){
         				output += "\n\n";
         				output += m.toString();
+        			}
+        			
+        			TestCaseGenerator tg = new TestCaseGenerator(services);
+        			if(m!=null){
+        				output += "\n\n\nTestGen\n\n\n";
+        				output += tg.generateJUnitTestCase(m);
         			}
         			
         			
