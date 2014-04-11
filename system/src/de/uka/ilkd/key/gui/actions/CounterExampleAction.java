@@ -33,6 +33,7 @@ public class CounterExampleAction extends MainWindowAction {
 	private static final String NAME = "CE";
 	private static final String TOOLTIP = "Search for a counterexample for the selected goal";
 	
+	public static Proof originalProof; 
 	
 	public CounterExampleAction(MainWindow mainWindow) {
 		super(mainWindow);
@@ -91,6 +92,8 @@ public class CounterExampleAction extends MainWindowAction {
 		Node node = goal.node();
 		Proof oldProof = node.proof();
 		
+		originalProof = oldProof;
+		
 		Sequent oldSequent = node.sequent();
 		Sequent newSequent = Sequent.createSequent(oldSequent.antecedent(), oldSequent.succedent());
 		Proof proof = new Proof("Semantics Blasting: "+oldProof.name(), 
@@ -148,6 +151,7 @@ public class CounterExampleAction extends MainWindowAction {
 	    	getMediator().setInteractive(true);
 	    	getMediator().startInterface(true);
 	    	getMediator().removeInterruptedListener(this);
+	    	originalProof = null;
 	    }
 
 		@Override

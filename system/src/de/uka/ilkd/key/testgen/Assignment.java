@@ -24,7 +24,7 @@ public class Assignment {
 
 
 	public String toString(){
-		return "\n\t"+type+" "+left+" = "+right+";\n";
+		return "\n   "+type+" "+left+" = "+right+";";
 	}
 
 }

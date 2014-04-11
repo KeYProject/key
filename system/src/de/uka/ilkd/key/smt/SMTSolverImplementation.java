@@ -21,6 +21,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
@@ -417,8 +418,8 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         				output += "\n\n";
         				output += m.toString();
         			}
-        			
-        			TestCaseGenerator tg = new TestCaseGenerator(services);
+        			Goal goal = problem.getGoal();
+        			TestCaseGenerator tg = new TestCaseGenerator(goal);
         			if(m!=null){
         				output += "\n\n\nTestGen\n\n\n";
         				output += tg.generateJUnitTestCase(m);
