@@ -129,5 +129,7 @@ public interface ProofMacro {
     /**
      * Assigns a key shortcut to the macro (optional).
      */
-	public javax.swing.KeyStroke getKeyStroke();
+    public javax.swing.KeyStroke getKeyStroke();
+
+    public boolean finishAfterMacro();
 }

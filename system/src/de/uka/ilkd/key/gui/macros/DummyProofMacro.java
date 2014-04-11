@@ -16,7 +16,6 @@ import javax.swing.KeyStroke;
  */
 public class DummyProofMacro implements ProofMacro {
 
-
     @Override
     public String getName() {
         return "DummyProofMacro";
@@ -28,6 +27,9 @@ public class DummyProofMacro implements ProofMacro {
         return "Does nothing";
     }
 
+    public boolean finishAfterMacro() {
+        return true;
+    }
 
     @Override
     public boolean canApplyTo(KeYMediator mediator,

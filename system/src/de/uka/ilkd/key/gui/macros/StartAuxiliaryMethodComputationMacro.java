@@ -35,7 +35,6 @@ public class StartAuxiliaryMethodComputationMacro implements ExtendedProofMacro 
         return "Start auxiliary computation for self-composition proofs";
     }
 
-
     @Override
     public String getDescription() {
         return "In order to increase the efficiency of self-composition " +
@@ -45,6 +44,9 @@ public class StartAuxiliaryMethodComputationMacro implements ExtendedProofMacro 
                "two executions of the self-composition.";
     }
 
+    public boolean finishAfterMacro() {
+        return true;
+    }
 
     @Override
     public boolean canApplyTo(KeYMediator mediator,

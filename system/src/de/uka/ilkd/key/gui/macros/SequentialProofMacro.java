@@ -44,6 +44,10 @@ public abstract class SequentialProofMacro implements ExtendedProofMacro {
      */
     private ExtendedProofMacro[] proofMacros = null;
 
+    public boolean finishAfterMacro() {
+        return true;
+    }
+
     /**
      * Creates the proof macro array.
      *
@@ -107,7 +111,8 @@ public abstract class SequentialProofMacro implements ExtendedProofMacro {
         final Node initNode = mediator.getSelectedNode();
         for (ExtendedProofMacro macro : getProofMacros()) {
             // reverse to original node
-            mediator.getSelectionModel().setSelectedNode(initNode);
+            mediator.getSelectionModel().setSelectedNode(initNode); // FIXME:
+            // Proof in InteractiveProverKeYSelectionListener is disposed proof in consoleMode!
             macro.applyTo(mediator, posInOcc, listener);
         }
     }

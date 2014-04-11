@@ -283,10 +283,10 @@ public class KeYMediator {
             @Override
             public String toString() {
                 return "Proof has been pruned: "+(proof.openGoals().size() == 1 ?
-                                "one open goal remains." :
-                                    (proof.openGoals().size()+" open goals remain."));
-                }
-            };
+                        "one open goal remains." :
+                            (proof.openGoals().size()+" open goals remain."));
+            }
+        };
         this.ui.taskFinished(info);
         if (!proof.isDisposed()) {
            proof.getServices().getCaches().getTermTacletAppIndexCache().clear();

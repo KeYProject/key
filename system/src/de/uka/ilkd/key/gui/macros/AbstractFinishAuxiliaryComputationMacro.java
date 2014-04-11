@@ -41,6 +41,10 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
         return "Finish auxiliary computation.";
     }
 
+    public boolean finishAfterMacro() {
+        return true;
+    }
+
 
     static Term calculateResultingTerm(Proof proof,
                                                IFProofObligationVars ifVars,

@@ -83,8 +83,7 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
                  ptl.taskFinished(tfi);
                  if (ui.macroChosen()) {
                      ui.applyMacro();
-                 }
-                 if (ptl instanceof UserInterface) {
+                 } else if (ptl instanceof UserInterface) {
                      ((UserInterface)ptl).finish();
                  }
              }

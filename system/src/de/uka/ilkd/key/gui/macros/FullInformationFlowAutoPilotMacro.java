@@ -37,13 +37,28 @@ public class FullInformationFlowAutoPilotMacro implements ProofMacro {
                 "<li>Try to close as many goals as possible</ol>";
     }
 
+    public boolean finishAfterMacro() {
+        return true;
+    }
+
     private ProofMacro createProofMacro() {
-        final SequentialProofMacro stateExpansionAndCloseMacro = new SequentialProofMacro() {
+        final SequentialProofMacro stateExpansionAndCloseMacro =
+                new SequentialProofMacro() {
+            @Override
+            public boolean finishAfterMacro() { return false; }
             @Override
             protected ExtendedProofMacro[] createProofMacroArray() {
-                return new ExtendedProofMacro[] { new StateExpansionAndInfFlowContractApplicationMacro(),
-                                                  new ProofMacroWrapper(
-                                                      new TryCloseMacro(NUMBER_OF_TRY_STEPS)) };
+                return new ExtendedProofMacro[] {
+                        new StateExpansionAndInfFlowContractApplicationMacro() {
+                            @Override
+                            public boolean finishAfterMacro() { return false; }
+                            },
+                        new ProofMacroWrapper(
+                                new TryCloseMacro(NUMBER_OF_TRY_STEPS) {
+                                    @Override
+                                    public boolean finishAfterMacro() { return false; }}) {
+                                @Override
+                                public boolean finishAfterMacro() { return false; }} };
             }
             @Override
             public String getName() { return "Anonymous Macro"; }
@@ -54,12 +69,17 @@ public class FullInformationFlowAutoPilotMacro implements ProofMacro {
                 new SequentialOnLastGoalProofMacro() {
             @Override
             protected ExtendedProofMacro[] createProofMacroArray() {
-                return new ExtendedProofMacro[] { new FinishAuxiliaryComputationMacro(),
-                                                  stateExpansionAndCloseMacro};}
+                return new ExtendedProofMacro[] {
+                        new FinishAuxiliaryComputationMacro() {
+                            @Override
+                            public boolean finishAfterMacro() { return false; }},
+                            stateExpansionAndCloseMacro};}
             @Override
             public String getName() { return "Anonymous Macro"; }
             @Override
             public String getDescription() { return "Anonymous Macro"; }
+            @Override
+            public boolean finishAfterMacro() { return false; }
         };
         AlternativeProofMacro alternativesMacro =
                 new AlternativeProofMacro() {
@@ -68,10 +88,18 @@ public class FullInformationFlowAutoPilotMacro implements ProofMacro {
                     @Override
                     public String getDescription() { return "Anonymous Macro"; }
                     @Override
+                    public boolean finishAfterMacro() { return false; }
+                    @Override
                     protected ExtendedProofMacro[] createProofMacroArray() {
                         return new ExtendedProofMacro[] { new ProofMacroWrapper(
-                                                              new AuxiliaryComputationAutoPilotMacro()),
-                                                          finishMainCompMacro}; }
+                                new AuxiliaryComputationAutoPilotMacro() {
+                                    @Override
+                                    public boolean finishAfterMacro() { return false; }
+                                }) {
+                            @Override
+                            public boolean finishAfterMacro() { return false; }
+                        },
+                        finishMainCompMacro}; }
         };
         return new DoWhileElseMacro(alternativesMacro, NUMBER_OF_TRY_STEPS);
     }

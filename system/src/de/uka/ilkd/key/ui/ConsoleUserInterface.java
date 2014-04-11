@@ -23,6 +23,7 @@ import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.KeYMediator;
 import static de.uka.ilkd.key.gui.Main.Verbosity.*;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.gui.macros.ProofMacro;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
@@ -75,7 +76,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        // has to be notified that we work in auto mode (CS)
        mediator.setInteractive(false);
 
-       final Object result = ps.start();
+       final Object result = ps.start(true);
        if (verbosity >= HIGH) {
            System.out.println(result);
        }
@@ -90,7 +91,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        }
        final int openGoals = proof.openGoals().size();
        final Object result2 = info.getResult();
-       if (info.getSource() instanceof ApplyStrategy) {
+       if (info.getSource() instanceof ApplyStrategy || info.getSource() instanceof ProofMacro) {
            if (verbosity >= HIGH) {
                System.out.println("]"); // end progress bar
            }
@@ -308,9 +309,9 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     */
    @Override
    public void removeProof(Proof proof) {
-      if (proof != null) {
-         proof.dispose();
-      }
+       if (proof != null) {
+           proof.dispose();
+       }
    }
 
    /**

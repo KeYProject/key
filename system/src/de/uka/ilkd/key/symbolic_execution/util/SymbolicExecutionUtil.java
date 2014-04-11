@@ -685,7 +685,7 @@ public final class SymbolicExecutionUtil {
       sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF); // Avoid branches caused by modalities not part of the main execution 
       starter.setStrategy(sp);
       // Execute proof in the current thread
-      return starter.start();
+      return starter.start(false);
    }
 
    /**

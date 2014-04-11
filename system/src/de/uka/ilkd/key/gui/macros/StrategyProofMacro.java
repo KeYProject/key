@@ -19,6 +19,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
@@ -42,6 +43,10 @@ import de.uka.ilkd.key.strategy.Strategy;
 public abstract class StrategyProofMacro implements ExtendedProofMacro {
 
     protected abstract Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc);
+
+    public boolean finishAfterMacro() {
+        return true;
+    }
 
     /**
      * {@inheritDoc}
@@ -106,8 +111,8 @@ public abstract class StrategyProofMacro implements ExtendedProofMacro {
                         Goal goal,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
-        final ApplyStrategy applyStrategy = 
-                new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
+        IGoalChooser goalChooser = mediator.getProfile().getSelectedGoalChooserBuilder().create();
+        final ApplyStrategy applyStrategy = new ApplyStrategy(goalChooser, false);
 
         if(listener != null) {
             applyStrategy.addProverTaskObserver(listener);

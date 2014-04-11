@@ -283,7 +283,7 @@ public abstract class AbstractPO implements IPersistablePO {
                                 initConfig.createBuiltInRuleIndex(),
                                 // Normally services and initConfig.getServices()
                                 // point to the same object. Only in case an
-                                // auxiliray proof is started, then services
+                                // auxiliary proof is started, then services
                                 // is a "newer" object which was cloned
                                 // from initConfig.getServices() and updated
                                 // later on. We have to use the updated

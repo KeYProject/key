@@ -18,6 +18,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.WindowUserInterface;
 import de.uka.ilkd.key.gui.macros.DummyProofMacro;
 import de.uka.ilkd.key.gui.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -72,6 +73,8 @@ public abstract class AbstractUserInterface implements UserInterface {
         if (autoMacro.canApplyTo(getMediator(), null)) {
             if (this instanceof ConsoleUserInterface) {
                 System.out.println("[ APPLY " + autoMacro.getClass().getSimpleName() + " ]");
+            } else if (this instanceof WindowUserInterface) {
+                System.out.println("Applying: " + autoMacro.getClass().getSimpleName());
             }
             try {
                 getMediator().stopInterface(true);
@@ -83,7 +86,6 @@ public abstract class AbstractUserInterface implements UserInterface {
                 Debug.out("Proof macro has been interrupted:");
                 Debug.out(ex);
             }
-            this.autoMacro = new DummyProofMacro(); // reset macro to avoid loops
             return true;
         } else {
             System.out.println(autoMacro.getClass().getSimpleName() + " not applicable!");

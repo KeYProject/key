@@ -31,7 +31,6 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
     private static final String AND_RIGHT_RULENAME = "andRight";
 
-
     @Override
     public String getName() {
         return "Prepare information flow pre branches";

@@ -44,12 +44,10 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
             private final int NUMBER_OF_TRY_STEPS =
                     Integer.getInteger("key.autopilot.closesteps", 1000);
 
-
             @Override
             public String getName() {
                 return "Auxiliary Computation Auto Pilot";
             }
-
 
             @Override
             public String getDescription() {
@@ -58,6 +56,9 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                        "<li>Try to close as many goals as possible</ol>";
             }
 
+            public boolean finishAfterMacro() {
+                return false;
+            }
 
             @Override
             protected ExtendedProofMacro[] createProofMacroArray() {
@@ -67,20 +68,30 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                 SequentialProofMacro finishSymbExecAndTryToClose =
                         new SequentialProofMacro() {
                     @Override
+                    public boolean finishAfterMacro() { return false; }
+
+                    @Override
                     protected ExtendedProofMacro[] createProofMacroArray() {
                         return new ExtendedProofMacro[]{
-                            new FinishSymbolicExecutionMacro(),
+                            new FinishSymbolicExecutionMacro() {
+                                @Override
+                                public boolean finishAfterMacro() { return false; }
+                            },
                             new ProofMacroWrapper(
-                                new TryCloseMacro(NUMBER_OF_TRY_STEPS))
+                                new TryCloseMacro(NUMBER_OF_TRY_STEPS) {
+                                    @Override
+                                    public boolean finishAfterMacro() { return false; }
+                                }) {
+                                @Override
+                                public boolean finishAfterMacro() { return false; }
+                            }
                         };
                     }
-
 
                     @Override
                     public String getName() {
                         return "Anonymous Macro";
                     }
-
 
                     @Override
                     public String getDescription() {
@@ -88,7 +99,9 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                     }
                 };
                 return new ExtendedProofMacro[]{
-                    new StartAuxiliaryComputationMacro(),
+                    new StartAuxiliaryComputationMacro() {
+                        @Override
+                        public boolean finishAfterMacro() { return false; } },
                     finishSymbExecAndTryToClose,};
             }
         };

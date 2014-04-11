@@ -38,6 +38,10 @@ public class StartAuxiliaryLoopComputationMacro implements ExtendedProofMacro {
                 "two executions of the self-composition.";
     }
 
+    public boolean finishAfterMacro() {
+        return true;
+    }
+
     @Override
     public boolean canApplyTo(KeYMediator mediator,
                               PosInOccurrence posInOcc) {
