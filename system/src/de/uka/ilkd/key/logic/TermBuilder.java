@@ -2012,10 +2012,6 @@ public class TermBuilder {
     public Term seqReverse(Term s) {
     return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
     }
-    
-    public Term mapEmpty() {
-    return func(services.getTypeConverter().getMapLDT().getMapEmpty());
-    }
 
     //-------------------------------------------------------------------------
     // misc    (moved from key.util.MiscTools)

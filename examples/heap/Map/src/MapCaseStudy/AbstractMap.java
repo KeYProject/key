@@ -6,15 +6,15 @@ public abstract class AbstractMap implements MapInterface {
 
     /*@
     @
-    @ public invariant entries.length == \dl_mapSize(map);
+    @ public invariant entries.length == \map_size(map);
     @
-    @ public invariant !\dl_inDomain(map,null);
+    @ public invariant !\in_domain(map,null);
     @
-    @ public invariant (\forall int i; 0 <= i && i < entries.length; \dl_inDomain(map,entries[i].key));
+    @ public invariant (\forall int i; 0 <= i && i < entries.length; \in_domain(map,entries[i].key));
     @ public invariant (\forall int i; 0 <= i && i < entries.length;
-    @                      \dl_mapGet(map, entries[i].key) == entries[i].value);
+    @                      \map_get(map, entries[i].key) == entries[i].value);
     @
-    @ public invariant (\forall Object o; \dl_inDomain(map,o);(
+    @ public invariant (\forall Object o; \in_domain(map,o);(
     @       \exists int i; 0 <= i && i < entries.length; o == entries[i].key ));
     @
     @ public invariant (\forall int i1; 0 <= i1 && i1 < entries.length;
@@ -29,7 +29,7 @@ public abstract class AbstractMap implements MapInterface {
     @
     @ public invariant (\forall int i; 0 <= i && i < entries.length; entries[i].key != null);
     @ public invariant (\forall int i; 0 <= i && i < entries.length; entries[i].value != null);
-    @ public invariant \dl_inDomainImpliesCreated(map);
+    @ public invariant \domain_implies_created(map);
     @
     @*/
     
@@ -51,7 +51,7 @@ public abstract class AbstractMap implements MapInterface {
             int numberCopies);
     
     /*@ normal_behavior
-     @ ensures \dl_inDomain(map, key) ? 
+     @ ensures \in_domain(map, key) ? 
      @              (\result >= 0 && \result < entries.length && entries[\result].key == key) : 
      @              (\result == -1);
      @ ensures (\forall Object o; !\fresh(o));
@@ -82,24 +82,24 @@ public abstract class AbstractMap implements MapInterface {
      @ ensures \result[entries.length].key == key;
      @ ensures \result[entries.length].value == value;
      @ ensures \fresh(\result, \result[entries.length]);
-     @ ensures !\dl_inDomain(map, \result);
-     @ ensures !\dl_inDomain(map, \result[entries.length]);
+     @ ensures !\in_domain(map, \result);
+     @ ensures !\in_domain(map, \result[entries.length]);
      @ ensures \typeof(\result) == \type(MapEntry[]);
      @*/
     abstract /*@ pure */ MapEntry[] putExtendArray(Object key, Object value);
 
     /*@ normal_behaviour
      @ requires 0 <= index && index < entries.length;
-     @ ensures map == \dl_mapUpdate(\old(map), entries[index].key, value);
-     @ ensures \result == (\dl_mapGet(\old(map), entries[index].key));
+     @ ensures map == \map_update(\old(map), entries[index].key, value);
+     @ ensures \result == (\map_get(\old(map), entries[index].key));
      @ ensures (\forall Object o; !\fresh(o));
      @ assignable entries[index].value, map;
      @*/
     abstract Object putInDomain(int index, Object value);
 
     /*@ normal_behaviour
-     @ requires !\dl_inDomain(map, key);
-     @ ensures map == \dl_mapUpdate(\old(map), key, value);
+     @ requires !\in_domain(map, key);
+     @ ensures map == \map_update(\old(map), key, value);
      @ ensures \result == null;
      @ ensures \fresh(entries, entries[entries.length - 1]);
      @ assignable footprint;
@@ -132,8 +132,8 @@ public abstract class AbstractMap implements MapInterface {
 
     /*@ normal_behaviour
      @ requires 0 <= index && index < entries.length;
-     @ ensures map == \dl_mapRemove(\old(map), \old(entries[index].key));
-     @ ensures \result == \dl_mapGet(\old(map), \old(entries[index].key));
+     @ ensures map == \map_remove(\old(map), \old(entries[index].key));
+     @ ensures \result == \map_get(\old(map), \old(entries[index].key));
      @ ensures \fresh(entries);
      @ assignable footprint;
      @*/
@@ -141,7 +141,7 @@ public abstract class AbstractMap implements MapInterface {
     
     /*@ normal_behaviour
      @ requires 0 <= index && index < entries.length;
-     @ ensures map == \dl_mapRemove(\old(map), \old(entries[index].key));
+     @ ensures map == \map_remove(\old(map), \old(entries[index].key));
      @ ensures \fresh(entries);
      @ assignable footprint;
      @*/
@@ -153,7 +153,7 @@ public abstract class AbstractMap implements MapInterface {
      @               newEntries[i] == ((i < index) ? entries[i] : entries[i + 1]));
      @ requires \typeof(newEntries) == \type(entries);
      @ requires newEntries.length == entries.length - 1;
-     @ ensures map == \dl_mapRemove(\old(map), \old(entries[index].key));
+     @ ensures map == \map_remove(\old(map), \old(entries[index].key));
      @ ensures (\forall Object o; !\fresh(o));
      @ ensures entries == newEntries;
      @ assignable footprint;

@@ -1589,6 +1589,11 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         {
             result = translator.translate("\\dl_", SLExpression.class, escape, list, services);
         }
+        
+    |   mapExp:MAPEXPRESSION ( LPAREN ( list=expressionlist )? RPAREN )?
+		{
+		    result = translator.translateMapExpressionToJDL(mapExp,list, services);
+		}
 
     |   NOT_MODIFIED LPAREN t=storeRefUnion RPAREN
         {
@@ -1806,11 +1811,6 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
             result = new SLExpression(put);
         }
         
-    |   MAPEMPTY
-        {
-            result = new SLExpression(tb.mapEmpty());
-        }
-        
     |   (tk2: SEQCONCAT{tk=tk2;} | tk3: SEQGET{tk=tk3;} | tk4: INDEXOF{tk=tk4;})
         LPAREN e1=expression COMMA e2=expression RPAREN
         {
@@ -1928,7 +1928,6 @@ seqdefterm returns [SLExpression result=null] throws SLTranslationException
         resolverManager.popLocalVariablesNamespace();
         throw ex;
         }
-
 
 quantifiedvardecls returns [Pair<KeYJavaType,ImmutableList<LogicVariable>> result = null]
                    throws SLTranslationException

@@ -63,12 +63,13 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
-
-
+import java.util.Collections;
+import java.util.TreeMap;
 
 /**
  * Translates JML expressions to FOL.
  */
+
 final class JMLTranslator {
 
     private final TermBuilder tb; 
@@ -78,6 +79,29 @@ final class JMLTranslator {
     private List<PositionedString> warnings = new ArrayList<PositionedString>();
 
     private EnumMap<JMLKeyWord, JMLTranslationMethod> translationMethods;
+    
+    /*
+     * New function symbols for JML can be registered here.
+     * The following files (and possibly additional ones)
+     * need to be adjusted as well for KeY
+     * to recognize the new symbols properly:
+     * ProofJavaParser.jj, jmlparser.g, jmllexer.g
+     * (Kai Wallisch 04/2014)
+     * 
+     */
+    public static final Map<String,String> jml2jdl;
+    static{
+        Map<String,String> tmp = new TreeMap();
+        tmp.put("\\map_empty", "mapEmpty");
+        tmp.put("\\map_get", "mapGet");
+        tmp.put("\\map_update", "mapUpdate");
+        tmp.put("\\map_remove", "mapRemove");
+        tmp.put("\\in_domain", "inDomain");
+        tmp.put("\\domain_implies_created", "inDomainImpliesCreated");
+        tmp.put("\\is_finite", "isFinite");
+        tmp.put("\\map_size", "mapSize");
+        jml2jdl = Collections.unmodifiableMap(tmp);
+    }
 
     public static enum JMLKeyWord {
     	// general features, not necessarily keywords
@@ -2358,5 +2382,99 @@ final class JMLTranslator {
 
         protected abstract String opName();
         protected abstract SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression left, SLExpression right) throws SLTranslationException;
+    }
+    
+    private static SLExpression translateToJDLTerm(Token escape,
+            final String functName,
+            Services services,
+            TermBuilder tb,
+            ImmutableList<SLExpression> list,
+            SLTranslationExceptionManager excManager) throws SLTranslationException {
+        Namespace funcs = services.getNamespaces().functions();
+        Named symbol = funcs.lookup(new Name(functName));
+
+        if (symbol != null) {
+            // Function or predicate symbol found
+
+            assert symbol instanceof Function : "Expecting a function symbol in this namespace";
+            Function function = (Function) symbol;
+
+            Term[] args;
+            if (list == null) {
+                // empty parameter list
+                args = new Term[0];
+            } else {
+
+                Term heap = tb.getBaseHeap();
+
+                        // special casing "implicit heap" arguments:
+                // omitting one argument means first argument is "heap"
+                int i = 0;
+                if (function.arity() == list.size() + 1
+                        && function.argSort(0) == heap.sort()) {
+                    args = new Term[list.size() + 1];
+                    args[i++] = heap;
+                } else {
+                    args = new Term[list.size()];
+                }
+
+                for (SLExpression expr : list) {
+                    if (!expr.isTerm()) {
+                        throw new SLTranslationException("Expecting a term here, not: "
+                                + expr);
+                    }
+                    args[i++] = expr.getTerm();
+                }
+            }
+
+            try {
+                Term resultTerm = tb.func(function, args, null);
+                final KeYJavaType type
+                        = services.getTypeConverter().getIntegerLDT().targetSort() == resultTerm.sort()
+                        ? services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT)
+                        : services.getJavaInfo().getKeYJavaType(resultTerm.sort());
+                SLExpression result = type == null ? new SLExpression(resultTerm) : new SLExpression(resultTerm, type);
+                return result;
+            } catch (TermCreationException ex) {
+                throw excManager.createException("Cannot create term " + function.name()
+                        + "(" + MiscTools.join(args, ", ") + ")", escape, ex);
+            }
+
+        }
+
+        assert symbol == null;  // no function symbol found
+
+        Namespace progVars = services.getNamespaces().programVariables();
+        symbol = progVars.lookup(new Name(functName));
+
+        if (symbol == null) {
+            throw excManager.createException("Unknown escaped symbol "
+                    + functName, escape);
+        }
+
+        assert symbol instanceof ProgramVariable : "Expecting a program variable";
+        ProgramVariable pv = (ProgramVariable) symbol;
+        try {
+            Term resultTerm = tb.var(pv);
+            SLExpression result = new SLExpression(resultTerm);
+            return result;
+        } catch (TermCreationException ex) {
+            throw excManager.createException("Cannot create term "
+                    + pv.name(), escape, ex);
+        }
+
+    }
+    
+    /*
+     * Translate a term of type \map to JavaDL, if it occurs in a JML
+     * expression.
+     */
+    public SLExpression translateMapExpressionToJDL(Token t, ImmutableList<SLExpression> list,
+            Services services) throws SLTranslationException {
+        String functName = jml2jdl.get(t.getText());
+        if(functName == null){
+            throw excManager.createException("Unknown token: " + t);
+        }
+        return translateToJDLTerm(t, functName, services, tb, list, excManager);
     }
 }
