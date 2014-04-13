@@ -179,8 +179,8 @@ SEQREPLACE : "\\seq_put";
 INDEXOF : "\\seq_indexOf";
 SEQDEF : "\\seq_def";
 
-MAPEXPRESSION : "\\map_empty" | "\\map_remove" | "\\map_update" | "\\in_domain" | "\\domain_implies_created" | "\\map_size" | "\\is_finite"
- | "\\map_get";
+MAPEMPTY : "\\map_empty";
+MAPEXPRESSION : "\\map_remove" | "\\map_update" | "\\in_domain" | "\\domain_implies_created" | "\\map_size" | "\\is_finite" | "\\map_get";
 
 FROM : "\\from";
 TO : "\\to";
