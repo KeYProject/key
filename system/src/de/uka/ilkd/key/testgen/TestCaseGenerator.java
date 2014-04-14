@@ -180,6 +180,9 @@ public class TestCaseGenerator {
 
 	public String generateTestCase(Model m){
 		
+		System.out.println("--generateTestCase "+fileCounter+"--");
+		System.out.println("Heaps:"+m.getHeaps().size()+ " Types:"+m.getTypes() + " Constants:"+m.getConstants().size());
+		
 		List<Assignment> assignments = new LinkedList<Assignment>();
 		
 		Heap heap = null;
@@ -190,7 +193,6 @@ public class TestCaseGenerator {
 			}
 		}
 		
-		System.out.println("Test!!!");
 		KeYJavaType kjt = services.getJavaInfo().getKeYJavaType("java.io.Serializable");
 		buildDummyClassForAbstractSort(kjt.getSort());		
 		kjt = services.getJavaInfo().getKeYJavaType("java.lang.Cloneable");
@@ -278,14 +280,14 @@ public class TestCaseGenerator {
 		}
 		
 		
-		String result = "";
+		StringBuffer result = new StringBuffer();
 		for(Assignment a : assignments){
-			result+=a.toString();
+			result.append(a.toString());
 		}
 		
 		
 		
-		return result;
+		return result.toString();
 	}
 
 	public String getSafeType(Sort sort){
