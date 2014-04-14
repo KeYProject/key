@@ -243,11 +243,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 // Firstly: Set the state to running and inform the listener.
                 setSolverState(SolverState.Running);
                 listener.processStarted(this, problem);
-
-                if(getType().getQuery() !=null){
-                	getType().setQuery(null);
-        		}
-                
+                                
                 // Secondly: Translate the given problem
                 String commands[];
                 try {

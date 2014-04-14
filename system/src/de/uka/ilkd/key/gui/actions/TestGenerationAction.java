@@ -127,7 +127,7 @@ public class TestGenerationAction extends MainWindowAction {
 	}
     
     private Vector<Proof> createProofsForTesting(KeYMediator mediator){
-    	Vector<Proof> res = new Vector();
+    	Vector<Proof> res = new Vector<Proof>();
     	
 		Proof oldProof = mediator.getSelectedGoal().proof();
 		originalProof = oldProof;		
@@ -137,7 +137,11 @@ public class TestGenerationAction extends MainWindowAction {
 		Iterator<Goal> oldGoalIter = oldGoals.iterator();
 		
 		while(oldGoalIter.hasNext()){
-			res.add(createProofForTesting(oldGoalIter.next().node()));
+			try{
+				res.add(createProofForTesting(oldGoalIter.next().node()));
+			}catch(Exception e){
+				System.err.println(e.getMessage());
+			}
 		}
 		
 		return res;
@@ -261,15 +265,15 @@ public class TestGenerationAction extends MainWindowAction {
     @Override
 	public void actionPerformed(ActionEvent e) {
 		//createProofForTesting(getMediator());
-		Goal goal = getMediator().getSelectedGoal();		
-		originalProof = goal.node().proof();
+		
+		originalProof = getMediator().getSelectedProof();
 
 		//Vector<Proof> proofs = createProofsForTesting(getMediator());
 
     	//The following loop is meant for debugging only and should be removed
 
     	
-		getMediator().setProof(originalProof);
+		//getMediator().setProof(originalProof);
 		//createProof(getMediator());	
 		
 		CEWorker worker = new CEWorker();
@@ -304,7 +308,7 @@ public class TestGenerationAction extends MainWindowAction {
 	    @Override 
 	    public void finished() {
 	    	getMediator().setInteractive(true);
-	    	getMediator().startInterface(true);
+	    	//getMediator().startInterface(true);
 	    	getMediator().removeInterruptedListener(this);
 	    	originalProof = null;
 	    }
@@ -313,25 +317,25 @@ public class TestGenerationAction extends MainWindowAction {
 		public Object construct() {
 			tgInfoDialog.write("Create proofs for testing");
 			Vector<Proof> proofs = createProofsForTesting(getMediator());
-	    	for(Proof p:proofs){
-	    		ProofAggregate pa = new SingleProof(p, "XXX");
-	    		MainWindow mw = MainWindow.getInstance();
-	    		mw.addProblem(pa);
-	    	}
+	    	
 			tgInfoDialog.write("Done creating "+proofs.size()+" proofs.");
 			KeYMediator mediator = getMediator();
 			Collection<SMTProblem> problems = new LinkedList<SMTProblem>();
 			tgInfoDialog.write("Apply semantic blasting macro");
 			for(Proof proof : proofs){
+				
 				SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
 				mediator.setProof(proof);				
 				try {
 					macro.applyTo(mediator, null, null);
 					problems.addAll(SMTProblem.createSMTProblems(mediator.getSelectedProof()));
+					//mediator.getUI().removeProof(mediator.getSelectedProof());
 				} catch (InterruptedException e) {
 					Debug.out("Semantics blasting interrupted");
+				} catch(Exception e){
+					System.err.println(e);
 				}
-				mediator.getUI().removeProof(proof);
+				
 			}
 			tgInfoDialog.write("Done applying semantic blasting");
 			

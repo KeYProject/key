@@ -14,9 +14,11 @@ import java.util.Map;
 
 
 
+
 import de.uka.ilkd.key.gui.actions.CounterExampleAction;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.gui.actions.TestGenerationAction;
+import de.uka.ilkd.key.gui.smt.TGInfoDialog;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -52,6 +54,7 @@ public class TestCaseGenerator {
 	private final String dontCopy;
     protected final String modDir;
     protected final String directory;
+    private TGInfoDialog logger;
     String fileName;
     
     private Map<Sort,StringBuffer> sortDummyClass;
@@ -80,6 +83,12 @@ public class TestCaseGenerator {
 		}
 	}
 	
+	
+	
+	public void setLogger(TGInfoDialog logger) {
+		this.logger = logger;
+	}
+
 	private ObjectVal getObject(Heap h,String name){
 		if(h==null){
 			return null;
@@ -125,7 +134,8 @@ public class TestCaseGenerator {
 			}
 			final File pcFile = new File(dir, file);
 			String path = pcFile.getAbsolutePath();
-			System.out.println("Writing test file to:"+path);
+			logger.write("Writing test file to:"+path);
+			//System.out.println("Writing test file to:"+path);
 			final FileWriter fw = new FileWriter(pcFile);
 			final BufferedWriter bw = new BufferedWriter(fw);
 			bw.write(sb.toString());
