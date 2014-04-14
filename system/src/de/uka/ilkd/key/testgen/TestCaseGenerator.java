@@ -16,6 +16,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.gui.actions.CounterExampleAction;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.gui.actions.TestGenerationAction;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -59,9 +60,9 @@ public class TestCaseGenerator {
 	final String TESTMETHOD = " public void  testcode0 () {";
 	final String POSTFIX = " }";
 	
-	public TestCaseGenerator(Goal  goal) {
+	public TestCaseGenerator() {
 		super();
-		this.proof = CounterExampleAction.originalProof;
+		this.proof = TestGenerationAction.originalProof;
 		this.services = proof.getServices();
 		junitFormat = false;
 		modDir = proof.getJavaModel().getModelDir();
@@ -197,9 +198,8 @@ public class TestCaseGenerator {
 				if(o.getName().equals("#o0")){
 					continue;
 				}
-				
 				String type;
-				Sort sort = o.getSort();
+				final Sort sort = o.getSort();
 				if(sort==null){ 
 					System.out.println("Warning: replacing unknwon sort by java.lang.Object");
 					sort = services.getJavaInfo().getKeYJavaType("java.lang.Object").getSort(); 
@@ -210,6 +210,7 @@ public class TestCaseGenerator {
 
 				type = sort.name().toString();
 				
+
 				String right;				
 				if(type.endsWith("[]")){
 					right = "new "+type.substring(0, type.length()-2)+"["+o.getLength()+"]";
