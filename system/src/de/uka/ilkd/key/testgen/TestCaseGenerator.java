@@ -62,8 +62,7 @@ public class TestCaseGenerator {
     private Map<Sort,StringBuffer> sortDummyClass;
 	
     final String DummyPostfix = "DummyImpl";
-	final String TESTMETHOD = " public void  testcode0 () {";
-	final String POSTFIX = " }";
+
 	
 	public TestCaseGenerator() {
 		super();
@@ -109,28 +108,34 @@ public class TestCaseGenerator {
 		if(mut==null){
 			mut = "<method under test> //Manually write a call to the method under test, because KeY could not determine it automatically.";
 		}
-		StringBuffer testCase = new StringBuffer();
+		StringBuffer testSuite = new StringBuffer();
+		testSuite.append(getFilePrefix() + "\n");
 		
+		StringBuffer testMethods = new StringBuffer();
 		int i = 0;
 		for(SMTSolver solver : problemSolvers){
-			if(solver.getQuery()!=null ){
+			if(solver.getQuery()!=null){
 				Model m = solver.getQuery().getModel();
-				if(m!=null ){
+				if(m!=null && !m.isEmpty()){
 					logger.write("Generate test Case: "+i);
-					testCase.append(getFilePrefix() + "\n");
-					testCase.append(getMainMethod()+"\n\n");
-					testCase.append(TESTMETHOD+"\n");
-					testCase.append("   //Test preamble: creating objects and intializing test data"+generateTestCase(m)+"\n\n");
-					testCase.append("   //Calling the method under test\n   "+mut+"; \n");
-					testCase.append(POSTFIX+"\n}");
+					testMethods.append(getTestMethodSignature(i)+"{\n");
+					testMethods.append("   //Test preamble: creating objects and intializing test data"+generateTestCase(m)+"\n\n");
+					testMethods.append("   //Calling the method under test\n   "+mut+"; \n");
+					testMethods.append(" }\n\n");
 					
 					i++;
 				}
 			}
 		}
 		
+		testSuite.append(getMainMethod(i)+"\n\n");
+
+		testSuite.append(testMethods);
+		
+		testSuite.append("\n}");
+		
 		System.out.println("Writing test file to:"+directory+modDir);
-		writeToFile(fileName + ".java", testCase);
+		writeToFile(fileName + ".java", testSuite);
 		exportCodeUnderTest();
 		
     	createDummyClasses();
@@ -138,7 +143,7 @@ public class TestCaseGenerator {
     	createOpenJMLShellScript();
 
 		fileCounter++;
-		return testCase.toString();
+		return testSuite.toString();
 		
 	}
 	
@@ -150,11 +155,11 @@ public class TestCaseGenerator {
 		}
 		StringBuffer testCase = new StringBuffer();
 		testCase.append(getFilePrefix() + "\n");
-		testCase.append(getMainMethod()+"\n\n");
-		testCase.append(TESTMETHOD+"\n");
+		testCase.append(getMainMethod(1)+"\n\n");
+		testCase.append(getTestMethodSignature(0)+"{\n");
 		testCase.append("   //Test preamble: creating objects and intializing test data"+generateTestCase(m)+"\n\n");
 		testCase.append("   //Calling the method under test\n   "+mut+"; \n");
-		testCase.append(POSTFIX+"\n}");
+		testCase.append("}\n}");
 		
 		System.out.println("Writing test file to:"+directory+modDir);
 		writeToFile(fileName + ".java", testCase);
@@ -221,12 +226,20 @@ public class TestCaseGenerator {
 		return res;
 	}
 	
-	private String getMainMethod(){
-		String res  = " public static void  main (java.lang.String[]  arg) {\n"
-					+ "   TestGeneric"+fileCounter+" testSuiteObject;\n"
-					+ "   testSuiteObject=new TestGeneric"+fileCounter+" ();\n"
-					+ "   testSuiteObject.testcode0();\n" 
-					+ " }";
+	private String getTestMethodSignature(int i){
+		return " public void  testcode"+i+"()";
+	}
+	private StringBuffer getMainMethod(int i){
+		StringBuffer res = new StringBuffer();
+		 res.append( " public static void  main (java.lang.String[]  arg) {\n"
+				    +"   TestGeneric"+fileCounter+" testSuiteObject;\n\n"
+					+"   testSuiteObject=new TestGeneric"+fileCounter+" ();\n");
+		 for(int j=0;j<i;j++){
+			res.append("   testSuiteObject.testcode"+j+"();\n");
+		 }
+		 if(i==0)
+			 res.append("   //Warning:no test methods were generated.");
+	     res.append(" }");
 		return res;
 	}
 
