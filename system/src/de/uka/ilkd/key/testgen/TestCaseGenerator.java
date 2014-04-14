@@ -136,6 +136,8 @@ public class TestCaseGenerator {
 		
 		System.out.println("Writing test file to:"+directory+modDir);
 		writeToFile(fileName + ".java", testSuite);
+		logger.write("Writing test file to:"+directory+modDir+File.separator+fileName);
+
 		exportCodeUnderTest();
 		
     	createDummyClasses();
@@ -162,6 +164,7 @@ public class TestCaseGenerator {
 		testCase.append("}\n}");
 		
 		System.out.println("Writing test file to:"+directory+modDir);
+		logger.write("Writing test file to:"+directory+modDir+File.separator+fileName);
 		writeToFile(fileName + ".java", testCase);
 		exportCodeUnderTest();
 		
@@ -183,8 +186,6 @@ public class TestCaseGenerator {
 			}
 			final File pcFile = new File(dir, file);
 			String path = pcFile.getAbsolutePath();
-			logger.write("Writing test file to:"+path);
-			//System.out.println("Writing test file to:"+path);
 			final FileWriter fw = new FileWriter(pcFile);
 			final BufferedWriter bw = new BufferedWriter(fw);
 			bw.write(sb.toString());
@@ -232,8 +233,8 @@ public class TestCaseGenerator {
 	private StringBuffer getMainMethod(int i){
 		StringBuffer res = new StringBuffer();
 		 res.append( " public static void  main (java.lang.String[]  arg) {\n"
-				    +"   TestGeneric"+fileCounter+" testSuiteObject;\n\n"
-					+"   testSuiteObject=new TestGeneric"+fileCounter+" ();\n");
+				    +"   TestGeneric"+fileCounter+" testSuiteObject;\n"
+					+"   testSuiteObject=new TestGeneric"+fileCounter+" ();\n\n");
 		 for(int j=0;j<i;j++){
 			res.append("   testSuiteObject.testcode"+j+"();\n");
 		 }
@@ -564,7 +565,7 @@ public class TestCaseGenerator {
 									"  if [ -e \"jmlspecs.jar\" ]\n"+
 									"  then\n"+
 									"   if [ \"$1\" = \"\" ] ; then\n"+
-									"    echo \"Provide the test driver as an argument. E.g.\"\n"+
+									"    echo \"Provide the test driver as an argument (without .java postfix). For example:\"\n"+
 									"    echo \"  executeWithOpenJML.sh TestGeneric0 \"\n"+
 									"    echo \"Make sure that jmlruntime.jar and jmlspecs.jar are in the\"\n"+
 									"    echo \"current directory.\"\n"+

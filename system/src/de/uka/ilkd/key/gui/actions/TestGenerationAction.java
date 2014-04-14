@@ -341,6 +341,14 @@ public class TestGenerationAction extends MainWindowAction {
 			}
 			tgInfoDialog.write("Done applying semantic blasting");
 			
+			mediator.setProof(originalProof);
+
+			for(Proof proof : proofs){				
+				mediator.getUI().removeProof(proof);
+				proof.dispose();
+			}
+			
+			
 			getMediator().setInteractive(true);
 	    	getMediator().startInterface(true);
 			
