@@ -308,7 +308,7 @@ public class TestGenerationAction extends MainWindowAction {
 	    @Override 
 	    public void finished() {
 	    	getMediator().setInteractive(true);
-	    	//getMediator().startInterface(true);
+	    	getMediator().startInterface(true);
 	    	getMediator().removeInterruptedListener(this);
 	    	originalProof = null;
 	    }
@@ -323,7 +323,9 @@ public class TestGenerationAction extends MainWindowAction {
 			Collection<SMTProblem> problems = new LinkedList<SMTProblem>();
 			tgInfoDialog.write("Apply semantic blasting macro");
 			for(Proof proof : proofs){
-				
+				ProofAggregate pa = new SingleProof(proof, "XXX");
+	    		MainWindow mw = MainWindow.getInstance();
+	    		mw.addProblem(pa);
 				SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
 				mediator.setProof(proof);				
 				try {
