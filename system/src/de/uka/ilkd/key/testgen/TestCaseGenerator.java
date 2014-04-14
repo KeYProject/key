@@ -199,7 +199,7 @@ public class TestCaseGenerator {
 					continue;
 				}
 				String type;
-				final Sort sort = o.getSort();
+				Sort sort = o.getSort();
 				if(sort==null){ 
 					System.out.println("Warning: replacing unknwon sort by java.lang.Object");
 					sort = services.getJavaInfo().getKeYJavaType("java.lang.Object").getSort(); 
