@@ -54,7 +54,7 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener{
 		tg.setLogger(this);
 		int i = 0;
 		for(SMTSolver solver : problemSolvers){
-			if(solver.getQuery()!=null){
+			if(solver.getQuery()!=null && solver.getQuery().getModel()!=null){				
 				write("Generate test Case: "+i);
 				tg.generateJUnitTestCase(solver.getQuery().getModel());
 				i++;
