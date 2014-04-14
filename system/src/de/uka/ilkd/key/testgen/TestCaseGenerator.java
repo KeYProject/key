@@ -106,6 +106,7 @@ public class TestCaseGenerator {
 		testCase.append("   //Calling the method under test\n   "+mut+"; \n");
 		testCase.append(POSTFIX+"\n}");
 		
+		System.out.println("Writing test file to:"+directory+modDir);
 		writeToFile(fileName + ".java", testCase);
 		exportCodeUnderTest();
 		
@@ -127,7 +128,6 @@ public class TestCaseGenerator {
 			}
 			final File pcFile = new File(dir, file);
 			String path = pcFile.getAbsolutePath();
-			System.out.println("Writing test file to:"+path);
 			final FileWriter fw = new FileWriter(pcFile);
 			final BufferedWriter bw = new BufferedWriter(fw);
 			bw.write(sb.toString());
