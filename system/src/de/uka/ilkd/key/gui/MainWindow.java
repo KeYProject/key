@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.gui.actions.TermLabelMenu;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -69,6 +70,7 @@ import javax.swing.event.MouseInputAdapter;
 import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
 import de.uka.ilkd.key.gui.actions.AboutAction;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
+import de.uka.ilkd.key.gui.actions.CounterExampleAction;
 import de.uka.ilkd.key.gui.actions.TestGenerationAction;
 import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
@@ -531,6 +533,8 @@ public final class MainWindow extends JFrame  {
         ComplexButton comp = createSMTComponent();
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
+        toolBar.addSeparator();        
+        toolBar.add(new CounterExampleAction(this));
         toolBar.addSeparator();        
         toolBar.add(new TestGenerationAction(this));
         toolBar.addSeparator();
