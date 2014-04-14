@@ -119,6 +119,8 @@ public class TestCaseGenerator {
 		exportCodeUnderTest();
 		
     	createDummyClasses();
+    	
+    	createOpenJMLShellScript();
 
 		fileCounter++;
 		return testCase.toString();
@@ -188,6 +190,9 @@ public class TestCaseGenerator {
 
 	public String generateTestCase(Model m){
 		
+		System.out.println("--generateTestCase "+fileCounter+"--");
+		System.out.println("Heaps:"+m.getHeaps().size()+ " Types:"+m.getTypes() + " Constants:"+m.getConstants().size());
+		
 		List<Assignment> assignments = new LinkedList<Assignment>();
 		
 		Heap heap = null;
@@ -198,9 +203,11 @@ public class TestCaseGenerator {
 			}
 		}
 		
-		System.out.println("Test!!!");
 		KeYJavaType kjt = services.getJavaInfo().getKeYJavaType("java.io.Serializable");
 		buildDummyClassForAbstractSort(kjt.getSort());		
+		kjt = services.getJavaInfo().getKeYJavaType("java.lang.Cloneable");
+		buildDummyClassForAbstractSort(kjt.getSort());
+		
 		
 		if(heap!=null){
 			//create objects
@@ -208,18 +215,7 @@ public class TestCaseGenerator {
 				if(o.getName().equals("#o0")){
 					continue;
 				}
-				String type;
-				Sort sort = o.getSort();
-				if(sort==null){ 
-					System.out.println("Warning: replacing unknwon sort by java.lang.Object");
-					sort = services.getJavaInfo().getKeYJavaType("java.lang.Object").getSort(); 
-				}
-				if(sort.isAbstract()){
-					buildDummyClassForAbstractSort(sort);
-				}
-
-				type = sort.name().toString();
-				
+				String type = getSafeType(o.getSort());
 
 				String right;				
 				if(type.endsWith("[]")){
@@ -228,7 +224,7 @@ public class TestCaseGenerator {
 				else{
 					right = "new "+type+"()";
 				}
-				assignments.add(new Assignment(type, o.getName().replace("#", ""), right));
+				assignments.add(new Assignment(type, o.getName().replace("#", "_"), right));
 				
 				
 			}			
@@ -250,7 +246,7 @@ public class TestCaseGenerator {
 						type = "Object";
 					}
 				}				
-				val = val.replace("#", "");
+				val = val.replace("#", "_");
 				assignments.add(new Assignment(type,c,val));
 			}
 		}
@@ -263,7 +259,7 @@ public class TestCaseGenerator {
 					continue;
 				}
 				
-				String name = o.getName().replace("#", "");
+				String name = o.getName().replace("#", "_");
 				
 				for(String f : o.getFieldvalues().keySet()){
 					if(f.contains("<") || f.contains(">")){
@@ -276,7 +272,7 @@ public class TestCaseGenerator {
 						val = val.substring(0, val.indexOf("/"));
 					}
 					val = val.replace("|", "");
-					val = val.replace("#", "");
+					val = val.replace("#", "_");
 					assignments.add(new Assignment(name+"."+fieldName, val));
 				}
 				
@@ -287,21 +283,21 @@ public class TestCaseGenerator {
 						val = val.substring(0, val.indexOf("/"));
 					}
 					val = val.replace("|", "");
-					val = val.replace("#", "");
+					val = val.replace("#", "_");
 					assignments.add(new Assignment(name+fieldName, val));
 				}				
 			}			
 		}
 		
 		
-		String result = "";
+		StringBuffer result = new StringBuffer();
 		for(Assignment a : assignments){
-			result+=a.toString();
+			result.append(a.toString());
 		}
 		
 		
 		
-		return result;
+		return result.toString();
 	}
 
 	public String getSafeType(Sort sort){
@@ -338,7 +334,7 @@ public class TestCaseGenerator {
 		while(methods.hasNext()){
 			IProgramMethod m = methods.next();
 			if(m.getFullName().indexOf('<')>-1) continue;
-			if(m.isPrivate() || m.isFinal() /*|| !m.isAbstract()*/) continue;
+			if(m.isPrivate() || m.isFinal() || !m.isAbstract()) continue;
 			sb.append(" ");
 			MethodDeclaration md = m.getMethodDeclaration();
 			//sb.append(md.toString()+ "\n");
@@ -494,6 +490,65 @@ public class TestCaseGenerator {
 			String file = getDummyClassNameFor(s) + ".java";
 			writeToFile(file,sb);
 		}	
+	}
+	//TODO: in future remove this string and provide the file in the KeY-project
+	final String compileWithOpenJML="#!/bin/bash\n\n"+
+									"if [ -e \"openjml.jar\" ]\n"+
+									"then\n"+
+									"   java -jar openjml.jar -cp \".\" -rac *.java\n"+
+									"else\n"+
+									"   echo \"openjml.jar not found!\"\n"+
+									"   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"+
+									"   echo \"Copy openjml.jar into the directory with test files.\"\n"+
+									"fi\n";
+
+	//TODO: in future remove this string and provide the file in the KeY-project
+	final String executeWithOpenJML="#!/bin/bash\n"+
+									"if [ -e \"jmlruntime.jar\" ]\n"+
+									"then"+
+									"  if [ -e \"jmlspecs.jar\" ]\n"+
+									"  then\n"+
+									"   if [ \"$1\" = \"\" ] ; then\n"+
+									"    echo \"Provide the test driver as an argument. E.g.\"\n"+
+									"    echo \"  executeWithOpenJML.sh TestGeneric0 \"\n"+
+									"    echo \"Make sure that jmlruntime.jar and jmlspecs.jar are in the\"\n"+
+									"    echo \"current directory.\"\n"+
+									"    quit\n"+
+									"   else\n"+								
+									"     java -cp jmlruntime.jar:jmlspecs.jar:. $1\n"+								
+									"   fi\n"+
+									"else\n"+
+									"  echo \"jmlspecs.jar not found!\"\n"+
+									"  echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"+
+									"  echo \"Copy jmlspecs.jar into the directory with test files.\"\n"+
+									"  quit\n"+
+									"fi\n"+
+									"else\n"+
+									"   echo \"jmlruntime.jar not found!\"\n"+
+									"   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"+
+									"   echo \"Copy jmlruntime.jar into the directory with test files.\"\n"+
+									"   quit\n"+
+									"fi\n";
+
+
+
+	protected void createOpenJMLShellScript(){
+		StringBuffer sb=new StringBuffer();
+		String filestr = "compileWithOpenJML.sh";
+		
+		File file = new File(directory + modDir + File.separator + filestr);
+		if (!file.exists()) {
+			sb.append(compileWithOpenJML);
+			writeToFile(filestr, sb);
+		}
+		
+		filestr= "executeWithOpenJML.sh";
+		file = new File(directory + modDir + File.separator + filestr);
+		if (!file.exists()) {
+			sb = new StringBuffer();
+			sb.append(executeWithOpenJML);
+			writeToFile(filestr, sb);
+		}
 	}
 
 	protected void exportCodeUnderTest() {
