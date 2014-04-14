@@ -39,8 +39,8 @@ import de.uka.ilkd.key.util.Debug;
 @SuppressWarnings("serial")
 public class TestGenerationAction extends MainWindowAction {
 
-	private static final String NAME = "CE";
-	private static final String TOOLTIP = "Search for a counterexample for the selected goal";
+	private static final String NAME = "T";
+	private static final String TOOLTIP = "Generate test cases for open goals";
 	private TGInfoDialog tgInfoDialog;
 	
 	public static Proof originalProof; 
@@ -69,10 +69,7 @@ public class TestGenerationAction extends MainWindowAction {
                     // no proof loaded
                     setEnabled(false);
                 } else {
-                    final Goal selGoal = getMediator().getSelectedGoal();
-                    final Node selNode = getMediator().getSelectedNode();
-                    //Can be applied only to root nodes
-                    setEnabled(selNode.childrenCount()==0);
+                    setEnabled(true);
                 }
             }
             
@@ -334,6 +331,7 @@ public class TestGenerationAction extends MainWindowAction {
 				} catch (InterruptedException e) {
 					Debug.out("Semantics blasting interrupted");
 				}
+				mediator.getUI().removeProof(proof);
 			}
 			tgInfoDialog.write("Done applying semantic blasting");
 			
