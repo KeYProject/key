@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -14,9 +15,11 @@ import java.util.Map;
 
 
 
+
 import de.uka.ilkd.key.gui.actions.CounterExampleAction;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.gui.actions.TestGenerationAction;
+import de.uka.ilkd.key.gui.smt.TGInfoDialog;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -37,6 +40,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.model.Heap;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
@@ -52,6 +56,7 @@ public class TestCaseGenerator {
 	private final String dontCopy;
     protected final String modDir;
     protected final String directory;
+    private TGInfoDialog logger;
     String fileName;
     
     private Map<Sort,StringBuffer> sortDummyClass;
@@ -80,6 +85,12 @@ public class TestCaseGenerator {
 		}
 	}
 	
+	
+	
+	public void setLogger(TGInfoDialog logger) {
+		this.logger = logger;
+	}
+
 	private ObjectVal getObject(Heap h,String name){
 		if(h==null){
 			return null;
@@ -90,6 +101,45 @@ public class TestCaseGenerator {
 			}
 		}
 		return null;
+	}
+	
+	public String generateJUnitTestSuite(Collection<SMTSolver> problemSolvers){
+		fileName = "TestGeneric"+fileCounter;
+		String mut = getMUT();
+		if(mut==null){
+			mut = "<method under test> //Manually write a call to the method under test, because KeY could not determine it automatically.";
+		}
+		StringBuffer testCase = new StringBuffer();
+		
+		int i = 0;
+		for(SMTSolver solver : problemSolvers){
+			if(solver.getQuery()!=null ){
+				Model m = solver.getQuery().getModel();
+				if(m!=null ){
+					logger.write("Generate test Case: "+i);
+					testCase.append(getFilePrefix() + "\n");
+					testCase.append(getMainMethod()+"\n\n");
+					testCase.append(TESTMETHOD+"\n");
+					testCase.append("   //Test preamble: creating objects and intializing test data"+generateTestCase(m)+"\n\n");
+					testCase.append("   //Calling the method under test\n   "+mut+"; \n");
+					testCase.append(POSTFIX+"\n}");
+					
+					i++;
+				}
+			}
+		}
+		
+		System.out.println("Writing test file to:"+directory+modDir);
+		writeToFile(fileName + ".java", testCase);
+		exportCodeUnderTest();
+		
+    	createDummyClasses();
+    	
+    	createOpenJMLShellScript();
+
+		fileCounter++;
+		return testCase.toString();
+		
 	}
 	
 	public String generateJUnitTestCase(Model m){
@@ -128,6 +178,8 @@ public class TestCaseGenerator {
 			}
 			final File pcFile = new File(dir, file);
 			String path = pcFile.getAbsolutePath();
+			logger.write("Writing test file to:"+path);
+			//System.out.println("Writing test file to:"+path);
 			final FileWriter fw = new FileWriter(pcFile);
 			final BufferedWriter bw = new BufferedWriter(fw);
 			bw.write(sb.toString());

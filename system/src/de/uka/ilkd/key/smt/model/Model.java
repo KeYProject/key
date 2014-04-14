@@ -16,6 +16,8 @@ import de.uka.ilkd.key.smt.lang.SMTSort;
  *
  */
 public class Model {
+	
+	private boolean empty;
 	/**
 	 * Maps constant names to constant values. (constantName, constantValue)
 	 */
@@ -43,12 +45,33 @@ public class Model {
 
 
 	public Model() {
+		empty = true;
 		constants = new HashMap<String,String>();
 		heaps = new LinkedList<Heap>();
 		locsets = new LinkedList<LocationSet>();
 		reversedConstants = new HashMap<String, String>();
 		sequences = new LinkedList<Sequence>();
 	}
+	
+	
+	
+	
+
+	public boolean isEmpty() {
+		return empty;
+	}
+
+
+
+
+
+	public void setEmpty(boolean empty) {
+		this.empty = empty;
+	}
+
+
+
+
 
 	/**
 	 * Transforms an Object id from binary form to #on, where n is a decimal number.

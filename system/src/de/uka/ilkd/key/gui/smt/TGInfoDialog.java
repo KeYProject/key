@@ -1,14 +1,11 @@
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.BorderLayout;
-import java.awt.Dialog;
 import java.util.Collection;
 
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.TestGenerator;
 
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
@@ -21,7 +18,7 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener{
 	
 	private JTextArea text;
 	
-	private int problemNr;
+	
 	
 	
 
@@ -54,9 +51,10 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener{
 		
 		write("Stoped solving smt problems: "+problemSolvers.size());
 		TestCaseGenerator tg = new TestCaseGenerator();
+		tg.setLogger(this);
 		int i = 0;
 		for(SMTSolver solver : problemSolvers){
-			if(solver.getQuery()!=null){
+			if(solver.getQuery()!=null && solver.getQuery().getModel()!=null){				
 				write("Generate test Case: "+i);
 				tg.generateJUnitTestCase(solver.getQuery().getModel());
 				i++;
