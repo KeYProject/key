@@ -6,16 +6,24 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
 
 
 import de.uka.ilkd.key.gui.actions.CounterExampleAction;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Method;
+import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -23,6 +31,8 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -42,9 +52,12 @@ public class TestCaseGenerator {
     protected final String modDir;
     protected final String directory;
     String fileName;
+    
+    private Map<Sort,StringBuffer> sortDummyClass;
 	
-	String TESTMETHOD = " public void  testcode0 () {";
-	String POSTFIX = " }";
+    final String DummyPostfix = "DummyImpl";
+	final String TESTMETHOD = " public void  testcode0 () {";
+	final String POSTFIX = " }";
 	
 	public TestCaseGenerator(Goal  goal) {
 		super();
@@ -54,6 +67,7 @@ public class TestCaseGenerator {
 		modDir = proof.getJavaModel().getModelDir();
 		dontCopy = modDir + File.separator + DONT_COPY;
 		this.directory = System.getProperty("user.home") + File.separator + "testFiles";
+		sortDummyClass = new HashMap<Sort,StringBuffer>();
 	}
 
 	private boolean filterVal(String s){
@@ -91,14 +105,16 @@ public class TestCaseGenerator {
 		testCase.append("   //Calling the method under test\n   "+mut+"; \n");
 		testCase.append(POSTFIX+"\n}");
 		
-		writeToFile(testCase);
+		writeToFile(fileName + ".java", testCase);
 		exportCodeUnderTest();
 		
+    	createDummyClasses();
+
 		fileCounter++;
 		return testCase.toString();
 	}
 	
-	public void writeToFile(StringBuffer sb){
+	public void writeToFile(String file, StringBuffer sb){
 		try
 		{
 
@@ -106,7 +122,7 @@ public class TestCaseGenerator {
 			if (!dir.exists()) {
 			    dir.mkdirs();
 			}
-			final File pcFile = new File(dir, fileName + ".java");
+			final File pcFile = new File(dir, file);
 			String path = pcFile.getAbsolutePath();
 			System.out.println("Writing test file to:"+path);
 			final FileWriter fw = new FileWriter(pcFile);
@@ -171,7 +187,9 @@ public class TestCaseGenerator {
 			}
 		}
 		
-				
+		System.out.println("Test!!!");
+		KeYJavaType kjt = services.getJavaInfo().getKeYJavaType("java.io.Serializable");
+		buildDummyClassForAbstractSort(kjt.getSort());		
 		
 		if(heap!=null){
 			//create objects
@@ -180,7 +198,18 @@ public class TestCaseGenerator {
 					continue;
 				}
 				
-				String type = o.getSort().name().toString();
+				String type;
+				Sort sort = o.getSort();
+				if(sort==null){ 
+					System.out.println("Warning: replacing unknwon sort by java.lang.Object");
+					sort = services.getJavaInfo().getKeYJavaType("java.lang.Object").getSort(); 
+				}
+				if(sort.isAbstract()){
+					buildDummyClassForAbstractSort(sort);
+				}
+
+				type = sort.name().toString();
+				
 				String right;				
 				if(type.endsWith("[]")){
 					right = "new "+type.substring(0, type.length()-2)+"["+o.getLength()+"]";
@@ -236,6 +265,7 @@ public class TestCaseGenerator {
 						val = val.substring(0, val.indexOf("/"));
 					}
 					val = val.replace("|", "");
+					val = val.replace("#", "");
 					assignments.add(new Assignment(name+"."+fieldName, val));
 				}
 				
@@ -245,6 +275,8 @@ public class TestCaseGenerator {
 					if(val.contains("/")){
 						val = val.substring(0, val.indexOf("/"));
 					}
+					val = val.replace("|", "");
+					val = val.replace("#", "");
 					assignments.add(new Assignment(name+fieldName, val));
 				}				
 			}			
@@ -259,6 +291,119 @@ public class TestCaseGenerator {
 		
 		
 		return result;
+	}
+
+	public String getSafeType(Sort sort){
+		if(sort==null){
+			return "java.lang.Object"; //TODO:Hopefully this is correct
+		}else if(sort.isAbstract()){
+			return buildDummyClassForAbstractSort(sort);
+		}else{
+			return sort.name().toString();
+		}
+	}
+	
+	private String getDummyClassNameFor(Sort sort){
+		JavaInfo jinfo = services.getJavaInfo();
+		KeYJavaType kjt = jinfo.getKeYJavaType(sort); 
+		return kjt.getName()+DummyPostfix;
+	}
+	
+	protected String buildDummyClassForAbstractSort(Sort sort){
+		
+		JavaInfo jinfo = services.getJavaInfo();
+		KeYJavaType kjt = jinfo.getKeYJavaType(sort); 
+		String className = getDummyClassNameFor(sort);
+		if(sortDummyClass.containsKey(sort)) return className;
+		
+		StringBuffer sb = new StringBuffer();
+		sortDummyClass.put(sort, sb); //Put the string buffer as soon as possible, due to possible recursive calls of this method.
+	
+		sb.append("import "+sort.declarationString()+";\n\n");
+		sb.append("class "+className + " implements "+sort.declarationString()+"{\n"); //TODO:extends or implements depending if it is a class or interface.
+		sb.append(" public "+className+"(){ };\n");  //default constructor
+
+		Iterator<IProgramMethod> methods = jinfo.getAllProgramMethods(kjt).iterator();		
+		while(methods.hasNext()){
+			IProgramMethod m = methods.next();
+			if(m.getFullName().indexOf('<')>-1) continue;
+			if(m.isPrivate() || m.isFinal() /*|| !m.isAbstract()*/) continue;
+			sb.append(" ");
+			MethodDeclaration md = m.getMethodDeclaration();
+			//sb.append(md.toString()+ "\n");
+			if(m.isProtected())
+				sb.append("protected ");
+			if(m.isPublic())
+				sb.append("public ");
+			if(m.isFinal())
+				sb.append("final "); //Is this possible?
+			if(m.isStatic())
+				sb.append("static ");
+			if(m.isSynchronized())
+				sb.append("synchronized ");
+			
+			if(md.getTypeReference()==null)
+				sb.append("void ");
+			else
+				sb.append(md.getTypeReference().toString() + " ");
+			
+			sb.append(m.getName()+"(");
+			Iterator<ParameterDeclaration> pdIter = md.getParameters().iterator();
+			int varcount =0;
+			while(pdIter.hasNext()){
+				ParameterDeclaration pd = pdIter.next();
+				if(pd.isFinal())
+					sb.append("final ");
+				
+				if(pd.getTypeReference()==null)
+					sb.append("void /*unkown type*/ ");
+				else 
+					sb.append(pd.getTypeReference().toString()+ " ");
+				
+				if(pd.getVariables().isEmpty())
+					sb.append("var"+varcount);
+				else
+					sb.append(pd.getVariables().iterator().next().getFullName());
+				
+				if(pdIter.hasNext())
+					sb.append(", ");
+				varcount ++;
+			}
+			sb.append(")");
+			if(md.getThrown()!=null){
+				sb.append(" throws "+md.getThrown().getTypeReferenceAt(0)+ " \n ");
+			}
+
+			if(md.getTypeReference()==null){
+				sb.append("{ };");
+			}else{
+				String type = md.getTypeReference().toString();
+				if(type.equals("byte") || type.equals("short") || type.equals("int") || 
+						type.equals("long") || type.equals("float") || type.equals("double") ){					
+					sb.append("{ return 0;}");
+				} else if( type.equals("boolean")){
+					sb.append("{ return true;}");
+				} else if( type.equals("char") ){
+					sb.append("{ return 'a';}");
+				}else {
+					boolean returnNull=true;
+					try{
+						String retType = md.getTypeReference().getKeYJavaType().getSort().name().toString();
+						if(retType.equals("java.lang.String")){
+							sb.append("{ return \""+className+"\";}");
+							returnNull=false;
+						}
+					}catch(Exception e){returnNull=true;}
+					
+					if(returnNull)
+						sb.append("{ return null;}");
+				}
+			} 
+			sb.append("\n");
+		}
+		sb.append("}");
+		System.out.println("--------------------\n"+sb.toString());
+		return className;
 	}
 
 	public String getMUT(){
@@ -332,11 +477,18 @@ public class TestCaseGenerator {
 		return null;
 	}
 
+	protected void createDummyClasses(){
+		for(Sort s:sortDummyClass.keySet()){
+			StringBuffer sb=sortDummyClass.get(s);
+			String file = getDummyClassNameFor(s) + ".java";
+			writeToFile(file,sb);
+		}	
+	}
 
 	protected void exportCodeUnderTest() {
 	    try {
-		// Copy the involved classes without modification
-		copyFiles(modDir, directory + modDir);
+	    	// Copy the involved classes without modification
+	    	copyFiles(modDir, directory + modDir);
 	    } catch (final IOException e) {
 		e.printStackTrace();
 	    }
