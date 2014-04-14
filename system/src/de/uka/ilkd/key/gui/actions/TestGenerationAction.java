@@ -126,7 +126,7 @@ public class TestGenerationAction extends MainWindowAction {
 
 	}
     
-    private Vector<Proof> createProofsForTesting(KeYMediator mediator){
+    private Vector<Proof> createProofsForTesting(KeYMediator mediator, boolean removeDuplicatePathConditions){
     	Vector<Proof> res = new Vector<Proof>();
     	
 		Proof oldProof = mediator.getSelectedGoal().proof();
@@ -138,7 +138,13 @@ public class TestGenerationAction extends MainWindowAction {
 		
 		while(oldGoalIter.hasNext()){
 			try{
-				res.add(createProofForTesting(oldGoalIter.next().node()));
+				Proof p=null;			
+				if(removeDuplicatePathConditions)
+					p = createProofForTesting_noDuplicate(oldGoalIter.next().node(),res);
+				else
+					p = createProofForTesting_noDuplicate(oldGoalIter.next().node(),null);
+				
+				if(p!=null)	res.add(p);
 			}catch(Exception e){
 				System.err.println(e.getMessage());
 			}
@@ -147,7 +153,7 @@ public class TestGenerationAction extends MainWindowAction {
 		return res;
     }
 
-    private Proof createProofForTesting(Node node){
+    private Proof createProofForTesting_noDuplicate(Node node, Vector<Proof> otherProofs){
 
     	System.out.println("Create proof for test case from Node:"+node.serialNr());
     	
@@ -167,6 +173,16 @@ public class TestGenerationAction extends MainWindowAction {
 			SequentFormula sf = it.next();
 			if(hasModalities(sf.formula())) continue;
 			newSequent = newSequent.addFormula(sf, false, false).sequent();
+		}
+		
+		//Check if a proof with the same sequent already exists.
+		if(otherProofs!=null){
+			for(Proof otherProof :otherProofs){
+				if(otherProof.root().sequent().equals(newSequent)){
+					System.out.println("Found and skip duplicate proof for node:"+node.serialNr());
+					return null;
+				}
+			}
 		}
 			
 		Proof proof = new Proof("Test Case for NodeNr: "+ node.serialNr(), 
@@ -316,7 +332,7 @@ public class TestGenerationAction extends MainWindowAction {
 		@Override
 		public Object construct() {
 			tgInfoDialog.write("Create proofs for testing");
-			Vector<Proof> proofs = createProofsForTesting(getMediator());
+			Vector<Proof> proofs = createProofsForTesting(getMediator(),true);
 	    	
 			tgInfoDialog.write("Done creating "+proofs.size()+" proofs.");
 			KeYMediator mediator = getMediator();
