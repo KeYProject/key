@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,14 +18,12 @@ import de.uka.ilkd.key.gui.SwingWorker3;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
-import de.uka.ilkd.key.gui.smt.SolverListener;
+import de.uka.ilkd.key.gui.smt.TGInfoDialog;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -38,18 +37,21 @@ import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.util.Debug;
 
 @SuppressWarnings("serial")
-public class CounterExampleAction extends MainWindowAction {
+public class TestGenerationAction extends MainWindowAction {
 
 	private static final String NAME = "CE";
 	private static final String TOOLTIP = "Search for a counterexample for the selected goal";
+	private TGInfoDialog tgInfoDialog;
 	
 	public static Proof originalProof; 
 	
-	public CounterExampleAction(MainWindow mainWindow) {
+	public TestGenerationAction(MainWindow mainWindow) {
 		super(mainWindow);
 		setName(NAME);
 		setTooltip(TOOLTIP);
 		init();
+		
+		
 		
 	}
 	
@@ -265,23 +267,21 @@ public class CounterExampleAction extends MainWindowAction {
 		Goal goal = getMediator().getSelectedGoal();		
 		originalProof = goal.node().proof();
 
-		Vector<Proof> proofs = createProofsForTesting(getMediator());
+		//Vector<Proof> proofs = createProofsForTesting(getMediator());
 
     	//The following loop is meant for debugging only and should be removed
-    	for(Proof p:proofs){
-    		ProofAggregate pa = new SingleProof(p, "XXX");
-    		MainWindow mw = MainWindow.getInstance();
-    		mw.addProblem(pa);
-    	}
+
     	
 		getMediator().setProof(originalProof);
-		createProof(getMediator());	
+		//createProof(getMediator());	
 		
 		CEWorker worker = new CEWorker();
 		worker.start();
 	}
 	
 	private class CEWorker extends SwingWorker3 implements InterruptListener{
+		
+		
 
 		@Override
 		public void interruptionPerformed() {
@@ -294,6 +294,7 @@ public class CounterExampleAction extends MainWindowAction {
 	     */
 	    @Override 
 	    public void start() {
+	    	tgInfoDialog = new TGInfoDialog();
 	        getMediator().stopInterface(true);
 	        getMediator().setInteractive(false);
 	        getMediator().addInterruptedListener(this);
@@ -313,34 +314,57 @@ public class CounterExampleAction extends MainWindowAction {
 
 		@Override
 		public Object construct() {
-			
+			tgInfoDialog.write("Create proofs for testing");
+			Vector<Proof> proofs = createProofsForTesting(getMediator());
+	    	for(Proof p:proofs){
+	    		ProofAggregate pa = new SingleProof(p, "XXX");
+	    		MainWindow mw = MainWindow.getInstance();
+	    		mw.addProblem(pa);
+	    	}
+			tgInfoDialog.write("Done creating "+proofs.size()+" proofs.");
 			KeYMediator mediator = getMediator();
-			Proof proof = mediator.getSelectedProof();
-			SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
-			
-			try {
-				macro.applyTo(mediator, null, null);
-			} catch (InterruptedException e) {
-				Debug.out("Semantics blasting interrupted");
+			Collection<SMTProblem> problems = new LinkedList<SMTProblem>();
+			tgInfoDialog.write("Apply semantic blasting macro");
+			for(Proof proof : proofs){
+				SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
+				mediator.setProof(proof);				
+				try {
+					macro.applyTo(mediator, null, null);
+					problems.addAll(SMTProblem.createSMTProblems(mediator.getSelectedProof()));
+				} catch (InterruptedException e) {
+					Debug.out("Semantics blasting interrupted");
+				}
 			}
+			tgInfoDialog.write("Done applying semantic blasting");
 			
 			getMediator().setInteractive(true);
 	    	getMediator().startInterface(true);
 			
 			
+			Proof proof = mediator.getSelectedProof();
+			
+			
+			
 			//invoke z3 for counterexamples
             SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
                             ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),proof);
+            
+            settings.getMaxConcurrentProcesses();
+            
             SolverLauncher launcher = new SolverLauncher(settings);
-            launcher.addListener(new SolverListener(settings));
+            launcher.addListener(tgInfoDialog);
+           // launcher.addListener(new SolverListener(settings));
             
             
             List<SolverType> solvers = new LinkedList<SolverType>();
-            solvers.add(SolverType.Z3_CE_SOLVER);
+            solvers.add(SolverType.Z3_CE_SOLVER);  
+            
+            
+            
             
             
             launcher.launch(solvers,
-		            SMTProblem.createSMTProblems(proof),
+		            problems,
 		            proof.getServices());		
 			
 			return null;

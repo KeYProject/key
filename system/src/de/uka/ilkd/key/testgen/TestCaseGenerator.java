@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-import de.uka.ilkd.key.gui.actions.CounterExampleAction;
+import de.uka.ilkd.key.gui.actions.TestGenerationAction;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -46,9 +46,9 @@ public class TestCaseGenerator {
 	String TESTMETHOD = " public void  testcode0 () {";
 	String POSTFIX = " }";
 	
-	public TestCaseGenerator(Goal  goal) {
+	public TestCaseGenerator() {
 		super();
-		this.proof = CounterExampleAction.originalProof;
+		this.proof = TestGenerationAction.originalProof;
 		this.services = proof.getServices();
 		junitFormat = false;
 		modDir = proof.getJavaModel().getModelDir();
@@ -179,8 +179,14 @@ public class TestCaseGenerator {
 				if(o.getName().equals("#o0")){
 					continue;
 				}
+				String type;
+				if(o.getSort()!=null){
+					type = o.getSort().name().toString();
+				}
+				else{
+					type = "java.lang.Object";
+				}
 				
-				String type = o.getSort().name().toString();
 				String right;				
 				if(type.endsWith("[]")){
 					right = "new "+type.substring(0, type.length()-2)+"["+o.getLength()+"]";
@@ -236,6 +242,7 @@ public class TestCaseGenerator {
 						val = val.substring(0, val.indexOf("/"));
 					}
 					val = val.replace("|", "");
+					val = val.replace("#", "");
 					assignments.add(new Assignment(name+"."+fieldName, val));
 				}
 				
@@ -245,6 +252,7 @@ public class TestCaseGenerator {
 					if(val.contains("/")){
 						val = val.substring(0, val.indexOf("/"));
 					}
+					val = val.replace("#", "");
 					assignments.add(new Assignment(name+fieldName, val));
 				}				
 			}			

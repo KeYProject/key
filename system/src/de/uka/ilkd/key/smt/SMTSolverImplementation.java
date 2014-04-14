@@ -43,9 +43,19 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
  
         private static int IDCounter = 0;
         private final int ID = IDCounter++;
+        
+        private ModelExtractor query;
 
 
-        /** The SMT problem that is related to this solver */
+        public ModelExtractor getQuery() {
+			return query;
+		}
+
+		public void setQuery(ModelExtractor query) {
+			this.query = query;
+		}
+
+		/** The SMT problem that is related to this solver */
         private SMTProblem problem;
         /** It is possible that a solver has a listener. */
         private SolverListener listener;
@@ -229,10 +239,15 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
         @Override
         public void run() {
+        		
                 // Firstly: Set the state to running and inform the listener.
                 setSolverState(SolverState.Running);
                 listener.processStarted(this, problem);
 
+                if(getType().getQuery() !=null){
+                	getType().setQuery(null);
+        		}
+                
                 // Secondly: Translate the given problem
                 String commands[];
                 try {
@@ -418,12 +433,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         				output += "\n\n";
         				output += m.toString();
         			}
-        			Goal goal = problem.getGoal();
-        			TestCaseGenerator tg = new TestCaseGenerator(goal);
-        			if(m!=null){
-        				output += "\n\n\nTestGen\n\n\n";
-        				output += tg.generateJUnitTestCase(m);
-        			}
+        			
         			
         			
         		}		
