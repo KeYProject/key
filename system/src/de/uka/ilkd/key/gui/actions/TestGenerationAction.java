@@ -130,7 +130,7 @@ public class TestGenerationAction extends MainWindowAction {
     private Vector<Proof> createProofsForTesting(KeYMediator mediator, boolean removeDuplicatePathConditions){
     	Vector<Proof> res = new Vector<Proof>();
     	
-		Proof oldProof = mediator.getSelectedGoal().proof();
+		Proof oldProof = mediator.getSelectedProof();
 		originalProof = oldProof;		
 		
 		
