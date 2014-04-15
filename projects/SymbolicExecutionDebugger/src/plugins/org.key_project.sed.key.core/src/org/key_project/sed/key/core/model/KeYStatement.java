@@ -38,7 +38,7 @@ public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNo
    /**
     * The {@link IExecutionStatement} to represent by this debug node.
     */
-   private IExecutionStatement executionNode;
+   private final IExecutionStatement executionNode;
 
    /**
     * The contained children.

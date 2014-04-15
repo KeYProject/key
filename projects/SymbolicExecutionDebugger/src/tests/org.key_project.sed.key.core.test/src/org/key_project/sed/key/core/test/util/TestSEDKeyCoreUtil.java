@@ -239,7 +239,7 @@ public final class TestSEDKeyCoreUtil {
     */
    public static ISEDDebugTarget createExpectedInitialModel(String targetName) {
       // Create debug target
-      SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null);
+      SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null, false);
       target.setModelIdentifier(KeYDebugTarget.MODEL_IDENTIFIER);
       target.setName(targetName);
       // Add thread

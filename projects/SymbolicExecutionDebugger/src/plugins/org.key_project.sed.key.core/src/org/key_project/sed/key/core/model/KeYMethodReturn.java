@@ -37,7 +37,7 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    /**
     * The {@link IExecutionMethodReturn} to represent by this debug node.
     */
-   private IExecutionMethodReturn executionNode;
+   private final IExecutionMethodReturn executionNode;
 
    /**
     * The contained children.

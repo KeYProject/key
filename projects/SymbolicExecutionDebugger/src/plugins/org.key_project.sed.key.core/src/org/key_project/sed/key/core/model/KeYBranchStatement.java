@@ -38,7 +38,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
    /**
     * The {@link IExecutionBranchStatement} to represent by this debug node.
     */
-   private IExecutionBranchStatement executionNode;
+   private final IExecutionBranchStatement executionNode;
 
    /**
     * The contained children.

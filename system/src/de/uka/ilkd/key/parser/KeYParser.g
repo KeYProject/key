@@ -133,6 +133,9 @@ options {
    private HashMap taclet2Builder;
    private AbbrevMap scm;
    private KeYExceptionHandler keh = null;
+   
+   
+   private String filename;
 
    // these variables are set if a file is read in step by
    // step. This used when reading in LDTs because of cyclic
@@ -212,6 +215,7 @@ options {
 	if(services != null)
           this.keh = services.getExceptionHandler();
 	this.nss = nss;
+	this.filename = filename;
         switchToNormalMode();
    }
 
@@ -354,6 +358,13 @@ options {
        input.consume();
        ttype = input.LA(1);
      }
+    }
+    
+    public String getSourceName() {
+    	if (super.getSourceName() == null) {
+    		return filename;
+    	}
+    	return super.getSourceName();
     }
 
     public String getChooseContract() {

@@ -5,10 +5,10 @@ package example3;
  * The example uses method contracts and loop invariants specified in the 
  * Java Modeling Language (JML). 
  * <p>
- * To debug method {@link #indexOf(Object[], Selector)} follow the instructions:
+ * To debug method {@link #indexOf(Object[], Filter)} follow the instructions:
  * <ol>
  *    <li>
- *       Debug method {@link #indexOf(Object[], Selector)} via context menu item
+ *       Debug method {@link #indexOf(Object[], Filter)} via context menu item
  *       'Debug As, Symbolic Execution Debugger (SED)'
  *    </li>
  *    <li>Terminate the debug session</li>
@@ -21,7 +21,7 @@ package example3;
  *       available method contract
  *    </li>
  *    <li>
- *       Debug method {@link #indexOf(Object[], Selector)} as before
+ *       Debug method {@link #indexOf(Object[], Filter)} as before
  *    </li>
  *    <li>
  *       Select method treatment 'Contract' in view 
@@ -33,7 +33,7 @@ package example3;
  *    <li>In view 'Debug', click on 'Resume' to start symbolic execution</li>
  * </ol>
  * Instead of unwinding the loop and inlining a specific implementation of 
- * interface method {@link Selector#select(Object)}, the loop invariant and the 
+ * interface method {@link Filter#accept(Object)}, the loop invariant and the 
  * method contract is applied. This achieves a finite symbolic execution tree 
  * which covers all possible concrete execution paths as long as the loop 
  * invariant holds and the contract is applicable. Potential problems with 
@@ -44,7 +44,7 @@ package example3;
  * invariant might not be preserved. Further inspection reveals that the loop 
  * counter variable {@code i} is not increased in the then branch.
  * <p>
- * The loop body calls method {@link Selector#select(Object)}. Instead of 
+ * The loop body calls method {@link Filter#accept(Object)}. Instead of 
  * inlining a specific method implementation, the method contract is used. 
  * To apply a method contract, its precondition has to be checked. A failed 
  * check is indicated by a node icon with a red cross.
@@ -56,10 +56,10 @@ package example3;
  */
 public class ArrayUtil {
 	/*@ normal_behavior
-	  @ requires \invariant_for(selector);
+	  @ requires \invariant_for(filter);
 	  @*/
 	public static int /*@ strictly_pure @*/ indexOf(Object[] array, 
-	                                                Selector selector) {
+	                                                Filter filter) {
 		int index = -1;
 		int i = 0;
 		/*@ loop_invariant i >= 0 && i <= array.length;
@@ -67,7 +67,7 @@ public class ArrayUtil {
 		  @ assignable \strictly_nothing;
 		  @*/
 		while (index < 0 && i < array.length) {
-			if (selector.select(array[i])) {
+			if (filter.accept(array[i])) {
 				index = i;
 			}
 			else {
@@ -77,11 +77,11 @@ public class ArrayUtil {
 		return i;
 	}
 	
-	public static interface Selector {
+	public static interface Filter {
 		/*@ normal_behavior
 		  @ requires true;
 		  @ ensures true;
 		  @*/
-		public boolean /*@ strictly_pure @*/ select(/*@ nullable @*/ Object object);
+		public boolean /*@ strictly_pure @*/ accept(/*@ nullable @*/ Object object);
 	}
 }

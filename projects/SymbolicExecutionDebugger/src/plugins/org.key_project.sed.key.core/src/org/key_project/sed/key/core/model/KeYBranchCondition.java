@@ -34,7 +34,7 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
    /**
     * The {@link IExecutionBranchCondition} to represent by this debug node.
     */
-   private IExecutionBranchCondition executionNode;
+   private final IExecutionBranchCondition executionNode;
    
    /**
     * The contained children.
