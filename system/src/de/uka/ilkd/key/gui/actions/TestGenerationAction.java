@@ -131,7 +131,7 @@ public class TestGenerationAction extends MainWindowAction {
     private Vector<Proof> createProofsForTesting(KeYMediator mediator, boolean removeDuplicatePathConditions){
     	Vector<Proof> res = new Vector<Proof>();
     	
-		Proof oldProof = mediator.getSelectedGoal().proof();
+		Proof oldProof = mediator.getSelectedProof();
 		originalProof = oldProof;		
 		
 		
@@ -334,7 +334,7 @@ public class TestGenerationAction extends MainWindowAction {
 		@Override
 		public Object construct() {
 			tgInfoDialog.write("Create proofs for testing");
-			Vector<Proof> proofs = createProofsForTesting(getMediator(),true);
+			Vector<Proof> proofs = createProofsForTesting(getMediator(),false);
 	    	
 			tgInfoDialog.write("Done creating "+proofs.size()+" proofs.");
 			KeYMediator mediator = getMediator();

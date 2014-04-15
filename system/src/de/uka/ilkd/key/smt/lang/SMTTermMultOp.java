@@ -20,7 +20,7 @@ public class SMTTermMultOp extends SMTTerm {
 
     private static HashMap<Op, String> bvSymbols;
     private static HashMap<Op,String> intSymbols;
-    public enum OpProperty{
+    public static enum OpProperty{
 	NONE,
 	LEFTASSOC,
 	RIGHTASSOC,
@@ -29,7 +29,7 @@ public class SMTTermMultOp extends SMTTerm {
 	PAIRWISE
     }
 
-    public enum Op {
+    public static enum Op {
 	// Bool/Int operator
 	IFF, IMPLIES, EQUALS, MUL, DIV, REM,
 	LT, LTE, GT, GTE, PLUS, MINUS, AND, OR,XOR, DISTINCT,
@@ -452,7 +452,7 @@ public class SMTTermMultOp extends SMTTerm {
 	    symbol = bvSymbols.get(operator);
 	}
 	if(symbol==null){
-	    throw new RuntimeException("Unknown operator: "+operator);
+	    throw new RuntimeException("Unknown operator: "+operator + "(class:"+Op.class+") intSym.size="+intSymbols.size()+ " bvSym.size="+bvSymbols.size());
 	}
 	return symbol;
     }
