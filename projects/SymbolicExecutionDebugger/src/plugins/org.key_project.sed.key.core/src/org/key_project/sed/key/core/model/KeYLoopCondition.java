@@ -38,7 +38,7 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
    /**
     * The {@link IExecutionLoopCondition} to represent by this debug node.
     */
-   private IExecutionLoopCondition executionNode;
+   private final IExecutionLoopCondition executionNode;
 
    /**
     * The contained children.

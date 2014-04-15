@@ -1,7 +1,21 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.shellutility.ui.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.shellutility.ui.wizard.page.UpdateSizeAndLocationWizardPage;
 
@@ -34,7 +48,7 @@ public class UpdateSizeAndLocationWizard extends Wizard {
     */
    @Override
    public void addPages() {
-      salPage = new UpdateSizeAndLocationWizardPage("salPage");
+      salPage = new UpdateSizeAndLocationWizardPage("salPage", shellToUpdate);
       addPage(salPage);
    }
 
@@ -43,8 +57,27 @@ public class UpdateSizeAndLocationWizard extends Wizard {
     */
    @Override
    public boolean performFinish() {
+      // Update size
       shellToUpdate.setSize(salPage.getWidth(), salPage.getHeight());
-      shellToUpdate.setLocation(salPage.getX(), salPage.getY());
+      // Update location
+      int x = salPage.getX();
+      int y = salPage.getY();
+      Rectangle clientArea = getShell().getDisplay().getClientArea();
+      switch (salPage.getLocation()) {
+         case TOP_LEFT : x = 0;
+                         y = 0;
+                         break;
+         case TOP_RIGHT : x = clientArea.width - shellToUpdate.getSize().x;
+                          y = 0;
+                          break;
+         case BOTTOM_LEFT : x = 0;
+                            y = clientArea.height - shellToUpdate.getSize().y;
+                            break;
+         case BOTTOM_RIGHT : x = clientArea.width - shellToUpdate.getSize().x;
+                             y = clientArea.height - shellToUpdate.getSize().y;
+                             break;
+      }
+      shellToUpdate.setLocation(x, y);
       return true;
    }
    

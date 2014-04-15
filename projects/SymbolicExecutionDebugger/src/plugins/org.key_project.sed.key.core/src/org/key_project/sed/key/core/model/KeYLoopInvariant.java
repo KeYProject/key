@@ -40,7 +40,7 @@ public class KeYLoopInvariant extends AbstractSEDLoopInvariant implements IKeYSE
    /**
     * The {@link IExecutionLoopInvariant} to represent by this debug node.
     */
-   private IExecutionLoopInvariant executionNode;
+   private final IExecutionLoopInvariant executionNode;
 
    /**
     * The contained children.

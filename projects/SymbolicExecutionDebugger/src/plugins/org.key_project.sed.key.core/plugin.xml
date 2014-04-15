@@ -6,7 +6,7 @@
       <sourceLocator
             class="org.key_project.sed.key.core.launch.KeYSourceLookupDirector"
             id="org.key_project.sed.key.core.launch.sed.key.sourceLocator"
-            name="Example Source Locator">
+            name="KeY Source Locator">
       </sourceLocator>
    </extension>
    <extension

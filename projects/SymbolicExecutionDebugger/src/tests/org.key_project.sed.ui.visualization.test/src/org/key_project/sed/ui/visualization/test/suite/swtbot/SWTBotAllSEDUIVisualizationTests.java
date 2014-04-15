@@ -18,6 +18,8 @@ import org.junit.runners.Suite;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiCallStackTabTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiNodeTabTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiSourceTabTest;
+import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSetFileLaunchTest;
+import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSetFileSourceLookupTest;
 
 /**
  * Run all contained JUnit 4 test cases that requires SWT Bot.
@@ -27,7 +29,9 @@ import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiS
 @Suite.SuiteClasses({
    SWTBotGraphitiCallStackTabTest.class,
    SWTBotGraphitiNodeTabTest.class,
-   SWTBotGraphitiSourceTabTest.class
+   SWTBotGraphitiSourceTabTest.class,
+   SWTBotSetFileLaunchTest.class,
+   SWTBotSetFileSourceLookupTest.class
 })
 public class SWTBotAllSEDUIVisualizationTests {
 }

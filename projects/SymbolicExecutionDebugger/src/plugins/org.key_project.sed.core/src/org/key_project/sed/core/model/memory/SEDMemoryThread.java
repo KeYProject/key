@@ -31,7 +31,7 @@ public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryDebu
    /**
     * The contained child nodes.
     */
-   private List<ISEDDebugNode> children = new LinkedList<ISEDDebugNode>();
+   private final List<ISEDDebugNode> children = new LinkedList<ISEDDebugNode>();
    
    /**
     * The name of this debug node.

@@ -37,16 +37,17 @@ import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
 import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
+import org.key_project.sed.core.model.ISEDLoopInvariant;
 import org.key_project.sed.core.model.ISEDLoopStatement;
 import org.key_project.sed.core.model.ISEDMethodCall;
+import org.key_project.sed.core.model.ISEDMethodContract;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.ISEDLoopInvariant;
-import org.key_project.sed.core.model.ISEDMethodContract;
 import org.key_project.sed.core.model.ISEDValue;
 import org.key_project.sed.core.model.ISEDVariable;
+import org.key_project.sed.core.model.ISourcePathProvider;
 import org.key_project.sed.core.util.LogUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.XMLUtil;
@@ -266,6 +267,11 @@ public class SEDXMLWriter {
     * Attribute name to store {@link ISEDTermination#isVerified()}.
     */
    public static final String ATTRIBUTE_VERIFIED = "verified";
+
+   /**
+    * Attribute name to store {@link ISourcePathProvider#getSourcePath()}.
+    */
+   public static final String ATTRIBUTE_SOURCE_PATH = "sourcePath";
    
    /**
     * Writes the given {@link ISEDDebugTarget}s into the {@link OutputStream} with the defined encoding.
@@ -478,6 +484,7 @@ public class SEDXMLWriter {
          appendAttribute(ATTRIBUTE_ID, target.getId(), sb);
          appendAttribute(ATTRIBUTE_NAME, target.getName(), sb);
          appendAttribute(ATTRIBUTE_MODEL_IDENTIFIER, target.getModelIdentifier(), sb);
+         appenSourcePathAttribute(target, sb);
          sb.append(">");
          appendNewLine(sb);
          ISEDThread[] threads = target.getSymbolicThreads();
@@ -833,6 +840,9 @@ public class SEDXMLWriter {
             attributeValues.put(ATTRIBUTE_CHAR_START, frame.getCharStart() + "");
             attributeValues.put(ATTRIBUTE_CHAR_END, frame.getCharEnd() + "");
          }
+         if (node instanceof ISourcePathProvider) {
+            attributeValues.put(ATTRIBUTE_SOURCE_PATH, ((ISourcePathProvider)node).getSourcePath());
+         }
       }
       return attributeValues;
    }
@@ -1025,6 +1035,17 @@ public class SEDXMLWriter {
    protected void appendWhiteSpace(int level, StringBuffer sb) {
       for (int i = 0; i < level; i++) {
          sb.append(LEADING_WHITE_SPACE_PER_LEVEL);
+      }
+   }
+
+   /**
+    * Appends the attribute to store {@link ISourcePathProvider#getSourcePath()} if available.
+    * @param object The {@link Object} to save its source path.
+    * @param sb The {@link StringBuffer} to write to.
+    */
+   protected void appenSourcePathAttribute(Object object, StringBuffer sb) {
+      if (object instanceof ISourcePathProvider) {
+         appendAttribute(ATTRIBUTE_SOURCE_PATH, ((ISourcePathProvider) object).getSourcePath(), sb);
       }
    }
    

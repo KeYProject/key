@@ -212,15 +212,19 @@ public final class HeapLDT extends LDT {
      * returns null.
      */
     public Sort getSortOfSelect(Operator op) {
-	if(op instanceof SortDependingFunction 
-           && ((SortDependingFunction)op).isSimilar(select)) {
-	   return ((SortDependingFunction)op).getSortDependingOn(); 
-	} else {
-	    return null;
-	}
+        if(isSelectOp(op)) {
+            return ((SortDependingFunction)op).getSortDependingOn();
+        } else {
+            return null;
+        }
     }
-    
-    
+
+    public boolean isSelectOp(Operator op) {
+        return op instanceof SortDependingFunction
+                && ((SortDependingFunction)op).isSimilar(select);
+    }
+
+
     public Function getStore() {
 	return store;
     }

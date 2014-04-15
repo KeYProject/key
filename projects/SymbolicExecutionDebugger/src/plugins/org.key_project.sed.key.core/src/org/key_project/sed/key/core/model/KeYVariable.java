@@ -34,7 +34,7 @@ public class KeYVariable extends AbstractSEDVariable {
    /**
     * The {@link IExecutionVariable} to represent in debug model.
     */
-   private IExecutionVariable executionVariable;
+   private final IExecutionVariable executionVariable;
    
    /**
     * The contained {@link IValue}.

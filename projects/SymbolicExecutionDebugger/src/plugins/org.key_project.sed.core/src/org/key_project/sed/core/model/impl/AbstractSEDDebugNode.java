@@ -38,12 +38,12 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
    /**
     * The parent in that this node is contained as child.
     */
-   private ISEDDebugNode parent;
+   private final ISEDDebugNode parent;
    
    /**
     * The thread.
     */
-   private ISEDThread thread;
+   private final ISEDThread thread;
    
    /**
     * Constructor.

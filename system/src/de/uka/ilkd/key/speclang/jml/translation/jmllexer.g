@@ -143,6 +143,7 @@ SPACE : "\\space";
 STRICTLY_NOTHING : "\\strictly_nothing";
 STRING_EQUAL : "\\string_equal";
 TRANSACTIONUPDATED: "\\transactionUpdated";
+TRANSIENT : "\\transient";
 TYPEOF : "\\typeof";
 TYPE_SMALL : "\\type";
 TYPE : "\\TYPE";

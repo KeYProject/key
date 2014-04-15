@@ -38,7 +38,7 @@ public class KeYValue extends AbstractSEDValue {
    /**
     * The {@link IExecutionValue} to represent in debug model.
     */
-   private IExecutionValue executionValue;
+   private final IExecutionValue executionValue;
    
    /**
     * The contained child {@link KeYVariable}s.

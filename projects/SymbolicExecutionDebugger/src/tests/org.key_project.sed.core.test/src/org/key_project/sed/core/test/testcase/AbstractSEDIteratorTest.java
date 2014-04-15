@@ -377,7 +377,7 @@ public abstract class AbstractSEDIteratorTest extends AbstractSetupTestCase {
     * @return The instantiated {@link SEDMemoryDebugTarget}.
     */
    protected static SEDMemoryDebugTarget appendDebugTarget(String name) {
-      SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null);
+      SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null, false);
       target.setName(name);
       return target;
    }

@@ -20,6 +20,9 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.IStateListener;
+import org.eclipse.core.commands.State;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
@@ -35,8 +38,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.editors.text.TextEditor;
+import org.eclipse.ui.handlers.RegistryToggleState;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
@@ -51,6 +57,7 @@ import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.keyide.ui.breakpoints.KeYBreakpointManager;
 import org.key_project.keyide.ui.editor.input.ProofEditorInput;
 import org.key_project.keyide.ui.editor.input.ProofOblInputEditorInput;
+import org.key_project.keyide.ui.handlers.BreakpointToggleHandler;
 import org.key_project.keyide.ui.propertyTester.AutoModePropertyTester;
 import org.key_project.keyide.ui.propertyTester.ProofPropertyTester;
 import org.key_project.keyide.ui.util.LogUtil;
@@ -69,6 +76,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -144,10 +153,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * The provided {@link ProofTreeContentOutlinePage}.
     */
    private ProofTreeContentOutlinePage outlinePage;
-   
-   private KeYBreakpointManager breakpointManager;
-   
-   private boolean breakpointsActivated = true;
    
    /**
     * Contains the registered {@link IProofProviderListener}.
@@ -237,6 +242,26 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
    
    /**
+    * Manages the available breakpoints.
+    */
+   private KeYBreakpointManager breakpointManager;
+   
+   /**
+    * The breakpoints activated {@link State}.
+    */
+   private State breakpointsActivatedState;
+   
+   /**
+    * Listens for changes on {@link #breakpointsActivatedState}.
+    */
+   private final IStateListener stateListener = new IStateListener() {
+      @Override
+      public void handleStateChange(State state, Object oldValue) {
+         configureProofForBreakpoints();
+      }
+   };
+   
+   /**
     * Constructor to initialize the ContextMenu IDs
     */
    public KeYEditor() {
@@ -249,6 +274,10 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    @Override
    public void dispose() {
+      if (breakpointsActivatedState != null) {
+         breakpointsActivatedState.removeListener(stateListener);
+         breakpointsActivatedState = null;
+      }
       if (viewerDecorator != null) {
          viewerDecorator.dispose();
       }
@@ -278,6 +307,16 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    @Override
    public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+      ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
+      if (service != null) {
+         Command hideCmd = service.getCommand(BreakpointToggleHandler.COMMAND_ID);
+         if (hideCmd != null) {
+            breakpointsActivatedState = hideCmd.getState(RegistryToggleState.STATE_ID);
+            if (breakpointsActivatedState != null) {
+               breakpointsActivatedState.addListener(stateListener);
+            }
+         }
+      }
       super.init(site, input);
    }
    
@@ -322,7 +361,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             if (this.getEnvironment().getMediator().getSelectedNode() == null) {
                this.getEnvironment().getMediator().getSelectionModel().setSelectedNode(currentProof.root());
             }
-            this.currentNode = this.getEnvironment().getMediator().getSelectedNode(); 
+            this.currentNode = this.getEnvironment().getMediator().getSelectedNode();
+            configureProofForBreakpoints();
          }
          else {
             setCurrentNode(currentNode);
@@ -365,6 +405,10 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       firePropertyChange(PROP_SELECTED_POS_IN_SEQUENT, evt.getOldValue(), evt.getNewValue());
    }
 
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public boolean isEditable() {
       return false;
    }
@@ -705,14 +749,23 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * @return the breakpointsActivated
     */
    public boolean isBreakpointsActivated() {
-      return breakpointsActivated;
+      Object value = breakpointsActivatedState.getValue();
+      return value instanceof Boolean && ((Boolean)value).booleanValue();
    }
 
    /**
-    * @param breakpointsActivated the breakpointsActivated to set
+    * Configures the current {@link Proof} to use breakpoints or not.
     */
-   public void setBreakpointsActivated(boolean breakpointsActivated) {
-      this.breakpointsActivated = breakpointsActivated;
+   protected void configureProofForBreakpoints() {
+      if (isBreakpointsActivated()) {
+         currentProof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(breakpointManager.getBreakpointStopConditions());
+         currentProof.getServices().setFactory(KeYBreakpointManager.createNewFactory(breakpointManager.getBreakpointStopConditions()));
+         StrategyProperties strategyProperties = currentProof.getSettings().getStrategySettings().getActiveStrategyProperties();
+         currentProof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(currentProof, strategyProperties));
+      }
+      else {
+         currentProof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(null);
+      }
    }
 
    /**

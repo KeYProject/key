@@ -38,7 +38,7 @@ public class KeYLoopStatement extends AbstractSEDLoopStatement implements IKeYSE
    /**
     * The {@link IExecutionLoopStatement} to represent by this debug node.
     */
-   private IExecutionLoopStatement executionNode;
+   private final IExecutionLoopStatement executionNode;
 
    /**
     * The contained children.

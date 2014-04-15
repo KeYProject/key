@@ -43,7 +43,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
    /**
     * The {@link IExecutionMethodCall} to represent by this debug node.
     */
-   private IExecutionMethodCall executionNode;
+   private final IExecutionMethodCall executionNode;
 
    /**
     * The contained children.
