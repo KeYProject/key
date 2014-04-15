@@ -17,6 +17,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SwingWorker3;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.macros.SemanticsBlastingMacro;
+import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.TGInfoDialog;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -371,13 +372,16 @@ public class TestGenerationAction extends MainWindowAction {
 			
 			Proof proof = mediator.getSelectedProof();
 			
+			//always use only 1 process when generating test cases
+			ProofIndependentSMTSettings piSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().clone();
+			piSettings.setMaxConcurrentProcesses(1);
 			
 			
 			//invoke z3 for counterexamples
             SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
-                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),proof);
+                            piSettings,proof);
             
-            settings.getMaxConcurrentProcesses();
+            
             
             SolverLauncher launcher = new SolverLauncher(settings);
             launcher.addListener(tgInfoDialog);
