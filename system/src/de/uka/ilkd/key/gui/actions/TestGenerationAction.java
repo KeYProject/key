@@ -17,6 +17,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SwingWorker3;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.macros.SemanticsBlastingMacro;
+import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.TGInfoDialog;
@@ -376,10 +377,12 @@ public class TestGenerationAction extends MainWindowAction {
 			ProofIndependentSMTSettings piSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().clone();
 			piSettings.setMaxConcurrentProcesses(1);
 			
+			ProofDependentSMTSettings pdSettings = proof.getSettings().getSMTSettings().clone();
+			pdSettings.invariantForall = true;
+			
 			
 			//invoke z3 for counterexamples
-            SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
-                            piSettings,proof);
+            SMTSettings settings = new SMTSettings(pdSettings,piSettings,proof);
             
             
             

@@ -233,6 +233,11 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 			return piSettings.locsetBound;
 		}
 
+		@Override
+		public boolean invarianForall() {
+			return pdSettings.invariantForall;
+		}
+
         
 
         
