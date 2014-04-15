@@ -136,6 +136,8 @@ public interface SMTSettings {
      * Returns true if and only if the version should be checked each time a solver is started.
      */
     public boolean checkForSupport();
+    
+    public boolean invarianForall();
   
 
 }
