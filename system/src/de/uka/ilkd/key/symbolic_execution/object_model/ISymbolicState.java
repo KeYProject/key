@@ -17,7 +17,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicState;
 
 /**
  * <p>
- * Represents the symbolic state of an {@link ISymbolicConfiguration}.
+ * Represents the symbolic state of an {@link ISymbolicLayout}.
  * </p>
  * <p>
  * The default implementation is {@link SymbolicState}.

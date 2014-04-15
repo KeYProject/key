@@ -20,7 +20,7 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * Provides the basic functionality for classes like {@link ExecutionNodeWriter}
- * and {@link SymbolicConfigurationWriter} which encodes an object structure as XML.
+ * and {@link SymbolicLayoutWriter} which encodes an object structure as XML.
  * @author Martin Hentschel
  */
 public abstract class AbstractWriter {

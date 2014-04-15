@@ -162,7 +162,7 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
          if (ObjectUtil.equals(getDiagram(), diagram)) {
             OutputStream out = ExecutionTreeUtil.writeDomainFile(diagram);
             SEDXMLWriter writer = new SEDXMLWriter();
-            writer.write(getDebugTargets(), SEDXMLWriter.DEFAULT_ENCODING, out, false, false);
+            writer.write(getDebugTargets(), SEDXMLWriter.DEFAULT_ENCODING, out, true, true);
          }
       }
       catch (Exception e) {
@@ -177,7 +177,7 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
     */
    public void makeSureThatDebugTargetIsAvailable() {
       if (debugTargets.isEmpty()) {
-         SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null);
+         SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null, false);
          target.setName("Default Symbolic Debug Target");
          getFeatureProvider().link(getDiagram(), target);
          debugTargets.add(target);

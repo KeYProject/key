@@ -1,8 +1,6 @@
 		*********************************
-		* KeY Source Code Installation  * 
-		*        Version 2.1.x         *
-		*        Nightly Builds        *
-                *     (Development Version)    *
+		* KeY Source Code Installation * 
+		*        Version 2.2.0         *
 		********************************
 
 (1) Requirements: 
@@ -13,26 +11,28 @@ Operating System: Linux/Unix, MacOSX, Windows (untested)
 Java SE 6 or newer (already installed)
 
 Needed additional Libraries:
-	antlr.jar Version >= 2.7.2: parser generator
+	antlr.jar Version >= 2.7.7: parser generator
 	javacc.jar Version >= 3.0 : parser generator
 	recoderKey.jar 
-                 a transformation framework for java patched by the KeY group
+                 a transformation framework for Java patched by the KeY group
 
 Optionally, KeY can make use of the following binaries:
 	SMT Solvers: bindings exist currently for Z3, Simplify, Yices and CVC3
               (export to SMT input file possible)        
 
 
-(2) Contents of the KeY-Distribution
+(2) Contents of the KeY distribution
 -------------------------------------
 
-  At the KeY-Homepage you can find the following parts:
+  At the KeY homepage you can find the following parts:
 
    * README.xxx-src.txt: this file
-   * KeY-xxx-src.tgz: the source code version of KeY-system
-   * KeYExtLib_xxx.tgz: contains the external libraries
-   * quicktour_xxx.zip or quicktour_xxx.tgz: a short tutorial
+   * KeY-xxx-src.tgz or KeY-xxx-src.zip: 
+		the source code version of KeY-system
+   * KeYExtLib-xxx.tgz or KeYExtLib-xxx.zip: 
+		contains the external libraries
 
+   where xxx stands for the current version.
 
 (3) Installation (Source Code)
 -------------------------------------
@@ -54,29 +54,7 @@ Optionally, KeY can make use of the following binaries:
                      or (bash)     export KEY_LIB=~/key_lib                  
                      or (Windows)  set KEY_LIB=<path to libraries>
 
-	4) Optional: Install Simplify and/or other SMT solvers.
-
-           If you download Simplify not from the KeY-website but
-           elsewhere (e.g. as part of ESC/Java), follow the intallation 
-           instructions given there. Then rename the Simplify binary which 
-           could be named something like Simplify Simplify-1.5.4.linux 
-           (Linux version) or Simplify-1.5.4.exe (Windows) to just 'Simplify' 
-           resp. 'Simplify.exe'. When using Linux make sure that the file is
-           is executable (you can make a file executable by issuing the
-           command 'chmod a+x filename').
-
-	   Make sure that the path where the binaries reside is included in 
-           your PATH environment variable or in the KEY_LIB environment
-	   variable. If not, use (e.g., in the csh to include Simplify
-	   which is assumed to be located in ~/simplify):
-
-		setenv PATH ~/simplify:$PATH
-
-           In bash-syntax the above command is
-       
-                export PATH=$PATH:~/simplify
-
-          (analog procedure for other solvers)
+	4) Optional: Install external SMT solvers.
 
 	5) Change to the subdirectory ./system
 
@@ -101,7 +79,7 @@ Optionally, KeY can make use of the following binaries:
 	
 	Assuming you are still in the 'system' directory, run:
 
-		../bin/runProver
+		../bin/key
 
 -------------------------------
 

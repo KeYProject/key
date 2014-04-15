@@ -29,10 +29,10 @@ package example1;
  * during symbolic execution are listed.
  */
 public class Number {
-	private int value;
+	private int content;
 
 	public boolean equals(Number n) {
-		if (value == n.value) {
+		if (content == n.content) {
 			return true;
 		}
 		else {

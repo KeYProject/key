@@ -30,6 +30,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
@@ -45,14 +46,14 @@ import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopBodyTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
+import org.key_project.sed.core.model.memory.SEDMemoryLoopInvariant;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
+import org.key_project.sed.core.model.memory.SEDMemoryMethodContract;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
-import org.key_project.sed.core.model.memory.SEDMemoryLoopInvariant;
-import org.key_project.sed.core.model.memory.SEDMemoryMethodContract;
 import org.key_project.sed.core.model.memory.SEDMemoryValue;
 import org.key_project.sed.core.model.memory.SEDMemoryVariable;
 import org.xml.sax.Attributes;
@@ -77,6 +78,34 @@ import org.xml.sax.helpers.DefaultHandler;
  * @see SEDXMLWriter
  */
 public class SEDXMLReader {
+   /**
+    * The {@link ILaunch} to use.
+    */
+   private final ILaunch launch;
+   
+   /**
+    * Is this {@link ISEDDebugTarget} executable meaning that
+    * suspend, resume, step operations and disconnect are supported?;
+    */
+   private final boolean executable;   
+   
+   /**
+    * Constructor.
+    */
+   public SEDXMLReader() {
+      this(null, false);
+   }
+   
+   /**
+    * Constructor.
+    * @param launch The {@link ILaunch} to use.
+    * @param executable {@code true} Support suspend, resume, etc.; {@code false} Do not support suspend, resume, etc.
+    */
+   public SEDXMLReader(ILaunch launch, boolean executable) {
+      this.launch = launch;
+      this.executable = executable;
+   }
+
    /**
     * Parses the given XML content.
     * @param xml The XML content to parse.
@@ -471,7 +500,7 @@ public class SEDXMLReader {
     * @return The created {@link SEDMemoryDebugTarget}.
     */
    protected SEDMemoryDebugTarget createDebugTarget(String uri, String localName, String qName, Attributes attributes) {
-      SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null);
+      SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(launch, executable);
       target.setId(getId(attributes));
       target.setName(getName(attributes));
       target.setModelIdentifier(getModelIdentifier(attributes));
@@ -492,11 +521,12 @@ public class SEDXMLReader {
     */   
    protected SEDMemoryBranchStatement createBranchStatement(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryBranchStatement branchStatement = new SEDMemoryBranchStatement(target, parent, thread);
+      branchStatement.setSourcePath(getSourcePath(attributes));
       fillDebugNode(branchStatement, attributes);
       fillStackFrame(branchStatement, attributes);
       return branchStatement;
    }
-   
+
    /**
     * Creates a {@link SEDMemoryExceptionalTermination} instance for the content in the given tag.
     * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
@@ -545,6 +575,7 @@ public class SEDXMLReader {
     */   
    protected SEDMemoryLoopCondition createLoopCondition(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryLoopCondition loopCondition = new SEDMemoryLoopCondition(target, parent, thread);
+      loopCondition.setSourcePath(getSourcePath(attributes));
       fillDebugNode(loopCondition, attributes);
       fillStackFrame(loopCondition, attributes);
       return loopCondition;
@@ -564,6 +595,7 @@ public class SEDXMLReader {
     */   
    protected SEDMemoryLoopStatement createLoopStatement(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryLoopStatement loopStatement = new SEDMemoryLoopStatement(target, parent, thread);
+      loopStatement.setSourcePath(getSourcePath(attributes));
       fillDebugNode(loopStatement, attributes);
       fillStackFrame(loopStatement, attributes);
       return loopStatement;
@@ -583,6 +615,7 @@ public class SEDXMLReader {
     */   
    protected SEDMemoryMethodCall createMethodCall(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryMethodCall methodCall = new SEDMemoryMethodCall(target, parent, thread);
+      methodCall.setSourcePath(getSourcePath(attributes));
       fillDebugNode(methodCall, attributes);
       fillStackFrame(methodCall, attributes);
       return methodCall;
@@ -602,6 +635,7 @@ public class SEDXMLReader {
     */   
    protected SEDMemoryMethodReturn createMethodReturn(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryMethodReturn methodReturn = new SEDMemoryMethodReturn(target, parent, thread);
+      methodReturn.setSourcePath(getSourcePath(attributes));
       fillDebugNode(methodReturn, attributes);
       fillStackFrame(methodReturn, attributes);
       return methodReturn;
@@ -621,6 +655,7 @@ public class SEDXMLReader {
     */   
    protected SEDMemoryStatement createStatement(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryStatement statement = new SEDMemoryStatement(target, parent, thread);
+      statement.setSourcePath(getSourcePath(attributes));
       fillDebugNode(statement, attributes);
       fillStackFrame(statement, attributes);
       return statement;
@@ -640,6 +675,7 @@ public class SEDXMLReader {
     */   
    protected SEDMemoryMethodContract createMethodContract(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryMethodContract methodContract = new SEDMemoryMethodContract(target, parent, thread);
+      methodContract.setSourcePath(getSourcePath(attributes));
       fillDebugNode(methodContract, attributes);
       fillStackFrame(methodContract, attributes);
       methodContract.setPreconditionComplied(isPreconditionComplied(attributes));
@@ -662,6 +698,7 @@ public class SEDXMLReader {
     */   
    protected SEDMemoryLoopInvariant createLoopInvariant(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryLoopInvariant loopInvariant = new SEDMemoryLoopInvariant(target, parent, thread);
+      loopInvariant.setSourcePath(getSourcePath(attributes));
       fillDebugNode(loopInvariant, attributes);
       fillStackFrame(loopInvariant, attributes);
       loopInvariant.setInitiallyValid(isInitiallyValid(attributes));
@@ -757,6 +794,15 @@ public class SEDXMLReader {
     */
    protected String getPathCondition(Attributes attributes) {
       return attributes.getValue(SEDXMLWriter.ATTRIBUTE_PATH_CONDITION);
+   }
+   
+   /**
+    * Returns the source path value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getSourcePath(Attributes attributes) {
+      return attributes.getValue(SEDXMLWriter.ATTRIBUTE_SOURCE_PATH);
    }
    
    /**
