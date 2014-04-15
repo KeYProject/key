@@ -36,6 +36,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -239,7 +240,7 @@ public class TestCaseGenerator {
 			res.append("   testSuiteObject.testcode"+j+"();\n");
 		 }
 		 if(i==0)
-			 res.append("   //Warning:no test methods were generated.");
+			 res.append("   //Warning:no test methods were generated.\n");
 	     res.append(" }");
 		return res;
 	}
@@ -259,11 +260,11 @@ public class TestCaseGenerator {
 			}
 		}
 		
-		KeYJavaType kjt = services.getJavaInfo().getKeYJavaType("java.io.Serializable");
+/*		KeYJavaType kjt = services.getJavaInfo().getKeYJavaType("java.io.Serializable");
 		buildDummyClassForAbstractSort(kjt.getSort());		
 		kjt = services.getJavaInfo().getKeYJavaType("java.lang.Cloneable");
 		buildDummyClassForAbstractSort(kjt.getSort());
-		
+*/
 		
 		if(heap!=null){
 			//create objects
@@ -301,8 +302,8 @@ public class TestCaseGenerator {
 					else{
 						type = "Object";
 					}
-				}				
-				val = val.replace("#", "_");
+				}
+				val = translateValueExpression(val);
 				assignments.add(new Assignment(type,c,val));
 			}
 		}
@@ -324,22 +325,14 @@ public class TestCaseGenerator {
 					String fieldName = f.substring(f.lastIndexOf(":")+1);
 					fieldName = fieldName.replace("|", "");
 					String val = o.getFieldvalues().get(f);
-					if(val.contains("/")){
-						val = val.substring(0, val.indexOf("/"));
-					}
-					val = val.replace("|", "");
-					val = val.replace("#", "_");
+					val = translateValueExpression(val);
 					assignments.add(new Assignment(name+"."+fieldName, val));
 				}
 				
 				for(int i = 0; i < o.getLength(); i++){
 					String fieldName = "["+i+"]";
 					String val = o.getArrayValue(i);
-					if(val.contains("/")){
-						val = val.substring(0, val.indexOf("/"));
-					}
-					val = val.replace("|", "");
-					val = val.replace("#", "_");
+					val = translateValueExpression(val);
 					assignments.add(new Assignment(name+fieldName, val));
 				}				
 			}			
@@ -354,6 +347,16 @@ public class TestCaseGenerator {
 		
 		
 		return result.toString();
+	}
+	
+	protected String translateValueExpression(String val){
+		if(val.contains("/")){
+			val = val.substring(0, val.indexOf("/"));
+		}
+		if(val.equals("#o0")) return "null";
+		val = val.replace("|", "");
+		val = val.replace("#", "_");
+		return val;
 	}
 
 	public String getSafeType(Sort sort){
@@ -512,6 +515,7 @@ public class TestCaseGenerator {
 				//System.out.println("ProgramElement ("+pe.getClass()+") "+pe);
 				if(pe instanceof MethodBodyStatement){
 					MethodBodyStatement mbs = (MethodBodyStatement)pe;
+										
 					
 					String methodCall = mbs.toString();
 					//System.out.println("Method call:"+methodCall);
@@ -526,6 +530,12 @@ public class TestCaseGenerator {
 					mc2 = mc2.replace("_", " ");
 					//System.out.println("mc1:"+mc1+"  mc2:"+mc2);
 					methodCall = mc1 + mc2 ;
+					
+					IProgramVariable resultVar = mbs.getResultVariable();
+					if(resultVar!=null){
+						Sort s= resultVar.sort();
+						methodCall = getSafeType(s) + " " + methodCall;
+					}
 					
 					//System.out.println("Method call:"+methodCall);
 					return methodCall;
