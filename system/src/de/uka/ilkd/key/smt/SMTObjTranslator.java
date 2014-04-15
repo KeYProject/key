@@ -1317,7 +1317,9 @@ public class SMTObjTranslator implements SMTTranslator {
 			SMTTermVariable o = new SMTTermVariable("o", sorts.get(OBJECT_SORT));
 			SMTTermVariable h = new SMTTermVariable("h", sorts.get(HEAP_SORT));
 			List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
-			SMTTerm inv = SMTTerm.call(functions.get(CLASS_INVARIANT), o);
+			vars.add(h);
+			vars.add(o);			
+			SMTTerm inv = SMTTerm.call(functions.get(CLASS_INVARIANT), h,o);
 			SMTTerm forall = inv.forall(vars);
 			file.addFormula(forall);
 		}
