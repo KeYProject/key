@@ -186,13 +186,13 @@ public class TacletForTests {
 	try {	    
 	    br   = new StringReader(termstr);
 	    KeYParserF parser = new KeYParserF(ParserMode.TERM,
-	                                     new KeYLexerF(br,null),
-					     "No file. " +
-					     "TacletForTests.parseTerm("
-					     +termstr+")",
-					     new Recoder2KeY(services, nss),
-					     services, nss,
-					     TacletForTests.getAbbrevs());
+		    new KeYLexerF(br,
+			    "No file. TacletForTests.parseTerm(" + termstr + ")",
+			    null),
+		    new Recoder2KeY(services, nss),
+		    services,
+		    nss,
+		    TacletForTests.getAbbrevs());
 	    return parser.term();
 	} catch (Exception e) {
 	    System.err.println("Exception during parsing!");
@@ -211,14 +211,12 @@ public class TacletForTests {
 	try {	    
 	    br = new StringReader(termstr);
 	    KeYParserF parser = new KeYParserF(ParserMode.TERM,
-	                                     new KeYLexerF(br,null),
-					     "No file. " +
-					     "TacletForTests.parseTerm("
-					     +termstr+")",
-					     new Recoder2KeY(services(), set),
-					     services(),
-					     set,
-					     new AbbrevMap());
+		    new KeYLexerF(br,
+			    "No file. TacletForTests.parseTerm(" + termstr + ")", null),
+		    new Recoder2KeY(services(), set),
+		    services(),
+		    set,
+		    new AbbrevMap());
 	    return parser.term();
 	} catch (Exception e) {
 	    System.err.println("Exception during parsing!");
