@@ -334,7 +334,7 @@ public class TestGenerationAction extends MainWindowAction {
 		@Override
 		public Object construct() {
 			tgInfoDialog.write("Create proofs for testing");
-			Vector<Proof> proofs = createProofsForTesting(getMediator(),false);
+			Vector<Proof> proofs = createProofsForTesting(getMediator(),true);
 	    	
 			tgInfoDialog.write("Done creating "+proofs.size()+" proofs.");
 			KeYMediator mediator = getMediator();
