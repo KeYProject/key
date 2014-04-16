@@ -157,7 +157,7 @@ public class TestGenerationAction extends MainWindowAction {
 
     private Proof createProofForTesting_noDuplicate(Node node, Vector<Proof> otherProofs){
 
-    	System.out.println("Create proof for test case from Node:"+node.serialNr());
+    	//System.out.println("Create proof for test case from Node:"+node.serialNr());
     	
 		Proof oldProof = node.proof();
 		
@@ -181,7 +181,7 @@ public class TestGenerationAction extends MainWindowAction {
 		if(otherProofs!=null){
 			for(Proof otherProof :otherProofs){
 				if(otherProof.root().sequent().equals(newSequent)){
-					System.out.println("Found and skip duplicate proof for node:"+node.serialNr());
+					//System.out.println("Found and skip duplicate proof for node:"+node.serialNr());
 					return null;
 				}
 			}
@@ -204,11 +204,11 @@ public class TestGenerationAction extends MainWindowAction {
     private boolean hasModalities(Term t){
     	JavaBlock jb = t.javaBlock();
     	if(jb!=null && !jb.isEmpty()){
-    		System.out.println("Excluded javablock");
+    		//System.out.println("Excluded javablock");
     		return true;
     	}
     	if(t.op()==UpdateApplication.UPDATE_APPLICATION){
-    		System.out.println("Exclude update application.");
+    		//System.out.println("Exclude update application.");
     		return true;
     	}
     	boolean res = false;
@@ -333,14 +333,19 @@ public class TestGenerationAction extends MainWindowAction {
 
 		@Override
 		public Object construct() {
-			tgInfoDialog.write("Create proofs for testing");
+			tgInfoDialog.writeln("Extracting test data constraints (path conditions).");
 			Vector<Proof> proofs = createProofsForTesting(getMediator(),true);
 	    	
-			tgInfoDialog.write("Done creating "+proofs.size()+" proofs.");
+			if(proofs.size()>0)
+				tgInfoDialog.writeln("Extracted "+proofs.size()+" test data constraints.");
+			else
+				tgInfoDialog.writeln("No test data constraints were extracted.");
+			
 			KeYMediator mediator = getMediator();
 			Collection<SMTProblem> problems = new LinkedList<SMTProblem>();
-			tgInfoDialog.write("Apply semantic blasting macro");
+			tgInfoDialog.writeln("Test data generation: appling semantic blasting macro on proofs");
 			for(Proof proof : proofs){
+				tgInfoDialog.write(".");
 				ProofAggregate pa = new SingleProof(proof, "XXX");
 	    		MainWindow mw = MainWindow.getInstance();
 	    		mw.addProblem(pa);
@@ -352,20 +357,23 @@ public class TestGenerationAction extends MainWindowAction {
 					//mediator.getUI().removeProof(mediator.getSelectedProof());
 				} catch (InterruptedException e) {
 					Debug.out("Semantics blasting interrupted");
+					tgInfoDialog.writeln("\n Warning: semantics blasting was interrupted. A test case will not be generated.");
 				} catch(Exception e){
+					tgInfoDialog.writeln(e.getLocalizedMessage());
 					System.err.println(e);
 				}
 				
 			}
-			tgInfoDialog.write("Done applying semantic blasting");
+			tgInfoDialog.writeln("\nDone applying semantic blasting. Cleaning up");
 			
 			mediator.setProof(originalProof);
 
-			for(Proof proof : proofs){				
+			for(Proof proof : proofs){	
+				tgInfoDialog.write(".");
 				mediator.getUI().removeProof(proof);
 				proof.dispose();
 			}
-			
+			tgInfoDialog.writeln("");
 			
 			getMediator().setInteractive(true);
 	    	getMediator().startInterface(true);

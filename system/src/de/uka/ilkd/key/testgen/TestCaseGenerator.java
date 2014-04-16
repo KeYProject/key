@@ -118,17 +118,22 @@ public class TestCaseGenerator {
 		StringBuffer testMethods = new StringBuffer();
 		int i = 0;
 		for(SMTSolver solver : problemSolvers){
-			if(solver.getQuery()!=null){
-				Model m = solver.getQuery().getModel();
-				if(m!=null && !m.isEmpty()){
-					logger.write("Generate test Case: "+i);
-					testMethods.append(getTestMethodSignature(i)+"{\n");
-					testMethods.append("   //Test preamble: creating objects and intializing test data"+generateTestCase(m)+"\n\n");
-					testMethods.append("   //Calling the method under test\n   "+mut+"; \n");
-					testMethods.append(" }\n\n");
-
-					i++;
+			try{
+				if(solver.getQuery()!=null){
+					Model m = solver.getQuery().getModel();
+					if(m!=null && !m.isEmpty()){
+						logger.writeln("Generate test Case: "+i);
+						testMethods.append(getTestMethodSignature(i)+"{\n");
+						testMethods.append("   //Test preamble: creating objects and intializing test data"+generateTestCase(m)+"\n\n");
+						testMethods.append("   //Calling the method under test\n   "+mut+"; \n");
+						testMethods.append(" }\n\n");
+	
+						i++;
+					}
 				}
+			}catch(Exception ex){
+				logger.writeln(ex.getMessage());
+				logger.writeln("A test case was not generated due to an exception. Continuing test generation...");
 			}
 		}
 
@@ -138,9 +143,8 @@ public class TestCaseGenerator {
 
 		testSuite.append("\n}");
 
-		System.out.println("Writing test file to:"+directory+modDir);
 		writeToFile(fileName + ".java", testSuite);
-		logger.write("Writing test file to:"+directory+modDir+File.separator+fileName);
+		logger.writeln("Writing test file to:"+directory+modDir+File.separator+fileName);
 
 		exportCodeUnderTest();
 
@@ -169,8 +173,7 @@ public class TestCaseGenerator {
 		testCase.append("   //Calling the method under test\n   "+mut+"; \n");
 		testCase.append("}\n}");
 
-		System.out.println("Writing test file to:"+directory+modDir);
-		logger.write("Writing test file to:"+directory+modDir+File.separator+fileName);
+		logger.writeln("Writing test file to:"+directory+modDir+File.separator+fileName);
 		writeToFile(fileName + ".java", testCase);
 		exportCodeUnderTest();
 

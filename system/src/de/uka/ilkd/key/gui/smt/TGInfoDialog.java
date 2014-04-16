@@ -6,6 +6,7 @@ import java.util.Collection;
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.text.DefaultCaret;
 
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
@@ -30,26 +31,31 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener{
 		 JScrollPane scrollpane = new JScrollPane(text);
 		 scrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		 scrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		 DefaultCaret caret = (DefaultCaret) text.getCaret();
+         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		 this.getContentPane().add(scrollpane);
 		 this.setModal(false);
 		 //this.pack();
 		 this.setTitle("Generate Counterexamples");
-		 this.setSize(300, 200);
+		 this.setSize(400, 200);		 
 		 this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		 this.setVisible(true);
 		
 	}
 	
-	public void write(String line){
-		text.setText(text.getText()+"\n"+line);
-		text.setCaretPosition(text.getText().length()-1);
+	public void write(String t){
+		text.append(t);
+	}
+
+	public void writeln(String line){
+		text.append(line+"\n");
 	}
 
 	@Override
 	public void launcherStopped(SolverLauncher launcher,
 			Collection<SMTSolver> problemSolvers) {
 		
-		write("Stoped solving smt problems: "+problemSolvers.size());
+		writeln("Stoped solving SMT problems: "+problemSolvers.size());
 		TestCaseGenerator tg = new TestCaseGenerator();
 		tg.setLogger(this);
 		tg.generateJUnitTestSuite(problemSolvers);
@@ -59,7 +65,7 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener{
 	@Override
 	public void launcherStarted(Collection<SMTProblem> problems,
 			Collection<SolverType> solverTypes, SolverLauncher launcher) {
-		write("Start solving smt problems");
+		writeln("Test data generation: Start solving SMT problems (Z3 version 4.3.1 is required)... \n please wait...");
 		
 		
 	}
