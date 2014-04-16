@@ -26,13 +26,13 @@ public class TestGenMacro extends StrategyProofMacro {
 	@Override
 	public String getName() {
 
-		return "TestGen";
+		return "TestGen (finite loop unwinding)";
 	}
 
 	@Override
 	public String getDescription() {
 
-		return "Generate test-cases for open goals";
+		return "Finish symbolic execution but restrict loop unwinding.";
 	}
 
 	/*

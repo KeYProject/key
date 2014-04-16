@@ -405,7 +405,7 @@ public class TestGenerationAction extends MainWindowAction {
 			for(Proof proof : proofs){	
 				tgInfoDialog.write(".");
 				mediator.getUI().removeProof(proof);
-				proof.dispose();
+				proof.dispose(); //Not sure if dispose here is correct, since the proof name and other information may be still needed.
 			}
 			tgInfoDialog.writeln("");
 			

@@ -102,6 +102,10 @@ public class TestCaseGenerator {
 		}
 		return null;
 	}
+	
+	boolean modelIsOK(Model m){
+		return m!=null && !m.isEmpty() && m.getHeaps()!=null && m.getHeaps().size()>0 && m.getTypes()!=null;
+	}
 
 	public String generateJUnitTestSuite(Collection<SMTSolver> problemSolvers){
 		MUTName = "";
@@ -119,16 +123,19 @@ public class TestCaseGenerator {
 		int i = 0;
 		for(SMTSolver solver : problemSolvers){
 			try{
+				StringBuffer testMethod = new StringBuffer();
 				if(solver.getQuery()!=null){
 					Model m = solver.getQuery().getModel();
-					if(m!=null && !m.isEmpty()){
-						logger.writeln("Generate test Case: "+i);
-						testMethods.append(getTestMethodSignature(i)+"{\n");
-						testMethods.append("   //Test preamble: creating objects and intializing test data"+generateTestCase(m)+"\n\n");
-						testMethods.append("   //Calling the method under test\n   "+mut+"; \n");
-						testMethods.append(" }\n\n");
-	
+					String originalNodeName = solver.getProblem().getGoal().proof().name().toString();
+					if(modelIsOK(m)){
+						logger.writeln("Generate test Case: "+originalNodeName);
+						testMethod.append("  //"+originalNodeName+"\n");
+						testMethod.append(getTestMethodSignature(i)+"{\n");
+						testMethod.append("   //Test preamble: creating objects and intializing test data"+generateTestCase(m)+"\n\n");
+						testMethod.append("   //Calling the method under test\n   "+mut+"; \n");
+						testMethod.append(" }\n\n");
 						i++;
+						testMethods.append(testMethod);
 					}
 				}
 			}catch(Exception ex){
@@ -492,7 +499,7 @@ public class TestCaseGenerator {
 	}
 
 	public String getMUT(){
-		System.out.println("Selected proof name:"+proof.name());
+		//System.out.println("Selected proof name:"+proof.name());
 
 		Node root = proof.root();
 		Sequent seq = root.sequent();

@@ -36,7 +36,7 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener{
 		 this.getContentPane().add(scrollpane);
 		 this.setModal(false);
 		 //this.pack();
-		 this.setTitle("Generate Counterexamples");
+		 this.setTitle("Test Suite Generation");
 		 this.setSize(400, 200);		 
 		 this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		 this.setVisible(true);
@@ -55,7 +55,7 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener{
 	public void launcherStopped(SolverLauncher launcher,
 			Collection<SMTSolver> problemSolvers) {
 		
-		writeln("Stoped solving SMT problems: "+problemSolvers.size());
+		writeln("Finished solving SMT problems: "+problemSolvers.size());
 		TestCaseGenerator tg = new TestCaseGenerator();
 		tg.setLogger(this);
 		tg.generateJUnitTestSuite(problemSolvers);
@@ -65,7 +65,7 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener{
 	@Override
 	public void launcherStarted(Collection<SMTProblem> problems,
 			Collection<SolverType> solverTypes, SolverLauncher launcher) {
-		writeln("Test data generation: Start solving SMT problems (Z3 version 4.3.1 is required)... \n please wait...");
+		writeln("Test data generation: solving SMT problems (Z3 version 4.3.1 is required)... \n please wait...");
 		
 		
 	}
