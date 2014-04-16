@@ -12,35 +12,30 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.strategy.BreakpointStopCondition;
 
 public abstract class AbstractNonSymbolicBreakpointStopCondition extends BreakpointStopCondition {
-
    public AbstractNonSymbolicBreakpointStopCondition(Proof proof, boolean enabled) {
       super(proof, enabled);
    }
 
    @Override
-   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
       return true;
    }
 
    @Override
-   public boolean shouldStop(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser, long startTime, int countApplied,
-         SingleRuleApplicationInfo singleRuleApplicationInfo) { 
-      try{
+   public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) { 
+      try {
          if (singleRuleApplicationInfo != null) {
             Goal goal = singleRuleApplicationInfo.getGoal();
             Node node = goal.node();
             RuleApp ruleApp = singleRuleApplicationInfo.getAppliedRuleApp();
             SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
-               if(isBreakpointHit(activeStatement, ruleApp, proof, node)){
-                  return true;
-               }
+            if(isBreakpointHit(activeStatement, ruleApp, proof, node)){
+               return true;
+            }
          }
-      }catch(ProofInputException e){
-         //TODO
+      }
+      catch(ProofInputException e){
       }
       return false;
    }
-
 }

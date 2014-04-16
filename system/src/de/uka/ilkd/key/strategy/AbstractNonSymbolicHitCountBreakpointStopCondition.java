@@ -21,11 +21,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 
-public abstract class AbstractNonSymbolicHitCountBreakpointStopCondition extends
-      AbstractNonSymbolicBreakpointStopCondition {
-   
-
-   
+public abstract class AbstractNonSymbolicHitCountBreakpointStopCondition extends AbstractNonSymbolicBreakpointStopCondition {
    /**
     * The HitCount of the Breakpoint (set by user).
     */
@@ -41,7 +37,6 @@ public abstract class AbstractNonSymbolicHitCountBreakpointStopCondition extends
     */
    private Map<Integer, Boolean> hittedNodes;
 
-
    /**
     * Creates a new {@link AbstractNonSymbolicHitCountBreakpointStopCondition}.
     * 
@@ -55,7 +50,6 @@ public abstract class AbstractNonSymbolicHitCountBreakpointStopCondition extends
       this.hitCount = hitCount;
    }
 
-   
    /**
     * Checks if the Hitcount is exceeded for the given {@link JavaLineBreakpoint}.
     * If the Hitcount is not exceeded the hitted counter is incremented, otherwise its set to 0.
@@ -85,7 +79,10 @@ public abstract class AbstractNonSymbolicHitCountBreakpointStopCondition extends
    }
    
    @Override
-   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
+   protected boolean isBreakpointHit(SourceElement activeStatement, 
+                                     RuleApp ruleApp, 
+                                     Proof proof, 
+                                     Node node) throws ProofInputException {
       return hitcountExceeded(node);
    }
 
@@ -104,5 +101,4 @@ public abstract class AbstractNonSymbolicHitCountBreakpointStopCondition extends
    public void setHitCount(int hitCount) {
       this.hitCount = hitCount;
    }
-
 }

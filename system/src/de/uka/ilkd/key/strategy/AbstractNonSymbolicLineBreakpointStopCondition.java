@@ -25,9 +25,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.ExtList;
 
-public class AbstractNonSymbolicLineBreakpointStopCondition extends
-      AbstractNonSymbolicConditionalBreakpointStopCondition {
-
+public class AbstractNonSymbolicLineBreakpointStopCondition extends AbstractNonSymbolicConditionalBreakpointStopCondition {
    /**
     * The path of the class this {@link LineBreakpointNonSymbolicStopCondition} is associated with.
     */
@@ -64,23 +62,24 @@ public class AbstractNonSymbolicLineBreakpointStopCondition extends
     * @param containerType the type of the element containing the breakpoint
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
-   public AbstractNonSymbolicLineBreakpointStopCondition(String classPath, int lineNumber,
-         int hitCount, IProgramMethod pm,
-         Proof proof, String condition,
-         boolean enabled, boolean conditionEnabled, int methodStart,
-         int methodEnd, KeYJavaType containerType)
-         throws SLTranslationException {
-      super(hitCount, pm, proof,
-            enabled, conditionEnabled, methodStart, methodEnd,
-            containerType);
+   public AbstractNonSymbolicLineBreakpointStopCondition(String classPath, 
+                                                         int lineNumber, 
+                                                         int hitCount, 
+                                                         IProgramMethod pm, 
+                                                         Proof proof, 
+                                                         String condition, 
+                                                         boolean enabled, 
+                                                         boolean conditionEnabled, 
+                                                         int methodStart, 
+                                                         int methodEnd, 
+                                                         KeYJavaType containerType) throws SLTranslationException {
+      super(hitCount, pm, proof, enabled, conditionEnabled, methodStart, methodEnd, containerType);
       this.classPath=classPath;
       this.methodEnd=methodEnd;
       this.methodStart=methodStart;
       this.lineNumber=lineNumber;
       this.setCondition(condition);
    }
-
-  
 
    /**
     * For a given {@link StatementContainer} this method computes the {@link StatementBlock} that contains all lines before the line the Breakpoint is at, including the line itself.
@@ -114,27 +113,25 @@ public class AbstractNonSymbolicLineBreakpointStopCondition extends
 
    /**
     * Checks if the execution should stop in the given line for the given class.
-    * 
     * @param line The current line of code, that the auto mode is evaluating
     * @param path The path of the Class, that contains the currently evaluated code 
     * @return true if a {@link JavaLineBreakpoint} is in the given line and the condition evaluates to true and the Hitcount is exceeded, false otherwise
     */
    protected boolean shouldStopInLine(int line, String path) {
-            if (lineNumber == line && getClassPath().equals(path)) {
-               return true;
-               }
+      if (lineNumber == line && getClassPath().equals(path)) {
+         return true;
+      }
       return false;
    }
    
    @Override
-   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp,
-         Proof proof, Node node) throws ProofInputException {
+   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
       if (activeStatement != null && activeStatement.getStartPosition().getLine() != -1) {
          String path = activeStatement.getPositionInfo().getParentClass();
          int startLine = activeStatement.getStartPosition().getLine();
          int endLine = activeStatement.getEndPosition().getLine();
-      boolean stopInLine = endLine>startLine+1 ? shouldStopInLine(startLine, path) : shouldStopInLine(endLine, path);
-      return stopInLine&&super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+         boolean stopInLine = endLine>startLine+1 ? shouldStopInLine(startLine, path) : shouldStopInLine(endLine, path);
+         return stopInLine&&super.isBreakpointHit(activeStatement, ruleApp, proof, node);
       }
       return false;
    }
@@ -146,6 +143,7 @@ public class AbstractNonSymbolicLineBreakpointStopCondition extends
    public int getLineNumber() {
       return lineNumber;
    }
+   
    @Override
    protected boolean isInScope(Node node) {
       Node checkNode = node;
@@ -162,8 +160,6 @@ public class AbstractNonSymbolicLineBreakpointStopCondition extends
       return false;
    }
 
-
-
    /**
     * @return the classPath
     */
@@ -171,13 +167,10 @@ public class AbstractNonSymbolicLineBreakpointStopCondition extends
       return classPath;
    }
 
-
-
    /**
     * @param classPath the classPath to set
     */
    public void setClassPath(String classPath) {
       this.classPath = classPath;
    }
-
 }

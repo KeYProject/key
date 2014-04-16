@@ -58,9 +58,7 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-public abstract class ConditionalBreakpointStopCondition extends
-      HitCountBreakpointStopCondition {
-   
+public abstract class ConditionalBreakpointStopCondition extends HitCountBreakpointStopCondition {
    /**
     * The condition  for this Breakpoint (set by user).
     */
@@ -113,7 +111,6 @@ public abstract class ConditionalBreakpointStopCondition extends
 
    /**
     * Creates a new {@link ConditionalBreakpointStopCondition}. Call setCondition immediately after calling the constructor!
-    * 
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
@@ -123,9 +120,7 @@ public abstract class ConditionalBreakpointStopCondition extends
     * @param methodEnd the line the containing method of this breakpoint ends at
     * @param containerType the type of the element containing the breakpoint
     */
-   public ConditionalBreakpointStopCondition(int hitCount, IProgramMethod pm, Proof proof, 
-         boolean enabled, boolean conditionEnabled,
-         int methodStart, int methodEnd, KeYJavaType containerType){
+   public ConditionalBreakpointStopCondition(int hitCount, IProgramMethod pm, Proof proof, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd, KeYJavaType containerType){
       super(hitCount, proof,enabled);
       this.setPm(pm);
       paramVars= new HashSet<LocationVariable>();
@@ -136,8 +131,7 @@ public abstract class ConditionalBreakpointStopCondition extends
    }
    
    @Override
-   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
       if(goal!=null){
          Node node = goal.node();
          RuleApp ruleApp = goal.getRuleAppManager().peekNext();
@@ -167,7 +161,6 @@ public abstract class ConditionalBreakpointStopCondition extends
 
    /**
     * Returns a map containing the same entries as the variableNamingMap changes in one map do not effect the other map
-    * 
     * @return the cloned map
     */
    private Map<SVSubstitute, SVSubstitute> getOldMap() {
@@ -184,7 +177,6 @@ public abstract class ConditionalBreakpointStopCondition extends
 
    /**
     * removes all stored parameters in to Keep when the ruleApp on the current node would induce a method return
-    * 
     * @param node
     * @param ruleApp
     * @param inScope
@@ -197,7 +189,6 @@ public abstract class ConditionalBreakpointStopCondition extends
 
    /**
     * put relevant values from the current nodes renamings in toKeep and variableNamingMap
-    * 
     * @param varForCondition the variable that might be relevant for the condition
     * @param node the current
     * @param inScope the flag to determine if the current statement is in the scope of the breakpoint
@@ -254,7 +245,6 @@ public abstract class ConditionalBreakpointStopCondition extends
 
    /**
     * Modifies toKeep and variableNamingMap to hold the correct parameters after execution of the given ruleApp on the given node
-    * 
     * @param ruleApp the applied rule app
     * @param nodethe current node
     */
@@ -276,7 +266,6 @@ public abstract class ConditionalBreakpointStopCondition extends
    
    /**
     * Computes the Term that can be evaluated, from the user given condition
-    * 
     * @param condition the condition given by the user
     * @return the {@link Term} that represents the condition
     * @throws SLTranslationException if the Term could not be parsed
@@ -336,7 +325,6 @@ public abstract class ConditionalBreakpointStopCondition extends
    
    /**
     * Checks if the condition, that was given by the user, evaluates to true with the current of the proof
-    * 
     * @param ruleApp the {@link RuleApp} to be executed next
     * @param proof the current {@link Proof}
     * @param node the current {@link Node}
@@ -364,9 +352,9 @@ public abstract class ConditionalBreakpointStopCondition extends
       proof.getServices().getNameRecorder();
       return info.getProof().closed();
    }
+   
    @Override
-   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp,
-         Proof proof, Node node) throws ProofInputException {
+   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
       return (!conditionEnabled||conditionMet(ruleApp, proof, node))&&super.isBreakpointHit(activeStatement, ruleApp, proof, node);
    }
 
@@ -394,11 +382,7 @@ public abstract class ConditionalBreakpointStopCondition extends
     */
    protected abstract boolean isInScopeForCondition(Node node);
    
-   
-
-
-   private ImmutableList<ProgramVariable> saveAddVariable(LocationVariable x,
-         ImmutableList<ProgramVariable> varsForCondition) {
+   private ImmutableList<ProgramVariable> saveAddVariable(LocationVariable x, ImmutableList<ProgramVariable> varsForCondition) {
       boolean contains = false;
       for(ProgramVariable paramVar : varsForCondition){
          if(paramVar.toString().equals(x.toString())){
@@ -411,8 +395,6 @@ public abstract class ConditionalBreakpointStopCondition extends
       }
       return varsForCondition;
    }
-
-
    
    /**
     * Sets the new conditionEnabled value.
@@ -437,7 +419,6 @@ public abstract class ConditionalBreakpointStopCondition extends
    public boolean isConditionEnabled() {
       return conditionEnabled;
    }
-   
    
    /**
     * Sets the condition to the Term that is parsed from the given String.

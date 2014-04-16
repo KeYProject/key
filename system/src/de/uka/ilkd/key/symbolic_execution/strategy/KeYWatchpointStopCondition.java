@@ -29,12 +29,10 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * @author Marco Drebing
  */
 public class KeYWatchpointStopCondition extends ConditionalBreakpointStopCondition{
-   
    /**
     * a flag to tell whether the condition should evaluate to true or just be satisfiable
     */
    private boolean suspendOnTrue;
-
 
    /**
     * Creates a new {@link ConditionalBreakpointStopCondition}. Call setCondition immediately after calling the constructor!
@@ -49,9 +47,7 @@ public class KeYWatchpointStopCondition extends ConditionalBreakpointStopConditi
     * @param suspendOnTrue the flag if the condition needs to evaluate to true or just be satisfiable
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
-   public KeYWatchpointStopCondition(int hitCount,
-         Proof proof, String condition,
-         boolean enabled, boolean conditionEnabled, KeYJavaType containerType, boolean suspendOnTrue) throws SLTranslationException {
+   public KeYWatchpointStopCondition(int hitCount, Proof proof, String condition, boolean enabled, boolean conditionEnabled, KeYJavaType containerType, boolean suspendOnTrue) throws SLTranslationException {
       super(hitCount, null, proof, enabled, conditionEnabled, -1, -1, containerType);
       setSuspendOnTrue(suspendOnTrue);
       this.setCondition(condition);
@@ -109,8 +105,7 @@ public class KeYWatchpointStopCondition extends ConditionalBreakpointStopConditi
    }
    
    @Override
-   protected boolean isBreakpointHit(SourceElement activeStatement,
-         RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
+   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
       if(activeStatement != null && activeStatement.getStartPosition().getLine() != -1){
          return super.isBreakpointHit(activeStatement, ruleApp, proof, node);
       }

@@ -10,7 +10,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -29,12 +28,10 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * @author Marco Drebing
  */
 public class KeYWatchpointNonSymbolicStopCondition extends AbstractNonSymbolicConditionalBreakpointStopCondition{
-   
    /**
     * a flag to tell whether the condition should evaluate to true or just be satisfiable
     */
    private boolean suspendOnTrue;
-
 
    /**
     * Creates a new {@link ConditionalBreakpointStopCondition}. Call setCondition immediately after calling the constructor!
@@ -51,9 +48,7 @@ public class KeYWatchpointNonSymbolicStopCondition extends AbstractNonSymbolicCo
     * @param suspendOnTrue the flag if the condition needs to evaluate to true or just be satisfiable
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
-   public KeYWatchpointNonSymbolicStopCondition(int hitCount,
-         Proof proof, String condition,
-         boolean enabled, boolean conditionEnabled, KeYJavaType containerType, boolean suspendOnTrue) throws SLTranslationException {
+   public KeYWatchpointNonSymbolicStopCondition(int hitCount, Proof proof, String condition, boolean enabled, boolean conditionEnabled, KeYJavaType containerType, boolean suspendOnTrue) throws SLTranslationException {
       super(hitCount, null, proof, enabled, conditionEnabled, -1, -1, containerType);
       setSuspendOnTrue(suspendOnTrue);
       this.setCondition(condition);
@@ -71,8 +66,7 @@ public class KeYWatchpointNonSymbolicStopCondition extends AbstractNonSymbolicCo
    }
    
    @Override
-   protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node)
-         throws ProofInputException {
+   protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
       if(suspendOnTrue){
          return super.conditionMet(ruleApp, proof, node);
       }else{

@@ -10,13 +10,9 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
  * 
  * @author Marco Drebing
  */
-
-
 public class LineBreakpointNonSymbolicStopCondition extends AbstractNonSymbolicLineBreakpointStopCondition {
-
    /**
     * Creates a new {@link LineBreakpointNonSymbolicStopCondition}.
-    * 
     * @param classPath the path of the class the associated Breakpoint lies within
     * @param lineNumber the line where the associated Breakpoint is located in the class
     * @param hitCount the hitCount for this Breakpoint, given by user
@@ -30,7 +26,6 @@ public class LineBreakpointNonSymbolicStopCondition extends AbstractNonSymbolicL
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
    public LineBreakpointNonSymbolicStopCondition(String classPath, int lineNumber, int hitCount, IProgramMethod pm, Proof proof, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd) throws SLTranslationException {
-      super(classPath, lineNumber, hitCount, pm, proof,
-            condition, enabled, conditionEnabled, methodStart, methodEnd, pm.getContainerType()); 
+      super(classPath, lineNumber, hitCount, pm, proof, condition, enabled, conditionEnabled, methodStart, methodEnd, pm.getContainerType()); 
    }
 }

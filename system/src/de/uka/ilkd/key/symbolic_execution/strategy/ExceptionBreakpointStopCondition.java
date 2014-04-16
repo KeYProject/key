@@ -24,9 +24,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * 
  * @author Marco Drebing
  */
-public class ExceptionBreakpointStopCondition extends
-      HitCountBreakpointStopCondition {
-   
+public class ExceptionBreakpointStopCondition extends HitCountBreakpointStopCondition {
    /**
     * The exception to watch for
     */
@@ -77,6 +75,7 @@ public class ExceptionBreakpointStopCondition extends
       this.uncaught=uncaught;
       this.suspendOnSubclasses=suspendOnSubclasses;
    }
+   
    /**
     * {@inheritDoc}
     */
@@ -121,8 +120,6 @@ public class ExceptionBreakpointStopCondition extends
       return true;
    }
 
-
-   
    /**
     * Checks if the given node is a parent of the other given node.
     * @param node The {@link Node} to start search in.
@@ -148,7 +145,6 @@ public class ExceptionBreakpointStopCondition extends
       }
    }
    
-   
    /**
     * {@inheritDoc}
     */
@@ -160,7 +156,7 @@ public class ExceptionBreakpointStopCondition extends
                              long startTime, 
                              int countApplied, 
                              SingleRuleApplicationInfo singleRuleApplicationInfo) {
-   // Check if a rule was applied
+      // Check if a rule was applied
       if (singleRuleApplicationInfo != null) {
          // Get the node on which a rule was applied.
          Goal goal = singleRuleApplicationInfo.getGoal();
@@ -189,9 +185,7 @@ public class ExceptionBreakpointStopCondition extends
             }
             exceptionNodes.remove(parent);
          }
-
       }
-      
       return false;
    }
    
@@ -201,18 +195,21 @@ public class ExceptionBreakpointStopCondition extends
    public boolean isCaught() {
       return caught;
    }
+   
    /**
     * @param isCaught the isCaught to set
     */
    public void setCaught(boolean isCaught) {
       this.caught = isCaught;
    }
+   
    /**
     * @return the isUncaught
     */
    public boolean isUncaught() {
       return uncaught;
    }
+   
    /**
     * @param isUncaught the isUncaught to set
     */
@@ -226,6 +223,7 @@ public class ExceptionBreakpointStopCondition extends
    public boolean isSuspendOnSubclasses() {
       return suspendOnSubclasses;
    }
+   
    /**
     * @param suspendOnSubclasses the suspendOnSubclasses to set
     */

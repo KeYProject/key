@@ -21,11 +21,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 
-public abstract class HitCountBreakpointStopCondition extends
-      BreakpointStopCondition {
-   
-
-   
+public abstract class HitCountBreakpointStopCondition extends BreakpointStopCondition {
    /**
     * The HitCount of the Breakpoint (set by user).
     */
@@ -41,7 +37,6 @@ public abstract class HitCountBreakpointStopCondition extends
     */
    private Map<Integer, Boolean> hittedNodes;
 
-
    /**
     * Creates a new {@link HitCountBreakpointStopCondition}.
     * 
@@ -54,7 +49,6 @@ public abstract class HitCountBreakpointStopCondition extends
       hittedNodes = new HashMap<Integer, Boolean>();
       this.hitCount = hitCount;
    }
-
    
    /**
     * Checks if the Hitcount is exceeded for the given {@link JavaLineBreakpoint}.
@@ -104,5 +98,4 @@ public abstract class HitCountBreakpointStopCondition extends
    public void setHitCount(int hitCount) {
       this.hitCount = hitCount;
    }
-
 }

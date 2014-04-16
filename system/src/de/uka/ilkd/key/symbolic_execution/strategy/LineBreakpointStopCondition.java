@@ -25,9 +25,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.ExtList;
 
-public class LineBreakpointStopCondition extends
-      ConditionalBreakpointStopCondition {
-
+public class LineBreakpointStopCondition extends ConditionalBreakpointStopCondition {
    /**
     * The path of the class this {@link LineBreakpointStopCondition} is associated with.
     */
@@ -63,15 +61,8 @@ public class LineBreakpointStopCondition extends
     * @param methodEnd the line the containing method of this breakpoint ends at
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
-   public LineBreakpointStopCondition(String classPath, int lineNumber,
-         int hitCount, IProgramMethod pm,
-         Proof proof, String condition,
-         boolean enabled, boolean conditionEnabled, int methodStart,
-         int methodEnd)
-         throws SLTranslationException {
-      super(hitCount, pm, proof, 
-            enabled, conditionEnabled, methodStart, methodEnd,
-            pm.getContainerType());
+   public LineBreakpointStopCondition(String classPath, int lineNumber, int hitCount, IProgramMethod pm, Proof proof, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd) throws SLTranslationException {
+      super(hitCount, pm, proof,  enabled, conditionEnabled, methodStart, methodEnd, pm.getContainerType());
       this.classPath=classPath;
       this.methodEnd=methodEnd;
       this.methodStart=methodStart;
@@ -119,15 +110,14 @@ public class LineBreakpointStopCondition extends
     * @return true if a {@link JavaLineBreakpoint} is in the given line and the condition evaluates to true and the Hitcount is exceeded, false otherwise
     */
    protected boolean shouldStopInLine(int line, String path) {
-            if (lineNumber == line && getClassPath().equals(path)) {
-               return true;
-               }
+      if (lineNumber == line && getClassPath().equals(path)) {
+         return true;
+      }
       return false;
    }
    
    @Override
-   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp,
-         Proof proof, Node node) throws ProofInputException {
+   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
       return isInLine(activeStatement)&&super.isBreakpointHit(activeStatement, ruleApp, proof, node);
    }
    
@@ -149,6 +139,7 @@ public class LineBreakpointStopCondition extends
    public int getLineNumber() {
       return lineNumber;
    }
+   
    @Override
    protected boolean isInScope(Node node) {
       Node checkNode = node;
@@ -181,8 +172,6 @@ public class LineBreakpointStopCondition extends
       return false;
    }
 
-
-
    /**
     * @return the classPath
     */
@@ -190,13 +179,10 @@ public class LineBreakpointStopCondition extends
       return classPath;
    }
 
-
-
    /**
     * @param classPath the classPath to set
     */
    public void setClassPath(String classPath) {
       this.classPath = classPath;
    }
-
 }

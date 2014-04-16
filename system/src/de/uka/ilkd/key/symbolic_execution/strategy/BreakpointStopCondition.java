@@ -31,7 +31,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 public abstract class BreakpointStopCondition implements IStopCondition {
-   
    /**
     * The flag if the Breakpoint is enabled.
     */
@@ -57,12 +56,10 @@ public abstract class BreakpointStopCondition implements IStopCondition {
 
    /**
     * Creates a new {@link BreakpointStopCondition}.
-    * 
     * @param proof the {@link Proof} that will be executed and should stop
     * @param enabled flag if the Breakpoint is enabled
     */
-   public BreakpointStopCondition(Proof proof, boolean enabled){
-      super();
+   public BreakpointStopCondition(Proof proof, boolean enabled) {
       this.enabled=enabled;
       this.setProof(proof);
    }
@@ -71,8 +68,13 @@ public abstract class BreakpointStopCondition implements IStopCondition {
     * {@inheritDoc}
     */
    @Override
-   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) { 
+   public boolean isGoalAllowed(int maxApplications, 
+                                long timeout, 
+                                Proof proof, 
+                                IGoalChooser goalChooser, 
+                                long startTime, 
+                                int countApplied, 
+                                Goal goal) { 
          if(goal!=null){
             Node node = goal.node();
             RuleApp ruleApp = goal.getRuleAppManager().peekNext();
@@ -99,10 +101,17 @@ public abstract class BreakpointStopCondition implements IStopCondition {
       return true;
    }
 
+   /**
+    * {@inheritDoc}
+    */
    @Override
-   public boolean shouldStop(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser, long startTime, int countApplied,
-         SingleRuleApplicationInfo singleRuleApplicationInfo) {
+   public boolean shouldStop(int maxApplications, 
+                             long timeout, 
+                             Proof proof, 
+                             IGoalChooser goalChooser, 
+                             long startTime, 
+                             int countApplied, 
+                             SingleRuleApplicationInfo singleRuleApplicationInfo) {
       // Check if a rule was applied
       if (singleRuleApplicationInfo != null) {
          // Get the node on which a rule was applied.
@@ -158,7 +167,10 @@ public abstract class BreakpointStopCondition implements IStopCondition {
     * @return true if execution should hold
     * @throws ProofInputException
     */
-   protected abstract boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node)throws ProofInputException;
+   protected abstract boolean isBreakpointHit(SourceElement activeStatement, 
+                                              RuleApp ruleApp, 
+                                              Proof proof, 
+                                              Node node) throws ProofInputException;
    
    /**
     * Checks if the Breakpoint is enabled.
@@ -190,23 +202,44 @@ public abstract class BreakpointStopCondition implements IStopCondition {
       this.proof = proof;
    }
    
+   /**
+    * {@inheritDoc}
+    */
    @Override
-   public String getGoalNotAllowedMessage(int maxApplications, long timeout,
-         Proof proof, IGoalChooser goalChooser, long startTime,
-         int countApplied, Goal goal) {
+   public String getGoalNotAllowedMessage(int maxApplications, 
+                                          long timeout, 
+                                          Proof proof, 
+                                          IGoalChooser goalChooser, 
+                                          long startTime, 
+                                          int countApplied, 
+                                          Goal goal) {
       return "Breakpoint hit!";
    }
+   
+   /**
+    * {@inheritDoc}
+    */
    @Override
-   public int getMaximalWork(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser) {
+   public int getMaximalWork(int maxApplications, 
+                             long timeout, 
+                             Proof proof, 
+                             IGoalChooser goalChooser) {
       getBreakpointGoals().clear(); // Reset number of already detected symbolic execution tree nodes for all goals.
       getGoalAllowedResultPerSetNode().clear(); // Remove no longer needed references.
       return 0;
    }
+   
+   /**
+    * {@inheritDoc}
+    */
    @Override
-   public String getStopMessage(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser, long startTime, int countApplied,
-         SingleRuleApplicationInfo singleRuleApplicationInfo) {
+   public String getStopMessage(int maxApplications, 
+                                long timeout, 
+                                Proof proof, 
+                                IGoalChooser goalChooser, 
+                                long startTime, 
+                                int countApplied, 
+                                SingleRuleApplicationInfo singleRuleApplicationInfo) {
       return "Breakpoint hit!";
    }
 
@@ -220,8 +253,7 @@ public abstract class BreakpointStopCondition implements IStopCondition {
    /**
     * @param goalAllowedResultPerSetNode the goalAllowedResultPerSetNode to set
     */
-   public void setGoalAllowedResultPerSetNode(
-         Map<Node, Boolean> goalAllowedResultPerSetNode) {
+   public void setGoalAllowedResultPerSetNode(Map<Node, Boolean> goalAllowedResultPerSetNode) {
       this.goalAllowedResultPerSetNode = goalAllowedResultPerSetNode;
    }
 
@@ -235,8 +267,7 @@ public abstract class BreakpointStopCondition implements IStopCondition {
    /**
     * @param breakpointGoals the breakpointGoals to set
     */
-   public void setBreakpointGoals(
-         LinkedHashSet<Goal> breakpointGoals) {
+   public void setBreakpointGoals(LinkedHashSet<Goal> breakpointGoals) {
       this.breakpointGoals = breakpointGoals;
    }
 }

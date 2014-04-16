@@ -18,7 +18,6 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 public class MethodBreakpointStopCondition extends ConditionalBreakpointStopCondition {
-
    /**
     * flag to tell whether to stop on method entry
     */
@@ -62,11 +61,7 @@ public class MethodBreakpointStopCondition extends ConditionalBreakpointStopCond
     * @param isExit flag to tell whether to stop on method exit
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
-   public MethodBreakpointStopCondition(String classPath, int lineNumber,
-         int hitCount, IProgramMethod pm,
-         Proof proof, String condition,
-         boolean enabled, boolean conditionEnabled, int methodStart,
-         int methodEnd, boolean isEntry, boolean isExit) throws SLTranslationException {
+   public MethodBreakpointStopCondition(String classPath, int lineNumber, int hitCount, IProgramMethod pm, Proof proof, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd, boolean isEntry, boolean isExit) throws SLTranslationException {
       super(hitCount, pm, proof, enabled, conditionEnabled, methodStart, methodEnd, pm.getContainerType());
       this.isEntry = isEntry;
       this.isExit = isExit;
@@ -77,8 +72,7 @@ public class MethodBreakpointStopCondition extends ConditionalBreakpointStopCond
    }
    
    @Override
-   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp,
-         Proof proof, Node node) throws ProofInputException {
+   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
       return ((isMethodCallNode(node, ruleApp)&&isEntry)||(isMethodReturnNode(node, ruleApp)&&isExit))&&(!isConditionEnabled()||conditionMet(ruleApp, proof, node))&&isEnabled()&&hitcountExceeded(node);
    }
 
@@ -106,8 +100,7 @@ public class MethodBreakpointStopCondition extends ConditionalBreakpointStopCond
             }
          }
       }
-      return false;
-      
+      return false;  
    }
    
    /**
@@ -163,8 +156,7 @@ public class MethodBreakpointStopCondition extends ConditionalBreakpointStopCond
    }
 
    @Override
-   protected StatementBlock getStatementBlock(
-         StatementContainer statementContainer) {
+   protected StatementBlock getStatementBlock(StatementContainer statementContainer) {
       return (StatementBlock) statementContainer;
    }
    
@@ -183,6 +175,7 @@ public class MethodBreakpointStopCondition extends ConditionalBreakpointStopCond
    public void setExit(boolean isExit) {
       this.isExit = isExit;
    }
+   
    @Override
    protected boolean isInScope(Node node) {
       Node checkNode = node;
@@ -228,5 +221,4 @@ public class MethodBreakpointStopCondition extends ConditionalBreakpointStopCond
    public void setClassPath(String classPath) {
       this.classPath = classPath;
    }
-
 }

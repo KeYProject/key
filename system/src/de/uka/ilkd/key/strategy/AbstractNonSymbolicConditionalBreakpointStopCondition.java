@@ -58,9 +58,7 @@ import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition extends
-      AbstractNonSymbolicHitCountBreakpointStopCondition {
-   
+public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition extends AbstractNonSymbolicHitCountBreakpointStopCondition {
    /**
     * The condition  for this Breakpoint (set by user).
     */
@@ -123,9 +121,14 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
     * @param methodEnd the line the containing method of this breakpoint ends at
     * @param containerType the type of the element containing the breakpoint
     */
-   public AbstractNonSymbolicConditionalBreakpointStopCondition(int hitCount, IProgramMethod pm, Proof proof,
-         boolean enabled, boolean conditionEnabled,
-         int methodStart, int methodEnd, KeYJavaType containerType){
+   public AbstractNonSymbolicConditionalBreakpointStopCondition(int hitCount, 
+                                                                IProgramMethod pm, 
+                                                                Proof proof, 
+                                                                boolean enabled, 
+                                                                boolean conditionEnabled, 
+                                                                int methodStart, 
+                                                                int methodEnd, 
+                                                                KeYJavaType containerType){
       super(hitCount, proof, enabled);
       this.setPm(pm);
       paramVars= new HashSet<LocationVariable>();
@@ -135,10 +138,17 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
       this.conditionEnabled = conditionEnabled;
    }
    
+   /**
+    * {@inheritDocs}
+    */
    @Override
-   public boolean shouldStop(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser, long startTime, int countApplied,
-         SingleRuleApplicationInfo singleRuleApplicationInfo) {
+   public boolean shouldStop(int maxApplications, 
+                             long timeout, 
+                             Proof proof, 
+                             IGoalChooser goalChooser, 
+                             long startTime, 
+                             int countApplied, 
+                             SingleRuleApplicationInfo singleRuleApplicationInfo) {
       if (singleRuleApplicationInfo != null) {
          Goal goal = singleRuleApplicationInfo.getGoal();
          Node node = goal.node();
@@ -147,8 +157,7 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
             refreshVarMaps(ruleApp, node);
          }
       }
-      return super.shouldStop(maxApplications, timeout, proof, goalChooser,
-            startTime, countApplied, singleRuleApplicationInfo);
+      return super.shouldStop(maxApplications, timeout, proof, goalChooser, startTime, countApplied, singleRuleApplicationInfo);
    }
 
    /**
@@ -331,7 +340,6 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
                                              null);
       
          return parser.parseExpression();
-      
    }
    
    /**
@@ -362,9 +370,9 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
       ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
       return info.getProof().closed();
    }
+   
    @Override
-   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp,
-         Proof proof, Node node) throws ProofInputException {
+   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
       return (!conditionEnabled||conditionMet(ruleApp, proof, node))&&super.isBreakpointHit(activeStatement, ruleApp, proof, node);
    }
 
@@ -384,9 +392,7 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
     */
    protected abstract boolean isInScope(Node node);
 
-
-   private ImmutableList<ProgramVariable> saveAddVariable(LocationVariable x,
-         ImmutableList<ProgramVariable> varsForCondition) {
+   private ImmutableList<ProgramVariable> saveAddVariable(LocationVariable x, ImmutableList<ProgramVariable> varsForCondition) {
       boolean contains = false;
       for(ProgramVariable paramVar : varsForCondition){
          if(paramVar.toString().equals(x.toString())){
@@ -399,8 +405,6 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
       }
       return varsForCondition;
    }
-
-
    
    /**
     * Sets the new conditionEnabled value.
@@ -425,8 +429,7 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
    public boolean isConditionEnabled() {
       return conditionEnabled;
    }
-   
-   
+
    /**
     * Sets the condition to the Term that is parsed from the given String.
     * @param condition the String to be parsed

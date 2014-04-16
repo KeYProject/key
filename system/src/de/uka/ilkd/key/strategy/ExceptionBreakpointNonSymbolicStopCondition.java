@@ -25,18 +25,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * 
  * @author Marco Drebing
  */
-public class ExceptionBreakpointNonSymbolicStopCondition extends
-      AbstractNonSymbolicHitCountBreakpointStopCondition {
-   
+public class ExceptionBreakpointNonSymbolicStopCondition extends AbstractNonSymbolicHitCountBreakpointStopCondition {
    /**
     * The exception to watch for
     */
    private String exceptionName;
-   
-   /**
-    * a Set of Nodes that represent exceptions
-    */
-   private Set<Node> exceptionNodes;
    
    /**
     * a list of nodes of the Symbolic Execution Tree whose children represent exceptions
@@ -72,14 +65,11 @@ public class ExceptionBreakpointNonSymbolicStopCondition extends
    public ExceptionBreakpointNonSymbolicStopCondition(Proof proof, String exceptionName, boolean caught, boolean uncaught, boolean suspendOnSubclasses, boolean enabled, int hitCount){
       super(hitCount, proof, enabled);
       this.exceptionName = exceptionName;
-      exceptionNodes = new HashSet<Node>();
       exceptionParentNodes = new HashSet<Node>();
       this.caught=caught;
       this.uncaught=uncaught;
       this.suspendOnSubclasses=suspendOnSubclasses;
    }
-
-
    
    /**
     * Checks if the given node is a parent of the other given node.
@@ -106,7 +96,6 @@ public class ExceptionBreakpointNonSymbolicStopCondition extends
       }
    }
    
-   
    /**
     * {@inheritDoc}
     */
@@ -118,13 +107,12 @@ public class ExceptionBreakpointNonSymbolicStopCondition extends
                              long startTime, 
                              int countApplied, 
                              SingleRuleApplicationInfo singleRuleApplicationInfo) {
-   // Check if a rule was applied
+      // Check if a rule was applied
       if (singleRuleApplicationInfo != null) {
          // Get the node on which a rule was applied.
          Goal goal = singleRuleApplicationInfo.getGoal();
          Node node = goal.node();
          RuleApp ruleApp = goal.getRuleAppManager().peekNext();
-         Node parent = null;
 
          SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
          Node SETParent = SymbolicExecutionUtil.findParentSetNode(node);
@@ -151,9 +139,7 @@ public class ExceptionBreakpointNonSymbolicStopCondition extends
                }
             }
          }
-
       }
-      
       return false;
    }
    
@@ -163,18 +149,21 @@ public class ExceptionBreakpointNonSymbolicStopCondition extends
    public boolean isCaught() {
       return caught;
    }
+   
    /**
     * @param isCaught the isCaught to set
     */
    public void setCaught(boolean isCaught) {
       this.caught = isCaught;
    }
+   
    /**
     * @return the isUncaught
     */
    public boolean isUncaught() {
       return uncaught;
    }
+   
    /**
     * @param isUncaught the isUncaught to set
     */
@@ -188,6 +177,7 @@ public class ExceptionBreakpointNonSymbolicStopCondition extends
    public boolean isSuspendOnSubclasses() {
       return suspendOnSubclasses;
    }
+   
    /**
     * @param suspendOnSubclasses the suspendOnSubclasses to set
     */

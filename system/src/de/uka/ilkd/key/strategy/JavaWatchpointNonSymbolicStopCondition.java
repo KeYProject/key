@@ -21,9 +21,7 @@ import de.uka.ilkd.key.rule.RuleApp;
  * 
  * @author Marco Drebing
  */
-public class JavaWatchpointNonSymbolicStopCondition extends
-      AbstractNonSymbolicHitCountBreakpointStopCondition {
-
+public class JavaWatchpointNonSymbolicStopCondition extends AbstractNonSymbolicHitCountBreakpointStopCondition {
    private boolean isAccess;
 
    private boolean isModification;
@@ -37,7 +35,6 @@ public class JavaWatchpointNonSymbolicStopCondition extends
 
    /**
     * Creates a new {@link JavaWatchpointNonSymbolicStopCondition}.
-    * 
     * @param enabled flag if the Breakpoint is enabled
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param fieldName the field to watch
@@ -56,9 +53,7 @@ public class JavaWatchpointNonSymbolicStopCondition extends
    }
    
    @Override
-   public boolean shouldStop(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser, long startTime, int countApplied,
-         SingleRuleApplicationInfo singleRuleApplicationInfo) {
+   public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
       if (singleRuleApplicationInfo != null&&isEnabled()) {
          Goal goal = singleRuleApplicationInfo.getGoal();
          Node node = goal.node();
@@ -123,6 +118,7 @@ public class JavaWatchpointNonSymbolicStopCondition extends
       }
       return found;
    }
+   
    /**
     * @return the isAccess
     */

@@ -18,7 +18,6 @@ import de.uka.ilkd.key.symbolic_execution.strategy.LineBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 public class MethodBreakpointNonSymbolicStopCondition extends AbstractNonSymbolicLineBreakpointStopCondition {
-
    /**
     * flag to tell whether to stop on method entry
     */
@@ -31,7 +30,6 @@ public class MethodBreakpointNonSymbolicStopCondition extends AbstractNonSymboli
 
    /**
     * Creates a new {@link LineBreakpointStopCondition}.
-    * 
     * @param classPath the path of the class the associated Breakpoint lies within
     * @param lineNumber the line where the associated Breakpoint is located in the class
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
@@ -47,27 +45,19 @@ public class MethodBreakpointNonSymbolicStopCondition extends AbstractNonSymboli
     * @param isExit flag to tell whether to stop on method exit
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
-   public MethodBreakpointNonSymbolicStopCondition(String classPath, int lineNumber,
-         int hitCount, IProgramMethod pm,
-         Proof proof, String condition,
-         boolean enabled, boolean conditionEnabled, int methodStart,
-         int methodEnd, boolean isEntry, boolean isExit) throws SLTranslationException {
-      super(classPath, lineNumber, hitCount, pm, proof,
-               condition, enabled, conditionEnabled, methodStart, methodEnd, pm.getContainerType());
+   public MethodBreakpointNonSymbolicStopCondition(String classPath, int lineNumber, int hitCount, IProgramMethod pm, Proof proof, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd, boolean isEntry, boolean isExit) throws SLTranslationException {
+      super(classPath, lineNumber, hitCount, pm, proof, condition, enabled, conditionEnabled, methodStart, methodEnd, pm.getContainerType());
       this.isEntry = isEntry;
       this.isExit = isExit;
    }
    
    @Override
-   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp,
-         Proof proof, Node node) throws ProofInputException {
+   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
       return ((isMethodCallNode(node, ruleApp)&&isEntry)||(isMethodReturnNode(node, ruleApp)&&isExit))&&super.isBreakpointHit(activeStatement, ruleApp, proof, node);
    } 
    
    @Override
-   public boolean shouldStop(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser, long startTime, int countApplied,
-         SingleRuleApplicationInfo singleRuleApplicationInfo) { 
+   public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) { 
       try{
          if (singleRuleApplicationInfo != null) {
             Goal goal = singleRuleApplicationInfo.getGoal();
@@ -108,12 +98,10 @@ public class MethodBreakpointNonSymbolicStopCondition extends AbstractNonSymboli
     * @return true if the node represents a method return
     */
    private boolean isMethodReturnNode(Node node, RuleApp ruleApp){
-      if(SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp)
-            &&isCorrectMethodReturn(node, ruleApp)){
-            return true;
+      if (SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp) && isCorrectMethodReturn(node, ruleApp)) {
+         return true;
       }
       return false;
-      
    }
    
    private boolean isCorrectMethodReturn(Node node, RuleApp ruleApp){
@@ -146,8 +134,7 @@ public class MethodBreakpointNonSymbolicStopCondition extends AbstractNonSymboli
    }
 
    @Override
-   protected StatementBlock getStatementBlock(
-         StatementContainer statementContainer) {
+   protected StatementBlock getStatementBlock(StatementContainer statementContainer) {
       return (StatementBlock) statementContainer;
    }
    

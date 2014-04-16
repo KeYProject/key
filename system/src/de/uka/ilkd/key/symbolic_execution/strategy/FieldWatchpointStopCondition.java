@@ -1,14 +1,10 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Assignment;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -24,19 +20,12 @@ import de.uka.ilkd.key.rule.RuleApp;
  * 
  * @author Marco Drebing
  */
-public class FieldWatchpointStopCondition extends
-      HitCountBreakpointStopCondition {
-
+public class FieldWatchpointStopCondition extends HitCountBreakpointStopCondition {
    private boolean isAccess;
 
    private boolean isModification;
 
-   private String fieldName;
-
    private String fullFieldName;
-   
-   private KeYJavaType containerKJT;
-
 
    /**
     * Creates a new {@link FieldWatchpointStopCondition}.
@@ -51,10 +40,8 @@ public class FieldWatchpointStopCondition extends
     */
    public FieldWatchpointStopCondition(boolean enabled, int hitCount, String fieldName, boolean isAcces, boolean isModification, KeYJavaType containerKJT, Proof proof) {
       super(hitCount, proof, enabled);
-      this.containerKJT=containerKJT;
       this.isAccess = isAcces;
       this.isModification = isModification;
-      this.fieldName = "this."+fieldName;
       this.fullFieldName = containerKJT.getSort().toString()+"::"+fieldName;
    }
    
@@ -62,8 +49,7 @@ public class FieldWatchpointStopCondition extends
     * 
     */
    @Override
-   protected boolean isBreakpointHit(SourceElement activeStatement,
-         RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
+   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
       if (activeStatement != null && activeStatement instanceof Assignment) {
          Assignment assignment = (Assignment) activeStatement;
          SourceElement firstElement = assignment.getChildAt(0);
@@ -125,6 +111,7 @@ public class FieldWatchpointStopCondition extends
       }
       return found;
    }
+   
    /**
     * @return the isAccess
     */
