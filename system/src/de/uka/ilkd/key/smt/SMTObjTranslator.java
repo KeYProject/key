@@ -1778,7 +1778,7 @@ public class SMTObjTranslator implements SMTTranslator {
 		SMTTerm asrt = SMTTerm.forall(vars, tpcall, null);
 		if (!functionTypeAssertions.contains(asrt)) {
 			asrt.setComment("Assertion regarding the type of "+f.getId());
-			functionTypeAssertions.add(asrt);
+			functionTypeAssertions.add(asrt);			
 		}
 	}
 	/**
@@ -1868,7 +1868,7 @@ public class SMTObjTranslator implements SMTTranslator {
 		}
 
 		types.putConstantType(Util.processName(id), imageSort);
-
+		types.putOriginalConstantType(Util.processName(id), s);
 		return fun;
 
 	}

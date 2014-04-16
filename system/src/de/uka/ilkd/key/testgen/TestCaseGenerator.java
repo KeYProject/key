@@ -8,30 +8,22 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
-
-
-
-import de.uka.ilkd.key.gui.actions.CounterExampleAction;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.gui.actions.TestGenerationAction;
 import de.uka.ilkd.key.gui.smt.TGInfoDialog;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Method;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -41,7 +33,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SMTSolver;
@@ -294,7 +285,9 @@ public class TestCaseGenerator {
 		//init constants
 		for(String c : m.getConstants().keySet()){
 			String val = m.getConstants().get(c);
+			
 			if(filterVal(val) && !c.equals("null")){
+				
 				String type = "int";
 				if(val.equals("true")||val.equals("false")){
 					type = "boolean";
@@ -302,7 +295,14 @@ public class TestCaseGenerator {
 				else if(val.startsWith("#o")){
 					ObjectVal o = getObject(heap, val);
 					if(o!=null){
-						type = o.getSort().name().toString();
+						if(val.equals("#o0")){
+							type = m.getTypes().getOriginalConstantType(c).name().toString();
+						}
+						else{
+							type = o.getSort().name().toString();
+						}
+									
+						
 					}
 					else{
 						type = "Object";
