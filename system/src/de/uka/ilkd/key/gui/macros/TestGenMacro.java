@@ -72,7 +72,7 @@ public class TestGenMacro extends StrategyProofMacro {
     	
     	
         return new TestGenStrategy(
-                mediator.getInteractiveProver().getProof().getActiveStrategy(),10);
+                mediator.getInteractiveProver().getProof().getActiveStrategy(),3);
     }
 
     /**
