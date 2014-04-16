@@ -1,25 +1,22 @@
 package de.uka.ilkd.key.gui.macros;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import javax.swing.KeyStroke;
-
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.Strategy;
 
-public class TestGenMacro implements ProofMacro {
+public class TestGenMacro extends StrategyProofMacro {
 
 	@Override
 	public String getName() {
@@ -33,79 +30,104 @@ public class TestGenMacro implements ProofMacro {
 		return "Generate test-cases for open goals";
 	}
 
-	@Override
-	public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-
-		return true;
-	}
-	
 	/*
-     * returns true if term is modality or update application
+     * find a modality term in a node
+     */
+    private static boolean hasModality(Node node) {
+        Sequent sequent = node.sequent();
+        for (SequentFormula sequentFormula : sequent) {
+            if(hasModality(sequentFormula.formula())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /*
+     * recursively descent into the term to detect a modality.
      */
     private static boolean hasModality(Term term) {
         if(term.op() instanceof Modality) {
             return true;
         }
-        
-        if(term.op() instanceof UpdateApplication){
-        	return true;
+
+        for (Term sub : term.subs()) {
+            if(hasModality(sub)) {
+                return true;
+            }
         }
 
         return false;
     }
-    
-    private void findModalities(PosInOccurrence pio, List<PosInOccurrence> toRemove){
-    	
-    	if(pio == null){
-    		return;
-    	}
-    	
-    	if(hasModality(pio.constrainedFormula().formula())){
-    		toRemove.add(pio);
-    	}
-    	
-    	int length = pio.constrainedFormula().formula().subs().size();
-    	
-    	for(int i = 0; i< length; ++i){
-    		findModalities(pio.down(i), toRemove);
-    	}
-    	
-    	
+
+    @Override
+    protected Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
+        return new TestGenStrategy(
+                mediator.getInteractiveProver().getProof().getActiveStrategy(),10);
     }
 
-	@Override
-	public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
-			ProverTaskListener listener) throws InterruptedException {
+    /**
+     * The Class FilterAppManager is a special strategy assigning to any rule
+     * infinite costs if the goal has no modality
+     */
+    private static class TestGenStrategy extends FilterStrategy {
 
-		final Proof proof = mediator.getInteractiveProver().getProof();
-		Node invokedNode = mediator.getSelectedNode();
-		
-        ImmutableList<Goal> enabledGoals = proof.getSubtreeEnabledGoals(invokedNode);
+        private static final Name NAME = new Name(TestGenStrategy.class.getSimpleName());
         
-        List<PosInOccurrence> toRemove = new LinkedList<PosInOccurrence>();
-        findModalities(posInOcc, toRemove);
+        private static final Set<String> unwindRules;
         
+        private int limit;
         
-        for(Goal g : enabledGoals){
-        	
-        	Node node = g.node();
-        	Sequent seq = node.sequent(); 
-        	
-        	
-        	
-        	for(PosInOccurrence pio : toRemove){
-        		seq.removeFormula(pio);
-        	}   	
-        	
+        static{
+        	unwindRules = new HashSet<String>();
+        	unwindRules.add("loopUnwind");
+        	unwindRules.add("doWhileUnwind");
+        	unwindRules.add("methodCall");
+        	unwindRules.add("methodCallWithAssignment");
+        	unwindRules.add("staticMethodCall");
+        	unwindRules.add("staticMethodCallWithAssignment");
+        }
+        
+        private static boolean isUnwindRule(Rule rule){
+        	String name = rule.name().toString();
+        	return unwindRules.contains(name);
         }
 
+        public TestGenStrategy(Strategy delegate, int limit) {
+            super(delegate);
+            this.limit = limit;
+        }
 
-	}
+        @Override
+        public Name name() {
+            return NAME;
+        }
 
-	@Override
-	public KeyStroke getKeyStroke() {
+        @Override
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+            if(!hasModality(goal.node())) {
+                return false;
+            }
+            
+            if(isUnwindRule(app.rule())){
+            	int unwindRules = computeUnwindRules(goal);
+            	if(unwindRules >= limit){
+            		return false;
+            	}
+            	else{
+            		return true;
+            	}
+            }
 
-		return KeyStrokeManager.get(this);
-	}
+            return super.isApprovedApp(app, pio, goal);
+        }
+
+		private int computeUnwindRules(Goal goal) {
+			
+			return 0;
+		}
+
+    }
 
 }

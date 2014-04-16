@@ -295,7 +295,7 @@ public class TestCaseGenerator {
 				else if(val.startsWith("#o")){
 					ObjectVal o = getObject(heap, val);
 					if(o!=null){
-						if(val.equals("#o0")){
+						if(val.equals("#o0") && m.getTypes().getOriginalConstantType(c)!=null){
 							type = m.getTypes().getOriginalConstantType(c).name().toString();
 						}
 						else{
