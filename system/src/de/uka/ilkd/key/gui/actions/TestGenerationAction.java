@@ -33,6 +33,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.SingleProof;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverType;
@@ -134,17 +135,29 @@ public class TestGenerationAction extends MainWindowAction {
 		Proof oldProof = mediator.getSelectedProof();
 		originalProof = oldProof;		
 		
-		
+		List<Node> nodes = new LinkedList<Node>();
 		ImmutableList<Goal> oldGoals = oldProof.openGoals();
-		Iterator<Goal> oldGoalIter = oldGoals.iterator();
+		
+		
+		if(originalProof.closed()){
+			getNodesWithEmptyModalities(originalProof.root(), nodes);
+		}
+		else{
+			for(Goal goal : oldGoals){
+				nodes.add(goal.node());
+			}
+		}
+		
+		
+		Iterator<Node> oldGoalIter = nodes.iterator();
 		
 		while(oldGoalIter.hasNext()){
 			try{
 				Proof p=null;			
 				if(removeDuplicatePathConditions)
-					p = createProofForTesting_noDuplicate(oldGoalIter.next().node(),res);
+					p = createProofForTesting_noDuplicate(oldGoalIter.next(),res);
 				else
-					p = createProofForTesting_noDuplicate(oldGoalIter.next().node(),null);
+					p = createProofForTesting_noDuplicate(oldGoalIter.next(),null);
 				
 				if(p!=null)	res.add(p);
 			}catch(Exception e){
@@ -154,6 +167,27 @@ public class TestGenerationAction extends MainWindowAction {
 		
 		return res;
     }
+    /**
+     * Adds all nodes on which the emptyModality rule was applied to the list.
+     * @param root
+     * @param nodes
+     */
+    private void getNodesWithEmptyModalities(Node root,List<Node> nodes){
+    	if(root.getAppliedRuleApp()!=null){
+    		RuleApp app = root.getAppliedRuleApp();
+    		if(app.rule().name().toString().equals("emptyModality")){
+    			nodes.add(root);
+    		}
+    	}
+    	for(int i = 0; i < root.childrenCount(); ++i){
+    		getNodesWithEmptyModalities(root.child(i), nodes);
+    	}
+    	
+    }
+    
+    
+    
+    
 
     private Proof createProofForTesting_noDuplicate(Node node, Vector<Proof> otherProofs){
 

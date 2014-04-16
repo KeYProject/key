@@ -340,10 +340,7 @@ public class TestCaseGenerator {
 				if(o.getSort()!=null && o.getSort().name().toString().endsWith("[]")){
 					for(int i = 0; i < o.getLength(); i++){
 						String fieldName = "["+i+"]";
-						String val = o.getArrayValue(i);
-						if(val == null){
-							System.err.println(o.getName()+fieldName+" is null!!");
-						}
+						String val = o.getArrayValue(i);						
 						val = translateValueExpression(val);
 						assignments.add(new Assignment(name+fieldName, val));
 					}
