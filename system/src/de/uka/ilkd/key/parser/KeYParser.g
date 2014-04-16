@@ -202,6 +202,7 @@ options {
 		     NamespaceSet nss,
 		     ParserMode mode) {
         this(lexer);
+        this.lexer = lexer;
         this.parserMode = mode;
  	this.services = services;
 	if(services != null)
@@ -241,13 +242,12 @@ options {
                      TokenStream lexer,
 		     Services services,
 		     NamespaceSet nss) {
-        this(lexer, services, nss, mode);
-        this.scm = new AbbrevMap();
-        this.javaReader = new Recoder2KeY(services,
-                new KeYCrossReferenceServiceConfiguration(
-                   services.getExceptionHandler()), 
-                services.getJavaInfo().rec2key(), new NamespaceSet(), 
-                services.getTypeConverter());
+        this(mode,
+             lexer,
+             new SchemaRecoder2KeY(services, nss),
+             services,
+             nss,
+             new LinkedHashMap());
     }
 
     /**

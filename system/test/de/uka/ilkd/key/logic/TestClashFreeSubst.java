@@ -22,6 +22,7 @@ import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -33,6 +34,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
 
@@ -155,7 +157,14 @@ public class TestClashFreeSubst extends TestCase {
 		new KeYLexerF(s,
 			"No file. Call of parser from logic/TestClashFreeSubst.java",
 			null),
-		services, nss);
+		new Recoder2KeY(services,
+			new KeYCrossReferenceServiceConfiguration(services.getExceptionHandler()),
+			services.getJavaInfo().rec2key(),
+			new NamespaceSet(),
+			services.getTypeConverter()),
+		services,
+		nss,
+		new AbbrevMap());
     }
 
     public Term parseTerm(String s) {
