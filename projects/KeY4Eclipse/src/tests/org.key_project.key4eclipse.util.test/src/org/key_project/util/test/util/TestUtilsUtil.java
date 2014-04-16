@@ -14,6 +14,7 @@
 package org.key_project.util.test.util;
 
 import static org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable.syncExec;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.ByteArrayInputStream;
@@ -1618,5 +1619,18 @@ public class TestUtilsUtil {
          }, IResource.DEPTH_INFINITE, IResource.FILE);
          waitForBuild();
       }
+   }
+
+   /**
+    * Performs the switch into the new perspective.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @param expectedTargetPerspectiveId The expected ID of the target perspective.
+    */
+   public static void confirmPerspectiveSwitch(SWTWorkbenchBot bot, String expectedTargetPerspectiveId) {
+      SWTBotShell switchShel = bot.shell("Confirm Perspective Switch");
+      switchShel.bot().button("Yes").click();
+      IPerspectiveDescriptor debugPerspective = TestUtilsUtil.getActivePerspective();
+      bot.waitUntil(org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses(switchShel));
+      assertEquals(expectedTargetPerspectiveId, debugPerspective.getId());
    }
 }
