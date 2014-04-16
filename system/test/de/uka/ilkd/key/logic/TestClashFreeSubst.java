@@ -63,9 +63,11 @@ public class TestClashFreeSubst extends TestCase {
 	tf = services.getTermFactory();
 	
 	String sorts = "\\sorts{boolean;int;LocSet;}";
-	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(sorts,null),
-			      "No file. Call of parser from logic/TestClashFreeSubst.java",
-			      services, nss);
+	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION,
+		new KeYLexerF(sorts,
+			"No file. Call of parser from logic/TestClashFreeSubst.java",
+			null),
+		services, nss);
 	try {
 	    basicSortsParser.parseSorts();
 	} catch(Exception e) {
@@ -129,9 +131,11 @@ public class TestClashFreeSubst extends TestCase {
 
     private KeYParserF stringDeclParser(String s) {
 
-	return new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s,null),
-			      "No file. Call of parser from logic/TestClashFreeSubst.java",
-			      services, nss);
+	return new KeYParserF(ParserMode.DECLARATION,
+		new KeYLexerF(s,
+			"No file. Call of parser from logic/TestClashFreeSubst.java",
+			null),
+		services, nss);
     }
 
     public void parseDecls(String s) {
@@ -148,9 +152,10 @@ public class TestClashFreeSubst extends TestCase {
 
     private KeYParserF stringTermParser(String s) {
 	return new KeYParserF(ParserMode.GLOBALDECL,
-			     new KeYLexerF(s,null),
-			     services, 
-			     nss);
+		new KeYLexerF(s,
+			"No file. Call of parser from logic/TestClashFreeSubst.java",
+			null),
+		services, nss);
     }
 
     public Term parseTerm(String s) {

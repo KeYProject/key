@@ -60,17 +60,20 @@ public class TestTacletTranslator extends TestCase {
     // Utility Methods for test cases.
     //
     private KeYParserF stringTacletParser(String s) {
-        return new KeYParserF(ParserMode.TACLET, new KeYLexerF(s, null),
-                "No file. parser/TestTacletParser.stringTacletParser(" + s + ")",
-                services, nss);
+	return new KeYParserF(ParserMode.TACLET,
+		new KeYLexerF(s,
+			"No file. parser/TestTacletParser.stringTacletParser(" + s + ")",
+			null),
+		services, nss);
     }
 
     private void parseDecls(String s) {
         try {
-            KeYParserF p = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s,
-                    null),
-                    "No file. parser/TestTacletParser.stringDeclParser(" + s + ")",
-                    services, nss);
+	    KeYParserF p = new KeYParserF(ParserMode.DECLARATION,
+		    new KeYLexerF(s,
+			    "No file. parser/TestTacletParser.stringDeclParser(" + s + ")",
+			    null),
+		   services, nss);
             p.decls();
         } catch (Exception e) {
             StringWriter sw = new StringWriter();

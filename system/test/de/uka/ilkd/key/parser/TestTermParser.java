@@ -158,9 +158,11 @@ public class TestTermParser extends TestCase {
     private KeYParserF stringDeclParser(String s) {
         // fills namespaces 
         new Recoder2KeY(TacletForTests.services (), nss).parseSpecialClasses();
-	return new KeYParserF(ParserMode.DECLARATION,new KeYLexerF(s,null),
-			      "No file. Call of parser from parser/TestTermParser.java",
-			      serv, nss);
+	return new KeYParserF(ParserMode.DECLARATION,
+		new KeYLexerF(s,
+			"No file. Call of parser from parser/TestTermParser.java",
+			null),
+		serv, nss);
     }
 
     public void parseDecls(String s) {
@@ -179,13 +181,14 @@ public class TestTermParser extends TestCase {
 	try {	  
 	    new Recoder2KeY(TacletForTests.services (), 
 	                    nss).parseSpecialClasses();	   
-	    return new KeYParserF
-		(ParserMode.PROBLEM, 
-	         new KeYLexerF(s,null),
-		 "No file. Call of parser from parser/TestTermParser.java",
-		 new ParserConfig(serv, nss),
-		 new ParserConfig(serv, nss),
-		 null, DefaultImmutableSet.<Taclet>nil()).problem();	    
+	    return new KeYParserF(ParserMode.PROBLEM,
+		    new KeYLexerF(s,
+			    "No file. Call of parser from parser/TestTermParser.java",
+			    null),
+		    new ParserConfig(serv, nss),
+		    new ParserConfig(serv, nss),
+		    null,
+		    DefaultImmutableSet.<Taclet> nil()).problem();
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
 	    PrintWriter pw = new PrintWriter(sw);
@@ -195,14 +198,14 @@ public class TestTermParser extends TestCase {
     }
 
     private KeYParserF stringTermParser(String s) {
-	return new KeYParserF
-	    (ParserMode.TERM, 
-	     new KeYLexerF(s, new DefaultExceptionHandler()),
-	     "No file. Call of parser from parser/TestTermParser.java",
-	     r2k,
-	     serv, 
-	     nss, 
-	     new AbbrevMap());
+	return new KeYParserF(ParserMode.TERM,
+		new KeYLexerF(s,
+			"No file. Call of parser from parser/TestTermParser.java",
+			new DefaultExceptionHandler()),
+		r2k,
+		serv,
+		nss,
+		new AbbrevMap());
 
     }
 
