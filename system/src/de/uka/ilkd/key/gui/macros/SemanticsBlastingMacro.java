@@ -447,8 +447,10 @@ public class SemanticsBlastingMacro extends StrategyProofMacro {
 
 			//other rules
 			allowedRulesNames.add("array_store_known_dynamic_array_type");
+			//non null
 			allowedRulesNames.add("nonNull");
 			allowedRulesNames.add("nonNullZero");
+			allowedRulesNames.add("sub_literals");
 			//allowedRulesNames.add("applyEq");
 		}
 		@Override
