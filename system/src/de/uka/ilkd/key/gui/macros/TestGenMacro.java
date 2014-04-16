@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -14,7 +16,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
+import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 public class TestGenMacro extends StrategyProofMacro {
 
@@ -63,6 +68,9 @@ public class TestGenMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
+    	
+    	
+    	
         return new TestGenStrategy(
                 mediator.getInteractiveProver().getProof().getActiveStrategy(),10);
     }
@@ -77,6 +85,8 @@ public class TestGenMacro extends StrategyProofMacro {
         
         private static final Set<String> unwindRules;
         
+        private static final int UNWIND_COST = 1000;
+        
         private int limit;
         
         static{
@@ -90,6 +100,11 @@ public class TestGenMacro extends StrategyProofMacro {
         }
         
         private static boolean isUnwindRule(Rule rule){
+        	
+        	if(rule == null){
+        		return false;
+        	}
+        	
         	String name = rule.name().toString();
         	return unwindRules.contains(name);
         }
@@ -111,7 +126,10 @@ public class TestGenMacro extends StrategyProofMacro {
             }
             
             if(isUnwindRule(app.rule())){
+            	//System.out.println("Found unwind rule!!");
+            	
             	int unwindRules = computeUnwindRules(goal);
+            	//System.out.println(unwindRules);
             	if(unwindRules >= limit){
             		return false;
             	}
@@ -122,10 +140,35 @@ public class TestGenMacro extends StrategyProofMacro {
 
             return super.isApprovedApp(app, pio, goal);
         }
+        
+        @Override
+        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+            if(isUnwindRule(app.rule())) {
+                return NumberRuleAppCost.create(UNWIND_COST);
+            }
+            return super.computeCost(app, pio, goal);
+        }
 
 		private int computeUnwindRules(Goal goal) {
+			int totalUnwinds = 0;
+			Node node = goal.node();
 			
-			return 0;
+			while(!node.root()){
+				
+				RuleApp app = node.getAppliedRuleApp();
+				if(app!=null){
+					Rule rule = app.rule();
+					if(isUnwindRule(rule)){
+						++totalUnwinds;
+					}
+				}
+				
+				node = node.parent();
+			}
+			
+			
+			
+			return totalUnwinds;
 		}
 
     }
