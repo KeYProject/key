@@ -96,9 +96,11 @@ public class TestTacletParser extends TestCase {
     
 
     private KeYParserF stringDeclParser(String s) {
-	return new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s, null),
-			      "No file. parser/TestTacletParser.stringDeclParser("+s+")",  
-			       services, nss);
+	return new KeYParserF(ParserMode.DECLARATION,
+		new KeYLexerF(s,
+			"No file. parser/TestTacletParser.stringDeclParser(" + s + ")",
+			null),
+		services, nss);
     }
 
     public void parseDecls(String s) {
@@ -117,10 +119,11 @@ public class TestTacletParser extends TestCase {
     // Utility Methods for test cases.
     //
     private KeYParserF stringTacletParser(String s) {
-	return new KeYParserF
-	    (ParserMode.TACLET,new KeYLexerF(s, null),
-	     "No file. parser/TestTacletParser.stringTacletParser("+s+")",  
-	     services, nss);
+	return new KeYParserF(ParserMode.TACLET,
+		new KeYLexerF(s,
+			"No file. parser/TestTacletParser.stringTacletParser(" + s + ")",
+			null),
+		services, nss);
     }
 
     public Term parseTerm(String s) {

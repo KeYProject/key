@@ -28,28 +28,21 @@ public class KeYParserF {
     private KeYParser keYParser;
 
     @SuppressWarnings("unchecked")
-    public KeYParserF(ParserMode mode, KeYLexerF keYLexerF, String filename,
+    public KeYParserF(ParserMode mode, KeYLexerF keYLexerF,
 	    ParserConfig schemaConfig, ParserConfig normalConfig,
 	    HashMap taclet2Builder, ImmutableSet<Taclet> taclets) {
 	LegacyCommonTokenStream stream = new LegacyCommonTokenStream(
 		keYLexerF.getKeYLexer());
-	this.keYParser = new KeYParser(mode, stream, filename, schemaConfig,
+	this.keYParser = new KeYParser(mode, stream, schemaConfig,
 		normalConfig, taclet2Builder, taclets);
     }
 
     @SuppressWarnings("unchecked")
-    public KeYParserF(ParserMode mode, TokenStream lexer, String filename,
+    public KeYParserF(ParserMode mode, TokenStream lexer,
 	    ParserConfig schemaConfig, ParserConfig normalConfig,
 	    HashMap taclet2Builder, ImmutableSet<Taclet> taclets) {
-	this.keYParser = new KeYParser(mode, lexer, filename, schemaConfig,
+	this.keYParser = new KeYParser(mode, lexer, schemaConfig,
 		normalConfig, taclet2Builder, taclets);
-    }
-
-    public KeYParserF(ParserMode mode, KeYLexerF keYLexerF, String filename,
-	    Services services, NamespaceSet nss) {
-	LegacyCommonTokenStream stream = new LegacyCommonTokenStream(
-		keYLexerF.getKeYLexer());
-	this.keYParser = new KeYParser(mode, stream, filename, services, nss);
     }
 
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF) {
@@ -58,18 +51,12 @@ public class KeYParserF {
 	this.keYParser = new KeYParser(mode, stream);
     }
 
-    public KeYParserF(ParserMode mode, KeYLexerF keYLexerF, String filename,
+    public KeYParserF(ParserMode mode, KeYLexerF keYLexerF,
 	    JavaReader jr, Services services, NamespaceSet nss, AbbrevMap scm) {
 	LegacyCommonTokenStream stream = new LegacyCommonTokenStream(
 		keYLexerF.getKeYLexer());
-	this.keYParser = new KeYParser(mode, stream, filename, jr, services,
+	this.keYParser = new KeYParser(mode, stream, jr, services,
 		nss, scm);
-    }
-
-    public KeYParserF(ParserMode mode, KeYLexerF keYLexerF, String filename) {
-	LegacyCommonTokenStream stream = new LegacyCommonTokenStream(
-		keYLexerF.getKeYLexer());
-	this.keYParser = new KeYParser(mode, stream, filename);
     }
 
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF, Services services,
