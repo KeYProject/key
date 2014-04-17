@@ -1,7 +1,21 @@
-package de.uka.ilkd.key.symbolic_execution.strategy;
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
+package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
@@ -23,19 +37,19 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 
 /**
- * This{@link KeYWatchpointStopCondition} represents a KeY watchpoint and is responsible to tell the debugger to stop execution when the respective
+ * This{@link KeYWatchpoint} represents a KeY watchpoint and is responsible to tell the debugger to stop execution when the respective
  * watchpoint evaluates its condition to true.
  * 
  * @author Marco Drebing
  */
-public class KeYWatchpointStopCondition extends ConditionalBreakpointStopCondition{
+public class KeYWatchpoint extends AbstractConditionalBreakpoint{
    /**
     * a flag to tell whether the condition should evaluate to true or just be satisfiable
     */
    private boolean suspendOnTrue;
 
    /**
-    * Creates a new {@link ConditionalBreakpointStopCondition}. Call setCondition immediately after calling the constructor!
+    * Creates a new {@link AbstractConditionalBreakpoint}. Call setCondition immediately after calling the constructor!
     * 
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
@@ -47,7 +61,7 @@ public class KeYWatchpointStopCondition extends ConditionalBreakpointStopConditi
     * @param suspendOnTrue the flag if the condition needs to evaluate to true or just be satisfiable
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
-   public KeYWatchpointStopCondition(int hitCount, Proof proof, String condition, boolean enabled, boolean conditionEnabled, KeYJavaType containerType, boolean suspendOnTrue) throws SLTranslationException {
+   public KeYWatchpoint(int hitCount, Proof proof, String condition, boolean enabled, boolean conditionEnabled, KeYJavaType containerType, boolean suspendOnTrue) throws SLTranslationException {
       super(hitCount, null, proof, enabled, conditionEnabled, -1, -1, containerType);
       setSuspendOnTrue(suspendOnTrue);
       this.setCondition(condition);
@@ -70,29 +84,33 @@ public class KeYWatchpointStopCondition extends ConditionalBreakpointStopConditi
    }
    
    @Override
-   protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node)
-         throws ProofInputException {
+   protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node) {
       if(suspendOnTrue){
          return super.conditionMet(ruleApp, proof, node);
       }else{
-         Term negatedCondition = getProof().getServices().getTermBuilder().not(getCondition());
-         //initialize values
-         PosInOccurrence pio = ruleApp.posInOccurrence();
-         Term term = pio.subTerm();
-         term = TermBuilder.goBelowUpdates(term);
-         IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
-         //put values into map which have to be replaced
-         if(ec!=null){
-            getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
+         try {
+            Term negatedCondition = getProof().getServices().getTermBuilder().not(getCondition());
+            //initialize values
+            PosInOccurrence pio = ruleApp.posInOccurrence();
+            Term term = pio.subTerm();
+            term = TermBuilder.goBelowUpdates(term);
+            IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
+            //put values into map which have to be replaced
+            if(ec!=null){
+               getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
+            }
+            //replace renamings etc.
+            OpReplacer replacer = new OpReplacer(getVariableNamingMap(), getProof().getServices().getTermFactory());
+            Term termForSideProof = replacer.replace(negatedCondition);
+            //start side proof
+            Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
+            Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
+            ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
+            return !info.getProof().closed();
          }
-         //replace renamings etc.
-         OpReplacer replacer = new OpReplacer(getVariableNamingMap(), getProof().getServices().getTermFactory());
-         Term termForSideProof = replacer.replace(negatedCondition);
-         //start side proof
-         Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
-         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
-         ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
-         return !info.getProof().closed();
+         catch (ProofInputException e) {
+            return false;
+         }
       }
    }
    
@@ -105,8 +123,8 @@ public class KeYWatchpointStopCondition extends ConditionalBreakpointStopConditi
    }
    
    @Override
-   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
-      if(activeStatement != null && activeStatement.getStartPosition().getLine() != -1){
+   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
+      if(activeStatement != null && activeStatement.getStartPosition() != Position.UNDEFINED){
          return super.isBreakpointHit(activeStatement, ruleApp, proof, node);
       }
       return false;

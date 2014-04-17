@@ -10,24 +10,25 @@
 // The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.strategy;
 
+package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
+
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.ExtList;
 
-public class AbstractNonSymbolicLineBreakpointStopCondition extends AbstractNonSymbolicConditionalBreakpointStopCondition {
+public class LineBreakpoint extends AbstractConditionalBreakpoint {
    /**
-    * The path of the class this {@link LineBreakpointNonSymbolicStopCondition} is associated with.
+    * The path of the class this {@link LineBreakpoint} is associated with.
     */
    private String classPath;
    
@@ -39,15 +40,15 @@ public class AbstractNonSymbolicLineBreakpointStopCondition extends AbstractNonS
    /**
     * The start of the method containing the associated Breakpoint
     */
-   private int methodStart;
+   protected int methodStart;
   
    /**
     * The end of the method containing the associated Breakpoint
     */
-   private int methodEnd;
+   protected int methodEnd;
 
    /**
-    * Creates a new {@link AbstractNonSymbolicLineBreakpointStopCondition}.
+    * Creates a new {@link LineBreakpoint}.
     * 
     * @param classPath the path of the class the associated Breakpoint lies within
     * @param lineNumber the line where the associated Breakpoint is located in the class
@@ -59,27 +60,18 @@ public class AbstractNonSymbolicLineBreakpointStopCondition extends AbstractNonS
     * @param conditionEnabled flag if the condition is enabled
     * @param methodStart the line the containing method of this breakpoint starts at
     * @param methodEnd the line the containing method of this breakpoint ends at
-    * @param containerType the type of the element containing the breakpoint
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
-   public AbstractNonSymbolicLineBreakpointStopCondition(String classPath, 
-                                                         int lineNumber, 
-                                                         int hitCount, 
-                                                         IProgramMethod pm, 
-                                                         Proof proof, 
-                                                         String condition, 
-                                                         boolean enabled, 
-                                                         boolean conditionEnabled, 
-                                                         int methodStart, 
-                                                         int methodEnd, 
-                                                         KeYJavaType containerType) throws SLTranslationException {
-      super(hitCount, pm, proof, enabled, conditionEnabled, methodStart, methodEnd, containerType);
+   public LineBreakpoint(String classPath, int lineNumber, int hitCount, IProgramMethod pm, Proof proof, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd) throws SLTranslationException {
+      super(hitCount, pm, proof,  enabled, conditionEnabled, methodStart, methodEnd, pm.getContainerType());
       this.classPath=classPath;
       this.methodEnd=methodEnd;
       this.methodStart=methodStart;
       this.lineNumber=lineNumber;
       this.setCondition(condition);
    }
+
+  
 
    /**
     * For a given {@link StatementContainer} this method computes the {@link StatementBlock} that contains all lines before the line the Breakpoint is at, including the line itself.
@@ -113,6 +105,7 @@ public class AbstractNonSymbolicLineBreakpointStopCondition extends AbstractNonS
 
    /**
     * Checks if the execution should stop in the given line for the given class.
+    * 
     * @param line The current line of code, that the auto mode is evaluating
     * @param path The path of the Class, that contains the currently evaluated code 
     * @return true if a {@link JavaLineBreakpoint} is in the given line and the condition evaluates to true and the Hitcount is exceeded, false otherwise
@@ -125,13 +118,17 @@ public class AbstractNonSymbolicLineBreakpointStopCondition extends AbstractNonS
    }
    
    @Override
-   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
-      if (activeStatement != null && activeStatement.getStartPosition().getLine() != -1) {
+   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
+      return isInLine(activeStatement)&&super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+   }
+   
+   private boolean isInLine(SourceElement activeStatement){
+      if (activeStatement != null && activeStatement.getStartPosition() != Position.UNDEFINED) {
          String path = activeStatement.getPositionInfo().getParentClass();
          int startLine = activeStatement.getStartPosition().getLine();
          int endLine = activeStatement.getEndPosition().getLine();
-         boolean stopInLine = endLine>startLine+1 ? shouldStopInLine(startLine, path) : shouldStopInLine(endLine, path);
-         return stopInLine&&super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+         boolean isInLine = endLine>startLine+1 ? shouldStopInLine(startLine, path) : shouldStopInLine(endLine, path);
+         return isInLine;
       }
       return false;
    }
@@ -149,8 +146,24 @@ public class AbstractNonSymbolicLineBreakpointStopCondition extends AbstractNonS
       Node checkNode = node;
       while (checkNode != null) {
          SourceElement activeStatement = NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
-         if (activeStatement != null && activeStatement.getStartPosition().getLine() != -1) {
+         if (activeStatement != null && activeStatement.getStartPosition() != Position.UNDEFINED) {
             if (activeStatement.getStartPosition().getLine() >= methodStart && activeStatement.getEndPosition().getLine() <= methodEnd) {
+               return true;
+            }
+            break;
+         }
+         checkNode = checkNode.parent();
+      }
+      return false;
+   }
+   
+   @Override
+   protected boolean isInScopeForCondition(Node node) {
+      Node checkNode = node;
+      while (checkNode != null) {
+         SourceElement activeStatement = NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
+         if (activeStatement != null && activeStatement.getStartPosition() != Position.UNDEFINED) {
+            if (activeStatement.getStartPosition().getLine() >= methodStart && activeStatement.getEndPosition().getLine() <= methodEnd && activeStatement instanceof LocalVariableDeclaration) {
                return true;
             }
             break;

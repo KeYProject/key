@@ -1,31 +1,39 @@
-package de.uka.ilkd.key.strategy;
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
+package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.symbolic_execution.strategy.HitCountBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * This{@link ExceptionBreakpointNonSymbolicStopCondition} represents an exception breakpoint and is responsible to tell the debugger to stop execution when the respective
+ * This{@link ExceptionBreakpoint} represents an exception breakpoint and is responsible to tell the debugger to stop execution when the respective
  * breakpoint is hit.
  * 
  * @author Marco Drebing
  */
-public class ExceptionBreakpointNonSymbolicStopCondition extends AbstractNonSymbolicHitCountBreakpointStopCondition {
+public class ExceptionBreakpoint extends AbstractHitCountBreakpoint {
    /**
     * The exception to watch for
     */
@@ -52,7 +60,7 @@ public class ExceptionBreakpointNonSymbolicStopCondition extends AbstractNonSymb
    private boolean uncaught;
 
    /**
-    * Creates a new {@link HitCountBreakpointStopCondition}.
+    * Creates a new {@link AbstractHitCountBreakpoint}.
     * 
     * @param proof the {@link Proof} that will be executed and should stop
     * @param exceptionName the name of the exception to watch for
@@ -62,7 +70,7 @@ public class ExceptionBreakpointNonSymbolicStopCondition extends AbstractNonSymb
     * @param enabled flag if the Breakpoint is enabled
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     */
-   public ExceptionBreakpointNonSymbolicStopCondition(Proof proof, String exceptionName, boolean caught, boolean uncaught, boolean suspendOnSubclasses, boolean enabled, int hitCount){
+   public ExceptionBreakpoint(Proof proof, String exceptionName, boolean caught, boolean uncaught, boolean suspendOnSubclasses, boolean enabled, int hitCount){
       super(hitCount, proof, enabled);
       this.exceptionName = exceptionName;
       exceptionParentNodes = new HashSet<Node>();
@@ -100,40 +108,25 @@ public class ExceptionBreakpointNonSymbolicStopCondition extends AbstractNonSymb
     * {@inheritDoc}
     */
    @Override
-   public boolean shouldStop(int maxApplications, 
-                             long timeout, 
-                             Proof proof, 
-                             IGoalChooser goalChooser, 
-                             long startTime, 
-                             int countApplied, 
-                             SingleRuleApplicationInfo singleRuleApplicationInfo) {
-      // Check if a rule was applied
-      if (singleRuleApplicationInfo != null) {
-         // Get the node on which a rule was applied.
-         Goal goal = singleRuleApplicationInfo.getGoal();
-         Node node = goal.node();
-         RuleApp ruleApp = goal.getRuleAppManager().peekNext();
-
-         SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
-         Node SETParent = SymbolicExecutionUtil.findParentSetNode(node);
-         if(activeStatement!=null&&activeStatement instanceof Throw&&isEnabled()){
-            Throw throwStatement = (Throw)activeStatement;
-            for(int i = 0; i<throwStatement.getChildCount();i++){
-               SourceElement childElement = throwStatement.getChildAt(i);
-               if(childElement instanceof LocationVariable){
-                  LocationVariable locVar = (LocationVariable)childElement;
-                  if(locVar.getKeYJavaType().getSort().toString().equals(exceptionName)&&!exceptionParentNodes.contains(SETParent)){
-                     exceptionParentNodes.add(SETParent);
-                     return true;
-                  }else if(suspendOnSubclasses){
-                     JavaInfo info = proof.getServices().getJavaInfo();
-                     KeYJavaType kjt = locVar.getKeYJavaType();
-                     ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(kjt);
-                     for(KeYJavaType kjtloc: kjts){
-                        if(kjtloc.getSort().toString().equals(exceptionName)&&!exceptionParentNodes.contains(SETParent)){
-                           exceptionParentNodes.add(SETParent);
-                           return true;
-                        }
+   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
+      Node SETParent = SymbolicExecutionUtil.findParentSetNode(node);
+      if(activeStatement!=null&&activeStatement instanceof Throw&&isEnabled()){
+         Throw throwStatement = (Throw)activeStatement;
+         for(int i = 0; i<throwStatement.getChildCount();i++){
+            SourceElement childElement = throwStatement.getChildAt(i);
+            if(childElement instanceof LocationVariable){
+               LocationVariable locVar = (LocationVariable)childElement;
+               if(locVar.getKeYJavaType().getSort().toString().equals(exceptionName)&&!exceptionParentNodes.contains(SETParent)){
+                  exceptionParentNodes.add(SETParent);
+                  return true;
+               }else if(suspendOnSubclasses){
+                  JavaInfo info = proof.getServices().getJavaInfo();
+                  KeYJavaType kjt = locVar.getKeYJavaType();
+                  ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(kjt);
+                  for(KeYJavaType kjtloc: kjts){
+                     if(kjtloc.getSort().toString().equals(exceptionName)&&!exceptionParentNodes.contains(SETParent)){
+                        exceptionParentNodes.add(SETParent);
+                        return true;
                      }
                   }
                }

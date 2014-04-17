@@ -10,7 +10,8 @@
 // The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.strategy;
+
+package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,10 +19,13 @@ import java.util.Map;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 
-public abstract class AbstractNonSymbolicHitCountBreakpointStopCondition extends AbstractNonSymbolicBreakpointStopCondition {
+/**
+ * Adds the hit count functionality to an {@link AbstractBreakpoint}.
+ * @author Martin Hentschel
+ */
+public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
    /**
     * The HitCount of the Breakpoint (set by user).
     */
@@ -38,18 +42,18 @@ public abstract class AbstractNonSymbolicHitCountBreakpointStopCondition extends
    private Map<Integer, Boolean> hittedNodes;
 
    /**
-    * Creates a new {@link AbstractNonSymbolicHitCountBreakpointStopCondition}.
+    * Creates a new {@link AbstractHitCountBreakpoint}.
     * 
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param proof the {@link Proof} that will be executed and should stop
     * @param enabled flag if the Breakpoint is enabled
     */
-   public AbstractNonSymbolicHitCountBreakpointStopCondition(int hitCount, Proof proof, boolean enabled){
+   public AbstractHitCountBreakpoint(int hitCount, Proof proof, boolean enabled){
       super(proof, enabled);
       hittedNodes = new HashMap<Integer, Boolean>();
       this.hitCount = hitCount;
    }
-
+   
    /**
     * Checks if the Hitcount is exceeded for the given {@link JavaLineBreakpoint}.
     * If the Hitcount is not exceeded the hitted counter is incremented, otherwise its set to 0.
@@ -78,11 +82,11 @@ public abstract class AbstractNonSymbolicHitCountBreakpointStopCondition extends
       return false;
    }
    
+   /**
+    * {@inheritDoc}
+    */
    @Override
-   protected boolean isBreakpointHit(SourceElement activeStatement, 
-                                     RuleApp ruleApp, 
-                                     Proof proof, 
-                                     Node node) throws ProofInputException {
+   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
       return hitcountExceeded(node);
    }
 

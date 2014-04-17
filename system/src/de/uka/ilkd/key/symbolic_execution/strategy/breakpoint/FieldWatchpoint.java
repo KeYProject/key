@@ -1,4 +1,17 @@
-package de.uka.ilkd.key.symbolic_execution.strategy;
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
+package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
@@ -11,16 +24,15 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * This{@link FieldWatchpointStopCondition} represents a Java watchpoint and is responsible to tell the debugger to stop execution when the respective
+ * This{@link FieldWatchpoint} represents a Java watchpoint and is responsible to tell the debugger to stop execution when the respective
  * variable is accessed or modified.
  * 
  * @author Marco Drebing
  */
-public class FieldWatchpointStopCondition extends HitCountBreakpointStopCondition {
+public class FieldWatchpoint extends AbstractHitCountBreakpoint {
    private boolean isAccess;
 
    private boolean isModification;
@@ -28,7 +40,7 @@ public class FieldWatchpointStopCondition extends HitCountBreakpointStopConditio
    private String fullFieldName;
 
    /**
-    * Creates a new {@link FieldWatchpointStopCondition}.
+    * Creates a new {@link FieldWatchpoint}.
     * 
     * @param enabled flag if the Breakpoint is enabled
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
@@ -38,7 +50,7 @@ public class FieldWatchpointStopCondition extends HitCountBreakpointStopConditio
     * @param containerType the type of the element containing the breakpoint
     * @param proof the {@link Proof} that will be executed and should stop
     */
-   public FieldWatchpointStopCondition(boolean enabled, int hitCount, String fieldName, boolean isAcces, boolean isModification, KeYJavaType containerKJT, Proof proof) {
+   public FieldWatchpoint(boolean enabled, int hitCount, String fieldName, boolean isAcces, boolean isModification, KeYJavaType containerKJT, Proof proof) {
       super(hitCount, proof, enabled);
       this.isAccess = isAcces;
       this.isModification = isModification;
@@ -46,10 +58,10 @@ public class FieldWatchpointStopCondition extends HitCountBreakpointStopConditio
    }
    
    /**
-    * 
+    * {@inheritDoc}
     */
    @Override
-   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
+   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
       if (activeStatement != null && activeStatement instanceof Assignment) {
          Assignment assignment = (Assignment) activeStatement;
          SourceElement firstElement = assignment.getChildAt(0);

@@ -1,23 +1,41 @@
-package de.uka.ilkd.key.symbolic_execution.strategy;
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
 
+package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
+
+import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-public class MethodBreakpointStopCondition extends ConditionalBreakpointStopCondition {
+public class MethodBreakpoint extends AbstractConditionalBreakpoint {
    /**
     * flag to tell whether to stop on method entry
     */
@@ -39,12 +57,12 @@ public class MethodBreakpointStopCondition extends ConditionalBreakpointStopCond
    protected int methodEnd;
 
    /**
-    * The path of the class this {@link LineBreakpointStopCondition} is associated with.
+    * The path of the class this {@link LineBreakpoint} is associated with.
     */
    private String classPath;
 
    /**
-    * Creates a new {@link LineBreakpointStopCondition}.
+    * Creates a new {@link LineBreakpoint}.
     * 
     * @param classPath the path of the class the associated Breakpoint lies within
     * @param lineNumber the line where the associated Breakpoint is located in the class
@@ -61,7 +79,7 @@ public class MethodBreakpointStopCondition extends ConditionalBreakpointStopCond
     * @param isExit flag to tell whether to stop on method exit
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
-   public MethodBreakpointStopCondition(String classPath, int lineNumber, int hitCount, IProgramMethod pm, Proof proof, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd, boolean isEntry, boolean isExit) throws SLTranslationException {
+   public MethodBreakpoint(String classPath, int lineNumber, int hitCount, IProgramMethod pm, Proof proof, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd, boolean isEntry, boolean isExit) throws SLTranslationException {
       super(hitCount, pm, proof, enabled, conditionEnabled, methodStart, methodEnd, pm.getContainerType());
       this.isEntry = isEntry;
       this.isExit = isExit;
@@ -72,8 +90,11 @@ public class MethodBreakpointStopCondition extends ConditionalBreakpointStopCond
    }
    
    @Override
-   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
-      return ((isMethodCallNode(node, ruleApp)&&isEntry)||(isMethodReturnNode(node, ruleApp)&&isExit))&&(!isConditionEnabled()||conditionMet(ruleApp, proof, node))&&isEnabled()&&hitcountExceeded(node);
+   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
+      return ((isEntry && isMethodCallNode(node, ruleApp)) || (isExit && isMethodReturnNode(node, ruleApp))) && 
+             (!isConditionEnabled() || conditionMet(ruleApp, proof, node)) && 
+             isEnabled() && 
+             hitcountExceeded(node);
    }
 
    /**
@@ -109,10 +130,10 @@ public class MethodBreakpointStopCondition extends ConditionalBreakpointStopCond
     * @return true if the node represents a method return
     */
    private boolean isMethodReturnNode(Node node, RuleApp ruleApp){
-      if(SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp)
-            &&isCorrectMethodReturn(node, ruleApp)){
-            return true;
-      }else if(ruleApp instanceof ContractRuleApp){
+      if (SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp) && isCorrectMethodReturn(node, ruleApp)) {
+         return true;
+      } 
+      else if(ruleApp instanceof ContractRuleApp) {
          ContractRuleApp methodRuleApp = (ContractRuleApp) ruleApp;
          Contract contract = methodRuleApp.getInstantiation();
          if(contract instanceof FunctionalOperationContract){
@@ -122,37 +143,14 @@ public class MethodBreakpointStopCondition extends ConditionalBreakpointStopCond
             }
          }
       }
-      return false;
-      
+      return false;      
    }
    
    private boolean isCorrectMethodReturn(Node node, RuleApp ruleApp){
-      Node checkNode = node.parent();
-      int innerMethodCount = 0;
-      while (checkNode != null) {
-         SourceElement activeStatement = NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
-         if(SymbolicExecutionUtil.isMethodReturnNode(checkNode, checkNode.getAppliedRuleApp())){
-            innerMethodCount++;
-         }
-         if (SymbolicExecutionUtil.isMethodCallNode(checkNode, checkNode.getAppliedRuleApp(), activeStatement)) {
-            IProgramMethod currentPm=null;
-            if (activeStatement instanceof MethodBodyStatement) {
-               MethodBodyStatement mbs = (MethodBodyStatement)activeStatement;
-               currentPm = mbs.getProgramMethod(getProof().getServices()); 
-               if (currentPm!=null&&currentPm.equals(getPm())) {
-                  return true;
-               }else{
-                  if(innerMethodCount==0){
-                     return false;
-                  }else{
-                     innerMethodCount--;
-                  }
-               }
-            }
-         }
-         checkNode = checkNode.parent();
-      }
-      return false;
+      Term term = ruleApp.posInOccurrence().subTerm();
+      term = TermBuilder.goBelowUpdates(term);
+      MethodFrame mf = JavaTools.getInnermostMethodFrame(term.javaBlock(), node.proof().getServices());
+      return JavaUtil.equals(getPm(), mf.getProgramMethod());
    }
 
    @Override
@@ -181,7 +179,7 @@ public class MethodBreakpointStopCondition extends ConditionalBreakpointStopCond
       Node checkNode = node;
       while (checkNode != null) {
          SourceElement activeStatement = NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
-         if (activeStatement != null && activeStatement.getStartPosition().getLine() != -1) {
+         if (activeStatement != null && activeStatement.getStartPosition() != Position.UNDEFINED) {
             if (activeStatement.getStartPosition().getLine() >= methodStart && activeStatement.getEndPosition().getLine() <= methodEnd) {
                return true;
             }
@@ -197,7 +195,7 @@ public class MethodBreakpointStopCondition extends ConditionalBreakpointStopCond
       Node checkNode = node;
       while (checkNode != null) {
          SourceElement activeStatement = NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
-         if (activeStatement != null && activeStatement.getStartPosition().getLine() != -1) {
+         if (activeStatement != null && activeStatement.getStartPosition() != Position.UNDEFINED) {
             if (activeStatement.getStartPosition().getLine() >= methodStart && activeStatement.getEndPosition().getLine() <= methodEnd && activeStatement instanceof LocalVariableDeclaration) {
                return true;
             }

@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.symbolic_execution.strategy;
+package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,7 +58,11 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-public abstract class ConditionalBreakpointStopCondition extends HitCountBreakpointStopCondition {
+/**
+ * Adds the funtionality to breakpoints to evaluate conditions.
+ * @author Martin Hentschel
+ */
+public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBreakpoint {
    /**
     * The condition  for this Breakpoint (set by user).
     */
@@ -110,7 +114,7 @@ public abstract class ConditionalBreakpointStopCondition extends HitCountBreakpo
    private IProgramMethod pm;
 
    /**
-    * Creates a new {@link ConditionalBreakpointStopCondition}. Call setCondition immediately after calling the constructor!
+    * Creates a new {@link AbstractConditionalBreakpoint}. Call setCondition immediately after calling the constructor!
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
@@ -120,7 +124,7 @@ public abstract class ConditionalBreakpointStopCondition extends HitCountBreakpo
     * @param methodEnd the line the containing method of this breakpoint ends at
     * @param containerType the type of the element containing the breakpoint
     */
-   public ConditionalBreakpointStopCondition(int hitCount, IProgramMethod pm, Proof proof, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd, KeYJavaType containerType){
+   public AbstractConditionalBreakpoint(int hitCount, IProgramMethod pm, Proof proof, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd, KeYJavaType containerType){
       super(hitCount, proof,enabled);
       this.setPm(pm);
       paramVars= new HashSet<LocationVariable>();
@@ -130,17 +134,25 @@ public abstract class ConditionalBreakpointStopCondition extends HitCountBreakpo
       this.conditionEnabled = conditionEnabled;
    }
    
+   /**
+    * {@inheritDoc}
+    */
    @Override
-   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
-      if(goal!=null){
+   public void updateState(int maxApplications, 
+                          long timeout, 
+                          Proof proof, 
+                          IGoalChooser goalChooser, 
+                          long startTime, 
+                          int countApplied, 
+                          Goal goal) {
+      super.updateState(maxApplications, timeout, proof, goalChooser, startTime, countApplied, goal);
+      if (goal != null) {
          Node node = goal.node();
          RuleApp ruleApp = goal.getRuleAppManager().peekNext();
-         if(getVarsForCondition()!=null&&ruleApp!=null&&node!=null){
+         if (getVarsForCondition() != null && ruleApp != null && node != null) {
             refreshVarMaps(ruleApp, node);
          }
       }
-      return super.isGoalAllowed(maxApplications, timeout, proof, goalChooser,
-            startTime, countApplied, goal);
    }
 
    /**
@@ -329,33 +341,40 @@ public abstract class ConditionalBreakpointStopCondition extends HitCountBreakpo
     * @param proof the current {@link Proof}
     * @param node the current {@link Node}
     * @return true if the condition evaluates to true
-    * @throws ProofInputException 
     */
-   protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node) throws ProofInputException{
-      //initialize values
-      PosInOccurrence pio = ruleApp.posInOccurrence();
-      Term term = pio.subTerm();
-      getProof().getServices().getTermBuilder();
-      term = TermBuilder.goBelowUpdates(term);
-      IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
-      //put values into map which have to be replaced
-      if(ec!=null){
-         getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
+   protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node) {
+      try {
+         //initialize values
+         PosInOccurrence pio = ruleApp.posInOccurrence();
+         Term term = pio.subTerm();
+         getProof().getServices().getTermBuilder();
+         term = TermBuilder.goBelowUpdates(term);
+         IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
+         //put values into map which have to be replaced
+         if(ec!=null){
+            getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
+         }
+         //replace renamings etc.
+         OpReplacer replacer = new OpReplacer(getVariableNamingMap(), getProof().getServices().getTermFactory());
+         Term termForSideProof = replacer.replace(condition);
+         //start side proof
+         Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
+         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
+         ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
+         return info.getProof().closed();
       }
-      //replace renamings etc.
-      OpReplacer replacer = new OpReplacer(getVariableNamingMap(), getProof().getServices().getTermFactory());
-      Term termForSideProof = replacer.replace(condition);
-      //start side proof
-      Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
-      Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
-      ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
-      proof.getServices().getNameRecorder();
-      return info.getProof().closed();
+      catch (ProofInputException e) {
+         return false;
+      }
    }
    
+   /**
+    * {@inheritDoc}
+    */
    @Override
-   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) throws ProofInputException {
-      return (!conditionEnabled||conditionMet(ruleApp, proof, node))&&super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
+      return (!conditionEnabled || conditionMet(ruleApp, proof, node)) &&
+             super.isBreakpointHit(activeStatement, ruleApp, proof, node);
    }
 
    /**
