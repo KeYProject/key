@@ -38,7 +38,12 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.util.Debug;
-
+/**
+ * Action which generates test cases for all open nodes. If the proof is closed,
+ * test cases will be generated for nodes on which the emptyModality rule was applied. 
+ * @author mihai
+ *
+ */
 @SuppressWarnings("serial")
 public class TestGenerationAction extends MainWindowAction {
 
@@ -91,44 +96,19 @@ public class TestGenerationAction extends MainWindowAction {
 
             public void autoModeStopped(ProofEvent e) {
                 getMediator().addKeYSelectionListener(selListener);
-                selListener.selectedNodeChanged(null);
+                //selListener.selectedNodeChanged(null);
             }                
         });
         selListener.selectedNodeChanged(new KeYSelectionEvent(getMediator().getSelectionModel()));
     }
     
-    private Proof createProof(KeYMediator mediator){
-
-		Goal goal = mediator.getSelectedGoal();
-		
-		Node node = goal.node();
-		Proof oldProof = node.proof();
-		
-		//originalProof = oldProof;
-		
-		Sequent oldSequent = node.sequent();
-		Sequent newSequent = Sequent.createSequent(oldSequent.antecedent(), oldSequent.succedent());
-		Proof proof = new Proof("Semantics Blasting: "+oldProof.name(), 
-				newSequent, "", 
-				oldProof.env().getInitConfig().createTacletIndex(), 
-				oldProof.env().getInitConfig().createBuiltInRuleIndex(), 
-				oldProof.getServices(), 
-				oldProof.getSettings());
-		
-		proof.setProofEnv(oldProof.env());
-		proof.setNamespaces(oldProof.getNamespaces());
-
-		ProofAggregate pa = new SingleProof(proof, "XXX");
-		
-		MainWindow mw = MainWindow.getInstance();
-		mw.addProblem(pa);
-		
-		mediator.goalChosen(proof.getGoal(proof.root()));		
-		
-		return proof;
-
-	}
-    
+    /**
+     * Creates a proof for each open node if the selected proof is open and a proof for each node
+     * on which the emptyModality rules was applied if the selected proof is closed.
+     * @param mediator
+     * @param removeDuplicatePathConditions - if true no identical proofs will be created
+     * @return
+     */
     private Vector<Proof> createProofsForTesting(KeYMediator mediator, boolean removeDuplicatePathConditions){
     	Vector<Proof> res = new Vector<Proof>();
     	
@@ -188,7 +168,14 @@ public class TestGenerationAction extends MainWindowAction {
     
     
     
-
+    /**
+     * Creates a proof with the specified node as its root. 
+     * If an identical proof is found in otherProofs than null will be returned instead.
+     * 
+     * @param node
+     * @param otherProofs
+     * @return
+     */
     private Proof createProofForTesting_noDuplicate(Node node, Vector<Proof> otherProofs){
 
     	//System.out.println("Create proof for test case from Node:"+node.serialNr());
@@ -252,93 +239,66 @@ public class TestGenerationAction extends MainWindowAction {
     	
     	return res;
     }
-    
-/*
-    private Proof createProofForTesting(KeYMediator mediator){
-
-		Node node = mediator.getSelectedNode();
-		Proof oldProof = node.proof();
-		
-		originalProof = oldProof;		
-		
-		Sequent oldSequent = node.sequent();
-		Sequent newSequent = Sequent.createSequent(oldSequent.antecedent(), oldSequent.succedent());
-		Proof proof = new Proof("Semantics Blasting: "+oldProof.name(), 
-				newSequent, "", 
-				oldProof.env().getInitConfig().createTacletIndex(), 
-				oldProof.env().getInitConfig().createBuiltInRuleIndex(), 
-				oldProof.getServices(), 
-				oldProof.getSettings());
-		
-		proof.setProofEnv(oldProof.env());
-		proof.setNamespaces(oldProof.getNamespaces());
-
-		Goal newGoal = proof.openGoals().iterator().next();
-
-		ImmutableList<Goal> oldGoals = oldProof.openGoals();
-		int goalCount = oldGoals.size();
-		
-		System.out.println("Splitting goal in subgoals:"+goalCount);
-		
-		final ImmutableList<Goal> newSubGoals = newGoal.split(goalCount);
-		
-		TermBuilder termBuilder = oldProof.getServices().getTermBuilder();
-		Term tt = termBuilder.tt();
-		SequentFormula sf = new SequentFormula(tt);
-		
-		Iterator<Goal> newGoalIter = newSubGoals.iterator();
-		Iterator<Goal> oldGoalIter = oldGoals.iterator();
-		int counter = 0;
-		
-		while(oldGoalIter.hasNext() && newGoalIter.hasNext()){
-			Goal newSubGoal = newGoalIter.next();
-			Goal oldSubGoal = oldGoalIter.next();
-			System.out.println("Initializing subgoal:"+counter);
-			newSubGoal.setBranchLabel("Test Case "+counter++);
-			Semisequent oldSemiSeq = oldSubGoal.node().sequent().succedent();
-			SequentFormula oldSF = oldSemiSeq.get(oldSemiSeq.size()-1);
-			newSubGoal.addFormula(new SequentFormula(oldSF.formula()), 
-	                true, 
-	                false);
-		}
-		
-		ProofAggregate pa = new SingleProof(proof, "XXX");
-		
-		MainWindow mw = MainWindow.getInstance();
-		mw.addProblem(pa);
-		
-		//mediator.goalChosen(proof.getGoal(proof.root()));		
-		
-		return proof;
-
-	}
-*/
+ 
     
     @Override
 	public void actionPerformed(ActionEvent e) {
-		//createProofForTesting(getMediator());
+	    try{
+	    	TGWorker worker = new TGWorker();
+			worker.start();
+	    }catch(Exception ie){
+	    	tgInfoDialog.writeln("Test case generation stopped: "+ie.getMessage());
+	    }
 		
-		originalProof = getMediator().getSelectedProof();
-
-		//Vector<Proof> proofs = createProofsForTesting(getMediator());
-
-    	//The following loop is meant for debugging only and should be removed
-
-    	
-		//getMediator().setProof(originalProof);
-		//createProof(getMediator());	
-		
-		CEWorker worker = new CEWorker();
-		worker.start();
 	}
 	
-	private class CEWorker extends SwingWorker3 implements InterruptListener{
+	private class TGWorker extends SwingWorker3 implements InterruptListener{
 		
+		private boolean stop;
+		
+		private SolverLauncher launcher;
+		
+		private Vector<Proof> proofs;
+		/**
+		 * Removes all generated proofs.
+		 */
+		private void removeGeneratedProofs(){
+			
+			if(proofs == null){
+				return;
+			}
+			
+			for(Proof p : proofs){
+				if(MainWindow.getInstance().getProofList().containsProof(p)){
+					getMediator().getUI().removeProof(p);
+					p.dispose();
+				}
+			}
+			
+			getMediator().setProof(originalProof);
+			
+			
+		}
+		
+		
+		
+		
+
 		
 
 		@Override
 		public void interruptionPerformed() {
 			interrupt();
+			tgInfoDialog.writeln("\nStopping test case generation.");
+			stop = true;
+
+			if(launcher != null){
+				launcher.stop();
+			}
+			
+			
+			
+			
 			
 		}
 		
@@ -359,6 +319,7 @@ public class TestGenerationAction extends MainWindowAction {
 	     */
 	    @Override 
 	    public void finished() {
+	    	removeGeneratedProofs();
 	    	getMediator().setInteractive(true);
 	    	getMediator().startInterface(true);
 	    	getMediator().removeInterruptedListener(this);
@@ -368,7 +329,12 @@ public class TestGenerationAction extends MainWindowAction {
 		@Override
 		public Object construct() {
 			tgInfoDialog.writeln("Extracting test data constraints (path conditions).");
-			Vector<Proof> proofs = createProofsForTesting(getMediator(),true);
+			proofs = createProofsForTesting(getMediator(),true);
+			
+			if(stop){
+				
+				return null;
+			}
 	    	
 			if(proofs.size()>0)
 				tgInfoDialog.writeln("Extracted "+proofs.size()+" test data constraints.");
@@ -379,13 +345,20 @@ public class TestGenerationAction extends MainWindowAction {
 			Collection<SMTProblem> problems = new LinkedList<SMTProblem>();
 			tgInfoDialog.writeln("Test data generation: appling semantic blasting macro on proofs");
 			for(Proof proof : proofs){
+				if(stop){					
+					return null;
+				}
 				tgInfoDialog.write(".");
 				ProofAggregate pa = new SingleProof(proof, "XXX");
 	    		MainWindow mw = MainWindow.getInstance();
 	    		mw.addProblem(pa);
 				SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
-				mediator.setProof(proof);				
+								
 				try {
+					if(stop){					
+						return null;
+					}
+					mediator.setProof(proof);
 					macro.applyTo(mediator, null, null);
 					problems.addAll(SMTProblem.createSMTProblems(mediator.getSelectedProof()));
 					//mediator.getUI().removeProof(mediator.getSelectedProof());
@@ -398,19 +371,14 @@ public class TestGenerationAction extends MainWindowAction {
 				}
 				
 			}
-			tgInfoDialog.writeln("\nDone applying semantic blasting. Cleaning up");
+			tgInfoDialog.writeln("\nDone applying semantic blasting.");
 			
 			mediator.setProof(originalProof);
 
-			for(Proof proof : proofs){	
-				tgInfoDialog.write(".");
-				mediator.getUI().removeProof(proof);
-				proof.dispose(); //Not sure if dispose here is correct, since the proof name and other information may be still needed.
-			}
-			tgInfoDialog.writeln("");
 			
-			getMediator().setInteractive(true);
-	    	getMediator().startInterface(true);
+			
+			//getMediator().setInteractive(true);
+	    	//getMediator().startInterface(true);
 			
 			
 			Proof proof = mediator.getSelectedProof();
@@ -428,7 +396,7 @@ public class TestGenerationAction extends MainWindowAction {
             
             
             
-            SolverLauncher launcher = new SolverLauncher(settings);
+            launcher = new SolverLauncher(settings);
             launcher.addListener(tgInfoDialog);
            // launcher.addListener(new SolverListener(settings));
             
@@ -436,10 +404,15 @@ public class TestGenerationAction extends MainWindowAction {
             List<SolverType> solvers = new LinkedList<SolverType>();
             solvers.add(SolverType.Z3_CE_SOLVER);  
             
+            SolverType.Z3_CE_SOLVER.checkForSupport();
             
             
             
-            
+            if(stop){
+				
+				return null;
+			}
+            if(Thread.interrupted())return null;
             launcher.launch(solvers,
 		            problems,
 		            proof.getServices());		

@@ -1,13 +1,21 @@
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collection;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.text.DefaultCaret;
 
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SolverLauncher;
@@ -17,23 +25,61 @@ import de.uka.ilkd.key.testgen.TestCaseGenerator;
 
 public class TGInfoDialog extends JDialog implements SolverLauncherListener{
 	
-	private JTextArea text;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private JTextArea textArea;
+	
+	private JButton stopButton;
+	
+	private JButton exitButton;
+	
+	
 	
 	
 	
 	
 
+	@SuppressWarnings("serial")
 	public TGInfoDialog() {
 		super();
 		
-		 text = new JTextArea();
+		 textArea = new JTextArea();
 		 this.setLayout(new BorderLayout());
-		 JScrollPane scrollpane = new JScrollPane(text);
+		 JScrollPane scrollpane = new JScrollPane(textArea);
 		 scrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		 scrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		 DefaultCaret caret = (DefaultCaret) text.getCaret();
+		 DefaultCaret caret = (DefaultCaret) textArea.getCaret();
          caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-		 this.getContentPane().add(scrollpane);
+         
+         
+         stopButton = new JButton(new AbstractAction("Stop") {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				MainWindow.getInstance().getMediator().stopAutoMode();	
+				exitButton.setEnabled(true);
+			}
+		});
+         
+         exitButton = new JButton(new AbstractAction("Exit") {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				TGInfoDialog.this.dispose();				
+			}
+		});
+         
+         exitButton.setEnabled(false);
+         
+         JPanel flowPanel = new JPanel(new FlowLayout());
+         flowPanel.add(stopButton);
+         flowPanel.add(exitButton);
+         
+         
+         
+		 this.getContentPane().add(scrollpane, BorderLayout.CENTER);
+		 this.getContentPane().add(flowPanel, BorderLayout.SOUTH);
 		 this.setModal(false);
 		 //this.pack();
 		 this.setTitle("Test Suite Generation");
@@ -44,11 +90,11 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener{
 	}
 	
 	public void write(String t){
-		text.append(t);
+		textArea.append(t);
 	}
 
 	public void writeln(String line){
-		text.append(line+"\n");
+		textArea.append(line+"\n");
 	}
 
 	@Override
@@ -59,6 +105,7 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener{
 		TestCaseGenerator tg = new TestCaseGenerator();
 		tg.setLogger(this);
 		tg.generateJUnitTestSuite(problemSolvers);
+		exitButton.setEnabled(true);
 		
 	}
 
