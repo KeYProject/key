@@ -13,7 +13,7 @@
 
 public class BST{
 
-    private /*@spec_public@*/ Node root;
+    public /*@spec_public@*/ Node root;
 
     /*@ public normal_behavior
       @ requires (\forall Node n; n!=null; 
