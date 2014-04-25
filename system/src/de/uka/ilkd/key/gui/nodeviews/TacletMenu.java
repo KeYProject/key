@@ -513,7 +513,8 @@ class TacletMenu extends JMenu {
 		    PosInOccurrence occ = pos.getPosInOccurrence();
 		    if (occ != null && occ.posInTerm() != null) {
 		        // trim string, otherwise window gets too large (bug #1430)
-		        final String term = occ.subTerm().toString().substring(0, 200);
+		        final String oldTerm = occ.subTerm().toString();
+		        final String term = oldTerm.length()>200? oldTerm.substring(0, 200): oldTerm;
 			String abbreviation = (String)JOptionPane.showInputDialog
 			    (new JFrame(),
 			     "Enter abbreviation for term: \n"+term,
