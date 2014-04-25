@@ -190,7 +190,8 @@ public class TestGenerationAction extends MainWindowAction {
 		Iterator<SequentFormula> it = oldSequent.antecedent().iterator();
 		while(it.hasNext()){
 			SequentFormula sf = it.next();
-			if(hasModalities(sf.formula())) continue;
+			//Allow modailities in the antecedent
+			//if(hasModalities(sf.formula())) continue;
 			newSequent = newSequent.addFormula(sf, true, false).sequent();
 		}
 		it = oldSequent.succedent().iterator();
