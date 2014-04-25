@@ -105,7 +105,7 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener{
 		tg.setLogger(this);
 
 		tg.setJUnit(TGOptionsDialog.isJunit());
-		tg.generateJUnitTestSuite(problemSolvers);
+		
 
 		problemSolvers = filterSolverResultsAndShowSolverStatistics(problemSolvers);
 		if(problemSolvers.size()>0){

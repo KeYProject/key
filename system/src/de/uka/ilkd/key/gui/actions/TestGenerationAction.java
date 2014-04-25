@@ -191,13 +191,13 @@ public class TestGenerationAction extends MainWindowAction {
 		while(it.hasNext()){
 			SequentFormula sf = it.next();
 			//Allow modailities in the antecedent
-			//if(hasModalities(sf.formula())) continue;
+			if(hasModalities(sf.formula(),false)) continue;
 			newSequent = newSequent.addFormula(sf, true, false).sequent();
 		}
 		it = oldSequent.succedent().iterator();
 		while(it.hasNext()){
 			SequentFormula sf = it.next();
-			if(hasModalities(sf.formula())) continue;
+			if(hasModalities(sf.formula(),true)) continue;
 			newSequent = newSequent.addFormula(sf, false, false).sequent();
 		}
 		
@@ -225,19 +225,19 @@ public class TestGenerationAction extends MainWindowAction {
 
 	}
     
-    private boolean hasModalities(Term t){
+    private boolean hasModalities(Term t, boolean checkUpdates){
     	JavaBlock jb = t.javaBlock();
     	if(jb!=null && !jb.isEmpty()){
     		//System.out.println("Excluded javablock");
     		return true;
     	}
-    	if(t.op()==UpdateApplication.UPDATE_APPLICATION){
+    	if(t.op()==UpdateApplication.UPDATE_APPLICATION && checkUpdates){
     		//System.out.println("Exclude update application.");
     		return true;
     	}
     	boolean res = false;
     	for(int i=0; i<t.arity() && !res; i++){
-    		res |= hasModalities(t.sub(i));
+    		res |= hasModalities(t.sub(i),checkUpdates);
     	}
     	
     	return res;
