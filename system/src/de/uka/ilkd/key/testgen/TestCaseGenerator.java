@@ -36,671 +36,205 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SMTSolver;
-import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.model.Heap;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
 
 /**
  * @author gladisch
- * @author herda 
+ * @author herda
  */
 public class TestCaseGenerator {
-
 	Services services;
 	Proof proof;
-	static int fileCounter=0;
+	static int fileCounter = 0;
 	boolean junitFormat;
+	private static final String DONT_COPY = "aux"; // Classes of the Java
+	                                               // environment needed by KeY
+	                                               // can be placed in this
+	                                               // subdirectory.
 
-	private static final String DONT_COPY = "aux"; //Classes of the Java environment needed by KeY can be placed in this subdirectory.
+	public static boolean modelIsOK(Model m) {
+		return m != null && !m.isEmpty() && m.getHeaps() != null
+		        && m.getHeaps().size() > 0 && m.getTypes() != null;
+	}
+
 	private final String dontCopy;
 	protected final String modDir;
 	protected final String directory;
 	private TGInfoDialog logger;
 	String fileName;
 	String MUTName;
-
-	private Map<Sort,StringBuffer> sortDummyClass;
-
+	private final Map<Sort, StringBuffer> sortDummyClass;
 	final String DummyPostfix = "DummyImpl";
-
+	// TODO: in future remove this string and provide the file in the
+	// KeY-project
+	final String compileWithOpenJML = "#!/bin/bash\n\n"
+	        + "if [ -e \"openjml.jar\" ]\n"
+	        + "then\n"
+	        + "   java -jar openjml.jar -cp \".\" -rac *.java\n"
+	        + "else\n"
+	        + "   echo \"openjml.jar not found!\"\n"
+	        + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"
+	        + "   echo \"Copy openjml.jar into the directory with test files.\"\n"
+	        + "fi\n";
+	// TODO: in future remove this string and provide the file in the
+	// KeY-project
+	final String executeWithOpenJML = "#!/bin/bash\n"
+	        + "if [ -e \"jmlruntime.jar\" ]\n"
+	        + "then"
+	        + "  if [ -e \"jmlspecs.jar\" ]\n"
+	        + "  then\n"
+	        + "   if [ \"$1\" = \"\" ] ; then\n"
+	        + "    echo \"Provide the test driver as an argument (without .java postfix). For example:\"\n"
+	        + "    echo \"  executeWithOpenJML.sh TestGeneric0 \"\n"
+	        + "    echo \"Make sure that jmlruntime.jar and jmlspecs.jar are in the\"\n"
+	        + "    echo \"current directory.\"\n"
+	        + "    quit\n"
+	        + "   else\n"
+	        + "     java -cp jmlruntime.jar:jmlspecs.jar:. $1\n"
+	        + "   fi\n"
+	        + "else\n"
+	        + "  echo \"jmlspecs.jar not found!\"\n"
+	        + "  echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"
+	        + "  echo \"Copy jmlspecs.jar into the directory with test files.\"\n"
+	        + "  quit\n"
+	        + "fi\n"
+	        + "else\n"
+	        + "   echo \"jmlruntime.jar not found!\"\n"
+	        + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"
+	        + "   echo \"Copy jmlruntime.jar into the directory with test files.\"\n"
+	        + "   quit\n" + "fi\n";
 
 	public TestCaseGenerator() {
 		super();
-		this.proof = TestGenerationAction.originalProof;
-		this.services = proof.getServices();
+		proof = TestGenerationAction.originalProof;
+		services = proof.getServices();
 		junitFormat = false;
 		modDir = proof.getJavaModel().getModelDir();
-		dontCopy = modDir + File.separator + DONT_COPY;
-		this.directory = System.getProperty("user.home") + File.separator + "testFiles";
-		sortDummyClass = new HashMap<Sort,StringBuffer>();
+		dontCopy = modDir + File.separator + TestCaseGenerator.DONT_COPY;
+		directory = System.getProperty("user.home") + File.separator
+		        + "testFiles";
+		sortDummyClass = new HashMap<Sort, StringBuffer>();
 		MUTName = "";
 	}
-	
-	public void setJUnit(boolean junit){
-		this.junitFormat = junit;
-	}
 
-	private boolean filterVal(String s){
-		if(s.startsWith("#a")||s.startsWith("#s")||s.startsWith("#h")||s.startsWith("#l")||s.startsWith("#f")){
-			return false;
+	protected String buildDummyClassForAbstractSort(Sort sort) {
+		final JavaInfo jinfo = services.getJavaInfo();
+		final KeYJavaType kjt = jinfo.getKeYJavaType(sort);
+		final String className = getDummyClassNameFor(sort);
+		if (sortDummyClass.containsKey(sort)) {
+			return className;
 		}
-		else{
-			return true;
-		}
-	}
-
-
-
-	public void setLogger(TGInfoDialog logger) {
-		this.logger = logger;
-	}
-
-	private ObjectVal getObject(Heap h,String name){
-		if(h==null){
-			return null;
-		}
-		for(ObjectVal o : h.getObjects()){
-			if(o.getName().equals(name)){
-				return o;
+		final StringBuffer sb = new StringBuffer();
+		sortDummyClass.put(sort, sb); // Put the string buffer as soon as
+		                              // possible, due to possible recursive
+		                              // calls of this method.
+		sb.append("import " + sort.declarationString() + ";\n\n");
+		sb.append("class " + className + " implements "
+		        + sort.declarationString() + "{\n"); // TODO:extends or
+		                                             // implements depending if
+		                                             // it is a class or
+		                                             // interface.
+		sb.append(" public " + className + "(){ };\n"); // default constructor
+		final Iterator<IProgramMethod> methods = jinfo
+		        .getAllProgramMethods(kjt).iterator();
+		while (methods.hasNext()) {
+			final IProgramMethod m = methods.next();
+			if (m.getFullName().indexOf('<') > -1) {
+				continue;
 			}
-		}
-		return null;
-	}
-	
-	public static boolean modelIsOK(Model m){
-		return m!=null && !m.isEmpty() && m.getHeaps()!=null && m.getHeaps().size()>0 && m.getTypes()!=null;
-	}
-
-	public String generateJUnitTestSuite(Collection<SMTSolver> problemSolvers){
-		MUTName = "";
-		fileName = "TestGeneric"+fileCounter;
-		String mut = getMUT(); //sets MUTName as side-effect
-		if(mut==null){
-			mut = "<method under test> //Manually write a call to the method under test, because KeY could not determine it automatically.";
-		}else{
-			fileName += "_"+MUTName;
-		}
-		StringBuffer testSuite = new StringBuffer();
-		testSuite.append(getFilePrefix(fileName) + "\n");
-
-		StringBuffer testMethods = new StringBuffer();
-		int i = 0;
-		for(SMTSolver solver : problemSolvers){
-			try{
-				StringBuffer testMethod = new StringBuffer();
-				String originalNodeName = solver.getProblem().getGoal().proof().name().toString();
-				boolean success = false;
-				if(solver.getQuery()!=null){
-					Model m = solver.getQuery().getModel();
-					if(modelIsOK(m)){
-						logger.writeln("Generate: "+originalNodeName);
-						testMethod.append("  //"+originalNodeName+"\n");
-						testMethod.append(getTestMethodSignature(i)+"{\n");
-						testMethod.append("   //Test preamble: creating objects and intializing test data"+generateTestCase(m)+"\n\n");
-						testMethod.append("   //Calling the method under test\n   "+mut+"; \n");
-						testMethod.append(" }\n\n");
-						i++;
-						success=true;
-						testMethods.append(testMethod);
-					}
-				}
-				if(!success){
-					
-					logger.writeln("A model (test data) was not generated for:"+originalNodeName);
-				}
-			}catch(Exception ex){
-				logger.writeln(ex.getMessage());
-				logger.writeln("A test case was not generated due to an exception. Continuing test generation...");
+			if (m.isPrivate() || m.isFinal() || !m.isAbstract()) {
+				continue;
 			}
-		}
-		
-		if(i==0){
-			logger.writeln("Warning: no test case was generated. Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
-		}else if (i<problemSolvers.size()){
-			logger.writeln("Warning: SMT solver could not solve all test data constraints. Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
-		}
-
-		testSuite.append(getMainMethod(fileName, i)+"\n\n");
-
-		testSuite.append(testMethods);
-
-		testSuite.append("\n}");
-
-		writeToFile(fileName + ".java", testSuite);
-		logger.writeln("Writing test file to:"+directory+modDir+File.separator+fileName+".java");
-
-		exportCodeUnderTest();
-
-		createDummyClasses();
-
-		createOpenJMLShellScript();
-
-		fileCounter++;
-		return testSuite.toString();
-
-	}
-
-	public String generateJUnitTestCase(Model m){
-		fileName = "TestGeneric"+fileCounter;
-		String mut = getMUT();//sets MUTName as side-effect
-		if(mut==null){
-			mut = "<method under test> //Manually write a call to the method under test, because KeY could not determine it automatically.";
-		}else{
-			fileName += "_"+MUTName;
-		}
-		StringBuffer testCase = new StringBuffer();
-		testCase.append(getFilePrefix(fileName) + "\n");
-		testCase.append(getMainMethod(fileName, 1)+"\n\n");
-		testCase.append(getTestMethodSignature(0)+"{\n");
-		testCase.append("   //Test preamble: creating objects and intializing test data"+generateTestCase(m)+"\n\n");
-		testCase.append("   //Calling the method under test\n   "+mut+"; \n");
-		testCase.append("}\n}");
-
-		logger.writeln("Writing test file to:"+directory+modDir+File.separator+fileName);
-		writeToFile(fileName + ".java", testCase);
-		exportCodeUnderTest();
-
-		createDummyClasses();
-
-		createOpenJMLShellScript();
-
-		fileCounter++;
-		return testCase.toString();
-	}
-
-	public void writeToFile(String file, StringBuffer sb){
-		try
-		{
-
-			final File dir = new File(directory + modDir);
-			if (!dir.exists()) {
-				dir.mkdirs();
-			}
-			final File pcFile = new File(dir, file);
-			String path = pcFile.getAbsolutePath();
-			final FileWriter fw = new FileWriter(pcFile);
-			final BufferedWriter bw = new BufferedWriter(fw);
-			bw.write(sb.toString());
-			bw.close();
-
-
-			//create a temporary file
-			//		    File logFile=new File("TestGeneric"+fileCounter+".java");
-			//		    BufferedWriter writer = new BufferedWriter(new FileWriter(logFile));
-			//		    writer.write (sb.toString());
-
-			//Close writer
-			//writer.close();
-		} catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-
-	private String getFilePrefix(String className){
-		String res = "//This is a test driver generated by KeY 2.2. \n" +
-				"//Possible use cases: \n" +
-				"//  1. Compile and execute the main method with a JML runtime checker to test the method under test.\n" +
-				"//  2. Use a debuger to follow the execution of the method under test.\n\n\n";
-		if(junitFormat){
-			res += "import junit.framework.*;\n"
-					+ " public class "+className+" extends junit.framework.TestCase {\n\n"
-					+ " public "+className+"(){}\n"
-					+ " public static junit.framework.TestSuite suite () {\n"
-					+ "   junit.framework.TestSuite suiteVar;\n"
-					+ "   suiteVar=new junit.framework.TestSuite ("+className+".class);\n"
-					+ "   return  suiteVar;\n" 
-					+ " }\n";
-		}else{
-			res += "public class "+className+"{ \n\n"
-					+ " public "+className+"(){}\n";			
-		}
-		return res;
-	}
-
-	private String getTestMethodSignature(int i){
-		String sig = " public void  testcode"+i+"()";
-		if(junitFormat){
-			return "@Test\n"+sig;
-		}
-		else{
-			return sig;
-		}		
-	}
-	private StringBuffer getMainMethod(String className, int i){
-		StringBuffer res = new StringBuffer();
-		res.append( " public static void  main (java.lang.String[]  arg) {\n"
-				+"   "+className+" testSuiteObject;\n"
-				+"   testSuiteObject=new "+className+" ();\n\n");
-		for(int j=0;j<i;j++){
-			res.append("   testSuiteObject.testcode"+j+"();\n");
-		}
-		if(i==0)
-			res.append("   //Warning:no test methods were generated.\n");
-		res.append(" }");
-		return res;
-	}
-
-	public String generateTestCase(Model m){
-
-		List<Assignment> assignments = new LinkedList<Assignment>();
-
-		Heap heap = null;
-		for(Heap h : m.getHeaps()){
-			if(h.getName().equals("heap")){
-				heap = h;
-				break;
-			}
-		}		
-
-		if(heap!=null){
-			//create objects
-			for(ObjectVal o : heap.getObjects()){
-				if(o.getName().equals("#o0")){
-					continue;
-				}
-				String type = getSafeType(o.getSort());
-
-				String right;				
-				if(type.endsWith("[]")){
-					right = "new "+type.substring(0, type.length()-2)+"["+o.getLength()+"]";
-				}
-				else{
-					right = "new "+type+"()";
-				}
-				assignments.add(new Assignment(type, o.getName().replace("#", "_"), right));
-
-
-			}			
-		}
-		//init constants
-		for(String c : m.getConstants().keySet()){
-			String val = m.getConstants().get(c);
-
-			if(filterVal(val) && !c.equals("null")){
-
-				String type = "int";
-				if(val.equals("true")||val.equals("false")){
-					type = "boolean";
-				}
-				else if(val.startsWith("#o")){
-					ObjectVal o = getObject(heap, val);
-					if(o!=null){
-						if(val.equals("#o0") && m.getTypes().getOriginalConstantType(c)!=null){
-							type = m.getTypes().getOriginalConstantType(c).name().toString();
-						}
-						else{
-							type = o.getSort().name().toString();
-						}
-
-
-					}
-					else{
-						type = "Object";
-					}
-					type = "/*@ nullable */ " + type;
-				}
-				val = translateValueExpression(val);
-				assignments.add(new Assignment(type,c,val));
-			}
-		}
-
-		//init fields
-		if(heap!=null){
-
-			for(ObjectVal o : heap.getObjects()){
-				if(o.getName().equals("#o0")){
-					continue;
-				}
-
-				String name = o.getName().replace("#", "_");
-
-				for(String f : o.getFieldvalues().keySet()){
-					if(f.contains("<") || f.contains(">")){
-						continue;
-					}
-					String fieldName = f.substring(f.lastIndexOf(":")+1);
-					fieldName = fieldName.replace("|", "");
-					String val = o.getFieldvalues().get(f);
-					val = translateValueExpression(val);
-					assignments.add(new Assignment(name+"."+fieldName, val));
-				}
-				if(o.getSort()!=null && o.getSort().name().toString().endsWith("[]")){
-					for(int i = 0; i < o.getLength(); i++){
-						String fieldName = "["+i+"]";
-						String val = o.getArrayValue(i);						
-						val = translateValueExpression(val);
-						assignments.add(new Assignment(name+fieldName, val));
-					}
-				}
-
-			}			
-		}
-
-
-		StringBuffer result = new StringBuffer();
-		for(Assignment a : assignments){
-			result.append(a.toString());
-		}
-
-
-
-		return result.toString();
-	}
-
-	protected String translateValueExpression(String val){
-		if(val.contains("/")){
-			val = val.substring(0, val.indexOf("/"));
-		}
-		if(val.equals("#o0")) return "null";
-		val = val.replace("|", "");
-		val = val.replace("#", "_");
-		return val;
-	}
-
-	public String getSafeType(Sort sort){
-		if(sort==null){
-			return "java.lang.Object"; //TODO:Hopefully this is correct
-		}else if(sort.isAbstract()){
-			return buildDummyClassForAbstractSort(sort);
-		}else{
-			return sort.name().toString();
-		}
-	}
-
-	private String getDummyClassNameFor(Sort sort){
-		JavaInfo jinfo = services.getJavaInfo();
-		KeYJavaType kjt = jinfo.getKeYJavaType(sort); 
-		return kjt.getName()+DummyPostfix;
-	}
-
-	protected boolean isNumericType(String type){
-		return type.equals("byte") || type.equals("short") || type.equals("int") || 
-				type.equals("long") || type.equals("float") || type.equals("double");
-	}
-
-	protected boolean isPrimitiveType(String type){
-		return isNumericType(type) || type.equals("boolean") || type.equals("char");
-	}
-
-	protected String buildDummyClassForAbstractSort(Sort sort){
-
-		JavaInfo jinfo = services.getJavaInfo();
-		KeYJavaType kjt = jinfo.getKeYJavaType(sort); 
-		String className = getDummyClassNameFor(sort);
-		if(sortDummyClass.containsKey(sort)) return className;
-
-		StringBuffer sb = new StringBuffer();
-		sortDummyClass.put(sort, sb); //Put the string buffer as soon as possible, due to possible recursive calls of this method.
-
-		sb.append("import "+sort.declarationString()+";\n\n");
-		sb.append("class "+className + " implements "+sort.declarationString()+"{\n"); //TODO:extends or implements depending if it is a class or interface.
-		sb.append(" public "+className+"(){ };\n");  //default constructor
-
-		Iterator<IProgramMethod> methods = jinfo.getAllProgramMethods(kjt).iterator();		
-		while(methods.hasNext()){
-			IProgramMethod m = methods.next();
-			if(m.getFullName().indexOf('<')>-1) continue;
-			if(m.isPrivate() || m.isFinal() || !m.isAbstract()) continue;
 			sb.append(" ");
-			MethodDeclaration md = m.getMethodDeclaration();
-			//sb.append(md.toString()+ "\n");
-			if(m.isProtected())
+			final MethodDeclaration md = m.getMethodDeclaration();
+			// sb.append(md.toString()+ "\n");
+			if (m.isProtected()) {
 				sb.append("protected ");
-			if(m.isPublic())
+			}
+			if (m.isPublic()) {
 				sb.append("public ");
-			if(m.isFinal())
-				sb.append("final "); //Is this possible?
-			if(m.isStatic())
+			}
+			if (m.isFinal()) {
+				sb.append("final "); // Is this possible?
+			}
+			if (m.isStatic()) {
 				sb.append("static ");
-			if(m.isSynchronized())
+			}
+			if (m.isSynchronized()) {
 				sb.append("synchronized ");
-
-			if(md.getTypeReference()==null)
+			}
+			if (md.getTypeReference() == null) {
 				sb.append("void ");
-			else
+			} else {
 				sb.append(md.getTypeReference().toString() + " ");
-
-			sb.append(m.getName()+"(");
-			Iterator<ParameterDeclaration> pdIter = md.getParameters().iterator();
-			int varcount =0;
-			while(pdIter.hasNext()){
-				ParameterDeclaration pd = pdIter.next();
-				if(pd.isFinal())
+			}
+			sb.append(m.getName() + "(");
+			final Iterator<ParameterDeclaration> pdIter = md.getParameters()
+			        .iterator();
+			int varcount = 0;
+			while (pdIter.hasNext()) {
+				final ParameterDeclaration pd = pdIter.next();
+				if (pd.isFinal()) {
 					sb.append("final ");
-
-				if(pd.getTypeReference()==null)
+				}
+				if (pd.getTypeReference() == null) {
 					sb.append("void /*unkown type*/ ");
-				else 
-					sb.append(pd.getTypeReference().toString()+ " ");
-
-				if(pd.getVariables().isEmpty())
-					sb.append("var"+varcount);
-				else
+				} else {
+					sb.append(pd.getTypeReference().toString() + " ");
+				}
+				if (pd.getVariables().isEmpty()) {
+					sb.append("var" + varcount);
+				} else {
 					sb.append(pd.getVariables().iterator().next().getFullName());
-
-				if(pdIter.hasNext())
+				}
+				if (pdIter.hasNext()) {
 					sb.append(", ");
-				varcount ++;
+				}
+				varcount++;
 			}
 			sb.append(")");
-			if(md.getThrown()!=null){
-				sb.append(" throws "+md.getThrown().getTypeReferenceAt(0)+ " \n ");
+			if (md.getThrown() != null) {
+				sb.append(" throws " + md.getThrown().getTypeReferenceAt(0)
+				        + " \n ");
 			}
-
-			if(md.getTypeReference()==null){
+			if (md.getTypeReference() == null) {
 				sb.append("{ };");
-			}else{
-				String type = md.getTypeReference().toString();
-				if(isNumericType(type) ){					
+			} else {
+				final String type = md.getTypeReference().toString();
+				if (isNumericType(type)) {
 					sb.append("{ return 0;}");
-				} else if( type.equals("boolean")){
+				} else if (type.equals("boolean")) {
 					sb.append("{ return true;}");
-				} else if( type.equals("char") ){
+				} else if (type.equals("char")) {
 					sb.append("{ return 'a';}");
-				}else {
-					boolean returnNull=true;
-					try{
-						String retType = md.getTypeReference().getKeYJavaType().getSort().name().toString();
-						if(retType.equals("java.lang.String")){
-							sb.append("{ return \""+className+"\";}");
-							returnNull=false;
+				} else {
+					boolean returnNull = true;
+					try {
+						final String retType = md.getTypeReference()
+						        .getKeYJavaType().getSort().name().toString();
+						if (retType.equals("java.lang.String")) {
+							sb.append("{ return \"" + className + "\";}");
+							returnNull = false;
 						}
-					}catch(Exception e){returnNull=true;}
-
-					if(returnNull)
+					} catch (final Exception e) {
+						returnNull = true;
+					}
+					if (returnNull) {
 						sb.append("{ return null;}");
+					}
 				}
-			} 
+			}
 			sb.append("\n");
 		}
 		sb.append("}");
-		//System.out.println("--------------------\n"+sb.toString());
+		// System.out.println("--------------------\n"+sb.toString());
 		return className;
 	}
 
-	public String getMUT(){
-		//System.out.println("Selected proof name:"+proof.name());
-
-		Node root = proof.root();
-		Sequent seq = root.sequent();
-		Semisequent succ = seq.succedent();
-		Iterator<SequentFormula> it = succ.iterator();
-		String res = null;
-		while(it.hasNext()){
-			SequentFormula sf = it.next();
-			Term form = sf.formula();
-			res = findMUTInFormula(form);
-			if(res!=null) break;
-		}
-		return res;
-	}
-
-	private String findMUTInFormula(Term form){
-		JavaBlock jb = form.javaBlock();
-		if(jb==null || jb.isEmpty()){
-			for(int i = 0 ; i<form.arity();i++){
-				String res = findMUTInFormula(form.sub(i));
-				if(res!=null) return res;
-			}
-		}
-		else {
-			//System.out.println("---JavaBlock found:"+jb);
-			JavaProgramElement jpe = jb.program();
-			String res = findMUTInJavaPE(jpe);			
-			if(res!=null) return res;
-		}
-		return null;
-	}
-
-	private String findMUTInJavaPE(JavaProgramElement jpe){
-		if(jpe instanceof JavaNonTerminalProgramElement){
-			JavaNonTerminalProgramElement jntpe = (JavaNonTerminalProgramElement) jpe;
-			//System.out.println("JavaNonTerminalProgramElement " + jntpe.toSource());
-			for(int i = 0; i<jntpe.getChildCount(); i++){
-				ProgramElement pe = jntpe.getChildAt(i);
-				//System.out.println("ProgramElement ("+pe.getClass()+") "+pe);
-				if(pe instanceof MethodBodyStatement){
-					MethodBodyStatement mbs = (MethodBodyStatement)pe;
-					MUTName = mbs.getMethodReference().getMethodName().toString();
-
-					String methodCall = mbs.toString();
-					//System.out.println("Method call:"+methodCall);
-					int idx = methodCall.indexOf("@");
-					if(idx>0){
-						methodCall = methodCall.substring(0, idx);
-					}
-					//System.out.println("Method call:"+methodCall);
-					//Parameters. The following is some dirty string magic that removes leading "_" of arguments.
-					//The correct solution is to translate the update in front of the modality and declare missing varialbes.
-
-					Iterator<? extends Expression> argIter = mbs.getArguments().iterator();
-					HashMap<String,String> newArgs = new HashMap();
-					while(argIter.hasNext()){
-						Expression ex = argIter.next();
-						if(ex instanceof IProgramVariable){
-							String progVar = ((IProgramVariable) ex).name().toString();
-							if(progVar.startsWith("_")){								
-								String newProgVar = progVar.substring(1);
-								newArgs.put(progVar, newProgVar);
-								//System.out.println("Replace:"+progVar+ "  by:"+newProgVar);
-							}
-						}
-					}
-					idx = methodCall.indexOf("(");
-					String mc1 = methodCall.substring(0,idx);
-					String mc2 = methodCall.substring(idx);
-					for(String oldVar: newArgs.keySet()){						
-						mc2 = mc2.replace(oldVar, newArgs.get(oldVar));
-					}
-					//System.out.println("mc1:"+mc1+"  mc2:"+mc2);
-					methodCall = mc1 + mc2 ;
-
-					//Result variable
-					IProgramVariable resultVar = mbs.getResultVariable();
-					if(resultVar!=null){
-						Sort s= resultVar.sort();						
-						methodCall = getSafeType(s) + " " + methodCall;
-						String resType = s.name().toString();
-						if(!isPrimitiveType(resType)){
-							methodCall = "/*@ nullable @*/ " + methodCall;
-						}
-					}
-
-					//System.out.println("Method call:"+methodCall);
-					return methodCall;
-
-				}else if(pe instanceof JavaProgramElement){
-					String res = findMUTInJavaPE((JavaProgramElement)pe);
-					if(res!=null) return res;
-				}
-
-			}
-		}
-		return null;
-	}
-
-	protected void createDummyClasses(){
-		for(Sort s:sortDummyClass.keySet()){
-			StringBuffer sb=sortDummyClass.get(s);
-			String file = getDummyClassNameFor(s) + ".java";
-			writeToFile(file,sb);
-		}	
-	}
-	//TODO: in future remove this string and provide the file in the KeY-project
-	final String compileWithOpenJML="#!/bin/bash\n\n"+
-			"if [ -e \"openjml.jar\" ]\n"+
-			"then\n"+
-			"   java -jar openjml.jar -cp \".\" -rac *.java\n"+
-			"else\n"+
-			"   echo \"openjml.jar not found!\"\n"+
-			"   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"+
-			"   echo \"Copy openjml.jar into the directory with test files.\"\n"+
-			"fi\n";
-
-	//TODO: in future remove this string and provide the file in the KeY-project
-	final String executeWithOpenJML="#!/bin/bash\n"+
-			"if [ -e \"jmlruntime.jar\" ]\n"+
-			"then"+
-			"  if [ -e \"jmlspecs.jar\" ]\n"+
-			"  then\n"+
-			"   if [ \"$1\" = \"\" ] ; then\n"+
-			"    echo \"Provide the test driver as an argument (without .java postfix). For example:\"\n"+
-			"    echo \"  executeWithOpenJML.sh TestGeneric0 \"\n"+
-			"    echo \"Make sure that jmlruntime.jar and jmlspecs.jar are in the\"\n"+
-			"    echo \"current directory.\"\n"+
-			"    quit\n"+
-			"   else\n"+								
-			"     java -cp jmlruntime.jar:jmlspecs.jar:. $1\n"+								
-			"   fi\n"+
-			"else\n"+
-			"  echo \"jmlspecs.jar not found!\"\n"+
-			"  echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"+
-			"  echo \"Copy jmlspecs.jar into the directory with test files.\"\n"+
-			"  quit\n"+
-			"fi\n"+
-			"else\n"+
-			"   echo \"jmlruntime.jar not found!\"\n"+
-			"   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"+
-			"   echo \"Copy jmlruntime.jar into the directory with test files.\"\n"+
-			"   quit\n"+
-			"fi\n";
-
-
-
-	protected void createOpenJMLShellScript(){
-		StringBuffer sb=new StringBuffer();
-		String filestr = "compileWithOpenJML.sh";
-
-		File file = new File(directory + modDir + File.separator + filestr);
-		if (!file.exists()) {
-			sb.append(compileWithOpenJML);
-			writeToFile(filestr, sb);
-		}
-
-		filestr= "executeWithOpenJML.sh";
-		file = new File(directory + modDir + File.separator + filestr);
-		if (!file.exists()) {
-			sb = new StringBuffer();
-			sb.append(executeWithOpenJML);
-			writeToFile(filestr, sb);
-		}
-	}
-
-	protected void exportCodeUnderTest() {
-		try {
-			// Copy the involved classes without modification
-			copyFiles(modDir, directory + modDir);
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
 	private void copyFiles(final String srcName, final String targName)
-			throws IOException {
+	        throws IOException {
 		// We don't want to copy the Folder with API Reference
 		// Implementation
 		if (srcName.equals(dontCopy)) {
@@ -711,11 +245,11 @@ public class TestCaseGenerator {
 		final File srcFile = new File(srcName);
 		if (!srcFile.exists()) {
 			throw new IOException("FileCopy: " + "no such source file: "
-					+ srcName);
+			        + srcName);
 		}
 		if (!srcFile.canRead()) {
 			throw new IOException("FileCopy: " + "source file is unreadable: "
-					+ srcName);
+			        + srcName);
 		}
 		if (srcFile.isDirectory()) {
 			final String newTarget;
@@ -736,7 +270,7 @@ public class TestCaseGenerator {
 			if (targFile.exists()) {
 				if (!targFile.canWrite()) {
 					throw new IOException("FileCopy: "
-							+ "destination file is unwriteable: " + targName);
+					        + "destination file is unwriteable: " + targName);
 				}
 			}
 			FileInputStream src = null;
@@ -746,7 +280,6 @@ public class TestCaseGenerator {
 				targ = new FileOutputStream(targFile);
 				final byte[] buffer = new byte[4096];
 				int bytesRead;
-
 				while ((bytesRead = src.read(buffer)) != -1) {
 					targ.write(buffer, 0, bytesRead); // write
 				}
@@ -768,8 +301,464 @@ public class TestCaseGenerator {
 			}
 		} else {
 			throw new IOException("FileCopy: " + srcName
-					+ " is neither a file nor a directory!");
+			        + " is neither a file nor a directory!");
 		}
 	}
 
+	protected void createDummyClasses() {
+		for (final Sort s : sortDummyClass.keySet()) {
+			final StringBuffer sb = sortDummyClass.get(s);
+			final String file = getDummyClassNameFor(s) + ".java";
+			writeToFile(file, sb);
+		}
+	}
+
+	protected void createOpenJMLShellScript() {
+		StringBuffer sb = new StringBuffer();
+		String filestr = "compileWithOpenJML.sh";
+		File file = new File(directory + modDir + File.separator + filestr);
+		if (!file.exists()) {
+			sb.append(compileWithOpenJML);
+			writeToFile(filestr, sb);
+		}
+		filestr = "executeWithOpenJML.sh";
+		file = new File(directory + modDir + File.separator + filestr);
+		if (!file.exists()) {
+			sb = new StringBuffer();
+			sb.append(executeWithOpenJML);
+			writeToFile(filestr, sb);
+		}
+	}
+
+	protected void exportCodeUnderTest() {
+		try {
+			// Copy the involved classes without modification
+			copyFiles(modDir, directory + modDir);
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private boolean filterVal(String s) {
+		if (s.startsWith("#a") || s.startsWith("#s") || s.startsWith("#h")
+		        || s.startsWith("#l") || s.startsWith("#f")) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	private String findMUTInFormula(Term form) {
+		final JavaBlock jb = form.javaBlock();
+		if (jb == null || jb.isEmpty()) {
+			for (int i = 0; i < form.arity(); i++) {
+				final String res = findMUTInFormula(form.sub(i));
+				if (res != null) {
+					return res;
+				}
+			}
+		} else {
+			// System.out.println("---JavaBlock found:"+jb);
+			final JavaProgramElement jpe = jb.program();
+			final String res = findMUTInJavaPE(jpe);
+			if (res != null) {
+				return res;
+			}
+		}
+		return null;
+	}
+
+	private String findMUTInJavaPE(JavaProgramElement jpe) {
+		if (jpe instanceof JavaNonTerminalProgramElement) {
+			final JavaNonTerminalProgramElement jntpe = (JavaNonTerminalProgramElement) jpe;
+			// System.out.println("JavaNonTerminalProgramElement " +
+			// jntpe.toSource());
+			for (int i = 0; i < jntpe.getChildCount(); i++) {
+				final ProgramElement pe = jntpe.getChildAt(i);
+				// System.out.println("ProgramElement ("+pe.getClass()+") "+pe);
+				if (pe instanceof MethodBodyStatement) {
+					final MethodBodyStatement mbs = (MethodBodyStatement) pe;
+					MUTName = mbs.getMethodReference().getMethodName()
+					        .toString();
+					String methodCall = mbs.toString();
+					// System.out.println("Method call:"+methodCall);
+					int idx = methodCall.indexOf("@");
+					if (idx > 0) {
+						methodCall = methodCall.substring(0, idx);
+					}
+					// System.out.println("Method call:"+methodCall);
+					// Parameters. The following is some dirty string magic that
+					// removes leading "_" of arguments.
+					// The correct solution is to translate the update in front
+					// of the modality and declare missing varialbes.
+					final Iterator<? extends Expression> argIter = mbs
+					        .getArguments().iterator();
+					final HashMap<String, String> newArgs = new HashMap<String, String>();
+					while (argIter.hasNext()) {
+						final Expression ex = argIter.next();
+						if (ex instanceof IProgramVariable) {
+							final String progVar = ((IProgramVariable) ex)
+							        .name().toString();
+							if (progVar.startsWith("_")) {
+								final String newProgVar = progVar.substring(1);
+								newArgs.put(progVar, newProgVar);
+								// System.out.println("Replace:"+progVar+
+								// "  by:"+newProgVar);
+							}
+						}
+					}
+					idx = methodCall.indexOf("(");
+					final String mc1 = methodCall.substring(0, idx);
+					String mc2 = methodCall.substring(idx);
+					for (final String oldVar : newArgs.keySet()) {
+						mc2 = mc2.replace(oldVar, newArgs.get(oldVar));
+					}
+					// System.out.println("mc1:"+mc1+"  mc2:"+mc2);
+					methodCall = mc1 + mc2;
+					// Result variable
+					final IProgramVariable resultVar = mbs.getResultVariable();
+					if (resultVar != null) {
+						final Sort s = resultVar.sort();
+						methodCall = getSafeType(s) + " " + methodCall;
+						final String resType = s.name().toString();
+						if (!isPrimitiveType(resType)) {
+							methodCall = "/*@ nullable @*/ " + methodCall;
+						}
+					}
+					// System.out.println("Method call:"+methodCall);
+					return methodCall;
+				} else if (pe instanceof JavaProgramElement) {
+					final String res = findMUTInJavaPE((JavaProgramElement) pe);
+					if (res != null) {
+						return res;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	public String generateJUnitTestCase(Model m) {
+		fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
+		String mut = getMUT();// sets MUTName as side-effect
+		if (mut == null) {
+			mut = "<method under test> //Manually write a call to the method under test, because KeY could not determine it automatically.";
+		} else {
+			fileName += "_" + MUTName;
+		}
+		final StringBuffer testCase = new StringBuffer();
+		testCase.append(getFilePrefix(fileName) + "\n");
+		testCase.append(getMainMethod(fileName, 1) + "\n\n");
+		testCase.append(getTestMethodSignature(0) + "{\n");
+		testCase.append("   //Test preamble: creating objects and intializing test data"
+		        + generateTestCase(m) + "\n\n");
+		testCase.append("   //Calling the method under test\n   " + mut
+		        + "; \n");
+		testCase.append("}\n}");
+		logger.writeln("Writing test file to:" + directory + modDir
+		        + File.separator + fileName);
+		writeToFile(fileName + ".java", testCase);
+		exportCodeUnderTest();
+		createDummyClasses();
+		createOpenJMLShellScript();
+		TestCaseGenerator.fileCounter++;
+		return testCase.toString();
+	}
+
+	public String generateJUnitTestSuite(Collection<SMTSolver> problemSolvers) {
+		MUTName = "";
+		fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
+		String mut = getMUT(); // sets MUTName as side-effect
+		if (mut == null) {
+			mut = "<method under test> //Manually write a call to the method under test, because KeY could not determine it automatically.";
+		} else {
+			fileName += "_" + MUTName;
+		}
+		final StringBuffer testSuite = new StringBuffer();
+		testSuite.append(getFilePrefix(fileName) + "\n");
+		final StringBuffer testMethods = new StringBuffer();
+		int i = 0;
+		for (final SMTSolver solver : problemSolvers) {
+			try {
+				final StringBuffer testMethod = new StringBuffer();
+				final String originalNodeName = solver.getProblem().getGoal()
+				        .proof().name().toString();
+				boolean success = false;
+				if (solver.getQuery() != null) {
+					final Model m = solver.getQuery().getModel();
+					if (TestCaseGenerator.modelIsOK(m)) {
+						logger.writeln("Generate: " + originalNodeName);
+						testMethod.append("  //" + originalNodeName + "\n");
+						testMethod.append(getTestMethodSignature(i) + "{\n");
+						testMethod
+						        .append("   //Test preamble: creating objects and intializing test data"
+						                + generateTestCase(m) + "\n\n");
+						testMethod
+						        .append("   //Calling the method under test\n   "
+						                + mut + "; \n");
+						testMethod.append(" }\n\n");
+						i++;
+						success = true;
+						testMethods.append(testMethod);
+					}
+				}
+				if (!success) {
+					logger.writeln("A model (test data) was not generated for:"
+					        + originalNodeName);
+				}
+			} catch (final Exception ex) {
+				logger.writeln(ex.getMessage());
+				logger.writeln("A test case was not generated due to an exception. Continuing test generation...");
+			}
+		}
+		if (i == 0) {
+			logger.writeln("Warning: no test case was generated. Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
+		} else if (i < problemSolvers.size()) {
+			logger.writeln("Warning: SMT solver could not solve all test data constraints. Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
+		}
+		testSuite.append(getMainMethod(fileName, i) + "\n\n");
+		testSuite.append(testMethods);
+		testSuite.append("\n}");
+		writeToFile(fileName + ".java", testSuite);
+		logger.writeln("Writing test file to:" + directory + modDir
+		        + File.separator + fileName + ".java");
+		exportCodeUnderTest();
+		createDummyClasses();
+		createOpenJMLShellScript();
+		TestCaseGenerator.fileCounter++;
+		return testSuite.toString();
+	}
+
+	public String generateTestCase(Model m) {
+		final List<Assignment> assignments = new LinkedList<Assignment>();
+		Heap heap = null;
+		for (final Heap h : m.getHeaps()) {
+			if (h.getName().equals("heap")) {
+				heap = h;
+				break;
+			}
+		}
+		if (heap != null) {
+			// create objects
+			for (final ObjectVal o : heap.getObjects()) {
+				if (o.getName().equals("#o0")) {
+					continue;
+				}
+				final String type = getSafeType(o.getSort());
+				String right;
+				if (type.endsWith("[]")) {
+					right = "new " + type.substring(0, type.length() - 2) + "["
+					        + o.getLength() + "]";
+				} else {
+					right = "new " + type + "()";
+				}
+				assignments.add(new Assignment(type, o.getName().replace("#",
+				        "_"), right));
+			}
+		}
+		// init constants
+		for (final String c : m.getConstants().keySet()) {
+			String val = m.getConstants().get(c);
+			if (filterVal(val) && !c.equals("null")) {
+				String type = "int";
+				if (val.equals("true") || val.equals("false")) {
+					type = "boolean";
+				} else if (val.startsWith("#o")) {
+					final ObjectVal o = getObject(heap, val);
+					if (o != null) {
+						if (val.equals("#o0")
+						        && m.getTypes().getOriginalConstantType(c) != null) {
+							type = m.getTypes().getOriginalConstantType(c)
+							        .name().toString();
+						} else {
+							type = o.getSort().name().toString();
+						}
+					} else {
+						type = "Object";
+					}
+					type = "/*@ nullable */ " + type;
+				}
+				val = translateValueExpression(val);
+				assignments.add(new Assignment(type, c, val));
+			}
+		}
+		// init fields
+		if (heap != null) {
+			for (final ObjectVal o : heap.getObjects()) {
+				if (o.getName().equals("#o0")) {
+					continue;
+				}
+				final String name = o.getName().replace("#", "_");
+				for (final String f : o.getFieldvalues().keySet()) {
+					if (f.contains("<") || f.contains(">")) {
+						continue;
+					}
+					String fieldName = f.substring(f.lastIndexOf(":") + 1);
+					fieldName = fieldName.replace("|", "");
+					String val = o.getFieldvalues().get(f);
+					val = translateValueExpression(val);
+					assignments
+					        .add(new Assignment(name + "." + fieldName, val));
+				}
+				if (o.getSort() != null
+				        && o.getSort().name().toString().endsWith("[]")) {
+					for (int i = 0; i < o.getLength(); i++) {
+						final String fieldName = "[" + i + "]";
+						String val = o.getArrayValue(i);
+						val = translateValueExpression(val);
+						assignments.add(new Assignment(name + fieldName, val));
+					}
+				}
+			}
+		}
+		final StringBuffer result = new StringBuffer();
+		for (final Assignment a : assignments) {
+			result.append(a.toString());
+		}
+		return result.toString();
+	}
+
+	private String getDummyClassNameFor(Sort sort) {
+		final JavaInfo jinfo = services.getJavaInfo();
+		final KeYJavaType kjt = jinfo.getKeYJavaType(sort);
+		return kjt.getName() + DummyPostfix;
+	}
+
+	private String getFilePrefix(String className) {
+		String res = "//This is a test driver generated by KeY 2.2. \n"
+		        + "//Possible use cases: \n"
+		        + "//  1. Compile and execute the main method with a JML runtime checker to test the method under test.\n"
+		        + "//  2. Use a debuger to follow the execution of the method under test.\n\n\n";
+		if (junitFormat) {
+			res += "import junit.framework.*;\n" + " public class " + className
+			        + " extends junit.framework.TestCase {\n\n" + " public "
+			        + className + "(){}\n"
+			        + " public static junit.framework.TestSuite suite () {\n"
+			        + "   junit.framework.TestSuite suiteVar;\n"
+			        + "   suiteVar=new junit.framework.TestSuite (" + className
+			        + ".class);\n" + "   return  suiteVar;\n" + " }\n";
+		} else {
+			res += "public class " + className + "{ \n\n" + " public "
+			        + className + "(){}\n";
+		}
+		return res;
+	}
+
+	private StringBuffer getMainMethod(String className, int i) {
+		final StringBuffer res = new StringBuffer();
+		res.append(" public static void  main (java.lang.String[]  arg) {\n"
+		        + "   " + className + " testSuiteObject;\n"
+		        + "   testSuiteObject=new " + className + " ();\n\n");
+		for (int j = 0; j < i; j++) {
+			res.append("   testSuiteObject.testcode" + j + "();\n");
+		}
+		if (i == 0) {
+			res.append("   //Warning:no test methods were generated.\n");
+		}
+		res.append(" }");
+		return res;
+	}
+
+	public String getMUT() {
+		// System.out.println("Selected proof name:"+proof.name());
+		final Node root = proof.root();
+		final Sequent seq = root.sequent();
+		final Semisequent succ = seq.succedent();
+		final Iterator<SequentFormula> it = succ.iterator();
+		String res = null;
+		while (it.hasNext()) {
+			final SequentFormula sf = it.next();
+			final Term form = sf.formula();
+			res = findMUTInFormula(form);
+			if (res != null) {
+				break;
+			}
+		}
+		return res;
+	}
+
+	private ObjectVal getObject(Heap h, String name) {
+		if (h == null) {
+			return null;
+		}
+		for (final ObjectVal o : h.getObjects()) {
+			if (o.getName().equals(name)) {
+				return o;
+			}
+		}
+		return null;
+	}
+
+	public String getSafeType(Sort sort) {
+		if (sort == null) {
+			return "java.lang.Object"; // TODO:Hopefully this is correct
+		} else if (sort.isAbstract()) {
+			return buildDummyClassForAbstractSort(sort);
+		} else {
+			return sort.name().toString();
+		}
+	}
+
+	private String getTestMethodSignature(int i) {
+		final String sig = " public void  testcode" + i + "()";
+		if (junitFormat) {
+			return "@Test\n" + sig;
+		} else {
+			return sig;
+		}
+	}
+
+	protected boolean isNumericType(String type) {
+		return type.equals("byte") || type.equals("short")
+		        || type.equals("int") || type.equals("long")
+		        || type.equals("float") || type.equals("double");
+	}
+
+	protected boolean isPrimitiveType(String type) {
+		return isNumericType(type) || type.equals("boolean")
+		        || type.equals("char");
+	}
+
+	public void setJUnit(boolean junit) {
+		junitFormat = junit;
+	}
+
+	public void setLogger(TGInfoDialog logger) {
+		this.logger = logger;
+	}
+
+	protected String translateValueExpression(String val) {
+		if (val.contains("/")) {
+			val = val.substring(0, val.indexOf("/"));
+		}
+		if (val.equals("#o0")) {
+			return "null";
+		}
+		val = val.replace("|", "");
+		val = val.replace("#", "_");
+		return val;
+	}
+
+	public void writeToFile(String file, StringBuffer sb) {
+		try {
+			final File dir = new File(directory + modDir);
+			if (!dir.exists()) {
+				dir.mkdirs();
+			}
+			final File pcFile = new File(dir, file);
+			final FileWriter fw = new FileWriter(pcFile);
+			final BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(sb.toString());
+			bw.close();
+			// create a temporary file
+			// File logFile=new File("TestGeneric"+fileCounter+".java");
+			// BufferedWriter writer = new BufferedWriter(new
+			// FileWriter(logFile));
+			// writer.write (sb.toString());
+			// Close writer
+			// writer.close();
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
