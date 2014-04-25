@@ -36,6 +36,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SMTSolver;
+import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.model.Heap;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
@@ -107,7 +108,7 @@ public class TestCaseGenerator {
 		return null;
 	}
 	
-	boolean modelIsOK(Model m){
+	public static boolean modelIsOK(Model m){
 		return m!=null && !m.isEmpty() && m.getHeaps()!=null && m.getHeaps().size()>0 && m.getTypes()!=null;
 	}
 
@@ -128,24 +129,36 @@ public class TestCaseGenerator {
 		for(SMTSolver solver : problemSolvers){
 			try{
 				StringBuffer testMethod = new StringBuffer();
+				String originalNodeName = solver.getProblem().getGoal().proof().name().toString();
+				boolean success = false;
 				if(solver.getQuery()!=null){
 					Model m = solver.getQuery().getModel();
-					String originalNodeName = solver.getProblem().getGoal().proof().name().toString();
 					if(modelIsOK(m)){
-						logger.writeln("Generate test Case: "+originalNodeName);
+						logger.writeln("Generate: "+originalNodeName);
 						testMethod.append("  //"+originalNodeName+"\n");
 						testMethod.append(getTestMethodSignature(i)+"{\n");
 						testMethod.append("   //Test preamble: creating objects and intializing test data"+generateTestCase(m)+"\n\n");
 						testMethod.append("   //Calling the method under test\n   "+mut+"; \n");
 						testMethod.append(" }\n\n");
 						i++;
+						success=true;
 						testMethods.append(testMethod);
 					}
+				}
+				if(!success){
+					
+					logger.writeln("A model (test data) was not generated for:"+originalNodeName);
 				}
 			}catch(Exception ex){
 				logger.writeln(ex.getMessage());
 				logger.writeln("A test case was not generated due to an exception. Continuing test generation...");
 			}
+		}
+		
+		if(i==0){
+			logger.writeln("Warning: no test case was generated. Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
+		}else if (i<problemSolvers.size()){
+			logger.writeln("Warning: SMT solver could not solve all test data constraints. Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
 		}
 
 		testSuite.append(getMainMethod(fileName, i)+"\n\n");
@@ -155,7 +168,7 @@ public class TestCaseGenerator {
 		testSuite.append("\n}");
 
 		writeToFile(fileName + ".java", testSuite);
-		logger.writeln("Writing test file to:"+directory+modDir+File.separator+fileName);
+		logger.writeln("Writing test file to:"+directory+modDir+File.separator+fileName+".java");
 
 		exportCodeUnderTest();
 
