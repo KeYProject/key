@@ -75,6 +75,10 @@ public class TestCaseGenerator {
 		sortDummyClass = new HashMap<Sort,StringBuffer>();
 		MUTName = "";
 	}
+	
+	public void setJUnit(boolean junit){
+		this.junitFormat = junit;
+	}
 
 	private boolean filterVal(String s){
 		if(s.startsWith("#a")||s.startsWith("#s")||s.startsWith("#h")||s.startsWith("#l")||s.startsWith("#f")){
@@ -244,7 +248,13 @@ public class TestCaseGenerator {
 	}
 
 	private String getTestMethodSignature(int i){
-		return " public void  testcode"+i+"()";
+		String sig = " public void  testcode"+i+"()";
+		if(junitFormat){
+			return "@Test\n"+sig;
+		}
+		else{
+			return sig;
+		}		
 	}
 	private StringBuffer getMainMethod(String className, int i){
 		StringBuffer res = new StringBuffer();

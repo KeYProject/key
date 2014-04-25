@@ -3,11 +3,9 @@ package de.uka.ilkd.key.gui.smt;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Collection;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -23,18 +21,16 @@ import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
 
+@SuppressWarnings("serial")
 public class TGInfoDialog extends JDialog implements SolverLauncherListener{
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
 	private JTextArea textArea;
 	
 	private JButton stopButton;
 	
 	private JButton exitButton;
+	
+	private JButton startButton;
 	
 	
 	
@@ -104,6 +100,7 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener{
 		writeln("Finished solving SMT problems: "+problemSolvers.size());
 		TestCaseGenerator tg = new TestCaseGenerator();
 		tg.setLogger(this);
+		tg.setJUnit(TGOptionsDialog.isJunit());
 		tg.generateJUnitTestSuite(problemSolvers);
 		exitButton.setEnabled(true);
 		
@@ -112,7 +109,7 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener{
 	@Override
 	public void launcherStarted(Collection<SMTProblem> problems,
 			Collection<SolverType> solverTypes, SolverLauncher launcher) {
-		writeln("Test data generation: solving SMT problems (Z3 version 4.3.1 is required)... \n please wait...");
+		writeln("Test data generation: solving SMT problems... \n please wait...");
 		
 		
 	}

@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -21,6 +22,7 @@ import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.TGInfoDialog;
+import de.uka.ilkd.key.gui.smt.TGOptionsDialog;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -243,6 +245,9 @@ public class TestGenerationAction extends MainWindowAction {
     
     @Override
 	public void actionPerformed(ActionEvent e) {
+    	TGOptionsDialog options = new TGOptionsDialog();
+    	
+    	
 	    try{
 	    	TGWorker worker = new TGWorker();
 			worker.start();
@@ -258,7 +263,17 @@ public class TestGenerationAction extends MainWindowAction {
 		
 		private SolverLauncher launcher;
 		
+
+		
 		private Vector<Proof> proofs;
+		
+
+
+
+
+
+
+
 		/**
 		 * Removes all generated proofs.
 		 */
@@ -328,8 +343,29 @@ public class TestGenerationAction extends MainWindowAction {
 
 		@Override
 		public Object construct() {
+			
+			
+			if(!SolverType.Z3_CE_SOLVER.isInstalled(true)){
+				tgInfoDialog.writeln("Could not find the z3 SMT solver. Aborting.");
+				return null;
+			}
+			
+			if(!SolverType.Z3_CE_SOLVER.isSupportedVersion()){
+				tgInfoDialog.writeln("Warning: z3 supported versions are: "+Arrays.toString(SolverType.Z3_CE_SOLVER.getSupportedVersions()));
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			tgInfoDialog.writeln("Extracting test data constraints (path conditions).");
-			proofs = createProofsForTesting(getMediator(),true);
+			proofs = createProofsForTesting(getMediator(),TGOptionsDialog.removeDuplicates());
 			
 			if(stop){
 				
