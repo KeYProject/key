@@ -318,7 +318,7 @@ public class SolverLauncher implements SolverListener {
     private void launchSolvers(LinkedList<SMTSolver> solvers,
 	    Collection<SMTProblem> problems, Collection<SolverType> solverTypes)
     {
-
+    //Show progress dialog
 	notifyListenersOfStart(problems, solverTypes);
 
 	// Launch all solvers until the queue is empty or the launcher is
@@ -415,7 +415,8 @@ public class SolverLauncher implements SolverListener {
      */
     private void notifySolverHasFinished(SMTSolver solver) {
 	lock.lock();
-	try {
+	try {		
+		solver.setQuery(solver.getType().getQuery());		
 		session.removeCurrentlyRunning(solver);
 		wait.signal();
 	} finally {
@@ -437,6 +438,7 @@ public class SolverLauncher implements SolverListener {
 
     @Override
     public void processStopped(SMTSolver solver, SMTProblem problem) {
+    session.addProblemSolver(solver);
 	notifySolverHasFinished(solver);
     }
 

@@ -161,5 +161,10 @@ public interface SMTSolver {
      * Returns the exceptions that has been thrown while translating taclets into assumptions. 
      */
     public Collection<Throwable> getExceptionsOfTacletTranslation();
+    
+    public void setQuery(ModelExtractor m);
+    
+    public ModelExtractor getQuery();
+    
 
 }
