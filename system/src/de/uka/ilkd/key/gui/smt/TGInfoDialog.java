@@ -110,6 +110,12 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener{
 		problemSolvers = filterSolverResultsAndShowSolverStatistics(problemSolvers);
 		if(problemSolvers.size()>0){
 			tg.generateJUnitTestSuite(problemSolvers);
+			if(TGOptionsDialog.isJunit()){
+				writeln("Test oracle not yet implemented for JUnit.");
+			}
+			else{
+				writeln("Compile and run the file with openjml!");
+			}
 		}else{
 			writeln("No test data was generated.");
 		}

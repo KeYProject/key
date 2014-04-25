@@ -246,8 +246,7 @@ public class TestGenerationAction extends MainWindowAction {
     
     @Override
 	public void actionPerformed(ActionEvent e) {
-    	TGOptionsDialog options = new TGOptionsDialog();
-    	
+    	new TGOptionsDialog();    	
     	
 	    try{
 	    	TGWorker worker = new TGWorker();
