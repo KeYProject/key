@@ -11,11 +11,12 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
+import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.LineBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
- * Tests for {@link LineBreakpointStopCondition}. Tests if execution stops at {@link JavaLineBreakpoint} correctly.
+ * Tests for {@link LineBreakpoint}. Tests if execution stops at {@link JavaLineBreakpoint} correctly.
  * 
  * @author Marco Drebing
  */
@@ -43,11 +44,12 @@ public class TestLineBreakpointStopConditionSimpleWithHitCount extends AbstractS
          IProgramMethod calleeMain = searchProgramMethod(env.getServices(), "BreakpointStopCallee", "main");
          IProgramMethod callerLoop = searchProgramMethod(env.getServices(), "BreakpointStopCallerAndLoop", "loop");
          CompoundStopCondition allBreakpoints = new CompoundStopCondition();
-         LineBreakpointStopCondition firstBreakpoint = new LineBreakpointStopCondition(callerMain.getPositionInfo().getFileName(), 16, -1, callerMain, env.getBuilder().getProof(),null, true, false, 15, 21);
-         LineBreakpointStopCondition secondBreakpoint = new LineBreakpointStopCondition(callerLoop.getPositionInfo().getFileName(), 10, 2, callerLoop, env.getBuilder().getProof(),null, true, false, 8, 13);
-         LineBreakpointStopCondition thirdBreakpoint = new LineBreakpointStopCondition(calleeMain.getPositionInfo().getFileName(), 7, -1, calleeMain, env.getBuilder().getProof(),null, true, false, 6, 9);
-         allBreakpoints.addChildren(firstBreakpoint,secondBreakpoint,thirdBreakpoint);
-         env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(allBreakpoints));
+         LineBreakpoint firstBreakpoint = new LineBreakpoint(callerMain.getPositionInfo().getFileName(), 16, -1, callerMain, env.getBuilder().getProof(),null, true, false, 15, 21);
+         LineBreakpoint secondBreakpoint = new LineBreakpoint(callerLoop.getPositionInfo().getFileName(), 10, 2, callerLoop, env.getBuilder().getProof(),null, true, false, 8, 13);
+         LineBreakpoint thirdBreakpoint = new LineBreakpoint(calleeMain.getPositionInfo().getFileName(), 7, -1, calleeMain, env.getBuilder().getProof(),null, true, false, 6, 9);
+         SymbolicExecutionBreakpointStopCondition bc = new SymbolicExecutionBreakpointStopCondition(firstBreakpoint, secondBreakpoint, thirdBreakpoint);
+         allBreakpoints.addChildren(bc);
+         env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(bc));
          // Do steps
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);

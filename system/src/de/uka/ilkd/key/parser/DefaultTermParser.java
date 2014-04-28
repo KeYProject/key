@@ -83,8 +83,8 @@ public final class DefaultTermParser {
             KeYParserF parser
                 = new KeYParserF(ParserMode.TERM, new KeYLexerF(
 		                in,
-		                services.getExceptionHandler()), 
 		                "",
+		                services.getExceptionHandler()),
 				new Recoder2KeY (services, nss),
                                 services, 
                                 nss, 
