@@ -388,7 +388,8 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
 			case WAIT_FOR_MODEL:
 				if(message.equals("endmodel")){
-					if(query !=null && query.getState()==ModelExtractor.DEFAULT){						 
+					if(query !=null && query.getState()==ModelExtractor.DEFAULT){
+						query.getModel().setEmpty(false);
 						//System.out.println("Starting query");						 
 						query.start(pipe);
 						sc.setState(WAIT_FOR_QUERY);

@@ -1540,10 +1540,16 @@ public class ModelExtractor implements PipeListener<SolverCommunication>{
 	public void start(Pipe<SolverCommunication> pipe){
 		//pipe.addListener(this);
 		generateTypeQueries();
-		currentQuery = 0;
-		Query q = queries.get(currentQuery);
-		state = TYPES;
-		pipe.sendMessage(q.getQuery());		
+		if(queries.size()>0){
+			currentQuery = 0;
+			Query q = queries.get(currentQuery);
+			state = TYPES;
+			pipe.sendMessage(q.getQuery());	
+		}
+		else{
+			finishTypesQueries(pipe);
+		}
+			
 
 	}
 

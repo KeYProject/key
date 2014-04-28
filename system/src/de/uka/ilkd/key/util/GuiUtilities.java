@@ -71,8 +71,9 @@ public final class GuiUtilities {
             try{
                SwingUtilities.invokeAndWait(runner);
             } catch(InterruptedException e) {
-                System.err.println(e);
-                e.printStackTrace();
+            	Debug.out(e);
+//                System.err.println(e);
+//                e.printStackTrace();
             } catch(InvocationTargetException ite) {
                Throwable targetExc = ite.getTargetException();
                System.err.println(targetExc);

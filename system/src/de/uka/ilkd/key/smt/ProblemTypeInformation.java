@@ -22,6 +22,7 @@ public class ProblemTypeInformation {
 
 	Map<String,SMTSort> fieldTypes;
 	Map<String,SMTSort> constantsTypes;
+	Map<String,Sort> originalConstantType;
 
 	Set<Sort> javaSorts;
 
@@ -36,6 +37,15 @@ public class ProblemTypeInformation {
 		fieldTypes = new HashMap<String, SMTSort>();
 		constantsTypes = new HashMap<String, SMTSort>();
 		javaSorts = new HashSet<Sort>();
+		originalConstantType = new HashMap<String,Sort>();
+	}
+	
+	public void putOriginalConstantType(String c,Sort s){
+		originalConstantType.put(c, s);
+	}
+	
+	public Sort getOriginalConstantType(String c){
+		return originalConstantType.get(c);
 	}
 
 	/**
