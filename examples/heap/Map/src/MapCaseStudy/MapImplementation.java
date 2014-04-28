@@ -107,7 +107,7 @@ final class MapImplementation extends AbstractMap {
     Object putInDomain(int index, Object value) {
         Object result = entries[index].value;
         entries[index].value = value;
-        //@ set map = \dl_mapUpdate(map, entries[index].key, value);
+        //@ set map = \map_update(map, entries[index].key, value);
         return result;
     }
 
@@ -115,7 +115,7 @@ final class MapImplementation extends AbstractMap {
         MapEntry[] newEntries = putExtendArray(key, value);
         entries = newEntries;
         //@ set footprint = \set_union(\dl_allElementsOfArray(entries, \all_fields(entries[0])), \set_union(\all_fields(this), \all_fields(entries)));
-        //@ set map = \dl_mapUpdate(map, key, value);
+        //@ set map = \map_update(map, key, value);
         return null;
     }
     
@@ -150,7 +150,7 @@ final class MapImplementation extends AbstractMap {
     }    
     
     public void removeSetEnries(MapEntry[] newEntries, int index){
-        //@ set map = \dl_mapRemove(map, entries[index].key);
+        //@ set map = \map_remove(map, entries[index].key);
         entries = newEntries;
         //@ set footprint = \set_union(\dl_allElementsOfArray(entries, \all_fields(entries[0])), \set_union(\all_fields(this), \all_fields(entries)));
     }

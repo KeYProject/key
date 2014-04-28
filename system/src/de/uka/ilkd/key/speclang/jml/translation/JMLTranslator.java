@@ -70,7 +70,7 @@ import java.util.TreeMap;
  * Translates JML expressions to FOL.
  */
 
-final class JMLTranslator {
+public final class JMLTranslator {
 
     private final TermBuilder tb; 
     private final String fileName;
