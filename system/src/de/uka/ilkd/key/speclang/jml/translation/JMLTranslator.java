@@ -1343,80 +1343,9 @@ final class JMLTranslator {
 
                 // strip leading "\dl_"
                 String functName = escape.getText().substring(4);
-                Namespace funcs = services.getNamespaces().functions();
-                Named symbol = funcs.lookup(new Name(functName));
-
-                if (symbol != null) {
-                    // Function or predicate symbol found
-
-                    assert symbol instanceof Function : "Expecting a function symbol in this namespace";
-                    Function function = (Function) symbol;
-
-                    Term[] args;
-                    if (list == null) {
-                        // empty parameter list
-                        args = new Term[0];
-                    } else {
-
-                        Term heap = tb.getBaseHeap();
-
-                        // special casing "implicit heap" arguments:
-                        // omitting one argument means first argument is "heap"
-                        int i = 0;
-                        if (function.arity() == list.size() + 1
-                                && function.argSort(0) == heap.sort()) {
-                            args = new Term[list.size() + 1];
-                            args[i++] = heap;
-                        } else {
-                            args = new Term[list.size()];
-                        }
-
-                        for (SLExpression expr : list) {
-                            if (!expr.isTerm()) {
-                                throw new SLTranslationException("Expecting a term here, not: "
-                                                                 + expr);
-                            }
-                            args[i++] = expr.getTerm();
-                        }
-                    }
-
-                    try {
-                        Term resultTerm = tb.func(function, args, null);
-                        final KeYJavaType type =
-                                services.getTypeConverter().getIntegerLDT().targetSort() == resultTerm.sort() ?
-                                        services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT) :
-                                services.getJavaInfo().getKeYJavaType(resultTerm.sort());
-                        SLExpression result = type==null? new SLExpression(resultTerm) : new SLExpression(resultTerm,type);
-                        return result;
-                    } catch (TermCreationException ex) {
-                        throw excManager.createException("Cannot create term " + function.name() +
-                                "(" + MiscTools.join(args, ", ") + ")", escape, ex);
-                    }
-
+                
+                return translateToJDLTerm(escape, functName, services, tb, list, excManager);
                 }
-
-                assert symbol == null;  // no function symbol found
-
-                Namespace progVars = services.getNamespaces().programVariables();
-                symbol = progVars.lookup(new Name(functName));
-
-                if (symbol == null) {
-                    throw excManager.createException("Unknown escaped symbol "
-                                                     + functName, escape);
-                }
-
-                assert symbol instanceof ProgramVariable : "Expecting a program variable";
-                ProgramVariable pv = (ProgramVariable) symbol;
-                try {
-                    Term resultTerm = tb.var(pv);
-                    SLExpression result = new SLExpression(resultTerm);
-                    return result;
-                } catch (TermCreationException ex) {
-                    throw excManager.createException("Cannot create term "
-                                                     + pv.name(), escape, ex);
-                }
-
-            }
         });
 
 
