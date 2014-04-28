@@ -130,8 +130,8 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
       <feature id="org.key_project.key4eclipse.bugfix_mac_os" version="1.0.0.qualifier"/>
       <feature id="org.key_project.sed.feature" version="1.0.0.qualifier"/>
       <feature id="org.key_project.keyide.feature" version="1.0.0.qualifier"/>
-      <feature id="org.eclipse.gef" version="3.9.0.201212170307"/>
-      <feature id="org.eclipse.emf" version="2.8.3.v20130125-0826"/>
+      <feature id="org.eclipse.gef"/>
+      <feature id="org.eclipse.emf"/>
    </features>
 
 
