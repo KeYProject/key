@@ -91,7 +91,7 @@ final class JMLTranslator {
      */
     public static final Map<String,String> jml2jdl;
     static{
-        Map<String,String> tmp = new TreeMap();
+        Map<String,String> tmp = new TreeMap<String,String>();
         tmp.put("\\map_empty", "mapEmpty");
         tmp.put("\\map_get", "mapGet");
         tmp.put("\\map_update", "mapUpdate");
@@ -217,6 +217,7 @@ final class JMLTranslator {
 
                     private static final long serialVersionUID = 1L;
 
+                    @Override
                     public JMLTranslationMethod get(Object key) {
                         JMLTranslationMethod m = super.get(key);
                         if (m != null) {
@@ -2313,6 +2314,9 @@ final class JMLTranslator {
         protected abstract SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression left, SLExpression right) throws SLTranslationException;
     }
     
+    /*
+     Translate a function name together with a list of arguments to a JDL term.
+     */
     private static SLExpression translateToJDLTerm(Token escape,
             final String functName,
             Services services,
