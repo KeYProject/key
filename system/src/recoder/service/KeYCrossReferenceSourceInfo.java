@@ -39,10 +39,6 @@ import recoder.java.reference.UncollatedReferenceQualifier;
 import recoder.java.reference.VariableReference;
 import recoder.java.statement.Case;
 import recoder.list.generic.ASTList;
-import recoder.service.ChangeHistory;
-import recoder.service.DefaultCrossReferenceSourceInfo;
-import recoder.service.NameInfo;
-import recoder.service.UnresolvedReferenceException;
 import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationBuilder;
 import de.uka.ilkd.key.java.recoderext.adt.*;
 import de.uka.ilkd.key.java.recoderext.*;
@@ -612,7 +608,7 @@ public class KeYCrossReferenceSourceInfo
                   || expr instanceof SeqSub
                   || expr instanceof SeqReverse) {
         return name2primitiveType.get("\\seq");
-	} else if(expr instanceof DLEmbeddedExpression) {
+	} else if(expr instanceof EscapeExpression) {
 	    // w/o further resolution, a type cannot be determined.
 	    // but this does not fail.
 	    return getNameInfo().getUnknownType();

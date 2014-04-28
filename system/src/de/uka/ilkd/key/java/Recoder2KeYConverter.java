@@ -637,7 +637,6 @@ public class Recoder2KeYConverter {
      *         there has been an exception
      */
     public ProgramElement convert(recoder.java.JavaProgramElement pe) {
-        ProgramElement result = null;
         ExtList parameter;
 
         if (pe instanceof recoder.java.JavaNonTerminalProgramElement) {
@@ -651,8 +650,7 @@ public class Recoder2KeYConverter {
         final Class<? extends recoder.java.JavaProgramElement> class_ = pe.getClass();
 
         try {
-            result = (ProgramElement) getKeYClassConstructor(class_).newInstance(parameter);
-            return result;
+            return (ProgramElement) getKeYClassConstructor(class_).newInstance(parameter);
         } catch (Exception e) {
             final String className = class_.toString().substring(6);
             final StringBuffer sb = new StringBuffer(className);
@@ -892,7 +890,7 @@ public class Recoder2KeYConverter {
      * Resolve the function symbol which is embedded here to its logical
      * counterpart.
      */
-    public DLEmbeddedExpression convert(de.uka.ilkd.key.java.recoderext.DLEmbeddedExpression e) {
+    public DLEmbeddedExpression convert(de.uka.ilkd.key.java.recoderext.EscapeExpression e) {
         ExtList children = collectChildren(e);
         String name = e.getFunctionName();
         Named named = namespaceSet.functions().lookup(new Name(name));

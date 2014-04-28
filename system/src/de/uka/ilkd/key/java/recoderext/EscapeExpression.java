@@ -35,8 +35,7 @@ public abstract class EscapeExpression extends Operator {
         } else if (JMLTranslator.jml2jdl.containsKey(functionName)) {
             return new RegisteredEscapeExpression(functionName, arguments);
         }
-        assert false;
-        return null;
+        throw new Error("Unknown escaped symbol used in JML code: " + functionName);
     }
 
     /**
