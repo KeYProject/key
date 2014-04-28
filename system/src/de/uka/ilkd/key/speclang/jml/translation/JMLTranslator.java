@@ -81,10 +81,10 @@ public final class JMLTranslator {
     private EnumMap<JMLKeyWord, JMLTranslationMethod> translationMethods;
     
     /*
-     * New function symbols for JML can be registered here.
-     * The following files (and possibly additional ones)
-     * need to be adjusted as well for KeY
-     * to recognize the new symbols properly:
+     * Register new JML function symbols in this map. It maps JML function names
+     * to JDL function names. 
+     * The following files (and possibly additional ones) need adjustment
+     * as well for proper recognition of the symbols:
      * ProofJavaParser.jj, jmlparser.g, jmllexer.g
      * (Kai Wallisch 04/2014)
      * 
