@@ -1558,7 +1558,7 @@ public final class TestSedCoreUtil {
          if (!item.isExpanded()) {
             item.expand();
          }
-         SEDUIUtil.waitForPendingRequests(lazyContentProvider);
+         SEDUIUtil.waitForPendingRequests(viewer, lazyContentProvider);
       }
       return item;
    }
