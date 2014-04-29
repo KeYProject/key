@@ -75,7 +75,14 @@ public class ExecutionTreeImageProvider extends AbstractImageProvider {
        addImageFilePath(IExecutionTreeImageConstants.IMG_VISUALIZE_STATE, ROOT_FOLDER_FOR_IMG + "object_diagram.gif");
    }
    
-   public void addImageFilePathLater(String imageId, String imageFilePath) {
-      addImageFilePath(imageId, imageFilePath);
+   /**
+    * Registers the given image if no image with that ID exist.
+    * @param imageId The ID of the image.
+    * @param imageFilePath The path to the image.
+    */
+   public void addImageFilePathIfNotAvailable(String imageId, String imageFilePath) {
+      if (getImageFilePath(imageId) == null) {
+         addImageFilePath(imageId, imageFilePath);
+      }
    }
 }

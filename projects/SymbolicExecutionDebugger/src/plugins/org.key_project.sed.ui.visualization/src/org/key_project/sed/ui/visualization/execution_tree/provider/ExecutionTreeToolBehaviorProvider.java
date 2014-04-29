@@ -248,7 +248,7 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
             Bundle bundle = Platform.getBundle(configElement.getContributor().getName());
             URL url = bundle.getResource(configElement.getAttribute("icon"));
             if (url != null) {
-               ((ExecutionTreeImageProvider)imageProvider).addImageFilePathLater(imageKey, url.toString());
+               ((ExecutionTreeImageProvider)imageProvider).addImageFilePathIfNotAvailable(imageKey, url.toString());
             }
          }
       }
