@@ -305,17 +305,19 @@ public final class SEDUIUtil {
          throw new DebugException(LogUtil.getLogger().createErrorStatus(run.getException().getMessage(), run.getException()));
       }
       // Wait until all pending requests in content provider are done
-      waitForPendingRequests(lazyContentProvider);
+      waitForPendingRequests(treeViewer, lazyContentProvider);
    }
 
    /**
     * Blocks the current thread until the given {@link ILazyTreeContentProvider}
     * has no pending requests.
+    * @param treeViewer The {@link TreeViewer} to use.
     * @param lazyContentProvider The {@link ILazyTreeContentProvider} to wait for.
     * @throws DebugException Occurred Exception.
     */
-   public static void waitForPendingRequests(ILazyTreePathContentProvider lazyContentProvider) throws DebugException {
-      while (hasPendingRequests(lazyContentProvider)) {
+   public static void waitForPendingRequests(TreeViewer treeViewer, 
+                                             ILazyTreePathContentProvider lazyContentProvider) throws DebugException {
+      while (hasPendingRequests(treeViewer, lazyContentProvider)) {
          try {
             Thread.sleep(10);
          }
@@ -326,22 +328,36 @@ public final class SEDUIUtil {
 
    /**
     * Checks if the given {@link ILazyTreeContentProvider} has pending requests.
+    * @param treeViewer The {@link TreeViewer} to use.
     * @param lazyContentProvider The {@link ILazyTreeContentProvider} to check.
     * @return {@code true} has pending requests, {@code false} no pending requests.
     * @throws DebugException Occurred Exception.
     */
-   protected static boolean hasPendingRequests(ILazyTreePathContentProvider lazyContentProvider) throws DebugException {
-      try {
-         if (lazyContentProvider instanceof TreeModelContentProvider){
-            Boolean result = ObjectUtil.invoke(lazyContentProvider, "areRequestsPending");
-            return result != null && result.booleanValue();
+   protected static boolean hasPendingRequests(TreeViewer treeViewer, 
+                                               final ILazyTreePathContentProvider lazyContentProvider) throws DebugException {
+      if (lazyContentProvider instanceof TreeModelContentProvider){
+         IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+            @Override
+            public void run() {
+               try {
+                  synchronized (lazyContentProvider) {
+                     Boolean result = ObjectUtil.invoke(lazyContentProvider, "areRequestsPending"); // Run in viewer thread in which all requests are scheduled.
+                     setResult(result);
+                  }
+               }
+               catch (Exception e) {
+                  setException(e);
+               }
+            }
+         };
+         treeViewer.getControl().getDisplay().syncExec(run);
+         if (run.getException() != null) {
+            throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't check if content provider \"" + lazyContentProvider + "\" has pending requests.", run.getException()));
          }
-         else {
-            return false;
-         }
+         return run.getResult() != null && run.getResult().booleanValue();
       }
-      catch (Exception e) {
-         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't check if content provider \"" + lazyContentProvider + "\" has pending requests.", e));
+      else {
+         return false;
       }
    }
 }
