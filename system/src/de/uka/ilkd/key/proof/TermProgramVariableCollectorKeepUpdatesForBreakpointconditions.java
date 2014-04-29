@@ -12,21 +12,21 @@
 //
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.symbolic_execution.strategy.ConditionalBreakpointStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
+import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.AbstractConditionalBreakpoint;
+import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
 
 public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions extends TermProgramVariableCollector {
-   private CompoundStopCondition parentCondition;
+   private IBreakpointStopCondition breakpointStopCondition;
    
-   public TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(Services services, CompoundStopCondition parentCondition) {
+   public TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(Services services, IBreakpointStopCondition breakpointStopCondition) {
        super(services);
-       this.parentCondition=parentCondition;
+       this.breakpointStopCondition = breakpointStopCondition;
    }
    
    /**
@@ -41,11 +41,11 @@ public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions exte
    }
    
    private void addVarsToKeep() {
-      for(IStopCondition stopCondition : parentCondition.getChildren()){
-         if(stopCondition instanceof ConditionalBreakpointStopCondition){
-            ConditionalBreakpointStopCondition lineBreakpoint = (ConditionalBreakpointStopCondition) stopCondition;
-            if(lineBreakpoint.getToKeep()!=null){
-               for(SVSubstitute sub : lineBreakpoint.getToKeep()){
+      for(IBreakpoint breakpoint : breakpointStopCondition.getBreakpoints()){
+         if(breakpoint instanceof AbstractConditionalBreakpoint){
+            AbstractConditionalBreakpoint conditionalBreakpoint = (AbstractConditionalBreakpoint) breakpoint;
+            if(conditionalBreakpoint.getToKeep() != null){
+               for(SVSubstitute sub : conditionalBreakpoint.getToKeep()){
                   if(sub instanceof LocationVariable){
                      super.result().add((LocationVariable)sub);
                   }
@@ -54,5 +54,4 @@ public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions exte
          }
       }
    }
-
 }

@@ -53,14 +53,17 @@ public class EnvironmentCreator  {
                 return pi.prepare(keyFile).getProofEnv();
         }
 
-        public File createDummyKeYFile(String pathForDummyFile) throws IOException {
+        private File createDummyKeYFile(String pathForDummyFile) throws IOException {
                 File file = new File(pathForDummyFile + File.separator
                                 + "lemmataGenDummy.key");
-                file.deleteOnExit();
-                String s = "\\problem{true}";
-                FileWriter writer = new FileWriter(file);
-                writer.write(s);
-                writer.close();
+                // see bug #1426
+                // file.deleteOnExit();
+                if(!file.exists()) {
+                    String s = "\\problem{true}";
+                    FileWriter writer = new FileWriter(file);
+                    writer.write(s);
+                    writer.close();
+                }
                 return file;
         }
 }

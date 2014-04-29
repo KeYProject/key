@@ -20,6 +20,7 @@ import java.util.Map;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
+import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
@@ -65,7 +66,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
    /**
     * Maps a {@link Goal} to the number of executed symbolic execution tree nodes.
     */
-   private Map<Goal, Integer> executedNumberOfSetNodesPerGoal = new LinkedHashMap<Goal, Integer>();
+   private final Map<Goal, Integer> executedNumberOfSetNodesPerGoal = new LinkedHashMap<Goal, Integer>();
    
    /**
     * Stores for each {@link Node} which is a symbolic execution tree node the computed result
@@ -73,7 +74,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
     * sure that it is only computed once and that the number of executed set statements is
     * not increased multiple times for the same {@link Node}.
     */
-   private Map<Node, Boolean> goalAllowedResultPerSetNode = new LinkedHashMap<Node, Boolean>();
+   private final Map<Node, Boolean> goalAllowedResultPerSetNode = new LinkedHashMap<Node, Boolean>();
    
    /**
     * Constructor to stop after one executed symbolic execution tree node.
@@ -98,8 +99,8 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
                              long timeout, 
                              Proof proof, 
                              IGoalChooser goalChooser) {
-      getExecutedNumberOfSetNodesPerGoal().clear(); // Reset number of already detected symbolic execution tree nodes for all goals.
-      getGoalAllowedResultPerSetNode().clear(); // Remove no longer needed references.
+      executedNumberOfSetNodesPerGoal.clear(); // Reset number of already detected symbolic execution tree nodes for all goals.
+      goalAllowedResultPerSetNode.clear(); // Remove no longer needed references.
       return 0; // Return unknown because there is no relation between applied rules and executed symbolic execution tree nodes.
    }
 
@@ -120,23 +121,23 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
          RuleApp ruleApp = goal.getRuleAppManager().peekNext();
          if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {
             // Check if the result for the current node was already computed.
-            Boolean value = getGoalAllowedResultPerSetNode().get(node);
+            Boolean value = goalAllowedResultPerSetNode.get(node);
             if (value == null) {
                // Get the number of executed set nodes on the current goal
-               Integer executedNumberOfSetNodes = getExecutedNumberOfSetNodesPerGoal().get(goal);
+               Integer executedNumberOfSetNodes = executedNumberOfSetNodesPerGoal.get(goal);
                if (executedNumberOfSetNodes == null) {
                   executedNumberOfSetNodes = Integer.valueOf(0);
                }
                // Check if limit of set nodes of the current goal is exceeded
                if (executedNumberOfSetNodes.intValue() + 1 > maximalNumberOfSetNodesToExecutePerGoal) {
-                  getGoalAllowedResultPerSetNode().put(node, Boolean.FALSE);
+                  handleNodeLimitExceeded(maxApplications, timeout, proof, goalChooser, startTime, countApplied, goal, node, ruleApp, executedNumberOfSetNodes);
                   return false; // Limit of set nodes of this goal exceeded
                }
                else {
                   // Increase number of set nodes on this goal and allow rule application
                   executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
-                  getExecutedNumberOfSetNodesPerGoal().put(goal, executedNumberOfSetNodes);
-                  getGoalAllowedResultPerSetNode().put(node, Boolean.TRUE);
+                  executedNumberOfSetNodesPerGoal.put(goal, executedNumberOfSetNodes);
+                  handleNodeLimitNotExceeded(maxApplications, timeout, proof, goalChooser, startTime, countApplied, goal, node, ruleApp, executedNumberOfSetNodes);
                   return true;
                }
             }
@@ -152,6 +153,58 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
       else {
          return true; // Allowed, because ApplyStrategy will handle the null case
       }
+   }
+
+   /**
+    * Handles the state that the node limit is exceeded.
+    * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
+    * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
+    * @param proof The current {@link Proof}.
+    * @param goalChooser The current {@link IGoalChooser}.
+    * @param startTime The timestamp when the apply strategy has started, computed via {@link System#currentTimeMillis()}
+    * @param countApplied The number of already applied rules.
+    * @param goal The current {@link Goal} on which the next rule will be applied.
+    * @param node The {@link Node} of the current {@link Goal}.
+    * @param ruleApp The current {@link RuleApp}.
+    * @param executedNumberOfSetNodes The executed number of SET nodes.
+    */
+   protected void handleNodeLimitExceeded(int maxApplications, 
+                                          long timeout, 
+                                          Proof proof, 
+                                          IGoalChooser goalChooser, 
+                                          long startTime, 
+                                          int countApplied, 
+                                          Goal goal,
+                                          Node node,
+                                          RuleApp ruleApp,
+                                          Integer executedNumberOfSetNodes) {
+      goalAllowedResultPerSetNode.put(node, Boolean.FALSE);
+   }
+   
+   /**
+    * Handles the state that the node limit is not exceeded.
+    * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
+    * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
+    * @param proof The current {@link Proof}.
+    * @param goalChooser The current {@link IGoalChooser}.
+    * @param startTime The timestamp when the apply strategy has started, computed via {@link System#currentTimeMillis()}
+    * @param countApplied The number of already applied rules.
+    * @param goal The current {@link Goal} on which the next rule will be applied.
+    * @param node The {@link Node} of the current {@link Goal}.
+    * @param ruleApp The current {@link RuleApp}.
+    * @param executedNumberOfSetNodes The executed number of SET nodes.
+    */
+   protected void handleNodeLimitNotExceeded(int maxApplications, 
+                                             long timeout, 
+                                             Proof proof, 
+                                             IGoalChooser goalChooser, 
+                                             long startTime, 
+                                             int countApplied, 
+                                             Goal goal,
+                                             Node node,
+                                             RuleApp ruleApp,
+                                             Integer executedNumberOfSetNodes) {
+      goalAllowedResultPerSetNode.put(node, Boolean.TRUE);
    }
 
    /**
@@ -194,7 +247,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
          // Check if multiple branches where created.
          if (updatedNode.childrenCount() >= 2) {
             // If a number of executed set nodes is available for the goal it must be used for all other new created goals.
-            Integer executedValue = getExecutedNumberOfSetNodesPerGoal().get(goal);
+            Integer executedValue = executedNumberOfSetNodesPerGoal.get(goal);
             if (executedValue != null) {
                // Reuse number of set nodes for new created goals
                 Iterator<Node> childIter = updatedNode.childrenIterator();
@@ -204,7 +257,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
                   // Check if the current goal is a new one
                   if (nextGoal != goal) {
                      // New goal found, use the number of set nodes for it.
-                     getExecutedNumberOfSetNodesPerGoal().put(nextGoal, executedValue);
+                     executedNumberOfSetNodesPerGoal.put(nextGoal, executedValue);
                   }
                }
             }
@@ -248,7 +301,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
     * @return {@code true} at least one symbolic execution tree node was executed, {@code false} no symbolic execution tree node was executed.
     */
    public boolean wasSetNodeExecuted() {
-      return !getExecutedNumberOfSetNodesPerGoal().isEmpty();
+      return !executedNumberOfSetNodesPerGoal.isEmpty();
    }
    
    /**
@@ -256,24 +309,6 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
     * @return The number of executed symbolic execution tree nodes per {@link Goal}.
     */
    public Map<Goal, Integer> getExectuedSetNodesPerGoal() {
-      return getExecutedNumberOfSetNodesPerGoal();
-   }
-
-   public Map<Node, Boolean> getGoalAllowedResultPerSetNode() {
-      return goalAllowedResultPerSetNode;
-   }
-
-   public void setGoalAllowedResultPerSetNode(
-         Map<Node, Boolean> goalAllowedResultPerSetNode) {
-      this.goalAllowedResultPerSetNode = goalAllowedResultPerSetNode;
-   }
-
-   public Map<Goal, Integer> getExecutedNumberOfSetNodesPerGoal() {
       return executedNumberOfSetNodesPerGoal;
-   }
-
-   public void setExecutedNumberOfSetNodesPerGoal(
-         Map<Goal, Integer> executedNumberOfSetNodesPerGoal) {
-      this.executedNumberOfSetNodesPerGoal = executedNumberOfSetNodesPerGoal;
    }
 }

@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.keyide.ui.breakpoints;
 
 import java.util.HashMap;
@@ -17,8 +30,8 @@ import org.eclipse.jdt.internal.debug.core.breakpoints.JavaLineBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaMethodBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaWatchpoint;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.util.jdt.JDTUtil;
 
-import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
@@ -30,11 +43,13 @@ import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.proof.TermProgramVariableCollectorKeepUpdatesForBreakpointconditions;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.strategy.ExceptionBreakpointNonSymbolicStopCondition;
-import de.uka.ilkd.key.strategy.JavaWatchpointNonSymbolicStopCondition;
-import de.uka.ilkd.key.strategy.LineBreakpointNonSymbolicStopCondition;
-import de.uka.ilkd.key.strategy.MethodBreakpointNonSymbolicStopCondition;
+import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.BreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.ExceptionBreakpoint;
+import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.FieldWatchpoint;
+import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.LineBreakpoint;
+import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.MethodBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 @SuppressWarnings("restriction")
@@ -42,22 +57,21 @@ public class KeYBreakpointManager implements IBreakpointListener {
    /**
     * The {@link CompoundStopCondition} that holds all BreakpointsStopCOnditons for this {@link KeYDebugTarget}.
     */
-   private CompoundStopCondition breakpointStopConditions = new CompoundStopCondition();
+   private final BreakpointStopCondition breakpointStopCondition = new BreakpointStopCondition();
 
    /**
     * The Map of {@link JavaLineBreakpoint}s with their current HitCount as value.
     */
-   private Map<IBreakpoint, IStopCondition> breakpointMap;
+   private final Map<IBreakpoint, de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint> breakpointMap = new HashMap<IBreakpoint, de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint>();;
    
-   private KeYEnvironment<?> environment;
+   private final KeYEnvironment<?> environment;
    
-   private Proof proof;
+   private final Proof proof;
    
    /**
     * Creates a new {@link KeYBreakpointManager}
     */
    public KeYBreakpointManager(KeYEnvironment<?> environment, Proof proof){
-      breakpointMap = new HashMap<IBreakpoint, IStopCondition>();
       this.environment=environment;
       this.proof = proof;
       addBreakpoints();
@@ -84,7 +98,7 @@ public class KeYBreakpointManager implements IBreakpointListener {
     */
    public void methodBreakpointAdded(JavaMethodBreakpoint methodBreakpoint) throws CoreException, ProofInputException {
       IResource resource = methodBreakpoint.getMarker().getResource();
-      if (resource.getFileExtension() != null && resource.getFileExtension().equalsIgnoreCase("java")) {
+      if (JDTUtil.isJavaFile(resource)) {
          IMethod method = KeYUtil.getContainingMethodForMethodStart(methodBreakpoint.getCharStart(), resource);
          // Determine container type
          IType containerType = method.getDeclaringType();
@@ -95,13 +109,13 @@ public class KeYBreakpointManager implements IBreakpointListener {
             IProgramMethod pm = KeYUtil.getProgramMethod(method, proof.getJavaInfo());
             int start = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset());
             int end = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset() + method.getSourceRange().getLength());
-            MethodBreakpointNonSymbolicStopCondition stopCondition = new MethodBreakpointNonSymbolicStopCondition(
+            MethodBreakpoint stopCondition = new MethodBreakpoint(
                   methodBreakpoint.getMarker().getResource().getLocation().toOSString(),
                   methodBreakpoint.getLineNumber(),
                   methodBreakpoint.getHitCount(), pm, proof,
                         methodBreakpoint.getCondition(), methodBreakpoint.isEnabled(),
                         methodBreakpoint.isConditionEnabled(), start, end, methodBreakpoint.isEntry(), methodBreakpoint.isExit());
-            breakpointStopConditions.addChildren(stopCondition);
+            breakpointStopCondition.addBreakpoint(stopCondition);
             breakpointMap.put(methodBreakpoint, stopCondition);
          }
       }
@@ -117,16 +131,16 @@ public class KeYBreakpointManager implements IBreakpointListener {
     */
    public void javaWatchpointAdded(JavaWatchpoint javaWatchpoint) throws CoreException, ProofInputException {
       IResource resource = javaWatchpoint.getMarker().getResource();
-      if (resource.getFileExtension() != null && resource.getFileExtension().equalsIgnoreCase("java")) {
+      if (JDTUtil.isJavaFile(resource)) {
          JavaInfo javaInfo = environment.getServices().getJavaInfo();
          String containerTypeName = KeYUtil.getType(resource).getFullyQualifiedName();
          containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
          KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
          if(containerKJT!=null){
-            JavaWatchpointNonSymbolicStopCondition stopCondition = new JavaWatchpointNonSymbolicStopCondition(javaWatchpoint.isEnabled(),javaWatchpoint.getHitCount(),
+            FieldWatchpoint stopCondition = new FieldWatchpoint(javaWatchpoint.isEnabled(),javaWatchpoint.getHitCount(),
                   javaWatchpoint.getFieldName(), javaWatchpoint.isAccess(), javaWatchpoint.isModification(), containerKJT,
                   proof);
-      breakpointStopConditions.addChildren(stopCondition);
+      breakpointStopCondition.addBreakpoint(stopCondition);
       breakpointMap.put(javaWatchpoint, stopCondition);
          }
       }
@@ -141,10 +155,10 @@ public class KeYBreakpointManager implements IBreakpointListener {
     * @throws ProofInputException
     */
    public void exceptionBreakpointAdded(JavaExceptionBreakpoint exceptionBreakpoint) throws CoreException {
-      ExceptionBreakpointNonSymbolicStopCondition stopCondition = new ExceptionBreakpointNonSymbolicStopCondition(proof, exceptionBreakpoint.getTypeName(),
+      ExceptionBreakpoint stopCondition = new ExceptionBreakpoint(proof, exceptionBreakpoint.getTypeName(),
             exceptionBreakpoint.isCaught(), exceptionBreakpoint.isUncaught(), exceptionBreakpoint.isSuspendOnSubclasses(),
             exceptionBreakpoint.isEnabled(), exceptionBreakpoint.getHitCount());
-      breakpointStopConditions.addChildren(stopCondition);
+      breakpointStopCondition.addBreakpoint(stopCondition);
       breakpointMap.put(exceptionBreakpoint, stopCondition);
       
    }
@@ -159,7 +173,7 @@ public class KeYBreakpointManager implements IBreakpointListener {
     */
    public void lineBreakpointAdded(JavaLineBreakpoint lineBreakpoint) throws CoreException, ProofInputException {
       IResource resource = lineBreakpoint.getMarker().getResource();
-      if (resource.getFileExtension() != null && resource.getFileExtension().equalsIgnoreCase("java")) {
+      if (JDTUtil.isJavaFile(resource)) {
          IMethod method = KeYUtil.getContainingMethod(lineBreakpoint.getLineNumber(), resource);
          // Determine container type
          IType containerType = method.getDeclaringType();
@@ -170,13 +184,13 @@ public class KeYBreakpointManager implements IBreakpointListener {
             IProgramMethod pm = KeYUtil.getProgramMethod(method, proof.getJavaInfo());
             int start = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset());
             int end = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset() + method.getSourceRange().getLength());
-            LineBreakpointNonSymbolicStopCondition stopCondition = new LineBreakpointNonSymbolicStopCondition(
+            LineBreakpoint stopCondition = new LineBreakpoint(
                   resource.getLocation().toOSString(),
                   lineBreakpoint.getLineNumber(),
                   lineBreakpoint.getHitCount(), pm, proof,
                   lineBreakpoint.getCondition(), lineBreakpoint.isEnabled(),
                   lineBreakpoint.isConditionEnabled(), start, end);
-            breakpointStopConditions.addChildren(stopCondition);
+            breakpointStopCondition.addBreakpoint(stopCondition);
             breakpointMap.put(lineBreakpoint, stopCondition);
          }
       }
@@ -192,23 +206,23 @@ public class KeYBreakpointManager implements IBreakpointListener {
    public void breakpointRemovedInternal(IBreakpoint breakpoint, IMarkerDelta delta) {
       if(breakpoint instanceof JavaMethodBreakpoint){
          JavaMethodBreakpoint methodBreakpoint = (JavaMethodBreakpoint) breakpoint;
-         breakpointStopConditions.removeChild(breakpointMap.get(methodBreakpoint));
+         breakpointStopCondition.removeBreakpoint(breakpointMap.get(methodBreakpoint));
          breakpointMap.remove(methodBreakpoint);
       } else if(breakpoint instanceof JavaWatchpoint){
          JavaWatchpoint javaWatchpoint = (JavaWatchpoint) breakpoint;
-         breakpointStopConditions.removeChild(breakpointMap.get(javaWatchpoint));
+         breakpointStopCondition.removeBreakpoint(breakpointMap.get(javaWatchpoint));
          breakpointMap.remove(javaWatchpoint);
       } else if(breakpoint instanceof JavaClassPrepareBreakpoint){
          JavaClassPrepareBreakpoint javaClassPrepareBreakpoint = (JavaClassPrepareBreakpoint) breakpoint;
-         breakpointStopConditions.removeChild(breakpointMap.get(javaClassPrepareBreakpoint));
+         breakpointStopCondition.removeBreakpoint(breakpointMap.get(javaClassPrepareBreakpoint));
          breakpointMap.remove(javaClassPrepareBreakpoint);
       } else if(breakpoint instanceof JavaLineBreakpoint){
          JavaLineBreakpoint lineBreakpoint = (JavaLineBreakpoint) breakpoint;
-         breakpointStopConditions.removeChild(breakpointMap.get(lineBreakpoint));
+         breakpointStopCondition.removeBreakpoint(breakpointMap.get(lineBreakpoint));
          breakpointMap.remove(lineBreakpoint);
       } else if(breakpoint instanceof JavaExceptionBreakpoint){
          JavaExceptionBreakpoint exceptionBreakpoint = (JavaExceptionBreakpoint) breakpoint;
-         breakpointStopConditions.removeChild(breakpointMap.get(exceptionBreakpoint));
+         breakpointStopCondition.removeBreakpoint(breakpointMap.get(exceptionBreakpoint));
          breakpointMap.remove(exceptionBreakpoint);
       }
    }  
@@ -221,7 +235,7 @@ public class KeYBreakpointManager implements IBreakpointListener {
     * @throws ProofInputException
     */
    public void exceptionBreakpointChanged(JavaExceptionBreakpoint exceptionBreakpoint) throws CoreException {
-      ExceptionBreakpointNonSymbolicStopCondition stopCondition = (ExceptionBreakpointNonSymbolicStopCondition) breakpointMap.get(exceptionBreakpoint);
+      ExceptionBreakpoint stopCondition = (ExceptionBreakpoint) breakpointMap.get(exceptionBreakpoint);
       stopCondition.setEnabled(exceptionBreakpoint.isEnabled());
       stopCondition.setCaught(exceptionBreakpoint.isCaught());
       stopCondition.setUncaught(exceptionBreakpoint.isUncaught());
@@ -237,7 +251,7 @@ public class KeYBreakpointManager implements IBreakpointListener {
     * @throws ProofInputException
     */
    public void javaLineBreakpointChanged(JavaLineBreakpoint lineBreakpoint) throws CoreException, SLTranslationException {
-      LineBreakpointNonSymbolicStopCondition stopCondition = (LineBreakpointNonSymbolicStopCondition) breakpointMap.get(lineBreakpoint);
+      LineBreakpoint stopCondition = (LineBreakpoint) breakpointMap.get(lineBreakpoint);
       stopCondition.setHitCount(lineBreakpoint.getHitCount());
       stopCondition.setEnabled(lineBreakpoint.isEnabled());
       stopCondition.setConditionEnabled(lineBreakpoint.isConditionEnabled());
@@ -252,7 +266,7 @@ public class KeYBreakpointManager implements IBreakpointListener {
     * @throws ProofInputException
     */
    public void javaWatchpointChanged(JavaWatchpoint javaWatchpoint) throws CoreException {
-      JavaWatchpointNonSymbolicStopCondition stopCondition = (JavaWatchpointNonSymbolicStopCondition) breakpointMap.get(javaWatchpoint);
+      FieldWatchpoint stopCondition = (FieldWatchpoint) breakpointMap.get(javaWatchpoint);
       stopCondition.setHitCount(javaWatchpoint.getHitCount());
       stopCondition.setEnabled(javaWatchpoint.isEnabled());
       stopCondition.setAccess(javaWatchpoint.isAccess());
@@ -267,7 +281,7 @@ public class KeYBreakpointManager implements IBreakpointListener {
     * @throws ProofInputException
     */
    public void methodBreakpointChanged(JavaMethodBreakpoint methodBreakpoint) throws CoreException, SLTranslationException {
-      MethodBreakpointNonSymbolicStopCondition stopCondition = (MethodBreakpointNonSymbolicStopCondition) breakpointMap.get(methodBreakpoint);
+      MethodBreakpoint stopCondition = (MethodBreakpoint) breakpointMap.get(methodBreakpoint);
       stopCondition.setHitCount(methodBreakpoint.getHitCount());
       stopCondition.setEnabled(methodBreakpoint.isEnabled());
       stopCondition.setConditionEnabled(methodBreakpoint.isConditionEnabled());
@@ -279,23 +293,17 @@ public class KeYBreakpointManager implements IBreakpointListener {
    /**
     * @return the breakpointStopConditions
     */
-   public CompoundStopCondition getBreakpointStopConditions() {
-      return breakpointStopConditions;
+   public BreakpointStopCondition getBreakpointStopCondition() {
+      return breakpointStopCondition;
    }
    
    /**
     * @return the breakpointMap
     */
-   public Map<IBreakpoint, IStopCondition> getBreakpointMap() {
+   public Map<IBreakpoint, de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint> getBreakpointMap() {
       return breakpointMap;
    }
    
-   /**
-    * @param breakpointMap the breakpointMap to set
-    */
-   public void setBreakpointMap(Map<IBreakpoint, IStopCondition> breakpointMap) {
-      this.breakpointMap = breakpointMap;
-   }
    @Override
    public void breakpointAdded(IBreakpoint breakpoint) {
       try {
@@ -390,13 +398,11 @@ public class KeYBreakpointManager implements IBreakpointListener {
     * creates a new factory that should be used by others afterwards
     * @return 
     */
-   public static ITermProgramVariableCollectorFactory createNewFactory(final CompoundStopCondition breakpointParentStopCondition) {
+   public static ITermProgramVariableCollectorFactory createNewFactory(final IBreakpointStopCondition breakpointParentStopCondition) {
       ITermProgramVariableCollectorFactory programVariableCollectorFactory = new ITermProgramVariableCollectorFactory() {
          @Override
          public TermProgramVariableCollector create(Services services) {
-            TermProgramVariableCollectorKeepUpdatesForBreakpointconditions collector = new TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(services, breakpointParentStopCondition);
-            
-              return collector;
+            return new TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(services, breakpointParentStopCondition);
          }
       };
       return programVariableCollectorFactory;
