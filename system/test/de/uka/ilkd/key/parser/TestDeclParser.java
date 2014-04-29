@@ -53,9 +53,11 @@ public class TestDeclParser extends TestCase {
 	nss = serv.getNamespaces();
 	
 	String sorts = "\\sorts{boolean;int;LocSet;}";
-	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(sorts,null),
-			      "No file. Call of parser from logic/TestClashFreeSubst.java",
-			      serv, nss);
+	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION,
+		new KeYLexerF(sorts,
+			"No file. Call of parser from logic/TestClashFreeSubst.java",
+			null),
+		serv, nss);
 	try {
 	    basicSortsParser.parseSorts();
 	} catch(Exception e) {
@@ -67,9 +69,11 @@ public class TestDeclParser extends TestCase {
     }
 
     private KeYParserF stringParser(String s) {
-	return new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s,null),
-			      "No file. Call of parser from parser/TestDeclParser.java",
-			      serv, nss);
+	return new KeYParserF(ParserMode.DECLARATION,
+		new KeYLexerF(s,
+			"No file. Call of parser from parser/TestDeclParser.java",
+			null),
+		serv, nss);
     }
 
     public void parseDecls(String s) {

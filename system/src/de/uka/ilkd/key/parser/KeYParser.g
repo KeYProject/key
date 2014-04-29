@@ -133,6 +133,9 @@ options {
    private HashMap taclet2Builder;
    private AbbrevMap scm;
    private KeYExceptionHandler keh = null;
+   
+   
+   private String filename;
 
    // these variables are set if a file is read in step by
    // step. This used when reading in LDTs because of cyclic
@@ -187,14 +190,6 @@ options {
      * used we still require the caller to provide the parser mode explicitly, 
      * so that the code is readable.
      */
-    public KeYParser(ParserMode mode, TokenStream lexer) {
-	this(lexer);
-        this.lexer = lexer;
-	this.parserMode = mode;
-	if(isTacletParser()) {
-	    switchToSchemaMode();
-	}
-    }
 
    public KeYParser(ParserMode mode, TokenStream lexer, Services services) {
        this(mode, lexer);
@@ -203,16 +198,21 @@ options {
 
    /* Most general constructor, should only be used internally */
    private KeYParser(TokenStream lexer,
-		     String filename,
                      Services services,
 		     NamespaceSet nss,
 		     ParserMode mode) {
-        this(mode, lexer);
+        this(lexer);
+        this.lexer = lexer;
+        this.parserMode = mode;
  	this.services = services;
 	if(services != null)
           this.keh = services.getExceptionHandler();
 	this.nss = nss;
+    if (this.isTacletParser()) {
+        switchToSchemaMode();
+    } else {
         switchToNormalMode();
+    }
    }
 
    /**
@@ -221,28 +221,13 @@ options {
     */
    public KeYParser(ParserMode mode,
                     TokenStream lexer,
-                    String filename,
                     JavaReader jr,
                     Services services,
                     NamespaceSet nss,
                     AbbrevMap scm) {
-        this(lexer, filename, services, nss, mode);
+        this(lexer, services, nss, mode);
         this.javaReader = jr;
         this.scm = scm;
-   }
-
-   public KeYParser(ParserMode mode,
-                    TokenStream lexer,
-                    String filename,
-                    Services services,
-                    NamespaceSet nss) {
-        this(mode,
-             lexer,
-             filename,
-             new SchemaRecoder2KeY(services, nss),
-	     services,
-	     nss,
-	     new LinkedHashMap());
    }
 
 
@@ -257,13 +242,12 @@ options {
                      TokenStream lexer,
 		     Services services,
 		     NamespaceSet nss) {
-        this(lexer, null, services, nss, mode);
-        this.scm = new AbbrevMap();
-        this.javaReader = new Recoder2KeY(services,
-                new KeYCrossReferenceServiceConfiguration(
-                   services.getExceptionHandler()), 
-                services.getJavaInfo().rec2key(), new NamespaceSet(), 
-                services.getTypeConverter());
+        this(mode,
+             lexer,
+             new SchemaRecoder2KeY(services, nss),
+             services,
+             nss,
+             new LinkedHashMap());
     }
 
     /**
@@ -271,12 +255,11 @@ options {
      */  
     public KeYParser(ParserMode mode, 
                      TokenStream lexer,
-                     String filename, 
                      SchemaJavaReader jr, 
                      Services services,  
                      NamespaceSet nss, 
                      HashMap taclet2Builder) {
-        this(lexer, filename, services, nss, mode);
+        this(lexer, services, nss, mode);
         switchToSchemaMode();
         this.scm = new AbbrevMap();
         this.javaReader = jr;
@@ -289,12 +272,11 @@ options {
      */  
     public KeYParser(ParserMode mode, 
     		     TokenStream lexer, 
-                     String filename, 
                      ParserConfig schemaConfig,
                      ParserConfig normalConfig, 
                      HashMap taclet2Builder,
                      ImmutableSet<Taclet> taclets) { 
-        this(lexer, filename, null, null, mode);
+        this(lexer, null, null, mode);
         if (lexer instanceof DeclPicker) {
             this.capturer = (DeclPicker) lexer;
         }
@@ -312,8 +294,8 @@ options {
         }
     }
 
-    public KeYParser(ParserMode mode, TokenStream lexer, String filename) { 
-        this(lexer, filename, null, null, mode);
+    public KeYParser(ParserMode mode, TokenStream lexer) {
+        this(lexer, null, null, mode);
         if (lexer instanceof DeclPicker) {
             this.capturer = (DeclPicker) lexer;
         }
@@ -332,10 +314,11 @@ options {
      */
     public static Taclet parseTaclet(String s, Services services) {
    	try {
-	    KeYParser p =
-                new KeYParser(ParserMode.TACLET,
-                              new CommonTokenStream(new KeYLexer(new StringReader(s),null)),
-                              "No file. KeYParser.parseTaclet(\n" + s + ")\n",
+	    KeYParserF p =
+                new KeYParserF(ParserMode.TACLET,
+                              new KeYLexerF(s,
+                                      "No file. KeYParser.parseTaclet(\n" + s + ")\n",
+                                      null),
                               services,
                               services.getNamespaces());
 	    return p.taclet(DefaultImmutableSet.<Choice>nil());
@@ -354,6 +337,13 @@ options {
        input.consume();
        ttype = input.LA(1);
      }
+    }
+    
+    public String getSourceName() {
+    	if (super.getSourceName() == null) {
+    		return filename;
+    	}
+    	return super.getSourceName();
     }
 
     public String getChooseContract() {
