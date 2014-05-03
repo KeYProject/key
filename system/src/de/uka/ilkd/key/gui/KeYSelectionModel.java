@@ -193,8 +193,8 @@ public class KeYSelectionModel {
     }
 
 
-    /** selectes the first goal in the goal list of proof if available
-     * if not it selectes a leaf of the proof tree
+    /** selects the first goal in the goal list of proof if available
+     * if not it selects a leaf of the proof tree
      */
     public void defaultSelection() {
 	Goal           g       = null;
@@ -272,7 +272,7 @@ public class KeYSelectionModel {
     }
 
     /**
-     * retrievs the first open goal below the given node, i.e. the goal
+     * retrieves the first open goal below the given node, i.e. the goal
      * containing the first leaf of the subtree starting at
      *  <code>n</code> which is not already closed
      *

@@ -19,6 +19,8 @@ import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.KeYMediator;
 import static de.uka.ilkd.key.gui.Main.Verbosity.*;
@@ -42,6 +44,9 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     private static final String PROGRESS_MARK = ">";
 
     public static final String PROP_AUTO_MODE = "autoMode";
+
+    // Substitute for TaskTree from graphical mode to facilitate side proofs
+    private ImmutableList<Proof> proofStack = ImmutableSLList.<Proof>nil();
 
    /**
     * The used {@link PropertyChangeSupport}.
@@ -151,6 +156,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     	ps = new ProofStarter(this, mediator.getAutoSaver() != null);
         ps.init(proofAggregate);
         mediator.setProof(proofAggregate.getFirstProof());
+        proofStack = proofStack.prepend(proofAggregate.getFirstProof());
     }
 
     @Override
@@ -310,6 +316,11 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    @Override
    public void removeProof(Proof proof) {
        if (proof != null) {
+           Proof p = proofStack.head();
+           proofStack = proofStack.removeAll(p);
+           assert p.name().equals(proof.name());
+           assert !proofStack.isEmpty();
+           getMediator().setProof(proofStack.head());
            proof.dispose();
        }
    }
