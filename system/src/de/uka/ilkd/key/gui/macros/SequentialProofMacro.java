@@ -44,6 +44,7 @@ public abstract class SequentialProofMacro implements ExtendedProofMacro {
      */
     private ExtendedProofMacro[] proofMacros = null;
 
+    @Override
     public boolean finishAfterMacro() {
         return true;
     }

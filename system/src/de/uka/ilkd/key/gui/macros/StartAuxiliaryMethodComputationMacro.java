@@ -44,6 +44,7 @@ public class StartAuxiliaryMethodComputationMacro implements ExtendedProofMacro 
                "two executions of the self-composition.";
     }
 
+    @Override
     public boolean finishAfterMacro() {
         return true;
     }

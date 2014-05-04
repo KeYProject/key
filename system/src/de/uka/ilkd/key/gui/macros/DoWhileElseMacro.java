@@ -26,9 +26,10 @@ public class DoWhileElseMacro implements ProofMacro {
         this.steps = steps;
     }
 
-    public boolean finishAfterMacro() {
-        return true;
-    }
+	@Override
+	public boolean finishAfterMacro() {
+		return true;
+	}
 
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.gui.macros.ProofMacro#getName()

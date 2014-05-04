@@ -41,8 +41,10 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
         return "Finish auxiliary computation.";
     }
 
+
+    @Override
     public boolean finishAfterMacro() {
-        return true;
+		return true;
     }
 
 

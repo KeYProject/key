@@ -56,6 +56,7 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                        "<li>Try to close as many goals as possible</ol>";
             }
 
+            @Override
             public boolean finishAfterMacro() {
                 return false;
             }

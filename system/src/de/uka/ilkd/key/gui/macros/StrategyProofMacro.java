@@ -44,6 +44,7 @@ public abstract class StrategyProofMacro implements ExtendedProofMacro {
 
     protected abstract Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc);
 
+    @Override
     public boolean finishAfterMacro() {
         return true;
     }

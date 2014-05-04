@@ -37,6 +37,7 @@ public class FullInformationFlowAutoPilotMacro implements ProofMacro {
                 "<li>Try to close as many goals as possible</ol>";
     }
 
+    @Override
     public boolean finishAfterMacro() {
         return true;
     }

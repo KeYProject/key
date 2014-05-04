@@ -27,6 +27,7 @@ public class DummyProofMacro implements ProofMacro {
         return "Does nothing";
     }
 
+    @Override
     public boolean finishAfterMacro() {
         return true;
     }
