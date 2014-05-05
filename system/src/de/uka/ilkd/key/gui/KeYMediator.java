@@ -113,7 +113,7 @@ public class KeYMediator {
      */
     public KeYMediator(UserInterface ui) {
 	this.ui             = ui;
-	this.autoSaver = AutoSaver.enabledByDefault()? new AutoSaver(): null;
+	this.autoSaver = AutoSaver.getDefaultInstance();
 
 	notationInfo        = new NotationInfo();
 	proofListener       = new KeYMediatorProofListener();

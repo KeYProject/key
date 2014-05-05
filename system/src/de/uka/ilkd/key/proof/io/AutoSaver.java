@@ -41,7 +41,6 @@ public class AutoSaver implements ProverTaskListener {
     private final boolean saveClosed;
 
     private static int defaultSaveInterval = 0;
-    
     private static boolean defaultSaveClosedProof = false;
     
     /**
@@ -54,16 +53,28 @@ public class AutoSaver implements ProverTaskListener {
        defaultSaveClosedProof = saveClosedProof;
     }
     
-    public static boolean enabledByDefault () {
-        return defaultSaveInterval > 0 || defaultSaveClosedProof;
+    /**
+     * Create a new instance using default values, 
+     * or null if auto save is disabled by default.
+     * The default values can be set through <code>AutoSaver.setDefaultValues()</code>
+     */
+    public static AutoSaver getDefaultInstance() {
+        return defaultSaveInterval > 0 || defaultSaveClosedProof?
+                        new AutoSaver(): null;
     }
 
-    public AutoSaver () {
+    private AutoSaver () {
        this(defaultSaveInterval, defaultSaveClosedProof);
     }
     
+    /**
+     * Create a custom instance.
+     * @param saveInterval
+     * @param saveClosedProof
+     */
     public AutoSaver (int saveInterval, boolean saveClosedProof) {
-        assert saveInterval >= 0;
+        if (saveInterval <= 0)
+            throw new IllegalArgumentException("Save interval must be positive");
         interval = saveInterval;
         saveClosed = saveClosedProof;
     }

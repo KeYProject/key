@@ -135,7 +135,7 @@ public class ProofStarter {
     public ProofStarter(ProverTaskListener ptl, boolean useAutoSaver) {
     	this.ptl = ptl;
       if (useAutoSaver) {
-         autoSaver = new AutoSaver();
+         autoSaver = AutoSaver.getDefaultInstance();
       }
     }
 
