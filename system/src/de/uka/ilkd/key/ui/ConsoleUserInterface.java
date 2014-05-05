@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -60,14 +61,14 @@ public class ConsoleUserInterface extends AbstractUserInterface {
         return autoMode;
     }
 
-   public ConsoleUserInterface(BatchMode batchMode, boolean useAutoSaver, byte verbosity) {
+   public ConsoleUserInterface(BatchMode batchMode, byte verbosity) {
     	this.batchMode = batchMode;
     	this.verbosity = verbosity;
-        this.mediator  = new KeYMediator(this, useAutoSaver);
+        this.mediator  = new KeYMediator(this);
    }
 
-   public ConsoleUserInterface(BatchMode batchMode, boolean useAutoSaver, boolean verbose) {
-       this(batchMode, useAutoSaver, verbose? DEBUG: NORMAL);
+   public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
+       this(batchMode, verbose? DEBUG: NORMAL);
    }
 
     public void taskFinished(TaskFinishedInfo info) {

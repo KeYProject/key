@@ -51,7 +51,7 @@ public class CustomConsoleUserInterface extends ConsoleUserInterface {
     * @param verbose Verbose?
     */
    public CustomConsoleUserInterface(boolean verbose) {
-      super(null, verbose, false);
+      super(null, verbose);
    }
 
    /**

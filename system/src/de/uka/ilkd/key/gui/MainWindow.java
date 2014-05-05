@@ -388,7 +388,7 @@ public final class MainWindow extends JFrame  {
      * @param userInterface The UserInterface.
      */
     private KeYMediator getMainWindowMediator(UserInterface userInterface) {
-        KeYMediator result = new KeYMediator(userInterface, true);
+        KeYMediator result = new KeYMediator(userInterface);
         result.addKeYSelectionListener(proofListener);
         result.addAutoModeListener(proofListener);
         result.addGUIListener(guiListener);

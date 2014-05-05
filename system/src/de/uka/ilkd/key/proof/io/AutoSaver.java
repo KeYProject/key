@@ -45,13 +45,17 @@ public class AutoSaver implements ProverTaskListener {
     private static boolean defaultSaveClosedProof = false;
     
     /**
-     * Initialize the singleton instance.
+     * Set default values.
      * @param saveInterval the interval (= number of proof steps) to periodically save
      * @param saveClosedProof whether to save the final closed proof
      */
-    public static void init ( int saveInterval, boolean saveClosedProof ) {
+    public static void setDefaultValues ( int saveInterval, boolean saveClosedProof ) {
        defaultSaveInterval = saveInterval;
        defaultSaveClosedProof = saveClosedProof;
+    }
+    
+    public static boolean enabledByDefault () {
+        return defaultSaveInterval > 0 || defaultSaveClosedProof;
     }
 
     public AutoSaver () {
