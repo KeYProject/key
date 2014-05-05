@@ -38,7 +38,7 @@ sub trim($) {
 #
 # Command line options
 my %option = ();
-GetOptions(\%option, 'help|h', 'verbose|v', 'silent|z', 'delete|d', 'reload|l', 'stopfail|t', 'storefailed|s=s', 'file|f=s', 'xml-junit|x=s', 'printStatistics|p=s');
+GetOptions(\%option, 'help|h', 'verbose|v', 'silent|z', 'delete|d', 'reload|l', 'stopfail|t', 'storefailed|s=s', 'file|f=s', 'xml-junit|x=s', 'printStatistics|p=s', 'noAuto|n', 'args|a=s');
 
 if ($option{'help'}) {
   print "Runs all proofs listed in the file \'$path_to_index\'.\n";
@@ -53,6 +53,8 @@ if ($option{'help'}) {
   print "Use '-f <filename>' or '--file <filename>' to load the problems from <filename>.\n";
   print "Use '-x <filename>' or '--xml-junit <filename>' to store the results in junit's xml result format to <filename>.\n";
   print "Use '-p <filename>' or '--printStatistics <filename>' to generate a statistics file. The file is overridden in case it already exists.\n";
+  print "Use '-n' or '--noAuto' to run all examples with gui.\n";
+  print "Use '-a' or '--args' to pass arguments directly to runProver.\n";
 #  print "[DEFUNCT] Use '-m email\@address.com' to send the report as an email to the specified address.\n";
 #  print "[DEFUNCT] Use '-c' to get the debug messages from the smtp part if there are email problems.\n";
   exit;
@@ -380,9 +382,13 @@ sub runAuto {
     $statisticsCmd = "--print-statistics '$option{'printStatistics'}'";
   }
   my $verbosity = "";
+  my $automode = "--auto";
+  my $arguments = "";
   if ($option{'silent'}) { $verbosity = "--verbose 0"; }
   if ($option{'verbose'}) { $verbosity = "--verbose 2"; }
-  my $command = "'" . $path_to_key . "/bin/runProver' --auto $verbosity $statisticsCmd '$dk'";
+  if ($option{'noAuto'}) { $automode = ""; }
+  if ($option{'args'}) { $arguments = $option{'args'}; }
+  my $command = "'" . $path_to_key . "/bin/runProver' $automode $verbosity $statisticsCmd $arguments '$dk'";
   print "Command is: $command\n" unless $option{'silent'};
   my $starttime = time();
   my $result = &system_timeout($time_limit, $command);
