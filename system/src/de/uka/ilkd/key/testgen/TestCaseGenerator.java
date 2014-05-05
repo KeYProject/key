@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.gui.actions.TestGenerationAction;
-import de.uka.ilkd.key.gui.smt.TGInfoDialog;
+import de.uka.ilkd.key.gui.testgen.TGInfoDialog;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;

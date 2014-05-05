@@ -31,8 +31,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
 import de.uka.ilkd.key.smt.SolverType;
 
 public class SMTSettingsModel extends DefaultTreeModel {
@@ -44,12 +44,12 @@ public class SMTSettingsModel extends DefaultTreeModel {
 	private final SMTSettings originalSettings;
 	private final SMTSettings temporarySettings;
 
-	public SMTSettingsModel(SMTSettings smtSettings) {
+	public SMTSettingsModel(SMTSettings smtSettings, TestGenerationSettings tgSettings) {
 		super( new DefaultMutableTreeNode("Options"));
 		originalSettings = smtSettings;
 		temporarySettings = new SMTSettings(smtSettings.getPdSettings().clone(),
 				smtSettings.getPiSettings().clone(), smtSettings.getProof());
-		create((DefaultMutableTreeNode)this.getRoot(), temporarySettings);
+		create((DefaultMutableTreeNode)this.getRoot(), temporarySettings,tgSettings);
 
 
 	}
@@ -72,12 +72,14 @@ public class SMTSettingsModel extends DefaultTreeModel {
 	}
 	private static final long serialVersionUID = 1L;
 
-	private DefaultMutableTreeNode create(DefaultMutableTreeNode optionsNode, SMTSettings smtSettings){
+	private DefaultMutableTreeNode create(DefaultMutableTreeNode optionsNode, SMTSettings smtSettings, TestGenerationSettings tgSettings){
 		OptionContentNode generalOptionsNode =  new OptionContentNode("General",
 				new JScrollPane(new GeneralOptions(smtSettings.getPiSettings())));
 
 		OptionContentNode translationOptionsNode =  new OptionContentNode("SMT-Translation",
 				new JScrollPane(new TranslationOptions(smtSettings.getPdSettings())));
+		
+		OptionContentNode testGenNode = new OptionContentNode("Test Generation Options", new JScrollPane(new TestGenOptions(tgSettings)));
 
 		OptionContentNode tacletTranslationOptionsNode =  new OptionContentNode("Taclet Translation",
 				new JScrollPane(new TacletTranslationOptions(smtSettings)));
@@ -92,6 +94,7 @@ public class SMTSettingsModel extends DefaultTreeModel {
 
 		optionsNode.add(generalOptionsNode);
 		optionsNode.add(translationOptionsNode);
+		optionsNode.add(testGenNode);
 		tacletTranslationOptionsNode.add(new OptionContentNode("Selection",
 				new JScrollPane((new TacletTranslationSelection(smtSettings)).getSelectionTree())));
 		optionsNode.add(tacletTranslationOptionsNode);
@@ -106,6 +109,150 @@ public class SMTSettingsModel extends DefaultTreeModel {
 
 	}
 
+}
+
+class TestGenOptions extends TablePanel{
+	
+	private TestGenerationSettings settings;
+	
+	private FileChooserPanel saveToFilePanel;
+	private JTextField maxProcesses;
+	private JTextField maxUnwinds;
+	private JCheckBox useJUnit;
+	private JCheckBox invariantForAll;
+	private JCheckBox removeDuplicates;
+
+	private int minWidthOfTitle;
+	
+	private static final String infoSaveTo = "Choose the folder where the testcase files will be written.";
+	private static final String infoMaxProcesses = "Maximal number of SMT processes that are allowed to run concurrently.";
+	private static final String infoUseJunit = "Generate JUnit test suites (Test oracles not yet implemented).";
+	private static final String infoInvariantForAll = "Require the invariant of all created objects to be true.";
+	private static final String infoMaxUnwinds = "Maximal number of loop unwinds or method calls on a branch.";
+	private static final String infoRemoveDuplicates = "Generate a single testcase for two ore more identical nodes.";
+	
+	public TestGenOptions(TestGenerationSettings settings){
+		super();
+		this.minWidthOfTitle = SwingUtilities.computeStringWidth(this.getFontMetrics(getFont()),"Concurrent ProcessesBLANK");
+		this.settings = settings;
+		createTable();
+	}
+	
+	@Override
+    protected void createComponents() {
+	   getSaveToFilePanel();
+	   getMaxProcesses();
+	   getMaxUnwinds();
+	   getInvariantForall();
+	   getRemoveDuplicatesPanel();
+	   getJUnitPanel();	   
+	    
+    }
+	
+	public JTextField getMaxProcesses() {
+		if(maxProcesses == null){
+			maxProcesses = addTextField("Concurrent Processes:",minWidthOfTitle,Long.toString(settings.getNumberOfProcesses()),infoMaxProcesses,
+					new ActionListener(){
+
+				@Override
+				public void actionPerformed(
+						ActionEvent e) {
+					int value;
+					try {
+						value = Integer.parseInt(maxProcesses.getText());
+					} catch (NumberFormatException ex) {
+						value = settings.getNumberOfProcesses();
+					}
+					settings.setConcurrentProcesses(value);
+				}                                
+			});
+		}
+		return maxProcesses;
+	}
+	
+	public JTextField getMaxUnwinds() {
+		if(maxUnwinds == null){
+			maxUnwinds = addTextField("Concurrent Processes:",minWidthOfTitle,Long.toString(settings.getNumberOfProcesses()),infoMaxUnwinds,
+					new ActionListener(){
+
+				@Override
+				public void actionPerformed(
+						ActionEvent e) {
+					int value;
+					try {
+						value = Integer.parseInt(maxUnwinds.getText());
+					} catch (NumberFormatException ex) {
+						value = settings.getMaximalUnwinds();
+					}
+					settings.setMaxUnwinds(value);
+				}                                
+			});
+		}
+		return maxProcesses;
+	}
+	
+	public FileChooserPanel getSaveToFilePanel() {
+		if(saveToFilePanel == null){
+			saveToFilePanel = addFileChooserPanel("Store translation to file:",
+					settings.getOutputFolderPath(), infoSaveTo, 
+                        true,true,new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					settings.setOutputPath(saveToFilePanel.getPath());
+
+				}
+			});
+		}
+		return saveToFilePanel;
+	}
+	
+	public JCheckBox getJUnitPanel(){
+		if(useJUnit == null){
+			
+			useJUnit = addCheckBox("Generate JUnit", infoUseJunit, settings.useJunit(), new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					settings.setUseJunit(useJUnit.isSelected());
+				}
+			});			
+		}		
+		return useJUnit;		
+	}
+	
+	public JCheckBox getRemoveDuplicatesPanel(){
+		if(removeDuplicates == null){
+			removeDuplicates = addCheckBox("Remove duplicates", infoRemoveDuplicates, settings.removeDuplicates(), new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					settings.setRemoveDuplicates(removeDuplicates.isSelected());
+				}
+			});
+		}
+		return removeDuplicates;
+	}
+	
+	public JCheckBox getInvariantForall(){
+		
+		if(invariantForAll == null){
+			
+			invariantForAll = addCheckBox("Invariant for all", infoInvariantForAll, settings.invaraiantForAll(), new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					settings.setInvariantForAll(invariantForAll.isSelected());
+				}
+			});
+			
+			
+		}
+		
+		return invariantForAll;
+		
+		
+	}
+	
+	
+	
 }
 
 

@@ -22,6 +22,7 @@ import java.util.Properties;
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmaGeneratorSettings;
 import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
+import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
 
 
 
@@ -35,11 +36,13 @@ public class ProofIndependentSettings implements SettingsListener {
         private final GeneralSettings generalSettings= new GeneralSettings();
         private final ViewSettings viewSettings = new ViewSettings();
         private final String filename;
+        
+        private final TestGenerationSettings testGenSettings = new TestGenerationSettings();
 
         private final Settings[] settingsSet = { smtSettings,
                         lemmaGeneratorSettings,
                         generalSettings,
-                        viewSettings};
+                        viewSettings,testGenSettings};
 
 
 
@@ -122,6 +125,10 @@ public class ProofIndependentSettings implements SettingsListener {
 
         public ProofIndependentSMTSettings getSMTSettings() {
                return smtSettings;
+        }
+        
+        public TestGenerationSettings getTestGenerationSettings(){
+        	return testGenSettings;
         }
 
 

@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui.smt;
+package de.uka.ilkd.key.gui.testgen;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
