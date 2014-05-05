@@ -712,7 +712,7 @@ ML_COMMENT
 	      break;
 	    }
 	    if (input.LA(1) == EOF) {
-		throw new NoViableAltException("Matched EOF", -1, -1, input);
+		    break;
 	    } else {
 		input.consume();
 	    }
