@@ -27,7 +27,6 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.SwingWorker3;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
@@ -43,6 +42,7 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.util.Debug;
+import javax.swing.SwingWorker;
 
 @SuppressWarnings("serial")
 public class CounterExampleAction extends MainWindowAction {
@@ -84,14 +84,14 @@ public class CounterExampleAction extends MainWindowAction {
                     setEnabled(selNode.childrenCount()==0);
                 }
             }
-            
+
             public void selectedProofChanged(KeYSelectionEvent e) {
                 selectedNodeChanged(e);
-            }                
+            }
         };
-        
+
         getMediator().addKeYSelectionListener(selListener);
-        
+
         getMediator().addAutoModeListener(new AutoModeListener() {
             public void autoModeStarted(ProofEvent e) {
                 getMediator().removeKeYSelectionListener(selListener);
@@ -101,128 +101,94 @@ public class CounterExampleAction extends MainWindowAction {
             public void autoModeStopped(ProofEvent e) {
                 getMediator().addKeYSelectionListener(selListener);
                 selListener.selectedNodeChanged(null);
-            }                
+            }
         });
         selListener.selectedNodeChanged(new KeYSelectionEvent(getMediator().getSelectionModel()));
     }
-    
-    private Proof createProof(KeYMediator mediator){
 
-		Goal goal = mediator.getSelectedGoal();
-		
-		Node node = goal.node();
-		Proof oldProof = node.proof();
-		
-		Sequent oldSequent = node.sequent();
-		Sequent newSequent = Sequent.createSequent(oldSequent.antecedent(), oldSequent.succedent());
-		Proof proof = new Proof("Semantics Blasting: "+oldProof.name(), 
-				newSequent, "", 
-				oldProof.env().getInitConfig().createTacletIndex(), 
-				oldProof.env().getInitConfig().createBuiltInRuleIndex(), 
-				oldProof.getServices(), 
-				oldProof.getSettings());
-		
-		proof.setProofEnv(oldProof.env());
-		proof.setNamespaces(oldProof.getNamespaces());
+    private Proof createProof(KeYMediator mediator) {
 
-		ProofAggregate pa = new SingleProof(proof, "XXX");
-		
-		MainWindow mw = MainWindow.getInstance();
-		mw.addProblem(pa);
-		
-		mediator.goalChosen(proof.getGoal(proof.root()));		
-		
-		return proof;
+        Goal goal = mediator.getSelectedGoal();
 
-	}
-    
+        Node node = goal.node();
+        Proof oldProof = node.proof();
+
+        Sequent oldSequent = node.sequent();
+        Sequent newSequent = Sequent.createSequent(oldSequent.antecedent(), oldSequent.succedent());
+        Proof proof = new Proof("Semantics Blasting: " + oldProof.name(),
+                newSequent, "",
+                oldProof.env().getInitConfig().createTacletIndex(),
+                oldProof.env().getInitConfig().createBuiltInRuleIndex(),
+                oldProof.getServices(),
+                oldProof.getSettings());
+
+        proof.setProofEnv(oldProof.env());
+        proof.setNamespaces(oldProof.getNamespaces());
+
+        ProofAggregate pa = new SingleProof(proof, "XXX");
+
+        MainWindow mw = MainWindow.getInstance();
+        mw.addProblem(pa);
+
+        mediator.goalChosen(proof.getGoal(proof.root()));
+
+        return proof;
+
+    }
+
     @Override
-	public void actionPerformed(ActionEvent e) {
-			
-		CEWorker worker = new CEWorker();
-		worker.start();
-	}
-	
-	private class CEWorker extends SwingWorker3 implements InterruptListener{
+    public void actionPerformed(ActionEvent e) {
+        createProof(getMediator());
+        getMediator().stopInterface(true);
+        getMediator().setInteractive(false);
+        CEWorker2 worker = new CEWorker2();
+        getMediator().addInterruptedListener(worker);
+        worker.execute();
+    }
 
-		@Override
-		public void interruptionPerformed() {
-			interrupt();
-			
-		}
-		
-		/* 
-	     * initiate the GUI stuff and relay to superclass
-	     */
-	    @Override 
-	    public void start() {
-	        getMediator().stopInterface(true);
-	        getMediator().setInteractive(false);
-	        getMediator().addInterruptedListener(this);
-	        super.start();
-	    }
+    private class CEWorker2 extends SwingWorker<Void, Void> implements InterruptListener {
 
-	    /* 
-	     * finalise the GUI stuff
-	     */
-	    @Override 
-	    public void finished() {
-	    	getMediator().setInteractive(true);
-	    	getMediator().startInterface(true);
-	    	getMediator().removeInterruptedListener(this);
-	    }
+        @Override
+        protected Void doInBackground() throws Exception {
+            KeYMediator mediator = getMediator();
+            Proof proof = mediator.getSelectedProof();
+            SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
 
-		@Override
-		public Object construct() {
-			
-			if(!SolverType.Z3_CE_SOLVER.isInstalled(false)){
-            	
-				JOptionPane.showMessageDialog(mainWindow,
-					    "Z3 is not installed.",
-					    "Error",
-					    JOptionPane.ERROR_MESSAGE);
-				
-            	return null;
+            try {
+                macro.applyTo(mediator, null, null);
+            } catch (InterruptedException e) {
+                Debug.out("Semantics blasting interrupted");
             }
-			createProof(getMediator());					
-			KeYMediator mediator = getMediator();
-			Proof proof = mediator.getSelectedProof();
-			SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
-			
-			try {
-				macro.applyTo(mediator, null, null);
-			} catch (InterruptedException e) {
-				Debug.out("Semantics blasting interrupted");
-			}
-			
-			getMediator().setInteractive(true);
-	    	getMediator().startInterface(true);
-			
-			
-			//invoke z3 for counterexamples
+
+            getMediator().setInteractive(true);
+            getMediator().startInterface(true);
+
+            //invoke z3 for counterexamples
             SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
-                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),proof);
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), proof);
             SolverLauncher launcher = new SolverLauncher(settings);
             launcher.addListener(new SolverListener(settings));
-            
-            
+
             List<SolverType> solvers = new LinkedList<SolverType>();
             solvers.add(SolverType.Z3_CE_SOLVER);
-            
-            
-            launcher.launch(solvers,
-		            SMTProblem.createSMTProblems(proof),
-		            proof.getServices());		
-			
-			return null;
-			
-			
-		}
-		
-	}
-	
-	
-	
-	
 
+            launcher.launch(solvers,
+                    SMTProblem.createSMTProblems(proof),
+                    proof.getServices());
+
+            return null;
+        }
+
+        @Override
+        public void interruptionPerformed() {
+            cancel(true);
+        }
+
+        @Override
+        protected void done() {
+            getMediator().setInteractive(true);
+            getMediator().startInterface(true);
+            getMediator().removeInterruptedListener(this);
+        }
+    }
 }
