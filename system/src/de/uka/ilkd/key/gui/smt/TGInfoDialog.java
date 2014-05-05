@@ -85,8 +85,8 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener {
 					unknown++;
 				} else if (res == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) {
 					solvedPaths++;
-					if (solver.getQuery() != null) {
-						final Model m = solver.getQuery().getModel();
+					if (solver.getSocket().getQuery() != null) {
+						final Model m = solver.getSocket().getQuery().getModel();
 						if (TestCaseGenerator.modelIsOK(m)) {
 							output.add(solver);
 						} else {

@@ -484,8 +484,8 @@ public class TestCaseGenerator {
 				final String originalNodeName = solver.getProblem().getGoal()
 				        .proof().name().toString();
 				boolean success = false;
-				if (solver.getQuery() != null) {
-					final Model m = solver.getQuery().getModel();
+				if (solver.getSocket().getQuery() != null) {
+					final Model m = solver.getSocket().getQuery().getModel();
 					if (TestCaseGenerator.modelIsOK(m)) {
 						logger.writeln("Generate: " + originalNodeName);
 						testMethod.append("  //" + originalNodeName + "\n");
