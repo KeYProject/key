@@ -111,6 +111,7 @@ public class SMTSettingsModel extends DefaultTreeModel {
 
 }
 
+@SuppressWarnings("serial")
 class TestGenOptions extends TablePanel{
 	
 	private TestGenerationSettings settings;
@@ -172,7 +173,7 @@ class TestGenOptions extends TablePanel{
 	
 	public JTextField getMaxUnwinds() {
 		if(maxUnwinds == null){
-			maxUnwinds = addTextField("Concurrent Processes:",minWidthOfTitle,Long.toString(settings.getNumberOfProcesses()),infoMaxUnwinds,
+			maxUnwinds = addTextField("Maximal Unwinds:",minWidthOfTitle,Long.toString(settings.getMaximalUnwinds()),infoMaxUnwinds,
 					new ActionListener(){
 
 				@Override
@@ -195,7 +196,7 @@ class TestGenOptions extends TablePanel{
 		if(saveToFilePanel == null){
 			saveToFilePanel = addFileChooserPanel("Store translation to file:",
 					settings.getOutputFolderPath(), infoSaveTo, 
-                        true,true,new ActionListener() {
+                        false,true,new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -236,7 +237,7 @@ class TestGenOptions extends TablePanel{
 		
 		if(invariantForAll == null){
 			
-			invariantForAll = addCheckBox("Invariant for all", infoInvariantForAll, settings.invaraiantForAll(), new ActionListener() {
+			invariantForAll = addCheckBox("Require invariant for all objects", infoInvariantForAll, settings.invaraiantForAll(), new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					settings.setInvariantForAll(invariantForAll.isSelected());
@@ -522,7 +523,7 @@ class SolverOptions extends TablePanel{
 	private JButton    toDefaultButton;
 
 
-	private JButton    checkForSupportButton;
+	//private JButton    checkForSupportButton;
 
 	private final SolverType solverType; 
 	private final ProofIndependentSMTSettings settings;
@@ -575,9 +576,9 @@ class SolverOptions extends TablePanel{
 	@Override
 	protected void updateOptions() {
 		getSolverInstalled().setText(Boolean.toString(solverType.isInstalled(true)));
-		if(checkForSupportButton != null){
-			checkForSupportButton.setEnabled(solverType.isInstalled(false));
-		}
+//		if(checkForSupportButton != null){
+//			checkForSupportButton.setEnabled(solverType.isInstalled(false));
+//		}
 	}
 
 
@@ -610,19 +611,19 @@ class SolverOptions extends TablePanel{
 		});
 
 
-		checkForSupportButton = new JButton("Check for support.");
-		checkForSupportButton.addActionListener(new ActionListener() {
+//		checkForSupportButton = new JButton("Check for support.");
+//		checkForSupportButton.addActionListener(new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(ActionEvent arg0) {
+//				solverType.checkForSupport();
+//				getSolverSupported().setText(getSolverSupportText());
+//			}
+//		}); 
+//		checkForSupportButton.setEnabled(solverType.isInstalled(false));
 
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				solverType.checkForSupport();
-				getSolverSupported().setText(getSolverSupportText());
-			}
-		}); 
-		checkForSupportButton.setEnabled(solverType.isInstalled(false));
-
-		Box box  = addComponent(null,toDefaultButton,checkForSupportButton);
-
+//		Box box  = addComponent(null,toDefaultButton,checkForSupportButton);
+		Box box  = addComponent(null,toDefaultButton);
 		box.add(Box.createHorizontalGlue());
 
 

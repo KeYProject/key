@@ -491,6 +491,9 @@ public class SolverListener implements SolverLauncherListener {
         private void storeSMTTranslation(SMTSolver solver, Goal goal,
                         String problemString) {
                 String path = settings.getPathForSMTTranslation();
+                
+                String fileName = goal.proof().name()+"_"+goal.getTime()+"_"+solver.name()+".smt";
+                path = path+File.separator+fileName;              
                 path = finalizePath(path, solver, goal);
                 storeToFile(problemString, path);
 

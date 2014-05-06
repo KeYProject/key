@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -69,7 +70,7 @@ public class TestGenMacro extends StrategyProofMacro {
     	
     	
         return new TestGenStrategy(
-                mediator.getInteractiveProver().getProof().getActiveStrategy(),3);
+                mediator.getInteractiveProver().getProof().getActiveStrategy());
     }
 
     /**
@@ -106,9 +107,9 @@ public class TestGenMacro extends StrategyProofMacro {
         	return unwindRules.contains(name);
         }
 
-        public TestGenStrategy(Strategy delegate, int limit) {
+        public TestGenStrategy(Strategy delegate) {
             super(delegate);
-            this.limit = limit;
+            this.limit = ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings().getMaximalUnwinds();
         }
 
         @Override

@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.gui.actions.TestGenerationAction;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.testgen.TGInfoDialog;
+import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
@@ -108,9 +110,10 @@ public class TestCaseGenerator {
 
 	public TestCaseGenerator() {
 		super();
+		TestGenerationSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
 		proof = TestGenerationAction.originalProof;
 		services = proof.getServices();
-		junitFormat = false;
+		junitFormat = settings.useJunit();
 		modDir = proof.getJavaModel().getModelDir();
 		dontCopy = modDir + File.separator + TestCaseGenerator.DONT_COPY;
 		directory = System.getProperty("user.home") + File.separator
@@ -761,4 +764,8 @@ public class TestCaseGenerator {
 			e.printStackTrace();
 		}
 	}
+
+	public boolean isJunit() {
+	    return junitFormat;
+    }
 }

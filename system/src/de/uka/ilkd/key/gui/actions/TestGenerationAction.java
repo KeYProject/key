@@ -22,7 +22,7 @@ import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.testgen.TGInfoDialog;
-import de.uka.ilkd.key.gui.testgen.TGOptionsDialog;
+import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -58,6 +58,10 @@ public class TestGenerationAction extends MainWindowAction {
 
 		@Override
 		public Object construct() {
+			
+			TestGenerationSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
+			
+			
 			if (!SolverType.Z3_CE_SOLVER.isInstalled(true)) {
 				tgInfoDialog
 				        .writeln("Could not find the z3 SMT solver. Aborting.");
@@ -71,7 +75,7 @@ public class TestGenerationAction extends MainWindowAction {
 			tgInfoDialog
 			        .writeln("Extracting test data constraints (path conditions).");
 			proofs = createProofsForTesting(getMediator(),
-			        TGOptionsDialog.removeDuplicates());
+			        settings.removeDuplicates());
 			if (stop) {
 				return null;
 			}
@@ -118,17 +122,18 @@ public class TestGenerationAction extends MainWindowAction {
 			// getMediator().setInteractive(true);
 			// getMediator().startInterface(true);
 			final Proof proof = mediator.getSelectedProof();
-			// always use only 1 process when generating test cases
+			
+			//create special smt settings for test case generation
 			final ProofIndependentSMTSettings piSettings = ProofIndependentSettings.DEFAULT_INSTANCE
 			        .getSMTSettings().clone();
-			piSettings.setMaxConcurrentProcesses(1);
+			piSettings.setMaxConcurrentProcesses(settings.getNumberOfProcesses());
 			final ProofDependentSMTSettings pdSettings = proof.getSettings()
 			        .getSMTSettings().clone();
-			pdSettings.invariantForall = true;
+			pdSettings.invariantForall = settings.invaraiantForAll();
 			// invoke z3 for counterexamples
-			final SMTSettings settings = new SMTSettings(pdSettings,
+			final SMTSettings smtsettings = new SMTSettings(pdSettings,
 			        piSettings, proof);
-			launcher = new SolverLauncher(settings);
+			launcher = new SolverLauncher(smtsettings);
 			launcher.addListener(tgInfoDialog);
 			// launcher.addListener(new SolverListener(settings));
 			final List<SolverType> solvers = new LinkedList<SolverType>();
@@ -209,7 +214,6 @@ public class TestGenerationAction extends MainWindowAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		new TGOptionsDialog();
 		try {
 			final TGWorker worker = new TGWorker();
 			worker.start();
