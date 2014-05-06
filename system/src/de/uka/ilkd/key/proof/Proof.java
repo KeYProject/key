@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,9 +27,7 @@ import java.util.Vector;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -62,9 +59,9 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
 import de.uka.ilkd.key.util.GuiUtilities;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -674,33 +671,20 @@ public class Proof implements Named {
      * saving is possible, and the save dialog never pops up automatically (except
      * for hitting the "Save ..." or "Save current proof" button).
      */
-    public void saveProof() {
-        if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave()
-                && !name().toString().endsWith(".proof")) {
-            // Save proof only if auto save is on and not a loaded proof
-            final MainWindow mainWindow = MainWindow.getInstance();
-            final KeYFileChooser jFC =
-                    GuiUtilities.getFileChooser("Choose filename to save proof");
-            final String defaultName =
-                    MiscTools.toValidFileName(this.name().toString()).toString();
-            boolean autoSave =
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave();
-
-            final Pair<Boolean, Pair<File, Boolean>> res =
-                    jFC.showSaveDialog(mainWindow, defaultName + ".proof", autoSave);
-            final boolean saved = res.first;
-            final boolean newDir = res.second.second;
-            if (saved) {
-                mainWindow.saveProof(jFC.getSelectedFile());
-            } else if (newDir) {
-                    final File dir = res.second.first;
-                    if (!dir.delete()) {
-                        dir.deleteOnExit();
-                    }
-                }
-            jFC.resetPath();
-        }
-    }
+	public void saveProof(final UserInterface ui) {
+		// Save proof only if auto save is on and not a loaded proof
+		if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave()
+				&& !name().toString().endsWith(".proof")) {
+			assert ui.getMediator().getSelectedProof().name().equals(name());
+			final Proof p = this;
+			Runnable r = new Runnable() {
+				public void run() {
+					ui.saveProof(p);
+				}
+			};
+			GuiUtilities.invokeAndWait(r);
+		}
+	}
 
     /**
      * This class is responsible for pruning a proof tree at a certain cutting point.
@@ -952,25 +936,24 @@ public class Proof implements Named {
 
 
     /** fires the event that the proof has been restructured */
-    public void fireProofGoalsChanged() {
-	ProofTreeEvent e = new ProofTreeEvent(this, openGoals());
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofGoalsChanged(e);
+	public void fireProofGoalsChanged() {
+		ProofTreeEvent e = new ProofTreeEvent(this, openGoals());
+		for (int i = 0; i<listenerList.size(); i++) {
+			listenerList.get(i).proofGoalsChanged(e);
+		}
 	}
-    }
 
 
     /** fires the event that the proof has closed.
      * This event fired instead of the proofGoalRemoved event when
      * the last goal in list is removed.
      */
-    protected void fireProofClosed() {
-	ProofTreeEvent e = new ProofTreeEvent(this);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofClosed(e);
+	protected void fireProofClosed() {
+		ProofTreeEvent e = new ProofTreeEvent(this);
+		for (int i = 0; i<listenerList.size(); i++) {
+			listenerList.get(i).proofClosed(e);
+		}
 	}
-	saveProof();
-    }
 
 
     /**

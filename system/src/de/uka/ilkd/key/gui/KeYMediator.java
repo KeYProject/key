@@ -799,8 +799,11 @@ public class KeYMediator {
     	private boolean pruningInProcess;
 
     	public void proofClosed(ProofTreeEvent e) {
-    		KeYMediator.this.notify
-    		(new ProofClosedNotificationEvent(e.getSource()));
+			Proof p = e.getSource();
+			assert p.name().equals(getSelectedProof().name());
+			assert p.closed();
+			p.saveProof(ui);
+			KeYMediator.this.notify(new ProofClosedNotificationEvent(e.getSource()));
     	}
 
     	public void proofPruningInProcess(ProofTreeEvent e) {

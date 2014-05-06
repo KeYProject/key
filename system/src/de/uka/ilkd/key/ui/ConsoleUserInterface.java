@@ -17,14 +17,17 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.Main;
 import static de.uka.ilkd.key.gui.Main.Verbosity.*;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.macros.ProofMacro;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
@@ -36,7 +39,9 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProofStarter;
 
 public class ConsoleUserInterface extends AbstractUserInterface {
@@ -322,6 +327,33 @@ public class ConsoleUserInterface extends AbstractUserInterface {
            assert !proofStack.isEmpty();
            getMediator().setProof(proofStack.head());
            proof.dispose();
+       }
+   }
+
+   @Override
+   public void saveProof(Proof proof) {
+	   assert proof.name().equals(proofStack.head().name());
+	   assert proof.name().equals((mediator.getSelectedProof().name()));
+       final String defaultName =
+               MiscTools.toValidFileName(proof.name().toString()).toString() + ".proof";
+       File file = new File((new File (Main.getFileNameOnStartUp())).getParent(), defaultName);
+       boolean proofFolderActive = ProofIndependentSettings.DEFAULT_INSTANCE
+                        .getGeneralSettings().storesInDefaultProofFolder();
+       String proofDir =
+               (!proofFolderActive || file.getParent().endsWith("/proof")) ?
+               file.getParent() : file.getParent().concat("/proof");
+       final File dir = new File(proofDir);
+       if (proofFolderActive && !dir.exists()) {
+           dir.mkdir();
+       }
+       file = new File(proofDir, file.getName());
+       ProofSaver saver = new ProofSaver(proof, file.getPath(), Main.INTERNAL_VERSION);
+       try {
+			saver.save();
+       } catch (IOException e) {
+			e.printStackTrace();
+       } catch (Exception e) {
+			e.printStackTrace();
        }
    }
 

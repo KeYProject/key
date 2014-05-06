@@ -195,4 +195,6 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @param proof The {@link Proof} to remove.
      */
     void removeProof(Proof proof);
+
+	void saveProof(Proof proof);
 }

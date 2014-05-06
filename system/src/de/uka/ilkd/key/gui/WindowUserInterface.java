@@ -20,6 +20,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
@@ -36,7 +37,10 @@ import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractUserInterface;
+import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * This class is the starting point for the extraction of a unified
@@ -313,6 +317,30 @@ public class WindowUserInterface extends AbstractUserInterface {
            Runtime r = Runtime.getRuntime();
            r.gc();
         }
+    }
+
+    @Override
+	public void saveProof(Proof proof) {
+		final MainWindow mainWindow = MainWindow.getInstance();
+		final KeYFileChooser jFC =
+				GuiUtilities.getFileChooser("Choose filename to save proof");
+		final String defaultName =
+				MiscTools.toValidFileName(proof.name().toString()).toString();
+		boolean autoSave =
+				ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave();
+		final Pair<Boolean, Pair<File, Boolean>> res =
+				jFC.showSaveDialog(mainWindow, defaultName + ".proof", autoSave);
+		final boolean saved = res.first;
+		final boolean newDir = res.second.second;
+		if (saved) {
+			mainWindow.saveProof(jFC.getSelectedFile());
+		} else if (newDir) {
+			final File dir = res.second.first;
+			if (!dir.delete()) {
+				dir.deleteOnExit();
+			}
+		}
+        jFC.resetPath();
     }
 
     /**

@@ -84,8 +84,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
         initiatingGoal.proof().unionIFSymbols(proof.getIFSymbols());
-
-        proof.saveProof();
+        proof.saveProof(mediator.getUI());
 
         // close auxiliary computation proof
         GuiUtilities.invokeAndWait(new Runnable() {
