@@ -20,155 +20,131 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.Strategy;
 
 public class TestGenMacro extends StrategyProofMacro {
+	/**
+	 * The Class FilterAppManager is a special strategy assigning to any rule
+	 * infinite costs if the goal has no modality
+	 */
+	private static class TestGenStrategy extends FilterStrategy {
+		private static final Name NAME = new Name(
+		        TestGenStrategy.class.getSimpleName());
+		private static final Set<String> unwindRules;
+		private static final int UNWIND_COST = 1000;
+		private final int limit;
+		static {
+			unwindRules = new HashSet<String>();
+			TestGenStrategy.unwindRules.add("loopUnwind");
+			TestGenStrategy.unwindRules.add("doWhileUnwind");
+			TestGenStrategy.unwindRules.add("methodCall");
+			TestGenStrategy.unwindRules.add("methodCallWithAssignment");
+			TestGenStrategy.unwindRules.add("staticMethodCall");
+			TestGenStrategy.unwindRules.add("staticMethodCallWithAssignment");
+		}
 
-	@Override
-	public String getName() {
+		private static boolean isUnwindRule(Rule rule) {
+			if (rule == null) {
+				return false;
+			}
+			final String name = rule.name().toString();
+			return TestGenStrategy.unwindRules.contains(name);
+		}
 
-		return "TestGen (finite loop unwinding)";
-	}
+		public TestGenStrategy(Strategy delegate) {
+			super(delegate);
+			limit = ProofIndependentSettings.DEFAULT_INSTANCE
+			        .getTestGenerationSettings().getMaximalUnwinds();
+		}
 
-	@Override
-	public String getDescription() {
-
-		return "Finish symbolic execution but restrict loop unwinding.";
-	}
-
-	/*
-     * find a modality term in a node
-     */
-    private static boolean hasModality(Node node) {
-        Sequent sequent = node.sequent();
-        for (SequentFormula sequentFormula : sequent) {
-            if(hasModality(sequentFormula.formula())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /*
-     * recursively descent into the term to detect a modality.
-     */
-    private static boolean hasModality(Term term) {
-        if(term.op() instanceof Modality) {
-            return true;
-        }
-
-        for (Term sub : term.subs()) {
-            if(hasModality(sub)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    @Override
-    protected Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
-    	
-    	
-    	
-        return new TestGenStrategy(
-                mediator.getInteractiveProver().getProof().getActiveStrategy());
-    }
-
-    /**
-     * The Class FilterAppManager is a special strategy assigning to any rule
-     * infinite costs if the goal has no modality
-     */
-    private static class TestGenStrategy extends FilterStrategy {
-
-        private static final Name NAME = new Name(TestGenStrategy.class.getSimpleName());
-        
-        private static final Set<String> unwindRules;
-        
-        private static final int UNWIND_COST = 1000;
-        
-        private int limit;
-        
-        static{
-        	unwindRules = new HashSet<String>();
-        	unwindRules.add("loopUnwind");
-        	unwindRules.add("doWhileUnwind");
-        	unwindRules.add("methodCall");
-        	unwindRules.add("methodCallWithAssignment");
-        	unwindRules.add("staticMethodCall");
-        	unwindRules.add("staticMethodCallWithAssignment");
-        }
-        
-        private static boolean isUnwindRule(Rule rule){
-        	
-        	if(rule == null){
-        		return false;
-        	}
-        	
-        	String name = rule.name().toString();
-        	return unwindRules.contains(name);
-        }
-
-        public TestGenStrategy(Strategy delegate) {
-            super(delegate);
-            this.limit = ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings().getMaximalUnwinds();
-        }
-
-        @Override
-        public Name name() {
-            return NAME;
-        }
-
-        @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            if(!hasModality(goal.node())) {
-                return false;
-            }
-            
-            if(isUnwindRule(app.rule())){
-            	//System.out.println("Found unwind rule!!");
-            	
-            	int unwindRules = computeUnwindRules(goal);
-            	//System.out.println(unwindRules);
-            	if(unwindRules >= limit){
-            		return false;
-            	}
-            	else{
-            		return true;
-            	}
-            }
-
-            return super.isApprovedApp(app, pio, goal);
-        }
-        
-        @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
-            if(isUnwindRule(app.rule())) {
-                return NumberRuleAppCost.create(UNWIND_COST);
-            }
-            return super.computeCost(app, pio, goal);
-        }
+		@Override
+		public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
+		        Goal goal) {
+			if (TestGenStrategy.isUnwindRule(app.rule())) {
+				return NumberRuleAppCost.create(TestGenStrategy.UNWIND_COST);
+			}
+			return super.computeCost(app, pio, goal);
+		}
 
 		private int computeUnwindRules(Goal goal) {
 			int totalUnwinds = 0;
 			Node node = goal.node();
-			
-			while(!node.root()){
-				
-				RuleApp app = node.getAppliedRuleApp();
-				if(app!=null){
-					Rule rule = app.rule();
-					if(isUnwindRule(rule)){
+			while (!node.root()) {
+				final RuleApp app = node.getAppliedRuleApp();
+				if (app != null) {
+					final Rule rule = app.rule();
+					if (TestGenStrategy.isUnwindRule(rule)) {
 						++totalUnwinds;
 					}
 				}
-				
 				node = node.parent();
 			}
-			
-			
-			
 			return totalUnwinds;
 		}
 
-    }
+		@Override
+		public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+			if (!TestGenMacro.hasModality(goal.node())) {
+				return false;
+			}
+			if (TestGenStrategy.isUnwindRule(app.rule())) {
+				// System.out.println("Found unwind rule!!");
+				final int unwindRules = computeUnwindRules(goal);
+				// System.out.println(unwindRules);
+				if (unwindRules >= limit) {
+					return false;
+				} else {
+					return true;
+				}
+			}
+			return super.isApprovedApp(app, pio, goal);
+		}
 
+		@Override
+		public Name name() {
+			return TestGenStrategy.NAME;
+		}
+	}
+
+	/*
+	 * find a modality term in a node
+	 */
+	private static boolean hasModality(Node node) {
+		final Sequent sequent = node.sequent();
+		for (final SequentFormula sequentFormula : sequent) {
+			if (TestGenMacro.hasModality(sequentFormula.formula())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/*
+	 * recursively descent into the term to detect a modality.
+	 */
+	private static boolean hasModality(Term term) {
+		if (term.op() instanceof Modality) {
+			return true;
+		}
+		for (final Term sub : term.subs()) {
+			if (TestGenMacro.hasModality(sub)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	protected Strategy createStrategy(KeYMediator mediator,
+	        PosInOccurrence posInOcc) {
+		return new TestGenStrategy(mediator.getInteractiveProver().getProof()
+		        .getActiveStrategy());
+	}
+
+	@Override
+	public String getDescription() {
+		return "Finish symbolic execution but restrict loop unwinding.";
+	}
+
+	@Override
+	public String getName() {
+		return "TestGen (finite loop unwinding)";
+	}
 }

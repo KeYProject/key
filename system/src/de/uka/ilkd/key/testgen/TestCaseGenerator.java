@@ -110,7 +110,8 @@ public class TestCaseGenerator {
 
 	public TestCaseGenerator() {
 		super();
-		TestGenerationSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
+		final TestGenerationSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE
+		        .getTestGenerationSettings();
 		proof = TestGenerationAction.originalProof;
 		services = proof.getServices();
 		junitFormat = settings.useJunit();
@@ -711,6 +712,10 @@ public class TestCaseGenerator {
 		}
 	}
 
+	public boolean isJunit() {
+		return junitFormat;
+	}
+
 	protected boolean isNumericType(String type) {
 		return type.equals("byte") || type.equals("short")
 		        || type.equals("int") || type.equals("long")
@@ -764,8 +769,4 @@ public class TestCaseGenerator {
 			e.printStackTrace();
 		}
 	}
-
-	public boolean isJunit() {
-	    return junitFormat;
-    }
 }

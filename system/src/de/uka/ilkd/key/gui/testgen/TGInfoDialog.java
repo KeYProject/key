@@ -86,7 +86,8 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener {
 				} else if (res == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) {
 					solvedPaths++;
 					if (solver.getSocket().getQuery() != null) {
-						final Model m = solver.getSocket().getQuery().getModel();
+						final Model m = solver.getSocket().getQuery()
+						        .getModel();
 						if (TestCaseGenerator.modelIsOK(m)) {
 							output.add(solver);
 						} else {
@@ -126,7 +127,7 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener {
 	        Collection<SMTSolver> problemSolvers) {
 		writeln("Finished solving SMT problems: " + problemSolvers.size());
 		final TestCaseGenerator tg = new TestCaseGenerator();
-		tg.setLogger(this);		
+		tg.setLogger(this);
 		problemSolvers = filterSolverResultsAndShowSolverStatistics(problemSolvers);
 		if (problemSolvers.size() > 0) {
 			tg.generateJUnitTestSuite(problemSolvers);
