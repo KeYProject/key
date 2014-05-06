@@ -117,8 +117,7 @@ public class TestCaseGenerator {
 		junitFormat = settings.useJunit();
 		modDir = proof.getJavaModel().getModelDir();
 		dontCopy = modDir + File.separator + TestCaseGenerator.DONT_COPY;
-		directory = System.getProperty("user.home") + File.separator
-		        + "testFiles";
+		directory = settings.getOutputFolderPath();
 		sortDummyClass = new HashMap<Sort, StringBuffer>();
 		MUTName = "";
 	}

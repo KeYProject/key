@@ -73,7 +73,7 @@ public class SMTSettingsModel extends DefaultTreeModel {
 	private static final long serialVersionUID = 1L;
 
 	private DefaultMutableTreeNode create(DefaultMutableTreeNode optionsNode, SMTSettings smtSettings, TestGenerationSettings tgSettings){
-		OptionContentNode generalOptionsNode =  new OptionContentNode("General",
+		OptionContentNode generalOptionsNode =  new OptionContentNode("General SMT Options",
 				new JScrollPane(new GeneralOptions(smtSettings.getPiSettings())));
 
 		OptionContentNode translationOptionsNode =  new OptionContentNode("SMT-Translation",
@@ -94,7 +94,7 @@ public class SMTSettingsModel extends DefaultTreeModel {
 
 		optionsNode.add(generalOptionsNode);
 		optionsNode.add(translationOptionsNode);
-		optionsNode.add(testGenNode);
+		
 		tacletTranslationOptionsNode.add(new OptionContentNode("Selection",
 				new JScrollPane((new TacletTranslationSelection(smtSettings)).getSelectionTree())));
 		optionsNode.add(tacletTranslationOptionsNode);
@@ -103,6 +103,8 @@ public class SMTSettingsModel extends DefaultTreeModel {
 			optionsNode.add(new OptionContentNode(options.getName(),
 					new JScrollPane(options)));  
 		}
+		
+		optionsNode.add(testGenNode);
 
 		return optionsNode;
 
@@ -194,7 +196,7 @@ class TestGenOptions extends TablePanel{
 	
 	public FileChooserPanel getSaveToFilePanel() {
 		if(saveToFilePanel == null){
-			saveToFilePanel = addFileChooserPanel("Store translation to file:",
+			saveToFilePanel = addFileChooserPanel("Store test cases to folder:",
 					settings.getOutputFolderPath(), infoSaveTo, 
                         false,true,new ActionListener() {
 
