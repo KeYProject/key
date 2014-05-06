@@ -332,8 +332,8 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
    @Override
    public void saveProof(Proof proof) {
-	   assert proof.name().equals(proofStack.head().name());
-	   assert proof.name().equals((mediator.getSelectedProof().name()));
+       assert proof.name().equals(proofStack.head().name());
+       assert proof.name().equals((mediator.getSelectedProof().name()));
        final String defaultName =
                MiscTools.toValidFileName(proof.name().toString()).toString() + ".proof";
        File file = new File((new File (Main.getFileNameOnStartUp())).getParent(), defaultName);
@@ -349,11 +349,11 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        file = new File(proofDir, file.getName());
        ProofSaver saver = new ProofSaver(proof, file.getPath(), Main.INTERNAL_VERSION);
        try {
-			saver.save();
+           saver.save();
        } catch (IOException e) {
-			e.printStackTrace();
+           e.printStackTrace();
        } catch (Exception e) {
-			e.printStackTrace();
+           e.printStackTrace();
        }
    }
 

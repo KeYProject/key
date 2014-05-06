@@ -676,13 +676,7 @@ public class Proof implements Named {
 		if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave()
 				&& !name().toString().endsWith(".proof")) {
 			assert ui.getMediator().getSelectedProof().name().equals(name());
-			final Proof p = this;
-			Runnable r = new Runnable() {
-				public void run() {
-					ui.saveProof(p);
-				}
-			};
-			GuiUtilities.invokeAndWait(r);
+			ui.saveProof(this);
 		}
 	}
 

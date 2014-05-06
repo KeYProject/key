@@ -92,11 +92,11 @@ public class FinishAuxiliaryBlockComputationMacro
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
         initiatingGoal.proof().unionIFSymbols(proof.getIFSymbols());
-        proof.saveProof(mediator.getUI());
 
         // close auxiliary computation proof
         GuiUtilities.invokeAndWait(new Runnable() {
             public void run() {
+                proof.saveProof(mediator.getUI());
                 // make everyone listen to the proof remove
                 mediator.startInterface(true);
                 mediator.getUI().removeProof(proof);
