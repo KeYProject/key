@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.testgen;
 
 public class Assignment {
-	private String type;
-	private String left;
-	private String right;
+	private final String type;
+	private final String left;
+	private final String right;
 
 	public Assignment(String left, String right) {
 		super();
-		this.type = "";
+		type = "";
 		this.left = left;
 		this.right = right;
 	}
@@ -19,6 +19,7 @@ public class Assignment {
 		this.right = right;
 	}
 
+	@Override
 	public String toString() {
 		return "\n   " + type + " " + left + " = " + right + ";";
 	}

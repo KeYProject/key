@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui.smt;
+package de.uka.ilkd.key.gui.testgen;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -85,8 +85,9 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener {
 					unknown++;
 				} else if (res == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) {
 					solvedPaths++;
-					if (solver.getQuery() != null) {
-						final Model m = solver.getQuery().getModel();
+					if (solver.getSocket().getQuery() != null) {
+						final Model m = solver.getSocket().getQuery()
+						        .getModel();
 						if (TestCaseGenerator.modelIsOK(m)) {
 							output.add(solver);
 						} else {
@@ -127,11 +128,10 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener {
 		writeln("Finished solving SMT problems: " + problemSolvers.size());
 		final TestCaseGenerator tg = new TestCaseGenerator();
 		tg.setLogger(this);
-		tg.setJUnit(TGOptionsDialog.isJunit());
 		problemSolvers = filterSolverResultsAndShowSolverStatistics(problemSolvers);
 		if (problemSolvers.size() > 0) {
 			tg.generateJUnitTestSuite(problemSolvers);
-			if (TGOptionsDialog.isJunit()) {
+			if (tg.isJunit()) {
 				writeln("Test oracle not yet implemented for JUnit.");
 			} else {
 				writeln("Compile and run the file with openjml!");

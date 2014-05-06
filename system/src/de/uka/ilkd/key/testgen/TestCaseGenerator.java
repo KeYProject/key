@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.gui.actions.TestGenerationAction;
-import de.uka.ilkd.key.gui.smt.TGInfoDialog;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.gui.testgen.TGInfoDialog;
+import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
@@ -108,13 +110,14 @@ public class TestCaseGenerator {
 
 	public TestCaseGenerator() {
 		super();
+		final TestGenerationSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE
+		        .getTestGenerationSettings();
 		proof = TestGenerationAction.originalProof;
 		services = proof.getServices();
-		junitFormat = false;
+		junitFormat = settings.useJunit();
 		modDir = proof.getJavaModel().getModelDir();
 		dontCopy = modDir + File.separator + TestCaseGenerator.DONT_COPY;
-		directory = System.getProperty("user.home") + File.separator
-		        + "testFiles";
+		directory = settings.getOutputFolderPath();
 		sortDummyClass = new HashMap<Sort, StringBuffer>();
 		MUTName = "";
 	}
@@ -484,8 +487,8 @@ public class TestCaseGenerator {
 				final String originalNodeName = solver.getProblem().getGoal()
 				        .proof().name().toString();
 				boolean success = false;
-				if (solver.getQuery() != null) {
-					final Model m = solver.getQuery().getModel();
+				if (solver.getSocket().getQuery() != null) {
+					final Model m = solver.getSocket().getQuery().getModel();
 					if (TestCaseGenerator.modelIsOK(m)) {
 						logger.writeln("Generate: " + originalNodeName);
 						testMethod.append("  //" + originalNodeName + "\n");
@@ -706,6 +709,10 @@ public class TestCaseGenerator {
 		} else {
 			return sig;
 		}
+	}
+
+	public boolean isJunit() {
+		return junitFormat;
 	}
 
 	protected boolean isNumericType(String type) {

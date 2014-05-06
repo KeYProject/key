@@ -154,8 +154,7 @@ class FileChooserPanel extends JPanel{
                     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     if(chooser.showDialog(FileChooserPanel.this, "Choose folder") 
                         == JFileChooser.APPROVE_OPTION){
-                        getFolderField().setText(chooser.getSelectedFile().getAbsolutePath()+
-                        "/output.smt"); // was: "/%d_%t_%i_%s"
+                        getFolderField().setText(chooser.getSelectedFile().getAbsolutePath()); // was: "/%d_%t_%i_%s"
                     }
                     }
                 });
