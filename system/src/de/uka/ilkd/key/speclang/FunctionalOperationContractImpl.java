@@ -303,7 +303,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             while(it1.hasNext()) {
                 ProgramVariable originalParamVar = it1.next();
                 Term paramTerm                   = it2.next();
-                assert originalParamVar.sort().extendsTrans(paramTerm.sort());
+                // TODO: what does this mean?
+                assert paramTerm.sort().extendsTrans(originalParamVar.sort());
                 result.put(TB.var(originalParamVar), paramTerm);
             }
         }
