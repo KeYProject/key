@@ -21,9 +21,12 @@ import java.util.List;
 
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
+import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import static de.uka.ilkd.key.gui.Main.Verbosity.*;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.macros.DummyProofMacro;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
@@ -32,7 +35,6 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -115,14 +117,25 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                 System.exit(0);
             }
 
-            // setInteractive(false) has to be called because the ruleAppIndex
-            // has to be notified that we work in auto mode (CS)
-            mediator.setInteractive(false);
-
+            final Object result;
             if (macroChosen()) {
                 applyMacro();
+                result = new ApplyStrategyInfo("", proof, null, mediator.getSelectedGoal(),
+                                               proof.statistics().time,
+                                               proof.statistics().totalRuleApps,
+                                               proof.countBranches() - proof.openGoals().size());
+                taskFinished(new DefaultTaskFinishedInfo(result, "", proof, proof.statistics().time,
+                                                         (proof != null ?
+                                                                 proof.countNodes() : 0),
+                                                         (proof != null ?
+                                                                 proof.countBranches()
+                                                                     - proof.openGoals().size() : 0)));
+            } else {
+                // setInteractive(false) has to be called because the ruleAppIndex
+                // has to be notified that we work in auto mode (CS)
+                mediator.setInteractive(false);
+                result = ps.start();
             }
-            final Object result = ps.start();
             if (verbosity >= HIGH) {
             	System.out.println(result);
             }
@@ -273,11 +286,16 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        if (autoMacro.canApplyTo(mediator, null)) {
            System.out.println("[ APPLY " + autoMacro.getClass().getSimpleName() + " ]");
            try {
-               autoMacro.applyTo(mediator, null, mediator.getUI());
+               mediator.stopInterface(true);
+               mediator.setInteractive(false);
+               autoMacro.applyTo(mediator, null, this);
+               mediator.setInteractive(true);
+               mediator.startInterface(true);
            } catch(InterruptedException ex) {
                Debug.out("Proof macro has been interrupted:");
                Debug.out(ex);
            }
+           this.autoMacro = new DummyProofMacro(); // reset macro to avoid loops
            return true;
        } else {
            System.out.println(autoMacro.getClass().getSimpleName() + " not applicable!");

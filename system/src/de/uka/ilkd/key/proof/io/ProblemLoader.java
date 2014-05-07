@@ -22,8 +22,10 @@ import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.SwingWorker3;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.gui.WindowUserInterface;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
@@ -66,17 +68,22 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
 
          @Override
          public void finished() {
-            getMediator().startInterface(true);
+             KeYMediator mediator = getMediator();
+             UserInterface ui = mediator.getUI();
+             mediator.startInterface(true);
             final Object msg = get();
             if (ptl != null) {
-               final TaskFinishedInfo tfi =
-                       new DefaultTaskFinishedInfo(ProblemLoader.this, msg, getProof(), time,
-                                                   (getProof() != null ?
-                                                           getProof().countNodes() : 0),
-                                                   (getProof() != null ?
-                                                           getProof().countBranches()
-                                                               - getProof().openGoals().size() : 0));
-               ptl.taskFinished(tfi);
+                final TaskFinishedInfo tfi =
+                        new DefaultTaskFinishedInfo(ProblemLoader.this, msg, getProof(), time,
+                                                    (getProof() != null ?
+                                                            getProof().countNodes() : 0),
+                                                    (getProof() != null ?
+                                                            getProof().countBranches()
+                                                                - getProof().openGoals().size() : 0));
+                ptl.taskFinished(tfi);
+                if (ui.macroChosen() && ui instanceof WindowUserInterface) {
+                    ui.applyMacro();
+                }
             }
          }
       };
