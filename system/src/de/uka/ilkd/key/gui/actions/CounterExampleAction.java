@@ -52,13 +52,18 @@ public class CounterExampleAction extends MainWindowAction {
 
             public void selectedNodeChanged(KeYSelectionEvent e) {
                 final Proof proof = getMediator().getSelectedProof();
+                
+                if(!SolverType.Z3_CE_SOLVER.isInstalled(false)){
+                	setEnabled(false);
+                	return;
+                }
+                
                 if (proof == null) {
                     // no proof loaded
                     setEnabled(false);
                 } else {
-                    final Goal selGoal = getMediator().getSelectedGoal();
                     final Node selNode = getMediator().getSelectedNode();
-                    //Can be applied only to root nodes
+                    //Can be applied only to leaf nodes
                     setEnabled(selNode.childrenCount()==0);
                 }
             }
@@ -152,7 +157,7 @@ public class CounterExampleAction extends MainWindowAction {
 
 		@Override
 		public Object construct() {
-			
+								
 			KeYMediator mediator = getMediator();
 			Proof proof = mediator.getSelectedProof();
 			SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
