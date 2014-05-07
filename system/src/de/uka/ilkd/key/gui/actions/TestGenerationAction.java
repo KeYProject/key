@@ -8,8 +8,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.Icon;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.AutoModeListener;
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.InterruptListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
@@ -200,7 +203,7 @@ public class TestGenerationAction extends MainWindowAction {
 		}
 	}
 
-	private static final String NAME = "T";
+	private static final String NAME = "Generate Testcases";
 	private static final String TOOLTIP = "Generate test cases for open goals";
 	private TGInfoDialog tgInfoDialog;
 	public static Proof originalProof;
@@ -209,6 +212,8 @@ public class TestGenerationAction extends MainWindowAction {
 		super(mainWindow);
 		setName(TestGenerationAction.NAME);
 		setTooltip(TestGenerationAction.TOOLTIP);
+		Icon icon = IconFactory.testGeneration(MainWindow.TOOLBAR_ICON_SIZE);
+        putValue(SMALL_ICON, icon);
 		init();
 	}
 
