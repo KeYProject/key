@@ -32,7 +32,7 @@ public class DummyProofMacro implements ProofMacro {
     @Override
     public boolean canApplyTo(KeYMediator mediator,
                               PosInOccurrence posInOcc) {
-        return false;
+        return true;
     }
 
 
