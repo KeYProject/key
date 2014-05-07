@@ -5,6 +5,7 @@ import org.key_project.sed.core.annotation.event.ISEDAnnotationLinkListener;
 import org.key_project.sed.core.annotation.impl.AbstractSEDAnnotation;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDIDElement;
 import org.key_project.util.bean.IBean;
 
 /**
@@ -26,7 +27,7 @@ import org.key_project.util.bean.IBean;
  * @see ISEDAnnotationType
  * @see ISEDAnnotation
  */
-public interface ISEDAnnotation extends IBean {
+public interface ISEDAnnotation extends IBean, ISEDIDElement {
    /**
     * Property {@link #isEnabled()}.
     */
@@ -198,4 +199,10 @@ public interface ISEDAnnotation extends IBean {
     * @param l The {@link ISEDAnnotationLinkListener} to remove.
     */
    public void removeAnnotationLinkListener(ISEDAnnotationLinkListener l);
+
+   /**
+    * Sets the unique ID which is valid as long as it was never accessed before.
+    * @param id The new unique ID to use.
+    */
+   public void setId(String id);
 }

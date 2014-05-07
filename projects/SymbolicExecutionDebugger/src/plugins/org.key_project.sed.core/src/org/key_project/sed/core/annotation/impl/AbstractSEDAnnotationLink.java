@@ -4,6 +4,7 @@ import org.eclipse.core.runtime.Assert;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.impl.AbstractSEDDebugElement;
 import org.key_project.util.bean.Bean;
 
 /**
@@ -11,6 +12,11 @@ import org.key_project.util.bean.Bean;
  * @author Martin Hentschel
  */
 public abstract class AbstractSEDAnnotationLink extends Bean implements ISEDAnnotationLink {
+   /**
+    * The unique ID.
+    */
+   private String id;
+   
    /**
     * The source {@link ISEDAnnotation}.
     */
@@ -55,5 +61,29 @@ public abstract class AbstractSEDAnnotationLink extends Bean implements ISEDAnno
    @Override
    public void delete() {
       target.removeAnnotationLink(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getId() {
+      if (id == null) {
+         synchronized (this) {
+            if (id == null) {
+               id = AbstractSEDDebugElement.computeNewId();
+            }
+         }
+      }
+      return id;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setId(String id) {
+      Assert.isTrue(this.id == null, "Can't change an already existing ID.");
+      this.id = id;
    }
 }

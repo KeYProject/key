@@ -3,6 +3,7 @@ package org.key_project.sed.core.annotation;
 import org.key_project.sed.core.annotation.impl.AbstractSEDAnnotation;
 import org.key_project.sed.core.annotation.impl.DefaultSEDAnnotationLink;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDIDElement;
 import org.key_project.util.bean.IBean;
 
 /**
@@ -23,7 +24,7 @@ import org.key_project.util.bean.IBean;
  * @see ISEDAnnotation
  * @see ISEDAnnotationType
  */
-public interface ISEDAnnotationLink extends IBean {
+public interface ISEDAnnotationLink extends IBean, ISEDIDElement {
    /**
     * Property {@link #getSource()}.
     */
@@ -56,4 +57,10 @@ public interface ISEDAnnotationLink extends IBean {
     * Removes this annotation link form the target {@link ISEDDebugNode}.
     */
    public void delete();
+
+   /**
+    * Sets the unique ID which is valid as long as it was never accessed before.
+    * @param id The new unique ID to use.
+    */
+   public void setId(String id);
 }

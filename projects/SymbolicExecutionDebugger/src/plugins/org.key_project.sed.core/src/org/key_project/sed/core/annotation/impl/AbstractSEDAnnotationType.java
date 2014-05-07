@@ -1,6 +1,7 @@
 package org.key_project.sed.core.annotation.impl;
 
 import org.eclipse.swt.graphics.RGB;
+import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
@@ -56,5 +57,35 @@ public abstract class AbstractSEDAnnotationType implements ISEDAnnotationType {
    @Override
    public String getAdditionalLinkColumnValue(int index, ISEDAnnotationLink link) {
       return null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String saveAnnotation(ISEDAnnotation annotation) {
+      return null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void restoreAnnotation(ISEDAnnotation annotation, String savedContent) {
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String saveAnnotationLink(ISEDAnnotationLink link) {
+      return null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void restoreAnnotationLink(ISEDAnnotationLink link, String savedContent) {
    }
 }

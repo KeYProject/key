@@ -113,4 +113,32 @@ public interface ISEDAnnotationType {
     * @return The text to show.
     */
    public String getAdditionalLinkColumnValue(int index, ISEDAnnotationLink link);
+   
+   /**
+    * Saves the specific {@link ISEDAnnotation} content as {@link String}.
+    * @param annotation The {@link ISEDAnnotation} to save.
+    * @return The specific {@link ISEDAnnotation} content as {@link String}.
+    */
+   public String saveAnnotation(ISEDAnnotation annotation);
+   
+   /**
+    * Restores the saved content on the given {@link ISEDAnnotation}.
+    * @param annotation The {@link ISEDAnnotation} to restore its content.
+    * @param savedContent The content to restore.
+    */
+   public void restoreAnnotation(ISEDAnnotation annotation, String savedContent);
+   
+   /**
+    * Saves the specific {@link ISEDAnnotationLink} content as {@link String}.
+    * @param link The {@link ISEDAnnotationLink} to save.
+    * @return The specific {@link ISEDAnnotationLink} content as {@link String}.
+    */
+   public String saveAnnotationLink(ISEDAnnotationLink link);
+   
+   /**
+    * Restores the saved content on the given {@link ISEDAnnotationLink}.
+    * @param link The {@link ISEDAnnotationLink} to restore its content.
+    * @param savedContent The content to restore.
+    */
+   public void restoreAnnotationLink(ISEDAnnotationLink link, String savedContent);
 }

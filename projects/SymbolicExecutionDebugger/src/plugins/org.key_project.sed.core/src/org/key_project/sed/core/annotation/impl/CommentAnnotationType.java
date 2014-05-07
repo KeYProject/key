@@ -1,5 +1,6 @@
 package org.key_project.sed.core.annotation.impl;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.graphics.RGB;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
@@ -106,5 +107,23 @@ public class CommentAnnotationType extends AbstractSEDAnnotationType {
       else {
          return null;
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String saveAnnotationLink(ISEDAnnotationLink link) {
+      Assert.isTrue(link instanceof CommentAnnotationLink);
+      return ((CommentAnnotationLink)link).getComment();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void restoreAnnotationLink(ISEDAnnotationLink link, String savedContent) {
+      Assert.isTrue(link instanceof CommentAnnotationLink);
+      ((CommentAnnotationLink)link).setComment(savedContent);
    }
 }

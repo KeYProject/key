@@ -1,5 +1,6 @@
 package org.key_project.sed.core.annotation.impl;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.graphics.RGB;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
@@ -79,5 +80,23 @@ public class SearchAnnotationType extends AbstractSEDAnnotationType {
    @Override
    public ISEDAnnotationLink createLink(ISEDAnnotation source, ISEDDebugNode target) {
       return new DefaultSEDAnnotationLink(source, target);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String saveAnnotation(ISEDAnnotation annotation) {
+      Assert.isTrue(annotation instanceof SearchAnnotation);
+      return ((SearchAnnotation)annotation).getSearch();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void restoreAnnotation(ISEDAnnotation annotation, String savedContent) {
+      Assert.isTrue(annotation instanceof SearchAnnotation);
+      ((SearchAnnotation)annotation).setSearch(savedContent);
    }
 }

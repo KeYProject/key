@@ -11,6 +11,7 @@ import org.key_project.sed.core.annotation.ISEDAnnotationType;
 import org.key_project.sed.core.annotation.event.ISEDAnnotationLinkListener;
 import org.key_project.sed.core.annotation.event.SEDAnnotationLinkEvent;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.impl.AbstractSEDDebugElement;
 import org.key_project.util.bean.Bean;
 
 /**
@@ -18,6 +19,11 @@ import org.key_project.util.bean.Bean;
  * @author Martin Hentschel
  */
 public abstract class AbstractSEDAnnotation extends Bean implements ISEDAnnotation {
+   /**
+    * The unique ID.
+    */
+   private String id;
+   
    /**
     * The enabled state.
     */
@@ -317,5 +323,29 @@ public abstract class AbstractSEDAnnotation extends Bean implements ISEDAnnotati
       for (ISEDAnnotationLinkListener l : listener) {
          l.annotationLinkRemoved(e);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getId() {
+      if (id == null) {
+         synchronized (this) {
+            if (id == null) {
+               id = AbstractSEDDebugElement.computeNewId();
+            }
+         }
+      }
+      return id;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setId(String id) {
+      Assert.isTrue(this.id == null, "Can't change an already existing ID.");
+      this.id = id;
    }
 }
