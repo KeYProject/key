@@ -161,9 +161,9 @@ public interface SMTSolver {
      */
     public Collection<Throwable> getExceptionsOfTacletTranslation();
     
-    public void setQuery(ModelExtractor m);
     
-    public ModelExtractor getQuery();
+    public AbstractSolverSocket getSocket();    
+    
     
 
 }
