@@ -78,9 +78,11 @@ public class WindowUserInterface extends AbstractUserInterface {
 	}
 
 	@Override
-	public void applyMacro() {
-	    super.applyMacro();
-	    System.err.println("Automatic macro option not applicable in graphic mode.");
+	public boolean applyMacro() {
+	    if (macroChosen()) {
+	        System.err.println("Automatic macro option not applicable in graphic mode.");
+	    }
+	    return false;
 	}
 
 	@Override

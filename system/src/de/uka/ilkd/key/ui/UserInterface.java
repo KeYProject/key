@@ -85,7 +85,11 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
 
     void setMacro(ProofMacro macro);
 
-    void applyMacro();
+    ProofMacro getMacro();
+
+    boolean macroChosen();
+
+    boolean applyMacro();
 
     /** 
      * called to open the build in examples 
