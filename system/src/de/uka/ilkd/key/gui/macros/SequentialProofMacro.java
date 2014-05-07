@@ -22,6 +22,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 
 /**
@@ -35,14 +36,14 @@ import de.uka.ilkd.key.proof.Node;
  *
  * @author mattias ulbrich
  */
-public abstract class SequentialProofMacro implements ProofMacro {
+public abstract class SequentialProofMacro implements ExtendedProofMacro {
 
     /**
      * The proof macros to be applied in their order.
      *
      * This array is created on demand using {@link #createProofMacroArray()}.
      */
-    private ProofMacro[] proofMacros = null;
+    private ExtendedProofMacro[] proofMacros = null;
 
     /**
      * Creates the proof macro array.
@@ -52,7 +53,7 @@ public abstract class SequentialProofMacro implements ProofMacro {
      *
      * @return a non-null array which should not be altered afterwards.
      */
-    protected abstract ProofMacro[] createProofMacroArray();
+    protected abstract ExtendedProofMacro[] createProofMacroArray();
 
     /**
      * {@inheritDoc}
@@ -63,11 +64,30 @@ public abstract class SequentialProofMacro implements ProofMacro {
      */
     @Override
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        List<ProofMacro> macros = getProofMacros();
+        List<ExtendedProofMacro> macros = getProofMacros();
         if(macros.isEmpty()) {
             return false;
         } else {
             return macros.get(0).canApplyTo(mediator, posInOcc);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>
+     * This compound macro is applicable if and only if the first macro is applicable.
+     * If there is no first macro, this is not applicable.
+     */
+    @Override
+    public boolean canApplyTo(KeYMediator mediator,
+                              Goal goal,
+                              PosInOccurrence posInOcc) {
+        List<ExtendedProofMacro> macros = getProofMacros();
+        if(macros.isEmpty()) {
+            return false;
+        } else {
+            return macros.get(0).canApplyTo(mediator, goal, posInOcc);
         }
     }
 
@@ -87,7 +107,7 @@ public abstract class SequentialProofMacro implements ProofMacro {
             ProverTaskListener listener) throws InterruptedException {
 
         final Node initNode = mediator.getSelectedNode();
-        for (ProofMacro macro : getProofMacros()) {
+        for (ExtendedProofMacro macro : getProofMacros()) {
             // reverse to original node
             mediator.getSelectionModel().setSelectedNode(initNode);
             macro.applyTo(mediator, posInOcc, listener);
@@ -96,11 +116,35 @@ public abstract class SequentialProofMacro implements ProofMacro {
     }
 
     /**
+     * {@inheritDoc}
+     *
+     * <p>
+     * This launches the first macro and registers a new
+     * {@link AutoModeListener} with the {@code mediator}. This listener
+     * unregisters itself after the last macro.
+     *
+     * @throws InterruptedException
+     *             if one of the wrapped macros is interrupted.
+     */
+    @Override
+    public void applyTo(KeYMediator mediator,
+                        Goal goal,
+                        PosInOccurrence posInOcc,
+            ProverTaskListener listener) throws InterruptedException {
+        final Node initNode = mediator.getSelectedNode();
+        for (ExtendedProofMacro macro : getProofMacros()) {
+            // reverse to original node
+            mediator.getSelectionModel().setSelectedNode(initNode);
+            macro.applyTo(mediator, goal, posInOcc, listener);
+        }
+    }
+
+    /**
      * Gets the proof macros.
      *
      * @return the proofMacros as an unmodifiable list.
      */
-    public List<ProofMacro> getProofMacros() {
+    public List<ExtendedProofMacro> getProofMacros() {
         if(proofMacros == null) {
             this.proofMacros = createProofMacroArray();
             assert proofMacros != null;

@@ -1,0 +1,74 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
+package de.uka.ilkd.key.gui.macros;
+
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.Goal;
+
+/**
+ *
+ * @author christoph scheben
+ */
+public abstract class SequentialOnLastGoalProofMacro extends SequentialProofMacro {
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>
+     * The macros are always started on the last active goal (in contrast
+     * to the same goal as it is done in the SequentialProofMacro).
+     *
+     * @throws InterruptedException
+     *             if one of the wrapped macros is interrupted.
+     */
+    @Override
+    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
+            ProverTaskListener listener) throws InterruptedException {
+
+        for (ProofMacro macro : getProofMacros()) {
+            // (here we do not reverse to original node)
+            macro.applyTo(mediator, posInOcc, listener);
+            // after the first macro the posInOcc does not match any more,
+            // because we changed the goal / node
+            posInOcc = null;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>
+     * The macros are always started on the last active goal (in contrast
+     * to the same goal as it is done in the SequentialProofMacro).
+     *
+     * @throws InterruptedException
+     *             if one of the wrapped macros is interrupted.
+     */
+    @Override
+    public void applyTo(KeYMediator mediator,
+                        Goal goal,
+                        PosInOccurrence posInOcc,
+            ProverTaskListener listener) throws InterruptedException {
+
+        for (ExtendedProofMacro macro : getProofMacros()) {
+            // (here we do not reverse to original node)
+            macro.applyTo(mediator, goal, posInOcc, listener);
+            // after the first macro the posInOcc does not match any more,
+            // because we changed the goal / node
+            posInOcc = null;
+        }
+    }
+}

@@ -40,7 +40,7 @@ import de.uka.ilkd.key.strategy.Strategy;
  * @see ProverTaskListener
  * @see Strategy
  */
-public abstract class StrategyProofMacro implements ProofMacro {
+public abstract class StrategyProofMacro implements ExtendedProofMacro {
 
     protected abstract Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc);
 
@@ -57,6 +57,28 @@ public abstract class StrategyProofMacro implements ProofMacro {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * This macro can always be applied (does not change anything perhaps)
+     *
+     * TODO make this only applicable if it has an impact.
+     *
+     */
+    @Override
+    public boolean canApplyTo(KeYMediator mediator,
+                              Goal goal,
+                              PosInOccurrence posInOcc) {
+        return true;
+    }
+
+    /**
+     * Subclasses can use this method to do some postprocessing on the
+     * proof-object after the strategy has finished.
+     * @param proof     The proof object.
+     */
+    protected void doPostProcessing(Proof proof) {}
+
     /*
      * Set a new rule app manager similar to the focussed mode.
      * Set a new strategy which only allows for the named admitted rules.
@@ -68,7 +90,23 @@ public abstract class StrategyProofMacro implements ProofMacro {
     @Override 
     public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
             ProverTaskListener listener) throws InterruptedException {
+            Goal goal = mediator.getSelectedGoal();
+            applyTo(mediator, goal, posInOcc, listener);
+    }
 
+    /*
+     * Set a new rule app manager similar to the focussed mode.
+     * Set a new strategy which only allows for the named admitted rules.
+     * Then run automation mode and in the end reset the managers.
+     * and the strategy.
+     *
+     * If the automation is interrupted, report the interruption as an exception.
+     */
+    @Override
+    public void applyTo(KeYMediator mediator,
+                        Goal goal,
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) throws InterruptedException {
         final ApplyStrategy applyStrategy = 
                 new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
 
@@ -77,8 +115,7 @@ public abstract class StrategyProofMacro implements ProofMacro {
         }
 
         // add a focus manager if there is a focus
-        if(posInOcc != null && mediator.getSelectedGoal() != null) {
-            Goal goal = mediator.getSelectedGoal();
+        if(posInOcc != null && goal != null) {
             AutomatedRuleApplicationManager realManager = goal.getRuleAppManager();
             realManager.clearCache();
             FocussedRuleApplicationManager manager =
@@ -100,15 +137,15 @@ public abstract class StrategyProofMacro implements ProofMacro {
         } finally {
             // this resets the proof strategy and the managers after the automation
             // has run
-            for (final Goal goal : proof.openGoals()) {
-                AutomatedRuleApplicationManager manager = goal.getRuleAppManager();
+            for (final Goal openGoal : proof.openGoals()) {
+                AutomatedRuleApplicationManager manager = openGoal.getRuleAppManager();
                 // touch the manager only if necessary
                 if(manager.getDelegate() != null) {
                     while(manager.getDelegate() != null) {
                         manager = manager.getDelegate();
                     }
                     manager.clearCache();
-                    goal.setRuleAppManager(manager);
+                    openGoal.setRuleAppManager(manager);
                 }
             }
 

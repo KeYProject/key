@@ -1348,6 +1348,15 @@ public final class SpecificationRepository {
         return null;
     }
 
+    public ContractPO getContractPOForProof(Proof proof) {
+        ProofOblInput po = getProofOblInput(proof);
+        if (po != null && po instanceof ContractPO) {
+            return (ContractPO)po;
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Returns the target that the passed proof is about, or null.
      */
