@@ -13,44 +13,66 @@
 
 package de.uka.ilkd.key.gui.macros;
 
-import java.util.Iterator;
-
 import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
 
 public abstract class ExhaustiveProofMacro implements ProofMacro {
 
+    private static boolean isApplicableRecursive(KeYMediator mediator,
+                                                 PosInOccurrence posInOcc,
+                                                 ProofMacro macro) {
+        if (macro.canApplyTo(mediator, posInOcc)) {
+            return true;
+        } else if (posInOcc == null || posInOcc.posInTerm() == null) {
+            return false;
+        }
+        for (int i = 0; i < posInOcc.constrainedFormula().formula().subs().size(); i++) {
+            if (posInOcc.subTerm().depth() > 0
+                    && isApplicableRecursive(mediator, posInOcc.down(i), macro)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void applyRecursive(KeYMediator mediator,
+                                       PosInOccurrence posInOcc,
+                                       ProofMacro macro,
+                                       ProverTaskListener listener) throws InterruptedException {
+        if (macro.canApplyTo(mediator, posInOcc)) {
+            macro.applyTo(mediator, posInOcc, listener);
+        } else if (posInOcc == null || posInOcc.posInTerm() == null) {
+            return;
+        }
+        for (int i = 0; i < posInOcc.constrainedFormula().formula().subs().size(); i++) {
+            if (posInOcc.subTerm().depth() > 0
+                    && isApplicableRecursive(mediator, posInOcc.down(i), macro)) {
+                applyRecursive(mediator, posInOcc.down(i), macro, listener);
+                return;
+            }
+        }
+    }
+
     @Override
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        while (posInOcc != null && !posInOcc.isTopLevel()) {
-            posInOcc = posInOcc.up();
+        final ProofMacro macro = getProofMacro();
+        assert macro != null;
+        assert mediator != null;
+        assert mediator.getSelectionModel() != null;
+        if (mediator.getSelectedNode() == null) {
+            return macro.canApplyTo(mediator, posInOcc);
         }
-        PosInTerm posInTerm = PosInTerm.TOP_LEVEL;
-        Sequent seq = mediator.getSelectedNode().sequent();
-        Iterator<SequentFormula> seqIt = seq.iterator();
-        Term term = null;
-        SequentFormula seqForm = null;
-        PosInOccurrence.findInSequent(seq, 0, posInTerm);
-        while (seqIt.hasNext()) {
-            seqForm = seqIt.next();
-            term = seqForm.formula();
-        }
-        if (posInOcc != null && posInOcc.posInTerm() != null) {
-            PIOPathIterator it = posInOcc.iterator();
-            PosInOccurrence subPos = null;
-            while (it.next() != -1) {
-                subPos = it.getPosInOccurrence();
-                if (getProofMacro().canApplyTo(mediator, subPos)) {
-                    return true;
-                }
+        final Sequent seq = mediator.getSelectedNode().sequent();
+        for (int i = 1; i <= seq.size(); i++) {
+            if (isApplicableRecursive(mediator,
+                                      PosInOccurrence.findInSequent(seq, i, PosInTerm.TOP_LEVEL),
+                                      macro)) {
+                return true;
             }
         }
         return false;
@@ -60,20 +82,11 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
     public void applyTo(KeYMediator mediator,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
-        assert posInOcc != null;
-        while (!posInOcc.isTopLevel()) {
-            posInOcc = posInOcc.up();
-        }
-        if (posInOcc.posInTerm() != null) {
-            PIOPathIterator it = posInOcc.iterator();
-            PosInOccurrence subPos = null;
-            while (it.next() != -1) {
-                subPos = it.getPosInOccurrence();
-                if (getProofMacro().canApplyTo(mediator, subPos)) {
-                    getProofMacro().applyTo(mediator, subPos, listener);
-                    return;
-                }
-            }
+        final Sequent seq = mediator.getSelectedNode().sequent();
+        final ProofMacro macro = getProofMacro();
+        for (int i = 1; i <= seq.size(); i++) {
+            applyRecursive(mediator, PosInOccurrence.findInSequent(seq, i, PosInTerm.TOP_LEVEL),
+                           macro, listener);
         }
     }
 
