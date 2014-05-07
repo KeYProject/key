@@ -832,6 +832,9 @@ public final class MainWindow extends JFrame  {
 	proof.add(showActiveSettingsAction);
         proof.add(new ShowProofStatistics(this));
         proof.add(new ShowKnownTypesAction(this));
+        proof.addSeparator();
+        proof.add(new CounterExampleAction(this));
+        proof.add(new TestGenerationAction(this));
 
         return proof;
     }

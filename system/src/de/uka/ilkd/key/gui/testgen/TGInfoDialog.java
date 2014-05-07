@@ -33,7 +33,7 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener {
 	private final JButton exitButton;
 
 	public TGInfoDialog() {
-		super();
+		super(MainWindow.getInstance());
 		textArea = new JTextArea();
 		setLayout(new BorderLayout());
 		final JScrollPane scrollpane = new JScrollPane(textArea);
@@ -65,8 +65,9 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener {
 		setModal(false);
 		// this.pack();
 		setTitle("Test Suite Generation");
-		this.setSize(400, 200);
+		this.setSize(500, 300);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		setLocationRelativeTo(MainWindow.getInstance());
 		setVisible(true);
 	}
 

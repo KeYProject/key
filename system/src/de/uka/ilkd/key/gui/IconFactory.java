@@ -94,7 +94,9 @@ public class IconFactory {
 
     private static Image interactiveAppLogo = 
         getImage("images/interactiveAppLogo.png");
-
+    
+    private static Image counterexampleImage = getImage("images/toolbar/ce.png");
+    private static Image testgenerationImage = getImage("images/toolbar/tg.png");
 
     public static Image getImage(String s) {
 	ImageIcon ii=resManager.createImageIcon(IconFactory.class, s);
@@ -236,6 +238,14 @@ public class IconFactory {
     
     public static Icon oneStepSimplifier(int size) {
         return scaleIcon(oneStepSimplifier, size, size);
+    }
+    
+    public static Icon testGeneration(int size){
+    	return scaleIcon(testgenerationImage, size, size);
+    }
+    
+    public static Icon counterExample(int size){
+    	return scaleIcon(counterexampleImage, size, size);
     }
 
     public static ImageIcon junitLogo(int size) {
