@@ -203,14 +203,14 @@ public class TestGenerationAction extends MainWindowAction {
 		}
 	}
 
-	private static final String NAME = "T";
+	private static final String NAME = "Generate Testcases";
 	private static final String TOOLTIP = "Generate test cases for open goals";
 	private TGInfoDialog tgInfoDialog;
 	public static Proof originalProof;
 
 	public TestGenerationAction(MainWindow mainWindow) {
 		super(mainWindow);
-		//setName(TestGenerationAction.NAME);
+		setName(TestGenerationAction.NAME);
 		setTooltip(TestGenerationAction.TOOLTIP);
 		Icon icon = IconFactory.testGeneration(MainWindow.TOOLBAR_ICON_SIZE);
         putValue(SMALL_ICON, icon);
