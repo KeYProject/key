@@ -220,14 +220,16 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             while(it1.hasNext()) {
                 ProgramVariable originalParamVar = it1.next();
                 ProgramVariable paramVar         = it2.next();
-                assert originalParamVar.sort().equals(paramVar.sort());
+                // allow contravariant parameter types
+                assert originalParamVar.sort().extendsTrans(paramVar.sort());
                 result.put(originalParamVar, paramVar);
             }
         }
 
         //result
         if(resultVar != null) {
-            assert originalResultVar.sort().equals(resultVar.sort());
+            // workaround to allow covariant return types (bug #1384)
+            assert resultVar.sort().extendsTrans(originalResultVar.sort());
             result.put(originalResultVar, resultVar);
         }
 
@@ -301,14 +303,14 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             while(it1.hasNext()) {
                 ProgramVariable originalParamVar = it1.next();
                 Term paramTerm                   = it2.next();
-                assert paramTerm.sort().extendsTrans(originalParamVar.sort());
+                assert originalParamVar.sort().extendsTrans(paramTerm.sort());
                 result.put(TB.var(originalParamVar), paramTerm);
             }
         }
 
         //result
         if(resultTerm != null) {
-            assert originalResultVar.sort().equals(resultTerm.sort());
+            assert resultTerm.sort().extendsTrans(originalResultVar.sort());
             result.put(TB.var(originalResultVar), resultTerm);
         }
 
