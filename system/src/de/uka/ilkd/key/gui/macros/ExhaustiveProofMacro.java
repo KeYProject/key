@@ -34,6 +34,7 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
     private Map<Node, PosInOccurrence> applicalbeOnNodeAtPos =
             new HashMap<Node, PosInOccurrence>();
 
+    @Override
     public boolean finishAfterMacro() {
         return true;
     }

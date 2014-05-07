@@ -42,6 +42,7 @@ public class ProofMacroWrapper implements ExtendedProofMacro {
         return wrappedMacro.getDescription();
     }
 
+    @Override
     public boolean finishAfterMacro() {
         return true;
     }
