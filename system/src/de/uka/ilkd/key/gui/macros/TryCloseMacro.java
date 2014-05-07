@@ -26,8 +26,10 @@ import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left
@@ -83,6 +85,10 @@ public class TryCloseMacro implements ProofMacro {
                 "Applies only to goals beneath the selected node.";
     }
 
+    public boolean finishAfterMacro() {
+        return true;
+    }
+
     /*
      * This macro is always applicable.
      */
@@ -100,8 +106,9 @@ public class TryCloseMacro implements ProofMacro {
 
         //
         // create the rule application engine
-        final ApplyStrategy applyStrategy = 
-                new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
+        final IGoalChooser goalChooser =
+                mediator.getProfile().getSelectedGoalChooserBuilder().create();
+        final ApplyStrategy applyStrategy =  new ApplyStrategy(goalChooser, false);
         
         // quick fix to bug #1356, along with the commented out lines below
         // this reenables "classical" progress bar
@@ -172,11 +179,16 @@ public class TryCloseMacro implements ProofMacro {
     }
 
     private void fireStop(ProverTaskListener listener, Proof proof, long time, 
-            int appliedRules, int closedGoals) {
+                          int appliedRules, int closedGoals) {
         if(listener != null) {
             TaskFinishedInfo info = new DefaultTaskFinishedInfo(this, null, proof, time,
                                                                 appliedRules, closedGoals);
-            listener.taskFinished(info);
+            if (finishAfterMacro()) {
+                listener.taskFinished(info);
+            } else if (listener instanceof UserInterface
+                    && !((UserInterface)listener).macroChosen()) {
+                ((UserInterface)listener).finish();
+            }
         }
     }
 

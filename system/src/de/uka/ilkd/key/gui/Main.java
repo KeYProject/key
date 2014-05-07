@@ -426,7 +426,8 @@ public final class Main {
                 @Override
                 public void uncaughtException(Thread t, Throwable e) {
                     if (verbosity > Verbosity.SILENT) {
-                        System.out.println("Auto mode was terminated by an exception:"+e.getClass().toString().substring(5));
+                        System.out.println("Auto mode was terminated by an exception:"
+                                            + e.getClass().toString().substring(5));
                         if (verbosity >= Verbosity.DEBUG) e.printStackTrace();
                         final String msg = e.getMessage();
                         if (msg!=null) System.out.println(msg);

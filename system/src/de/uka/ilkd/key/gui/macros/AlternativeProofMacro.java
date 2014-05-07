@@ -43,6 +43,10 @@ public abstract class AlternativeProofMacro implements ExtendedProofMacro {
      */
     protected abstract ExtendedProofMacro[] createProofMacroArray();
 
+    public boolean finishAfterMacro() {
+        return true;
+    }
+
     /**
      * {@inheritDoc}
      *

@@ -503,7 +503,7 @@ public class SymbolicLayoutExtractor {
          }
       }
       starter.setMaxRuleApplications(maxProofSteps);
-      starter.start();
+      starter.start(false);
    }
 
    /**
@@ -530,7 +530,7 @@ public class SymbolicLayoutExtractor {
             TacletApp t2 = c.addInstantiation(cutF, term, false, getServices());
 
             final ImmutableList<Goal> branches = g.apply(t2);
-            starter.start(branches);
+            starter.start(branches, false);
         }
       }
    }

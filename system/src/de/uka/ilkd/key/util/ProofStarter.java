@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -97,7 +98,8 @@ public class ProofStarter {
             final Proof proof = createProof("Proof object for "+
                     ProofSaver.printAnything(seq, null));
 
-            return ProofAggregate.createProofAggregate(proof, "ProofAggregate for claim: "+proof.name());
+            return ProofAggregate.createProofAggregate(proof,
+                                                       "ProofAggregate for claim: "+proof.name());
         }
 
         @Override
@@ -194,20 +196,21 @@ public class ProofStarter {
      * starts proof attempt
      * @return the proof after the attempt terminated
      */
-     public ApplyStrategyInfo start() {
-        return start(proof.openGoals());
+     public ApplyStrategyInfo start(boolean finishAfterProof) {
+        return start(proof.openGoals(), finishAfterProof);
      }
 
    /**
     * starts proof attempt
     * @return the proof after the attempt terminated
     */
-    public ApplyStrategyInfo start(ImmutableList<Goal> goals) {
+    public ApplyStrategyInfo start(ImmutableList<Goal> goals, boolean finishAfterStrategy) {
         try {
            proof.setRuleAppIndexToAutoMode();
            
            final Profile profile = proof.env().getInitConfig().getProfile();
-           proof.setActiveStrategy(profile.getDefaultStrategyFactory().create(proof, strategyProperties));
+           proof.setActiveStrategy(profile.getDefaultStrategyFactory().create(proof,
+                                                                              strategyProperties));
 
            if (proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification()) {
               OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof);
@@ -218,7 +221,8 @@ public class ProofStarter {
 
            profile.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
 
-           ApplyStrategy prover = new ApplyStrategy(profile.getSelectedGoalChooserBuilder().create());
+           IGoalChooser goalChooser = profile.getSelectedGoalChooserBuilder().create();
+           ApplyStrategy prover = new ApplyStrategy(goalChooser, finishAfterStrategy);
            if (ptl != null) {
               prover.addProverTaskObserver(ptl);
            }
@@ -227,13 +231,15 @@ public class ProofStarter {
               prover.addProverTaskObserver(autoSaver);
            }
 
-           boolean stopMode = strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY).equals(StrategyProperties.STOPMODE_NONCLOSE);
+           boolean stopMode = strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
+                                                       .equals(StrategyProperties.STOPMODE_NONCLOSE);
            ApplyStrategy.ApplyStrategyInfo result;
            result = prover.start(proof, goals, maxSteps, timeout, stopMode);
            
            if (result.isError()) {
-               throw new RuntimeException("Proof attempt failed due to exception:"+result.getException(),
-                       result.getException());
+               throw new RuntimeException("Proof attempt failed due to exception:"
+                                           + result.getException(),
+                                          result.getException());
            }
 
            if (ptl != null) {
