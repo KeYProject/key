@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
@@ -17,6 +18,7 @@ import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.event.ISEDAnnotationListener;
 import org.key_project.sed.core.model.event.SEDAnnotationEvent;
+import org.key_project.sed.core.util.SEDPreferenceUtil;
 
 /**
  * Shows the colors defined by {@link ISEDAnnotation} in an {@link TableViewer}.
@@ -56,6 +58,16 @@ public class AnnotationColorTableSynchronizer implements IDisposable {
          handlePropertyChange(evt);
       }
    };
+
+   /**
+    * Listens for changes on {@link SEDPreferenceUtil#getStore()}.
+    */
+   private final IPropertyChangeListener storeListener = new IPropertyChangeListener() {
+      @Override
+      public void propertyChange(org.eclipse.jface.util.PropertyChangeEvent event) {
+         handleStorePropertyChange(event);
+      }
+   };
    
    /**
     * The {@link TableViewer} to show colors in.
@@ -77,6 +89,7 @@ public class AnnotationColorTableSynchronizer implements IDisposable {
       Assert.isNotNull(viewer);
       this.model = model;
       this.model.addAnnotationListener(modelListener);
+      SEDPreferenceUtil.getStore().addPropertyChangeListener(storeListener);
       for (ISEDAnnotation annotation : model.getRegisteredAnnotations()) {
          addListener(annotation);
       }
@@ -131,6 +144,21 @@ public class AnnotationColorTableSynchronizer implements IDisposable {
     */
    protected void handlePropertyChange(PropertyChangeEvent evt) {
       updateColor(evt.getSource());
+   }
+
+   /**
+    * Handles a change on {@link SEDPreferenceUtil#getStore()}.
+    * @param event The event.
+    */
+   protected void handleStorePropertyChange(org.eclipse.jface.util.PropertyChangeEvent event) {
+      if (event.getProperty().startsWith(SEDPreferenceUtil.PROP_ANNOTATION_TYPE_HIGHLIGHT_BACKGROUND_PREFIX) ||
+          event.getProperty().startsWith(SEDPreferenceUtil.PROP_ANNOTATION_TYPE_BACKGROUND_COLOR_PREFIX) ||
+          event.getProperty().startsWith(SEDPreferenceUtil.PROP_ANNOTATION_TYPE_HIGHLIGHT_FOREGROUND_PREFIX) ||
+          event.getProperty().startsWith(SEDPreferenceUtil.PROP_ANNOTATION_TYPE_FOREGROUND_COLOR_PREFIX)) {
+         for (TableItem item : viewer.getTable().getItems()) {
+            updateColor(item);
+         }
+      }
    }
    
    /**
@@ -191,6 +219,7 @@ public class AnnotationColorTableSynchronizer implements IDisposable {
     */
    @Override
    public void dispose() {
+      SEDPreferenceUtil.getStore().removePropertyChangeListener(storeListener);
       model.removeAnnotationListener(modelListener);
       for (ISEDAnnotation annotation : model.getRegisteredAnnotations()) {
          removeListener(annotation);

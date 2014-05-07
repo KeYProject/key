@@ -63,11 +63,11 @@ public class AnnotationsColorsPreferencePage extends FieldEditorPreferencePage i
          
          final ColorBooleanFieldEditor highlightBackgroundEditor = new ColorBooleanFieldEditor(SEDPreferenceUtil.PROP_ANNOTATION_TYPE_HIGHLIGHT_BACKGROUND_PREFIX + type.getTypeId(), "Highlight Background Color", group);
          addField(highlightBackgroundEditor);
-         final ColorFieldEditor backgroundEditor = new ColorFieldEditor(SEDPreferenceUtil.PROP_ANNOTATION_TYPE_BACKGROUND_COLOR + type.getTypeId(), "Background Color", group);
+         final ColorFieldEditor backgroundEditor = new ColorFieldEditor(SEDPreferenceUtil.PROP_ANNOTATION_TYPE_BACKGROUND_COLOR_PREFIX + type.getTypeId(), "Background Color", group);
          addField(backgroundEditor);
          final ColorBooleanFieldEditor highlightForegroundEditor = new ColorBooleanFieldEditor(SEDPreferenceUtil.PROP_ANNOTATION_TYPE_HIGHLIGHT_FOREGROUND_PREFIX + type.getTypeId(), "Highlight Foreground Color", group);
          addField(highlightForegroundEditor);
-         final ColorFieldEditor foregroundEditor = new ColorFieldEditor(SEDPreferenceUtil.PROP_ANNOTATION_TYPE_FOREGROUND_COLOR + type.getTypeId(), "Foreground Color", group);
+         final ColorFieldEditor foregroundEditor = new ColorFieldEditor(SEDPreferenceUtil.PROP_ANNOTATION_TYPE_FOREGROUND_COLOR_PREFIX + type.getTypeId(), "Foreground Color", group);
          addField(foregroundEditor);
          
          highlightBackgroundEditor.setColorEditor(backgroundEditor);

@@ -44,7 +44,7 @@ public final class SEDPreferenceUtil {
    /**
     * Prefix to store {@link ISEDAnnotationType#getBackgroundColor()}.
     */
-   public static final String PROP_ANNOTATION_TYPE_BACKGROUND_COLOR = "org.key_project.sed.preference.annotationType.backgroundColor_";
+   public static final String PROP_ANNOTATION_TYPE_BACKGROUND_COLOR_PREFIX = "org.key_project.sed.preference.annotationType.backgroundColor_";
 
    /**
     * Prefix to store {@link ISEDAnnotationType#isHighlightForeground()}.
@@ -54,7 +54,7 @@ public final class SEDPreferenceUtil {
    /**
     * Prefix to store {@link ISEDAnnotationType#getForegroundColor()}.
     */
-   public static final String PROP_ANNOTATION_TYPE_FOREGROUND_COLOR = "org.key_project.sed.preference.annotationType.foregroundColor_";
+   public static final String PROP_ANNOTATION_TYPE_FOREGROUND_COLOR_PREFIX = "org.key_project.sed.preference.annotationType.foregroundColor_";
    
    /**
     * Forbid instances.
@@ -169,7 +169,7 @@ public final class SEDPreferenceUtil {
     * @return The current value.
     */
    public static RGB getAnnotationTypeBackgroundColor(ISEDAnnotationType type) {
-      return PreferenceConverter.getColor(getStore(), PROP_ANNOTATION_TYPE_BACKGROUND_COLOR + type.getTypeId());
+      return PreferenceConverter.getColor(getStore(), PROP_ANNOTATION_TYPE_BACKGROUND_COLOR_PREFIX + type.getTypeId());
    }
    
    /**
@@ -178,7 +178,7 @@ public final class SEDPreferenceUtil {
     * @return The default value.
     */
    public static RGB getDefaultAnnotationTypeBackgroundColor(ISEDAnnotationType type) {
-      return PreferenceConverter.getDefaultColor(getStore(), PROP_ANNOTATION_TYPE_BACKGROUND_COLOR + type.getTypeId());
+      return PreferenceConverter.getDefaultColor(getStore(), PROP_ANNOTATION_TYPE_BACKGROUND_COLOR_PREFIX + type.getTypeId());
    }
    
    /**
@@ -187,7 +187,7 @@ public final class SEDPreferenceUtil {
     * @param value The new value to set.
     */
    public static void setAnnotationTypeBackgroundColor(ISEDAnnotationType type, RGB value) {
-      PreferenceConverter.setValue(getStore(), PROP_ANNOTATION_TYPE_BACKGROUND_COLOR + type.getTypeId(), value);
+      PreferenceConverter.setValue(getStore(), PROP_ANNOTATION_TYPE_BACKGROUND_COLOR_PREFIX + type.getTypeId(), value);
    }
    
    /**
@@ -195,7 +195,7 @@ public final class SEDPreferenceUtil {
     * @param type The {@link ISEDAnnotationType} to set its value.
     */
    public static void setDefaultAnnotationTypeBackgroundColor(ISEDAnnotationType type) {
-      PreferenceConverter.setDefault(getStore(), PROP_ANNOTATION_TYPE_BACKGROUND_COLOR + type.getTypeId(), type.getDefaultBackgroundColor());
+      PreferenceConverter.setDefault(getStore(), PROP_ANNOTATION_TYPE_BACKGROUND_COLOR_PREFIX + type.getTypeId(), type.getDefaultBackgroundColor());
    }
    
    /**
@@ -239,7 +239,7 @@ public final class SEDPreferenceUtil {
     * @return The current value.
     */
    public static RGB getAnnotationTypeForegroundColor(ISEDAnnotationType type) {
-      return PreferenceConverter.getColor(getStore(), PROP_ANNOTATION_TYPE_FOREGROUND_COLOR + type.getTypeId());
+      return PreferenceConverter.getColor(getStore(), PROP_ANNOTATION_TYPE_FOREGROUND_COLOR_PREFIX + type.getTypeId());
    }
    
    /**
@@ -248,7 +248,7 @@ public final class SEDPreferenceUtil {
     * @return The default value.
     */
    public static RGB getDefaultAnnotationTypeForegroundColor(ISEDAnnotationType type) {
-      return PreferenceConverter.getDefaultColor(getStore(), PROP_ANNOTATION_TYPE_FOREGROUND_COLOR + type.getTypeId());
+      return PreferenceConverter.getDefaultColor(getStore(), PROP_ANNOTATION_TYPE_FOREGROUND_COLOR_PREFIX + type.getTypeId());
    }
    
    /**
@@ -257,7 +257,7 @@ public final class SEDPreferenceUtil {
     * @param value The new value to set.
     */
    public static void setAnnotationTypeForegroundColor(ISEDAnnotationType type, RGB value) {
-      PreferenceConverter.setValue(getStore(), PROP_ANNOTATION_TYPE_FOREGROUND_COLOR + type.getTypeId(), value);
+      PreferenceConverter.setValue(getStore(), PROP_ANNOTATION_TYPE_FOREGROUND_COLOR_PREFIX + type.getTypeId(), value);
    }
    
    /**
@@ -265,6 +265,6 @@ public final class SEDPreferenceUtil {
     * @param type The {@link ISEDAnnotationType} to set its value.
     */
    public static void setDefaultAnnotationTypeForegroundColor(ISEDAnnotationType type) {
-      PreferenceConverter.setDefault(getStore(), PROP_ANNOTATION_TYPE_FOREGROUND_COLOR + type.getTypeId(), type.getDefaultForegroundColor());
+      PreferenceConverter.setDefault(getStore(), PROP_ANNOTATION_TYPE_FOREGROUND_COLOR_PREFIX + type.getTypeId(), type.getDefaultForegroundColor());
    }
 }
