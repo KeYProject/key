@@ -13,6 +13,12 @@
 
 package org.key_project.sed.core.model.impl;
 
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IDebugElement;
@@ -22,11 +28,16 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelSelectionPo
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelSelectionPolicyFactory;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
 import org.eclipse.debug.internal.ui.viewers.update.DefaultSelectionPolicy;
+import org.key_project.sed.core.annotation.ISEDAnnotationLink;
+import org.key_project.sed.core.annotation.ISEDAnnotationType;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.event.ISEDAnnotationLinkListener;
+import org.key_project.sed.core.model.event.SEDAnnotationLinkEvent;
 import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * Provides a basic implementation of {@link ISEDDebugNode}.
@@ -44,6 +55,16 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
     * The thread.
     */
    private final ISEDThread thread;
+   
+   /**
+    * All contained {@link ISEDAnnotationLink}s.
+    */
+   private final Set<ISEDAnnotationLink> annotationLinks = new LinkedHashSet<ISEDAnnotationLink>();
+   
+   /**
+    * All registered {@link ISEDAnnotationLinkListener}.
+    */
+   private final List<ISEDAnnotationLinkListener> annotationLinkListener = new LinkedList<ISEDAnnotationLinkListener>();
    
    /**
     * Constructor.
@@ -73,6 +94,63 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
    @Override
    public ISEDThread getThread() {
       return thread;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addAnnotationLink(ISEDAnnotationLink link) {
+      if (link != null) {
+         Assert.isTrue(getDebugTarget().isRegistered(link.getSource()), "Annotation is not registered in debug target.");
+         if (annotationLinks.add(link)) {
+            link.getSource().addLink(link);
+            fireAnnotationLinkAdded(new SEDAnnotationLinkEvent(this, link));
+         }
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeAnnotationLink(ISEDAnnotationLink link) {
+      if (link != null) {
+         if (annotationLinks.remove(link)) {
+            link.getSource().removeLink(link);
+            fireAnnotationLinkRemoved(new SEDAnnotationLinkEvent(this, link));
+         }
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDAnnotationLink[] getAnnotationLinks() {
+      return annotationLinks.toArray(new ISEDAnnotationLink[annotationLinks.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDAnnotationLink[] getAnnotationLinks(ISEDAnnotationType type) {
+      List<ISEDAnnotationLink> result = new LinkedList<ISEDAnnotationLink>();
+      for (ISEDAnnotationLink link : annotationLinks) {
+         if (ObjectUtil.equals(type, link.getSource().getType())) {
+            result.add(link);
+         }
+      }
+      return result.toArray(new ISEDAnnotationLink[result.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean containsAnnotationLink(ISEDAnnotationLink link) {
+      return link != null && annotationLinks.contains(link);
    }
 
    /**
@@ -132,6 +210,48 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
       }
       else {
          return Platform.getAdapterManager().getAdapter(this, adapter);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addAnnotationLinkListener(ISEDAnnotationLinkListener l) {
+      if (l != null) {
+         annotationLinkListener.add(l);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeAnnotationLinkListener(ISEDAnnotationLinkListener l) {
+      if (l != null) {
+         annotationLinkListener.remove(l);
+      }
+   }
+   
+   /**
+    * Fires the event {@link ISEDAnnotationLinkListener#annotationLinkAdded(SEDAnnotationLinkEvent)}.
+    * @param e The {@link SEDAnnotationLinkEvent}.
+    */
+   protected void fireAnnotationLinkAdded(SEDAnnotationLinkEvent e) {
+      ISEDAnnotationLinkListener[] listener = annotationLinkListener.toArray(new ISEDAnnotationLinkListener[annotationLinkListener.size()]);
+      for (ISEDAnnotationLinkListener l : listener) {
+         l.annotationLinkAdded(e);
+      }
+   }
+   
+   /**
+    * Fires the event {@link ISEDAnnotationLinkListener#annotationLinkRemoved(SEDAnnotationLinkEvent)}.
+    * @param e The {@link SEDAnnotationLinkEvent}.
+    */
+   protected void fireAnnotationLinkRemoved(SEDAnnotationLinkEvent e) {
+      ISEDAnnotationLinkListener[] listener = annotationLinkListener.toArray(new ISEDAnnotationLinkListener[annotationLinkListener.size()]);
+      for (ISEDAnnotationLinkListener l : listener) {
+         l.annotationLinkRemoved(e);
       }
    }
    
