@@ -26,12 +26,14 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
     private static boolean isApplicableRecursive(KeYMediator mediator,
                                                  PosInOccurrence posInOcc,
                                                  ProofMacro macro) {
-        if (macro.canApplyTo(mediator, posInOcc)) {
-            return true;
-        } else if (posInOcc == null || posInOcc.posInTerm() == null) {
+        if (posInOcc == null
+                || posInOcc.depth() >= posInOcc.constrainedFormula().formula().arity()
+                || posInOcc.subTerm() == null) {
             return false;
+        } else if (macro.canApplyTo(mediator, posInOcc)) {
+            return true;
         }
-        for (int i = 0; i < posInOcc.constrainedFormula().formula().subs().size(); i++) {
+        for (int i = 0; i < posInOcc.constrainedFormula().formula().arity(); i++) {
             if (posInOcc.subTerm().depth() > 0
                     && isApplicableRecursive(mediator, posInOcc.down(i), macro)) {
                 return true;
@@ -46,10 +48,12 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
                                        ProverTaskListener listener) throws InterruptedException {
         if (macro.canApplyTo(mediator, posInOcc)) {
             macro.applyTo(mediator, posInOcc, listener);
-        } else if (posInOcc == null || posInOcc.posInTerm() == null) {
+        } else if (posInOcc == null
+                || posInOcc.depth() >= posInOcc.constrainedFormula().formula().arity()
+                || posInOcc.subTerm() == null) {
             return;
         }
-        for (int i = 0; i < posInOcc.constrainedFormula().formula().subs().size(); i++) {
+        for (int i = 0; i < posInOcc.constrainedFormula().formula().arity(); i++) {
             if (posInOcc.subTerm().depth() > 0
                     && isApplicableRecursive(mediator, posInOcc.down(i), macro)) {
                 applyRecursive(mediator, posInOcc.down(i), macro, listener);
@@ -84,9 +88,13 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
                         ProverTaskListener listener) throws InterruptedException {
         final Sequent seq = mediator.getSelectedNode().sequent();
         final ProofMacro macro = getProofMacro();
+        PosInOccurrence searchPos = posInOcc;
         for (int i = 1; i <= seq.size(); i++) {
-            applyRecursive(mediator, PosInOccurrence.findInSequent(seq, i, PosInTerm.TOP_LEVEL),
-                           macro, listener);
+            searchPos = PosInOccurrence.findInSequent(seq, i, PosInTerm.TOP_LEVEL);
+            if (isApplicableRecursive(mediator, searchPos, macro)) {
+                applyRecursive(mediator, searchPos, macro, listener);
+                return;
+            }
         }
     }
 
