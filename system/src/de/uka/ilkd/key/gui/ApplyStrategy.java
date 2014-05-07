@@ -38,6 +38,7 @@ import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -526,6 +527,9 @@ public class ApplyStrategy {
     private synchronized void fireTaskFinished (TaskFinishedInfo info) {
         for (ProverTaskListener ptl : proverTaskObservers) {
             ptl.taskFinished(info);
+            if (ptl instanceof UserInterface) {
+                ((UserInterface)ptl).finish(info, true);
+            }
         }
     }
 
@@ -623,14 +627,11 @@ public class ApplyStrategy {
     }
 
     private void finishStrategy(ApplyStrategyInfo result) {
-//        if (result != null) {
         assert result != null; // CS
-            proof.addAutoModeTime(result.getTime());
-
-        fireTaskFinished (new DefaultTaskFinishedInfo(this, result,
-                proof, result.getTime(),
-                result.getAppliedRuleApps(), result.getClosedGoals()));
-//        }
+        proof.addAutoModeTime(result.getTime());
+        fireTaskFinished (new DefaultTaskFinishedInfo(this, result, proof, result.getTime(),
+                                                      result.getAppliedRuleApps(),
+                                                      result.getClosedGoals()));
     }
 
     // Used to combine multiple iteratively called proofs and integrate their results in final result

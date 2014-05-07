@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.util.Debug;
 
 public abstract class AbstractUserInterface implements UserInterface {
 
@@ -63,6 +64,30 @@ public abstract class AbstractUserInterface implements UserInterface {
 
     public boolean macroChosen() {
         return !(getMacro() instanceof DummyProofMacro);
+    }
+
+    public boolean applyMacro() {
+        assert macroChosen();
+        if (autoMacro.canApplyTo(getMediator(), null)) {
+            if (this instanceof ConsoleUserInterface) {
+                System.out.println("[ APPLY " + autoMacro.getClass().getSimpleName() + " ]");
+            }
+            try {
+                getMediator().stopInterface(true);
+                getMediator().setInteractive(false);
+                autoMacro.applyTo(getMediator(), null, this);
+                getMediator().setInteractive(true);
+                getMediator().startInterface(true);
+            } catch(InterruptedException ex) {
+                Debug.out("Proof macro has been interrupted:");
+                Debug.out(ex);
+            }
+            this.autoMacro = new DummyProofMacro(); // reset macro to avoid loops
+            return true;
+        } else {
+            System.out.println(autoMacro.getClass().getSimpleName() + " not applicable!");
+        }
+        return false;
     }
 
     /**
