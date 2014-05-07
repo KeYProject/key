@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.Icon;
+import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.IconFactory;
@@ -60,12 +61,7 @@ public class CounterExampleAction extends MainWindowAction {
 
             public void selectedNodeChanged(KeYSelectionEvent e) {
                 final Proof proof = getMediator().getSelectedProof();
-                
-                if(!SolverType.Z3_CE_SOLVER.isInstalled(false)){
-                	setEnabled(false);
-                	return;
-                }
-                
+                                        
                 if (proof == null) {
                     // no proof loaded
                     setEnabled(false);
@@ -129,7 +125,7 @@ public class CounterExampleAction extends MainWindowAction {
     
     @Override
 	public void actionPerformed(ActionEvent e) {
-		createProof(getMediator());		
+			
 		CEWorker worker = new CEWorker();
 		worker.start();
 	}
@@ -165,7 +161,17 @@ public class CounterExampleAction extends MainWindowAction {
 
 		@Override
 		public Object construct() {
-								
+			
+			if(!SolverType.Z3_CE_SOLVER.isInstalled(false)){
+            	
+				JOptionPane.showMessageDialog(mainWindow,
+					    "Z3 is not installed.",
+					    "Error",
+					    JOptionPane.ERROR_MESSAGE);
+				
+            	return null;
+            }
+			createProof(getMediator());					
 			KeYMediator mediator = getMediator();
 			Proof proof = mediator.getSelectedProof();
 			SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
