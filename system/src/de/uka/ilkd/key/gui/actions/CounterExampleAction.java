@@ -4,7 +4,10 @@ import java.awt.event.ActionEvent;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.Icon;
+
 import de.uka.ilkd.key.gui.AutoModeListener;
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.InterruptListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
@@ -36,8 +39,13 @@ public class CounterExampleAction extends MainWindowAction {
 	
 	public CounterExampleAction(MainWindow mainWindow) {
 		super(mainWindow);
-		setName(NAME);
+		//setName(NAME);
 		setTooltip(TOOLTIP);
+		
+		Icon icon = IconFactory.counterExample(MainWindow.TOOLBAR_ICON_SIZE);
+        putValue(SMALL_ICON, icon);
+		
+		
 		init();
 		
 	}

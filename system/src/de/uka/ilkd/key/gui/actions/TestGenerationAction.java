@@ -8,8 +8,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.Icon;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.AutoModeListener;
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.InterruptListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
@@ -207,8 +210,10 @@ public class TestGenerationAction extends MainWindowAction {
 
 	public TestGenerationAction(MainWindow mainWindow) {
 		super(mainWindow);
-		setName(TestGenerationAction.NAME);
+		//setName(TestGenerationAction.NAME);
 		setTooltip(TestGenerationAction.TOOLTIP);
+		Icon icon = IconFactory.testGeneration(MainWindow.TOOLBAR_ICON_SIZE);
+        putValue(SMALL_ICON, icon);
 		init();
 	}
 
