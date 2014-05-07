@@ -79,7 +79,7 @@ public class SearchAnnotationType extends AbstractSEDAnnotationType {
     */
    @Override
    public ISEDAnnotationLink createLink(ISEDAnnotation source, ISEDDebugNode target) {
-      return new DefaultSEDAnnotationLink(source, target);
+      return new SearchAnnotationLink(source, target);
    }
 
    /**

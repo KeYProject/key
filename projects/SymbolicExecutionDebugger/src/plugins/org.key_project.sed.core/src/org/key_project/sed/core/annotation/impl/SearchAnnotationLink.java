@@ -5,16 +5,16 @@ import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.model.ISEDDebugNode;
 
 /**
- * The default implementation of {@link ISEDAnnotationLink}.
+ * An {@link ISEDAnnotationLink} which represents a search result.
  * @author Martin Hentschel
  */
-public class DefaultSEDAnnotationLink extends AbstractSEDAnnotationLink {
+public class SearchAnnotationLink extends AbstractSEDAnnotationLink {
    /**
     * Constructor.
     * @param source The source {@link ISEDAnnotation}.
     * @param target The target {@link ISEDDebugNode}.
     */
-   public DefaultSEDAnnotationLink(ISEDAnnotation source, ISEDDebugNode target) {
+   public SearchAnnotationLink(ISEDAnnotation source, ISEDDebugNode target) {
       super(source, target);
    }
 
@@ -24,5 +24,13 @@ public class DefaultSEDAnnotationLink extends AbstractSEDAnnotationLink {
    @Override
    public boolean canDelete() {
       return false;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String toString() {
+      return getSource().toString();
    }
 }

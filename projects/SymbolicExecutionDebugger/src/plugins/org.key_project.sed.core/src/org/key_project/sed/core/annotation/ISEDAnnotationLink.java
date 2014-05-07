@@ -1,7 +1,6 @@
 package org.key_project.sed.core.annotation;
 
 import org.key_project.sed.core.annotation.impl.AbstractSEDAnnotation;
-import org.key_project.sed.core.annotation.impl.DefaultSEDAnnotationLink;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDIDElement;
 import org.key_project.util.bean.IBean;
@@ -13,8 +12,7 @@ import org.key_project.util.bean.IBean;
  * the interface implementation.
  * </p>
  * <p>
- * Implementations should subclass from {@link AbstractSEDAnnotation} or
- * just use the {@link DefaultSEDAnnotationLink} implementation.
+ * Implementations should subclass from {@link AbstractSEDAnnotation}.
  * </p>
  * <p>
  * Instances of this interface are created via 
