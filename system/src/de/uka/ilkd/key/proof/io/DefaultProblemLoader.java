@@ -149,6 +149,7 @@ public class DefaultProblemLoader {
                if (proof != null) {
                    replayProof(proof);
                }
+               mediator.getUI().applyMacro();
                // this message is propagated to the top level in console mode
                return null; // Everything fine
          }

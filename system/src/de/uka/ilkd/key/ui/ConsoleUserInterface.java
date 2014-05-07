@@ -24,6 +24,7 @@ import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.gui.KeYMediator;
 import static de.uka.ilkd.key.gui.Main.Verbosity.*;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.gui.macros.ProofMacroWorker;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
@@ -262,6 +263,15 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    @Override
    public void loadProblem(File file, List<File> classPath, File bootClassPath) {
       super.loadProblem(file, classPath, bootClassPath, mediator);
+   }
+
+   @Override
+   public void applyMacro() {
+       super.applyMacro();
+       // TODO: execute macro
+       ProofMacroWorker worker = new ProofMacroWorker(autoMacro, mediator, null);
+       System.out.println("Apply it ... NOW!");
+       worker.start();
    }
 
 	@Override

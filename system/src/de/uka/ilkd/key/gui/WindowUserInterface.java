@@ -20,6 +20,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.macros.ProofMacro;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
@@ -74,6 +75,12 @@ public class WindowUserInterface extends AbstractUserInterface {
 	@Override
 	public void loadProblem(File file) {
 		loadProblem(file, null, null);
+	}
+
+	@Override
+	public void applyMacro() {
+	    super.applyMacro();
+	    System.err.println("Automatic macro option not applicable in graphic mode.");
 	}
 
 	@Override

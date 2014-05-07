@@ -18,6 +18,8 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.macros.DummyProofMacro;
+import de.uka.ilkd.key.gui.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -33,6 +35,8 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 public abstract class AbstractUserInterface implements UserInterface {
 
+    ProofMacro autoMacro = new DummyProofMacro();
+
 	public void loadProblem(File file, List<File> classPath,
 	        File bootClassPath, KeYMediator mediator) {
 		final ProblemLoader pl = new ProblemLoader(file, classPath,
@@ -47,6 +51,17 @@ public abstract class AbstractUserInterface implements UserInterface {
 		// cannot complete that app
 		return app.complete() ? app : null;
 	}
+
+    public void setMacro(ProofMacro macro) {
+        assert macro != null;
+        this.autoMacro = macro;
+    }
+
+    public void applyMacro() {
+        if (autoMacro instanceof DummyProofMacro) {
+            return;
+        }
+    }
 
     /**
      * {@inheritDoc}

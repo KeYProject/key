@@ -23,6 +23,9 @@ import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
+import de.uka.ilkd.key.gui.macros.DummyProofMacro;
+import de.uka.ilkd.key.gui.macros.FullInformationFlowAutoPilotMacro;
+import de.uka.ilkd.key.gui.macros.ProofMacro;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.ui.BatchMode;
@@ -51,6 +54,8 @@ public final class Main {
     private static final String AUTOSAVE = "--autosave";
     private static final String EXPERIMENTAL = "--experimental";
     private static final String DEBUG = "--debug";
+    private static final String MACRO = "--macro";
+    private static final String INF_FLOW = "inf-flow";
     private static final String NO_DEBUG = "--no_debug";
     private static final String ASSERTION = "--assertion";
     private static final String NO_ASSERTION = "--no-assertion";
@@ -144,6 +149,7 @@ public final class Main {
     private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES =
         {de.uka.ilkd.key.proof.delayedcut.DelayedCut.FEATURE};
 
+    private static ProofMacro autoMacro = new DummyProofMacro();
 
     /**
      * <p>
@@ -190,8 +196,9 @@ public final class Main {
 
     public static void loadCommandLineFile(UserInterface ui) {
         if (Main.getFileNameOnStartUp() != null) {
-            ui.loadProblem(new File(Main.getFileNameOnStartUp()));
-
+            final File fnos = new File(Main.getFileNameOnStartUp());
+            ui.loadProblem(fnos);
+            ui.setMacro(autoMacro);
         } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
             ui.openExamples();
         }
@@ -234,6 +241,7 @@ public final class Main {
         cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "save or drop proofs (then stored to path given by "+ JPATH_OF_RESULT + ")");
         cl.addOption(JFILE_FOR_AXIOMS, "<filename>", "read axioms from given file");
         cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "read definitions from given file");
+        cl.addOption(MACRO, "<proofMacro>", "apply automatic proof macro");
         return cl;
     }
     /**
@@ -350,6 +358,18 @@ public final class Main {
 
         if (cl.isSet(DEBUG)) {
             Debug.ENABLE_DEBUG = true;
+        }
+
+        // TODO: check here for (auto-)macros
+        if (cl.isSet(MACRO)) {
+            String macro = cl.getString(MACRO, "");
+            if (macro.equals(INF_FLOW)) {
+                // memorize macro for later
+                autoMacro = new FullInformationFlowAutoPilotMacro();
+            } else {
+                // auto-macro option without macro
+                System.err.println("No automatic proof macro specified.");
+            }
         }
 
         //arguments not assigned to a command line option may be files
