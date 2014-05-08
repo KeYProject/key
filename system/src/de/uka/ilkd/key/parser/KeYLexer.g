@@ -58,38 +58,10 @@ lexer grammar KeYLexer;
 
     // why is keh sometimes null?
 
-    public KeYLexer(InputStream in, KeYExceptionHandler keh) throws IOException {
-        this(new ANTLRInputStream(in));
-	if(keh != null)
-            this.keh = keh;
-	this.selector = new Stack<SaveStruct>();
-	//selector.select(this);
-    }
-
-    public KeYLexer(InputStream in, KeYExceptionHandler keh,
-                    Stack<SaveStruct> selector) throws IOException {
-        this(new ANTLRInputStream(in));
-	if(keh != null)
-          this.keh = keh;
-	this.selector = selector;
-    }
-
-    public KeYLexer(Reader in, KeYExceptionHandler keh) throws IOException {
-        this(new ANTLRReaderStream(in));
-	if(keh != null)
-          this.keh = keh;
-	this.selector = new Stack<SaveStruct>();
-	//selector.select(this);
-    }
-
     public KeYLexer(CharStream in, KeYExceptionHandler keh) {
 	this(in);
 	if(keh != null) { this.keh = keh; }
 	this.selector = new Stack<SaveStruct>();
-    }
-
-    public KeYLexer(String in, KeYExceptionHandler keh) {
-	this(new ANTLRStringStream(in), keh);
     }
 
     public void reportError(RecognitionException ex){

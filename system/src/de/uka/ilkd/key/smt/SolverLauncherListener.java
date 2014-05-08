@@ -22,7 +22,7 @@ import java.util.Collection;
 public interface SolverLauncherListener {
 	
     public void launcherStopped(SolverLauncher launcher,
-	    Collection<SMTSolver> problemSolvers);
+	    Collection<SMTSolver> finishedSolvers);
 
     public void launcherStarted(Collection<SMTProblem> problems,
 	    Collection<SolverType> solverTypes, SolverLauncher launcher);

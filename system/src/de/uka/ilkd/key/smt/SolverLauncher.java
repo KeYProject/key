@@ -20,7 +20,6 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import de.uka.ilkd.key.java.Services;
-
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 
 /**
@@ -318,7 +317,7 @@ public class SolverLauncher implements SolverListener {
     private void launchSolvers(LinkedList<SMTSolver> solvers,
 	    Collection<SMTProblem> problems, Collection<SolverType> solverTypes)
     {
-
+    //Show progress dialog
 	notifyListenersOfStart(problems, solverTypes);
 
 	// Launch all solvers until the queue is empty or the launcher is
@@ -398,13 +397,15 @@ public class SolverLauncher implements SolverListener {
     }
 
     private void notifyListenersOfStop()  {
-	Collection<SMTSolver> solvers = session.getProblemSolvers();
+	Collection<SMTSolver> problemSolvers = session.getProblemSolvers();
+	Collection<SMTSolver> finishedSolvers = session.getFinishedSolvers();
+	finishedSolvers.addAll(problemSolvers);
 	for (SolverLauncherListener listener : listeners) {
-	    listener.launcherStopped(this, solvers);
+	    listener.launcherStopped(this, finishedSolvers);
 	}
 
-	if (!solvers.isEmpty() && listeners.isEmpty()) {
-	    throw new SolverException(solvers);
+	if (!problemSolvers.isEmpty() && listeners.isEmpty()) {
+	    throw new SolverException(problemSolvers);
 	}
     }
 
@@ -415,7 +416,8 @@ public class SolverLauncher implements SolverListener {
      */
     private void notifySolverHasFinished(SMTSolver solver) {
 	lock.lock();
-	try {
+	try {		
+		solver.setQuery(solver.getType().getQuery());		
 		session.removeCurrentlyRunning(solver);
 		wait.signal();
 	} finally {
@@ -437,6 +439,7 @@ public class SolverLauncher implements SolverListener {
 
     @Override
     public void processStopped(SMTSolver solver, SMTProblem problem) {
+    session.addFinishedSolver(solver);
 	notifySolverHasFinished(solver);
     }
 
@@ -468,6 +471,8 @@ class Session {
     private ReentrantLock lock = new ReentrantLock();
     /** Locks the collection of the problem solvers. */
     private ReentrantLock problemSolverLock = new ReentrantLock();
+    private ReentrantLock finishedSolverLock = new ReentrantLock();
+    private Collection<SMTSolver> finishedSolvers = new LinkedList<SMTSolver>();
     private Collection<SMTSolver> problemSolvers = new LinkedList<SMTSolver>();
     private LinkedList<SMTSolver> currentlyRunning = new LinkedList<SMTSolver>();
 
@@ -539,6 +544,15 @@ class Session {
 	    problemSolverLock.unlock();
 	}
     }
+    
+    public void addFinishedSolver(SMTSolver solver) {
+    	try {
+    		finishedSolverLock.lock();
+    		finishedSolvers.add(solver);
+    	} finally {
+    		finishedSolverLock.unlock();
+    	}
+    }
 
     public Collection<SMTSolver> getProblemSolvers() {
 	try {
@@ -549,6 +563,18 @@ class Session {
 	} finally {
 	    problemSolverLock.unlock();
 	}
+
+    }
+    
+    public Collection<SMTSolver> getFinishedSolvers() {
+    	try {
+    		finishedSolverLock.lock();
+    		Collection<SMTSolver> copy = new LinkedList<SMTSolver>(
+    				finishedSolvers);
+    		return copy; // finally trumps return
+    	} finally {
+    		finishedSolverLock.unlock();
+    	}
 
     }
 

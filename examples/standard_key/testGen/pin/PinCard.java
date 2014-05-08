@@ -13,17 +13,17 @@
 
 public class PinCard{
 
-    protected int pin;
-    protected int counter_pin;
-    protected boolean permission_session;
+    public int pin;
+    public int counter_pin;
+    public boolean permission_session;
 
     /*@ public normal_behavior
-      @  requires 0 <= counter_pin && counter_pin <= 3;
+      @  requires 0 <= counter_pin && counter_pin <= 3 && oldPin>=0 && newPin>=0;
       @  assignable permission_session, counter_pin, pin;
       @  ensures counter_pin==0 ==> \result==9840;
       @  ensures (\old(pin) != oldPin || \old(counter_pin) == 0) ?
-      @          (\old(pin) == pin && (\result==9840 || \result==9804)) : 
-      @          (pin == newPin && \result==9000);
+      @          (\old(pin) == pin && (\result==840 || \result==980)) : 
+      @          (pin == newPin && \result==900);
       @*/
     public int changePin(int oldPin, int newPin){
 	int sw;

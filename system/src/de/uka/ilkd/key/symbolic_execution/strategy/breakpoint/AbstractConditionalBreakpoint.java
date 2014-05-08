@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.strategy;
+package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,7 +22,6 @@ import java.util.Set;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.SourceElement;
@@ -30,8 +29,8 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
@@ -56,11 +55,14 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition extends
-      AbstractNonSymbolicHitCountBreakpointStopCondition {
-   
+/**
+ * Adds the funtionality to breakpoints to evaluate conditions.
+ * @author Martin Hentschel
+ */
+public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBreakpoint {
    /**
     * The condition  for this Breakpoint (set by user).
     */
@@ -112,8 +114,7 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
    private IProgramMethod pm;
 
    /**
-    * Creates a new {@link AbstractNonSymbolicConditionalBreakpointStopCondition}. Call setCondition immediately after calling the constructor!
-    * 
+    * Creates a new {@link AbstractConditionalBreakpoint}. Call setCondition immediately after calling the constructor!
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
@@ -123,10 +124,8 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
     * @param methodEnd the line the containing method of this breakpoint ends at
     * @param containerType the type of the element containing the breakpoint
     */
-   public AbstractNonSymbolicConditionalBreakpointStopCondition(int hitCount, IProgramMethod pm, Proof proof,
-         boolean enabled, boolean conditionEnabled,
-         int methodStart, int methodEnd, KeYJavaType containerType){
-      super(hitCount, proof, enabled);
+   public AbstractConditionalBreakpoint(int hitCount, IProgramMethod pm, Proof proof, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd, KeYJavaType containerType){
+      super(hitCount, proof,enabled);
       this.setPm(pm);
       paramVars= new HashSet<LocationVariable>();
       setVariableNamingMap(new HashMap<SVSubstitute, SVSubstitute>());
@@ -135,20 +134,25 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
       this.conditionEnabled = conditionEnabled;
    }
    
+   /**
+    * {@inheritDoc}
+    */
    @Override
-   public boolean shouldStop(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser, long startTime, int countApplied,
-         SingleRuleApplicationInfo singleRuleApplicationInfo) {
-      if (singleRuleApplicationInfo != null) {
-         Goal goal = singleRuleApplicationInfo.getGoal();
+   public void updateState(int maxApplications, 
+                          long timeout, 
+                          Proof proof, 
+                          IGoalChooser goalChooser, 
+                          long startTime, 
+                          int countApplied, 
+                          Goal goal) {
+      super.updateState(maxApplications, timeout, proof, goalChooser, startTime, countApplied, goal);
+      if (goal != null) {
          Node node = goal.node();
-         RuleApp ruleApp = singleRuleApplicationInfo.getAppliedRuleApp();
-         if(getVarsForCondition()!=null&&ruleApp!=null&&node!=null){
+         RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+         if (getVarsForCondition() != null && ruleApp != null && node != null) {
             refreshVarMaps(ruleApp, node);
          }
       }
-      return super.shouldStop(maxApplications, timeout, proof, goalChooser,
-            startTime, countApplied, singleRuleApplicationInfo);
    }
 
    /**
@@ -169,7 +173,6 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
 
    /**
     * Returns a map containing the same entries as the variableNamingMap changes in one map do not effect the other map
-    * 
     * @return the cloned map
     */
    private Map<SVSubstitute, SVSubstitute> getOldMap() {
@@ -186,7 +189,6 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
 
    /**
     * removes all stored parameters in to Keep when the ruleApp on the current node would induce a method return
-    * 
     * @param node
     * @param ruleApp
     * @param inScope
@@ -199,13 +201,12 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
 
    /**
     * put relevant values from the current nodes renamings in toKeep and variableNamingMap
-    * 
     * @param varForCondition the variable that might be relevant for the condition
     * @param node the current
     * @param inScope the flag to determine if the current statement is in the scope of the breakpoint
     * @param oldMap the oldMap variableNamings
     */
-   private void putValuesFromRenamings(ProgramVariable varForCondition, Node node, boolean inScope, Map<SVSubstitute, SVSubstitute> oldMap) {
+   private void putValuesFromRenamings(ProgramVariable varForCondition, Node node, boolean inScope, Map<SVSubstitute, SVSubstitute> oldMap, RuleApp ruleApp) {
       // look for renamings KeY did
       boolean found = false;
       //get current renaming tables
@@ -256,7 +257,6 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
 
    /**
     * Modifies toKeep and variableNamingMap to hold the correct parameters after execution of the given ruleApp on the given node
-    * 
     * @param ruleApp the applied rule app
     * @param nodethe current node
     */
@@ -271,14 +271,13 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
          putValuesFromGlobalVars(varForCondition, node, inScope);
          // put renamings into map and tokeep remove no longer need vars from
          // tokeep
-         putValuesFromRenamings(varForCondition, node, inScope, oldMap);
+         putValuesFromRenamings(varForCondition, node, isInScopeForCondition(node), oldMap, ruleApp);
       }
       freeVariablesAfterReturn(node, ruleApp, inScope);
    }
    
    /**
     * Computes the Term that can be evaluated, from the user given condition
-    * 
     * @param condition the condition given by the user
     * @return the {@link Term} that represents the condition
     * @throws SLTranslationException if the Term could not be parsed
@@ -311,10 +310,12 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
       ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(containerType);
       ImmutableList<ProgramVariable> globalVars = ImmutableSLList.nil();
       for(KeYJavaType kjtloc: kjts){
-         ImmutableList<Field> fields = info.getAllFields((ClassDeclaration)kjtloc.getJavaType());
-         for(Field field : fields){
-            if((kjtloc.equals(containerType)||!field.isPrivate())&&!((LocationVariable) field.getProgramVariable()).isImplicit())
-               globalVars = globalVars.append((ProgramVariable) field.getProgramVariable());
+         if (kjtloc.getJavaType() instanceof TypeDeclaration) {
+            ImmutableList<Field> fields = info.getAllFields((TypeDeclaration)kjtloc.getJavaType());
+            for(Field field : fields){
+               if((kjtloc.equals(containerType)||!field.isPrivate())&&!((LocationVariable) field.getProgramVariable()).isImplicit())
+                  globalVars = globalVars.append((ProgramVariable) field.getProgramVariable());
+            }
          }
       }
       varsForCondition = varsForCondition.append(globalVars);
@@ -336,36 +337,44 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
    
    /**
     * Checks if the condition, that was given by the user, evaluates to true with the current of the proof
-    * 
     * @param ruleApp the {@link RuleApp} to be executed next
     * @param proof the current {@link Proof}
     * @param node the current {@link Node}
     * @return true if the condition evaluates to true
-    * @throws ProofInputException 
     */
-   protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node) throws ProofInputException{
-      //initialize values
-      PosInOccurrence pio = ruleApp.posInOccurrence();
-      Term term = pio.subTerm();
-      term = TermBuilder.goBelowUpdates(term);
-      IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
-      //put values into map which have to be replaced
-      if(ec!=null){
-         getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
+   protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node) {
+      try {
+         //initialize values
+         PosInOccurrence pio = ruleApp.posInOccurrence();
+         Term term = pio.subTerm();
+         getProof().getServices().getTermBuilder();
+         term = TermBuilder.goBelowUpdates(term);
+         IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
+         //put values into map which have to be replaced
+         if(ec!=null){
+            getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
+         }
+         //replace renamings etc.
+         OpReplacer replacer = new OpReplacer(getVariableNamingMap(), getProof().getServices().getTermFactory());
+         Term termForSideProof = replacer.replace(condition);
+         //start side proof
+         Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
+         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
+         ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
+         return info.getProof().closed();
       }
-      //replace renamings etc.
-      OpReplacer replacer = new OpReplacer(getVariableNamingMap(), getProof().getServices().getTermFactory());
-      Term termForSideProof = replacer.replace(condition);
-      //start side proof
-      Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
-      Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
-      ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
-      return info.getProof().closed();
+      catch (ProofInputException e) {
+         return false;
+      }
    }
+   
+   /**
+    * {@inheritDoc}
+    */
    @Override
-   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp,
-         Proof proof, Node node) throws ProofInputException {
-      return (!conditionEnabled||conditionMet(ruleApp, proof, node))&&super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
+      return (!conditionEnabled || conditionMet(ruleApp, proof, node)) &&
+             super.isBreakpointHit(activeStatement, ruleApp, proof, node);
    }
 
    /**
@@ -384,9 +393,15 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
     */
    protected abstract boolean isInScope(Node node);
 
-
-   private ImmutableList<ProgramVariable> saveAddVariable(LocationVariable x,
-         ImmutableList<ProgramVariable> varsForCondition) {
+   /**
+    * Checks if the statement of a given {@link Node} is in the scope of this breakpoint.
+    * 
+    * @param node the {@link Node} to be checked
+    * @return true if the node represents a statement in the scope of this breakpoint.
+    */
+   protected abstract boolean isInScopeForCondition(Node node);
+   
+   private ImmutableList<ProgramVariable> saveAddVariable(LocationVariable x, ImmutableList<ProgramVariable> varsForCondition) {
       boolean contains = false;
       for(ProgramVariable paramVar : varsForCondition){
          if(paramVar.toString().equals(x.toString())){
@@ -399,8 +414,6 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
       }
       return varsForCondition;
    }
-
-
    
    /**
     * Sets the new conditionEnabled value.
@@ -425,7 +438,6 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
    public boolean isConditionEnabled() {
       return conditionEnabled;
    }
-   
    
    /**
     * Sets the condition to the Term that is parsed from the given String.

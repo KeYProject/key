@@ -1,42 +1,46 @@
-package de.uka.ilkd.key.strategy;
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
 
-import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
+package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
+
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * This{@link JavaWatchpointNonSymbolicStopCondition} represents a Java watchpoint and is responsible to tell the debugger to stop execution when the respective
+ * This{@link FieldWatchpoint} represents a Java watchpoint and is responsible to tell the debugger to stop execution when the respective
  * variable is accessed or modified.
  * 
  * @author Marco Drebing
  */
-public class JavaWatchpointNonSymbolicStopCondition extends
-      AbstractNonSymbolicHitCountBreakpointStopCondition {
-
+public class FieldWatchpoint extends AbstractHitCountBreakpoint {
    private boolean isAccess;
 
    private boolean isModification;
 
-   private String fieldName;
-
    private String fullFieldName;
-   
-   private KeYJavaType containerKJT;
-
 
    /**
-    * Creates a new {@link JavaWatchpointNonSymbolicStopCondition}.
+    * Creates a new {@link FieldWatchpoint}.
     * 
     * @param enabled flag if the Breakpoint is enabled
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
@@ -46,43 +50,37 @@ public class JavaWatchpointNonSymbolicStopCondition extends
     * @param containerType the type of the element containing the breakpoint
     * @param proof the {@link Proof} that will be executed and should stop
     */
-   public JavaWatchpointNonSymbolicStopCondition(boolean enabled, int hitCount, String fieldName, boolean isAcces, boolean isModification, KeYJavaType containerKJT, Proof proof) {
+   public FieldWatchpoint(boolean enabled, int hitCount, String fieldName, boolean isAcces, boolean isModification, KeYJavaType containerKJT, Proof proof) {
       super(hitCount, proof, enabled);
-      this.containerKJT=containerKJT;
       this.isAccess = isAcces;
       this.isModification = isModification;
-      this.fieldName = fieldName;
       this.fullFieldName = containerKJT.getSort().toString()+"::"+fieldName;
    }
    
+   /**
+    * {@inheritDoc}
+    */
    @Override
-   public boolean shouldStop(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser, long startTime, int countApplied,
-         SingleRuleApplicationInfo singleRuleApplicationInfo) {
-      if (singleRuleApplicationInfo != null&&isEnabled()) {
-         Goal goal = singleRuleApplicationInfo.getGoal();
-         Node node = goal.node();
-         RuleApp ruleApp = singleRuleApplicationInfo.getAppliedRuleApp();
-         SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
-         if (activeStatement != null && activeStatement instanceof Assignment) {
-            Assignment assignment = (Assignment) activeStatement;
-            SourceElement firstElement = assignment.getFirstElement();
-            if(firstElement instanceof LocationVariable){
-               LocationVariable locVar = (LocationVariable)firstElement;
-               KeYJavaType containerType = locVar.getContainerType();
-               if(containerType!=null&&containerType.equals(containerKJT)&&fullFieldName.equals(locVar.toString())&&isModification&&hitcountExceeded(node)){
-                  return true;
-               }
-            }
-            if(checkChildrenOfSourceElement(assignment)&&hitcountExceeded(node)){
-               return true;
+   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
+      if (activeStatement != null && activeStatement instanceof Assignment) {
+         Assignment assignment = (Assignment) activeStatement;
+         SourceElement firstElement = assignment.getChildAt(0);
+         if(firstElement instanceof FieldReference){
+            PosInOccurrence pio = ruleApp.posInOccurrence();
+            Term term = pio.subTerm();
+            getProof().getServices().getTermBuilder();
+            term = TermBuilder.goBelowUpdates(term);
+            if(((FieldReference) firstElement).getProgramVariable().name().toString().equals(fullFieldName)&&isModification&&hitcountExceeded(node)){
+               return super.isBreakpointHit(activeStatement, ruleApp, proof, node);
             }
          }
-//         else if (activeStatement != null) {
-//            if(checkChildrenOfSourceElement(activeStatement)&&hitcountExceeded(node)){
-//               return true;
-//            }
-//         }
+         if(checkChildrenOfSourceElement(assignment)&&hitcountExceeded(node)){
+            return super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+         }
+      }else if (activeStatement != null) {
+         if(checkChildrenOfSourceElement(activeStatement)&&hitcountExceeded(node)){
+            return super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+         }
       }
       return false;
    }
@@ -93,7 +91,8 @@ public class JavaWatchpointNonSymbolicStopCondition extends
          Assignment assignment = (Assignment) sourceElement;
          for (int i = 1; i < assignment.getChildCount(); i++) {
             SourceElement childElement = assignment.getChildAt(i);
-            if (childElement.toString().equals(fieldName)&& childElement instanceof FieldReference) {
+            if (childElement instanceof FieldReference
+                  && ((FieldReference) childElement).getProgramVariable().name().toString().equals(fullFieldName)) {
                FieldReference field = (FieldReference) childElement;
                ProgramVariable progVar = field.getProgramVariable();
                if (fullFieldName.equals(progVar.toString())) {
@@ -109,7 +108,8 @@ public class JavaWatchpointNonSymbolicStopCondition extends
          NonTerminalProgramElement programElement = (NonTerminalProgramElement) sourceElement;
          for (int i = 0; i < programElement.getChildCount(); i++) {
             SourceElement childElement = programElement.getChildAt(i);
-            if (childElement.toString().equals(fieldName)&& childElement instanceof FieldReference) {
+            if (childElement instanceof FieldReference
+                  && ((FieldReference) childElement).getProgramVariable().name().toString().equals(fullFieldName)) {
                FieldReference field = (FieldReference) childElement;
                ProgramVariable progVar = field.getProgramVariable();
                if (fullFieldName.equals(progVar.toString())) {
@@ -123,6 +123,7 @@ public class JavaWatchpointNonSymbolicStopCondition extends
       }
       return found;
    }
+   
    /**
     * @return the isAccess
     */

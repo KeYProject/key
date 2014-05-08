@@ -13,7 +13,8 @@
 
 public class BubbleSort{
 
-	//@ghost int[] b;
+    public int[] b;
+
     /*@ public normal_behavior
       @  requires a!=null && a.length>1 && a.length<5;
       @  requires a.length == b.length && 
