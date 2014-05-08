@@ -334,6 +334,9 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    public void saveProof(Proof proof) {
        assert proof.name().equals(proofStack.head().name());
        assert proof.name().equals((mediator.getSelectedProof().name()));
+       if (batchMode.isLoadOnly()) {
+           return;
+       }
        final String defaultName =
                MiscTools.toValidFileName(proof.name().toString()).toString() + ".proof";
        File file = new File((new File (Main.getFileNameOnStartUp())).getParent(), defaultName);
