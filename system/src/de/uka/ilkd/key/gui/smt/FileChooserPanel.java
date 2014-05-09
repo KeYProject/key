@@ -30,7 +30,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-class FileChooserPanel extends JPanel{
+public class FileChooserPanel extends JPanel{
         private static final long serialVersionUID = 1L;
         private JCheckBox saveToFileBox = null;
         private JTextField folderField = null;
