@@ -48,9 +48,9 @@ import de.uka.ilkd.key.util.LRUCache;
 import de.uka.ilkd.key.util.MiscTools;
 
 
-public final class OneStepSimplifier implements BuiltInRule,
-KeYSelectionListener {
+public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListener {
 
+    private static final int APPLICABILITY_CACHE_SIZE = 1000;
     private static final int DEFAULT_CACHE_SIZE = 10000;
 
     public final static class Protocol extends ArrayList<RuleApp> {
@@ -59,6 +59,9 @@ KeYSelectionListener {
 
     private static final Name NAME = new Name("One Step Simplification");
 
+    /**
+     * Rule sets to capture.
+     */
     private static final ImmutableList<String> ruleSets
     = ImmutableSLList.<String>nil().append("concrete")
     .append("update_elim")
@@ -68,10 +71,8 @@ KeYSelectionListener {
     .append("elimQuantifier")
     ;
 
-    private static final boolean[] bottomUp
-    = {false, false, true, true, true, false };
-    private final Map<SequentFormula,Boolean> applicabilityCache
-    = new LRUCache<SequentFormula,Boolean>(100);
+    private static final boolean[] bottomUp = {false, false, true, true, true, false };
+    private final Map<SequentFormula,Boolean> applicabilityCache = new LRUCache<SequentFormula,Boolean>(APPLICABILITY_CACHE_SIZE);
 
     private Proof lastProof;
     private ImmutableSet<NoPosTacletApp> appsTakenOver;
