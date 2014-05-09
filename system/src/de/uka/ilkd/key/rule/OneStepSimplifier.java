@@ -108,11 +108,7 @@ KeYSelectionListener {
 
         //collect apps present in all open goals
         ImmutableSet<NoPosTacletApp> allApps
-        = proof.openGoals()
-        .head()
-        .ruleAppIndex()
-        .tacletIndex()
-        .allNoPosTacletApps();
+            = proof.openGoals().head().ruleAppIndex().tacletIndex().allNoPosTacletApps();
         for(Goal goal : proof.openGoals().tail()) {
             allApps = allApps.intersect(goal.ruleAppIndex()
                             .tacletIndex()
@@ -130,10 +126,8 @@ KeYSelectionListener {
                             || !tac.goalTemplates().head().sequent().isEmpty()
                             || !tac.varsNew().isEmpty()
                             || tac.varsNewDependingOn().hasNext()
-                            || ((RewriteTaclet)tac).getApplicationRestriction()
-                            != RewriteTaclet.NONE
-                            || !proof.mgt().getJustification(app)
-                            .isAxiomJustification()) {
+                            || ((RewriteTaclet)tac).getApplicationRestriction()!= RewriteTaclet.NONE
+                            || !proof.mgt().getJustification(app).isAxiomJustification()) {
                 continue;
             }
 
@@ -364,7 +358,7 @@ KeYSelectionListener {
         }
         final Term formula = cf.formula();
         final Term simplifiedFormula
-        = replaceKnownHelper(context, formula, ifInsts, protocol, services);
+            = replaceKnownHelper(context, formula, ifInsts, protocol, services);
         if(simplifiedFormula.equals(formula)) {
             return null;
         } else {
@@ -399,8 +393,7 @@ KeYSelectionListener {
                     Map<Term,PosInOccurrence> context,
                     /*out*/ List<PosInOccurrence> ifInsts,
                     Protocol protocol) {
-        SequentFormula result
-        = replaceKnown(services, cf, context, ifInsts, protocol);
+        SequentFormula result = replaceKnown(services, cf, context, ifInsts, protocol);
         if(result != null) {
             return result;
         }
@@ -430,7 +423,7 @@ KeYSelectionListener {
                     Protocol protocol) {
         //collect context formulas (potential if-insts for replace-known)
         final Map<Term,PosInOccurrence> context
-        = new LinkedHashMap<Term,PosInOccurrence>();
+            = new LinkedHashMap<Term,PosInOccurrence>();
         for(SequentFormula ante : seq.antecedent()) {
             if(!ante.equals(cf) && ante.formula().op() != Junctor.TRUE) {
                 context.put(
@@ -445,8 +438,7 @@ KeYSelectionListener {
                                 new PosInOccurrence(succ, PosInTerm.getTopLevel(), false));
             }
         }
-        final List<PosInOccurrence> ifInsts
-        = new ArrayList<PosInOccurrence>(seq.size());
+        final List<PosInOccurrence> ifInsts = new ArrayList<PosInOccurrence>(seq.size());
 
         //simplify as long as possible
         ImmutableList<SequentFormula> list
@@ -503,9 +495,6 @@ KeYSelectionListener {
         active = ProofIndependentSettings.DEFAULT_INSTANCE
                         .getGeneralSettings()
                         .oneStepSimplification();
-        //	active = ProofSettings.DEFAULT_SETTINGS
-        //		              .getGeneralSettings()
-        //		              .oneStepSimplification();
         if(active && proof != null && !proof.closed()) {
             initIndices(proof);
         } else {
@@ -545,32 +534,31 @@ KeYSelectionListener {
         assert ruleApp instanceof OneStepSimplifierRuleApp :
             "The rule app must be suitable for OSS";
 
-    final PosInOccurrence pos = ruleApp.posInOccurrence();
-    assert pos != null && pos.isTopLevel();
+        final PosInOccurrence pos = ruleApp.posInOccurrence();
+        assert pos != null && pos.isTopLevel();
 
-    Protocol protocol = new Protocol();
+        Protocol protocol = new Protocol();
 
-    //get instantiation
-    final Instantiation inst
-    = computeInstantiation(services,
+        // get instantiation
+        final Instantiation inst
+            = computeInstantiation(services,
                     pos.constrainedFormula(),
                     goal.sequent(),
                     protocol);
 
-    ((OneStepSimplifierRuleApp)ruleApp).setProtocol(protocol);
+        ((OneStepSimplifierRuleApp)ruleApp).setProtocol(protocol);
 
-    //change goal, set if-insts
-    final ImmutableList<Goal> result = goal.split(1);
-    final Goal resultGoal = result.head();
-    resultGoal.changeFormula(inst.getCf(), pos);
-    goal.setBranchLabel(inst.getNumAppliedRules()
+        // change goal, set if-insts
+        final ImmutableList<Goal> result = goal.split(1);
+        final Goal resultGoal = result.head();
+        resultGoal.changeFormula(inst.getCf(), pos);
+        goal.setBranchLabel(inst.getNumAppliedRules()
                     + (inst.getNumAppliedRules() > 1
-                                    ? " rules"
-                                                    : " rule"));
-    ruleApp = ((IBuiltInRuleApp)ruleApp).setIfInsts(inst.getIfInsts());
+                                    ? " rules" : " rule"));
+        ruleApp = ((IBuiltInRuleApp)ruleApp).setIfInsts(inst.getIfInsts());
 
 
-    return result;
+        return result;
     }
 
 
