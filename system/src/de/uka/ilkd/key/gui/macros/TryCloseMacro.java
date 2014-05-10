@@ -74,11 +74,6 @@ public class TryCloseMacro implements ProofMacro {
     public String getName() {
         return "Close provable goals below";
     }
-    
-    @Override
-    public String getShortName() {
-        return "tryclose";
-    }
 
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.gui.macros.ProofMacro#getDescription()
