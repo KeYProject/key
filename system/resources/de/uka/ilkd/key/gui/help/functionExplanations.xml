@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    
+<comment>
+    Put descriptions for JavaDL function symbols in here.
+</comment>
+
+<entry key="seqLen">
+Return the length of a sequence.
+</entry>
+
+</properties>
+
