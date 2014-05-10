@@ -32,7 +32,7 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
 
     /*
      * @param title The name of the node.
-     * @param explanations The XML resource, where the description for this node comes from.
+     * @param explanations An XML resource containing node descriptions.
      */
     InfoTreeNode(final String title, final Properties explanations) {
         super(title);
