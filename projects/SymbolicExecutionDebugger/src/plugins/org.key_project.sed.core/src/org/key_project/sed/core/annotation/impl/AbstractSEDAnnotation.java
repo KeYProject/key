@@ -1,7 +1,9 @@
 package org.key_project.sed.core.annotation.impl;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.graphics.RGB;
@@ -10,6 +12,7 @@ import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
 import org.key_project.sed.core.annotation.event.ISEDAnnotationLinkListener;
 import org.key_project.sed.core.annotation.event.SEDAnnotationLinkEvent;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.impl.AbstractSEDDebugElement;
 import org.key_project.util.bean.Bean;
@@ -153,6 +156,18 @@ public abstract class AbstractSEDAnnotation extends Bean implements ISEDAnnotati
    @Override
    public int indexOfLink(ISEDAnnotationLink link) {
       return link != null ? links.indexOf(link) : -1;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Set<ISEDDebugNode> listLinkTargets() {
+      Set<ISEDDebugNode> targets = new LinkedHashSet<ISEDDebugNode>();
+      for (ISEDAnnotationLink link : links) {
+         targets.add(link.getTarget());
+      }
+      return targets;
    }
 
    /**

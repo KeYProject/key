@@ -13,6 +13,7 @@
 
 package org.key_project.sed.core.model.impl;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelSelectionPo
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelSelectionPolicyFactory;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
 import org.eclipse.debug.internal.ui.viewers.update.DefaultSelectionPolicy;
+import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
 import org.key_project.sed.core.model.ISEDDebugElement;
@@ -151,6 +153,41 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
    @Override
    public boolean containsAnnotationLink(ISEDAnnotationLink link) {
       return link != null && annotationLinks.contains(link);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDAnnotation[] computeUsedAnnotations() {
+      if (!annotationLinks.isEmpty()) {
+         // Compute used annotations defining a background color
+         Set<ISEDAnnotation> annotations = new HashSet<ISEDAnnotation>();
+         for (ISEDAnnotationLink link : annotationLinks) {
+            annotations.add(link.getSource());
+         }
+         // Sort annotations if necessary
+         if (annotations.size() == 1) {
+            return annotations.toArray(new ISEDAnnotation[annotations.size()]);
+         }
+         else {
+            ISEDAnnotation[] result = new ISEDAnnotation[annotations.size()];
+            ISEDAnnotation[] allAnnotations = getDebugTarget().getRegisteredAnnotations();
+            int i = 0;
+            int resultIndex = 0;
+            while (i < allAnnotations.length && resultIndex < result.length) {
+               if (annotations.contains(allAnnotations[i])) {
+                  result[resultIndex] = allAnnotations[i];
+                  resultIndex++;
+               }
+               i++;
+            }
+            return result;
+         }
+      }
+      else {
+         return new ISEDAnnotation[0];
+      }
    }
 
    /**

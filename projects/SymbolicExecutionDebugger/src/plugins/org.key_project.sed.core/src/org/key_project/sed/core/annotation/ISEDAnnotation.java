@@ -1,5 +1,7 @@
 package org.key_project.sed.core.annotation;
 
+import java.util.Set;
+
 import org.eclipse.swt.graphics.RGB;
 import org.key_project.sed.core.annotation.event.ISEDAnnotationLinkListener;
 import org.key_project.sed.core.annotation.impl.AbstractSEDAnnotation;
@@ -200,6 +202,12 @@ public interface ISEDAnnotation extends IBean, ISEDIDElement {
     */
    public void removeAnnotationLinkListener(ISEDAnnotationLinkListener l);
 
+   /**
+    * Lists all {@link ISEDDebugNode}s which are targets of {@link #getLinks()}.
+    * @return The {@link Set} with all available {@link ISEDDebugNode}s.
+    */
+   public Set<ISEDDebugNode> listLinkTargets();
+   
    /**
     * Sets the unique ID which is valid as long as it was never accessed before.
     * @param id The new unique ID to use.

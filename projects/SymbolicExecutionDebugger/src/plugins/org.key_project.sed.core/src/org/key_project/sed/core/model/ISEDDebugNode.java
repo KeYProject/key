@@ -15,6 +15,7 @@ package org.key_project.sed.core.model;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
 import org.key_project.sed.core.model.event.ISEDAnnotationLinkListener;
@@ -143,6 +144,13 @@ public interface ISEDDebugNode extends ISEDDebugElement {
     * @return All contained {@link ISEDAnnotationLink}s of the given {@link ISEDAnnotationType}
     */
    public ISEDAnnotationLink[] getAnnotationLinks(ISEDAnnotationType type);
+   
+   /**
+    * Returns all {@link ISEDAnnotation} referenced by {@link ISEDAnnotationLink}s
+    * in the order they are defined in the {@link ISEDDebugTarget}.
+    * @return The used {@link ISEDAnnotation}s.
+    */
+   public ISEDAnnotation[] computeUsedAnnotations();
    
    /**
     * Checks if the given {@link ISEDAnnotationLink} is contained in this node.
