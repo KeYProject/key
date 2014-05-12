@@ -34,6 +34,7 @@ import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 /**
@@ -114,7 +115,7 @@ public class ProofStarter {
 
     private long timeout = -1L;
 
-    private StrategyProperties strategyProperties = new StrategyProperties();
+    private StrategyProperties strategyProperties;
 
     private ProverTaskListener ptl;
     
@@ -207,15 +208,18 @@ public class ProofStarter {
         try {
            proof.setRuleAppIndexToAutoMode();
            
-           final Profile profile = proof.env().getInitConfig().getProfile();
-           proof.setActiveStrategy(profile.getDefaultStrategyFactory().create(proof, strategyProperties));
-
            if (proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification()) {
               OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof);
               if (simplifier != null) {
                  simplifier.refresh(proof);
               }
            }
+           final Profile profile = proof.env().getInitConfig().getProfile();
+           StrategyFactory factory = profile.getDefaultStrategyFactory();
+           if (strategyProperties == null) {
+              strategyProperties = factory.getSettingsDefinition().getDefaultPropertiesFactory().createDefaultStrategyProperties();
+           }
+           proof.setActiveStrategy(factory.create(proof, strategyProperties));
 
            profile.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
 
