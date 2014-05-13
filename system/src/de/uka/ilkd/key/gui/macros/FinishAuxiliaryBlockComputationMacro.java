@@ -92,6 +92,7 @@ public class FinishAuxiliaryBlockComputationMacro
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
         initiatingGoal.proof().unionIFSymbols(proof.getIFSymbols());
+        initiatingGoal.proof().getIFSymbols().useProofSymbols();
 
         // close auxiliary computation proof
         GuiUtilities.invokeAndWait(new Runnable() {

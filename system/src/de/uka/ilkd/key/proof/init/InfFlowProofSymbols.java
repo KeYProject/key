@@ -33,6 +33,8 @@ import java.util.Iterator;
 
 public class InfFlowProofSymbols {
 
+    private boolean isFreshContract;
+
     private ImmutableSet<Pair<Sort, Boolean>> sorts
             = DefaultImmutableSet.<Pair<Sort, Boolean>>nil();
 
@@ -59,6 +61,7 @@ public class InfFlowProofSymbols {
                                                .add("Remove_post");*/
 
     public InfFlowProofSymbols() {
+        isFreshContract = true;
     }
 
     /*public InfFlowProofSymbols(ImmutableSet<Taclet> taclets) {
@@ -77,6 +80,9 @@ public class InfFlowProofSymbols {
 
     private InfFlowProofSymbols getLabeledSymbols() {
         InfFlowProofSymbols symbols = new InfFlowProofSymbols();
+        if (!isFreshContract()) {
+            symbols.useProofSymbols();
+        }
         symbols.sorts = getLabeledSorts();
         symbols.predicates = getLabeledPredicates();
         symbols.functions = getLabeledFunctions();
@@ -292,6 +298,14 @@ public class InfFlowProofSymbols {
         }
     }
 
+    public void useProofSymbols() {
+        this.isFreshContract = false;
+    }
+
+    public boolean isFreshContract() {
+        return this.isFreshContract;
+    }
+
     public static ProgramVariable searchPV(String s, Services services) {
         Namespace ns = services.getNamespaces().programVariables();
         Named n = ns.lookup(s);
@@ -390,6 +404,9 @@ public class InfFlowProofSymbols {
     public InfFlowProofSymbols union(InfFlowProofSymbols symbols) {
         assert symbols != null;
         InfFlowProofSymbols result = new InfFlowProofSymbols();
+        if (!isFreshContract() || !symbols.isFreshContract()) {
+            result.useProofSymbols();
+        }
         result.sorts = sorts.union(symbols.sorts);
         result.predicates = predicates.union(symbols.predicates);
         result.functions = functions.union(symbols.functions);
@@ -403,6 +420,9 @@ public class InfFlowProofSymbols {
         assert symbols != null;
         symbols = symbols.getLabeledSymbols();
         InfFlowProofSymbols result = new InfFlowProofSymbols();
+        if (!isFreshContract() || !symbols.isFreshContract()) {
+            result.useProofSymbols();
+        }
         result.sorts = sorts.union(symbols.sorts);
         result.predicates = predicates.union(symbols.predicates);
         result.functions = functions.union(symbols.functions);

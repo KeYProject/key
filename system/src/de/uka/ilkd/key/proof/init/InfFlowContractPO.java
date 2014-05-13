@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 
 import java.io.IOException;
@@ -173,8 +174,28 @@ public class InfFlowContractPO extends AbstractOperationPO
     @Override
     public void fillSaveProperties(Properties properties) throws IOException {
         super.fillSaveProperties(properties);
-        properties.setProperty("Non-interference contract", contract.getName());
+        properties.setProperty("contract", contract.getName());
     }
+
+
+    /**
+     * Instantiates a new proof obligation with the given settings.
+     * @param initConfig The already load {@link InitConfig}.
+     * @param properties The settings of the proof obligation to instantiate.
+     * @return The instantiated proof obligation.
+     */
+    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {
+       final String contractName = properties.getProperty("contract");
+       final Contract contract =
+               initConfig.getServices().getSpecificationRepository().getContractByName(contractName);
+       if (contract == null) {
+          throw new RuntimeException("Contract not found: " + contractName);
+       }
+       else {
+          return new LoadedPOContainer(contract.createProofObl(initConfig), 0);
+       }
+    }
+
 
     @Override
     public InfFlowProofSymbols getIFSymbols() {
@@ -221,7 +242,6 @@ public class InfFlowContractPO extends AbstractOperationPO
         // information flow contracts do not have global defs
         return null;
     }
-
 
 
     @Override

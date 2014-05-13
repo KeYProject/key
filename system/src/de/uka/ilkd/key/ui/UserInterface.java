@@ -196,5 +196,5 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      */
     void removeProof(Proof proof);
 
-	void saveProof(Proof proof);
+    void saveProof(Proof proof);
 }

@@ -44,6 +44,7 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
+import de.uka.ilkd.key.proof.init.InfFlowCompositePO;
 import de.uka.ilkd.key.proof.init.InfFlowPO;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -134,7 +135,8 @@ public class ProofSaver {
           //settings
           final StrategySettings strategySettings = proof.getSettings().getStrategySettings();
           final StrategyProperties strategyProperties = strategySettings.getActiveStrategyProperties();
-          if (po instanceof InfFlowPO) {
+          if (po instanceof InfFlowPO
+                  && (po instanceof InfFlowCompositePO || !proof.getIFSymbols().isFreshContract())) {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_TRUE);
               strategySettings.setActiveStrategyProperties(strategyProperties);
@@ -148,7 +150,8 @@ public class ProofSaver {
           }
           ps.println(writeSettings(proof.getSettings()));
 
-          if (po instanceof InfFlowPO) {
+          if (po instanceof InfFlowPO
+                  && (po instanceof InfFlowCompositePO || !proof.getIFSymbols().isFreshContract())) {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_FALSE);
               strategySettings.setActiveStrategyProperties(strategyProperties);
@@ -161,7 +164,9 @@ public class ProofSaver {
 
           //\problem or \proofObligation
           if(po instanceof IPersistablePO &&
-                  !(po instanceof InfFlowPO)) {
+                  !(po instanceof InfFlowPO
+                          && (po instanceof InfFlowCompositePO
+                                  || !proof.getIFSymbols().isFreshContract()))) {
               Properties properties = new Properties();
               ((IPersistablePO)po).fillSaveProperties(properties);
               StringWriter writer = new StringWriter();
@@ -173,7 +178,9 @@ public class ProofSaver {
                 writer.close();
               }
           } else {
-              if (po instanceof InfFlowPO) {
+              if (po instanceof InfFlowPO
+                      && (po instanceof InfFlowCompositePO
+                              || !proof.getIFSymbols().isFreshContract())) {
                   Properties properties = new Properties();
                   ((IPersistablePO)po).fillSaveProperties(properties);
                   ps.print(proof.printIFSymbols());
