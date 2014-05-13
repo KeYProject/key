@@ -473,8 +473,6 @@ public final class MainWindow extends JFrame  {
         toolBarPanel.add(controlToolBar);
         toolBarPanel.add(fileOpToolBar);
 
-        // FIXME double entry?
-        getContentPane().add(GuiUtilities.getClipBoardArea(), BorderLayout.PAGE_START);
         getContentPane().add(toolBarPanel, BorderLayout.PAGE_START);
 
         // create tabbed pane
