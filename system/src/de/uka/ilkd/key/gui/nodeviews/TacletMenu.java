@@ -98,6 +98,7 @@ class TacletMenu extends JMenu {
         CLUTTER_RULES.add(new Name("typeStatic"));
         CLUTTER_RULES.add(new Name("less_is_total"));
         CLUTTER_RULES.add(new Name("less_zero_is_total"));
+        CLUTTER_RULES.add(new Name("eqTermCut"));
     }
 
     private TacletAppComparator comp = new TacletAppComparator();
