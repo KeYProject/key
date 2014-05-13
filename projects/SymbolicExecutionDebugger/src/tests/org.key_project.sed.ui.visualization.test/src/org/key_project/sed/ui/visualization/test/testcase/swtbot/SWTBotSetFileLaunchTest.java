@@ -25,12 +25,12 @@ import org.key_project.sed.ui.visualization.launch.SETFileLaunchShortcut;
  */
 public class SWTBotSetFileLaunchTest extends AbstractSWTBotSetFileTest {
    /**
-    * Launches "data/Number/src/Number.set".
+    * Launches "data/Number/test/Number.set".
     */
    @Test
    public void testSetFile() throws Exception {
       doSetFileTest("SWTBotSetFileLaunchTest_testSetFile", 
-                    "data/Number/src", 
+                    "data/Number/test", 
                     "Number.set",
                     null);
    }

@@ -20,6 +20,7 @@ import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiN
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiSourceTabTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSetFileLaunchTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSetFileSourceLookupTest;
+import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSymbolicExecutionTreeLayoutTest;
 
 /**
  * Run all contained JUnit 4 test cases that requires SWT Bot.
@@ -31,7 +32,8 @@ import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSetFileSo
    SWTBotGraphitiNodeTabTest.class,
    SWTBotGraphitiSourceTabTest.class,
    SWTBotSetFileLaunchTest.class,
-   SWTBotSetFileSourceLookupTest.class
+   SWTBotSetFileSourceLookupTest.class,
+   SWTBotSymbolicExecutionTreeLayoutTest.class
 })
 public class SWTBotAllSEDUIVisualizationTests {
 }

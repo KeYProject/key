@@ -662,4 +662,36 @@ public final class IOUtil {
       }
       return contains;
    }
+
+   /**
+    * Copies the content from the {@link InputStream} to the {@link OutputStream}
+    * and closes both streams.
+    * @param source The {@link InputStream} to read from.
+    * @param target The {@link OutputStream} to write to.
+    * @return {@code true} if copy was performed and {@code false} if not performed.
+    * @throws IOException Occurred Exception.
+    */
+   public static boolean copy(InputStream source, OutputStream target) throws IOException {
+      try {
+         if (source != null && target != null) {
+            byte[] buffer = new byte[BUFFER_SIZE];
+            int read;
+            while ((read = source.read(buffer)) >= 1) {
+               target.write(buffer, 0, read);
+            }
+            return true;
+         }
+         else {
+            return false;
+         }
+      }
+      finally {
+         if (source != null) {
+            source.close();
+         }
+         if (target != null) {
+            target.close();
+         }
+      }   
+   }
 }
