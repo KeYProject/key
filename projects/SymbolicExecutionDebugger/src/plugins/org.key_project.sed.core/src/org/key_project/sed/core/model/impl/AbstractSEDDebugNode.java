@@ -39,10 +39,17 @@ import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.event.ISEDAnnotationLinkListener;
 import org.key_project.sed.core.model.event.SEDAnnotationLinkEvent;
 import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
+import org.key_project.sed.core.util.SEDAnnotationUtil;
 import org.key_project.util.java.ObjectUtil;
 
 /**
+ * <p>
  * Provides a basic implementation of {@link ISEDDebugNode}.
+ * </p>
+ * <p>
+ * Constructors should call {@link #initializeAnnotations()} to initialize
+ * a nwe node with {@link ISEDAnnotation}s.
+ * </p>
  * @author Martin Hentschel
  * @see ISEDDebugNode
  */
@@ -80,6 +87,14 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
       super(target);
       this.parent = parent;
       this.thread = thread;
+   }
+   
+   /**
+    * This method should be called as last step of all constructors to
+    * initialize the new created node with annotations.
+    */
+   protected void initializeAnnotations() throws DebugException {
+      SEDAnnotationUtil.initializeAnnotations(this);
    }
 
    /**

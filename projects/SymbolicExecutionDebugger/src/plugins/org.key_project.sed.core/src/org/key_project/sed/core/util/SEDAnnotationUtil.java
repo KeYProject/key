@@ -9,8 +9,11 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
@@ -94,5 +97,21 @@ public final class SEDAnnotationUtil {
             return ObjectUtil.equals(element.getTypeId(), typeId);
          }
       });
+   }
+
+   /**
+    * Initializes the given {@link ISEDDebugNode} with annotations.
+    * @param node The {@link ISEDDebugNode} to initialize.
+    */
+   public static void initializeAnnotations(ISEDDebugNode node) throws DebugException {
+      if (node != null) {
+         ISEDDebugTarget target = node.getDebugTarget();
+         if (target != null) {
+            ISEDAnnotation[] annotations = target.getRegisteredAnnotations();
+            for (ISEDAnnotation annotation : annotations) {
+               annotation.getType().initializeNode(node, annotation);
+            }
+         }
+      }
    }
 }

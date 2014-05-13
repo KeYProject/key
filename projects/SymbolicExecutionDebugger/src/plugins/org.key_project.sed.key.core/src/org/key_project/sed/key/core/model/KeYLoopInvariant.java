@@ -77,10 +77,11 @@ public class KeYLoopInvariant extends AbstractSEDLoopInvariant implements IKeYSE
    public KeYLoopInvariant(KeYDebugTarget target, 
                            IKeYSEDDebugNode<?> parent, 
                            ISEDThread thread, 
-                           IExecutionLoopInvariant executionNode) {
+                           IExecutionLoopInvariant executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
    
    /**

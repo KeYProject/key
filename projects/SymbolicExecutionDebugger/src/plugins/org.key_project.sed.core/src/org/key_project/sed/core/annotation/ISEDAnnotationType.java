@@ -1,5 +1,6 @@
 package org.key_project.sed.core.annotation;
 
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.swt.graphics.RGB;
 import org.key_project.sed.core.annotation.impl.AbstractSEDAnnotationType;
 import org.key_project.sed.core.model.ISEDDebugNode;
@@ -141,4 +142,12 @@ public interface ISEDAnnotationType {
     * @param savedContent The content to restore.
     */
    public void restoreAnnotationLink(ISEDAnnotationLink link, String savedContent);
+
+   /**
+    * This method is called when a new {@link ISEDDebugNode} is created
+    * to may initialize it with the given {@link ISEDAnnotation}.
+    * @param node The {@link ISEDDebugNode} to initialize.
+    * @param annotation The {@link ISEDAnnotation} which might be added to the {@link ISEDDebugNode} or not.
+    */
+   public void initializeNode(ISEDDebugNode node, ISEDAnnotation annotation) throws DebugException;
 }

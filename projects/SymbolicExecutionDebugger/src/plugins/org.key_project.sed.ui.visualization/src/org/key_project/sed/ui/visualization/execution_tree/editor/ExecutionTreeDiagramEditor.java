@@ -588,9 +588,13 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
     */
    protected void updateStyle(Set<ISEDDebugNode> nodes) {
       if (!nodes.isEmpty()) {
+         boolean refreshRequired = false;
          IFeatureProvider fp = getDiagramTypeProvider().getFeatureProvider();
          for (ISEDDebugNode node : nodes) {
             PictogramElement[] pes = fp.getAllPictogramElementsForBusinessObject(node);
+            if (!refreshRequired && pes.length >= 1) {
+               refreshRequired = true;
+            }
             for (PictogramElement pe : pes) {
                UpdateContext updateContext = new UpdateContext(pe);
                updateContext.putProperty(AbstractDebugNodeUpdateFeature.KEY_UPDATE_STYLE, Boolean.TRUE);
@@ -598,7 +602,7 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
                fp.updateIfPossibleAndNeeded(updateContext);
             }
          }
-         if (!getSite().getShell().isDisposed()) {
+         if (refreshRequired && !getSite().getShell().isDisposed()) {
             getSite().getShell().getDisplay().syncExec(new Runnable() {
                @Override
                public void run() {

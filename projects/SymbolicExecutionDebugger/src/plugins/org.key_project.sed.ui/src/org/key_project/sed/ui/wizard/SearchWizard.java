@@ -24,7 +24,6 @@ import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.sed.ui.wizard.page.SearchWizardPage;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.StringUtil;
 
 /**
  * The search {@link Wizard} which performs a search with help of a {@link SearchAnnotation}.
@@ -75,10 +74,10 @@ public class SearchWizard extends Wizard {
                   // Perform search
                   ISEDAnnotationType type = SEDAnnotationUtil.getAnnotationtype(SearchAnnotationType.TYPE_ID);
                   SearchAnnotation annotation = (SearchAnnotation)type.createAnnotation();
+                  annotation.setSearch(search);
                   List<ISEDAnnotationLink> links = search(type, annotation, target, search, monitor);
                   // Add annotation and links
                   SWTUtil.checkCanceled(monitor);
-                  annotation.setSearch(search);
                   target.registerAnnotation(annotation);
                   monitor.worked(1);
                   for (ISEDAnnotationLink link : links) {
@@ -126,8 +125,7 @@ public class SearchWizard extends Wizard {
          ISEDDebugElement next = iterator.next();
          if (next instanceof ISEDDebugNode) {
             ISEDDebugNode node = (ISEDDebugNode)next;
-            String name = node.getName();
-            if (StringUtil.contains(name, search)) {
+            if (SearchAnnotationType.accept(node, search)) {
                ISEDAnnotationLink link = type.createLink(annotation, node);
                foundNodes.add(link);
             }
