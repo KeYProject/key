@@ -12,18 +12,14 @@
 //
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
-import java.util.List;
 
-import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.ProofManagementDialog;
-import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
+import java.io.File;
+import java.util.List;
 import javax.swing.SwingWorker;
 
 /**
@@ -47,6 +43,7 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
         this.ptl = ptl;
     }
 
+    @Override
     public void run() {
         /*
          * Invoking execute() on the SwingWorker causes a new Thread to be

@@ -12,41 +12,21 @@
 //
 package de.uka.ilkd.key.gui;
 
-import java.util.Iterator;
-
-import javax.swing.SwingUtilities;
-
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.RuleAppIndex;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
-import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
-import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.util.Debug;
+import java.util.Iterator;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 public class InteractiveProver implements InterruptListener {
@@ -64,7 +44,7 @@ public class InteractiveProver implements InterruptListener {
     /**
      * the central strategy processor including GUI signalling
      */
-    private ApplyStrategy applyStrategy;
+    private final ApplyStrategy applyStrategy;
     private final ProverTaskListener focussedAutoModeTaskListener
             = new FocussedAutoModeTaskListener();
 
@@ -78,7 +58,7 @@ public class InteractiveProver implements InterruptListener {
     /**
      * the mediator
      */
-    private KeYMediator mediator;
+    private final KeYMediator mediator;
 
     private boolean resumeAutoMode = false;
 
@@ -89,7 +69,7 @@ public class InteractiveProver implements InterruptListener {
     /**
      * creates a new interactive prover object
      */
-    public InteractiveProver(KeYMediator mediator) {
+    public InteractiveProver(final KeYMediator mediator) {
         /* listens to the current selected proof and node */
         this.mediator = mediator;
         mediator.addKeYSelectionListener(new InteractiveProverKeYSelectionListener());
@@ -262,14 +242,18 @@ public class InteractiveProver implements InterruptListener {
 
     private final class FocussedAutoModeTaskListener implements ProverTaskListener {
 
+        @Override
         public void taskStarted(String message, int size) {
         }
 
+        @Override
         public void taskProgress(int position) {
         }
 
+        @Override
         public void taskFinished(TaskFinishedInfo info) {
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     finishFocussedAutoMode();
                 }
@@ -478,6 +462,7 @@ public class InteractiveProver implements InterruptListener {
         /**
          * focused node has changed
          */
+        @Override
         public void selectedNodeChanged(KeYSelectionEvent e) {
             focusedGoal = e.getSource().getSelectedGoal();
         }
@@ -485,6 +470,7 @@ public class InteractiveProver implements InterruptListener {
         /**
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
+        @Override
         public void selectedProofChanged(KeYSelectionEvent e) {
             Debug.out("InteractiveProver: initialize with new proof");
             Proof newProof = e.getSource().getSelectedProof();
@@ -534,7 +520,7 @@ public class InteractiveProver implements InterruptListener {
                         = app.findIfFormulaInstantiations(
                                 mediator().getSelectedGoal().sequent(),
                                 mediator().getServices());
-                if (ifCandidates.size() == 0) {
+                if (ifCandidates.isEmpty()) {
                     continue; // skip this app
                 }
                 if (ifCandidates.size() == 1 && pos != null) {
@@ -610,7 +596,7 @@ public class InteractiveProver implements InterruptListener {
             } catch (final InterruptedException exception) {
                 notifyException(exception);
             } catch (final ExecutionException exception) {
-                 notifyException(exception);
+                notifyException(exception);
             } catch (final CancellationException exception) {
                 // when the user canceled it's not an error
             }
@@ -621,10 +607,10 @@ public class InteractiveProver implements InterruptListener {
             // make it possible to free memory
             worker = null;
         }
-        
+
         private void notifyException(final Exception exception) {
             mediator().notify(new GeneralFailureEvent("An exception occurred during"
-                        + " strategy execution.\n Exception:" + exception));
+                    + " strategy execution.\n Exception:" + exception));
         }
 
         @Override
@@ -637,5 +623,4 @@ public class InteractiveProver implements InterruptListener {
                     getTimeout(), stopMode);
         }
     }
-
 }

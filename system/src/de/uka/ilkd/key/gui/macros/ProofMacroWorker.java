@@ -12,10 +12,7 @@
 // 
 package de.uka.ilkd.key.gui.macros;
 
-import de.uka.ilkd.key.gui.ExceptionDialog;
-import de.uka.ilkd.key.gui.InterruptListener;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.util.Debug;
 import javax.swing.SwingWorker;

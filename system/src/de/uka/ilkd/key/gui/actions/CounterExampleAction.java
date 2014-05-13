@@ -38,7 +38,6 @@ public class CounterExampleAction extends MainWindowAction {
         setName(NAME);
         setTooltip(TOOLTIP);
         init();
-
     }
 
     /**
@@ -48,7 +47,7 @@ public class CounterExampleAction extends MainWindowAction {
      */
     public void init() {
         final KeYSelectionListener selListener = new KeYSelectionListener() {
-
+            @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
                 final Proof proof = getMediator().getSelectedProof();
                 if (proof == null) {
@@ -62,19 +61,20 @@ public class CounterExampleAction extends MainWindowAction {
                 }
             }
 
+            @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
                 selectedNodeChanged(e);
             }
         };
-
         getMediator().addKeYSelectionListener(selListener);
-
         getMediator().addAutoModeListener(new AutoModeListener() {
+            @Override
             public void autoModeStarted(ProofEvent e) {
                 getMediator().removeKeYSelectionListener(selListener);
                 setEnabled(false);
             }
 
+            @Override
             public void autoModeStopped(ProofEvent e) {
                 getMediator().addKeYSelectionListener(selListener);
                 selListener.selectedNodeChanged(null);
@@ -84,12 +84,9 @@ public class CounterExampleAction extends MainWindowAction {
     }
 
     private Proof createProof(KeYMediator mediator) {
-
         Goal goal = mediator.getSelectedGoal();
-
         Node node = goal.node();
         Proof oldProof = node.proof();
-
         Sequent oldSequent = node.sequent();
         Sequent newSequent = Sequent.createSequent(oldSequent.antecedent(), oldSequent.succedent());
         Proof proof = new Proof("Semantics Blasting: " + oldProof.name(),
@@ -118,12 +115,12 @@ public class CounterExampleAction extends MainWindowAction {
         createProof(getMediator());
         getMediator().stopInterface(true);
         getMediator().setInteractive(false);
-        CEWorker2 worker = new CEWorker2();
+        CEWorker worker = new CEWorker();
         getMediator().addInterruptedListener(worker);
         worker.execute();
     }
 
-    private class CEWorker2 extends SwingWorker<Void, Void> implements InterruptListener {
+    private class CEWorker extends SwingWorker<Void, Void> implements InterruptListener {
 
         @Override
         protected Void doInBackground() throws Exception {
