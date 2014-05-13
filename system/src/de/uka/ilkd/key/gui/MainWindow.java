@@ -822,6 +822,7 @@ public final class MainWindow extends JFrame  {
         proof.add(new UndoLastStepAction(this, true));
         proof.add(new AbandonTaskAction(this));
         proof.addSeparator();
+//        proof.add(new CopyToClipboardAction(this));
         proof.add(new SearchInProofTreeAction(this));
         proof.add(new SearchInSequentAction(this));
         proof.addSeparator();
@@ -964,6 +965,13 @@ public final class MainWindow extends JFrame  {
 
     public ProofTreeView getProofView() {
         return proofTreeView;
+    }
+    
+    /**
+     * Returns the current goal view.
+     */
+    public CurrentGoalView getGoalView() {
+        return currentGoalView;
     }
 
     /** saves a proof */
