@@ -74,6 +74,7 @@ provable: ./heap/block_contracts/Simple__unnecessaryLoopInvariant.key
 provable: ./standard_key/java_dl/jml-assert/assert.key
 
 # Other tests:
+provable: ./heap/coincidence_count/project.key
 provable: ./heap/fm12_01_LRS/lcp.key
 provable: ./heap/SemanticSlicing/project.key
 provable: ./heap/information_flow/ArrayList_contains.key
