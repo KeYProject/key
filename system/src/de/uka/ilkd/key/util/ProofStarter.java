@@ -206,18 +206,17 @@ public class ProofStarter {
     */
     public ApplyStrategyInfo start(ImmutableList<Goal> goals) {
         try {
-           proof.setRuleAppIndexToAutoMode();
+           final Profile profile = proof.env().getInitConfig().getProfile();
+           final StrategyFactory factory = profile.getDefaultStrategyFactory();
+           if (strategyProperties == null) {
+              strategyProperties = factory.getSettingsDefinition().getDefaultPropertiesFactory().createDefaultStrategyProperties();
+           }
            
            if (proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification()) {
               OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof);
               if (simplifier != null) {
                  simplifier.refresh(proof);
               }
-           }
-           final Profile profile = proof.env().getInitConfig().getProfile();
-           StrategyFactory factory = profile.getDefaultStrategyFactory();
-           if (strategyProperties == null) {
-              strategyProperties = factory.getSettingsDefinition().getDefaultPropertiesFactory().createDefaultStrategyProperties();
            }
            proof.setActiveStrategy(factory.create(proof, strategyProperties));
 
@@ -234,6 +233,7 @@ public class ProofStarter {
 
            boolean stopMode = strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY).equals(StrategyProperties.STOPMODE_NONCLOSE);
            ApplyStrategy.ApplyStrategyInfo result;
+           proof.setRuleAppIndexToAutoMode();
            result = prover.start(proof, goals, maxSteps, timeout, stopMode);
            
            if (result.isError()) {
@@ -256,6 +256,13 @@ public class ProofStarter {
         }
     }
 
+    public void init(Proof proof) {
+       this.proof = proof;
+       this.setMaxRuleApplications(proof.getSettings().getStrategySettings().getMaxSteps());
+       this.setTimeout(proof.getSettings().getStrategySettings().getTimeout());
+       this.setStrategy(proof.getSettings().getStrategySettings().getActiveStrategyProperties());
+    }
+    
     public void init(ProofAggregate proofAggregate) {
     	this.proof = proofAggregate.getFirstProof();
 
