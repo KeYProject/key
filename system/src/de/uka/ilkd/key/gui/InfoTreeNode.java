@@ -32,18 +32,10 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
     InfoTreeNode(String title, Properties explanations) {
         super(title);
 
-        int parenIdx = title.lastIndexOf("(");
-        String shortenedTitle;
-        if (parenIdx >= 0) // strip number of taclets
-        {
-            shortenedTitle = title.substring(0, parenIdx - 1).intern();
-        } else {
-            shortenedTitle = title;
-        }
-        String desc = explanations.getProperty(shortenedTitle);
-        
+        String desc = explanations.getProperty(title);
+
         if (desc == null) {
-            description = "No description available for " + shortenedTitle + ".";
+            description = "No description available for " + title + ".";
         } else {
             description = desc;
         }
