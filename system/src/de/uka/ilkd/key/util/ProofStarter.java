@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -34,6 +34,7 @@ import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 /**
@@ -114,7 +115,7 @@ public class ProofStarter {
 
     private long timeout = -1L;
 
-    private StrategyProperties strategyProperties = new StrategyProperties();
+    private StrategyProperties strategyProperties;
 
     private ProverTaskListener ptl;
     
@@ -135,7 +136,7 @@ public class ProofStarter {
     public ProofStarter(ProverTaskListener ptl, boolean useAutoSaver) {
     	this.ptl = ptl;
       if (useAutoSaver) {
-         autoSaver = new AutoSaver();
+         autoSaver = AutoSaver.getDefaultInstance();
       }
     }
 
@@ -205,17 +206,19 @@ public class ProofStarter {
     */
     public ApplyStrategyInfo start(ImmutableList<Goal> goals) {
         try {
-           proof.setRuleAppIndexToAutoMode();
-           
            final Profile profile = proof.env().getInitConfig().getProfile();
-           proof.setActiveStrategy(profile.getDefaultStrategyFactory().create(proof, strategyProperties));
-
+           final StrategyFactory factory = profile.getDefaultStrategyFactory();
+           if (strategyProperties == null) {
+              strategyProperties = factory.getSettingsDefinition().getDefaultPropertiesFactory().createDefaultStrategyProperties();
+           }
+           
            if (proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification()) {
               OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof);
               if (simplifier != null) {
                  simplifier.refresh(proof);
               }
            }
+           proof.setActiveStrategy(factory.create(proof, strategyProperties));
 
            profile.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
 
@@ -230,6 +233,7 @@ public class ProofStarter {
 
            boolean stopMode = strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY).equals(StrategyProperties.STOPMODE_NONCLOSE);
            ApplyStrategy.ApplyStrategyInfo result;
+           proof.setRuleAppIndexToAutoMode();
            result = prover.start(proof, goals, maxSteps, timeout, stopMode);
            
            if (result.isError()) {
@@ -252,6 +256,13 @@ public class ProofStarter {
         }
     }
 
+    public void init(Proof proof) {
+       this.proof = proof;
+       this.setMaxRuleApplications(proof.getSettings().getStrategySettings().getMaxSteps());
+       this.setTimeout(proof.getSettings().getStrategySettings().getTimeout());
+       this.setStrategy(proof.getSettings().getStrategySettings().getActiveStrategyProperties());
+    }
+    
     public void init(ProofAggregate proofAggregate) {
     	this.proof = proofAggregate.getFirstProof();
 

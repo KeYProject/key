@@ -21,6 +21,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -28,26 +29,41 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.MiscTools;
+import java.util.Properties;
 
 public class InfoTreeModel extends DefaultTreeModel {
 
     private static final String LEMMAS = "Lemmas";
     private static final String TACLET_BASE = "Taclet Base";
 
-    public InfoTreeModel(Goal goal, XMLProperties ruleExplanations,
-            XMLProperties termLabelExplanations, MainWindow mainWindow) {
+    public InfoTreeModel(Goal goal, XMLResources xmlResources, MainWindow mainWindow) {
         super(new InfoTreeNode());
-        insertAsLast(new RulesNode(ruleExplanations, goal), (InfoTreeNode) root);
-        insertAsLast(new TermLabelsNode(mainWindow, termLabelExplanations), (InfoTreeNode) root);
+        insertAsLast(new RulesNode(xmlResources.ruleExplanations, goal), (InfoTreeNode) root);
+        insertAsLast(new TermLabelsNode(mainWindow, xmlResources.termLabelExplanations), (InfoTreeNode) root);
+        insertAsLast(new FunctionsNode(mainWindow, xmlResources.functionExplanations), (InfoTreeNode) root);
     }
 
     private void insertAsLast(InfoTreeNode ins, InfoTreeNode parent) {
         insertNodeInto(ins, parent, parent.getChildCount());
     }
 
+    private class FunctionsNode extends InfoTreeNode {
+
+        FunctionsNode(MainWindow mainWindow, Properties functionExplanations) {
+            super("Function Symbols", "Display descriptions for documented function symbols.");
+
+            List<String> sortedKeys = new ArrayList<String>(functionExplanations.stringPropertyNames());
+            java.util.Collections.sort(sortedKeys);
+
+            for (String key : sortedKeys) {
+                insertAsLast(new InfoTreeNode(key, functionExplanations), this);
+            }
+        }
+    }
+
     private class TermLabelsNode extends InfoTreeNode {
 
-        TermLabelsNode(MainWindow mainWindow, XMLProperties termLabelExplanations) {
+        TermLabelsNode(MainWindow mainWindow, Properties termLabelExplanations) {
             super("Term Labels", "Get descriptions for currently available term labels.");
 
             List<Name> labelNames = mainWindow.getSortedTermLabelNames();
@@ -59,7 +75,7 @@ public class InfoTreeModel extends DefaultTreeModel {
 
     private class RulesNode extends InfoTreeNode {
 
-        RulesNode(XMLProperties ruleExplanations, Goal goal) {
+        RulesNode(Properties ruleExplanations, Goal goal) {
             super("Rules", "Browse descriptions for currently available rules.");
 
             InfoTreeNode builtInRoot = new InfoTreeNode("Built-In", ruleExplanations);
@@ -110,7 +126,7 @@ public class InfoTreeModel extends DefaultTreeModel {
         /**
          * groups subsequent insertions with the same name under a new node
          */
-        private void insertAndGroup(InfoTreeNode ins, InfoTreeNode parent, XMLProperties ruleExplanations) {
+        private void insertAndGroup(InfoTreeNode ins, InfoTreeNode parent, Properties ruleExplanations) {
             InfoTreeNode insNode = (InfoTreeNode) ins;
             if (parent.getChildCount() > 0) {
                 InfoTreeNode lastNode

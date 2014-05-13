@@ -4,6 +4,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
+import java.util.Properties;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
@@ -31,9 +32,9 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
 
     /*
      * @param title The name of the node.
-     * @param explanations The XML resource, where the description for this node comes from.
+     * @param explanations An XML resource containing node descriptions.
      */
-    InfoTreeNode(final String title, final XMLProperties explanations) {
+    InfoTreeNode(final String title, final Properties explanations) {
         super(title);
         description = new Description() {
             @Override

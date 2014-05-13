@@ -21,22 +21,16 @@ import javax.swing.event.TreeSelectionEvent;
 
 public class InfoView extends JSplitPane {
 
-    private static final String RULE_RESOURCE = "/de/uka/ilkd/key/gui/help/ruleExplanations.xml";
-    private final XMLProperties ruleExplanations;
-
-    private static final String LABEL_RESOURCE = "/de/uka/ilkd/key/gui/help/termLabelExplanations.xml";
-    private final XMLProperties termLabelExplanations;
-
     private final InfoTree infoTree;
     private final InfoViewContentPane contentPane;
     private final KeYMediator mediator;
     private final MainWindow mainWindow;
+    private final XMLResources xmlResources;
 
     public InfoView(KeYMediator mediator, MainWindow mainWindow) {
         super(VERTICAL_SPLIT);
         assert mediator != null;
-        ruleExplanations = new XMLProperties(RULE_RESOURCE);
-        termLabelExplanations = new XMLProperties(LABEL_RESOURCE);
+        xmlResources = new XMLResources();
         this.mainWindow = mainWindow;
         this.mediator = mediator;
         mediator.addKeYSelectionListener(new SelectionListener());
@@ -88,7 +82,7 @@ public class InfoView extends JSplitPane {
                 public void run() {
                     if (mediator.getSelectedProof() != null) {
                         infoTree.setModel(new InfoTreeModel(mediator.getSelectedGoal(),
-                                ruleExplanations, termLabelExplanations, mainWindow));
+                                xmlResources, mainWindow));
                     }
                 }
             };

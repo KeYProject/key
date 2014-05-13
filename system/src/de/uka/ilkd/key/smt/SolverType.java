@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.smt;
 
@@ -29,7 +28,7 @@ import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
  * - supported versions
  *
  */
-public interface SolverType extends PipeListener<SolverCommunication> {
+public interface SolverType  {
 
 	/**
 	 * Creates an instance of SMTSolver representing a concrete instance of that solver.
@@ -123,15 +122,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 	 */
 	public boolean supportHasBeenChecked();
 
-    /**
-     * Get the object to retrieve the model from this solver
-     */
-	public ModelExtractor getQuery();
-
-    /**
-     * Set the object to retrieve the model from this solver
-     */	
-    public void setQuery(ModelExtractor query);
+   
 
 	
 	/**
@@ -206,55 +197,10 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 //                                    + " the execution command.";
             }
 
-            private static final int WAIT_FOR_RESULT = 0;
-            private static final int WAIT_FOR_DETAILS =1;
 
 
-			@Override
-			public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
-				SolverCommunication sc = pipe.getSession();
-				if(type == Pipe.ERROR_MESSAGE || message.startsWith("(error")){
-					 sc.addMessage(message);
-					 if(message.indexOf("WARNING:")>-1){
-						return;
-					 }
-					 throw new RuntimeException("Error while executing Z3:\n" +message);
-				 }
-				if (!message.equals("success")) {
-					sc.addMessage(message);
-				}
 
-			switch (sc.getState()) {
-			case WAIT_FOR_RESULT:
-				 if(message.equals("unsat")){
-					 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
-					 // One cannot ask for proofs and models at one time
-					 // rather have modesl than proofs (MU, 2013-07-19)
-					 // pipe.sendMessage("(get-proof)\n");
-					 pipe.sendMessage("(exit)\n");
-					 sc.setState(WAIT_FOR_DETAILS);
-				 }
-				 if(message.equals("sat")){
-					 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
-					 pipe.sendMessage("(get-model)");
-					 pipe.sendMessage("(exit)\n");
-					 sc.setState(WAIT_FOR_DETAILS);
-
-				 }
-				 if(message.equals("unknown")){
-					 sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
-					 sc.setState(WAIT_FOR_DETAILS);
-					 pipe.sendMessage("(exit)\n");
-				 }
-				break;
-
-			case WAIT_FOR_DETAILS:
-				if(message.equals("success")){
-					pipe.close();
-				}
-				break;
-			}
-		}
+			
 
     };
 
@@ -291,7 +237,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 		};
 
 		public String[] getSupportedVersions() {
-			return new String[] {"version 3.2","version 4.1","version 4.3.0", "version 4.3.1"};
+			return new String[] {"version 4.3.1"};
 		};
 
 		public String[] getDelimiters() {
@@ -324,92 +270,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 			//                                        + " the execution command.";
 		}
 
-		private static final int WAIT_FOR_RESULT = 0;
-		private static final int WAIT_FOR_DETAILS =1;
-		private static final int WAIT_FOR_QUERY = 2;
-		private static final int WAIT_FOR_MODEL = 3;
-
-
-
-		@Override
-		public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
-
-
-
-			SolverCommunication sc = pipe.getSession();
-			if(type == Pipe.ERROR_MESSAGE || message.startsWith("(error")){
-				sc.addMessage(message);
-				if(message.indexOf("WARNING:")>-1){
-					return;
-				}
-				throw new RuntimeException("Error while executing Z3:\n" +message);
-			}
-			if (!message.equals("success")) {
-				sc.addMessage(message);
-			}
-
-			switch (sc.getState()) {
-			case WAIT_FOR_RESULT:
-				if(message.equals("unsat")){
-					sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
-					//pipe.sendMessage("(get-proof)\n");
-					pipe.sendMessage("(exit)\n");
-					sc.setState(WAIT_FOR_DETAILS);
-				}
-				if(message.equals("sat")){
-					sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
-					pipe.sendMessage("(get-model)");
-					pipe.sendMessage("(echo \"endmodel\")");
-					sc.setState(WAIT_FOR_MODEL);					
-				}
-				if(message.equals("unknown")){
-					sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
-					sc.setState(WAIT_FOR_DETAILS);
-					pipe.sendMessage("(exit)\n");
-				}
-
-				break;
-
-			case WAIT_FOR_DETAILS:
-				if(message.equals("success")){
-					pipe.close();
-				}						
-				break;		
-
-			case WAIT_FOR_QUERY:
-				if(message.equals("success")){
-					pipe.close();
-				}
-				else{
-					query.messageIncoming(pipe, message, type);
-				}
-
-				break;
-
-			case WAIT_FOR_MODEL:
-				if(message.equals("endmodel")){
-					if(query !=null && query.getState()==ModelExtractor.DEFAULT){
-						query.getModel().setEmpty(false);
-						//System.out.println("Starting query");						 
-						query.start(pipe);
-						sc.setState(WAIT_FOR_QUERY);
-					}
-					else{
-						pipe.sendMessage("(exit)\n");
-						sc.setState(WAIT_FOR_DETAILS); 
-					}
-				}
-
-
-				break;
-			}
-
-
-
-
-
-
-		}
+		
 
 	};
 
@@ -491,29 +352,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 		}
 
 
-
-		final static int WAIT_FOR_RESULT=0;
-		final static int FINISH = 1;
-		@Override
-		public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
-			SolverCommunication sc = pipe.getSession();
-			sc.addMessage(message);
-			if(type == Pipe.ERROR_MESSAGE && message.indexOf("Interrupted by signal")==-1){
-				throw new RuntimeException("Error while executing CVC:\n" +message);
-			}
-
-			if(sc.getState() == WAIT_FOR_RESULT ){
-				if(message.indexOf(" unsat") > -1){
-					sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
-                         } else if(message.indexOf("sat") > -1){
-							 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
-				}
-				sc.setState(FINISH);
-				pipe.close();
-
-			}
-
-		}
+		
 
 	};
 
@@ -577,23 +416,6 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
 
 
-		@Override
-		public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
-			SolverCommunication sc = pipe.getSession();
-			message = message.replaceAll("\n","");
-			sc.addMessage(message);		
-
-
-			if(message.equals("unsat")){
-				sc.setFinalResult(SMTSolverResult.createValidResult(getName()));						
-				pipe.close();
-			}
-			if(message.equals("sat")){
-				sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));						 
-				pipe.close();
-			}
-
-		}
 
 		public String modifyProblem(String problem) {
 			return problem += "\n\n check\n";
@@ -664,29 +486,6 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 }
 
 
-		@Override
-		public void messageIncoming(Pipe<SolverCommunication> pipe,String message, int type) {
-			SolverCommunication sc = pipe.getSession();
-			sc.addMessage(message);		
-
-
-			if(message.indexOf("Valid.")>-1){
-				sc.setFinalResult(SMTSolverResult.createValidResult(getName()));						
-				pipe.close();
-			}
-
-			if(message.indexOf("Invalid.")>-1){
-				sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));						 
-				pipe.close();
-			}
-
-			if(message.indexOf("Bad input:")>-1){
-				pipe.close();
-			}
-
-
-
-		}
 	};
 
 }
@@ -701,7 +500,7 @@ abstract class AbstractSolverType implements SolverType {
 	private boolean supportHasBeenChecked = false;
 
 
-	protected ModelExtractor query = null;
+	
 
 
 
@@ -710,21 +509,7 @@ abstract class AbstractSolverType implements SolverType {
 
 
 
-	/**
-	 * @return the query
-	 */
-	 public ModelExtractor getQuery() {
-		return query;
-	}
-
-
-
-	 /**
-	  * @param query the query to set
-	  */
-	 public void setQuery(ModelExtractor query) {
-		 this.query = query;
-	 }
+	
 
 
 
@@ -848,15 +633,6 @@ abstract class AbstractSolverType implements SolverType {
                 return VersionChecker.INSTANCE.getVersionFor(getSolverCommand(),getVersionParameter());
             else return null;
 	 }
-
-
-	 @Override
-	 public void exceptionOccurred(Pipe<SolverCommunication> pipe,
-			 Throwable exception) {
-		 pipe.getSession().addException(exception);
-
-	 }
-
 
 	 public String toString() {
 		 return getName();

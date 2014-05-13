@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.smt;
 
@@ -43,6 +42,8 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
  
         private static int IDCounter = 0;
         private final int ID = IDCounter++;
+        
+        private AbstractSolverSocket socket;
         
         private ModelExtractor query;
 
@@ -131,6 +132,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 this.listener = listener;
                 this.services = services;
                 this.type = myType;
+                this.socket = AbstractSolverSocket.createSocket(type, query);
                 processLauncher = new ExternalProcessLauncher<SolverCommunication>(new SolverCommunication(),type.getDelimiters());
 
         }
@@ -259,7 +261,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
                 // start the external process.
                 try {
-                        processLauncher.launch(commands,type.modifyProblem(problemString),type);
+                        processLauncher.launch(commands,type.modifyProblem(problemString),socket);
                  
                         solverCommunication = processLauncher.getCommunication();
                         if(solverCommunication.exceptionHasOccurred() && 
@@ -347,7 +349,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         		problemString = objTrans.translateProblem(term, services, smtSettings).toString();
         		problemTypeInformation = objTrans.getTypes();
         		ModelExtractor query = objTrans.getQuery();
-        		getType().setQuery(query);
+        		getSocket().setQuery(query);
         		tacletTranslation = null;
         		
         		exceptionsForTacletTranslation.addAll(objTrans.getExceptionsOfTacletTranslation());
@@ -422,8 +424,8 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         			
         		}
         		
-        		if(getType().getQuery()!=null){
-        			ModelExtractor mq = getType().getQuery();
+        		if(getSocket().getQuery()!=null){
+        			ModelExtractor mq = getSocket().getQuery();
         			Model m = mq.getModel();
         			if(m!=null){
         				output += "\n\n";
@@ -441,6 +443,12 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         public Collection<Throwable> getExceptionsOfTacletTranslation() {
                 
                 return exceptionsForTacletTranslation;
+        }
+
+		@Override
+        public AbstractSolverSocket getSocket() {
+	        
+	        return socket;
         }
 
 

@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -88,11 +88,11 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepReturnSymbolicExecutionTreeNodesStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -1719,14 +1719,14 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    }
 
    /**
-    *
-    * @param proof
-    * @param enabled
+    * Defines if one step simplification is enabled in general and within the {@link Proof}.
+    * @param proof The optional {@link Proof}.
+    * @param enabled {@code true} use one step simplification, {@code false} do not use one step simplification.
     */
    public static void setOneStepSimplificationEnabled(Proof proof, boolean enabled) {
       ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(enabled);
       if (proof != null && !proof.isDisposed()) {
-         proof.getProofIndependentSettings().getGeneralSettings().setOneStepSimplification(true);
+         proof.getProofIndependentSettings().getGeneralSettings().setOneStepSimplification(enabled);
          OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof.env().getInitConfig().getProfile());
          if (simplifier != null) {
             simplifier.refresh(proof);
