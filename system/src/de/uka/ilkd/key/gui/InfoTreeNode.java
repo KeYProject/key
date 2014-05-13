@@ -14,7 +14,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class InfoTreeNode extends DefaultMutableTreeNode {
 
-    final Description description;
+    private final String description;
 
     /*
      * This constructor should only be used for the invisible root node of
@@ -22,62 +22,44 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
      */
     InfoTreeNode() {
         super("root node");
-        description = new Description() {
-            @Override
-            public String getString() {
-                return "This is the root node of InfoTreeModel. It should not be visible.";
-            }
-        };
+        description = "This is the root node of InfoTreeModel. It should not be visible.";
     }
 
     /*
      * @param title The name of the node.
      * @param explanations An XML resource containing node descriptions.
      */
-    InfoTreeNode(final String title, final Properties explanations) {
+    InfoTreeNode(String title, Properties explanations) {
         super(title);
-        description = new Description() {
-            @Override
-            public String getString() {
-                int parenIdx = title.lastIndexOf("(");
-                String shortenedTitle;
-                if (parenIdx >= 0) // strip number of taclets
-                {
-                    shortenedTitle = title.substring(0, parenIdx - 1).intern();
-                } else {
-                    shortenedTitle = title;
-                }
-                String desc = explanations.getProperty(shortenedTitle);
 
-                if (desc == null) {
-                    return "No description available for " + shortenedTitle + ".";
-                } else {
-                    return desc;
-                }
-            }
-        };
+        int parenIdx = title.lastIndexOf("(");
+        String shortenedTitle;
+        if (parenIdx >= 0) // strip number of taclets
+        {
+            shortenedTitle = title.substring(0, parenIdx - 1).intern();
+        } else {
+            shortenedTitle = title;
+        }
+        String desc = explanations.getProperty(shortenedTitle);
+
+        if (desc == null) {
+            description = "No description available for " + shortenedTitle + ".";
+        } else {
+            description = desc;
+        }
+
     }
 
-    InfoTreeNode(final Taclet taclet) {
+    InfoTreeNode(Taclet taclet) {
         super(taclet.displayName());
-        description = new Description() {
-            @Override
-            public String getString() {
-                LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
-                lp.printTaclet(taclet);
-                return lp.toString();
-            }
-        };
+        LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
+        lp.printTaclet(taclet);
+        description = lp.toString();
     }
 
-    InfoTreeNode(String title, final String description) {
+    InfoTreeNode(String title, String description) {
         super(title);
-        this.description = new Description() {
-            @Override
-            public String getString() {
-                return description;
-            }
-        };
+        this.description = description;
     }
 
     String getTitle() {
@@ -85,12 +67,7 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
     }
 
     String getDescription() {
-        return description.getString();
-    }
-
-    private static interface Description {
-
-        String getString();
+        return description;
     }
 
 }
