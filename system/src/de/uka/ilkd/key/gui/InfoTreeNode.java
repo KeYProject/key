@@ -8,7 +8,7 @@ import java.util.Properties;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
- * Instances of this class are nodes of {@link InfoTree}.
+ * Every node of {@link InfoTree} is an instance of this class.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
@@ -41,7 +41,7 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
             shortenedTitle = title;
         }
         String desc = explanations.getProperty(shortenedTitle);
-
+        
         if (desc == null) {
             description = "No description available for " + shortenedTitle + ".";
         } else {

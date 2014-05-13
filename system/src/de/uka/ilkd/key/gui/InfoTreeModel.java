@@ -21,7 +21,6 @@ import javax.swing.tree.DefaultTreeModel;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -64,7 +63,7 @@ public class InfoTreeModel extends DefaultTreeModel {
     private class TermLabelsNode extends InfoTreeNode {
 
         TermLabelsNode(MainWindow mainWindow, Properties termLabelExplanations) {
-            super("Term Labels", "Get descriptions for currently available term labels.");
+            super("Term Labels", "Show descriptions for currently available term labels.");
 
             List<Name> labelNames = mainWindow.getSortedTermLabelNames();
             for (Name name : labelNames) {
