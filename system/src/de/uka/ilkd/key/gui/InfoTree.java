@@ -5,8 +5,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 /**
- * This class is used by {@link InfoView} to display the description contents as
- * a tree.
+ * This class is used by {@link InfoView} to display its contents.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */

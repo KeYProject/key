@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.gui;
 
@@ -128,6 +127,7 @@ public final class Main {
     private static boolean loadOnly = false;
 
     private static String fileNameOnStartUp = null;
+    
     /**
      * Object handling the parsing of commandline options
      */
@@ -271,7 +271,7 @@ public final class Main {
                 if (eachSteps < 0) {
                     printUsageAndExit(false, "Illegal autosave period (must be a number >= 0)", -5);
                 }
-                AutoSaver.init(eachSteps, uiMode == UiMode.INTERACTIVE);
+                AutoSaver.setDefaultValues(eachSteps, uiMode == UiMode.INTERACTIVE);
             } catch (CommandLineException e) {
                 if(Debug.ENABLE_DEBUG) {
                     e.printStackTrace();
@@ -409,7 +409,7 @@ public final class Main {
                 printUsageAndExit(true, "Error: No file to load from.", -4);
             BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
 
-            ui = new ConsoleUserInterface(batch, true, verbosity);
+            ui = new ConsoleUserInterface(batch, verbosity);
         } else {
             updateSplashScreen();
             MainWindow mainWindow = MainWindow.getInstance();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -79,7 +79,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.strategy.BreakpointStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
@@ -250,7 +250,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       // Update stop condition
       CompoundStopCondition stopCondition = new CompoundStopCondition();
       stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfSetNodesToExecute));
-      CompoundStopCondition breakpointParentStopCondition = breakpointManager.getBreakpointStopConditions();
+      SymbolicExecutionBreakpointStopCondition breakpointParentStopCondition = breakpointManager.getBreakpointStopCondition();
       stopCondition.addChildren(breakpointParentStopCondition);
       proof.getServices().setFactory(createNewFactory(breakpointParentStopCondition));
       if (stepOver) {
@@ -269,13 +269,11 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * creates a new factory that should be used by others afterwards
     * @return 
     */
-   private ITermProgramVariableCollectorFactory createNewFactory(final CompoundStopCondition breakpointParentStopCondition) {
+   private ITermProgramVariableCollectorFactory createNewFactory(final SymbolicExecutionBreakpointStopCondition breakpointParentStopCondition) {
       ITermProgramVariableCollectorFactory programVariableCollectorFactory = new ITermProgramVariableCollectorFactory() {
          @Override
          public TermProgramVariableCollector create(Services services) {
-            TermProgramVariableCollectorKeepUpdatesForBreakpointconditions collector = new TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(services, breakpointParentStopCondition);
-            
-              return collector;
+            return new TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(services, breakpointParentStopCondition);
          }
       };
       return programVariableCollectorFactory;
@@ -746,12 +744,12 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    }
 
    /**
-    * Returns the {@link CompoundStopCondition} containing all {@link BreakpointStopCondition}s of this target.
+    * Returns the {@link CompoundStopCondition} containing all {@link SymbolicExecutionBreakpointStopCondition}s of this target.
     * 
-    * @return  the {@link CompoundStopCondition} containing all {@link BreakpointStopCondition}s of this target
+    * @return  the {@link CompoundStopCondition} containing all {@link SymbolicExecutionBreakpointStopCondition}s of this target
     */
-   public CompoundStopCondition getBreakpointStopConditions() {
-      return breakpointManager.getBreakpointStopConditions();
+   public SymbolicExecutionBreakpointStopCondition getBreakpointStopCondition() {
+      return breakpointManager.getBreakpointStopCondition();
    } 
    
    /**

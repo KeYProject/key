@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,11 +11,11 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.actions.TermLabelMenu;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -27,6 +27,7 @@ import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagLayout;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -70,6 +71,7 @@ import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
 import de.uka.ilkd.key.gui.actions.AboutAction;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.actions.CounterExampleAction;
+import de.uka.ilkd.key.gui.actions.TestGenerationAction;
 import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.FontSizeAction;
@@ -272,6 +274,7 @@ public final class MainWindow extends JFrame  {
      */
     private MainWindow() {
         setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
+        applyGnomeWorkaround();
         setLaF();
         setIconImage(IconFactory.keyLogo());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -321,6 +324,24 @@ public final class MainWindow extends JFrame  {
     public static boolean hasInstance() {
        return instance != null;
     }
+    
+    /**
+     * Workaround to an issue with the Gnome window manager.
+     * This sets the application title in the app menu (in the top bar)
+     * to "KeY" instead of the full class name ("de-uka-ilkd....").
+     * This should not have a negative effect on other window managers.
+     * See <a href="http://elliotth.blogspot.de/2007/02/fixing-wmclass-for-your-java.html">
+     * here</a> for details.
+     */
+    private void applyGnomeWorkaround() {
+        Toolkit xToolkit = Toolkit.getDefaultToolkit();
+        java.lang.reflect.Field awtAppClassNameField;
+        try {
+            awtAppClassNameField = xToolkit.getClass().getDeclaredField("awtAppClassName");
+            awtAppClassNameField.setAccessible(true);
+            awtAppClassNameField.set(xToolkit, "KeY");
+        } catch (Exception e) {}
+    }
 
     /**
      * Tries to set the system look and feel if this option is activated.
@@ -348,7 +369,7 @@ public final class MainWindow extends JFrame  {
      * @param userInterface The UserInterface.
      */
     private KeYMediator getMainWindowMediator(UserInterface userInterface) {
-        KeYMediator result = new KeYMediator(userInterface, true);
+        KeYMediator result = new KeYMediator(userInterface);
         result.addKeYSelectionListener(proofListener);
         result.addAutoModeListener(proofListener);
         result.addGUIListener(new MainGUIListener());
@@ -419,8 +440,6 @@ public final class MainWindow extends JFrame  {
         toolBarPanel.add(controlToolBar);
         toolBarPanel.add(fileOpToolBar);
 
-        // FIXME double entry?
-        getContentPane().add(GuiUtilities.getClipBoardArea(), BorderLayout.PAGE_START);
         getContentPane().add(toolBarPanel, BorderLayout.PAGE_START);
 
         proofListView.setPreferredSize(new java.awt.Dimension(350, 100));
@@ -478,6 +497,8 @@ public final class MainWindow extends JFrame  {
         toolBar.add(comp.getSelectionComponent());
         toolBar.addSeparator();        
         toolBar.add(new CounterExampleAction(this));
+        toolBar.addSeparator();        
+        toolBar.add(new TestGenerationAction(this));
         toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this, false));
@@ -711,11 +732,14 @@ public final class MainWindow extends JFrame  {
         proof.add(new SearchInProofTreeAction(this));
         proof.add(new SearchInSequentAction(this));
         proof.addSeparator();
-	proof.add(new ShowUsedContractsAction(this));
+        proof.add(new ShowUsedContractsAction(this));
         proof.add(new ShowActiveTactletOptionsAction(this));
-	proof.add(showActiveSettingsAction);
+        proof.add(showActiveSettingsAction);
         proof.add(new ShowProofStatistics(this));
         proof.add(new ShowKnownTypesAction(this));
+        proof.addSeparator();
+        proof.add(new CounterExampleAction(this));
+        proof.add(new TestGenerationAction(this));
 
         return proof;
     }
@@ -846,6 +870,13 @@ public final class MainWindow extends JFrame  {
 
     public ProofTreeView getProofTreeView() {
         return mainWindowTabbedPane.getProofTreeView();
+    }
+    
+    /**
+     * Returns the current goal view.
+     */
+    public CurrentGoalView getGoalView() {
+        return currentGoalView;
     }
 
     /** saves a proof */

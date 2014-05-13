@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.io.IOException;
@@ -12,6 +25,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
+import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.SymbolicExecutionExceptionBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 /**
@@ -47,10 +61,11 @@ public class TestExceptionBreakpointStopConditionCaughtOrUncaught extends Abstra
          props.put(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_EXPAND);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(props);
 
-         ExceptionBreakpointStopCondition firstBreakpoint = new ExceptionBreakpointStopCondition(proof, "java.lang.NullPointerException", true, false, false, true, -1);
-         ExceptionBreakpointStopCondition secondBreakpoint = new ExceptionBreakpointStopCondition(proof, "java.lang.ClassCastException", false, true, false, true, -1);
-         allBreakpoints.addChildren(firstBreakpoint, secondBreakpoint);
-         env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(allBreakpoints));
+         SymbolicExecutionExceptionBreakpoint firstBreakpoint = new SymbolicExecutionExceptionBreakpoint(proof, "java.lang.NullPointerException", true, false, false, true, -1);
+         SymbolicExecutionExceptionBreakpoint secondBreakpoint = new SymbolicExecutionExceptionBreakpoint(proof, "java.lang.ClassCastException", false, true, false, true, -1);
+         SymbolicExecutionBreakpointStopCondition bc = new SymbolicExecutionBreakpointStopCondition(firstBreakpoint, secondBreakpoint);
+         allBreakpoints.addChildren(bc);
+         env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(bc));
          // Do steps
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);

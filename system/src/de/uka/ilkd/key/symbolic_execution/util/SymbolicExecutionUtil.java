@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -2552,10 +2552,8 @@ public final class SymbolicExecutionUtil {
                                                               Term additionalAntecedent,
                                                               Term newSuccedent) {
       // Get the updates from the return node which includes the value interested in.
-      Term originalModifiedFormula =
-              ruleApp.posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates =
-              TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
+      Term originalModifiedFormula = ruleApp.posInOccurrence().constrainedFormula().formula();
+      ImmutableList<Term> originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
       // Create new sequent
       return createSequentToProveWithNewSuccedent(node, ruleApp, additionalAntecedent, newSuccedent, originalUpdates);
    }
@@ -2601,16 +2599,11 @@ public final class SymbolicExecutionUtil {
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       PosInOccurrence pio = ruleApp.posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
-      Set<Term> skolemTerms =
-              collectSkolemConstants(originalSequentWithoutMethodFrame, newSuccedentToProve);
-      originalSequentWithoutMethodFrame =
-              removeAllUnusedSkolemEqualities(originalSequentWithoutMethodFrame, skolemTerms);
-      Sequent sequentToProve =
-              originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve),
-                                                           false, true).sequent();
+      Set<Term> skolemTerms = collectSkolemConstants(originalSequentWithoutMethodFrame, newSuccedentToProve);
+      originalSequentWithoutMethodFrame = removeAllUnusedSkolemEqualities(originalSequentWithoutMethodFrame, skolemTerms);
+      Sequent sequentToProve = originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent();
       if (additionalAntecedent != null) {
-         sequentToProve = sequentToProve.addFormula(new SequentFormula(additionalAntecedent),
-                                                    true, false).sequent();
+         sequentToProve = sequentToProve.addFormula(new SequentFormula(additionalAntecedent), true, false).sequent();
       }
       return sequentToProve;
    }
