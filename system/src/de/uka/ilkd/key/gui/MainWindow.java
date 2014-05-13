@@ -473,8 +473,6 @@ public final class MainWindow extends JFrame  {
         toolBarPanel.add(controlToolBar);
         toolBarPanel.add(fileOpToolBar);
 
-        // FIXME double entry?
-        getContentPane().add(GuiUtilities.getClipBoardArea(), BorderLayout.PAGE_START);
         getContentPane().add(toolBarPanel, BorderLayout.PAGE_START);
 
         // create tabbed pane
@@ -824,6 +822,7 @@ public final class MainWindow extends JFrame  {
         proof.add(new UndoLastStepAction(this, true));
         proof.add(new AbandonTaskAction(this));
         proof.addSeparator();
+//        proof.add(new CopyToClipboardAction(this));
         proof.add(new SearchInProofTreeAction(this));
         proof.add(new SearchInSequentAction(this));
         proof.addSeparator();
@@ -966,6 +965,13 @@ public final class MainWindow extends JFrame  {
 
     public ProofTreeView getProofView() {
         return proofTreeView;
+    }
+    
+    /**
+     * Returns the current goal view.
+     */
+    public CurrentGoalView getGoalView() {
+        return currentGoalView;
     }
 
     /** saves a proof */
