@@ -35,6 +35,8 @@ public class SearchWizard extends Wizard {
     */
    private final ISEDDebugTarget target;
    
+   private final ISEDAnnotationType annotationType;
+   
    /**
     * The shown {@link SearchWizardPage}.
     */
@@ -45,8 +47,10 @@ public class SearchWizard extends Wizard {
     * @param target The {@link ISEDDebugTarget} to search in.
     */
    public SearchWizard(ISEDDebugTarget target) {
-      Assert.isNotNull(target);
       this.target = target;
+      this.annotationType = SEDAnnotationUtil.getAnnotationtype(SearchAnnotationType.TYPE_ID);
+      Assert.isNotNull(target);
+      Assert.isNotNull(annotationType);
       setWindowTitle("Search");
       setNeedsProgressMonitor(true);
    }
@@ -56,7 +60,7 @@ public class SearchWizard extends Wizard {
     */
    @Override
    public void addPages() {
-      searchWizardPage = new SearchWizardPage("searchWizardPage");
+      searchWizardPage = new SearchWizardPage("searchWizardPage", annotationType);
       addPage(searchWizardPage);
    }
 
@@ -66,16 +70,15 @@ public class SearchWizard extends Wizard {
    @Override
    public boolean performFinish() {
       try {
-         final String search = searchWizardPage.getSearch();
+         final SearchAnnotation annotation = (SearchAnnotation)annotationType.createAnnotation();
+         annotation.setSearch(searchWizardPage.getSearch());
+         searchWizardPage.applyAppearance(annotation);
          getContainer().run(true, true, new IRunnableWithProgress() {
             @Override
             public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                try {
                   // Perform search
-                  ISEDAnnotationType type = SEDAnnotationUtil.getAnnotationtype(SearchAnnotationType.TYPE_ID);
-                  SearchAnnotation annotation = (SearchAnnotation)type.createAnnotation();
-                  annotation.setSearch(search);
-                  List<ISEDAnnotationLink> links = search(type, annotation, target, search, monitor);
+                  List<ISEDAnnotationLink> links = search(annotationType, annotation, target, annotation.getSearch(), monitor);
                   // Add annotation and links
                   SWTUtil.checkCanceled(monitor);
                   target.registerAnnotation(annotation);
