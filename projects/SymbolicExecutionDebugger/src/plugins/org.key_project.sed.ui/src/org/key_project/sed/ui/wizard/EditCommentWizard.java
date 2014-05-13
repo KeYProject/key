@@ -37,7 +37,7 @@ public class EditCommentWizard extends Wizard {
     */
    @Override
    public void addPages() {
-      commentWizardPage = new CommentWizardPage("commentWizardPage", "Edit Comment", "Define comment.", link.getComment());
+      commentWizardPage = new CommentWizardPage("commentWizardPage", "Edit " + link.getSource() + " Comment", "Define comment.", link.getComment());
       addPage(commentWizardPage);
    }
 

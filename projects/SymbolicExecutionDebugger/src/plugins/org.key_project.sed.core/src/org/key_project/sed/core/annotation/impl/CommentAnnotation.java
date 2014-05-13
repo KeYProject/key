@@ -11,6 +11,16 @@ import org.key_project.sed.core.util.SEDAnnotationUtil;
  */
 public class CommentAnnotation extends AbstractSEDAnnotation {
    /**
+    * The default comment type.
+    */
+   public static final String DEFAULT_COMMENT_TYPE = "Comment";
+   
+   /**
+    * The type of comments.
+    */
+   private String commentType = DEFAULT_COMMENT_TYPE;
+   
+   /**
     * Constructor.
     */
    public CommentAnnotation() {
@@ -26,10 +36,26 @@ public class CommentAnnotation extends AbstractSEDAnnotation {
    }
 
    /**
+    * Returns the type of comments.
+    * @return The type of comments.
+    */
+   public String getCommentType() {
+      return commentType;
+   }
+
+   /**
+    * Sets the type of comments.
+    * @param commentType The type of comments to set.
+    */
+   public void setCommentType(String commentType) {
+      this.commentType = commentType;
+   }
+
+   /**
     * {@inheritDoc}
     */
    @Override
    public String toString() {
-      return "Comments";
+      return getCommentType();
    }
 }

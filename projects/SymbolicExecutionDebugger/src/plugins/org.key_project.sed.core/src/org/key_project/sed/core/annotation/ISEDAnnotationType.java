@@ -101,10 +101,11 @@ public interface ISEDAnnotationType {
    public ISEDAnnotationLink createLink(ISEDAnnotation source, ISEDDebugNode target);
    
    /**
-    * Returns some optional additional link columns.
+    * Returns some optional additional link columns of the given {@link ISEDAnnotation}.
+    * @param annotation The {@link ISEDAnnotation} to show.
     * @return Additional link columns or {@code null} if not available.
     */
-   public String[] getAdditionalLinkColumns();
+   public String[] getAdditionalLinkColumns(ISEDAnnotation annotation);
    
    /**
     * Returns the value of the given {@link ISEDDebugNode} 

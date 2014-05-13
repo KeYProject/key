@@ -87,8 +87,9 @@ public class CommentAnnotationType extends AbstractSEDAnnotationType {
     * {@inheritDoc}
     */
    @Override
-   public String[] getAdditionalLinkColumns() {
-      return new String[] {"Comment"};
+   public String[] getAdditionalLinkColumns(ISEDAnnotation annotation) {
+      Assert.isTrue(annotation instanceof CommentAnnotation);
+      return new String[] {((CommentAnnotation)annotation).getCommentType()};
    }
    
    /**
@@ -107,6 +108,24 @@ public class CommentAnnotationType extends AbstractSEDAnnotationType {
       else {
          return null;
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String saveAnnotation(ISEDAnnotation annotation) {
+      Assert.isTrue(annotation instanceof CommentAnnotation);
+      return ((CommentAnnotation)annotation).getCommentType();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void restoreAnnotation(ISEDAnnotation annotation, String savedContent) {
+      Assert.isTrue(annotation instanceof CommentAnnotation);
+      ((CommentAnnotation)annotation).setCommentType(savedContent);
    }
 
    /**

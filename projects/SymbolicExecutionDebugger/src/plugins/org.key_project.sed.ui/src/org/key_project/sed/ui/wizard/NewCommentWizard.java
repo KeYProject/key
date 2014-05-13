@@ -12,7 +12,10 @@ import org.key_project.sed.core.annotation.impl.CommentAnnotationType;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.util.SEDAnnotationUtil;
-import org.key_project.sed.ui.wizard.page.CommentWizardPage;
+import org.key_project.sed.ui.wizard.page.NewCommentWizardPage;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * The new comment {@link Wizard} which creates a comment via {@link CommentAnnotation}s.
@@ -25,17 +28,30 @@ public class NewCommentWizard extends Wizard {
    private final ISEDDebugNode node;
    
    /**
-    * The shown {@link CommentWizardPage}.
+    * The {@link ISEDAnnotationType} for comments.
     */
-   private CommentWizardPage commentWizardPage;
+   private final ISEDAnnotationType annotationType;
+   
+   /**
+    * All available comment annotations.
+    */
+   private final ISEDAnnotation[] commentAnnotations;
+   
+   /**
+    * The shown {@link NewCommentWizardPage}.
+    */
+   private NewCommentWizardPage newCommentWizardPage;
 
    /**
     * Constructor.
     * @param node The {@link ISEDDebugTarget} to search in.
     */
    public NewCommentWizard(ISEDDebugNode node) {
-      Assert.isNotNull(node);
       this.node = node;
+      this.annotationType = SEDAnnotationUtil.getAnnotationtype(CommentAnnotationType.TYPE_ID);
+      this.commentAnnotations = node.getDebugTarget().getRegisteredAnnotations(annotationType);
+      Assert.isNotNull(node);
+      Assert.isNotNull(annotationType);
       setWindowTitle("New Comment");
    }
 
@@ -44,8 +60,8 @@ public class NewCommentWizard extends Wizard {
     */
    @Override
    public void addPages() {
-      commentWizardPage = new CommentWizardPage("commentWizardPage", "New Comment", "Define comment.", null);
-      addPage(commentWizardPage);
+      newCommentWizardPage = new NewCommentWizardPage("newCommentWizardPage", "New Comment", "Define comment.", null, commentAnnotations);
+      addPage(newCommentWizardPage);
    }
 
    /**
@@ -53,19 +69,22 @@ public class NewCommentWizard extends Wizard {
     */
    @Override
    public boolean performFinish() {
-      ISEDAnnotationType type = SEDAnnotationUtil.getAnnotationtype(CommentAnnotationType.TYPE_ID);
       ISEDDebugTarget target = node.getDebugTarget();
-      ISEDAnnotation[] annotations = target.getRegisteredAnnotations(type);
-      ISEDAnnotation annotation;
-      if (annotations.length >= 1) {
-         annotation = annotations[0];
-      }
-      else {
-         annotation = type.createAnnotation();
+      final String commentType = newCommentWizardPage.getCommentType();
+      ISEDAnnotation annotation = ArrayUtil.search(commentAnnotations, new IFilter<ISEDAnnotation>() {
+         @Override
+         public boolean select(ISEDAnnotation element) {
+            return element instanceof CommentAnnotation &&
+                   ObjectUtil.equals(commentType, ((CommentAnnotation)element).getCommentType());
+         }
+      });
+      if (annotation == null) {
+         annotation = annotationType.createAnnotation();
+         ((CommentAnnotation)annotation).setCommentType(commentType);
          target.registerAnnotation(annotation);
       }
-      CommentAnnotationLink link = (CommentAnnotationLink)type.createLink(annotation, node);
-      link.setComment(commentWizardPage.getComment());
+      CommentAnnotationLink link = (CommentAnnotationLink)annotationType.createLink(annotation, node);
+      link.setComment(newCommentWizardPage.getComment());
       node.addAnnotationLink(link);
       return true;
    }

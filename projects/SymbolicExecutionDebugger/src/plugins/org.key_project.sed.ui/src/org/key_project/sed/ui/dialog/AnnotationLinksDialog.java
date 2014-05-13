@@ -147,7 +147,7 @@ public class AnnotationLinksDialog extends TitleAreaDialog {
       container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
       container.setLayout(new GridLayout(1, false));  
       
-      String[] additionalColumnTexts = annotation.getType().getAdditionalLinkColumns();
+      String[] additionalColumnTexts = annotation.getType().getAdditionalLinkColumns(annotation);
       if (!ArrayUtil.isEmpty(additionalColumnTexts)) {
          Composite linksViewerComposite = new Composite(container, SWT.NONE);
          linksViewerComposite.setLayoutData(new GridData(GridData.FILL_BOTH));

@@ -29,9 +29,9 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.annotation.impl.CommentAnnotation;
 import org.key_project.sed.core.annotation.impl.CommentAnnotationLink;
 import org.key_project.sed.core.annotation.impl.CommentAnnotationType;
 import org.key_project.sed.core.annotation.impl.SearchAnnotation;
@@ -153,7 +153,8 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          assertNotNull(launch);
          // Simulate comments
          ISEDAnnotationType commentType = SEDAnnotationUtil.getAnnotationtype(CommentAnnotationType.TYPE_ID);
-         ISEDAnnotation commentAnnotation = commentType.createAnnotation();
+         CommentAnnotation commentAnnotation = (CommentAnnotation)commentType.createAnnotation();
+         commentAnnotation.setCommentType("MyCommentType");
          CommentAnnotationLink firstCommentLink = (CommentAnnotationLink)commentType.createLink(commentAnnotation, target.getSymbolicThreads()[0].getChildren()[0]);
          CommentAnnotationLink secondCommentLink = (CommentAnnotationLink)commentType.createLink(commentAnnotation, target.getSymbolicThreads()[0].getChildren()[0].getChildren()[0]);
          firstCommentLink.setComment("Comment of first Link");

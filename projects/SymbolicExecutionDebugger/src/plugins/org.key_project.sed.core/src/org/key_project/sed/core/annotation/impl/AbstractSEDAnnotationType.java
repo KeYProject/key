@@ -49,7 +49,7 @@ public abstract class AbstractSEDAnnotationType implements ISEDAnnotationType {
     * {@inheritDoc}
     */
    @Override
-   public String[] getAdditionalLinkColumns() {
+   public String[] getAdditionalLinkColumns(ISEDAnnotation annotation) {
       return null;
    }
    
