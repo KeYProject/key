@@ -171,7 +171,7 @@ public final class SymbolicExecutionUtil {
     * @throws ProofInputException Occurred Exception.
     */
    public static Term simplify(Proof parentProof,
-                               Term term) throws ProofInputException { // TODO: May does not work, check and try to avoid
+                               Term term) throws ProofInputException {
       // Create sequent to proof
       Sequent sequentToProve =
               Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(term), false, true).sequent();
@@ -2128,9 +2128,9 @@ public final class SymbolicExecutionUtil {
          Semisequent antecedent = useNode.sequent().antecedent();
          Term invTerm = antecedent.get(antecedent.size() - 1).formula();
          // Extract loop condition from child
-         Term loopConditionModalityTerm = posInOccurrenceInOtherNode(parent, app.posInOccurrence(), node);
-         Pair<ImmutableList<Term>,Term> pair = TermBuilder.goBelowUpdates2(loopConditionModalityTerm);
-         loopConditionModalityTerm = pair.second;
+         Term loopConditionModalityTerm =
+                 posInOccurrenceInOtherNode(parent, app.posInOccurrence(), node);
+         loopConditionModalityTerm = TermBuilder.goBelowUpdates(loopConditionModalityTerm);
          if (childIndex == 1) { // Body Preserves Invariant
             if (loopConditionModalityTerm.op() != Junctor.IMP) {
                throw new ProofInputException("Implementation of WhileInvariantRule has changed."); 
@@ -2145,75 +2145,40 @@ public final class SymbolicExecutionUtil {
             if (sub.op() != Junctor.IMP) {
                throw new ProofInputException("Implementation of WhileInvariantRule has changed."); 
             }
-            loopConditionModalityTerm = services.getTermBuilder().box(loopConditionModalityTerm.javaBlock(), sub.sub(0));
+            loopConditionModalityTerm =
+                    services.getTermBuilder().box(loopConditionModalityTerm.javaBlock(), sub.sub(0));
          }
          if (loopConditionModalityTerm.op() != Modality.BOX ||
              loopConditionModalityTerm.sub(0).op() != Equality.EQUALS ||
              !(loopConditionModalityTerm.sub(0).sub(0).op() instanceof LocationVariable) ||
-             loopConditionModalityTerm.sub(0).sub(1) != (childIndex == 1 ? services.getTermBuilder().TRUE() : services.getTermBuilder().FALSE())) {
+             loopConditionModalityTerm.sub(0).sub(1) != (childIndex == 1 ?
+                     services.getTermBuilder().TRUE() : services.getTermBuilder().FALSE())) {
             throw new ProofInputException("Implementation of WhileInvariantRule has changed."); 
          }
-         
-         
-         
          // Execute modality in a side proof to convert the JavaBlock of the modality into a Term
-         SiteProofVariableValueInput input = createComputeLoopBranchCondition(services, parent, null, loopConditionModalityTerm, true, pair.first, invTerm);
-System.out.println("INITIAL::::::");
-System.out.println(ProofSaver.printAnything(input.getSequentToProve(), services));
-         ApplyStrategyInfo info = startSideProof(parent.proof(), input.getSequentToProve(), StrategyProperties.SPLITTING_DELAYED);
+         SiteProofVariableValueInput input =
+                 createExtractTermSequent(services, parent, null, loopConditionModalityTerm, false);
+         ApplyStrategyInfo info = startSideProof(parent.proof(), input.getSequentToProve(),
+                                                 StrategyProperties.SPLITTING_DELAYED);
          ImmutableList<Term> results = ImmutableSLList.<Term>nil();
          for (Goal goal : info.getProof().openGoals()) {
             Term goalTerm = extractOperatorValue(goal, input.getOperator());
             results = results.append(goalTerm);
-System.out.println("GOAL::::::");
-System.out.println(ProofSaver.printAnything(goal.node().sequent(), services));
          }
          Term loopCondition = services.getTermBuilder().or(results);
-         Term branchCondition = loopCondition;
-//         Term branchCondition = services.getTermBuilder().and(loopCondition, invTerm);
+         Term branchCondition = services.getTermBuilder().and(loopCondition, invTerm);
          // Simplify result if requested
-         branchCondition = improveReadability(branchCondition, services);
+         if (simplify) {
+            branchCondition = simplify(node.proof(), branchCondition);
+         }
+         if (improveReadability) {
+            branchCondition = improveReadability(branchCondition, services);
+         }
          return branchCondition;
       }
       else {
          throw new ProofInputException("Branch condition of initially valid check is not supported."); 
       }
-   }
-
-   /**
-    * Creates a {@link Sequent} which can be used in site proofs to
-    * extract the value of the given {@link IProgramVariable} from the
-    * sequent of the given {@link Node}.
-    * @param services The {@link Services} to use.
-    * @param node The original {@link Node} which provides the sequent to extract from.
-    * @param additionalConditions Additional conditions to add to the antecedent.
-    * @param term The new succedent term.
-    * @param keepUpdates {@code true} keep updates, {@code false} throw updates away.
-    * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
-    */
-   public static SiteProofVariableValueInput createComputeLoopBranchCondition(Services services,
-                                                                              Node node,
-                                                                              Term additionalConditions,
-                                                                              Term term,
-                                                                              boolean keepUpdates,
-                                                                              ImmutableList<Term> updates,
-                                                                              Term invTerm) {
-      // Make sure that correct parameters are given
-      assert node != null;
-      assert term != null;
-      // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(services.getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, term.sort());
-      // Create formula which contains the value interested in.
-      invTerm = TermBuilder.goBelowUpdates(invTerm);
-      Term loopCondAndInv = services.getTermBuilder().and(term.sub(0), invTerm);
-      Term newTerm = services.getTermBuilder().func(newPredicate, loopCondAndInv);
-      Term modalityTerm = services.getTermBuilder().box(term.javaBlock(), newTerm);
-      
-      
-      // Create Sequent to prove with new succedent.
-      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, additionalConditions, modalityTerm, updates);
-      // Return created sequent and the used predicate to identify the value interested in.
-      return new SiteProofVariableValueInput(sequentToProve, newPredicate);
    }
 
    /**
@@ -2407,32 +2372,24 @@ System.out.println(ProofSaver.printAnything(goal.node().sequent(), services));
       Term left = services.getTermBuilder().and(antecedents);
       Term right = services.getTermBuilder().or(succedents);
       Term leftAndRight = services.getTermBuilder().and(left, services.getTermBuilder().not(right));
-      
+      Term result;
       // Check if an update context is available
       if (!instantiations.getUpdateContext().isEmpty()) {
          // Simplify branch condition if required
-         leftAndRight = services.getTermBuilder().applyUpdatePairsSequential(instantiations.getUpdateContext(),
+         result = services.getTermBuilder().applyUpdatePairsSequential(instantiations.getUpdateContext(),
                                                             leftAndRight);
       }
-      
-      // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(services.getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, leftAndRight.sort());
-      // Create formula which contains the value interested in.
-      Term newTerm = services.getTermBuilder().func(newPredicate, leftAndRight);
-      
-      Sequent newSequent = parent.sequent().removeFormula(app.posInOccurrence()).sequent();
-      newSequent = newSequent.addFormula(new SequentFormula(newTerm), false, true).sequent();
-      
-      ApplyStrategyInfo info = startSideProof(parent.proof(), newSequent, StrategyProperties.SPLITTING_OFF);
-      ImmutableList<Term> results = ImmutableSLList.<Term>nil();
-      for (Goal goal : info.getProof().openGoals()) {
-         Term goalTerm = extractOperatorValue(goal, newPredicate);
-         results = results.append(goalTerm);
+      else {
+         // No update context, just use the implication as branch condition
+         result = leftAndRight;
       }
-      
-      Term result = services.getTermBuilder().or(results);
-  
-      result = improveReadability(result, services);
+      // Execute simplification if requested
+      if (simplify) {
+         result = simplify(node.proof(), result);
+      }
+      if (improveReadability) {
+         result = improveReadability(result, services);
+      }
       // Make sure that no skolem constant is contained in the result.
       result = replaceSkolemConstants(node.sequent(), result, services);
       return result;
