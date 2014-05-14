@@ -40,6 +40,7 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 	private boolean stop;
 	private SolverLauncher launcher;
 	private Vector<Proof> proofs;
+	private Proof originalProof;
 	
 	public TGWorker(TGInfoDialog tgInfoDialog){
 		this.tgInfoDialog = tgInfoDialog;
@@ -76,6 +77,7 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 			.writeln("No test data constraints were extracted.");
 		}
 		final KeYMediator mediator = getMediator();
+		originalProof = mediator.getSelectedProof();
 		final Collection<SMTProblem> problems = new LinkedList<SMTProblem>();
 		tgInfoDialog
 		.writeln("Test data generation: appling semantic blasting macro on proofs");
@@ -107,7 +109,7 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 			}
 		}
 		tgInfoDialog.writeln("\nDone applying semantic blasting.");
-		mediator.setProof(TestGenerationAction.originalProof);
+		mediator.setProof(originalProof);
 		// getMediator().setInteractive(true);
 		// getMediator().startInterface(true);
 		final Proof proof = mediator.getSelectedProof();
@@ -147,7 +149,7 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 		getMediator().setInteractive(true);
 		getMediator().startInterface(true);
 		getMediator().removeInterruptedListener(this);
-		TestGenerationAction.originalProof = null;
+		originalProof = null;
 	}
 
 	@Override
@@ -173,7 +175,7 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 				p.dispose();
 			}
 		}
-		getMediator().setProof(TestGenerationAction.originalProof);
+		getMediator().setProof(originalProof);
 	}
 
 	/*
@@ -257,12 +259,12 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 			boolean removeDuplicatePathConditions) {
 		final Vector<Proof> res = new Vector<Proof>();
 		final Proof oldProof = mediator.getSelectedProof();
-		TestGenerationAction.originalProof = oldProof;
+		originalProof = oldProof;
 		final List<Node> nodes = new LinkedList<Node>();
 		final ImmutableList<Goal> oldGoals = oldProof.openGoals();
-		if (TestGenerationAction.originalProof.closed()) {
+		if (originalProof.closed()) {
 			getNodesWithEmptyModalities(
-					TestGenerationAction.originalProof.root(), nodes);
+					originalProof.root(), nodes);
 		} else {
 			for (final Goal goal : oldGoals) {
 				nodes.add(goal.node());
@@ -322,5 +324,9 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 			res |= hasModalities(t.sub(i), checkUpdates);
 		}
 		return res;
+	}
+	
+	public Proof getOriginalProof(){
+		return originalProof;
 	}
 }

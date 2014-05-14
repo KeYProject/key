@@ -12,6 +12,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.testgen.TGInfoDialog;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.testgen.OracleGenerator;
 
 /**
  * Action which generates test cases for all open nodes. If the proof is closed,
@@ -27,7 +28,7 @@ public class TestGenerationAction extends MainWindowAction {
 	private static final String NAME = "Generate Testcases";
 	private static final String TOOLTIP = "Generate test cases for open goals";
 	
-	public static Proof originalProof;
+	//public static Proof originalProof;
 
 	public TestGenerationAction(MainWindow mainWindow) {
 		super(mainWindow);

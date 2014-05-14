@@ -32,6 +32,8 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener {
 	private final JButton stopButton;
 	private final JButton exitButton;
 	private final JButton startButton;
+	
+	private TGWorker worker;
 
 	public TGInfoDialog() {
 		super(MainWindow.getInstance());
@@ -63,7 +65,7 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener {
 		startButton = new JButton(new AbstractAction("Start") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				TGWorker worker = new TGWorker(TGInfoDialog.this);
+				worker = new TGWorker(TGInfoDialog.this);
 				worker.start();
 			}
 		});
@@ -140,7 +142,7 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener {
 	public void launcherStopped(SolverLauncher launcher,
 	        Collection<SMTSolver> problemSolvers) {
 		writeln("Finished solving SMT problems: " + problemSolvers.size());
-		final TestCaseGenerator tg = new TestCaseGenerator();
+		final TestCaseGenerator tg = new TestCaseGenerator(worker.getOriginalProof());
 		tg.setLogger(this);
 		problemSolvers = filterSolverResultsAndShowSolverStatistics(problemSolvers);
 		if (problemSolvers.size() > 0) {
