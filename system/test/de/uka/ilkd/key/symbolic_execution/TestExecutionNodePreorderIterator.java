@@ -159,7 +159,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
    public void testEmptyRoot() throws ProofInputException {
       // Create tree to test
       UserInterface ui = new CustomConsoleUserInterface(false);
-      KeYMediator mediator = new KeYMediator(ui, false);
+      KeYMediator mediator = new KeYMediator(ui);
       Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
       Node root = appendRoot(proof);
       // Create execution test model

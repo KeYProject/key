@@ -115,30 +115,16 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         return nsb;
     }
 
-    protected StringBuffer removeEmptyLines(StringBuffer sb) {
-        String s = sb.toString();
-        String[] sa = s.split("\n");
-        StringBuffer result = new StringBuffer();
-        for (String aSa : sa) {
-            //logger.debug("'" + sa[i] + "'");
-            if ("".equals(aSa)) {
-                continue;
-            }
-            boolean onlySpaces = true;
-            for (int j = 0; j < aSa.length(); j++) {
-                if (aSa.charAt(j) != ' ') {
-                    onlySpaces = false;
-                }
-            }
-            if (onlySpaces) {
-                continue;
-            }
-            result.append(aSa).append("\n");
-        }
-        if (result.charAt(result.length()-1) == '\n') {
-    	result.setLength(result.length() - 1);
-        }
-        return result;
+    private static StringBuffer removeEmptyLines(StringBuffer sb) {
+        String string = sb.toString();
+        // This regular expression matches against lines that only have spaces
+        // (' ' or '\t') in them and against trailing new line characters and
+        // replaces them with "".
+        // This fixes bug #1435, MU
+        string = string.replaceAll("(?m)^[ \t]*\r?\n|\n$", "");
+        sb.setLength(0);
+        sb.append(string);
+        return sb;
     }
     
     /* (non-Javadoc)

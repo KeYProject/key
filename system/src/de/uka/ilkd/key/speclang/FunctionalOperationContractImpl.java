@@ -58,6 +58,7 @@ import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import static de.uka.ilkd.key.util.Assert.*;
 
 /**
  * Standard implementation of the OperationContract interface.
@@ -208,7 +209,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         //self
         if(selfVar != null) {
-            assert selfVar.sort().extendsTrans(originalSelfVar.sort());
+            assertSubSort(selfVar,originalSelfVar);
             result.put(originalSelfVar, selfVar);
         }
 
@@ -220,20 +221,22 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             while(it1.hasNext()) {
                 ProgramVariable originalParamVar = it1.next();
                 ProgramVariable paramVar         = it2.next();
-                assert originalParamVar.sort().equals(paramVar.sort());
+                // allow contravariant parameter types
+                assertSubSort(originalParamVar, paramVar);
                 result.put(originalParamVar, paramVar);
             }
         }
 
         //result
         if(resultVar != null) {
-            assert originalResultVar.sort().equals(resultVar.sort());
+            // workaround to allow covariant return types (bug #1384)
+            assertSubSort(resultVar, originalResultVar);
             result.put(originalResultVar, resultVar);
         }
 
         //exception
         if(excVar != null) {
-            assert originalExcVar.sort().equals(excVar.sort()) : "Incompatible sorts: "+originalExcVar.sort()+" and "+excVar.sort();
+            assertEqualSort(originalExcVar, excVar);
             result.put(originalExcVar, excVar);
         }
 
@@ -241,7 +244,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
             for(LocationVariable h : heapLDT.getAllHeaps()) {
                 if(atPreVars.get(h) != null) {
-                    assert originalAtPreVars.get(h).sort().equals(atPreVars.get(h).sort());
+                    assertEqualSort(originalAtPreVars.get(h), atPreVars.get(h));
                     result.put(originalAtPreVars.get(h), atPreVars.get(h));
                 }
             }
@@ -289,7 +292,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         //self
         if(selfTerm != null) {
-            assert selfTerm.sort().extendsTrans(originalSelfVar.sort());
+            assertSubSort(selfTerm, originalSelfVar);
             result.put(TB.var(originalSelfVar), selfTerm);
         }
 
@@ -301,6 +304,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             while(it1.hasNext()) {
                 ProgramVariable originalParamVar = it1.next();
                 Term paramTerm                   = it2.next();
+                // TODO: what does this mean?
                 assert paramTerm.sort().extendsTrans(originalParamVar.sort());
                 result.put(TB.var(originalParamVar), paramTerm);
             }
@@ -308,13 +312,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         //result
         if(resultTerm != null) {
-            assert originalResultVar.sort().equals(resultTerm.sort());
+            assertSubSort(resultTerm, originalResultVar);
             result.put(TB.var(originalResultVar), resultTerm);
         }
 
         //exception
         if(excTerm != null) {
-            assert originalExcVar.sort().equals(excTerm.sort());
+            assertEqualSort(originalExcVar, excTerm);
             result.put(TB.var(originalExcVar), excTerm);
         }
 
@@ -322,7 +326,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
             for(LocationVariable h : heapLDT.getAllHeaps()) {
                 if(atPres.get(h) != null) {
-                    assert originalAtPreVars.get(h).sort().equals(atPres.get(h).sort());
+                    assertEqualSort(originalAtPreVars.get(h), atPres.get(h));
                     result.put(TB.var(originalAtPreVars.get(h)), atPres.get(h));
                 }
             }
