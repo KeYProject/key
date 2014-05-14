@@ -17,8 +17,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import org.eclipse.core.runtime.Assert;
-
 import de.uka.ilkd.key.proof.Proof;
 
 /**
@@ -63,8 +61,8 @@ public final class ProofUserManager {
     * @param user The user.
     */
    public void addUser(Proof proof, KeYEnvironment<?> environment, Object user) {
-      Assert.isNotNull(proof, "Proof not defined.");
-      Assert.isNotNull(user, "User not defined.");
+      assert proof != null : "Proof not defined.";
+      assert user != null : "User not defined.";
       synchronized (this) {
          Set<Object> users = proofUsers.get(proof);
          if (users == null) {
@@ -91,8 +89,8 @@ public final class ProofUserManager {
     * @param userThe user.
     */
    public void removeUserAndDispose(Proof proof, Object user) {
-      Assert.isNotNull(proof, "Proof not defined.");
-      Assert.isNotNull(user, "User not defined.");
+      assert proof != null : "Proof not defined.";
+      assert user != null : "User not defined.";
       synchronized (this) {
          Set<Object> users = proofUsers.get(proof);
          if (users != null) {
