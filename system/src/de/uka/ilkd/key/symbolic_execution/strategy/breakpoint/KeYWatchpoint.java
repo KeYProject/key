@@ -33,6 +33,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofStore;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 
@@ -88,6 +89,7 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint{
       if(suspendOnTrue){
          return super.conditionMet(ruleApp, proof, node);
       }else{
+         ApplyStrategyInfo info = null;
          try {
             Term negatedCondition = getProof().getServices().getTermBuilder().not(getCondition());
             //initialize values
@@ -105,11 +107,14 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint{
             //start side proof
             Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
             Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
-            ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
+            info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
             return !info.getProof().closed();
          }
          catch (ProofInputException e) {
             return false;
+         }
+         finally {
+            SideProofStore.disposeOrStore("KeY Watchpoint evaluation on node " + node.serialNr() + ".", info);
          }
       }
    }

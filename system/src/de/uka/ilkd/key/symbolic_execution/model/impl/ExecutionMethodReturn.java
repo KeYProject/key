@@ -42,6 +42,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofStore;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 import de.uka.ilkd.key.util.MiscTools;
@@ -238,7 +239,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                }
             }
             finally {
-               info.getProof().dispose();
+               SideProofStore.disposeOrStore("Return value computation on method return node " + methodReturnNode.serialNr() + ".", info);
             }
          }
          else {

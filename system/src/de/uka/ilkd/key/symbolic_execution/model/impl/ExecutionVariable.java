@@ -36,6 +36,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofStore;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 
@@ -226,7 +227,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          return result.toArray(new ExecutionValue[result.size()]);
       }
       finally {
-         info.getProof().dispose();
+         SideProofStore.disposeOrStore("Value computation on node " + getProofNode().serialNr(), info);
       }
    }
 

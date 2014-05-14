@@ -11,25 +11,19 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.key4eclipse.starter.core.test.testcase;
+package de.uka.ilkd.key.symbolic_execution.util;
 
-import org.junit.Test;
-import org.key_project.key4eclipse.starter.core.util.ProofUserManager;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.test.testcase.AbstractSetupTestCase;
-import org.key_project.util.test.util.TestUtilsUtil;
-
+import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * Tests for {@link ProofUserManager}.
  * @author Martin Hentschel
  */
-public class ProofUserManagerTest extends AbstractSetupTestCase {
+public class TestProofUserManager extends TestCase {
    /**
     * Tests {@link ProofUserManager#addUser(de.uka.ilkd.key.proof.Proof, Object)},
     * {@link ProofUserManager#removeUserAndDispose(de.uka.ilkd.key.proof.Proof, Object)},
@@ -38,7 +32,6 @@ public class ProofUserManagerTest extends AbstractSetupTestCase {
     * {@link ProofUserManager#getEnvironment(Proof)} and
     * {@link ProofUserManager#getProofs(KeYEnvironment)}.
     */
-   @Test
    public void testUserManagement_Environment() {
       Proof firstProof = new Proof(new Services(AbstractProfile.getDefaultProfile()));
       Proof secondProof = new Proof(new Services(AbstractProfile.getDefaultProfile()));
@@ -113,10 +106,10 @@ public class ProofUserManagerTest extends AbstractSetupTestCase {
       Proof[] proofs = {firstProof, secondProof, thirdProof};
       // Made sure that correct proofs are registered for environments
       for (Proof proof : proofs) {
-         if (ArrayUtil.contains(firstEnvProofs, proof)) {
+         if (JavaUtil.contains(firstEnvProofs, proof)) {
             assertEquals(firstEnv, ProofUserManager.getInstance().getEnvironment(proof));
          }
-         else if (ArrayUtil.contains(secondEnvProofs, proof)) {
+         else if (JavaUtil.contains(secondEnvProofs, proof)) {
             assertEquals(secondEnv, ProofUserManager.getInstance().getEnvironment(proof));
          }
          else {
@@ -126,17 +119,17 @@ public class ProofUserManagerTest extends AbstractSetupTestCase {
       // Made sure that correct proofs are known 
       Proof[] currentFirstEnvProofs = ProofUserManager.getInstance().getProofs(firstEnv);
       for (Proof proof : currentFirstEnvProofs) {
-         assertTrue(ArrayUtil.contains(firstEnvProofs, proof));
+         assertTrue(JavaUtil.contains(firstEnvProofs, proof));
       }
       for (Proof proof : firstEnvProofs) {
-         assertTrue(ArrayUtil.contains(currentFirstEnvProofs, proof));
+         assertTrue(JavaUtil.contains(currentFirstEnvProofs, proof));
       }
       Proof[] currentSecondEnvProofs = ProofUserManager.getInstance().getProofs(secondEnv);
       for (Proof proof : currentSecondEnvProofs) {
-         assertTrue(ArrayUtil.contains(secondEnvProofs, proof));
+         assertTrue(JavaUtil.contains(secondEnvProofs, proof));
       }
       for (Proof proof : secondEnvProofs) {
-         assertTrue(ArrayUtil.contains(currentSecondEnvProofs, proof));
+         assertTrue(JavaUtil.contains(currentSecondEnvProofs, proof));
       }
    }
 
@@ -146,8 +139,7 @@ public class ProofUserManagerTest extends AbstractSetupTestCase {
     * {@link ProofUserManager#getProofs()} and
     * {@link ProofUserManager#getUsers(Proof)}.
     */
-   @Test
-   public void testUserManagement_NoEnvironment() {
+   public void testUserManagement_NoEnvironment() throws Exception {
       Proof firstProof = new Proof(new Services(AbstractProfile.getDefaultProfile()));
       Proof secondProof = new Proof(new Services(AbstractProfile.getDefaultProfile()));
       Proof thirdProof = new Proof(new Services(AbstractProfile.getDefaultProfile()));
@@ -241,9 +233,9 @@ public class ProofUserManagerTest extends AbstractSetupTestCase {
       assertProofs(fifthProof);
       fifthProof.dispose();
       fifthProof = null;
-      TestUtilsUtil.sleep(1000);
+      Thread.sleep(1000);
       Runtime.getRuntime().gc();
-      TestUtilsUtil.sleep(1000);
+      Thread.sleep(1000);
       assertProofs();
    }
    
@@ -276,19 +268,19 @@ public class ProofUserManagerTest extends AbstractSetupTestCase {
       Proof[] registeredProofs = ProofUserManager.getInstance().getProofs();
       assertNotNull(registeredProofs);
       int expectedCount = 0;
-      if (!ArrayUtil.isEmpty(expectedFirstProofUsers)) {
+      if (!JavaUtil.isEmpty(expectedFirstProofUsers)) {
          expectedCount++;
-         assertTrue(ArrayUtil.contains(registeredProofs, firstProof));
+         assertTrue(JavaUtil.contains(registeredProofs, firstProof));
          assertUser(firstProof, expectedFirstProofUsers);
       }
-      if (!ArrayUtil.isEmpty(expectedSecondProofUsers)) {
+      if (!JavaUtil.isEmpty(expectedSecondProofUsers)) {
          expectedCount++;
-         assertTrue(ArrayUtil.contains(registeredProofs, secondProof));
+         assertTrue(JavaUtil.contains(registeredProofs, secondProof));
          assertUser(secondProof, expectedSecondProofUsers);
       }
-      if (!ArrayUtil.isEmpty(expectedThirdProofUsers)) {
+      if (!JavaUtil.isEmpty(expectedThirdProofUsers)) {
          expectedCount++;
-         assertTrue(ArrayUtil.contains(registeredProofs, thirdProof));
+         assertTrue(JavaUtil.contains(registeredProofs, thirdProof));
          assertUser(thirdProof, expectedThirdProofUsers);
       }
       assertEquals(expectedCount, registeredProofs.length);
@@ -304,7 +296,7 @@ public class ProofUserManagerTest extends AbstractSetupTestCase {
       assertNotNull(users);
       assertEquals(expectedUsers.length, users.length);
       for (Object user : expectedUsers) {
-         assertTrue(ArrayUtil.contains(users, user));
+         assertTrue(JavaUtil.contains(users, user));
       }
    }
 
@@ -317,14 +309,13 @@ public class ProofUserManagerTest extends AbstractSetupTestCase {
       assertNotNull(proofs);
       assertEquals(expectedProofs.length, proofs.length);
       for (Proof proof : expectedProofs) {
-         assertTrue(ArrayUtil.contains(proofs, proof));
+         assertTrue(JavaUtil.contains(proofs, proof));
       }
    }
 
    /**
     * Tests {@link ProofUserManager#getInstance()}.
     */
-   @Test
    public void testGetInstance() {
       ProofUserManager first = ProofUserManager.getInstance();
       assertNotNull(first);

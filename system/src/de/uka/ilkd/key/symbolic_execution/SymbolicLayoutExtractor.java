@@ -29,6 +29,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ApplyStrategy;
+import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -55,6 +56,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -73,6 +75,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicValue;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofStore;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.ProofStarter;
 
@@ -293,13 +296,14 @@ public class SymbolicLayoutExtractor {
             symbolicObjectsResultingInCurrentState.add(getServices().getTermBuilder().NULL()); // Add null because it can happen that a object is null and this option must be included in equivalence class computation
             // Compute a Sequent with the initial conditions of the proof without modality
             Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation(pathCondition);
-            // Instantiate proof in which equivalent classes of symbolic objects are computed.
-            ProofStarter equivalentClassesProofStarter = SymbolicExecutionUtil.createSideProof(getProof(), initialConditionsSequent);
+            ApplyStrategyInfo info = null;
             try {
+               // Instantiate proof in which equivalent classes of symbolic objects are computed.
+               ProofStarter equivalentClassesProofStarter = SymbolicExecutionUtil.createSideProof(getProof(), initialConditionsSequent);
                // Apply cut rules to compute equivalent classes
                applyCutRules(equivalentClassesProofStarter, symbolicObjectsResultingInCurrentState);
                // Finish proof automatically
-               SymbolicExecutionUtil.startSideProof(getProof(), equivalentClassesProofStarter, StrategyProperties.SPLITTING_NORMAL);
+               info = SymbolicExecutionUtil.startSideProof(getProof(), equivalentClassesProofStarter, StrategyProperties.SPLITTING_NORMAL);
                // Compute the available instance memory layout via the opened goals of the equivalent proof.
                appliedCutsPerLayout = extractAppliedCutsFromGoals(equivalentClassesProofStarter.getProof());
                // Create predicate required for state computation
@@ -311,7 +315,7 @@ public class SymbolicLayoutExtractor {
                layoutsEquivalentClasses = new LinkedHashMap<Integer, ImmutableList<ISymbolicEquivalenceClass>>();
             }
             finally {
-               equivalentClassesProofStarter.getProof().dispose();
+               SideProofStore.disposeOrStore("Equivalence class computation on node " + node.serialNr() + ".", info);
             }
          }
       }
@@ -1136,7 +1140,7 @@ public class SymbolicLayoutExtractor {
             return createLayoutFromExecutionVariableValuePairs(equivalentClasses, pairs, stateName);
          }
          finally {
-            info.getProof().dispose();
+            SideProofStore.disposeOrStore("Layout computation on node " + node.serialNr() + " with layout term " + ProofSaver.printAnything(layoutTerm, getServices()) + ".", info);
          }
       }
       else {

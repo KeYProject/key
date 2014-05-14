@@ -195,7 +195,7 @@ public final class SymbolicExecutionUtil {
          }
       }
       finally {
-         info.getProof().dispose();
+         SideProofStore.disposeOrStore("Simplification of " + ProofSaver.printAnything(term, parentProof.getServices()), info);
       }
    }
    
@@ -2106,12 +2106,11 @@ public final class SymbolicExecutionUtil {
     * @return The computed branch condition.
     * @throws ProofInputException Occurred Exception.
     */
-   private static Term
-           computeLoopInvariantBuiltInRuleAppBranchCondition(Node parent,
-                                                             Node node,
-                                                             boolean simplify,
-                                                             boolean improveReadability)
-                                                                     throws ProofInputException {
+   private static Term computeLoopInvariantBuiltInRuleAppBranchCondition(Node parent,
+                                                                         Node node,
+                                                                         boolean simplify,
+                                                                         boolean improveReadability)
+                                                                         throws ProofInputException {
       // Make sure that a computation is possible
       if (!(parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp)) {
          throw new ProofInputException(
@@ -2128,8 +2127,7 @@ public final class SymbolicExecutionUtil {
          Semisequent antecedent = useNode.sequent().antecedent();
          Term invTerm = antecedent.get(antecedent.size() - 1).formula();
          // Extract loop condition from child
-         Term loopConditionModalityTerm =
-                 posInOccurrenceInOtherNode(parent, app.posInOccurrence(), node);
+         Term loopConditionModalityTerm = posInOccurrenceInOtherNode(parent, app.posInOccurrence(), node);
          loopConditionModalityTerm = TermBuilder.goBelowUpdates(loopConditionModalityTerm);
          if (childIndex == 1) { // Body Preserves Invariant
             if (loopConditionModalityTerm.op() != Junctor.IMP) {
@@ -2145,36 +2143,37 @@ public final class SymbolicExecutionUtil {
             if (sub.op() != Junctor.IMP) {
                throw new ProofInputException("Implementation of WhileInvariantRule has changed."); 
             }
-            loopConditionModalityTerm =
-                    services.getTermBuilder().box(loopConditionModalityTerm.javaBlock(), sub.sub(0));
+            loopConditionModalityTerm = services.getTermBuilder().box(loopConditionModalityTerm.javaBlock(), sub.sub(0));
          }
          if (loopConditionModalityTerm.op() != Modality.BOX ||
              loopConditionModalityTerm.sub(0).op() != Equality.EQUALS ||
              !(loopConditionModalityTerm.sub(0).sub(0).op() instanceof LocationVariable) ||
-             loopConditionModalityTerm.sub(0).sub(1) != (childIndex == 1 ?
-                     services.getTermBuilder().TRUE() : services.getTermBuilder().FALSE())) {
+             loopConditionModalityTerm.sub(0).sub(1) != (childIndex == 1 ? services.getTermBuilder().TRUE() : services.getTermBuilder().FALSE())) {
             throw new ProofInputException("Implementation of WhileInvariantRule has changed."); 
          }
          // Execute modality in a side proof to convert the JavaBlock of the modality into a Term
-         SiteProofVariableValueInput input =
-                 createExtractTermSequent(services, parent, null, loopConditionModalityTerm, false);
-         ApplyStrategyInfo info = startSideProof(parent.proof(), input.getSequentToProve(),
-                                                 StrategyProperties.SPLITTING_DELAYED);
-         ImmutableList<Term> results = ImmutableSLList.<Term>nil();
-         for (Goal goal : info.getProof().openGoals()) {
-            Term goalTerm = extractOperatorValue(goal, input.getOperator());
-            results = results.append(goalTerm);
+         SiteProofVariableValueInput input = createExtractTermSequent(services, parent, null, loopConditionModalityTerm, false);
+         ApplyStrategyInfo info = startSideProof(parent.proof(), input.getSequentToProve(), StrategyProperties.SPLITTING_DELAYED);
+         try {
+            ImmutableList<Term> results = ImmutableSLList.<Term>nil();
+            for (Goal goal : info.getProof().openGoals()) {
+               Term goalTerm = extractOperatorValue(goal, input.getOperator());
+               results = results.append(goalTerm);
+            }
+            Term loopCondition = services.getTermBuilder().or(results);
+            Term branchCondition = services.getTermBuilder().and(loopCondition, invTerm);
+            // Simplify result if requested
+            if (simplify) {
+               branchCondition = simplify(node.proof(), branchCondition);
+            }
+            if (improveReadability) {
+               branchCondition = improveReadability(branchCondition, services);
+            }
+            return branchCondition;            
          }
-         Term loopCondition = services.getTermBuilder().or(results);
-         Term branchCondition = services.getTermBuilder().and(loopCondition, invTerm);
-         // Simplify result if requested
-         if (simplify) {
-            branchCondition = simplify(node.proof(), branchCondition);
+         finally {
+            SideProofStore.disposeOrStore("Loop invariant branch condition computation on node " + parent.serialNr() + " for branch " + node.serialNr() + "." , info);
          }
-         if (improveReadability) {
-            branchCondition = improveReadability(branchCondition, services);
-         }
-         return branchCondition;
       }
       else {
          throw new ProofInputException("Branch condition of initially valid check is not supported."); 
@@ -2508,7 +2507,7 @@ public final class SymbolicExecutionUtil {
          return !info.getProof().openEnabledGoals().isEmpty();
       }
       finally {
-         info.getProof().dispose();
+         SideProofStore.disposeOrStore("Null check on node " + node.serialNr() + ".", info);
       }
    }
    

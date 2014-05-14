@@ -57,6 +57,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofStore;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -344,6 +345,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     * @return true if the condition evaluates to true
     */
    protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node) {
+      ApplyStrategyInfo info = null;
       try {
          //initialize values
          PosInOccurrence pio = ruleApp.posInOccurrence();
@@ -361,11 +363,14 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
          //start side proof
          Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
          Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
-         ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
+         info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
          return info.getProof().closed();
       }
       catch (ProofInputException e) {
          return false;
+      }
+      finally {
+         SideProofStore.disposeOrStore("Breakpoint condition computation on node " + node.serialNr() + ".", info);
       }
    }
    

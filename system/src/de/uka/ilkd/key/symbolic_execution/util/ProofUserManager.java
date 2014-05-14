@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.key4eclipse.starter.core.util;
+package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,7 +20,6 @@ import java.util.WeakHashMap;
 import org.eclipse.core.runtime.Assert;
 
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * This singleton class is used to manage user of a {@link Proof} to make

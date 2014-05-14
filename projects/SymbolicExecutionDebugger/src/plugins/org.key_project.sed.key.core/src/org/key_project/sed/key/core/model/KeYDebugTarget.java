@@ -50,7 +50,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.key_project.key4eclipse.starter.core.util.ProofUserManager;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
@@ -85,6 +84,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTree
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepReturnSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
+import de.uka.ilkd.key.symbolic_execution.util.ProofUserManager;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 

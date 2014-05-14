@@ -573,6 +573,22 @@ public final class SWTUtil {
    }
 
    /**
+    * Invokes {@link AbstractTableViewer#add(Object)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param elements The new elements to add.
+    */
+   public static void add(final AbstractTableViewer viewer, final Object[] elements) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.add(elements);
+            }
+         });
+      }
+   }
+
+   /**
     * Invokes {@link AbstractTableViewer#remove(Object)} thread save.
     * @param viewer The {@link AbstractTableViewer} to invoke method on.
     * @param element The old element to remove.
@@ -583,6 +599,22 @@ public final class SWTUtil {
             @Override
             public void run() {
                viewer.remove(element);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link AbstractTableViewer#remove(Object)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param elements The old elements to remove.
+    */
+   public static void remove(final AbstractTableViewer viewer, final Object[] elements) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.remove(elements);
             }
          });
       }

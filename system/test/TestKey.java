@@ -11,8 +11,6 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-import java.util.HashMap;
-
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
@@ -117,6 +115,7 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.symbolic_execution.util.TestDefaultEntry.class,
         de.uka.ilkd.key.symbolic_execution.util.TestEqualsHashCodeResetter.class,
         de.uka.ilkd.key.symbolic_execution.util.TestJavaUtil.class,
+        de.uka.ilkd.key.symbolic_execution.util.TestProofUserManager.class,
         de.uka.ilkd.key.symbolic_execution.util.TestSymbolicExecutionUtil.class
     };
     
