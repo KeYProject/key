@@ -112,13 +112,31 @@ public final class SideProofStore {
     * @param proof The {@link Proof} to check.
     * @return {@code true} {@link Entry} for {@link Proof} exist, {@code false} otherwise.
     */
-   public boolean containsEntry(final Proof proof) {
+   public boolean containsEntry(Proof proof) {
+      return getEntry(proof) != null;
+   }
+   
+   /**
+    * Returns the {@link Entry} for the given {@link Proof}.
+    * @param proof The {@link Proof} for which the {@link Entry} is requested.
+    * @return The {@link Entry} with the given {@link Proof} or {@code null} if not available.
+    */
+   public Entry getEntry(final Proof proof) {
       return JavaUtil.search(entries, new IFilter<Entry>() {
          @Override
          public boolean select(Entry element) {
             return element != null && element.getProof() == proof;
          }
-      }) != null;
+      });
+   }
+
+   /**
+    * Checks if the given {@link Entry} is contained.
+    * @param entry The {@link Entry} to check.
+    * @return {@code true} {@link Entry} is contained, {@code false} {@link Entry} is not contained.
+    */
+   public boolean containsEntry(Entry entry) {
+      return entries.contains(entry);
    }
    
    /**
@@ -138,6 +156,14 @@ public final class SideProofStore {
       return index >= 0 && index < entries.size() ? 
              entries.get(index) :
              null;
+   }
+   
+   /**
+    * Returns all available {@link Entry}s.
+    * @return All available {@link Entry}s.
+    */
+   public Entry[] getEntries() {
+      return entries.toArray(new Entry[entries.size()]);
    }
    
    /**

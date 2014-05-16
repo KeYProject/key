@@ -671,9 +671,10 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       boolean restoreThumbinalExecutionTreeView = false;
       boolean restorePropertiesView = false;
       List<? extends SWTBotEditor> oldEditors = bot.editors();
+      // Open symbolic debug perspective
+      IPerspectiveDescriptor debugPerspective = TestSedCoreUtil.openSymbolicDebugPerspective();
       try {
-         // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective();
+         // Configure debug perspective
          if (closeExecutionTreeViews) {
             restoreExecutionTreeView = TestUtilsUtil.closeView(ExecutionTreeView.VIEW_ID);
             restoreThumbinalExecutionTreeView = TestUtilsUtil.closeView(ExecutionTreeThumbNailView.VIEW_ID);
@@ -681,6 +682,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          if (closePropertiesView) {
             restorePropertiesView = TestUtilsUtil.closeView(IPageLayout.ID_PROP_SHEET);
          }
+         executor.configureDebugPerspective(bot, debugPerspective);
          // Get method
          assertNotNull(selector);
          IMethod method = selector.getMethod(project);
@@ -717,6 +719,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
             }
          }
          // Restore closed views if required
+         executor.cleanupDebugPerspective(bot, debugPerspective);
          if (restorePropertiesView) {
             TestUtilsUtil.openView(IPageLayout.ID_PROP_SHEET);
          }
@@ -742,7 +745,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                                               final boolean useLoopInvariants,
                                                               final boolean nonExecutionBranchHidingSideProofs,
                                                               final boolean aliasChecks) {
-      return new IKeYDebugTargetTestExecutor() {
+      return new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Test launch commands after loading completed
@@ -878,6 +881,15 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     */
    protected static interface IKeYDebugTargetTestExecutor {
       /**
+       * Can be used to initialize the debug perspective.
+       * @param bot The {@link SWTWorkbenchBot} to use.
+       * @param debugPerspective The currently shown debug perspective.
+       * @throws Exception Occurred Exception.
+       */
+      public void configureDebugPerspective(SWTWorkbenchBot bot, 
+                                            IPerspectiveDescriptor debugPerspective) throws Exception;
+      
+      /**
        * Does the test.
        * @param bot The {@link SWTWorkbenchBot} to use.
        * @param project The {@link IJavaProject} which contains the source code.
@@ -897,6 +909,42 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                        SWTBotTree debugTree, 
                        ISEDDebugTarget target, 
                        ILaunch launch) throws Exception;
+      
+      /**
+       * Reverts all changes done on the debug perspective.
+       * @param bot The {@link SWTWorkbenchBot} to use.
+       * @param debugPerspective The currently shown debug perspective.
+       * @throws Exception Occurred Exception.
+       */
+      public void cleanupDebugPerspective(SWTWorkbenchBot bot, 
+                                          IPerspectiveDescriptor debugPerspective) throws Exception;
+   }
+
+   /**
+    * Abstract implementation of {@link IKeYDebugTargetTestExecutor} which does nothing.
+    * @author Martin Hentschel
+    */
+   protected static abstract class AbstractKeYDebugTargetTestExecutor implements IKeYDebugTargetTestExecutor {
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void configureDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void cleanupDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
+      }
    }
    
    /**
