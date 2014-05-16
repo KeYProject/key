@@ -288,26 +288,4 @@ public final class SideProofStore {
          return description;
       }
    }
-
-   /**
-    * <p>
-    * Stores or disposes the {@link Proof} of the {@link ApplyStrategyInfo} in {@link SideProofStore#DEFAULT_INSTANCE}.
-    * </p>
-    * <p>
-    * This method should be called whenever a side proof is no longer needed
-    * and should be disposed or stored for debugging purposes.
-    * </p>
-    * @param description The description.
-    * @param info The {@link ApplyStrategyInfo} to store or dispose its {@link Proof}.
-    */
-   public static void disposeOrStore(String description, ApplyStrategyInfo info) {
-      if (info != null) {
-         if (DEFAULT_INSTANCE.isEnabled()) {
-            DEFAULT_INSTANCE.addProof(description, info.getProof());
-         }
-         else {
-            info.getProof().dispose();
-         }
-      }
-   }
 }

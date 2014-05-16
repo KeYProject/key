@@ -42,7 +42,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
-import de.uka.ilkd.key.symbolic_execution.util.SideProofStore;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 import de.uka.ilkd.key.util.MiscTools;
@@ -191,11 +191,16 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                                                                                                               methodReturnNode,
                                                                                                               getProofNode(),
                                                                                                               resultVar);
-            ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), input.getSequentToProve(), StrategyProperties.SPLITTING_NORMAL);
+            ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
+                                                                                input.getSequentToProve(), 
+                                                                                StrategyProperties.METHOD_NONE,
+                                                                                StrategyProperties.LOOP_NONE,
+                                                                                StrategyProperties.QUERY_OFF,
+                                                                                StrategyProperties.SPLITTING_NORMAL);
             try {
                if (info.getProof().openGoals().size() == 1) {
                   Goal goal = info.getProof().openGoals().head();
-                  Term returnValue = SymbolicExecutionUtil.extractOperatorValue(goal, input.getOperator());
+                  Term returnValue = SideProofUtil.extractOperatorValue(goal, input.getOperator());
                   assert returnValue != null;
                   returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), returnValue, getServices());
                   return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), returnValue, null)};
@@ -204,7 +209,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                   // Group equal values of different branches
                   Map<Term, List<Node>> valueNodeMap = new LinkedHashMap<Term, List<Node>>();
                   for (Goal goal : info.getProof().openGoals()) {
-                     Term returnValue = SymbolicExecutionUtil.extractOperatorValue(goal, input.getOperator());
+                     Term returnValue = SideProofUtil.extractOperatorValue(goal, input.getOperator());
                      assert returnValue != null;
                      returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.node().sequent(), returnValue, getServices());
                      List<Node> nodeList = valueNodeMap.get(returnValue);
@@ -225,7 +230,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                      for (Entry<Term, List<Node>> entry : valueNodeMap.entrySet()) {
                         List<Term> conditions = new LinkedList<Term>();
                         for (Node node : entry.getValue()) {
-                           Term condition = SymbolicExecutionUtil.computePathCondition(node, false, false);
+                           Term condition = SymbolicExecutionUtil.computePathCondition(node, false);
                            conditions.add(condition);
                         }
                         Term condition = getServices().getTermBuilder().or(conditions);
@@ -239,7 +244,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                }
             }
             finally {
-               SideProofStore.disposeOrStore("Return value computation on method return node " + methodReturnNode.serialNr() + ".", info);
+               SideProofUtil.disposeOrStore("Return value computation on method return node " + methodReturnNode.serialNr() + ".", info);
             }
          }
          else {

@@ -13,8 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.rule;
 
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -34,13 +33,16 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * <p>
@@ -152,7 +154,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             varFirst = false;
          }
          // Compute sequent for side proof to compute query in.
-         Sequent sequentToProve = computeGeneralSequentToProve(goal.sequent(), pio.constrainedFormula());
+         Sequent sequentToProve = SideProofUtil.computeGeneralSequentToProve(goal.sequent(), pio.constrainedFormula());
          Function newPredicate = createResultFunction(services, varTerm.sort());
          final TermBuilder tb = services.getTermBuilder();
          Term newTerm = tb.func(newPredicate, varTerm);
@@ -160,16 +162,16 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
          Term newModalityWithUpdatesTerm = tb.applySequential(updates, newModalityTerm);
          sequentToProve = sequentToProve.addFormula(new SequentFormula(newModalityWithUpdatesTerm), false, false).sequent();
          // Compute results and their conditions
-         Map<Term, Set<Term>> conditionsAndResultsMap = computeResultsAndConditions(services, goal, sequentToProve, newPredicate);
+         List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap = computeResultsAndConditions(services, goal, sequentToProve, newPredicate);
          // Create new single goal in which the query is replaced by the possible results
          ImmutableList<Goal> goals = goal.split(1);
          Goal resultGoal = goals.head();
          resultGoal.removeFormula(pio);
-         for (Entry<Term, Set<Term>> conditionsAndResult : conditionsAndResultsMap.entrySet()) {
-            Term conditionTerm = tb.and(conditionsAndResult.getValue());
+         for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {
+            Term conditionTerm = tb.and(conditionsAndResult.second);
             Term resultEqualityTerm = varFirst ?
-                                      tb.equals(conditionsAndResult.getKey(), otherTerm) :
-                                      tb.equals(otherTerm, conditionsAndResult.getKey());
+                                      tb.equals(conditionsAndResult.first, otherTerm) :
+                                      tb.equals(otherTerm, conditionsAndResult.first);
             Term resultTerm = pio.isInAntec() ?
                               tb.imp(conditionTerm, resultEqualityTerm) :
                               tb.and(conditionTerm, resultEqualityTerm);

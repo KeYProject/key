@@ -13,7 +13,7 @@ mod: \if (true)  \then (empty)  \else (allLocs)
          \then (empty)
          \else (allLocs)
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-            <branchCondition name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchCondition name="leq(x,Z(neglit(1(#))))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="leq(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="return magicValue;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
                   <methodReturn name="&lt;return of ComplexPrecondition.main(x,y);&gt;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of ComplexPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
                      <methodReturnValue name="Z(neglit(1(1(7(4(#))))))" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="false">
@@ -23,8 +23,8 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                   </methodReturn>
                </statement>
             </branchCondition>
-            <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <branchCondition name="lt(y,Z(0(#)))" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="lt(y,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchCondition name="geq(x,Z(0(#)))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="geq(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <branchCondition name="leq(y,Z(neglit(1(#))))" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="leq(y,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return magicValue;" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="false">
                      <methodReturn name="&lt;return of ComplexPrecondition.main(x,y);&gt;" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of ComplexPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
                         <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
@@ -34,7 +34,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                      </methodReturn>
                   </statement>
                </branchCondition>
-               <branchCondition name="gt(y,Z(neglit(1(#))))" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="true" branchCondition="gt(y,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <branchCondition name="geq(y,Z(0(#)))" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="true" branchCondition="geq(y,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return magicValue;" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="false">
                      <methodReturn name="&lt;return of ComplexPrecondition.main(x,y);&gt;" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of ComplexPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
                         <methodReturnValue name="Z(neglit(1(1(7(4(#))))))" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="false">
