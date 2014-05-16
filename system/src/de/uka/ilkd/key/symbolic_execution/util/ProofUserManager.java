@@ -61,8 +61,12 @@ public final class ProofUserManager {
     * @param user The user.
     */
    public void addUser(Proof proof, KeYEnvironment<?> environment, Object user) {
-      assert proof != null : "Proof not defined.";
-      assert user != null : "User not defined.";
+      if (proof == null) {
+         throw new IllegalArgumentException("Proof not defined.");
+      }
+      if (user == null) {
+         throw new IllegalArgumentException("User not defined.");
+      }
       synchronized (this) {
          Set<Object> users = proofUsers.get(proof);
          if (users == null) {
@@ -89,8 +93,12 @@ public final class ProofUserManager {
     * @param userThe user.
     */
    public void removeUserAndDispose(Proof proof, Object user) {
-      assert proof != null : "Proof not defined.";
-      assert user != null : "User not defined.";
+      if (proof == null) {
+         throw new IllegalArgumentException("Proof not defined.");
+      }
+      if (user == null) {
+         throw new IllegalArgumentException("User not defined.");
+      }
       synchronized (this) {
          Set<Object> users = proofUsers.get(proof);
          if (users != null) {

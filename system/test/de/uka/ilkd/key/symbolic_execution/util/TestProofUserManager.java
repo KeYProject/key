@@ -153,28 +153,28 @@ public class TestProofUserManager extends TestCase {
          fail();
       }
       catch (Exception e) {
-         assertEquals("null argument:Proof not defined.", e.getMessage());
+         assertEquals("Proof not defined.", e.getMessage());
       }
       try {
          ProofUserManager.getInstance().removeUserAndDispose(null, firstUser);
          fail();
       }
       catch (Exception e) {
-         assertEquals("null argument:Proof not defined.", e.getMessage());
+         assertEquals("Proof not defined.", e.getMessage());
       }
       try {
          ProofUserManager.getInstance().addUser(firstProof, null, null);
          fail();
       }
       catch (Exception e) {
-         assertEquals("null argument:User not defined.", e.getMessage());
+         assertEquals("User not defined.", e.getMessage());
       }
       try {
          ProofUserManager.getInstance().removeUserAndDispose(firstProof, null);
          fail();
       }
       catch (Exception e) {
-         assertEquals("null argument:User not defined.", e.getMessage());
+         assertEquals("User not defined.", e.getMessage());
       }
       assertProofs(firstProof, secondProof, thirdProof, false, false, false, null, null, null);
       Object[] nullUser = ProofUserManager.getInstance().getUsers(null);
