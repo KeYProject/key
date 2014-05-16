@@ -5,87 +5,87 @@
 variant: magic(x)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
          <branchCondition name="update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\] (and(equals(b_2,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathCondition="update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+}\] (and(equals(b_1,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathCondition="update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\] (and(equals(b_2,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathConditionChanged="true" branchCondition="update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+}\] (and(equals(b_1,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathConditionChanged="true" branchCondition="update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\] (and(equals(b_2,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
-            <methodCall name="LoopInvariantWithSplittingQuery.magic(x_9);" pathCondition="update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+}\] (and(equals(b_1,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+            <methodCall name="LoopInvariantWithSplittingQuery.magic(x_4);" pathCondition="update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\] (and(equals(b_2,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathConditionChanged="false">
-               <branchStatement name="if (x_9&gt;=0)" pathCondition="update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+}\] (and(equals(b_1,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathConditionChanged="false">
+               <branchStatement name="if (x_4&gt;=0)" pathCondition="update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\] (and(equals(b_2,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathConditionChanged="false">
+}\] (and(equals(b_1,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathConditionChanged="false">
                   <branchCondition name="geq(x_0,Z(0(#)))" pathCondition="not(or(leq(x_0,Z(neglit(1(#)))),not(imp(geq(x_0,Z(0(#))),update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\] (and(equals(b_2,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="true" branchCondition="geq(x_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <statement name="return x_9;" pathCondition="not(or(leq(x_0,Z(neglit(1(#)))),not(imp(geq(x_0,Z(0(#))),update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+}\] (and(equals(b_1,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="true" branchCondition="geq(x_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <statement name="return x_4;" pathCondition="not(or(leq(x_0,Z(neglit(1(#)))),not(imp(geq(x_0,Z(0(#))),update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\] (and(equals(b_2,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of LoopInvariantWithSplittingQuery.magic(x_9);&gt;" pathCondition="not(or(leq(x_0,Z(neglit(1(#)))),not(imp(geq(x_0,Z(0(#))),update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+}\] (and(equals(b_1,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of LoopInvariantWithSplittingQuery.magic(x_4);&gt;" pathCondition="not(or(leq(x_0,Z(neglit(1(#)))),not(imp(geq(x_0,Z(0(#))),update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\] (and(equals(b_2,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return magic_sk_1 as result of LoopInvariantWithSplittingQuery.magic(x_9);&gt;" isReturnValueComputed="true">
+}\] (and(equals(b_1,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return magic_sk_1 as result of LoopInvariantWithSplittingQuery.magic(x_4);&gt;" isReturnValueComputed="true">
                            <methodReturnValue name="magic_sk_1" returnValueString="magic_sk_1" hasCondition="false">
                            </methodReturnValue>
                            <statement name="x--;" pathCondition="not(or(leq(x_0,Z(neglit(1(#)))),not(imp(geq(x_0,Z(0(#))),update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\] (and(equals(b_2,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false">
+}\] (and(equals(b_1,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false">
                               <termination name="&lt;loop body end&gt;" pathCondition="not(or(leq(x_0,Z(neglit(1(#)))),not(imp(geq(x_0,Z(0(#))),update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\] (and(equals(b_2,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
+}\] (and(equals(b_1,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
                               </termination>
                            </statement>
                         </methodReturn>
                      </statement>
                   </branchCondition>
                   <branchCondition name="leq(x_0,Z(neglit(1(#))))" pathCondition="not(or(geq(x_0,Z(0(#))),not(imp(leq(x_0,Z(neglit(1(#)))),update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\] (and(equals(b_2,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="true" branchCondition="leq(x_0,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <statement name="return -x_9;" pathCondition="not(or(geq(x_0,Z(0(#))),not(imp(leq(x_0,Z(neglit(1(#)))),update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+}\] (and(equals(b_1,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="true" branchCondition="leq(x_0,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <statement name="return -x_4;" pathCondition="not(or(geq(x_0,Z(0(#))),not(imp(leq(x_0,Z(neglit(1(#)))),update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\] (and(equals(b_2,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of LoopInvariantWithSplittingQuery.magic(x_9);&gt;" pathCondition="not(or(geq(x_0,Z(0(#))),not(imp(leq(x_0,Z(neglit(1(#)))),update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+}\] (and(equals(b_1,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of LoopInvariantWithSplittingQuery.magic(x_4);&gt;" pathCondition="not(or(geq(x_0,Z(0(#))),not(imp(leq(x_0,Z(neglit(1(#)))),update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\] (and(equals(b_2,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return magic_sk_1 as result of LoopInvariantWithSplittingQuery.magic(x_9);&gt;" isReturnValueComputed="true">
+}\] (and(equals(b_1,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return magic_sk_1 as result of LoopInvariantWithSplittingQuery.magic(x_4);&gt;" isReturnValueComputed="true">
                            <methodReturnValue name="magic_sk_1" returnValueString="magic_sk_1" hasCondition="false">
                            </methodReturnValue>
                            <statement name="x--;" pathCondition="not(or(geq(x_0,Z(0(#))),not(imp(leq(x_0,Z(neglit(1(#)))),update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\] (and(equals(b_2,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false">
+}\] (and(equals(b_1,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false">
                               <termination name="&lt;loop body end&gt;" pathCondition="not(or(geq(x_0,Z(0(#))),not(imp(leq(x_0,Z(neglit(1(#)))),update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\] (and(equals(b_2,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+}\] (and(equals(b_1,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                               </termination>
                            </statement>
                         </methodReturn>
@@ -95,35 +95,35 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
             </methodCall>
          </branchCondition>
          <branchCondition name="update-application(elem-update(x)(x_0),\&lt;{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\&gt; (and(not(equals(b_2,TRUE)),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathCondition="update-application(elem-update(x)(x_0),\&lt;{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+}\&gt; (and(not(equals(b_1,TRUE)),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathCondition="update-application(elem-update(x)(x_0),\&lt;{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\&gt; (and(not(equals(b_2,TRUE)),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathConditionChanged="true" branchCondition="update-application(elem-update(x)(x_0),\&lt;{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+}\&gt; (and(not(equals(b_1,TRUE)),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathConditionChanged="true" branchCondition="update-application(elem-update(x)(x_0),\&lt;{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\&gt; (and(not(equals(b_2,TRUE)),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+}\&gt; (and(not(equals(b_1,TRUE)),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
             <statement name="return x;" pathCondition="update-application(elem-update(x)(x_0),\&lt;{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\&gt; (and(not(equals(b_2,TRUE)),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathConditionChanged="false">
+}\&gt; (and(not(equals(b_1,TRUE)),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathConditionChanged="false">
                <methodReturn name="&lt;return of LoopInvariantWithSplittingQuery.main(x);&gt;" pathCondition="update-application(elem-update(x)(x_0),\&lt;{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\&gt; (and(not(equals(b_2,TRUE)),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(0(#)) as result of LoopInvariantWithSplittingQuery.main(x);&gt;" isReturnValueComputed="true">
+}\&gt; (and(not(equals(b_1,TRUE)),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(0(#)) as result of LoopInvariantWithSplittingQuery.main(x);&gt;" isReturnValueComputed="true">
                   <methodReturnValue name="Z(0(#))" returnValueString="Z(0(#))" hasCondition="false">
                   </methodReturnValue>
                   <termination name="&lt;end&gt;" pathCondition="update-application(elem-update(x)(x_0),\&lt;{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
-    x_14=magic(x);
-    b_2=x_14&gt;0;
+    x_9=magic(x);
+    b_1=x_9&gt;0;
   }
-}\&gt; (and(not(equals(b_2,TRUE)),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+}\&gt; (and(not(equals(b_1,TRUE)),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>
