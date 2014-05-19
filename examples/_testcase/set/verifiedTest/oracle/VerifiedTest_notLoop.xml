@@ -2,23 +2,22 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="VerifiedTest.notLoop(_x);" pathCondition="true" pathConditionChanged="false">
       <branchStatement name="if (_x&lt;0)" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+         <branchCondition name="leq(x,Z(neglit(1(#))))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="leq(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="_x=-_x;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
-               <loopInvariant name="
-invariant: _x &gt;= 0;
+               <loopInvariant name="invariant: _x &gt;= 0;
 variant: _x
 mod: allLocs
 mod[savedHeap]: allLocs" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initiallyValid="true">
-                  <branchCondition name="and(geq(_x,Z(1(#))),geq(_x_1,Z(0(#))))" pathCondition="and(and(geq(_x,Z(1(#))),geq(_x_1,Z(0(#)))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="and(geq(_x,Z(1(#))),geq(_x_1,Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
-                     <statement name="_x-=2;" pathCondition="and(and(geq(_x,Z(1(#))),geq(_x_1,Z(0(#)))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false">
-                        <termination name="&lt;loop body end&gt;" pathCondition="and(and(geq(_x,Z(1(#))),geq(_x_1,Z(0(#)))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+                  <branchCondition name="geq(_x_1,Z(1(#)))" pathCondition="and(geq(_x_1,Z(1(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="geq(_x_1,Z(1(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                     <statement name="_x-=2;" pathCondition="and(geq(_x_1,Z(1(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false">
+                        <termination name="&lt;loop body end&gt;" pathCondition="and(geq(_x_1,Z(1(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                         </termination>
                      </statement>
                   </branchCondition>
-                  <branchCondition name="and(leq(_x,Z(0(#))),geq(_x_1,Z(0(#))))" pathCondition="and(and(leq(_x,Z(0(#))),geq(_x_1,Z(0(#)))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="and(leq(_x,Z(0(#))),geq(_x_1,Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
-                     <statement name="return _x;" pathCondition="and(and(leq(_x,Z(0(#))),geq(_x_1,Z(0(#)))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of VerifiedTest.notLoop(_x);&gt;" pathCondition="and(and(leq(_x,Z(0(#))),geq(_x_1,Z(0(#)))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false" isReturnValueComputed="false">
-                           <termination name="&lt;end&gt;" pathCondition="and(and(leq(_x,Z(0(#))),geq(_x_1,Z(0(#)))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  <branchCondition name="equals(_x_1,Z(0(#)))" pathCondition="and(equals(_x_1,Z(0(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="equals(_x_1,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                     <statement name="return _x;" pathCondition="and(equals(_x_1,Z(0(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of VerifiedTest.notLoop(_x);&gt;" pathCondition="and(equals(_x_1,Z(0(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false" isReturnValueComputed="false">
+                           <termination name="&lt;end&gt;" pathCondition="and(equals(_x_1,Z(0(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>
@@ -26,22 +25,21 @@ mod[savedHeap]: allLocs" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="fal
                </loopInvariant>
             </statement>
          </branchCondition>
-         <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <loopInvariant name="
-invariant: _x &gt;= 0;
+         <branchCondition name="geq(x,Z(0(#)))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="geq(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <loopInvariant name="invariant: _x &gt;= 0;
 variant: _x
 mod: allLocs
 mod[savedHeap]: allLocs" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" initiallyValid="true">
-               <branchCondition name="and(geq(_x,Z(1(#))),geq(_x_0,Z(0(#))))" pathCondition="and(and(geq(_x,Z(1(#))),geq(_x_0,Z(0(#)))),geq(x,Z(0(#))))" pathConditionChanged="true" branchCondition="and(geq(_x,Z(1(#))),geq(_x_0,Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
-                  <statement name="_x-=2;" pathCondition="and(and(geq(_x,Z(1(#))),geq(_x_0,Z(0(#)))),geq(x,Z(0(#))))" pathConditionChanged="false">
-                     <termination name="&lt;loop body end&gt;" pathCondition="and(and(geq(_x,Z(1(#))),geq(_x_0,Z(0(#)))),geq(x,Z(0(#))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+               <branchCondition name="geq(_x_0,Z(1(#)))" pathCondition="and(geq(_x_0,Z(1(#))),geq(x,Z(0(#))))" pathConditionChanged="true" branchCondition="geq(_x_0,Z(1(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                  <statement name="_x-=2;" pathCondition="and(geq(_x_0,Z(1(#))),geq(x,Z(0(#))))" pathConditionChanged="false">
+                     <termination name="&lt;loop body end&gt;" pathCondition="and(geq(_x_0,Z(1(#))),geq(x,Z(0(#))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                      </termination>
                   </statement>
                </branchCondition>
-               <branchCondition name="and(leq(_x,Z(0(#))),geq(_x_0,Z(0(#))))" pathCondition="and(and(leq(_x,Z(0(#))),geq(_x_0,Z(0(#)))),geq(x,Z(0(#))))" pathConditionChanged="true" branchCondition="and(leq(_x,Z(0(#))),geq(_x_0,Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
-                  <statement name="return _x;" pathCondition="and(and(leq(_x,Z(0(#))),geq(_x_0,Z(0(#)))),geq(x,Z(0(#))))" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of VerifiedTest.notLoop(_x);&gt;" pathCondition="and(and(leq(_x,Z(0(#))),geq(_x_0,Z(0(#)))),geq(x,Z(0(#))))" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="and(and(leq(_x,Z(0(#))),geq(_x_0,Z(0(#)))),geq(x,Z(0(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+               <branchCondition name="equals(_x_0,Z(0(#)))" pathCondition="and(equals(_x_0,Z(0(#))),geq(x,Z(0(#))))" pathConditionChanged="true" branchCondition="equals(_x_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                  <statement name="return _x;" pathCondition="and(equals(_x_0,Z(0(#))),geq(x,Z(0(#))))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of VerifiedTest.notLoop(_x);&gt;" pathCondition="and(equals(_x_0,Z(0(#))),geq(x,Z(0(#))))" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="and(equals(_x_0,Z(0(#))),geq(x,Z(0(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

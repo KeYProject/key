@@ -11,16 +11,13 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.key4eclipse.starter.core.util;
+package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import org.eclipse.core.runtime.Assert;
-
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * This singleton class is used to manage user of a {@link Proof} to make
@@ -64,8 +61,12 @@ public final class ProofUserManager {
     * @param user The user.
     */
    public void addUser(Proof proof, KeYEnvironment<?> environment, Object user) {
-      Assert.isNotNull(proof, "Proof not defined.");
-      Assert.isNotNull(user, "User not defined.");
+      if (proof == null) {
+         throw new IllegalArgumentException("Proof not defined.");
+      }
+      if (user == null) {
+         throw new IllegalArgumentException("User not defined.");
+      }
       synchronized (this) {
          Set<Object> users = proofUsers.get(proof);
          if (users == null) {
@@ -92,8 +93,12 @@ public final class ProofUserManager {
     * @param userThe user.
     */
    public void removeUserAndDispose(Proof proof, Object user) {
-      Assert.isNotNull(proof, "Proof not defined.");
-      Assert.isNotNull(user, "User not defined.");
+      if (proof == null) {
+         throw new IllegalArgumentException("Proof not defined.");
+      }
+      if (user == null) {
+         throw new IllegalArgumentException("User not defined.");
+      }
       synchronized (this) {
          Set<Object> users = proofUsers.get(proof);
          if (users != null) {

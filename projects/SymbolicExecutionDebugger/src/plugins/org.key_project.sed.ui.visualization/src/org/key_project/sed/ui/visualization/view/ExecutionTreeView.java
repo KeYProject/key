@@ -227,7 +227,6 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
       }
    }
    
-   
    /**
     * Updates the {@link Diagram} in a way that only {@link ISEDDebugTarget}
     * contained in the given {@link ISelection} are visible.

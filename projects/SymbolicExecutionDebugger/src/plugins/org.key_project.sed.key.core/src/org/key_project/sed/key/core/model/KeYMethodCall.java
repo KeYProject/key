@@ -80,10 +80,11 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
    public KeYMethodCall(KeYDebugTarget target, 
                         IKeYSEDDebugNode<?> parent, 
                         ISEDThread thread, 
-                        IExecutionMethodCall executionNode) {
+                        IExecutionMethodCall executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
    
    /**

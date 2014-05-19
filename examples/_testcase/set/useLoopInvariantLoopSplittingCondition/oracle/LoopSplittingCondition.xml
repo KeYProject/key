@@ -2,22 +2,54 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="LoopSplittingCondition.main(x);" pathCondition="true" pathConditionChanged="false">
       <statement name="int i = x&gt;=0 ?x :-x;" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <loopInvariant name="
-invariant: i &gt;= 0;
+         <branchCondition name="geq(x,Z(0(#)))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="geq(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <loopInvariant name="invariant: i &gt;= 0;
 variant: i
 mod: false" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" initiallyValid="true">
-               <branchCondition name="not(or(leq(i_1,Z(neglit(1(#)))),and(leq(x,Z(0(#))),geq(i_1,Z(0(#))))))" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="true" branchCondition="not(or(leq(i_1,Z(neglit(1(#)))),and(leq(x,Z(0(#))),geq(i_1,Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
-                  <methodCall name="LoopSplittingCondition.goOn(x_17);" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="false">
-                     <branchStatement name="if (x_17&gt;0)" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="false">
-                        <statement name="return true;" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of LoopSplittingCondition.goOn(x_17);&gt;" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return TRUE as result of LoopSplittingCondition.goOn(x_17);&gt;" isReturnValueComputed="true">
+               <branchCondition name="update-application(parallel-upd(elem-update(i)(i_1),elem-update(x)(x_8)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_0_3=goOn(x);
+  }
+}\] (and(equals(b_0_3,TRUE),geq(i,Z(0(#))))))" pathCondition="not(or(leq(x,Z(neglit(1(#)))),not(imp(geq(x,Z(0(#))),update-application(parallel-upd(elem-update(i)(i_1),elem-update(x)(x_8)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_0_3=goOn(x);
+  }
+}\] (and(equals(b_0_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(i)(i_1),elem-update(x)(x_8)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_0_3=goOn(x);
+  }
+}\] (and(equals(b_0_3,TRUE),geq(i,Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                  <methodCall name="LoopSplittingCondition.goOn(x_17);" pathCondition="not(or(leq(x,Z(neglit(1(#)))),not(imp(geq(x,Z(0(#))),update-application(parallel-upd(elem-update(i)(i_1),elem-update(x)(x_8)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_0_3=goOn(x);
+  }
+}\] (and(equals(b_0_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="false">
+                     <branchStatement name="if (x_17&gt;0)" pathCondition="not(or(leq(x,Z(neglit(1(#)))),not(imp(geq(x,Z(0(#))),update-application(parallel-upd(elem-update(i)(i_1),elem-update(x)(x_8)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_0_3=goOn(x);
+  }
+}\] (and(equals(b_0_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="false">
+                        <statement name="return true;" pathCondition="not(or(leq(x,Z(neglit(1(#)))),not(imp(geq(x,Z(0(#))),update-application(parallel-upd(elem-update(i)(i_1),elem-update(x)(x_8)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_0_3=goOn(x);
+  }
+}\] (and(equals(b_0_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="false">
+                           <methodReturn name="&lt;return of LoopSplittingCondition.goOn(x_17);&gt;" pathCondition="not(or(leq(x,Z(neglit(1(#)))),not(imp(geq(x,Z(0(#))),update-application(parallel-upd(elem-update(i)(i_1),elem-update(x)(x_8)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_0_3=goOn(x);
+  }
+}\] (and(equals(b_0_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return TRUE as result of LoopSplittingCondition.goOn(x_17);&gt;" isReturnValueComputed="true">
                               <methodReturnValue name="TRUE" returnValueString="TRUE" hasCondition="false">
                               </methodReturnValue>
-                              <branchStatement name="if (i&gt;=0)" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="false">
-                                 <statement name="x--;" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="false">
-                                    <statement name="i--;" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="false">
-                                       <termination name="&lt;loop body end&gt;" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),leq(x,Z(0(#))))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+                              <branchStatement name="if (i&gt;=0)" pathCondition="not(or(leq(x,Z(neglit(1(#)))),not(imp(geq(x,Z(0(#))),update-application(parallel-upd(elem-update(i)(i_1),elem-update(x)(x_8)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_0_3=goOn(x);
+  }
+}\] (and(equals(b_0_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="false">
+                                 <statement name="x--;" pathCondition="not(or(leq(x,Z(neglit(1(#)))),not(imp(geq(x,Z(0(#))),update-application(parallel-upd(elem-update(i)(i_1),elem-update(x)(x_8)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_0_3=goOn(x);
+  }
+}\] (and(equals(b_0_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="false">
+                                    <statement name="i--;" pathCondition="not(or(leq(x,Z(neglit(1(#)))),not(imp(geq(x,Z(0(#))),update-application(parallel-upd(elem-update(i)(i_1),elem-update(x)(x_8)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_0_3=goOn(x);
+  }
+}\] (and(equals(b_0_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="false">
+                                       <termination name="&lt;loop body end&gt;" pathCondition="not(or(leq(x,Z(neglit(1(#)))),not(imp(geq(x,Z(0(#))),update-application(parallel-upd(elem-update(i)(i_1),elem-update(x)(x_8)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_0_3=goOn(x);
+  }
+}\] (and(equals(b_0_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                                        </termination>
                                     </statement>
                                  </statement>
@@ -27,34 +59,84 @@ mod: false" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" i
                      </branchStatement>
                   </methodCall>
                </branchCondition>
-               <branchCondition name="not(or(leq(i_1,Z(neglit(1(#)))),and(geq(x,Z(1(#))),geq(i_1,Z(0(#))))))" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),geq(x,Z(1(#))))))" pathConditionChanged="true" branchCondition="not(or(leq(i_1,Z(neglit(1(#)))),and(geq(x,Z(1(#))),geq(i_1,Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
-                  <statement name="return i;" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),geq(x,Z(1(#))))))" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of LoopSplittingCondition.main(x);&gt;" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),geq(x,Z(1(#))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return i_1 as result of LoopSplittingCondition.main(x);&gt;" isReturnValueComputed="true">
+               <branchCondition name="update-application(parallel-upd(elem-update(i)(i_1),elem-update(x)(x_8)),\&lt;{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_0_3=goOn(x);
+  }
+}\&gt; (and(not(equals(b_0_3,TRUE)),geq(i,Z(0(#))))))" pathCondition="not(or(leq(x,Z(neglit(1(#)))),not(imp(geq(x,Z(0(#))),update-application(parallel-upd(elem-update(i)(i_1),elem-update(x)(x_8)),\&lt;{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_0_3=goOn(x);
+  }
+}\&gt; (and(not(equals(b_0_3,TRUE)),geq(i,Z(0(#))))))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(i)(i_1),elem-update(x)(x_8)),\&lt;{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_0_3=goOn(x);
+  }
+}\&gt; (and(not(equals(b_0_3,TRUE)),geq(i,Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                  <statement name="return i;" pathCondition="not(or(leq(x,Z(neglit(1(#)))),not(imp(geq(x,Z(0(#))),update-application(parallel-upd(elem-update(i)(i_1),elem-update(x)(x_8)),\&lt;{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_0_3=goOn(x);
+  }
+}\&gt; (and(not(equals(b_0_3,TRUE)),geq(i,Z(0(#))))))))))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of LoopSplittingCondition.main(x);&gt;" pathCondition="not(or(leq(x,Z(neglit(1(#)))),not(imp(geq(x,Z(0(#))),update-application(parallel-upd(elem-update(i)(i_1),elem-update(x)(x_8)),\&lt;{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_0_3=goOn(x);
+  }
+}\&gt; (and(not(equals(b_0_3,TRUE)),geq(i,Z(0(#))))))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return i_1 as result of LoopSplittingCondition.main(x);&gt;" isReturnValueComputed="true">
                         <methodReturnValue name="i_1" returnValueString="i_1" hasCondition="false">
                         </methodReturnValue>
-                        <termination name="&lt;end&gt;" pathCondition="and(geq(x,Z(0(#))),not(or(leq(i_1,Z(neglit(1(#)))),geq(x,Z(1(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <termination name="&lt;end&gt;" pathCondition="not(or(leq(x,Z(neglit(1(#)))),not(imp(geq(x,Z(0(#))),update-application(parallel-upd(elem-update(i)(i_1),elem-update(x)(x_8)),\&lt;{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_0_3=goOn(x);
+  }
+}\&gt; (and(not(equals(b_0_3,TRUE)),geq(i,Z(0(#))))))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
                </branchCondition>
             </loopInvariant>
          </branchCondition>
-         <branchCondition name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <loopInvariant name="
-invariant: i &gt;= 0;
+         <branchCondition name="leq(x,Z(neglit(1(#))))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="leq(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <loopInvariant name="invariant: i &gt;= 0;
 variant: i
 mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initiallyValid="true">
-               <branchCondition name="not(or(leq(i_0,Z(neglit(1(#)))),geq(i_0,Z(0(#)))))" pathCondition="false" pathConditionChanged="true" branchCondition="not(or(leq(i_0,Z(neglit(1(#)))),geq(i_0,Z(0(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
-                  <methodCall name="LoopSplittingCondition.goOn(x_7);" pathCondition="false" pathConditionChanged="false">
-                     <branchStatement name="if (x_7&gt;0)" pathCondition="false" pathConditionChanged="false">
-                        <statement name="return true;" pathCondition="false" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of LoopSplittingCondition.goOn(x_7);&gt;" pathCondition="false" pathConditionChanged="false" nameIncludingReturnValue="&lt;return TRUE as result of LoopSplittingCondition.goOn(x_7);&gt;" isReturnValueComputed="true">
+               <branchCondition name="update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_3=goOn(x);
+  }
+}\] (and(equals(b_3,TRUE),geq(i,Z(0(#))))))" pathCondition="not(or(geq(x,Z(0(#))),not(imp(leq(x,Z(neglit(1(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_3=goOn(x);
+  }
+}\] (and(equals(b_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_3=goOn(x);
+  }
+}\] (and(equals(b_3,TRUE),geq(i,Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                  <methodCall name="LoopSplittingCondition.goOn(x_7);" pathCondition="not(or(geq(x,Z(0(#))),not(imp(leq(x,Z(neglit(1(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_3=goOn(x);
+  }
+}\] (and(equals(b_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="false">
+                     <branchStatement name="if (x_7&gt;0)" pathCondition="not(or(geq(x,Z(0(#))),not(imp(leq(x,Z(neglit(1(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_3=goOn(x);
+  }
+}\] (and(equals(b_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="false">
+                        <statement name="return true;" pathCondition="not(or(geq(x,Z(0(#))),not(imp(leq(x,Z(neglit(1(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_3=goOn(x);
+  }
+}\] (and(equals(b_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="false">
+                           <methodReturn name="&lt;return of LoopSplittingCondition.goOn(x_7);&gt;" pathCondition="not(or(geq(x,Z(0(#))),not(imp(leq(x,Z(neglit(1(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_3=goOn(x);
+  }
+}\] (and(equals(b_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return TRUE as result of LoopSplittingCondition.goOn(x_7);&gt;" isReturnValueComputed="true">
                               <methodReturnValue name="TRUE" returnValueString="TRUE" hasCondition="false">
                               </methodReturnValue>
-                              <branchStatement name="if (i&gt;=0)" pathCondition="false" pathConditionChanged="false">
-                                 <statement name="x--;" pathCondition="false" pathConditionChanged="false">
-                                    <statement name="i--;" pathCondition="false" pathConditionChanged="false">
-                                       <termination name="&lt;loop body end&gt;" pathCondition="false" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+                              <branchStatement name="if (i&gt;=0)" pathCondition="not(or(geq(x,Z(0(#))),not(imp(leq(x,Z(neglit(1(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_3=goOn(x);
+  }
+}\] (and(equals(b_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="false">
+                                 <statement name="x--;" pathCondition="not(or(geq(x,Z(0(#))),not(imp(leq(x,Z(neglit(1(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_3=goOn(x);
+  }
+}\] (and(equals(b_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="false">
+                                    <statement name="i--;" pathCondition="not(or(geq(x,Z(0(#))),not(imp(leq(x,Z(neglit(1(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_3=goOn(x);
+  }
+}\] (and(equals(b_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="false">
+                                       <termination name="&lt;loop body end&gt;" pathCondition="not(or(geq(x,Z(0(#))),not(imp(leq(x,Z(neglit(1(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_3=goOn(x);
+  }
+}\] (and(equals(b_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                                        </termination>
                                     </statement>
                                  </statement>
@@ -64,12 +146,30 @@ mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initially
                      </branchStatement>
                   </methodCall>
                </branchCondition>
-               <branchCondition name="gt(i_0,Z(neglit(1(#))))" pathCondition="and(geq(i_0,Z(0(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="gt(i_0,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
-                  <statement name="return i;" pathCondition="and(geq(i_0,Z(0(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of LoopSplittingCondition.main(x);&gt;" pathCondition="and(geq(i_0,Z(0(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return i_0 as result of LoopSplittingCondition.main(x);&gt;" isReturnValueComputed="true">
+               <branchCondition name="update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\&lt;{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_3=goOn(x);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),geq(i,Z(0(#))))))" pathCondition="not(or(geq(x,Z(0(#))),not(imp(leq(x,Z(neglit(1(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\&lt;{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_3=goOn(x);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),geq(i,Z(0(#))))))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\&lt;{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_3=goOn(x);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),geq(i,Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                  <statement name="return i;" pathCondition="not(or(geq(x,Z(0(#))),not(imp(leq(x,Z(neglit(1(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\&lt;{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_3=goOn(x);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),geq(i,Z(0(#))))))))))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of LoopSplittingCondition.main(x);&gt;" pathCondition="not(or(geq(x,Z(0(#))),not(imp(leq(x,Z(neglit(1(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\&lt;{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_3=goOn(x);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),geq(i,Z(0(#))))))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return i_0 as result of LoopSplittingCondition.main(x);&gt;" isReturnValueComputed="true">
                         <methodReturnValue name="i_0" returnValueString="i_0" hasCondition="false">
                         </methodReturnValue>
-                        <termination name="&lt;end&gt;" pathCondition="and(geq(i_0,Z(0(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <termination name="&lt;end&gt;" pathCondition="not(or(geq(x,Z(0(#))),not(imp(leq(x,Z(neglit(1(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\&lt;{method-frame(source=main(int)@LoopSplittingCondition): {
+    b_3=goOn(x);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),geq(i,Z(0(#))))))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

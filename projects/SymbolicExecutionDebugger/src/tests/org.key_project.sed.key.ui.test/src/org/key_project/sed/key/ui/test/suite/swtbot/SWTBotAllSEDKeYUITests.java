@@ -24,6 +24,7 @@ import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotKeYSourceCodeLookup
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotKeYTabTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotMainTabTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotOpenProofTest;
+import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotSideProofsViewTest;
 
 /**
  * Run all contained JUnit 4 test cases that requires SWT Bot.
@@ -39,7 +40,8 @@ import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotOpenProofTest;
    SWTBotKeYTabTest.class,
    SWTBotMainTabTest.class,
    SWTBotAddKeYWatchpointTest.class,
-   SWTBotOpenProofTest.class
+   SWTBotOpenProofTest.class,
+   SWTBotSideProofsViewTest.class
 })
 public class SWTBotAllSEDKeYUITests {
 }

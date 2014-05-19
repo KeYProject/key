@@ -550,6 +550,14 @@
                name="Symbolic Execution Settings"
                restorable="true">
          </view>
+         <view
+               category="org.key_project.sed.ui.category"
+               class="org.key_project.sed.key.ui.view.SideProofsView"
+               icon="icons/logo16.gif"
+               id="org.key_project.sed.key.ui.view.SideProofsView"
+               name="Side Proofs"
+               restorable="true">
+         </view>
       </extension>
       <extension
             point="org.eclipse.ui.perspectiveExtensions">

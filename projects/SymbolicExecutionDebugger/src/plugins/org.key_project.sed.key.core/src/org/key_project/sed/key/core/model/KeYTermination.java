@@ -56,10 +56,11 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDeb
    public KeYTermination(KeYDebugTarget target, 
                          IKeYSEDDebugNode<?> parent, 
                          ISEDThread thread, 
-                         IExecutionTermination executionNode) {
+                         IExecutionTermination executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
    
    /**
