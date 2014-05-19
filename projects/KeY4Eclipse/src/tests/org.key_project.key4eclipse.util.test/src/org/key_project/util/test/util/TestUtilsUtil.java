@@ -58,6 +58,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
@@ -920,6 +921,22 @@ public class TestUtilsUtil {
     * @return The data {@link Object}.
     */
    public static Object getTreeItemData(final SWTBotTreeItem item) {
+      IRunnableWithResult<Object> run = new AbstractRunnableWithResult<Object>() {
+         @Override
+         public void run() {
+            setResult(item.widget.getData());
+         }
+      };
+      item.widget.getDisplay().syncExec(run);
+      return run.getResult();
+   }
+
+   /**
+    * Returns {@link TableItem#getData()}.
+    * @param item The {@link SWTBotTableItem} to return from.
+    * @return The data {@link Object}.
+    */   
+   public static Object getTableItemData(final SWTBotTableItem item) {
       IRunnableWithResult<Object> run = new AbstractRunnableWithResult<Object>() {
          @Override
          public void run() {

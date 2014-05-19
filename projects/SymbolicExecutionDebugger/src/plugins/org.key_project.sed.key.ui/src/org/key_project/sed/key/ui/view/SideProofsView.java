@@ -15,6 +15,8 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
@@ -31,6 +33,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SideProofStore.Entry;
  * @author Martin Hentschel
  */
 public class SideProofsView extends ViewPart {
+   /**
+    * The ID of this view.
+    */
+   public static final String VIEW_ID = "org.key_project.sed.key.ui.view.SideProofsView";
+   
    /**
     * Shows the {@link Entry}s of {@link SideProofStore#DEFAULT_INSTANCE}.
     */
@@ -88,6 +95,12 @@ public class SideProofsView extends ViewPart {
             handleSelectionChanged(event);
          }
       });
+      viewer.getControl().addKeyListener(new KeyAdapter() {
+         @Override
+         public void keyPressed(KeyEvent e) {
+            handleKeyPressed(e);
+         }
+      });
       MenuManager viewerMenuManager = new MenuManager();
       openAction = new Action("&Open") {
          @Override
@@ -116,6 +129,16 @@ public class SideProofsView extends ViewPart {
       deleteAction.setEnabled(false);
       viewer.getControl().setMenu(viewerMenuManager.createContextMenu(viewer.getControl()));
       SideProofStore.DEFAULT_INSTANCE.addPropertyChangeListener(SideProofStore.PROP_ENABLED, storeListener);
+   }
+
+   /**
+    * When a key was pressed on {@link #viewer}.
+    * @param e The event.
+    */
+   protected void handleKeyPressed(KeyEvent e) {
+      if (e.character == SWT.DEL) {
+         deleteEntries();
+      }
    }
 
    /**

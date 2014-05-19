@@ -36,7 +36,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
-import de.uka.ilkd.key.symbolic_execution.util.SideProofStore;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 
@@ -173,7 +173,12 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
       else {
          sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(getServices(), getProofNode(), siteProofCondition, getProgramVariable());
       }
-      ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequentToProve.getSequentToProve(), StrategyProperties.SPLITTING_DELAYED);
+      ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
+                                                                          sequentToProve.getSequentToProve(), 
+                                                                          StrategyProperties.METHOD_NONE,
+                                                                          StrategyProperties.LOOP_NONE,
+                                                                          StrategyProperties.QUERY_OFF,
+                                                                          StrategyProperties.SPLITTING_DELAYED);
       try {
          List<ExecutionValue> result = new ArrayList<ExecutionValue>(info.getProof().openGoals().size());
          // Group values of the branches
@@ -227,7 +232,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          return result.toArray(new ExecutionValue[result.size()]);
       }
       finally {
-         SideProofStore.disposeOrStore("Value computation on node " + getProofNode().serialNr(), info);
+         SideProofUtil.disposeOrStore("Value computation on node " + getProofNode().serialNr(), info);
       }
    }
 
@@ -244,7 +249,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
                                     List<Goal> unknownValues) throws ProofInputException {
       for (Goal goal : goals) {
          // Extract value
-         Term value = SymbolicExecutionUtil.extractOperatorValue(goal, operator);
+         Term value = SideProofUtil.extractOperatorValue(goal, operator);
          assert value != null;
          value = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), value, getServices());
          // Compute unknown flag if required
@@ -284,7 +289,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          List<Term> pathConditions = new LinkedList<Term>();
          Proof proof = null;
          for (Goal valueGoal : valueGoals) {
-            pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(), false, false));
+            pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(), false));
             proof = valueGoal.node().proof();
          }
          Term comboundPathCondition = getServices().getTermBuilder().or(pathConditions);

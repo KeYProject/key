@@ -200,10 +200,11 @@ public final class TestSedCoreUtil {
 
    /**
     * Opens the "Symbolic Debug" perspective.
+    * @return The {@link IPerspectiveDescriptor} of "Symbolic Debug" perspective.
     * @throws Exception Occurred Exception.
     */
-   public static void openSymbolicDebugPerspective() throws Exception {
-      IRunnableWithException run = new AbstractRunnableWithException() {
+   public static IPerspectiveDescriptor openSymbolicDebugPerspective() throws Exception {
+      IRunnableWithResult<IPerspectiveDescriptor> run = new AbstractRunnableWithResult<IPerspectiveDescriptor>() {
          @Override
          public void run() {
             try {
@@ -247,6 +248,7 @@ public final class TestSedCoreUtil {
       if (run.getException() != null) {
          throw run.getException();
       }
+      return run.getResult();
    }
 
    /**

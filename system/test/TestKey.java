@@ -116,6 +116,7 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.symbolic_execution.util.TestEqualsHashCodeResetter.class,
         de.uka.ilkd.key.symbolic_execution.util.TestJavaUtil.class,
         de.uka.ilkd.key.symbolic_execution.util.TestProofUserManager.class,
+        de.uka.ilkd.key.symbolic_execution.util.TestSideProofStore.class,
         de.uka.ilkd.key.symbolic_execution.util.TestSymbolicExecutionUtil.class
     };
     
