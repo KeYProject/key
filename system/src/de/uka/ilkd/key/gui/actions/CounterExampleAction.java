@@ -1,10 +1,27 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.Icon;
+import javax.swing.JOptionPane;
+
 import de.uka.ilkd.key.gui.AutoModeListener;
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.InterruptListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
@@ -50,11 +67,11 @@ public class CounterExampleAction extends MainWindowAction {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
                 final Proof proof = getMediator().getSelectedProof();
+                                        
                 if (proof == null) {
                     // no proof loaded
                     setEnabled(false);
                 } else {
-                    final Goal selGoal = getMediator().getSelectedGoal();
                     final Node selNode = getMediator().getSelectedNode();
                     //Can be applied only to root nodes
                     setEnabled(selNode.childrenCount() == 0);

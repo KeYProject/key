@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,7 +13,6 @@
 
 package org.key_project.sed.ui.property;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -29,7 +28,7 @@ public abstract class AbstractSEDDebugNodePropertySection extends AbstractProper
    /**
     * The shown content.
     */
-   private AbstractSEDDebugNodeTabComposite contentComposite;
+   private ISEDDebugNodeTabContent content;
    
    /**
     * {@inheritDoc}
@@ -37,23 +36,22 @@ public abstract class AbstractSEDDebugNodePropertySection extends AbstractProper
    @Override
    public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
       super.createControls(parent, tabbedPropertySheetPage);
-      contentComposite = createContentComposite(parent, SWT.NONE);
+      content = createContent();
+      content.createComposite(parent, getWidgetFactory());
    }
-   
+
    /**
-    * Creates the {@link AbstractSEDDebugNodeTabComposite} which shows the content.
-    * @param parent The parent {@link Composite}.
-    * @param style The style to use.
-    * @return The created {@link AbstractSEDDebugNodeTabComposite}.
+    * Creates the {@link ISEDDebugNodeTabContent} which shows the content.
+    * @return The created {@link ISEDDebugNodeTabContent}.
     */
-   protected abstract AbstractSEDDebugNodeTabComposite createContentComposite(Composite parent, int style);
+   protected abstract ISEDDebugNodeTabContent createContent();
 
    /**
     * {@inheritDoc}
     */
    @Override
    public void refresh() {
-      contentComposite.updateContent(getDebugNode());
+      content.updateContent(getDebugNode());
    }
    
    /**
@@ -72,5 +70,16 @@ public abstract class AbstractSEDDebugNodePropertySection extends AbstractProper
     */
    public static ISEDDebugNode getDebugNode(Object object) {
       return object instanceof ISEDDebugNode ? (ISEDDebugNode)object : null;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
+      if (content != null) {
+         content.dispose();
+      }
+      super.dispose();
    }
 }

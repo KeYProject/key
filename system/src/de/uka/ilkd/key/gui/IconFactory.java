@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.gui;
 
@@ -95,7 +94,9 @@ public class IconFactory {
 
     private static Image interactiveAppLogo = 
         getImage("images/interactiveAppLogo.png");
-
+    
+    private static Image counterexampleImage = getImage("images/toolbar/ce.png");
+    private static Image testgenerationImage = getImage("images/toolbar/tg.png");
 
     public static Image getImage(String s) {
 	ImageIcon ii=resManager.createImageIcon(IconFactory.class, s);
@@ -237,6 +238,14 @@ public class IconFactory {
     
     public static Icon oneStepSimplifier(int size) {
         return scaleIcon(oneStepSimplifier, size, size);
+    }
+    
+    public static Icon testGeneration(int size){
+    	return scaleIcon(testgenerationImage, size, size);
+    }
+    
+    public static Icon counterExample(int size){
+    	return scaleIcon(counterexampleImage, size, size);
     }
 
     public static ImageIcon junitLogo(int size) {

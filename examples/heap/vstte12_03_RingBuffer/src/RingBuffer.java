@@ -57,7 +57,7 @@ public class RingBuffer {
     
     /*@ normal_behavior
       @ requires !isEmpty();
-      @ ensures list == \seq_sub(\old(list),1,\old(list.length)-1);
+      @ ensures list == \seq_sub(\old(list),1,\old(list.length));
       @ ensures first == modulo(\old(first)+1);
       @ ensures \result == \old(data[first]);
       @ assignable first,len,list;
@@ -67,7 +67,7 @@ public class RingBuffer {
         first = modulo(first+1);
 
         len--;
-        //@ set list = \seq_sub(list,1,\seq_length(list)-1);
+        //@ set list = \seq_sub(list,1,\seq_length(list));
         return r;
     }
     
@@ -75,7 +75,7 @@ public class RingBuffer {
     // helper methods
     /*@ normal_behavior
       @ ensures \result == (len == 0);
-      @ pure helper
+      @ strictly_pure helper
       @*/
     boolean isEmpty() {
         return len == 0;
@@ -83,7 +83,7 @@ public class RingBuffer {
     
     /*@ normal_behavior
       @ ensures \result == (len  == data.length);
-      @ pure
+      @ strictly_pure
       @*/
     boolean isFull() {
         return len == data.length;
@@ -93,7 +93,7 @@ public class RingBuffer {
       @   ensures x >= 0 && x < data.length ==> \result == x;
       @   ensures x >= data.length && x < data.length + data.length ==>
       @       \result == x - data.length;
-      @   pure
+      @   strictly_pure
       @*/
     int modulo(int x) {
 	return x < data.length ? x : x - data.length;

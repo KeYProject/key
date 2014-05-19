@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -18,14 +18,13 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.ui.property.AbstractSEDDebugNodeTabComposite;
+import org.key_project.sed.ui.property.ISEDDebugNodeTabContent;
 
 /**
  * Provides the basic implementation of {@link AbstractPropertySection}s
@@ -36,7 +35,7 @@ public abstract class AbstractGraphitiDebugNodePropertySection extends GFPropert
    /**
     * The shown content.
     */
-   private AbstractSEDDebugNodeTabComposite contentComposite;
+   private ISEDDebugNodeTabContent content;
    
    /**
     * {@inheritDoc}
@@ -44,23 +43,24 @@ public abstract class AbstractGraphitiDebugNodePropertySection extends GFPropert
    @Override
    public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
       super.createControls(parent, tabbedPropertySheetPage);
-      contentComposite = createContentComposite(parent, SWT.NONE);
+      content = createContent();
+      if (content != null) {
+         content.createComposite(parent, getWidgetFactory());
+      }
    }
    
    /**
-    * Creates the {@link AbstractSEDDebugNodeTabComposite} which shows the content.
-    * @param parent The parent {@link Composite}.
-    * @param style The style to use.
-    * @return The created {@link AbstractSEDDebugNodeTabComposite}.
+    * Creates the {@link ISEDDebugNodeTabContent} which shows the content.
+    * @return The created {@link ISEDDebugNodeTabContent}.
     */
-   protected abstract AbstractSEDDebugNodeTabComposite createContentComposite(Composite parent, int style);
+   protected abstract ISEDDebugNodeTabContent createContent();
 
    /**
     * {@inheritDoc}
     */
    @Override
    public void refresh() {
-      contentComposite.updateContent(getDebugNode());
+      content.updateContent(getDebugNode());
    }
    
    /**
@@ -114,5 +114,16 @@ public abstract class AbstractGraphitiDebugNodePropertySection extends GFPropert
          }
       }
       return editor;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
+      if (content != null) {
+         content.dispose();
+      }
+      super.dispose();
    }
 }

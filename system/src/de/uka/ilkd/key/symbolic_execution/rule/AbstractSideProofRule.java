@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.rule;
 
 import java.util.Deque;
@@ -31,6 +44,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofStore;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
 
@@ -114,50 +128,55 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
    protected Map<Term, Set<Term>> computeResultsAndConditions(Services services, Goal goal, Sequent sequentToProve, Function newPredicate) throws ProofInputException {
       // Execute side proof
       ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(goal.proof(), sequentToProve, StrategyProperties.SPLITTING_DELAYED);
-      // Extract relevant things
-      Set<Operator> relevantThingsInSequentToProve = extractRelevantThings(info.getProof().getServices(), sequentToProve);
-      // Extract results and conditions from side proof
-      Map<Term, Set<Term>> conditionsAndResultsMap = new LinkedHashMap<Term, Set<Term>>();
-      for (Goal resultGoal : info.getProof().openGoals()) {
-         if (SymbolicExecutionUtil.hasApplicableRules(resultGoal)) {
-            throw new IllegalStateException("Side roof contains goal with automatic applicable rules.");
-         }
-         Sequent sequent = resultGoal.sequent();
-         Set<Term> resultConditions = new LinkedHashSet<Term>();
-         Term result = null;
-         for (SequentFormula sf : sequent.antecedent()) {
-            if (sf.formula().op() == newPredicate) {
-               throw new IllegalStateException("Result predicate found in antecedent.");
+      try {
+         // Extract relevant things
+         Set<Operator> relevantThingsInSequentToProve = extractRelevantThings(info.getProof().getServices(), sequentToProve);
+         // Extract results and conditions from side proof
+         Map<Term, Set<Term>> conditionsAndResultsMap = new LinkedHashMap<Term, Set<Term>>();
+         for (Goal resultGoal : info.getProof().openGoals()) {
+            if (SymbolicExecutionUtil.hasApplicableRules(resultGoal)) {
+               throw new IllegalStateException("Side roof contains goal with automatic applicable rules.");
             }
-            if (!isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
-               if (resultConditions.add(sf.formula())) {
-                  addNewNamesToNamespace(services, sf.formula());
+            Sequent sequent = resultGoal.sequent();
+            Set<Term> resultConditions = new LinkedHashSet<Term>();
+            Term result = null;
+            for (SequentFormula sf : sequent.antecedent()) {
+               if (sf.formula().op() == newPredicate) {
+                  throw new IllegalStateException("Result predicate found in antecedent.");
                }
-            }
-         }
-         for (SequentFormula sf : sequent.succedent()) {
-            if (sf.formula().op() == newPredicate) {
-               if (result != null) {
-                  throw new IllegalStateException("Result predicate found multiple times in succedent.");
-               }
-               result = sf.formula().sub(0);
-            }
-            else {
                if (!isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
-                  if (resultConditions.add(services.getTermBuilder().not(sf.formula()))) {
+                  if (resultConditions.add(sf.formula())) {
                      addNewNamesToNamespace(services, sf.formula());
                   }
                }
             }
+            for (SequentFormula sf : sequent.succedent()) {
+               if (sf.formula().op() == newPredicate) {
+                  if (result != null) {
+                     throw new IllegalStateException("Result predicate found multiple times in succedent.");
+                  }
+                  result = sf.formula().sub(0);
+               }
+               else {
+                  if (!isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
+                     if (resultConditions.add(services.getTermBuilder().not(sf.formula()))) {
+                        addNewNamesToNamespace(services, sf.formula());
+                     }
+                  }
+               }
+            }
+            Set<Term> conditions = conditionsAndResultsMap.get(result);
+            if (conditions == null) {
+               conditions = new LinkedHashSet<Term>();
+               conditionsAndResultsMap.put(result, conditions);
+            }
+            conditions.add(services.getTermBuilder().and(resultConditions));
          }
-         Set<Term> conditions = conditionsAndResultsMap.get(result);
-         if (conditions == null) {
-            conditions = new LinkedHashSet<Term>();
-            conditionsAndResultsMap.put(result, conditions);
-         }
-         conditions.add(services.getTermBuilder().and(resultConditions));
+         return conditionsAndResultsMap;
       }
-      return conditionsAndResultsMap;
+      finally {
+         SideProofStore.disposeOrStore("Side proof rule on node " + goal.node().serialNr() + ".", info);
+      }
    }
    
    /**

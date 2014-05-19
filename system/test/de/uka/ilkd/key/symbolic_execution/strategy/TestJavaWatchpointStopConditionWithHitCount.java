@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.io.IOException;
@@ -11,6 +24,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
+import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.FieldWatchpoint;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
@@ -42,11 +56,12 @@ public class TestJavaWatchpointStopConditionWithHitCount extends AbstractSymboli
             }
          }
          
-         FieldWatchpointStopCondition firstBreakpoint = new FieldWatchpointStopCondition(true, 2, "access", true,false, containerType, env.getBuilder().getProof());
-         FieldWatchpointStopCondition secondBreakpoint = new FieldWatchpointStopCondition(true, -1, "modification", false,true, containerType, env.getBuilder().getProof());
-         FieldWatchpointStopCondition thirdBreakpoint = new FieldWatchpointStopCondition(true, 2, "accessAndModification", true,true, containerType, env.getBuilder().getProof());
-         allBreakpoints.addChildren(firstBreakpoint,secondBreakpoint,thirdBreakpoint);
-         env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(allBreakpoints));
+         FieldWatchpoint firstBreakpoint = new FieldWatchpoint(true, 2, "access", true,false, containerType, env.getBuilder().getProof());
+         FieldWatchpoint secondBreakpoint = new FieldWatchpoint(true, -1, "modification", false,true, containerType, env.getBuilder().getProof());
+         FieldWatchpoint thirdBreakpoint = new FieldWatchpoint(true, 2, "accessAndModification", true,true, containerType, env.getBuilder().getProof());
+         SymbolicExecutionBreakpointStopCondition bc = new SymbolicExecutionBreakpointStopCondition(firstBreakpoint,secondBreakpoint,thirdBreakpoint);
+         allBreakpoints.addChildren(bc);
+         env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(bc));
          // Do steps
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);

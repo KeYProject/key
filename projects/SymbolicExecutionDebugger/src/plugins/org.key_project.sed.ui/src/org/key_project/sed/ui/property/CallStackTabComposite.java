@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -41,7 +41,7 @@ import org.key_project.util.eclipse.WorkbenchUtil;
  * @author Martin Hentschel
  */
 @SuppressWarnings("restriction")
-public class CallStackTabComposite extends AbstractSEDDebugNodeTabComposite {
+public class CallStackTabComposite implements ISEDDebugNodeTabContent {
    /**
     * Shows the name of the current node.
     */
@@ -59,15 +59,16 @@ public class CallStackTabComposite extends AbstractSEDDebugNodeTabComposite {
    
    /**
     * Constructor.
-    * @param parent The parent {@link Composite}.
-    * @param style The style to use.
-    * @param factory The {@link TabbedPropertySheetWidgetFactory} to use.
     */
-   public CallStackTabComposite(Composite parent, int style, TabbedPropertySheetWidgetFactory factory) {
-      super(parent, style);
-      setLayout(new FillLayout());
-      
-      Composite composite = factory.createFlatFormComposite(this);
+   public CallStackTabComposite() {
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void createComposite(Composite parent, TabbedPropertySheetWidgetFactory factory) {
+      Composite composite = factory.createFlatFormComposite(parent);
       
       viewerGroup = factory.createGroup(composite, "Call stack");
       viewerGroup.setLayout(new FillLayout());
@@ -115,5 +116,12 @@ public class CallStackTabComposite extends AbstractSEDDebugNodeTabComposite {
       viewerContext.setProperty(ISEDConstants.PRESENTATION_CONTEXT_PROPERTY_INPUT, node);
       viewer.setInput(node);
       viewerGroup.setText(nodeText);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
    }
 }

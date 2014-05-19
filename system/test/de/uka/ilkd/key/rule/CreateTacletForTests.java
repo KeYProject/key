@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.rule;
 
@@ -299,9 +298,10 @@ public class CreateTacletForTests extends TestCase {
 	String test1="\\predicates {A; B; } (A -> B) -> (!(!(A -> B)))";
 	Term t_test1=null;
 	try{
-	    StringReader fr = new StringReader(test1);
 	    KeYParserF parser=
-		new KeYParserF(ParserMode.PROBLEM,new KeYLexerF(fr,null));
+		new KeYParserF(ParserMode.PROBLEM,new KeYLexerF(test1,
+			"No file. CreateTacletForTests.setUp(" + test1 + ")",
+			null));
 	    t_test1=parser.problem();
 	} catch (Exception e) {
 	    System.err.println("Parser Error or Input Error");
@@ -371,9 +371,10 @@ public class CreateTacletForTests extends TestCase {
     }
     
     private KeYParserF stringDeclParser(String s) {
-	return new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s,null),
-			      "No file. CreateTacletForTests.stringParser("+s+")",
-			      services, nss);
+	return new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s,
+			"No file. CreateTacletForTests.stringDeclParser(" + s + ")",
+			null),
+		services, nss);
     }
 
     public void parseDecls(String s) {
@@ -389,11 +390,11 @@ public class CreateTacletForTests extends TestCase {
     }
      
     private KeYParserF stringTacletParser(String s) {
-	return new KeYParserF(ParserMode.TACLET,
-		             new KeYLexerF(s,null),
-			     "No file. CreateTacletForTests.stringParser("+s+")",
-			     services, 
-			     nss);
+	return new KeYParserF(ParserMode.TACLET, new KeYLexerF(s,
+			"No file. CreateTacletForTests.stringTacletParser(" + s + ")",
+			null),
+		services,
+		nss);
     }
     
     Taclet parseTaclet(String s) {

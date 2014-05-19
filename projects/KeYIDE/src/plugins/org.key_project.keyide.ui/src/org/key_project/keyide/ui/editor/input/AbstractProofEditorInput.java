@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -14,7 +14,6 @@
 package org.key_project.keyide.ui.editor.input;
 
 import org.eclipse.core.resources.IStorage;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jdt.core.IMethod;
@@ -62,7 +61,6 @@ public abstract class AbstractProofEditorInput extends PlatformObject implements
    public AbstractProofEditorInput(KeYEnvironment<CustomConsoleUserInterface> environment, 
                                    IMethod method,
                                    String name) {
-      Assert.isNotNull(environment);
       this.environment = environment;
       this.method = method;
       this.storage = new TextStorage(StringUtil.EMPTY_STRING, name);

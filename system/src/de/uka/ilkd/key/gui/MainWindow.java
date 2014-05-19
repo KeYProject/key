@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,10 +11,10 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.gui.actions.TermLabelMenu;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -71,6 +71,7 @@ import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
 import de.uka.ilkd.key.gui.actions.AboutAction;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.actions.CounterExampleAction;
+import de.uka.ilkd.key.gui.actions.TestGenerationAction;
 import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.FontSizeAction;
@@ -387,7 +388,7 @@ public final class MainWindow extends JFrame  {
      * @param userInterface The UserInterface.
      */
     private KeYMediator getMainWindowMediator(UserInterface userInterface) {
-        KeYMediator result = new KeYMediator(userInterface, true);
+        KeYMediator result = new KeYMediator(userInterface);
         result.addKeYSelectionListener(proofListener);
         result.addAutoModeListener(proofListener);
         result.addGUIListener(guiListener);
@@ -472,8 +473,6 @@ public final class MainWindow extends JFrame  {
         toolBarPanel.add(controlToolBar);
         toolBarPanel.add(fileOpToolBar);
 
-        // FIXME double entry?
-        getContentPane().add(GuiUtilities.getClipBoardArea(), BorderLayout.PAGE_START);
         getContentPane().add(toolBarPanel, BorderLayout.PAGE_START);
 
         // create tabbed pane
@@ -553,6 +552,8 @@ public final class MainWindow extends JFrame  {
         toolBar.add(comp.getSelectionComponent());
         toolBar.addSeparator();        
         toolBar.add(new CounterExampleAction(this));
+        toolBar.addSeparator();        
+        toolBar.add(new TestGenerationAction(this));
         toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this, false));
@@ -824,11 +825,14 @@ public final class MainWindow extends JFrame  {
         proof.add(new SearchInProofTreeAction(this));
         proof.add(new SearchInSequentAction(this));
         proof.addSeparator();
-	proof.add(new ShowUsedContractsAction(this));
+        proof.add(new ShowUsedContractsAction(this));
         proof.add(new ShowActiveTactletOptionsAction(this));
-	proof.add(showActiveSettingsAction);
+        proof.add(showActiveSettingsAction);
         proof.add(new ShowProofStatistics(this));
         proof.add(new ShowKnownTypesAction(this));
+        proof.addSeparator();
+        proof.add(new CounterExampleAction(this));
+        proof.add(new TestGenerationAction(this));
 
         return proof;
     }
@@ -960,6 +964,13 @@ public final class MainWindow extends JFrame  {
 
     public ProofTreeView getProofView() {
         return proofTreeView;
+    }
+    
+    /**
+     * Returns the current goal view.
+     */
+    public CurrentGoalView getGoalView() {
+        return currentGoalView;
     }
 
     /** saves a proof */
