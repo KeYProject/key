@@ -16,8 +16,10 @@ package org.key_project.util.eclipse;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Target;
 import java.net.URI;
 import java.util.Collection;
 
@@ -321,5 +323,26 @@ public class ResourceUtil {
     */
    public static String computeContentMD5(IFile iFile) throws IOException, CoreException{
       return IOUtil.computeMD5(iFile.getContents());
+   }
+
+   /**
+    * Copies the {@link IFile} to the given {@link Target}.
+    * @param source The {@link IFile} to copy.
+    * @param target The target {@link File} to copy to.
+    * @return {@code true} if copy was performed and {@code false} if not performed.
+    * @throws CoreException Occurred Exception
+    */
+   public static boolean copyIntoFileSystem(IFile source, File target) throws CoreException {
+      try {
+         if (source != null && target != null) {
+            return IOUtil.copy(source.getContents(), new FileOutputStream(target));
+         }
+         else {
+            return false;
+         }
+      }
+      catch (IOException e) {
+         throw new CoreException(new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(e));
+      }
    }
 }

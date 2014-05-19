@@ -11,29 +11,23 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.sed.ui.property;
+package org.key_project.sed.ui.visualization.execution_tree.property;
 
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.ui.property.AnnotationLinkTabComposite;
+import org.key_project.sed.ui.property.ISEDDebugNodeTabContent;
 
 /**
- * Provides the basic functionalities for a content {@link Composite}
- * shown in an {@link AbstractSEDDebugNodePropertySection}.
+ * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
  * @author Martin Hentschel
  */
-public abstract class AbstractSEDDebugNodeTabComposite extends Composite {
+public class GraphitiAnnotationLinkPropertySection extends AbstractGraphitiDebugNodePropertySection {
    /**
-    * Constructor.
-    * @param parent The parent {@link Composite}.
-    * @param style The style to use.
+    * {@inheritDoc}
     */
-   public AbstractSEDDebugNodeTabComposite(Composite parent, int style) {
-      super(parent, style);
+   @Override
+   protected ISEDDebugNodeTabContent createContent() {
+      return new AnnotationLinkTabComposite();
    }
-
-   /**
-    * Updates the shown content.
-    * @param node The {@link ISEDDebugNode} which provides the new content.
-    */
-   public abstract void updateContent(ISEDDebugNode node);
 }

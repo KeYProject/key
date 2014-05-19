@@ -19,7 +19,6 @@ import org.key_project.key4eclipse.starter.core.test.testcase.JavaElementResourc
 import org.key_project.key4eclipse.starter.core.test.testcase.JavaTextSelectionPropertyTesterTest;
 import org.key_project.key4eclipse.starter.core.test.testcase.KeYUtilTest;
 import org.key_project.key4eclipse.starter.core.test.testcase.LogUtilTest;
-import org.key_project.key4eclipse.starter.core.test.testcase.ProofUserManagerTest;
 
 /**
  * Run all contained JUnit 4 test cases.
@@ -30,8 +29,7 @@ import org.key_project.key4eclipse.starter.core.test.testcase.ProofUserManagerTe
     JavaElementResourceAdapterFactoryTest.class,
     JavaTextSelectionPropertyTesterTest.class,
     KeYUtilTest.class,
-    LogUtilTest.class,
-    ProofUserManagerTest.class
+    LogUtilTest.class
 })
 public class AllStarterCoreTests {
 }

@@ -5,8 +5,7 @@
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <loopInvariant name="
-invariant: i &gt;= 0 &amp; (i &lt;= array.length &amp; result_1 = i);
+            <loopInvariant name="invariant: i &gt;= 0 &amp; (i &lt;= array.length &amp; result_1 = i);
 variant: javaSubInt(array.length, i)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>

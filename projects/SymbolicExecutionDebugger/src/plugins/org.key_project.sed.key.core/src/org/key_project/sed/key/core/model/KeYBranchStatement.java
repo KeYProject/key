@@ -75,10 +75,11 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
    public KeYBranchStatement(KeYDebugTarget target, 
                              IKeYSEDDebugNode<?> parent, 
                              ISEDThread thread, 
-                             IExecutionBranchStatement executionNode) {
+                             IExecutionBranchStatement executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
    
    /**

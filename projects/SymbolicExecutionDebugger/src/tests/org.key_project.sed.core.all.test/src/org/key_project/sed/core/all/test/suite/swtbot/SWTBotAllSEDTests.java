@@ -42,12 +42,12 @@ import org.key_project.util.test.suite.swtbot.SWTBotAllUtilTests;
 @Suite.SuiteClasses({
    SWTBotAllKeY4EclipseTests.class,
    SWTBotAllUtilTests.class,
-   SWTBotAllSEDUITests.class,
    SWTBotAllStarterCoreTests.class,
    SWTBotAllSEDCoreTests.class,
+   SWTBotAllSEDUITests.class,
+   SWTBotAllSEDUIVisualizationTests.class,
    SWTBotAllSEDKeYTests.class,
    SWTBotAllSEDKeYUITests.class,
-   SWTBotAllSEDUIVisualizationTests.class,
    SWTBotAllSEDExampleUITests.class
 })
 public class SWTBotAllSEDTests {

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="Arrays.indexOf(array,filter);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int acceptedIndex = -1;" pathCondition="true" pathConditionChanged="false">
+         <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
+            <loopInvariant name="invariant: i &gt;= 0 &amp; i &lt;= array.length;
+variant: javaSubInt(array.length, i)
+mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
+               <branchCondition name="and(lt(acceptedIndex_0,Z(0(#))),or(or(lt(length(array),Z(0(#))),gt(acceptedIndex_0,Z(neglit(1(#))))),and(geq(i_0,Z(0(#))),gt(length(array),i_0))))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(leq(acceptedIndex_0,Z(neglit(1(#)))),or(geq(acceptedIndex_0,Z(0(#))),geq(i_0,Z(0(#))))),or(geq(acceptedIndex_0,Z(0(#))),gt(length(array),i_0))))" pathConditionChanged="true" branchCondition="and(lt(acceptedIndex_0,Z(0(#))),or(or(lt(length(array),Z(0(#))),gt(acceptedIndex_0,Z(neglit(1(#))))),and(geq(i_0,Z(0(#))),gt(length(array),i_0))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                  <branchStatement name="if (filter.accept(array[i]))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(leq(acceptedIndex_0,Z(neglit(1(#)))),or(geq(acceptedIndex_0,Z(0(#))),geq(i_0,Z(0(#))))),or(geq(acceptedIndex_0,Z(0(#))),gt(length(array),i_0))))" pathConditionChanged="false">
+                     <operationContract name="result_0 = var.accept(var_1) catch(exc_0)
+pre: var.&lt;inv&gt;
+post: var.&lt;inv&gt; &amp; exc_0 = null
+mod: empty, creates no new objects
+termination: diamond" pathCondition="imp(geq(length(array),Z(0(#))),and(and(leq(acceptedIndex_0,Z(neglit(1(#)))),or(geq(acceptedIndex_0,Z(0(#))),geq(i_0,Z(0(#))))),or(geq(acceptedIndex_0,Z(0(#))),gt(length(array),i_0))))" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="true" notNullCheckComplied="true">
+                        <branchCondition name="equals(result_0,TRUE)" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(equals(result_0,TRUE),leq(acceptedIndex_0,Z(neglit(1(#))))),or(geq(acceptedIndex_0,Z(0(#))),geq(i_0,Z(0(#))))),or(geq(acceptedIndex_0,Z(0(#))),gt(length(array),i_0))))" pathConditionChanged="true" branchCondition="equals(result_0,TRUE)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <statement name="acceptedIndex=i;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(equals(result_0,TRUE),leq(acceptedIndex_0,Z(neglit(1(#))))),or(geq(acceptedIndex_0,Z(0(#))),geq(i_0,Z(0(#))))),or(geq(acceptedIndex_0,Z(0(#))),gt(length(array),i_0))))" pathConditionChanged="false">
+                              <statement name="i++;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(equals(result_0,TRUE),leq(acceptedIndex_0,Z(neglit(1(#))))),or(geq(acceptedIndex_0,Z(0(#))),geq(i_0,Z(0(#))))),or(geq(acceptedIndex_0,Z(0(#))),gt(length(array),i_0))))" pathConditionChanged="false">
+                                 <termination name="&lt;loop body end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(equals(result_0,TRUE),leq(acceptedIndex_0,Z(neglit(1(#))))),or(geq(acceptedIndex_0,Z(0(#))),geq(i_0,Z(0(#))))),or(geq(acceptedIndex_0,Z(0(#))),gt(length(array),i_0))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
+                                 </termination>
+                              </statement>
+                           </statement>
+                        </branchCondition>
+                        <branchCondition name="not(equals(result_0,TRUE))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(result_0,TRUE)),leq(acceptedIndex_0,Z(neglit(1(#))))),or(geq(acceptedIndex_0,Z(0(#))),geq(i_0,Z(0(#))))),or(geq(acceptedIndex_0,Z(0(#))),gt(length(array),i_0))))" pathConditionChanged="true" branchCondition="not(equals(result_0,TRUE))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <statement name="i++;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(result_0,TRUE)),leq(acceptedIndex_0,Z(neglit(1(#))))),or(geq(acceptedIndex_0,Z(0(#))),geq(i_0,Z(0(#))))),or(geq(acceptedIndex_0,Z(0(#))),gt(length(array),i_0))))" pathConditionChanged="false">
+                              <termination name="&lt;loop body end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(result_0,TRUE)),leq(acceptedIndex_0,Z(neglit(1(#))))),or(geq(acceptedIndex_0,Z(0(#))),geq(i_0,Z(0(#))))),or(geq(acceptedIndex_0,Z(0(#))),gt(length(array),i_0))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
+                              </termination>
+                           </statement>
+                        </branchCondition>
+                     </operationContract>
+                  </branchStatement>
+               </branchCondition>
+               <branchCondition name="and(or(or(lt(length(array),Z(0(#))),lt(acceptedIndex_0,Z(0(#)))),and(geq(i_0,Z(0(#))),geq(length(array),i_0))),or(or(lt(length(array),Z(0(#))),gt(acceptedIndex_0,Z(neglit(1(#))))),and(geq(i_0,Z(0(#))),equals(length(array),i_0))))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(or(geq(acceptedIndex_0,Z(0(#))),equals(length(array),i_0)),or(geq(acceptedIndex_0,Z(0(#))),geq(i_0,Z(0(#))))),or(leq(acceptedIndex_0,Z(neglit(1(#)))),geq(i_0,Z(0(#))))),or(leq(acceptedIndex_0,Z(neglit(1(#)))),geq(length(array),i_0))))" pathConditionChanged="true" branchCondition="and(or(or(lt(length(array),Z(0(#))),lt(acceptedIndex_0,Z(0(#)))),and(geq(i_0,Z(0(#))),geq(length(array),i_0))),or(or(lt(length(array),Z(0(#))),gt(acceptedIndex_0,Z(neglit(1(#))))),and(geq(i_0,Z(0(#))),equals(length(array),i_0))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                  <statement name="return acceptedIndex;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(or(geq(acceptedIndex_0,Z(0(#))),equals(length(array),i_0)),or(geq(acceptedIndex_0,Z(0(#))),geq(i_0,Z(0(#))))),or(leq(acceptedIndex_0,Z(neglit(1(#)))),geq(i_0,Z(0(#))))),or(leq(acceptedIndex_0,Z(neglit(1(#)))),geq(length(array),i_0))))" pathConditionChanged="false">
+                     <branchCondition name="geq(acceptedIndex_0,Z(0(#)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(geq(acceptedIndex_0,Z(0(#))),or(geq(acceptedIndex_0,Z(0(#))),equals(length(array),i_0))),or(geq(acceptedIndex_0,Z(0(#))),geq(i_0,Z(0(#))))),or(leq(acceptedIndex_0,Z(neglit(1(#)))),geq(i_0,Z(0(#))))),or(leq(acceptedIndex_0,Z(neglit(1(#)))),geq(length(array),i_0))))" pathConditionChanged="true" branchCondition="geq(acceptedIndex_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <methodReturn name="&lt;return of Arrays.indexOf(array,filter);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(geq(acceptedIndex_0,Z(0(#))),or(geq(acceptedIndex_0,Z(0(#))),equals(length(array),i_0))),or(geq(acceptedIndex_0,Z(0(#))),geq(i_0,Z(0(#))))),or(leq(acceptedIndex_0,Z(neglit(1(#)))),geq(i_0,Z(0(#))))),or(leq(acceptedIndex_0,Z(neglit(1(#)))),geq(length(array),i_0))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return acceptedIndex_0 as result of Arrays.indexOf(array,filter);&gt;" isReturnValueComputed="true">
+                           <methodReturnValue name="acceptedIndex_0" returnValueString="acceptedIndex_0" hasCondition="false">
+                           </methodReturnValue>
+                           <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(geq(acceptedIndex_0,Z(0(#))),or(geq(acceptedIndex_0,Z(0(#))),equals(length(array),i_0))),or(geq(acceptedIndex_0,Z(0(#))),geq(i_0,Z(0(#))))),or(leq(acceptedIndex_0,Z(neglit(1(#)))),geq(i_0,Z(0(#))))),or(leq(acceptedIndex_0,Z(neglit(1(#)))),geq(length(array),i_0))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           </termination>
+                        </methodReturn>
+                     </branchCondition>
+                     <branchCondition name="leq(acceptedIndex_0,Z(neglit(1(#))))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(leq(acceptedIndex_0,Z(neglit(1(#)))),or(geq(acceptedIndex_0,Z(0(#))),equals(length(array),i_0))),or(geq(acceptedIndex_0,Z(0(#))),geq(i_0,Z(0(#))))),or(leq(acceptedIndex_0,Z(neglit(1(#)))),geq(i_0,Z(0(#))))),or(leq(acceptedIndex_0,Z(neglit(1(#)))),geq(length(array),i_0))))" pathConditionChanged="true" branchCondition="leq(acceptedIndex_0,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <methodReturn name="&lt;return of Arrays.indexOf(array,filter);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(leq(acceptedIndex_0,Z(neglit(1(#)))),or(geq(acceptedIndex_0,Z(0(#))),equals(length(array),i_0))),or(geq(acceptedIndex_0,Z(0(#))),geq(i_0,Z(0(#))))),or(leq(acceptedIndex_0,Z(neglit(1(#)))),geq(i_0,Z(0(#))))),or(leq(acceptedIndex_0,Z(neglit(1(#)))),geq(length(array),i_0))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return acceptedIndex_0 as result of Arrays.indexOf(array,filter);&gt;" isReturnValueComputed="true">
+                           <methodReturnValue name="acceptedIndex_0" returnValueString="acceptedIndex_0" hasCondition="false">
+                           </methodReturnValue>
+                           <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(leq(acceptedIndex_0,Z(neglit(1(#)))),or(geq(acceptedIndex_0,Z(0(#))),equals(length(array),i_0))),or(geq(acceptedIndex_0,Z(0(#))),geq(i_0,Z(0(#))))),or(leq(acceptedIndex_0,Z(neglit(1(#)))),geq(i_0,Z(0(#))))),or(leq(acceptedIndex_0,Z(neglit(1(#)))),geq(length(array),i_0))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           </termination>
+                        </methodReturn>
+                     </branchCondition>
+                  </statement>
+               </branchCondition>
+            </loopInvariant>
+         </statement>
+      </statement>
+   </methodCall>
+</start>
