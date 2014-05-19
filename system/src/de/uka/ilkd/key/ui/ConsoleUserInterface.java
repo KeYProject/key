@@ -32,7 +32,6 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -50,6 +49,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
     private final BatchMode batchMode;
     private final byte verbosity;
+	private ProofStarter ps;
 	private KeYMediator mediator;
 	private boolean autoMode;
 
@@ -91,6 +91,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                     System.out.println("Proof steps: "+stat.nodes);
                     System.out.println("Branches: "+stat.branches);
                     System.out.println("Automode Time: "+stat.autoModeTime+"ms");
+                    System.out.println("Time per step: "+stat.timePerStep+"ms");
                 }
                 System.out.println("Number of goals remaining open: " +
                         openGoals);
@@ -118,9 +119,9 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             // has to be notified that we work in auto mode (CS)
             mediator.setInteractive(false);
 
-            startAndWaitForAutoMode(proof);
-            if (verbosity >= HIGH) { // WARNING: Is never executed since application terminates via System.exit() before.
-            	System.out.println(proof.statistics());
+            final Object result = ps.start();
+            if (verbosity >= HIGH) {
+            	System.out.println(result);
             }
         }
     }
@@ -145,6 +146,8 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             ProofAggregate proofAggregate) {
         // TODO Implement ProblemInitializerListener.proofCreated
         // XXX WHY AT THE MAINWINDOW?!?!
+    	ps = new ProofStarter(this, mediator.getAutoSaver() != null);
+        ps.init(proofAggregate);
         mediator.setProof(proofAggregate.getFirstProof());
     }
 
