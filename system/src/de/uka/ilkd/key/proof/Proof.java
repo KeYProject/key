@@ -1025,6 +1025,7 @@ public class Proof implements Named {
         public final int loopInvApps;
         public final long autoModeTime;
         public final long time;
+        public final float timePerStep;
 
         private List<Pair<String, String>> summaryList =
                 new ArrayList<Pair<String, String>>(14);
@@ -1096,29 +1097,19 @@ public class Proof implements Named {
             this.loopInvApps = tmpInv;
             this.autoModeTime = proof.getAutoModeTime();
             this.time = System.currentTimeMillis() - Main.getStartTime();
+            timePerStep = autoModeTime/(float)nodes;
 
-            generateSummary(proof, tmpNodes, tmpBranches, tmpInteractive, tmpQuant, tmpOss, tmpSmt, tmpDep, tmpContr, tmpInv, tmpOssCaptured);
+            generateSummary(proof);
         }
 
-
-        private void generateSummary(Proof proof,
-                                     int tmpNodes,
-                                     int tmpBranches,
-                                     int tmpInteractive,
-                                     int quant,
-                                     int tmpOss,
-                                     int tmpSmt,
-                                     int tmpDep,
-                                     int tmpContr,
-                                     int tmpInv,
-                                     int tmpOssCaptured) {
+        private void generateSummary(Proof proof) {
             final String nodeString =
-                    EnhancedStringBuffer.format(tmpNodes).toString();
+                    EnhancedStringBuffer.format(nodes).toString();
             summaryList.add(new Pair<String, String>("Nodes", nodeString));
             summaryList.add(new Pair<String, String>("Branches",
-                                                     EnhancedStringBuffer.format(tmpBranches).toString()));
+                                                     EnhancedStringBuffer.format(branches).toString()));
             summaryList.add(new Pair<String, String>("Interactive steps", "" +
-                                                                          tmpInteractive));
+                                                                          interactiveSteps));
             final long time = proof.getAutoModeTime();
             summaryList.add(new Pair<String, String>("Automode time",
                                                      EnhancedStringBuffer.formatTime(time).toString()));
@@ -1127,31 +1118,31 @@ public class Proof implements Named {
                                                                           time +
                                                                           "ms"));
             }
-            if (tmpNodes > 0) { // TODO: real rounding
-                final String avgTime = "" + (time / tmpNodes) + "." + ((time *
-                                                                        10 /
-                                                                        tmpNodes) %
-                                                                       10);
+            if (nodes > 0) {
+                String avgTime = "" + timePerStep;
+                // round to 3 digits after point
+                int i = avgTime.indexOf('.')+4;
+                if (i > avgTime.length()) i = avgTime.length();
+                avgTime = avgTime.substring(0,i);
                 summaryList.add(new Pair<String, String>("Avg. time per step", "" +
                                                                                avgTime +
                                                                                "ms"));
             }
 
             summaryList.add(new Pair<String, String>("Rule applications", ""));
-            summaryList.add(new Pair<String, String>("Quantifier instantiations", ""+quant));
+            summaryList.add(new Pair<String, String>("Quantifier instantiations", ""+quantifierInstantiations));
             summaryList.add(new Pair<String, String>("One-step Simplifier apps", "" +
-                                                                                 tmpOss));
+                                                                                 ossApps));
             summaryList.add(new Pair<String, String>("SMT solver apps", "" +
-                                                                        tmpSmt));
+                                                                        smtSolverApps));
             summaryList.add(new Pair<String, String>("Dependency Contract apps", "" +
-                                                                                 tmpDep));
+                                                                                 dependencyContractApps));
             summaryList.add(new Pair<String, String>("Operation Contract apps", "" +
-                                                                                tmpContr));
+                                                                                operationContractApps));
             summaryList.add(new Pair<String, String>("Loop invariant apps", "" +
-                                                                            tmpInv));
+                                                                            loopInvApps));
             summaryList.add(new Pair<String, String>("Total rule apps",
-                                                     EnhancedStringBuffer.format(tmpNodes +
-                                                                                 tmpOssCaptured).toString()));
+                                                     EnhancedStringBuffer.format(totalRuleApps).toString()));
         }
 
 
