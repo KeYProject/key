@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_1fb53e22-623c-46fe-9e3d-dccb3de44e60" name="equals(Number)" modelIdentifier="org.key_project.sed.key.core">
+      <sedAnnotation xml:id="AnnotationUniqueID" typeId="org.key_project.sed.core.annotationType.comment" enabled="true" highlightBackground="true" backgroundColor="43,43,43" highlightForeground="true" foregroundColor="0,255,0" content="Comment"/>
+      <sedThread xml:id="_35610221-6779-4503-9ee4-484311de1af1" name="&lt;start&gt;" pathCondition="true">
+         <sedAnnotationLink xml:id="AnnotationLinkUniqueID" sourceIdRef="AnnotationUniqueID" targetIdRef="_35610221-6779-4503-9ee4-484311de1af1"/>
+         <sedMethodCall xml:id="_2665da05-b3c1-4fe5-b0ca-31ef160252ae" name="self.equals(n);" pathCondition="true" lineNumber="-1" charStart="1343" charEnd="1349" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSymbolicExecutionTreeStyleTest_testChangeBackgroundColor\Number.java">
+            <sedBranchStatement xml:id="_b7359669-af12-40c0-850b-115260bcb8ba" name="if (this.content==n.content)" pathCondition="true" lineNumber="-1" charStart="1364" charEnd="1441" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSymbolicExecutionTreeStyleTest_testChangeBackgroundColor\Number.java">
+               <sedBranchCondition xml:id="_9421520c-4b67-4dbf-a7c0-04f5ae232c6d" name="!n = null" pathCondition="!n = null">
+                  <sedBranchCondition xml:id="_9295f176-0fed-403f-afa0-691e4af894b1" name="self.content = n.content" pathCondition="!n = null &amp; self.content = n.content">
+                     <sedStatement xml:id="_d2cce5df-8732-4c7f-8fae-65f75cc149cc" name="return true;" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="1395" charEnd="1407" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSymbolicExecutionTreeStyleTest_testChangeBackgroundColor\Number.java">
+                        <sedMethodReturn xml:id="_0e992376-4fd1-4f24-bfd6-dda55014632a" name="&lt;return TRUE as result of self.equals(n);&gt;" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="1343" charEnd="1349" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSymbolicExecutionTreeStyleTest_testChangeBackgroundColor\Number.java">
+                           <sedTermination xml:id="_257e85c5-bbfc-4398-8761-09c68c2f863a" name="&lt;end&gt;" pathCondition="!n = null &amp; self.content = n.content" verified="true">
+                           </sedTermination>
+                        </sedMethodReturn>
+                     </sedStatement>
+                  </sedBranchCondition>
+                  <sedBranchCondition xml:id="_dbcec85e-1b70-4f31-807a-40134c8b63c0" name="!self.content = n.content" pathCondition="!n = null &amp; !self.content = n.content">
+                     <sedStatement xml:id="_475c1f0e-28d1-4cd3-8fbf-e5124c3091d7" name="return false;" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="1424" charEnd="1437" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSymbolicExecutionTreeStyleTest_testChangeBackgroundColor\Number.java">
+                        <sedMethodReturn xml:id="_185a5b3b-e99b-4858-992f-072cb3caeb37" name="&lt;return FALSE as result of self.equals(n);&gt;" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="1343" charEnd="1349" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSymbolicExecutionTreeStyleTest_testChangeBackgroundColor\Number.java">
+                           <sedTermination xml:id="_a6326ac8-dc5e-40bf-af00-7a9e13b6f830" name="&lt;end&gt;" pathCondition="!n = null &amp; !self.content = n.content" verified="true">
+                           </sedTermination>
+                        </sedMethodReturn>
+                     </sedStatement>
+                  </sedBranchCondition>
+               </sedBranchCondition>
+               <sedBranchCondition xml:id="_b13498fb-eee7-499d-8772-ad74648f8c52" name="n = null" pathCondition="n = null">
+                  <sedExceptionalTermination xml:id="_bb80f334-5a0d-4b30-9726-cab9620fcb37" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="n = null" verified="true">
+                  </sedExceptionalTermination>
+               </sedBranchCondition>
+            </sedBranchStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

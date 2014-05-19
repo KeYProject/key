@@ -81,7 +81,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
                                final String pathToSetFile,
                                final String pathToOracleFiles,
                                PathReplacement... pathReplacements) throws Exception {
-      IDiagramTestSteps steps = new IDiagramTestSteps() {
+      IDiagramTestSteps steps = new AbstractDiagramTestSteps() {
          @Override
          public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
             assertDiagram(bot, project, pathToSetFile, pathToOracleFiles, null);
@@ -106,17 +106,18 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
                                 PathReplacement... pathReplacements) throws Exception {
       IPerspectiveDescriptor originalPerspective = TestUtilsUtil.getActivePerspective();
       try {
-         // Close and reopen symbolic execution tree view to ensure that IDs start at 0
+         // Close symbolic execution tree view to ensure that IDs start at 0 when diagram is visualized
          TestUtilsUtil.openPerspective(TestUtilsUtil.getPerspective(SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID));
          TestUtilsUtil.closeView(ExecutionTreeView.VIEW_ID);
-         TestUtilsUtil.openView(ExecutionTreeView.VIEW_ID);
          TestUtilsUtil.openPerspective(originalPerspective);
          // Create diagram
          ISetFileTestSteps additionalTestSteps = new ISetFileTestSteps() {
             @Override
             public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
                try {
+                  testSteps.init(bot, project, setFile, debugView, debugTree, launch, target);
                   // Wait until diagram is completely constructed
+                  TestUtilsUtil.openView(ExecutionTreeView.VIEW_ID);
                   TestUtilsUtil.waitForJobs();
                   // Perform test steps
                   testSteps.test(bot, project, setFile, debugView, debugTree, launch, target);
@@ -139,6 +140,24 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
     */
    public static interface IDiagramTestSteps {
       /**
+       * Performs some optional initializations before the set is visualized.
+       * @param bot The used {@link SWTWorkbenchBot}.
+       * @param project The {@link IProject} which contains the SET file.
+       * @param setFile The SET file.
+       * @param debugView The debug view.
+       * @param debugTree The debug tree.
+       * @param launch The {@link ILaunch}.
+       * @param target The {@link ISEDDebugTarget}.
+       */
+      public void init(SWTWorkbenchBot bot, 
+                       IProject project, 
+                       IFile setFile, 
+                       SWTBotView debugView, 
+                       SWTBotTree debugTree, 
+                       ILaunch launch, 
+                       ISEDDebugTarget target) throws Exception;
+      
+      /**
        * Executes the test steps.
        * @param bot The used {@link SWTWorkbenchBot}.
        * @param project The {@link IProject} which contains the SET file.
@@ -156,7 +175,26 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
                        ILaunch launch, 
                        ISEDDebugTarget target) throws Exception;
    }
-   
+
+   /**
+    * Provides some default implementations of {@link IDiagramTestSteps}.
+    * @author Martin Hentschel
+    */
+   public static abstract class AbstractDiagramTestSteps implements IDiagramTestSteps {
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void init(SWTWorkbenchBot bot, 
+                       IProject project, 
+                       IFile setFile, 
+                       SWTBotView debugView, 
+                       SWTBotTree debugTree, 
+                       ILaunch launch, 
+                       ISEDDebugTarget target) throws Exception {
+      }
+   }
+
    /**
     * Ensures that the current diagram matches the oracle files.
     * @param bot The {@link SWTWorkbenchBot} to use.
@@ -185,25 +223,27 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
       TestUtilsUtil.clickDirectly(wizardShell.bot().button("Next >"));
       TestUtilsUtil.clickDirectly(wizardShell.bot().button("Finish"));
       bot.waitUntil(Conditions.shellCloses(wizardShell));
-      // Save oracle file
       if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
+         // Save oracle file
          copyOracleFiles(pathToOracleFiles, project, fileName);
       }
-      // Read diagram file
-      String expectedDiagramFile = IOUtil.readFrom(BundleUtil.openInputStream(Activator.PLUGIN_ID, pathToOracleFiles + "/" + fileName + ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION_WITH_DOT));
-      String currentDiagramFile = ResourceUtil.readFrom(project.getFile(fileName + ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION_WITH_DOT));
-      // Update model path
-      final String PROP_START = "<properties key=\"domainModelFile\" value=\"";
-      int expectedStart = expectedDiagramFile.indexOf(PROP_START);
-      int expectedEnd = expectedDiagramFile.indexOf("\"/>", expectedStart + PROP_START.length());
-      int currentStart = currentDiagramFile.indexOf(PROP_START);
-      int currentEnd = currentDiagramFile.indexOf("\"/>", currentStart + PROP_START.length());
-      expectedDiagramFile = expectedDiagramFile.substring(0, expectedStart + PROP_START.length()) +
-                            currentDiagramFile.substring(currentStart + PROP_START.length(), currentEnd) +
-                            expectedDiagramFile.substring(expectedEnd);
-      // Compare diagram files
-      if (!StringUtil.equalIgnoreWhiteSpace(expectedDiagramFile, currentDiagramFile)) {
-         assertEquals(expectedDiagramFile, currentDiagramFile); // Let test fail to have an improved comparison dialog
+      else {
+         // Read diagram file
+         String expectedDiagramFile = IOUtil.readFrom(BundleUtil.openInputStream(Activator.PLUGIN_ID, pathToOracleFiles + "/" + fileName + ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION_WITH_DOT));
+         String currentDiagramFile = ResourceUtil.readFrom(project.getFile(fileName + ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION_WITH_DOT));
+         // Update model path
+         final String PROP_START = "<properties key=\"domainModelFile\" value=\"";
+         int expectedStart = expectedDiagramFile.indexOf(PROP_START);
+         int expectedEnd = expectedDiagramFile.indexOf("\"/>", expectedStart + PROP_START.length());
+         int currentStart = currentDiagramFile.indexOf(PROP_START);
+         int currentEnd = currentDiagramFile.indexOf("\"/>", currentStart + PROP_START.length());
+         expectedDiagramFile = expectedDiagramFile.substring(0, expectedStart + PROP_START.length()) +
+                               currentDiagramFile.substring(currentStart + PROP_START.length(), currentEnd) +
+                               expectedDiagramFile.substring(expectedEnd);
+         // Compare diagram files
+         if (!StringUtil.equalIgnoreWhiteSpace(expectedDiagramFile, currentDiagramFile)) {
+            assertEquals(expectedDiagramFile, currentDiagramFile); // Let test fail to have an improved comparison dialog
+         }
       }
    }
    
