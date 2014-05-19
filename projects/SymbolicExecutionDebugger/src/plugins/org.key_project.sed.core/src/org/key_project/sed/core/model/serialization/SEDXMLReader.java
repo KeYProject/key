@@ -315,7 +315,8 @@ public class SEDXMLReader {
                target.registerAnnotation(annotation);
             }
             else if (obj instanceof ISEDAnnotationLink) {
-               parent.addAnnotationLink((ISEDAnnotationLink)obj);
+               ISEDAnnotationLink link = (ISEDAnnotationLink)obj;
+               link.getSource().addLink(link);
             }
          }
       }
