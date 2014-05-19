@@ -340,14 +340,17 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        File file = new File((new File (Main.getFileNameOnStartUp())).getParent(), defaultName);
        boolean proofFolderActive = ProofIndependentSettings.DEFAULT_INSTANCE
                         .getGeneralSettings().storesInDefaultProofFolder();
+       String poDir =
+               file.getParent().endsWith("src") ?
+                       new File(file.getParent()).getParent() : file.getParent();
        String proofDir =
                (!proofFolderActive || file.getParent().endsWith("/proof")) ?
                file.getParent() : file.getParent().concat("/proof");
        final File dir = new File(proofDir);
-       if (proofFolderActive && !dir.exists()) {
+       if (proofFolderActive && !dir.exists() && fileExtension.equals(".proof")) {
            dir.mkdir();
        }
-       file = new File(proofDir, file.getName());
+       file = new File(fileExtension.equals(".key") ? poDir : proofDir, file.getName());
        ProofSaver saver = new ProofSaver(proof, file.getPath(), Main.INTERNAL_VERSION);
        try {
            saver.save();

@@ -97,10 +97,11 @@ public class KeYFileChooser {
         resetFile = (defaultName != null) ? new File(recDir, defaultName): file;
         fileChooser.setSelectedFile(resetFile);
         setSaveDialog(true);
-
         boolean proofFolderActive = ProofIndependentSettings.DEFAULT_INSTANCE
                          .getGeneralSettings().storesInDefaultProofFolder();
-
+        String poDir =
+                resetFile.getParent().endsWith("src") ?
+                        new File(resetFile.getParent()).getParent() : resetFile.getParent();
         String proofDir =
                 (!proofFolderActive || resetFile.getParent().endsWith(PROOF_SUBDIRECTORY)) ?
                 resetFile.getParent() : resetFile.getParent().concat(PROOF_SUBDIRECTORY);
@@ -109,7 +110,7 @@ public class KeYFileChooser {
         if (newDir) {
             dir.mkdir();
         }
-        file = new File(proofDir, resetFile.getName());
+        file = new File(defaultName.endsWith(".key") ? poDir : proofDir, resetFile.getName());
         fileChooser.setSelectedFile(file);
         fileChooser.updateUI(); // Might prevent empty filename suggestion?
 	int result = autoSave ? JFileChooser.APPROVE_OPTION : fileChooser.showSaveDialog(parent);
