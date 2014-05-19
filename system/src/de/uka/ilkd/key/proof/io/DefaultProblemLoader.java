@@ -193,8 +193,11 @@ public class DefaultProblemLoader {
 
    private void writeToFile(String path, File file) {
        String examplesPath = "examples/";
+       boolean inExampleDir = 0 <= path.indexOf(examplesPath);
        String prefix = path.contains("insecure") ? "notprovable: " : "provable: ";
-       path = "./" + path.substring(path.indexOf(examplesPath) + examplesPath.length());
+       path = "./" +
+               (inExampleDir ?
+                       path.substring(path.indexOf(examplesPath) + examplesPath.length()) : path);
        try {
            PrintWriter w = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
            w.println(prefix + path);
