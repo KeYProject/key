@@ -248,7 +248,7 @@ public class AnnotationPropertySection extends AbstractSEDDebugTargetPropertySec
          }
       };
       annoationLinksViewerMenuManager.add(editAction);
-      linksAction = new Action("&Show annotation links.", SEDImages.getImageDescriptor(SEDImages.ANNOTATION_LINKS)) {
+      linksAction = new Action("&Show annotation links", SEDImages.getImageDescriptor(SEDImages.ANNOTATION_LINKS)) {
          @Override
          public void run() {
             showAnnotationLinks();

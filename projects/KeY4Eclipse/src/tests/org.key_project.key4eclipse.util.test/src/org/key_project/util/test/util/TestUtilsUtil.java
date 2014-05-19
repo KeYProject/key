@@ -1650,4 +1650,28 @@ public class TestUtilsUtil {
       bot.waitUntil(org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses(switchShel));
       assertEquals(expectedTargetPerspectiveId, debugPerspective.getId());
    }
+
+   /**
+    * Returns the selection of the given {@link SWTBotTree}.
+    * @param tree The {@link SWTBotTree}.
+    * @return The selected {@link Object}s.
+    * @throws Exception Occurred Exception.
+    */
+   public static Object[] getSelectedObjects(final SWTBotTree tree) throws Exception {
+      IRunnableWithResult<Object[]> run = new AbstractRunnableWithResult<Object[]>() {
+         @Override
+         public void run() {
+            List<Object> result = new LinkedList<Object>();
+            for (TreeItem item : tree.widget.getSelection()) {
+               result.add(item.getData());
+            }
+            setResult(result.toArray(new Object[result.size()]));
+         }
+      };
+      tree.widget.getDisplay().syncExec(run);
+      if (run.getException() != null) {
+         throw run.getException();
+      }
+      return run.getResult();
+   }
 }

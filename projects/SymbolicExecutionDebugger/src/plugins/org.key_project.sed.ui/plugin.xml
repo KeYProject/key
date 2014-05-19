@@ -198,6 +198,10 @@
                annotationTypeID="org.key_project.sed.core.annotationType.search"
                class="org.key_project.sed.ui.edit.SearchAnnotationEditor">
          </editor>
+         <editor
+               annotationTypeID="org.key_project.sed.core.annotationType.comment"
+               class="org.key_project.sed.ui.edit.CommentAnnotationEditor">
+         </editor>
       </extension>
       <extension
             point="org.key_project.sed.ui.annotationLinkActions">

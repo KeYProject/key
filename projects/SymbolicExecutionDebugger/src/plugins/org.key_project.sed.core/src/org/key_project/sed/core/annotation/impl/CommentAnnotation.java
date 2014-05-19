@@ -14,6 +14,11 @@ public class CommentAnnotation extends AbstractSEDAnnotation {
     * The default comment type.
     */
    public static final String DEFAULT_COMMENT_TYPE = "Comment";
+
+   /**
+    * Property {@link #getCommentType()}.
+    */
+   public static final String PROP_COMMENT_TYPE = "commentType";
    
    /**
     * The type of comments.
@@ -48,7 +53,9 @@ public class CommentAnnotation extends AbstractSEDAnnotation {
     * @param commentType The type of comments to set.
     */
    public void setCommentType(String commentType) {
+      String oldValue = getCommentType();
       this.commentType = commentType;
+      firePropertyChange(PROP_COMMENT_TYPE, oldValue, getCommentType());
    }
 
    /**

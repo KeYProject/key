@@ -32,6 +32,7 @@ import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotHotCodeReplaceCon
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotHotCodeReplaceDisconnectTestCase;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotHotCodeReplacePreferenceTestCase;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotHotCodeReplaceTerminateTestCase;
+import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotInitialAnnotationLinkTest;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotKeYDebugTargetProofFileTest;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotKeYDebugTargetTest;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotKeYLaunchConfigurationDelegateTest;
@@ -78,6 +79,7 @@ import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotStepReturnTest;
    SWTBotHotCodeReplaceDisconnectTestCase.class,
    SWTBotHotCodeReplacePreferenceTestCase.class,
    SWTBotHotCodeReplaceTerminateTestCase.class,
+   SWTBotInitialAnnotationLinkTest.class,
    SWTBotRemoveExceptionBreakpoint.class,
    SWTBotRemoveLineBreakpoint.class,
    SWTBotRemoveMethodBreakpoint.class,
