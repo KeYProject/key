@@ -16,6 +16,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 import javax.swing.text.DefaultCaret;
 
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
@@ -65,8 +66,12 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener {
 		startButton = new JButton(new AbstractAction("Start") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				KeYMediator mediator = MainWindow.getInstance().getMediator();
+				mediator.stopInterface(true);
+				mediator.setInteractive(false);				
 				worker = new TGWorker(TGInfoDialog.this);
-				worker.start();
+				mediator.addInterruptedListener(worker);
+				worker.execute();
 			}
 		});
 		exitButton.setEnabled(false);

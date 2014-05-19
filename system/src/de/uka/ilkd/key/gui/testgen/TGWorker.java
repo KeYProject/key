@@ -7,12 +7,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.SwingWorker;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.InterruptListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.SwingWorker3;
-import de.uka.ilkd.key.gui.actions.TestGenerationAction;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
@@ -35,7 +35,7 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.util.Debug;
 
-public class TGWorker extends SwingWorker3 implements InterruptListener {
+public class TGWorker extends SwingWorker<Void, Void> implements InterruptListener {
 	private TGInfoDialog tgInfoDialog;
 	private boolean stop;
 	private SolverLauncher launcher;
@@ -47,7 +47,7 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 	}
 
 	@Override
-	public Object construct() {
+	public Void doInBackground() {
 
 		TestGenerationSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
 
@@ -144,7 +144,7 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 	 * finalise the GUI stuff
 	 */
 	@Override
-	public void finished() {
+	public void done() {
 		removeGeneratedProofs();
 		getMediator().setInteractive(true);
 		getMediator().startInterface(true);
@@ -154,7 +154,7 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 
 	@Override
 	public void interruptionPerformed() {
-		interrupt();
+		cancel(true);
 		tgInfoDialog.writeln("\nStopping test case generation.");
 		stop = true;
 		if (launcher != null) {
@@ -178,17 +178,7 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 		getMediator().setProof(originalProof);
 	}
 
-	/*
-	 * initiate the GUI stuff and relay to superclass
-	 */
-	@Override
-	public void start() {
-		//tgInfoDialog = new TGInfoDialog();
-		getMediator().stopInterface(true);
-		getMediator().setInteractive(false);
-		getMediator().addInterruptedListener(this);
-		super.start();
-	}
+	
 
 	private KeYMediator getMediator(){
 		return MainWindow.getInstance().getMediator();
