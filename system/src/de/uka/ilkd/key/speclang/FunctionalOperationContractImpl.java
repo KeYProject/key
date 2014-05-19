@@ -48,6 +48,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -1160,7 +1161,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
 
     @Override
-    public ProofOblInput createProofObl(InitConfig initConfig) {
+    public ContractPO createProofObl(InitConfig initConfig) {
         return new FunctionalOperationContractPO(initConfig, this);
     }
 

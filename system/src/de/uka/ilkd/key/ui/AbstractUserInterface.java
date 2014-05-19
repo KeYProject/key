@@ -41,6 +41,7 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class AbstractUserInterface implements UserInterface {
 
     protected ProofMacro autoMacro = new DummyProofMacro();
+    protected boolean saveOnly = false;
 
 	public void loadProblem(File file, List<File> classPath,
 	        File bootClassPath, KeYMediator mediator) {
@@ -51,11 +52,19 @@ public abstract class AbstractUserInterface implements UserInterface {
 	}
 
     @Override
-	public  IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
-    	app = forced? app.forceInstantiate(goal): app.tryToInstantiate(goal);
-		// cannot complete that app
-		return app.complete() ? app : null;
-	}
+    public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
+        app = forced? app.forceInstantiate(goal): app.tryToInstantiate(goal);
+        // cannot complete that app
+        return app.complete() ? app : null;
+    }
+
+    public void setSaveOnly(boolean s) {
+        this.saveOnly = s;
+    }
+
+    public boolean isSaveOnly() {
+        return this.saveOnly;
+    }
 
     public void setMacro(ProofMacro macro) {
         assert macro != null;
@@ -113,7 +122,11 @@ public abstract class AbstractUserInterface implements UserInterface {
        try {
           getMediator().stopInterface(true);
           loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile, getMediator());
-          loader.load(isRegisterProofs());
+          if (isSaveOnly()) {
+              loader.saveAll(isRegisterProofs());
+          } else {
+              loader.load(isRegisterProofs());
+          }
           return loader;
        }
        catch (ProblemLoaderException e) {

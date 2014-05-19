@@ -70,6 +70,9 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
          public void finished() {
              KeYMediator mediator = getMediator();
              UserInterface ui = mediator.getUI();
+             if (getMediator().getUI().isSaveOnly()) {
+                 System.exit(0);
+             }
              getMediator().startInterface(true);
              final Object msg = get();
              if (ptl != null) {
@@ -101,7 +104,11 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
       Throwable status = null;
       try {
          try {
-            status = load(true);
+             if (getMediator().getUI().isSaveOnly()) {
+                 saveAll(true);
+             } else {
+                 status = load(true);
+             }
          }
          catch (ExceptionHandlerException e) {
             // e.printStackTrace();

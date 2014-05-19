@@ -85,6 +85,10 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      */
     void loadProblem(File file, List<File> classPath, File bootClassPath);
 
+    void setSaveOnly(boolean s);
+
+    boolean isSaveOnly();
+
     void setMacro(ProofMacro macro);
 
     ProofMacro getMacro();

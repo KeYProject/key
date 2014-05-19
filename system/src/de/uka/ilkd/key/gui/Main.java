@@ -55,13 +55,14 @@ public final class Main {
     private static final String AUTOSAVE = "--autosave";
     private static final String EXPERIMENTAL = "--experimental";
     private static final String DEBUG = "--debug";
-    private static final String MACRO = "--macro";
     private static final String NO_DEBUG = "--no_debug";
     private static final String ASSERTION = "--assertion";
     private static final String NO_ASSERTION = "--no-assertion";
     private static final String NO_JMLSPECS = "--no-jmlspecs";
     public static final String JUSTIFY_RULES ="--justify-rules";
+    private static final String MACRO = "--macro";
     private static final String PRINT_STATISTICS ="--print-statistics";
+    private static final String SAVE_ALL_CONTRACTS = "--save-all";
     private static final String TIMEOUT ="--timeout";
     private static final String EXAMPLES = "--examples";
     public static final String JKEY_PREFIX = "--jr-";
@@ -150,6 +151,8 @@ public final class Main {
 
     private static ProofMacro autoMacro = new DummyProofMacro();
 
+    private static boolean saveAllContracts = false;
+
     /**
      * <p>
      * This flag indicates if the example chooser should be shown
@@ -197,6 +200,7 @@ public final class Main {
         if (Main.getFileNameOnStartUp() != null) {
             final File fnos = new File(Main.getFileNameOnStartUp());
             ui.setMacro(autoMacro);
+            ui.setSaveOnly(saveAllContracts);
             ui.loadProblem(fnos);
         } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
             ui.openExamples();
@@ -225,7 +229,9 @@ public final class Main {
         cl.addOption(VERBOSITY, "<number>", "verbosity (default: "+Verbosity.NORMAL+")");
         cl.addOption(NO_JMLSPECS, null, "disable parsing JML specifications");
         cl.addOption(EXAMPLES, "<directory>", "load the directory containing the example files on startup");
+        cl.addOption(MACRO, "<proofMacro>", "apply automatic proof macro");
         cl.addOption(PRINT_STATISTICS, "<filename>",  "output nr. of rule applications and time spent on proving");
+        cl.addOption(SAVE_ALL_CONTRACTS, null, "save all selected contracts for automatic execution");
         cl.addOption(TIMEOUT, "<timeout>", "timeout for each automatic proof of a problem in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +", i.e., no timeout)");
         cl.addSection("Options for justify rules:");
         cl.addOption(JUSTIFY_RULES, "<filename>", "autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument" );
@@ -240,7 +246,6 @@ public final class Main {
         cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "save or drop proofs (then stored to path given by "+ JPATH_OF_RESULT + ")");
         cl.addOption(JFILE_FOR_AXIOMS, "<filename>", "read axioms from given file");
         cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "read definitions from given file");
-        cl.addOption(MACRO, "<proofMacro>", "apply automatic proof macro");
         return cl;
     }
     /**
@@ -379,6 +384,10 @@ public final class Main {
             if (macro.equals("") || autoMacro instanceof DummyProofMacro) {
                 System.err.println("No automatic proof macro specified.");
             }
+        }
+
+        if (cl.isSet(SAVE_ALL_CONTRACTS)) {
+            saveAllContracts = true;
         }
 
         //arguments not assigned to a command line option may be files

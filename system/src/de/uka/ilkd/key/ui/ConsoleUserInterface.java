@@ -332,8 +332,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
    @Override
    public void saveProof(Proof proof) {
-       assert proof.name().equals(proofStack.head().name());
-       assert proof.name().equals((mediator.getSelectedProof().name()));
        if (batchMode.isLoadOnly()) {
            return;
        }

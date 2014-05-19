@@ -21,10 +21,16 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Properties;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
@@ -36,6 +42,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -168,6 +175,46 @@ public class DefaultProblemLoader {
       catch (Exception e) { // TODO give more specific exception message
          throw new ProblemLoaderException(this, e);
       }
+   }
+
+   public void saveAll(boolean registerProof) throws ProblemLoaderException {
+       ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
+       try {
+           envInput = createEnvInput();
+           problemInitializer = createProblemInitializer(registerProof);
+           initConfig = createInitConfig();
+           final SpecificationRepository specRepos =
+                   initConfig.getServices().getSpecificationRepository();
+           final UserInterface ui = getMediator().getUI();
+           final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
+           ImmutableSet<String> fileNames = DefaultImmutableSet.<String>nil();
+           for (File f: getFile().getParentFile().listFiles()) {
+               if (!f.isDirectory()) {
+                   fileNames = fileNames.add(f.getName().substring(0, f.getName().indexOf(".")));
+               }
+           }
+           for (KeYJavaType kjt: javaInfo.getAllKeYJavaTypes()) {
+               if (!fileNames.contains(kjt.getName())) {
+                   // skip
+               } else {
+                   for (IObserverFunction target: specRepos.getContractTargets(kjt)) {
+                       for (Contract c: specRepos.getContracts(kjt, target)) {
+                           ContractPO po = c.createProofObl(initConfig);
+                           po.readProblem();
+                           for (Proof p: po.getPO().getProofs()) {
+                               p.removeInfFlowProofSymbols();
+                               p.setProofEnv(initConfig.getProofEnv());
+                               ui.getMediator().getSelectionModel().setProof(p);
+                               specRepos.registerProof(po, p);
+                               ui.saveProof(p);
+                           }
+                       }
+                   }
+               }
+           }
+       } catch (Exception e) {
+           throw new ProblemLoaderException(this, e);
+       }
    }
 
    /**

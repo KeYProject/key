@@ -61,7 +61,6 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
-import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -457,6 +456,12 @@ public class Proof implements Named {
     }
     public ProofIndependentSettings getProofIndependentSettings(){
     	return pis;
+    }
+
+    public InfFlowProofSymbols removeInfFlowProofSymbols() {
+        InfFlowProofSymbols symbols = infFlowSymbols;
+        infFlowSymbols = new InfFlowProofSymbols();
+        return symbols;
     }
 
     public InfFlowProofSymbols getIFSymbols() {

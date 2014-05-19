@@ -75,7 +75,7 @@ public class ProofSaver {
    //protected IMain main;
    //protected KeYMediator mediator;
    final protected String filename;
-   final protected Proof proof;
+   protected Proof proof;
    final protected String internalVersion;
 
    LogicPrinter printer;
@@ -87,6 +87,10 @@ public class ProofSaver {
       this.proof = proof;//mediator.getSelectedProof();
       this.internalVersion = internalVersion;
       
+   }
+
+   public void setProof(Proof p) {
+       proof = p;
    }
 
    public StringBuffer writeLog(Proof p){
@@ -164,9 +168,9 @@ public class ProofSaver {
 
           //\problem or \proofObligation
           if(po instanceof IPersistablePO &&
-                  !(po instanceof InfFlowPO
-                          && (po instanceof InfFlowCompositePO
-                                  || !proof.getIFSymbols().isFreshContract()))) {
+                  (!(po instanceof InfFlowPO)
+                          || (!(po instanceof InfFlowCompositePO)
+                                  && proof.getIFSymbols().isFreshContract()))) {
               Properties properties = new Properties();
               ((IPersistablePO)po).fillSaveProperties(properties);
               StringWriter writer = new StringWriter();
