@@ -6,9 +6,150 @@
     Put descriptions for JavaDL function symbols in here.
 </comment>
 
-<entry key="seqLen">
+<entry key="heap">
+This program variable holds to the current heap state. Its type is Heap.
+</entry>
+
+<entry key="heap/wellformed">
+This predicate takes an argument of type Heap. It is true if the following conditions hold for its the argument:
+1. Every location contains a reference to a created (in this heap) object or null.
+2. Every location set stored on the heap contains only created objects.
+3. Every location belonging to a declared Java field holds a value compatible with its type.
+4. Only finitely many objects are created on the heap.
+</entry>
+
+<entry key="seq/seqLen">
 Return the length of a sequence.
 </entry>
 
+<entry key="seq/seqGet">
+Return the element at a position within a sequence. The type read from the sequence is part of the function name.
+</entry>
+
+<entry key="seq/seqIndexOf"> 
+Return the first index in a sequence that holds a value.
+</entry>
+
+<entry key="seq/seqGetOutside">
+The underspecified error value if a sequence is accessed outside its idnex range.
+</entry>
+    
+<entry key="seq/seqEmpty">
+The empty sequence
+</entry>
+
+<entry key="seq/seqSingleton">
+A singleton sequence that has the argument as only entry
+</entry>
+
+<entry key="seq/seqConcat">
+Concatenates two sequences
+</entry>
+
+<entry key="seq/seqSub">
+Takes a subsequence from a sequence. 
+The first argument is the original sequence,
+the second is the first index to consider (inclusive) and
+the third is the last index to consider (!exclusive!).
+</entry>
+
+<entry key="seq/seqReverse">
+Reverses a sequence. The result has the same entries as the argument but in reverse order.
+</entry>
+
+<entry key="seq/seqDef">
+This function binds an integer variable and evaluates an expression over this variable for a range of values to obtain the entries of a sequence.
+
+The sequence 
+  seqDef{int i;}(-2, 3, i*i)
+has, for instance, the entries
+  [ 4, 1, 0, 1, 4 ].
+
+The first and second argument give the range over which the variable goes. Again, the right-hand bound is exclusive.
+
+seqDef is related to the lambda operator in lambda calculus.
+</entry>
+
+<entry key="seq/seqSwap">tbd </entry>
+<entry key="seq/seqRemove">tbd</entry>
+<entry key="seq/seqNPermInv">tbd </entry>
+
+<entry key="seq/array2seq">tbd </entry>
+<entry key="pair/pair">tbd </entry>
+<entry key="pair/first">tbd</entry>
+<entry key="pair/second">tbd</entry>
+
+<entry key="exactInstance">
+A boolean function which is true iff the dynamic type of its argument is precisely the type which is part of the function name.
+</entry>
+
+<entry key="instance">
+A boolean function which is true iff the dynamic type of its argument is a subtype of the type which is part of the function name.
+</entry>
+
+<entry key="cast">
+cast
+</entry>
+
+<entry key="TODO">dd
+<![CDATA[TRUE
+FALSE
+    select/store
+    alpha alpha::select(Heap, Object, Field);
+    Heap store(Heap, Object, Field, any);
+    Heap create(Heap, Object);
+    Heap anon(Heap, LocSet, Heap);
+    Heap memset(Heap, LocSet, any);
+    
+    //fields
+    \unique Field arr(int);
+    \unique Field java.lang.Object::<transient>;
+    \unique Field java.lang.Object::<transactionConditionallyUpdated>;
+    \unique Field java.lang.Object::<created>;
+    \unique Field java.lang.Object::<initialized>;        
+    \unique Field alpha::<classPrepared>;    			//static
+    \unique Field alpha::<classInitialized>;			//static
+    \unique Field alpha::<classInitializationInProgress>;	//static
+    \unique Field alpha::<classErroneous>;			//static
+    
+    //array length
+    int length(Object);
+
+    //null
+    Null null; 
+    wellFormed(Heap);
+    arrayStoreValid(any, any);
+    nonNull(Heap,Object,int);
+                            java...
+inInt(int);
+
+\functions {
+    // unique function symbols 
+    \unique LocSet empty;
+    \unique LocSet allLocs;
+
+    // other constructors 
+    LocSet singleton(Object, Field);
+    LocSet union(LocSet, LocSet);
+    LocSet intersect(LocSet, LocSet);
+    LocSet setMinus(LocSet, LocSet);
+    LocSet infiniteUnion{true}(LocSet);
+    LocSet allFields(Object);
+    LocSet allObjects(Field);
+    LocSet arrayRange(Object, int, int);
+    LocSet freshLocs(Heap);
+    // work-a-round
+    LocSet allElementsOfArray(Heap, Object, LocSet);
+    LocSet allElementsOfArrayLocsets(Heap, Object, LocSet);
+}
+
+\predicates {
+    elementOf(Object, Field, LocSet);
+    subset(LocSet, LocSet);
+    disjoint(LocSet, LocSet);
+    createdInHeap(LocSet, Heap);
+}]]>
+
+</entry>
 </properties>
 

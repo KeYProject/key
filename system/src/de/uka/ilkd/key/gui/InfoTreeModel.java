@@ -15,7 +15,10 @@ package de.uka.ilkd.key.gui;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import javax.swing.tree.DefaultTreeModel;
 
@@ -28,7 +31,6 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.MiscTools;
-import java.util.Properties;
 
 public class InfoTreeModel extends DefaultTreeModel {
 
@@ -51,11 +53,27 @@ public class InfoTreeModel extends DefaultTreeModel {
         FunctionsNode(MainWindow mainWindow, Properties functionExplanations) {
             super("Function Symbols", "Display descriptions for documented function symbols.");
 
+            Map<String, InfoTreeNode> categoryMap = new HashMap<String, InfoTreeNode>();
+
             List<String> sortedKeys = new ArrayList<String>(functionExplanations.stringPropertyNames());
             java.util.Collections.sort(sortedKeys);
 
             for (String key : sortedKeys) {
-                insertAsLast(new InfoTreeNode(key, functionExplanations), this);
+                String[] parts = key.split("/", 2);
+                if(parts.length == 1) {
+                    // no "/"
+                    insertAsLast(new InfoTreeNode(key, functionExplanations), this);
+                } else {
+                    String category = parts[0];
+                    InfoTreeNode categoryNode = categoryMap.get(category);
+                    if(categoryNode == null) {
+                        categoryNode = new InfoTreeNode(category, "This collects a category of symbols.");
+                        categoryMap.put(category, categoryNode);
+                        insertAsLast(categoryNode, this);
+                    }
+                    String description = functionExplanations.getProperty(key);
+                    insertAsLast(new InfoTreeNode(parts[1], description), categoryNode);
+                }
             }
         }
     }

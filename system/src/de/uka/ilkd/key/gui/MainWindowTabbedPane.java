@@ -71,7 +71,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
         // set ruleView
         infoView = new InfoView(mediator, mainWindow);
         addTab("Info", null, infoView,
-                "Taclet and term label descriptions");
+                "Documentation on taclets and symbols");
 
         setSelectedIndex(0);
         setPreferredSize(new java.awt.Dimension(250, 440));
