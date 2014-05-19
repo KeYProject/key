@@ -85,7 +85,8 @@ public abstract class AbstractSEDAnnotation extends Bean implements ISEDAnnotati
    public void addLink(ISEDAnnotationLink link) {
       if (link != null) {
          Assert.isTrue(link.getTarget().getDebugTarget().isRegistered(this), "Annotation is not registered in debug target.");
-         if (links.add(link)) {
+         if (!links.contains(link)) {
+            links.add(link);
             link.getTarget().addAnnotationLink(link);
             fireAnnotationLinkAdded(new SEDAnnotationLinkEvent(this, link));
          }
