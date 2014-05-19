@@ -21,7 +21,6 @@ import javax.swing.tree.DefaultTreeModel;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -64,7 +63,7 @@ public class InfoTreeModel extends DefaultTreeModel {
     private class TermLabelsNode extends InfoTreeNode {
 
         TermLabelsNode(MainWindow mainWindow, Properties termLabelExplanations) {
-            super("Term Labels", "Get descriptions for currently available term labels.");
+            super("Term Labels", "Show descriptions for currently available term labels.");
 
             List<Name> labelNames = mainWindow.getSortedTermLabelNames();
             for (Name name : labelNames) {
@@ -129,9 +128,7 @@ public class InfoTreeModel extends DefaultTreeModel {
         private void insertAndGroup(InfoTreeNode ins, InfoTreeNode parent, Properties ruleExplanations) {
             InfoTreeNode insNode = (InfoTreeNode) ins;
             if (parent.getChildCount() > 0) {
-                InfoTreeNode lastNode
-                        = (InfoTreeNode) parent.getChildAt(
-                                parent.getChildCount() - 1);
+                InfoTreeNode lastNode = (InfoTreeNode) parent.getChildAt(parent.getChildCount() - 1);
                 if (getName(insNode).equals(getName(lastNode))) {
                     if (lastNode.getChildCount() == 0) {
                         removeNodeFromParent(lastNode);
@@ -151,7 +148,15 @@ public class InfoTreeModel extends DefaultTreeModel {
             if (t1.getUserObject() instanceof Taclet) {
                 return ((Taclet) t1.getUserObject()).displayName();
             } else {
-                return t1.toString();
+                String title = t1.toString();
+
+                // strip number of taclets
+                int parenIdx = title.lastIndexOf("(");
+                if (parenIdx >= 0) {
+                    return title.substring(0, parenIdx - 1).intern();
+                } else {
+                    return title;
+                }
             }
         }
 
