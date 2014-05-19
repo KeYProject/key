@@ -1006,6 +1006,12 @@ public class Proof implements Named {
 	return result.toString();
     }
 
+    /**
+     * Instances of this class encapsulate statistical information about proofs,
+     * such as the number of nodes, or the number of interactions.
+     * @author bruns
+     *
+     */
     public final static class Statistics {
         public final int nodes;
         public final int branches;
@@ -1027,16 +1033,16 @@ public class Proof implements Named {
         private Statistics(Proof proof) {
             final Iterator<Node> it = proof.root().subtreeIterator();
 
-            int tmpNodes = 0;
-            int tmpBranches = 1;
-            int tmpInteractive = 0;
-            int tmpQuant = 0;
-            int tmpOss = 0;
-            int tmpOssCaptured = 0;
-            int tmpSmt = 0;
-            int tmpDep = 0;
-            int tmpContr = 0;
-            int tmpInv = 0;
+            int tmpNodes = 0; // proof nodes
+            int tmpBranches = 1; // proof branches
+            int tmpInteractive = 0; // interactive steps
+            int tmpQuant = 0; // quantifier instantiations
+            int tmpOss = 0; // OSS applications
+            int tmpOssCaptured = 0; // rules apps in OSS protocol
+            int tmpSmt = 0; // SMT rule apps
+            int tmpDep = 0; // dependency contract apps
+            int tmpContr = 0; // functional contract apps
+            int tmpInv = 0; // loop invariants
 
             while (it.hasNext()) {
                 tmpNodes++;
@@ -1071,7 +1077,7 @@ public class Proof implements Named {
                     } else if (ruleApp instanceof TacletApp) {
                         final de.uka.ilkd.key.rule.Taclet t = ((TacletApp)ruleApp).taclet();
                         final String tName = t.name().toString();
-                        if (tName.startsWith("allLeft") || tName.startsWith("exRight")) {
+                        if (tName.startsWith("allLeft") || tName.startsWith("exRight") || tName.startsWith("inst")) {
                             tmpQuant++;
                         }
                     }
