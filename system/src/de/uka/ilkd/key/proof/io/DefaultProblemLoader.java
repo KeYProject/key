@@ -13,10 +13,13 @@
 
 package de.uka.ilkd.key.proof.io;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Properties;
@@ -35,6 +38,7 @@ import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.init.InfFlowPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -177,6 +181,29 @@ public class DefaultProblemLoader {
       }
    }
 
+   private File chooseFile(ContractPO po) {
+       final String fName;
+       if (po instanceof InfFlowPO) {
+           fName = "automaticMacroInfFlow.txt";
+       } else {
+           fName = "automaticInfFlow.txt";
+       }
+       return new File("examples/index/", fName);
+   }
+
+   private void writeToFile(String path, File file) {
+       String examplesPath = "examples/";
+       String prefix = path.contains("insecure") ? "notprovable: " : "provable: ";
+       path = "./" + path.substring(path.indexOf(examplesPath) + examplesPath.length());
+       try {
+           PrintWriter w = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
+           w.println(prefix + path);
+           w.close();
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+   }
+
    public void saveAll(boolean registerProof) throws ProblemLoaderException {
        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
        try {
@@ -188,8 +215,9 @@ public class DefaultProblemLoader {
            final UserInterface ui = getMediator().getUI();
            final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
            ImmutableSet<String> fileNames = DefaultImmutableSet.<String>nil();
-           for (File f: getFile().getParentFile().listFiles()) {
-               if (!f.isDirectory()) {
+           File dir = getFile().isDirectory() ? getFile() : getFile().getParentFile();
+           for (File f: dir.listFiles()) {
+               if (!f.isDirectory() && f.getName().endsWith(".java")) {
                    fileNames = fileNames.add(f.getName().substring(0, f.getName().indexOf(".")));
                }
            }
@@ -199,14 +227,16 @@ public class DefaultProblemLoader {
                } else {
                    for (IObserverFunction target: specRepos.getContractTargets(kjt)) {
                        for (Contract c: specRepos.getContracts(kjt, target)) {
-                           ContractPO po = c.createProofObl(initConfig);
+                           final ContractPO po = c.createProofObl(initConfig);
                            po.readProblem();
                            for (Proof p: po.getPO().getProofs()) {
                                p.removeInfFlowProofSymbols();
                                p.setProofEnv(initConfig.getProofEnv());
                                ui.getMediator().getSelectionModel().setProof(p);
                                specRepos.registerProof(po, p);
-                               ui.saveProof(p);
+                               final File poFile = ui.saveProof(p, ".key");
+                               final String path = poFile.getPath();
+                               writeToFile(path, chooseFile(po));
                            }
                        }
                    }

@@ -200,5 +200,5 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      */
     void removeProof(Proof proof);
 
-    void saveProof(Proof proof);
+    File saveProof(Proof proof, String fileExtension);
 }

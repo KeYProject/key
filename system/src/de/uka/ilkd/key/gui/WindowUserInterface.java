@@ -312,16 +312,18 @@ public class WindowUserInterface extends AbstractUserInterface {
     }
 
     @Override
-    public void saveProof(Proof proof) {
+    public File saveProof(Proof proof, String fileExtension) {
         final MainWindow mainWindow = MainWindow.getInstance();
         final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
         final String defaultName = MiscTools.toValidFileName(proof.name().toString()).toString();
         boolean autoSave = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave();
         final Pair<Boolean, Pair<File, Boolean>> res =
-                jFC.showSaveDialog(mainWindow, defaultName + ".proof", autoSave);
+                jFC.showSaveDialog(mainWindow, defaultName + fileExtension, autoSave);
         final boolean saved = res.first;
         final boolean newDir = res.second.second;
+        File file = null;
         if (saved) {
+            file = jFC.getSelectedFile();
             mainWindow.saveProof(jFC.getSelectedFile());
         } else if (newDir) {
             final File dir = res.second.first;
@@ -330,6 +332,7 @@ public class WindowUserInterface extends AbstractUserInterface {
             }
         }
         jFC.resetPath();
+        return file;
     }
 
     /**

@@ -71,6 +71,7 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
              KeYMediator mediator = getMediator();
              UserInterface ui = mediator.getUI();
              if (getMediator().getUI().isSaveOnly()) {
+                 System.out.println("Saving completed.");
                  System.exit(0);
              }
              getMediator().startInterface(true);

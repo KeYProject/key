@@ -331,12 +331,12 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    }
 
    @Override
-   public void saveProof(Proof proof) {
+   public File saveProof(Proof proof, String fileExtension) {
        if (batchMode.isLoadOnly()) {
-           return;
+           return null;
        }
        final String defaultName =
-               MiscTools.toValidFileName(proof.name().toString()).toString() + ".proof";
+               MiscTools.toValidFileName(proof.name().toString()).toString() + fileExtension;
        File file = new File((new File (Main.getFileNameOnStartUp())).getParent(), defaultName);
        boolean proofFolderActive = ProofIndependentSettings.DEFAULT_INSTANCE
                         .getGeneralSettings().storesInDefaultProofFolder();
@@ -356,6 +356,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        } catch (Exception e) {
            e.printStackTrace();
        }
+       return file;
    }
 
    /**
