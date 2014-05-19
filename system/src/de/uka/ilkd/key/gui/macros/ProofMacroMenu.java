@@ -12,15 +12,10 @@
 // 
 package de.uka.ilkd.key.gui.macros;
 
-import de.uka.ilkd.key.gui.InterruptListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ServiceLoader;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-
+import javax.swing.*;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 
@@ -119,5 +114,4 @@ public class ProofMacroMenu extends JMenu {
     public boolean isEmpty() {
         return numberOfMacros == 0;
     }
-
 }

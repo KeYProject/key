@@ -10,37 +10,19 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.swing.Icon;
-import javax.swing.JOptionPane;
-
-import de.uka.ilkd.key.gui.AutoModeListener;
-import de.uka.ilkd.key.gui.IconFactory;
-import de.uka.ilkd.key.gui.InterruptListener;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.KeYSelectionEvent;
-import de.uka.ilkd.key.gui.KeYSelectionListener;
-import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.SingleProof;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.util.Debug;
 import javax.swing.SwingWorker;
 
@@ -67,7 +49,7 @@ public class CounterExampleAction extends MainWindowAction {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
                 final Proof proof = getMediator().getSelectedProof();
-                                        
+
                 if (proof == null) {
                     // no proof loaded
                     setEnabled(false);
