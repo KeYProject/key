@@ -49,7 +49,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
     private final BatchMode batchMode;
     private final byte verbosity;
-	private ProofStarter ps;
 	private KeYMediator mediator;
 	private boolean autoMode;
 
@@ -119,9 +118,9 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             // has to be notified that we work in auto mode (CS)
             mediator.setInteractive(false);
 
-            final Object result = ps.start();
-            if (verbosity >= HIGH) {
-            	System.out.println(result);
+            startAndWaitForAutoMode(proof);
+            if (verbosity >= HIGH) { // WARNING: Is never executed since application terminates via System.exit() before.
+            	System.out.println(proof.statistics());
             }
         }
     }
@@ -146,8 +145,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             ProofAggregate proofAggregate) {
         // TODO Implement ProblemInitializerListener.proofCreated
         // XXX WHY AT THE MAINWINDOW?!?!
-    	ps = new ProofStarter(this, mediator.getAutoSaver() != null);
-        ps.init(proofAggregate);
         mediator.setProof(proofAggregate.getFirstProof());
     }
 
