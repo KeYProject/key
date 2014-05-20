@@ -207,6 +207,28 @@ public class DefaultProblemLoader {
        }
    }
 
+   private ImmutableSet<String> getFileNames(File file) {
+       ImmutableSet<String> result = DefaultImmutableSet.<String>nil();
+       boolean foundValidJavaFiles = false;
+       if (file.isDirectory()) {
+           for (File f: file.listFiles()) {
+               if (!f.isDirectory() && f.getName().endsWith(".java")) {
+                   foundValidJavaFiles = true;
+                   result = result.add(f.getName().substring(0, f.getName().indexOf(".")));
+               }
+           }
+       } else if (file.getName().endsWith(".java")) {
+           foundValidJavaFiles = true;
+           result = result.add(getFile().getName()
+                   .substring(0, getFile().getName().indexOf(".")));
+       }
+       if (!foundValidJavaFiles) {
+           throw new IllegalArgumentException(
+                   "Specified file is no valid directory or java-file!");
+       }
+       return result;
+   }
+
    public void saveAll(boolean registerProof) throws ProblemLoaderException {
        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
        try {
@@ -217,13 +239,7 @@ public class DefaultProblemLoader {
                    initConfig.getServices().getSpecificationRepository();
            final UserInterface ui = getMediator().getUI();
            final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
-           ImmutableSet<String> fileNames = DefaultImmutableSet.<String>nil();
-           File dir = getFile().isDirectory() ? getFile() : getFile().getParentFile();
-           for (File f: dir.listFiles()) {
-               if (!f.isDirectory() && f.getName().endsWith(".java")) {
-                   fileNames = fileNames.add(f.getName().substring(0, f.getName().indexOf(".")));
-               }
-           }
+           ImmutableSet<String> fileNames = getFileNames(getFile());
            for (KeYJavaType kjt: javaInfo.getAllKeYJavaTypes()) {
                if (!fileNames.contains(kjt.getName())) {
                    // skip
