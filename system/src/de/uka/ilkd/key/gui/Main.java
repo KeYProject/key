@@ -45,6 +45,7 @@ public final class Main {
  * Command line options
  */
     private static final String HELP = "--help";
+    private static final String SHOW_PROPERTIES = "--show-properties";
     private static final String AUTO = "--auto";
     private static final String LAST = "--last";
     private static final String AUTO_LOADONLY = "--auto-loadonly";
@@ -101,6 +102,7 @@ public final class Main {
             +" Copyright 2001"+UnicodeHelper.ENDASH+"2013 "
             +"Karlsruhe Institute of Technology, "
             +"Chalmers University of Technology, and Technische Universit\u00e4t Darmstadt";
+    
 
     /** Level of verbosity for command line outputs. */
     private static byte verbosity = Verbosity.NORMAL;
@@ -196,6 +198,7 @@ public final class Main {
             ui.openExamples();
         }
     }
+    
 
     /**
      * Register commandline options with command line object
@@ -209,6 +212,7 @@ public final class Main {
         cl.addSection("Options for the KeY-Prover");
         cl.addOption(HELP, null, "display this text");
         cl.addTextPart("--K-help", "display help for technical/debug parameters\n", true);
+        cl.addOption(SHOW_PROPERTIES, null, "list all Java properties and exit");
         cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
         cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
@@ -255,6 +259,17 @@ public final class Main {
 
         if (verbosity > Verbosity.SILENT) {
             printHeader();
+        }
+        
+        if (cl.isSet(SHOW_PROPERTIES)) {
+            try {
+                java.util.Properties props = System.getProperties();
+                for (Object o: props.keySet()) {
+                    System.out.println(""+o+"=\""+props.get(o)+"\"");
+                }
+            } finally {
+                System.exit(0);
+            }
         }
 
         if(cl.isSet(AUTO)){
