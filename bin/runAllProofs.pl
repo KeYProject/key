@@ -94,7 +94,7 @@ open (AUTOMATIC, $testFile) or die $testFile . " couldn't be opened.";
 close AUTOMATIC;
 
 my $counter = 0;
-my $total = trim(`grep provable "$path_to_index" | grep -v "\#" | wc -l`);
+my $total = trim(`grep provable "$testFile" | grep -v "\#" | wc -l`);
 my $correct = 0;
 my $failures = 0;
 my $errors = 0;
