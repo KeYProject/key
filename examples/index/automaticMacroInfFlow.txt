@@ -14,7 +14,7 @@
 # It is used by bin/runAllProofs.pl.
 #
 
-# # Test for information flow
+# # Test for information flow to be executed with information flow proof macro "FullInformationFlowAutoPilotMacro"
 
 
 # End -- please do not remove this line.
