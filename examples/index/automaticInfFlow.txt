@@ -36,7 +36,7 @@ provable: ./information_flow/collection/banking_example.BankAccount(banking_exam
 provable: ./information_flow/collection/banking_example.Bank(banking_example.Bank__login(int,(C)).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/banking_example2.UserAccount(banking_example2.UserAccount__getBankAccount(int)).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/banking_example2.UserAccount(banking_example2.UserAccount__tryLogin(int,(C)).JML normal_behavior operation contract.0.key
-provable: ./information_flow/collection/banking_example2.UserAccount(java.lang.Object___inv_()).JML accessible clause.0.key
+notprovable: ./information_flow/collection/banking_example2.UserAccount(java.lang.Object___inv_()).JML accessible clause.0.key
 provable: ./information_flow/collection/banking_example2.BankAccount(banking_example2.BankAccount__depositMoney(int)).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/banking_example2.BankAccount(banking_example2.BankAccount__getBalance()).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/banking_example2.BankAccount(banking_example2.BankAccount__getId()).JML normal_behavior operation contract.0.key
@@ -89,7 +89,7 @@ provable: ./information_flow/collection/loop.IFLoopExamples(loop.IFLoopExamples_
 provable: ./information_flow/collection/loop.IFLoopExamples(loop.IFLoopExamples__secure_nestedTwoWhile(int)).JML operation contract.0.key
 provable: ./information_flow/collection/loop.IFLoopExamples(loop.IFLoopExamples__secure_nestedWhile(int)).JML operation contract.0.key
 provable: ./information_flow/collection/loop.IFLoopExamples(loop.IFLoopExamples__notSecure_while(int)).JML operation contract.0.key
-provable: ./information_flow/collection/loop.IFLoopExamples(loop.IFLoopExamples__notSecure_while_wrongInv(int)).JML operation contract.0.key
+notprovable: ./information_flow/collection/loop.IFLoopExamples(loop.IFLoopExamples__notSecure_while_wrongInv(int)).JML operation contract.0.key
 provable: ./information_flow/collection/loop.IFLoopExamples(loop.IFLoopExamples__insecure_twoWhile(int)).JML operation contract.0.key
 provable: ./information_flow/collection/loop.IFLoopExamples(loop.IFLoopExamples__insecure_twoWhile_2(int)).JML operation contract.0.key
 provable: ./information_flow/collection/loop.IFLoopExamples(loop.IFLoopExamples__secure_twoWhile(int)).JML operation contract.0.key
@@ -148,13 +148,13 @@ provable: ./information_flow/collection/object.ObjectOrientation(object.ObjectOr
 provable: ./information_flow/collection/object.AmtoftBanerjee2(object.AmtoftBanerjee2__expensive(int)).JML accessible clause.0.key
 provable: ./information_flow/collection/object.AmtoftBanerjee2(object.AmtoftBanerjee2__expensive(int)).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/object.AmtoftBanerjee2(object.AmtoftBanerjee2__cexp(int)).JML normal_behavior operation contract.0.key
-provable: ./information_flow/collection/passwordfile.SecurePasswordFile(passwordfile.SecurePasswordFile___userIndex()).JML accessible clause.0.key
+notprovable: ./information_flow/collection/passwordfile.SecurePasswordFile(passwordfile.SecurePasswordFile___userIndex()).JML accessible clause.0.key
 provable: ./information_flow/collection/simple_evoting.Environment(simple_evoting.Environment__untrustedOutputMessage((B)).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage((B)).JML normal_behavior operation contract.0.key
-provable: ./information_flow/collection/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage()).JML normal_behavior operation contract.0.key
+# provable: ./information_flow/collection/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage()).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/simple_evoting.Environment(simple_evoting.Environment__untrustedOutput(int)).JML normal_behavior operation contract.0.key
-provable: ./information_flow/collection/simple_evoting.Environment(simple_evoting.Environment__untrustedInput(int)).JML normal_behavior operation contract.0.key
-provable: ./information_flow/collection/simple_evoting.Environment(simple_evoting.Environment__untrustedInput()).JML normal_behavior operation contract.0.key
+notprovable: ./information_flow/collection/simple_evoting.Environment(simple_evoting.Environment__untrustedInput(int)).JML normal_behavior operation contract.0.key
+notprovable: ./information_flow/collection/simple_evoting.Environment(simple_evoting.Environment__untrustedInput()).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/simple_evoting.Environment(simple_evoting.Environment___rep()).JML accessible clause.0.key
 provable: ./information_flow/collection/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).JML normal_behavior operation contract.1.key
 provable: ./information_flow/collection/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).JML normal_behavior operation contract.0.key
@@ -168,7 +168,7 @@ provable: ./information_flow/collection/simple_evoting.Server(java.lang.Object__
 provable: ./information_flow/collection/simple_evoting.SMTEnv(simple_evoting.SMTEnv__send(int,int,int,simple_evoting.Server,int)).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/simple_evoting.NetworkClient(simple_evoting.NetworkClient__send((B,simple_evoting.Server,int)).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/simple_evoting.Setup(simple_evoting.Setup__publishResult()).JML normal_behavior operation contract.0.key
-provable: ./information_flow/collection/simple_evoting.Setup(simple_evoting.Setup__main()).JML normal_behavior operation contract.0.key
+notprovable: ./information_flow/collection/simple_evoting.Setup(simple_evoting.Setup__main()).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/simple_evoting.Setup(java.lang.Object___inv_()).JML accessible clause.0.key
 provable: ./information_flow/collection/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).JML normal_behavior operation contract.1.key
 provable: ./information_flow/collection/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).JML normal_behavior operation contract.0.key
