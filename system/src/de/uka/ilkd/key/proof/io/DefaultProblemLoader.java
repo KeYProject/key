@@ -112,6 +112,10 @@ public class DefaultProblemLoader {
     */
    private Proof proof;
 
+   private static String INDEX_FILE = "automaticInfFlow.txt";
+
+   private static String IF_INDEX_FILE = "automaticMacroInfFlow.txt";
+
    /**
     * Constructor.
     * @param file The file or folder to load.
@@ -184,9 +188,9 @@ public class DefaultProblemLoader {
    private File chooseFile(ContractPO po) {
        final String fName;
        if (po instanceof InfFlowPO) {
-           fName = "automaticMacroInfFlow.txt";
+           fName = IF_INDEX_FILE;
        } else {
-           fName = "automaticInfFlow.txt";
+           fName = INDEX_FILE;
        }
        return new File("examples/index/", fName);
    }
@@ -194,7 +198,9 @@ public class DefaultProblemLoader {
    private void writeToFile(String path, File file) {
        String examplesPath = "examples/";
        boolean inExampleDir = 0 <= path.indexOf(examplesPath);
-       String prefix = path.contains("insecure") ? "notprovable: " : "provable: ";
+       String prefix =
+               file.getName().endsWith(IF_INDEX_FILE) && path.contains("insecure") ?
+                       "notprovable: " : "provable: ";
        path = "./" +
                (inExampleDir ?
                        path.substring(path.indexOf(examplesPath) + examplesPath.length()) : path);
