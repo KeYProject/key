@@ -51,14 +51,6 @@ lexer grammar KeYLexer;
         public int marker;
     }
 
-    /*
-        Not sure what this is intended for. A rule description is pushed on
-        this for each entered lexer rule and removed when the rule is left.
-        I think this can be removed.
-        (Kai Wallisch May 2014)
-    */
-    Stack<String> paraphrase = new Stack<String>();
-
     protected KeYExceptionHandler keh = new KeYRecoderExcHandler();
     protected Stack<SaveStruct> selector;
 
@@ -381,208 +373,140 @@ VOCAB
    ;
 
 SEMI
-@init { paraphrase.push("`;'"); }
-@after { paraphrase.pop(); }
 :	';'
     ;
 
 SLASH
-@init { paraphrase.push("`/'"); }
-@after { paraphrase.pop(); }
 :	'/'
     ;
 
 COLON
-    @init { paraphrase.push("`:'"); }
-@after { paraphrase.pop(); }
 :    ':'
     ;
 
 DOUBLECOLON
-@init { paraphrase.push("Double `:'"); }
-@after { paraphrase.pop(); }
 :    '::'
   ;
 
 ASSIGN
-    @init { paraphrase.push("`:='"); }
-@after { paraphrase.pop(); }
 :    ':='
     ;
 
 DOT
-@init { paraphrase.push("`.'"); }
-@after { paraphrase.pop(); }
 :	'.'
 	;
 
 DOTRANGE
-@init { paraphrase.push("`..'"); }
-@after { paraphrase.pop(); }
 :	'.' '.'
 	;
 
 COMMA
-@init { paraphrase.push("`,'"); }
-@after { paraphrase.pop(); }
 :	','
 	;
 
 LPAREN
-@init { paraphrase.push("`('"); }
-@after { paraphrase.pop(); }
 :
 	'('
 	;
 
 RPAREN
-@init { paraphrase.push("`)'"); }
-@after { paraphrase.pop(); }
 :	')'
     ;
 
 LBRACE
-@init { paraphrase.push("`{'"); }
-	@after { paraphrase.pop(); }
 :	'{'
 	;
 
 RBRACE
-@init { paraphrase.push("`}'"); }
-@after { paraphrase.pop(); }
 :	'}'
     ;
 
 LBRACKET
-@init { paraphrase.push("`['"); }
-@after { paraphrase.pop(); }
 :	'['
     ;
 
 RBRACKET
-@init { paraphrase.push("`]'"); }
-@after { paraphrase.pop(); }
 :	']'
 	;
 
 EMPTYBRACKETS
-@init { paraphrase.push("a pair of empty brackets []"); }
-@after { paraphrase.pop(); }
 :	'[' ']'
 	;
 
 AT
-@init { paraphrase.push("`at'"); }
-@after { paraphrase.pop(); }
 :	'@'
 	;
 
 PARALLEL
-@init { paraphrase.push("`parallel'"); }
-@after { paraphrase.pop(); }
 :     '|' '|'
 	;
 
 
 OR
-@init { paraphrase.push("`|'"); }
-@after { paraphrase.pop(); }
 :	'|' | '\u2228'
 	;
 
 AND
-@init { paraphrase.push("`&'"); }
-@after { paraphrase.pop(); }
 :	'&' | '\u2227'
 	;
 
 NOT
-@init { paraphrase.push("`!'"); }
-@after { paraphrase.pop(); }
 :	'!' | '\u00AC'
 	;
 
 IMP
-@init { paraphrase.push("`->'"); }
-@after { paraphrase.pop(); }
 :	'->' | '\u2192'
 	;
 
 EQUALS
-@init { paraphrase.push("`='"); }
-	@after { paraphrase.pop(); }
 :	'='
 	;
 
 NOT_EQUALS
-@init { paraphrase.push("`!='"); }
-	@after { paraphrase.pop(); }
 :	'!=' | '\u2260'
 	;
 
 SEQARROW
-@init { paraphrase.push("`==>'"); }
-	@after { paraphrase.pop(); }
 :	'==>'
 	;
 
 EXP
-@init { paraphrase.push("'^'"); }
-	@after { paraphrase.pop(); }
 :	'^'
 	;
 
 TILDE
-@init { paraphrase.push("'~'"); }
-	@after { paraphrase.pop(); }
 :	'~'
 	;
 
 PERCENT
-@init { paraphrase.push("`\%'"); }
-@after { paraphrase.pop(); }
 :   '%'
       ;
 
 STAR
-@init { paraphrase.push("`*'"); }
-@after { paraphrase.pop(); }
 :   '*'
       ;
 
 MINUS
-@init { paraphrase.push("`-'"); }
-@after { paraphrase.pop(); }
 :   '-'
       ;
 
 PLUS
-@init { paraphrase.push("`+'"); }
-@after { paraphrase.pop(); }
 :   '+'
       ;
 
 GREATER
-@init { paraphrase.push("`>'"); }
-@after { paraphrase.pop(); }
 :   '>'
       ;
 
 GREATEREQUAL
-@init { paraphrase.push("`>='"); }
-@after { paraphrase.pop(); }
 :   '>' '=' | '\u2265'
       ;
 
 RGUILLEMETS
-@init { paraphrase.push("`>>'"); }
-@after { paraphrase.pop(); }
       :   '>' '>'
       ;
       
 WS
-@init { paraphrase.push("whitespace"); }
-@after { paraphrase.pop(); }
 :       (' '
       |       '\t'
       |       '\n'  { newline(); }
@@ -591,8 +515,8 @@ WS
       ;
 
 STRING_LITERAL
-@init { paraphrase.push("a string in double quotes"); StringBuilder _literal = new StringBuilder(); }
-@after { paraphrase.pop(); setText('"' + _literal.toString() + '"'); }
+@init {StringBuilder _literal = new StringBuilder(); }
+@after {setText('"' + _literal.toString() + '"'); }
 : '"' (  ESC { _literal.append(getText()); }
        | newline='\n' { newline(); _literal.appendCodePoint(newline); }
        | normal=~('\n' | '"' | '\\' | '\uFFFF') { _literal.appendCodePoint(normal); }
@@ -601,7 +525,6 @@ STRING_LITERAL
 
 
 LESS_DISPATCH
-@after { paraphrase.pop(); }
 :
      ('<' (LETTER)+ '>') => IMPLICIT_IDENT {$type = IDENT;}
     |
@@ -615,42 +538,31 @@ LESS_DISPATCH
     ;
 
 fragment LESS
-@init { paraphrase.push("'<'"); }
-@after { paraphrase.pop(); }
 :
   '<'
 ;
 
 fragment LESSEQUAL
-@init { paraphrase.push("'<='"); }
-@after { paraphrase.pop(); }
 :
   '<' '=' | '\u2264'
     ;
 
 fragment LGUILLEMETS
-@init { paraphrase.push("'<<'"); }
-@after { paraphrase.pop(); }
 :
   '<' '<'
     ;
 
 
 fragment IMPLICIT_IDENT
-@init { paraphrase.push("an implicit identifier (letters only)"); }
-@after { paraphrase.pop(); }
 :
   '<' (LETTER)+ '>'
 ;
 
 fragment EQV
-@init { paraphrase.push("`<->'"); }
-@after { paraphrase.pop(); }
 :	'<->' | '\u2194'
 ;
 
 PRIMES_OR_CHARLITERAL
-@after { paraphrase.pop(); }
 :
      ('\'' '\'') => PRIMES {$type = PRIMES;}
     |
@@ -664,15 +576,11 @@ PRIMES_OR_CHARLITERAL
 
 fragment
 PRIMES
-@init { paraphrase.push("Sequence of primes (at least one)"); }
-	@after { paraphrase.pop(); }
 :	('\'')+
 	;
 
 fragment
 CHAR_LITERAL
-@init { paraphrase.push("a char in single quotes"); }
-@after { paraphrase.pop(); }
 : '\''
                 ((' '..'&') |
                  ('('..'[') |
@@ -684,7 +592,6 @@ CHAR_LITERAL
 
 fragment
 ESC
-@after { paraphrase.pop(); }
 :	'\\'
     (	'n'         { setText("\n"); }
 	|	'r' { setText("\r"); }
@@ -701,12 +608,9 @@ ESC
 
 fragment
 QUOTED_STRING_LITERAL
-@init { paraphrase.push("a string with double quotes"); }
     : '"' ('\\' . | '\n' {newline();} | ~('\n' | '"' | '\\') )* '"' ;
 
 SL_COMMENT
-@init { paraphrase.push("a comment"); }
-@after { paraphrase.pop(); }
 :
 	'//'
 	(~('\n' | '\uFFFF'))* ('\n' | '\uFFFF' | EOF)
@@ -714,8 +618,6 @@ SL_COMMENT
 	;
 
 ML_COMMENT
-@init { paraphrase.push("a comment"); }
-@after { paraphrase.pop(); }
 :
 	'/*' {
 	  
@@ -749,7 +651,6 @@ ML_COMMENT
 // A single Digit that is followed by a ( is an ident, otherwise it's a number
 
 DIGIT_DISPATCH
-@after { paraphrase.pop(); }
 :
     (DIGIT (' ' | '\t' | '\r' | '\n')* LPAREN) => DIGIT {$type = IDENT;}
   | ('0' 'x') => HEX_LITERAL {$type = NUM_LITERAL;}
@@ -758,23 +659,17 @@ DIGIT_DISPATCH
 
 fragment
 HEX_LITERAL
-@init { paraphrase.push("a hexadeciaml constant"); }
-	@after { paraphrase.pop(); }
 : '0' 'x' (DIGIT | 'a'..'f' | 'A'..'F')+
 	;
 
 fragment
 DIGIT
-@init { paraphrase.push("a digit"); }
-	@after { paraphrase.pop(); }
 :	'0'..'9'
 	;
 
 
 fragment
 HEX
-@init { paraphrase.push("a hexadeciamal number"); }
-@after { paraphrase.pop(); }
 :	('a'..'f'|'A'..'F'|DIGIT )
 	('a'..'f'|'A'..'F'|DIGIT )
 	('a'..'f'|'A'..'F'|DIGIT )
@@ -783,32 +678,21 @@ HEX
 
 fragment
 LETTER
-@init { paraphrase.push("a letter"); }
-@after { paraphrase.pop(); }
 :	'a'..'z'|'A'..'Z'
     ;
 
 
 fragment IDCHAR
-@init { paraphrase.push("an admissible character for identifiers"); }
-	@after { paraphrase.pop(); }
 : LETTER | DIGIT | '_' | '#' | '$'
 	;
 
 IDENT
-@init {
-    paraphrase.push("an identifer");
-}
-
-@after { paraphrase.pop(); }
 :  ( (LETTER | '_' | '#' | '$') (IDCHAR)*
     )
 ;
 
 fragment
 NUM_LITERAL
-@init { paraphrase.push("a number"); }
-@after { paraphrase.pop(); }
 :
     (DIGIT)+
     ;
@@ -820,10 +704,8 @@ NUM_LITERAL
   */
 MODALITY
 @init {
-    paraphrase.push("All possible modalities, including schema.");
     int _begin = getText().length();
 }
-@after { paraphrase.pop(); }
 :	'\\' ( (LETTER | '_')+ | '<' | '[' | '[[') {
     modalityBegin = getText();
     Debug.out("modalityBegin == ", modalityBegin);
