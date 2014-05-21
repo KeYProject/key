@@ -130,13 +130,6 @@ lexer grammar KeYLexer;
       modPairs.put("\\throughout_transaction","\\endmodality");
    }
 
-    /*
-     TODO: Remove this method. (Kai Wallisch May 2014)
-    */
-   private void newline() {
-     Debug.out("newline() was called but ANTLRv3 does not implement it anymore.");
-   }
-
    public void recover( RecognitionException ex, BitSet tokenSet ) throws CharStreamException {
      input.consume();
      int ttype = input.LA(1);
@@ -509,8 +502,8 @@ RGUILLEMETS
 WS
 :       (' '
       |       '\t'
-      |       '\n'  { newline(); }
-      |       '\r'  {if(input.LA(1) != '\n') newline();} )
+      |       '\n'  
+      |       '\r' )
 	      { $channel = HIDDEN; }
       ;
 
@@ -518,7 +511,7 @@ STRING_LITERAL
 @init {StringBuilder _literal = new StringBuilder(); }
 @after {setText('"' + _literal.toString() + '"'); }
 : '"' (  ESC { _literal.append(getText()); }
-       | newline='\n' { newline(); _literal.appendCodePoint(newline); }
+       | newline='\n' {  _literal.appendCodePoint(newline); }
        | normal=~('\n' | '"' | '\\' | '\uFFFF') { _literal.appendCodePoint(normal); }
       )*
   '"' ;
@@ -608,7 +601,7 @@ ESC
 
 fragment
 QUOTED_STRING_LITERAL
-    : '"' ('\\' . | '\n' {newline();} | ~('\n' | '"' | '\\') )* '"' ;
+    : '"' ('\\' . | '\n' | ~('\n' | '"' | '\\') )* '"' ;
 
 SL_COMMENT
 :
@@ -732,8 +725,6 @@ MODALITY
             if(input.LA(1) == '\'') {
                 mCHAR_LITERAL(); continue;
             }
-            if((input.LA(1) == '\r' && input.LA(2) != '\n') ||
-                    input.LA(1) == '\n') newline();
             if(input.LA(1) == '\\' && (input.LA(2) == 'e' || input.LA(2) == '>' || input.LA(2) == ']'))
                 // check whether it follows an ENDMODALITY
                 break;
@@ -806,8 +797,8 @@ JAVABLOCK
       | '/' ~('/' | '*')
       | CHAR_LITERAL
       | QUOTED_STRING_LITERAL
-      | '\r' {if(input.LA(1) != '\n') newline();}
-      | '\n' {newline(); }
+      | '\r' 
+      | '\n' 
       | 'a'..'z' | 'A'..'Z' | '_'
       | '0'..'9'
       | ' ' | '\t'
