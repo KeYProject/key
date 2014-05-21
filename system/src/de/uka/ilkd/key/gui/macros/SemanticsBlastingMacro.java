@@ -95,9 +95,6 @@ public class SemanticsBlastingMacro extends StrategyProofMacro {
 		allowedPullOut.add("seqConcat");
 		allowedPullOut.add("seqSingleton");
 		allowedPullOut.add("infiniteUnion");
-
-		new HashSet<String>();
-
 	}
 
 	@Override
