@@ -479,10 +479,10 @@ sub calculateSummas {
     # Compute average time per step.
     # This is the ratio between sums.
     # Previously, we wrongly calculated the average of ratios (bug #1442).
-    $sum[@sum-2] = $sum[2] / $sum[5];
+    $sum[6] = $sum[4] / $sum[3];
 
     # Compute averages instead of sums for memory consumption.
-    $sum[@sum-1] = $sum[@sum-1] / $countExamples;
+    $sum[7] = $sum[7] / $countExamples;
     return @sum;
 }
 
