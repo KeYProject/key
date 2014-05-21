@@ -716,7 +716,7 @@ SL_COMMENT
 ML_COMMENT
 @init { paraphrase.push("a comment"); }
 @after { paraphrase.pop(); }
-
+:
 	'/*' {
 	  
 	  final int startAtLine = input.getLine();
