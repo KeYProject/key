@@ -474,6 +474,7 @@
             <visibleWhen
                   checkEnabled="false">
                <iterate
+                     ifEmpty="false"
                      operator="and">
                   <and>
                      <test
