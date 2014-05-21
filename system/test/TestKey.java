@@ -11,7 +11,6 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-import java.util.HashMap;
 
 import junit.framework.TestCase;
 import junit.framework.TestResult;
@@ -25,7 +24,6 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.collection.TestSLListOfString.class,
         de.uka.ilkd.key.collection.TestMapAsListFromIntegerToString.class,
         de.uka.ilkd.key.collection.TestLeftistHeapOfInteger.class,
-        de.uka.ilkd.key.util.TestLexicographicComparator.class,
         de.uka.ilkd.key.util.TestMiscTools.class,
         de.uka.ilkd.key.util.pp.TestLayouter.class
     }; 
