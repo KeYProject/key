@@ -95,8 +95,6 @@ public final class KeyStrokeManager {
         mapping.put(de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_T,MULTI_KEY_MASK));
         mapping.put(de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_P,MULTI_KEY_MASK));
         mapping.put(de.uka.ilkd.key.gui.actions.UnicodeToggleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_U,MULTI_KEY_MASK));
-        mapping.put(de.uka.ilkd.key.gui.actions.TestGenerationAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_K,SHORTCUT_KEY_MASK));
-        mapping.put(de.uka.ilkd.key.gui.actions.CounterExampleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_L,SHORTCUT_KEY_MASK));
     }
     
     public static KeyStroke get (ProofMacro macro) {
