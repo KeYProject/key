@@ -29,6 +29,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -253,12 +254,12 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
 	@Override
     public void loadProblem(File file) {
-		super.loadProblem(file, null, null, mediator);
+		super.getProblemLoader(file, null, null, mediator).runSynchronously();
 	}
 
    @Override
    public void loadProblem(File file, List<File> classPath, File bootClassPath) {
-      super.loadProblem(file, classPath, bootClassPath, mediator);
+      super.getProblemLoader(file, classPath, bootClassPath, mediator).runSynchronously();
    }
 
 	@Override
