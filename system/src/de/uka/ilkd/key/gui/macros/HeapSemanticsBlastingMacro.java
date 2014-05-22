@@ -36,23 +36,7 @@ public final class HeapSemanticsBlastingMacro extends AbstractBlastingMacro {
 		super();
 		semanticsFilter = new SemanticsRuleFilter();
 		equalityRuleFilter = new EqualityRuleFilter();
-		allowedPullOut = new HashSet<String>(20);
-
-		allowedPullOut.add("store");
-		allowedPullOut.add("create");
-		allowedPullOut.add("anon");
-		allowedPullOut.add("memset");
-		allowedPullOut.add("empty");
-		allowedPullOut.add("allLocs");
-		allowedPullOut.add("singleton");
-		allowedPullOut.add("union");
-		allowedPullOut.add("intersect");
-		allowedPullOut.add("setMinus");
-		allowedPullOut.add("allFields");
-		allowedPullOut.add("allObjects");
-		allowedPullOut.add("arrayRange");
-		allowedPullOut.add("freshLocs");
-		allowedPullOut.add("infiniteUnion");
+		allowedPullOut = new HashSet<String>(); // disallow pullout
 	}
 	
 	@Override
@@ -87,7 +71,7 @@ public final class HeapSemanticsBlastingMacro extends AbstractBlastingMacro {
 	private class SemanticsRuleFilter implements RuleFilter{		
 		protected HashSet<String> allowedRulesNames;		
 		{
-			allowedRulesNames = new HashSet<String>(20);			
+			allowedRulesNames = new HashSet<String>(40);			
 			allowedRulesNames.add("selectOfStore");
 			allowedRulesNames.add("selectOfCreate");
 			allowedRulesNames.add("selectOfAnon");
@@ -108,6 +92,9 @@ public final class HeapSemanticsBlastingMacro extends AbstractBlastingMacro {
 			allowedRulesNames.add("disjointToElementOf");
 			allowedRulesNames.add("createdInHeapToElementOf");
 
+			final HashSet<String> tmp = new HashSet<String>(20);
+			for (String s: allowedRulesNames)
+			    tmp.add(s+"EQ");
 		}
 		@Override
 		public boolean filter(Rule rule) {			
