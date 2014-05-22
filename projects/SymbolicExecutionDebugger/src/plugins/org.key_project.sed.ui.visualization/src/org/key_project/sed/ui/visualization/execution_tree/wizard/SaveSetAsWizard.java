@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -95,18 +96,26 @@ public class SaveSetAsWizard extends BasicNewResourceWizard {
                                                 monitor);
                   setResult(content);
                }
+               catch (OperationCanceledException e) {
+                  // Nothing to do
+               }
                catch (Exception e) {
                   throw new InvocationTargetException(e);
                }
             }
          };
          getContainer().run(true, true, run);
-         modelPage.setInitialContents(new ByteArrayInputStream(run.getResult().getBytes(Charset.forName(SEDXMLWriter.DEFAULT_ENCODING))));
-         IFile file = modelPage.createNewFile();
-         if (window != null) {
-            selectAndReveal(file, window);
+         if (run.getResult() != null) {
+            modelPage.setInitialContents(new ByteArrayInputStream(run.getResult().getBytes(Charset.forName(SEDXMLWriter.DEFAULT_ENCODING))));
+            IFile file = modelPage.createNewFile();
+            if (window != null) {
+               selectAndReveal(file, window);
+            }
+            return true;
          }
-         return true;
+         else {
+            return false;
+         }
       }
       catch (Exception e) {
          LogUtil.getLogger().logError(e);
