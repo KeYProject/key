@@ -446,6 +446,14 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    }
 
    /**
+    * Checks if the signature is shown on {@link KeYMethodCall}s.
+    * @return {@code true} show signature, {@code false} show only name.
+    */
+   public boolean isShowSignatureOnMethodReturnNodes() {
+      return launchSettings.isShowSignatureOnMethodReturnNodes();
+   }
+
+   /**
     * Checks if step into is possible.
     * @param keyNode The {@link IKeYSEDDebugNode} which requests the step into action.
     * @return {@code true} can step into, {@code false} can not step into.

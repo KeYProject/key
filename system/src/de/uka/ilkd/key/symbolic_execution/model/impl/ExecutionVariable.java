@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -156,6 +157,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * @throws ProofInputException Occurred Exception.
     */
    protected ExecutionValue[] lazyComputeValues() throws ProofInputException {
+      final TermBuilder tb = getServices().getTermBuilder();
       // Start site proof to extract the value of the result variable.
       SiteProofVariableValueInput sequentToProve;
       Term siteProofSelectTerm = null;
@@ -163,10 +165,10 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
       if (getParentValue() != null || SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
          siteProofSelectTerm = createSelectTerm();
          if (getParentValue() != null) { // Is null at static variables
-            siteProofCondition = getServices().getTermBuilder().and(siteProofCondition, getParentValue().getCondition());
+            siteProofCondition = tb.and(siteProofCondition, getParentValue().getCondition());
          }
          if (lengthValue != null) {
-            siteProofCondition = getServices().getTermBuilder().and(siteProofCondition, lengthValue.getCondition());
+            siteProofCondition = tb.and(siteProofCondition, lengthValue.getCondition());
          }
          sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(getServices(), getProofNode(), siteProofCondition, siteProofSelectTerm, true); 
       }
@@ -193,7 +195,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
             // Determine type
             String typeString = value.sort().toString();
             // Compute value condition
-            Term condition = computeValueCondition(valueEntry.getValue());
+            Term condition = computeValueCondition(tb, valueEntry.getValue());
             String conditionString = null;
             if (condition != null) {
                conditionString = formatTerm(condition);
@@ -212,7 +214,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          // Instantiate unknown child values
          if (!unknownValues.isEmpty()) {
             // Compute value condition
-            Term condition = computeValueCondition(unknownValues);
+            Term condition = computeValueCondition(tb, unknownValues);
             String conditionString = null;
             if (condition != null) {
                conditionString = formatTerm(condition);
@@ -280,11 +282,12 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
    /**
     * Computes the combined path condition of all {@link Goal}s which is the
     * or combination of each path condition per {@link Goal}.
+    * @param tb The {@link TermBuilder} to use passed to ensure that it is still available even if the {@link Proof} is disposed in between.
     * @param valueGoals The {@link Goal}s to compute combined path condition for.
     * @return The combined path condition.
     * @throws ProofInputException Occurred Exception.
     */
-   protected Term computeValueCondition(List<Goal> valueGoals) throws ProofInputException {
+   protected Term computeValueCondition(TermBuilder tb, List<Goal> valueGoals) throws ProofInputException {
       if (!valueGoals.isEmpty()) {
          List<Term> pathConditions = new LinkedList<Term>();
          Proof proof = null;
@@ -292,13 +295,13 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
             pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(), false));
             proof = valueGoal.node().proof();
          }
-         Term comboundPathCondition = getServices().getTermBuilder().or(pathConditions);
+         Term comboundPathCondition = tb.or(pathConditions);
          comboundPathCondition = SymbolicExecutionUtil.simplify(proof, comboundPathCondition);
          comboundPathCondition = SymbolicExecutionUtil.improveReadability(comboundPathCondition, proof.getServices());
          return comboundPathCondition;
       }
       else {
-         return getServices().getTermBuilder().tt();
+         return tb.tt();
       }
    }
    

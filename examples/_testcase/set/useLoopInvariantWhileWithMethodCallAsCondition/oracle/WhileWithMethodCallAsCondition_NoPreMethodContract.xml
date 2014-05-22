@@ -216,7 +216,7 @@ termination: diamond" pathCondition="false" pathConditionChanged="false" precond
     b_3=goOnNice(array,i);
   }
 }\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))),equals(array,null)))" pathConditionChanged="true" branchCondition="not(equals(array,null))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (goOnNice)">
-                        <methodReturn name="&lt;return of WhileWithMethodCallAsCondition.size(array);&gt;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+                        <methodReturn name="&lt;return of size&gt;" signature="&lt;return of WhileWithMethodCallAsCondition.size(array);&gt;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b_3=goOnNice(array,i);
   }
 }\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))),equals(array,null)))" pathConditionChanged="false" isReturnValueComputed="false">

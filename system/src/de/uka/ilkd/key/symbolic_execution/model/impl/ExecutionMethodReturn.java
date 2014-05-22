@@ -58,9 +58,19 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
    private final IExecutionMethodCall methodCall;
    
    /**
+    * The node name with signature including the return value.
+    */
+   private String signatureIncludingReturnValue;
+   
+   /**
     * The node name including the return value.
     */
    private String nameIncludingReturnValue;
+
+   /**
+    * The signature.
+    */
+   private String signature;
    
    /**
     * The possible return values.
@@ -96,6 +106,27 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
     */
    @Override
    protected String lazyComputeName() throws ProofInputException {
+      return createMethodReturnName(null, getMethodCall().getProgramMethod().getName());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getSignature() throws ProofInputException {
+      if (signature == null) {
+         signature = lazyComputeSignature();
+      }
+      return signature;
+   }
+
+   /**
+    * Computes the signature lazily when
+    * {@link #getSignature()} is called the first time.
+    * @return The name including the return value.
+    * @throws Occurred Exception.
+    */
+   protected String lazyComputeSignature() throws ProofInputException {
       return createMethodReturnName(null, getMethodCall().getName());
    }
 
@@ -117,6 +148,50 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
     * @throws Occurred Exception.
     */
    protected String lazyComputeNameIncludingReturnValue() throws ProofInputException {
+      IExecutionMethodReturnValue[] returnValues = getReturnValues();
+      if (returnValues.length == 0) {
+         return createMethodReturnName(null, getMethodCall().getProgramMethod().getName());
+      }
+      else if (returnValues.length == 1) {
+         return createMethodReturnName(returnValues[0].getName() + " ", getMethodCall().getProgramMethod().getName());
+      }
+      else {
+         StringBuilder sb = new StringBuilder();
+         sb.append('\n');
+         boolean afterFirst = false;
+         for (IExecutionMethodReturnValue value : returnValues) {
+            if (afterFirst) {
+               sb.append(", \n");
+            }
+            else {
+               afterFirst = true;
+            }
+            sb.append('\t');
+            sb.append(value.getName());
+         }
+         sb.append('\n');
+         return createMethodReturnName(sb.toString(), getMethodCall().getProgramMethod().getName());
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getSignatureIncludingReturnValue() throws ProofInputException {
+      if (signatureIncludingReturnValue == null) {
+         signatureIncludingReturnValue = lazyComputeSigntureIncludingReturnValue();
+      }
+      return signatureIncludingReturnValue;
+   }
+
+   /**
+    * Computes the signature including the return value lazily when
+    * {@link #getNameIncludingReturnValue()} is called the first time.
+    * @return The name including the return value.
+    * @throws Occurred Exception.
+    */
+   protected String lazyComputeSigntureIncludingReturnValue() throws ProofInputException {
       IExecutionMethodReturnValue[] returnValues = getReturnValues();
       if (returnValues.length == 0) {
          return createMethodReturnName(null, getMethodCall().getName());

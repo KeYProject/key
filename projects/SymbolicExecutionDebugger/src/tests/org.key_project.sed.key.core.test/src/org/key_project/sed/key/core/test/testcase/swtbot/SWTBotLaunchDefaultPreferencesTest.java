@@ -103,8 +103,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               null,
-                              8,
-                              executor);
+                              Boolean.TRUE,
+                              8, executor);
       }
       finally {
          // Restore original value
@@ -179,8 +179,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               null,
                               Boolean.FALSE,
-                              8,
-                              executor);
+                              Boolean.TRUE,
+                              8, executor);
       }
       finally {
          // Restore original value
@@ -258,8 +258,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.FALSE,
-                              8,
-                              executor);
+                              Boolean.TRUE,
+                              8, executor);
       }
       finally {
          // Restore original value
@@ -339,8 +339,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               null,
                               Boolean.FALSE,
                               Boolean.FALSE,
-                              8,
-                              executor);
+                              Boolean.TRUE,
+                              8, executor);
       }
       finally {
          // Restore original value
@@ -353,16 +353,32 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
     * Tests the launch where return values are shown in tree.
     */
    @Test
-   public void testShowMethodReturnValuesInDebugNodes() throws Exception {
-      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodes", true);
+   public void testShowMethodReturnValuesInDebugNodes_Signature() throws Exception {
+      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodesWithSignature", true, true);
    }
 
    /**
     * Tests the launch where return values are not shown in tree.
     */
    @Test
-   public void testDoNotShowMethodReturnValuesInDebugNodes() throws Exception {
-      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes", false);
+   public void testDoNotShowMethodReturnValuesInDebugNodes_Signature() throws Exception {
+      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodesWithSignature", false, true);
+   }
+   
+   /**
+    * Tests the launch where return values are shown in tree.
+    */
+   @Test
+   public void testShowMethodReturnValuesInDebugNodes_NameOnly() throws Exception {
+      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodes", true, false);
+   }
+
+   /**
+    * Tests the launch where return values are not shown in tree.
+    */
+   @Test
+   public void testDoNotShowMethodReturnValuesInDebugNodes_NameOnly() throws Exception {
+      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes", false, false);
    }
    
    /**
@@ -373,7 +389,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
     * @throws Exception Occurred Exception
     */
    protected void doTestShowMethodReturnValuesInDebugNodes(String projectName, 
-                                                           final boolean showMethodReturnValuesInDebugNodes) throws Exception {
+                                                           final boolean showMethodReturnValuesInDebugNodes,
+                                                           final boolean showSignature) throws Exception {
       boolean originalShowMethodReturnValuesInDebugNodes = KeYSEDPreferences.isShowMethodReturnValuesInDebugNode();
       try {
          // Set preference
@@ -385,6 +402,12 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          else {
             preferenceShell.bot().checkBox("Show method return values in debug nodes").deselect();
          }
+         if (showSignature) {
+            preferenceShell.bot().checkBox("Show signature instead of only the name on method return nodes").select();
+         }
+         else {
+            preferenceShell.bot().checkBox("Show signature instead of only the name on method return nodes").deselect();
+         }
          preferenceShell.bot().button("OK").click();
          assertEquals(showMethodReturnValuesInDebugNodes, KeYSEDPreferences.isShowMethodReturnValuesInDebugNode());
          // Launch something
@@ -394,7 +417,17 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Get debug target TreeItem
                SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
                // Do resume and test created tree
-               String expectedModelPathInBundle = showMethodReturnValuesInDebugNodes ? "data/simpleIf/oracle/SimpleIf.xml" : "data/simpleIf/oracle_noMethodReturnValues/SimpleIf.xml";
+               String expectedModelPathInBundle;
+               if (showSignature) {
+                  expectedModelPathInBundle = showMethodReturnValuesInDebugNodes ? 
+                                              "data/simpleIf/oracle/SimpleIf_Signature.xml" : 
+                                              "data/simpleIf/oracle_noMethodReturnValues/SimpleIf_Signature.xml";
+               }
+               else {
+                  expectedModelPathInBundle = showMethodReturnValuesInDebugNodes ? 
+                                              "data/simpleIf/oracle/SimpleIf.xml" : 
+                                              "data/simpleIf/oracle_noMethodReturnValues/SimpleIf.xml";
+               }
                resume(bot, item, target);
                assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false);
             }
@@ -411,8 +444,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.FALSE,
-                              8,
-                              executor);
+                              null,
+                              8, executor);
       }
       finally {
          // Restore original value

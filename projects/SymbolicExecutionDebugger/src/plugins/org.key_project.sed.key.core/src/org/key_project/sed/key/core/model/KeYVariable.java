@@ -102,7 +102,7 @@ public class KeYVariable extends AbstractSEDVariable {
    public IValue getValue() throws DebugException {
       synchronized (this) {
          try {
-            if (value == null) {
+            if (value == null && !executionVariable.isDisposed()) {
                IExecutionValue[] values = executionVariable.getValues();
                if (values.length == 0) {
                   throw new DebugException(LogUtil.getLogger().createErrorStatus("An IExecutionVariable must provide at least one IExecutionValue."));
