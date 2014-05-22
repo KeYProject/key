@@ -22,16 +22,17 @@ import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.Rule;
 
 /**
- * @author mihai
+ * @author bruns
  *
  */
-public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
+public final class HeapSemanticsBlastingMacro extends AbstractBlastingMacro {
 
 
 	private final SemanticsRuleFilter semanticsFilter;
 	private final EqualityRuleFilter equalityRuleFilter;
 	private final HashSet<String> allowedPullOut;
-	public SemanticsBlastingMacro() {
+	
+	public HeapSemanticsBlastingMacro() {
 		super();
 		semanticsFilter = new SemanticsRuleFilter();
 		equalityRuleFilter = new EqualityRuleFilter();
@@ -51,11 +52,6 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
 		allowedPullOut.add("allObjects");
 		allowedPullOut.add("arrayRange");
 		allowedPullOut.add("freshLocs");
-		allowedPullOut.add("seqDef");
-		allowedPullOut.add("seqReverse");
-		allowedPullOut.add("seqSub");
-		allowedPullOut.add("seqConcat");
-		allowedPullOut.add("seqSingleton");
 		allowedPullOut.add("infiniteUnion");
 	}
 	
@@ -77,7 +73,7 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "Semantics Blasting";
+		return "Heap Semantics Blasting";
 	}
 
 	@Override
@@ -91,7 +87,7 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
 	private class SemanticsRuleFilter implements RuleFilter{		
 		protected HashSet<String> allowedRulesNames;		
 		{
-			allowedRulesNames = new HashSet<String>(100);			
+			allowedRulesNames = new HashSet<String>(20);			
 			allowedRulesNames.add("selectOfStore");
 			allowedRulesNames.add("selectOfCreate");
 			allowedRulesNames.add("selectOfAnon");
@@ -112,50 +108,6 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
 			allowedRulesNames.add("disjointToElementOf");
 			allowedRulesNames.add("createdInHeapToElementOf");
 
-
-
-			allowedRulesNames.add("getOfSeqDef");
-			allowedRulesNames.add("getOfSeqSingleton");
-			allowedRulesNames.add("getOfSeqConcat");
-			allowedRulesNames.add("getOfSeqSub");
-			allowedRulesNames.add("getOfSeqReverse");
-			allowedRulesNames.add("lenOfSeqDef");
-			allowedRulesNames.add("lenOfSeqSingleton");
-			allowedRulesNames.add("lenOfSeqConcat");
-			allowedRulesNames.add("lenOfSeqSub");
-			allowedRulesNames.add("lenOfSeqReverse");
-
-			//some int rules
-			allowedRulesNames.add("inByte");
-			allowedRulesNames.add("inChar");
-			allowedRulesNames.add("inShort");
-			allowedRulesNames.add("inInt");
-			allowedRulesNames.add("inLong");
-			allowedRulesNames.add("translateJavaUnaryMinusInt");
-			allowedRulesNames.add("translateJavaUnaryMinusLong");
-			allowedRulesNames.add("translateJavaAddInt");
-			allowedRulesNames.add("translateJavaAddLong");
-			allowedRulesNames.add("translateJavaSubInt");
-			allowedRulesNames.add("translateJavaSubLong");
-			allowedRulesNames.add("translateJavaMulInt");
-			allowedRulesNames.add("translateJavaMulLong");
-			allowedRulesNames.add("translateJavaMod");
-			allowedRulesNames.add("translateJavaDivInt");
-			allowedRulesNames.add("translateJavaDivLong");
-			allowedRulesNames.add("translateJavaCastByte");
-			allowedRulesNames.add("translateJavaCastShort");
-			allowedRulesNames.add("translateJavaCastInt");
-			allowedRulesNames.add("translateJavaCastLong");
-			allowedRulesNames.add("translateJavaCastChar");
-			allowedRulesNames.add("jdiv_axiom_inline");
-
-			//other rules
-			allowedRulesNames.add("array_store_known_dynamic_array_type");
-			//non null
-			allowedRulesNames.add("nonNull");
-			allowedRulesNames.add("nonNullZero");
-			allowedRulesNames.add("sub_literals");
-			//allowedRulesNames.add("applyEq");
 		}
 		@Override
 		public boolean filter(Rule rule) {			
@@ -168,8 +120,7 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
 		{
 			allowedRulesNames = new HashSet<String>();			
 			allowedRulesNames.add("equalityToElementOf");
-			allowedRulesNames.add("equalityToSelect");	
-			allowedRulesNames.add("equalityToSeqGetAndSeqLen");
+			allowedRulesNames.add("equalityToSelect");
 		}
 		@Override
 		public boolean filter(Rule rule) {			

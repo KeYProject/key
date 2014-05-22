@@ -51,11 +51,6 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         Sort nullSort = mediator.getServices().getTypeConverter().getHeapLDT().getNull().sort();
         Goal goal = mediator.getSelectedGoal();
 
-
-
-
-
-
         SortCollector sortCollector = new SortCollector();
 
         for(SequentFormula sf : goal.sequent()){
@@ -117,13 +112,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
 
             LogicVariable o = new LogicVariable(new Name("o"), kjt.getSort());
-
             Term exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));
-
-
             for(ClassAxiom c : spec.getClassAxioms(kjt)){
-
-
 
                 if(c instanceof RepresentsAxiom && c.getKJT().equals(kjt)){
                     RepresentsAxiom ra = (RepresentsAxiom) c;
@@ -160,9 +150,6 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                                 if(!right.equals(tb.tt())){
                                     result.add(new SequentFormula(instanceImpl));
                                 }
-
-
-
                             }
                             else if(right.op().name().equals(inv.op().name())){
 
@@ -179,13 +166,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                                     result.add(new SequentFormula(instanceImpl));
                                 }
 
-
-
-
                             }
                             else{
-
-
                                 Term f = t;
                                 f = tb.all(h, tb.all(o, f));                            
                                 result.add(new SequentFormula(f));
@@ -196,33 +178,16 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                             f = tb.all(h, tb.all(o, f));                            
                             result.add(new SequentFormula(f));
                         }
-
-
-
-
-
+                        
                     }catch(Exception e){
 
                         //System.err.println(e.getMessage());
 
                     }
 
-
                 }
-
             }
-
-
-
-
-
         }
-
-
-
-
-
-
         return result;
     }
 
