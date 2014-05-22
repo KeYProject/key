@@ -22,6 +22,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
@@ -56,10 +57,15 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
      * @return a constant non-<code>null</code> set
      */
     protected abstract Set<String> getAdmittedRuleNames();
+    
+    /**
+     * Whether this macro includes One Step Simplification.
+     */
+    protected abstract boolean allowOSS();
 
     @Override
     protected PropExpansionStrategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
-        return new PropExpansionStrategy(getAdmittedRuleNames());
+        return new PropExpansionStrategy(getAdmittedRuleNames(), allowOSS());
     }
 
     /**
@@ -71,9 +77,11 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         private static final Name NAME = new Name(PropExpansionStrategy.class.getSimpleName());
 
         private final Set<String> admittedRuleNames;
+        private final boolean allowOSS;
 
-        public PropExpansionStrategy(Set<String> admittedRuleNames) {
+        public PropExpansionStrategy(Set<String> admittedRuleNames, boolean allowOSS) {
             this.admittedRuleNames = admittedRuleNames;
+            this.allowOSS = allowOSS;
         }
 
         @Override
@@ -84,7 +92,9 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         @Override
         public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
-            if(admittedRuleNames.contains(name)) {
+            if (ruleApp instanceof OneStepSimplifierRuleApp && allowOSS) {
+                return NumberRuleAppCost.getZeroCost();
+            } else if(admittedRuleNames.contains(name)) {
                 return NumberRuleAppCost.getZeroCost();
             } else {
                 return TopRuleAppCost.INSTANCE;

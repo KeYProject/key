@@ -131,4 +131,9 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
     protected Set<String> getAdmittedRuleNames() {
         return ADMITTED_RULES_SET;
     }
+    
+    @Override
+    protected boolean allowOSS () {
+        return true;
+    }
 }

@@ -47,4 +47,9 @@ public class PropositionalExpansionMacro extends AbstractPropositionalExpansionM
     protected Set<String> getAdmittedRuleNames() {
         return ADMITTED_RULES_SET;
     }
+
+    @Override
+    protected boolean allowOSS() {
+        return false;
+    }
 }
