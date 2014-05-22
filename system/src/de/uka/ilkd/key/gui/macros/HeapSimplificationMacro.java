@@ -27,8 +27,8 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
     public String getDescription() {
         return "todo";
     }
-
-    private static final String[] ADMITTED_RULES = {
+    
+    private static final Set<String> ADMITTED_RULES_SET = asSet(new String[]{
         "selectOfStore",
         "selectOfCreate",
         "selectOfAnon",
@@ -63,6 +63,7 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         
         
         // EQ versions of the above
+        // XXX do not really work....
         "selectOfStoreEQ",
         "selectOfCreateEQ",
         "selectOfAnonEQ",
@@ -120,12 +121,12 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "nonNull",
         "nonNullZero",
         
+        "allRight",
         "close",
         "closeTrue",
         "closeFalse"
-    };
+    });
 
-    private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
 
     @Override
     protected Set<String> getAdmittedRuleNames() {

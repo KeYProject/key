@@ -93,7 +93,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
             if (ruleApp instanceof OneStepSimplifierRuleApp && allowOSS) {
-                return NumberRuleAppCost.getZeroCost();
+                return NumberRuleAppCost.create(-5000);
             } else if(admittedRuleNames.contains(name)) {
                 return NumberRuleAppCost.getZeroCost();
             } else {
