@@ -13,6 +13,9 @@
 
 package org.key_project.sed.core.model;
 
+import java.util.Map;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ITerminate;
@@ -142,4 +145,12 @@ public interface ISEDDebugTarget extends ISEDDebugElement, IDebugTarget {
     * @param l The {@link ISEDAnnotationListener} to remove.
     */
    public void removeAnnotationListener(ISEDAnnotationListener l);
+   
+   /**
+    * Computes some statistics of this {@link ISEDDebugTarget}.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @return The computed statistics.
+    * @throws DebugException Occurred Exception.
+    */
+   public Map<String, String> computeStatistics(IProgressMonitor monitor) throws DebugException;
 }

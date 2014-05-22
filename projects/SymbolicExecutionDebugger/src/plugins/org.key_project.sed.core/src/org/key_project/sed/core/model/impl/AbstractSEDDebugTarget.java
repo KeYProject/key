@@ -13,10 +13,14 @@
 
 package org.key_project.sed.core.model.impl;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IMarkerDelta;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
@@ -30,10 +34,16 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentPr
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.model.ISEDDebugElement;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.event.ISEDAnnotationListener;
 import org.key_project.sed.core.model.event.SEDAnnotationEvent;
 import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
+import org.key_project.sed.core.util.ISEDIterator;
+import org.key_project.sed.core.util.SEDPreorderIterator;
+import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ObjectUtil;
 
 /**
@@ -469,6 +479,47 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
       for (ISEDAnnotationListener l : listener) {
          l.annotationMoved(e);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Map<String, String> computeStatistics(IProgressMonitor monitor) throws DebugException {
+      // Compute statistics
+      if (monitor == null) {
+         monitor = new NullProgressMonitor();
+      }
+      monitor.beginTask("Computing statistics", IProgressMonitor.UNKNOWN);
+      SWTUtil.checkCanceled(monitor);
+      int nodeCount = 0;
+      int terminatedBranchesCount = 0;
+      int notTerminatedBranchesCount = 0;
+      ISEDIterator iter = new SEDPreorderIterator(this);
+      while (iter.hasNext()) {
+         SWTUtil.checkCanceled(monitor);
+         ISEDDebugElement next = iter.next();
+         if (next instanceof ISEDDebugNode) {
+            ISEDDebugNode node = (ISEDDebugNode)next;
+            nodeCount++;
+            if (!node.hasChildren()) {
+               if (node instanceof ISEDTermination) {
+                  terminatedBranchesCount++;
+               }
+               else {
+                  notTerminatedBranchesCount++;
+               }
+            }
+         }
+         monitor.worked(1);
+      }
+      // Create result
+      Map<String, String> statistics = new LinkedHashMap<String, String>();
+      statistics.put("Number of nodes", nodeCount + "");
+      statistics.put("Number of completed branches", terminatedBranchesCount + "");
+      statistics.put("Number of not completed branches", notTerminatedBranchesCount + "");
+      monitor.done();
+      return statistics;
    }
 
    /**
