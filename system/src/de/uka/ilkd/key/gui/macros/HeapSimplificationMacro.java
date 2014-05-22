@@ -34,6 +34,59 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "selectOfAnon",
         "selectOfMemset",
         
+        "selectCreatedOfStore",
+        "selectCreatedOfCreate",
+        "selectCreatedOfAnon",
+        "selectCreatedOfMemset",
+        
+        "dismissNonSelectedField",
+        "dismissNonSelectedFieldEQ",
+        
+        // these are in ruleset concrete, but listed here to be applied when OSS is off
+        "replaceKnownSelect",
+        "dropEffectlessStores",
+        "memsetEmpty",
+        "selectCreatedOfAnonAsFormula",
+        
+        "wellFormedStoreObject",
+        "wellFormedStoreArray",
+        "wellFormedStorePrimitive",
+        "wellFormedStorePrimitiveArray",
+        "wellFormedStoreLocSet",
+        "wellFormedCreate",
+        "wellFormedAnon",
+        "wellFormedMemsetArrayObject",
+        "wellFormedMemsetArrayPrimitive",
+        "wellFormedMemsetObject",
+        "wellFormedMemsetLocSet",
+        "wellFormedMemsetPrimitive",
+        
+        
+        // EQ versions of the above
+        "selectOfStoreEQ",
+        "selectOfCreateEQ",
+        "selectOfAnonEQ",
+        "selectOfMemsetEQ",
+        
+        "selectCreatedOfStoreEQ",
+        "selectCreatedOfCreateEQ",
+        "selectCreatedOfAnonEQ",
+        "selectCreatedOfMemsetEQ",
+
+        "wellFormedStoreObjectEQ",
+        "wellFormedStoreArrayEQ",
+        "wellFormedStorePrimitiveEQ",
+        "wellFormedStorePrimitiveArrayEQ",
+        "wellFormedStoreLocSetEQ",
+        "wellFormedCreateEQ",
+        "wellFormedAnonEQ",
+        "wellFormedMemsetArrayObjectEQ",
+        "wellFormedMemsetArrayPrimitiveEQ",
+        "wellFormedMemsetObjectEQ",
+        "wellFormedMemsetLocSetEQ",
+        "wellFormedMemsetPrimitiveEQ",
+        
+        // locset rules
         "elementOfEmpty",
         "elementOfAllLocs",
         "elementOfSingleton",
@@ -45,14 +98,11 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "elementOfArrayRange",
         "elementOfFreshLocs",
         "elementOfInfiniteUnion",
-        "subsetToElementOf",
-        "disjointToElementOf",
-        "createdInHeapToElementOf",
+        "elementOfInfiniteUnion2Vars",
         
-        "selectOfStoreEQ",
-        "selectOfCreateEQ",
-        "selectOfAnonEQ",
-        "selectOfMemsetEQ",
+        "disjointDefinition", // TODO: may have own rules in future
+        
+        // TODO: add derived simplification rules
         
         "elementOfEmptyEQ",
         "elementOfAllLocsEQ",
@@ -64,8 +114,15 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "elementOfAllObjectsEQ",
         "elementOfArrayRangeEQ",
         "elementOfFreshLocsEQ",
-        "elementOfInfiniteUnionEQ",
-//        "ifthenelse_split", "ifthenelse_split_for",
+        "elementOfInfiniteUnion2VarsEQ",
+        
+        // others
+        "nonNull",
+        "nonNullZero",
+        
+        "close",
+        "closeTrue",
+        "closeFalse"
     };
 
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
