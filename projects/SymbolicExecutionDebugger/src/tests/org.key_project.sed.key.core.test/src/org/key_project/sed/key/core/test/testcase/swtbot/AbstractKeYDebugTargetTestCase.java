@@ -155,7 +155,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       oracleFile.getParentFile().mkdirs();
       // Create oracle file
       SEDXMLWriter writer = new SEDXMLWriter();
-      writer.write(target.getLaunch(), SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(oracleFile), saveVariables, saveCallStack);
+      writer.write(target.getLaunch(), SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(oracleFile), saveVariables, saveCallStack, null);
       // Print message to the user.
       printOracleDirectory();
    }

@@ -57,6 +57,36 @@
                </dynamic>
             </menu>
          </menuContribution>
+         <menuContribution
+               allPopups="true"
+               locationURI="popup:org.eclipse.debug.ui.DebugView?after=additions">
+            <command
+                  commandId="org.key_project.sed.ui.expandAllCommand"
+                  icon="icons/expandall.gif"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <or>
+                        <instanceof
+                              value="org.key_project.sed.core.model.ISEDDebugElement">
+                        </instanceof>
+                        <and>
+                           <instanceof
+                                 value="org.eclipse.debug.core.ILaunch">
+                           </instanceof>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.key_project.sed.core.hasSEDDebugTarget">
+                           </test>
+                        </and>
+                     </or>
+                  </iterate>
+               </visibleWhen>
+            </command>
+         </menuContribution>
       </extension>
       <extension
             point="org.eclipse.core.runtime.adapters">
@@ -229,5 +259,48 @@
                annotationTypeID="org.key_project.sed.core.annotationType.search"
                icon="icons/search.gif">
          </image>
+      </extension>
+      <extension
+            point="org.eclipse.ui.commands">
+         <command
+               categoryId="org.eclipse.debug.ui.category.run"
+               description="Expand all children of the selected item"
+               id="org.key_project.sed.ui.expandAllCommand"
+               name="Expand All">
+         </command>
+      </extension>
+      <extension
+            point="org.eclipse.ui.commandImages">
+         <image
+               commandId="org.key_project.sed.ui.expandAllCommand"
+               icon="icons/expandall.gif">
+         </image>
+      </extension>
+      <extension
+            point="org.eclipse.ui.handlers">
+         <handler
+               class="org.key_project.sed.ui.command.ExpandAllCommand"
+               commandId="org.key_project.sed.ui.expandAllCommand">
+            <enabledWhen>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <or>
+                     <instanceof
+                           value="org.key_project.sed.core.model.ISEDDebugElement">
+                     </instanceof>
+                     <and>
+                        <instanceof
+                              value="org.eclipse.debug.core.ILaunch">
+                        </instanceof>
+                        <test
+                              forcePluginActivation="true"
+                              property="org.key_project.sed.core.hasSEDDebugTarget">
+                        </test>
+                     </and>
+                  </or>
+               </iterate>
+            </enabledWhen>
+         </handler>
       </extension>
 </plugin>

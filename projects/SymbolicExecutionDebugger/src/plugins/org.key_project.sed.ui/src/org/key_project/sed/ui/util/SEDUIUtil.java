@@ -27,11 +27,14 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -49,11 +52,13 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
 import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
 import org.key_project.sed.core.util.LogUtil;
+import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.sed.ui.Activator;
 import org.key_project.sed.ui.action.ISEDAnnotationAction;
 import org.key_project.sed.ui.action.ISEDAnnotationLinkAction;
@@ -195,6 +200,100 @@ public final class SEDUIUtil {
          selectJob.schedule();
       }
    }
+   
+   /**
+    * Expands all given elements in the {@link IDebugView}.
+    * @param parentPart The current {@link IWorkbenchPart} which requests the selection change.
+    * @param debugView The {@link IDebugView} to change selection in.
+    * @param toExpand The elements to expand.
+    */
+   public static void expandInDebugView(IWorkbenchPart parentPart, 
+                                        final IDebugView debugView, 
+                                        final List<?> toExpand) {
+      // Change selection in debug view if new elements are selected in a Job because the debug view uses Jobs itself to expand the debug model and it is required to wait for them.
+      AbstractWorkbenchPartJob.cancelJobs(parentPart);
+      Job selectJob = new AbstractWorkbenchPartJob("Expanding elements", parentPart) {
+         @Override
+         protected IStatus run(IProgressMonitor monitor) {
+            try {
+               final Viewer debugViewer = debugView.getViewer();
+               if (debugViewer instanceof TreeViewer) {
+                  // Collect elements to expand
+                  monitor.beginTask("Collecting unknown leafs", IProgressMonitor.UNKNOWN);
+                  List<ISEDDebugElement> leafs = new LinkedList<ISEDDebugElement>();
+                  TreeViewer treeViewer = (TreeViewer)debugViewer;
+                  for (Object element : toExpand) {
+                     try {
+                        if (element instanceof ILaunch) {
+                           for (IDebugTarget target : ((ILaunch)element).getDebugTargets()) {
+                              if (target instanceof ISEDDebugTarget) {
+                                 collectElementsToExpand(monitor, treeViewer, (ISEDDebugTarget)target, leafs);
+                              }
+                           }
+                        }
+                        else if (element instanceof ISEDDebugElement) {
+                           collectElementsToExpand(monitor, treeViewer, (ISEDDebugElement)element, leafs);
+                        }
+                     }
+                     catch (DebugException e) {
+                        LogUtil.getLogger().logError("Can't collect leafs of \"" + element + "\".", e);
+                     }
+                  }
+                  monitor.done();
+                  // Inject unknown elements
+                  monitor.beginTask("Injecting paths to leafs (" + leafs.size() + ")", leafs.size());
+                  for (ISEDDebugElement element : leafs) {
+                     try {
+                        SWTUtil.checkCanceled(monitor);
+                        monitor.subTask("Collecting unknown elements");
+                        Deque<Object> expandQue = collectUnknownElementsInParentHierarchy(treeViewer, element);
+                        monitor.subTask("Injecting unknown elements");
+                        injectElements(treeViewer, expandQue, new NullProgressMonitor());
+                        monitor.worked(1);
+                     }
+                     catch (DebugException e) {
+                        LogUtil.getLogger().logError("Can't inject debug view element \"" + element + "\".", e);
+                     }
+                  }
+                  monitor.done();
+                  // Expand elements
+                  monitor.beginTask("Expanding elements", toExpand.size());
+                  for (Object element : toExpand) {
+                     SWTUtil.checkCanceled(monitor);
+                     SWTUtil.expandToLevel(treeViewer, element, TreeViewer.ALL_LEVELS);
+                  }
+                  monitor.done();
+               }
+               monitor.done();
+               return Status.OK_STATUS;
+            }
+            catch (OperationCanceledException e) {
+               return Status.CANCEL_STATUS;
+            }
+         }
+         
+         protected void collectElementsToExpand(IProgressMonitor monitor, 
+                                                TreeViewer treeViewer, 
+                                                ISEDDebugElement element, 
+                                                List<ISEDDebugElement> toFill) throws DebugException {
+            SEDPreorderIterator iterator = new SEDPreorderIterator(element);
+            while (iterator.hasNext()) {
+               SWTUtil.checkCanceled(monitor);
+               ISEDDebugElement next = iterator.next();
+               if (next instanceof ISEDDebugNode) {
+                  ISEDDebugNode node = (ISEDDebugNode)next;
+                  if (node.getChildren().length == 0) { // Test for leaf
+                     if (isUnknownInTreeViewer(treeViewer, node)) { // Test if leaf is unknown in the TreeViewer
+                        toFill.add(next);
+                     }
+                  }
+               }
+               monitor.worked(0);
+            }
+         }
+      };
+      selectJob.schedule();
+   }
 
    /**
     * <p>
@@ -214,16 +313,7 @@ public final class SEDUIUtil {
       Deque<Object> expandQue = new LinkedList<Object>();
       while (element != null) {
          // Check if the element is unknown in tree
-         final Object toTest = element;
-         IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
-            @Override
-            public void run() {
-               Widget item = treeViewer.testFindItem(toTest);
-               setResult(item == null);
-            }
-         };
-         treeViewer.getControl().getDisplay().syncExec(run);
-         if (run.getResult() != null && run.getResult().booleanValue()) {
+         if (isUnknownInTreeViewer(treeViewer, element)) {
             // Element is not known, add to deque and continue with parent.
             expandQue.addFirst(element);
             // Update current element for next loop iteration.
@@ -235,6 +325,24 @@ public final class SEDUIUtil {
          }
       }
       return expandQue;
+   }
+   
+   /**
+    * Checks if the given {@link Object} is unknown in the {@link TreeViewer}.
+    * @param treeViewer The {@link TreeViewer}.
+    * @param toTest The {@link Object} to test.
+    * @return {@code true} is unknown, {@code false} is known.
+    */
+   protected static boolean isUnknownInTreeViewer(final TreeViewer treeViewer, final Object toTest) {
+      IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+         @Override
+         public void run() {
+            Widget item = treeViewer.testFindItem(toTest);
+            setResult(item == null);
+         }
+      };
+      treeViewer.getControl().getDisplay().syncExec(run);
+      return run.getResult() != null && run.getResult().booleanValue();
    }
    
    /**

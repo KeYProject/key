@@ -566,6 +566,7 @@ public class SEDXMLReader {
 
    protected SEDMemoryValue createValue(ISEDDebugTarget target, String uri, String localName, String qName, Attributes attributes) {
       SEDMemoryValue value = new SEDMemoryValue(target);
+      value.setId(getId(attributes));
       value.setAllocated(isAllocated(attributes));
       value.setReferenceTypeName(getReferenceTypeName(attributes));
       value.setValueString(getValueString(attributes));
@@ -575,6 +576,7 @@ public class SEDXMLReader {
    
    protected SEDMemoryVariable createVariable(ISEDDebugTarget target, String uri, String localName, String qName, Attributes attributes) {
       SEDMemoryVariable variable = new SEDMemoryVariable(target);
+      variable.setId(getId(attributes));
       variable.setName(getName(attributes));
       variable.setReferenceTypeName(getReferenceTypeName(attributes));
       return variable;

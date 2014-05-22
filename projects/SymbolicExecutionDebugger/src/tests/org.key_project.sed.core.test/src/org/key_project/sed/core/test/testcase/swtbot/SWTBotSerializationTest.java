@@ -179,7 +179,7 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          secondSearchLink.getTarget().addAnnotationLink(secondSearchLink);
          // Serialize launch to String
          SEDXMLWriter writer = new SEDXMLWriter();
-         String xml = writer.toXML(launch, SEDXMLWriter.DEFAULT_ENCODING, saveVariables, saveCallStack);
+         String xml = writer.toXML(launch, SEDXMLWriter.DEFAULT_ENCODING, saveVariables, saveCallStack, null);
          // Read launch from String
          SEDXMLReader reader = new SEDXMLReader();
          List<ISEDDebugTarget> read = reader.read(xml);
@@ -189,7 +189,7 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          TestSedCoreUtil.compareDebugTarget(target, read.get(0), true, saveVariables, saveCallStack);
          
          // Serialize targets to String
-         xml = writer.toXML(launch.getDebugTargets(), SEDXMLWriter.DEFAULT_ENCODING, saveVariables, saveCallStack);
+         xml = writer.toXML(launch.getDebugTargets(), SEDXMLWriter.DEFAULT_ENCODING, saveVariables, saveCallStack, null);
          // Read launch from String
          read = reader.read(xml);
          // Compare models
@@ -199,7 +199,7 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          
          // Serialize launch to File
          tempFile = File.createTempFile(testName, ".xml");
-         writer.write(launch, SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(tempFile), saveVariables, saveCallStack);
+         writer.write(launch, SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(tempFile), saveVariables, saveCallStack, null);
          // Read launch from String
          read = reader.read(new FileInputStream(tempFile));
          // Compare models
@@ -209,7 +209,7 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          
          // Serialize launch to File
          tempFile = File.createTempFile(testName, ".xml");
-         writer.write(launch.getDebugTargets(), SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(tempFile), saveVariables, saveCallStack);
+         writer.write(launch.getDebugTargets(), SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(tempFile), saveVariables, saveCallStack, null);
          // Read launch from String
          read = reader.read(new FileInputStream(tempFile));
          // Compare models
@@ -220,7 +220,7 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          // Serialize launch to File
          IProject project = TestUtilsUtil.createProject(testName);
          IFile workspaceFile = project.getFile("Test.xml");
-         writer.write(launch, SEDXMLWriter.DEFAULT_ENCODING, workspaceFile, saveVariables, saveCallStack);
+         writer.write(launch, SEDXMLWriter.DEFAULT_ENCODING, workspaceFile, saveVariables, saveCallStack, null);
          // Read launch from String
          read = reader.read(workspaceFile);
          // Compare models
@@ -229,7 +229,7 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          TestSedCoreUtil.compareDebugTarget(target, read.get(0), true, saveVariables, saveCallStack);
 
          // Serialize launch to File
-         writer.write(launch.getDebugTargets(), SEDXMLWriter.DEFAULT_ENCODING, workspaceFile, saveVariables, saveCallStack);
+         writer.write(launch.getDebugTargets(), SEDXMLWriter.DEFAULT_ENCODING, workspaceFile, saveVariables, saveCallStack, null);
          // Read launch from String
          read = reader.read(workspaceFile);
          // Compare models
@@ -238,7 +238,7 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          TestSedCoreUtil.compareDebugTarget(target, read.get(0), true, saveVariables, saveCallStack);
          
          // Serialize launch to String without encoding
-         xml = writer.toXML(launch, null, saveVariables, saveCallStack);
+         xml = writer.toXML(launch, null, saveVariables, saveCallStack, null);
          // Read launch from String
          read = reader.read(xml);
          // Compare models
@@ -247,7 +247,7 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          TestSedCoreUtil.compareDebugTarget(target, read.get(0), true, saveVariables, saveCallStack);
          
          // Serialize launch to String without encoding
-         xml = writer.toXML(launch.getDebugTargets(), null, saveVariables, saveCallStack);
+         xml = writer.toXML(launch.getDebugTargets(), null, saveVariables, saveCallStack, null);
          // Read launch from String
          read = reader.read(xml);
          // Compare models
@@ -256,7 +256,7 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          TestSedCoreUtil.compareDebugTarget(target, read.get(0), true, saveVariables, saveCallStack);
          
          // Serialize launch to File without encoding
-         writer.write(launch, null, new FileOutputStream(tempFile, false), saveVariables, saveCallStack);
+         writer.write(launch, null, new FileOutputStream(tempFile, false), saveVariables, saveCallStack, null);
          // Read launch from String
          read = reader.read(new FileInputStream(tempFile));
          // Compare models
@@ -265,7 +265,7 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          TestSedCoreUtil.compareDebugTarget(target, read.get(0), true, saveVariables, saveCallStack);
          
          // Serialize launch to File without encoding
-         writer.write(launch, null, workspaceFile, saveVariables, saveCallStack);
+         writer.write(launch, null, workspaceFile, saveVariables, saveCallStack, null);
          // Read launch from String
          read = reader.read(workspaceFile);
          // Compare models
@@ -274,7 +274,7 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          TestSedCoreUtil.compareDebugTarget(target, read.get(0), true, saveVariables, saveCallStack);
 
          // Serialize launch to File without encoding
-         writer.write(launch.getDebugTargets(), null, workspaceFile, saveVariables, saveCallStack);
+         writer.write(launch.getDebugTargets(), null, workspaceFile, saveVariables, saveCallStack, null);
          // Read launch from String
          read = reader.read(workspaceFile);
          // Compare models
@@ -283,7 +283,7 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          TestSedCoreUtil.compareDebugTarget(target, read.get(0), true, saveVariables, saveCallStack);
          
          // Serialize null to String
-         xml = writer.toXML((ILaunch)null, SEDXMLWriter.DEFAULT_ENCODING, saveVariables, saveCallStack);
+         xml = writer.toXML((ILaunch)null, SEDXMLWriter.DEFAULT_ENCODING, saveVariables, saveCallStack, null);
          // Read launch from String
          try {
             read = reader.read(xml);
@@ -293,7 +293,7 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          }
          
          // Serialize null to String
-         xml = writer.toXML((IDebugTarget[])null, SEDXMLWriter.DEFAULT_ENCODING, saveVariables, saveCallStack);
+         xml = writer.toXML((IDebugTarget[])null, SEDXMLWriter.DEFAULT_ENCODING, saveVariables, saveCallStack, null);
          // Read launch from String
          try {
             read = reader.read(xml);
@@ -303,7 +303,7 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          }
          
          // Serialize null to File
-         writer.write((ILaunch)null, SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(tempFile, false), saveVariables, saveCallStack);
+         writer.write((ILaunch)null, SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(tempFile, false), saveVariables, saveCallStack, null);
          // Read launch from File
          try {
             read = reader.read(new FileInputStream(tempFile));
@@ -313,7 +313,7 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          }
          
          // Serialize null to File
-         writer.write((IDebugTarget[])null, SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(tempFile, false), saveVariables, saveCallStack);
+         writer.write((IDebugTarget[])null, SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(tempFile, false), saveVariables, saveCallStack, null);
          // Read launch from File
          try {
             read = reader.read(new FileInputStream(tempFile));
@@ -323,7 +323,7 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          }
          
          // Serialize null to File
-         writer.write((ILaunch)null, SEDXMLWriter.DEFAULT_ENCODING, workspaceFile, saveVariables, saveCallStack);
+         writer.write((ILaunch)null, SEDXMLWriter.DEFAULT_ENCODING, workspaceFile, saveVariables, saveCallStack, null);
          // Read launch from File
          try {
             read = reader.read(new FileInputStream(tempFile));
@@ -333,7 +333,7 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          }
          
          // Serialize null to File
-         writer.write((ISEDDebugTarget[])null, SEDXMLWriter.DEFAULT_ENCODING, workspaceFile, saveVariables, saveCallStack);
+         writer.write((ISEDDebugTarget[])null, SEDXMLWriter.DEFAULT_ENCODING, workspaceFile, saveVariables, saveCallStack, null);
          // Read launch from File
          try {
             read = reader.read(new FileInputStream(tempFile));
