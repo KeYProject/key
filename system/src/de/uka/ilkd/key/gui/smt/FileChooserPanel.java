@@ -30,7 +30,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-class FileChooserPanel extends JPanel{
+public class FileChooserPanel extends JPanel{
         private static final long serialVersionUID = 1L;
         private JCheckBox saveToFileBox = null;
         private JTextField folderField = null;
@@ -154,8 +154,7 @@ class FileChooserPanel extends JPanel{
                     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     if(chooser.showDialog(FileChooserPanel.this, "Choose folder") 
                         == JFileChooser.APPROVE_OPTION){
-                        getFolderField().setText(chooser.getSelectedFile().getAbsolutePath()+
-                        "/output.smt"); // was: "/%d_%t_%i_%s"
+                        getFolderField().setText(chooser.getSelectedFile().getAbsolutePath()); // was: "/%d_%t_%i_%s"
                     }
                     }
                 });

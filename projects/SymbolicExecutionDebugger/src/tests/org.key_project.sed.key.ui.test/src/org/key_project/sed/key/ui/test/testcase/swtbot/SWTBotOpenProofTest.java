@@ -54,7 +54,7 @@ public class SWTBotOpenProofTest extends AbstractKeYDebugTargetTestCase {
       StarterPreferenceUtil.setSelectedProofStarterID(KeYIDEProofStarter.STARTER_ID);
       KeYIDEPreferences.setSwitchToKeyPerspective(MessageDialogWithToggle.NEVER);
       try {
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Resume on thread
@@ -85,6 +85,7 @@ public class SWTBotOpenProofTest extends AbstractKeYDebugTargetTestCase {
                               Boolean.FALSE, 
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.TRUE,
                               8, 
                               executor);
       }
@@ -107,7 +108,7 @@ public class SWTBotOpenProofTest extends AbstractKeYDebugTargetTestCase {
       StarterPreferenceUtil.setSelectedProofStarterID(KeYIDEProofStarter.STARTER_ID);
       KeYIDEPreferences.setSwitchToKeyPerspective(MessageDialogWithToggle.NEVER);
       try {
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Resume on thread
@@ -136,6 +137,7 @@ public class SWTBotOpenProofTest extends AbstractKeYDebugTargetTestCase {
                               Boolean.TRUE, 
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.TRUE,
                               8, 
                               executor);
       }

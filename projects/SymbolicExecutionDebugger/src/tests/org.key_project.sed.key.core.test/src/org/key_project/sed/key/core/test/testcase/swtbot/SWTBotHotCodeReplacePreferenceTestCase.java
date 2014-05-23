@@ -38,7 +38,7 @@ public class SWTBotHotCodeReplacePreferenceTestCase extends
 
    @Test
    public void testHotCodeReplace() throws Exception{
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+      IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             IPath classPath = new Path(ResourcesPlugin.getWorkspace().getRoot().getRawLocation().toString() + "/SWTBotHotCodeReplacePreferenceTestCase_testHotCodeReplace/src/CodeReplace.java");
@@ -77,8 +77,8 @@ public class SWTBotHotCodeReplacePreferenceTestCase extends
             Boolean.FALSE,
             Boolean.FALSE,
             Boolean.FALSE,
-            8,
-            executor);   
+            Boolean.TRUE,
+            8, executor);   
    
    }
 }

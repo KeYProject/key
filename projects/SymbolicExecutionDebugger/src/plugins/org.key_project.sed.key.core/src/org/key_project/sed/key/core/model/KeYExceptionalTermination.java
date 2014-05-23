@@ -56,10 +56,11 @@ public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination
    public KeYExceptionalTermination(KeYDebugTarget target, 
                                     IKeYSEDDebugNode<?> parent, 
                                     ISEDThread thread, 
-                                    IExecutionTermination executionNode) {
+                                    IExecutionTermination executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
    
    /**

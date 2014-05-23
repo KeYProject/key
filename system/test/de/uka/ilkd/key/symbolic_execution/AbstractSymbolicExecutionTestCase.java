@@ -88,11 +88,11 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepReturnSymbolicExecutionTreeNodesStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -434,8 +434,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       else if (expected instanceof IExecutionMethodReturn) {
          assertTrue("Expected IExecutionMethodReturn but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionMethodReturn);
+         assertTrue(((IExecutionMethodReturn)expected).getSignature() + " does not match " + ((IExecutionMethodReturn)current).getSignature(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getSignature(), ((IExecutionMethodReturn)current).getSignature()));
          if (compareReturnValues) {
             assertTrue(((IExecutionMethodReturn)expected).getNameIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getNameIncludingReturnValue(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getNameIncludingReturnValue(), ((IExecutionMethodReturn)current).getNameIncludingReturnValue()));
+            assertTrue(((IExecutionMethodReturn)expected).getSignatureIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getSignatureIncludingReturnValue(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getSignatureIncludingReturnValue(), ((IExecutionMethodReturn)current).getSignatureIncludingReturnValue()));
          }
          assertEquals(((IExecutionMethodReturn)expected).isReturnValuesComputed(), ((IExecutionMethodReturn)current).isReturnValuesComputed());
          assertVariables((IExecutionMethodReturn)expected, (IExecutionMethodReturn)current, compareVariables);
@@ -1719,14 +1721,14 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    }
 
    /**
-    *
-    * @param proof
-    * @param enabled
+    * Defines if one step simplification is enabled in general and within the {@link Proof}.
+    * @param proof The optional {@link Proof}.
+    * @param enabled {@code true} use one step simplification, {@code false} do not use one step simplification.
     */
    public static void setOneStepSimplificationEnabled(Proof proof, boolean enabled) {
       ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(enabled);
       if (proof != null && !proof.isDisposed()) {
-         proof.getProofIndependentSettings().getGeneralSettings().setOneStepSimplification(true);
+         proof.getProofIndependentSettings().getGeneralSettings().setOneStepSimplification(enabled);
          OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof.env().getInitConfig().getProfile());
          if (simplifier != null) {
             simplifier.refresh(proof);

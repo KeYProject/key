@@ -17,7 +17,11 @@ import java.awt.event.ActionEvent;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.Icon;
+import javax.swing.JOptionPane;
+
 import de.uka.ilkd.key.gui.AutoModeListener;
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.InterruptListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
@@ -43,7 +47,7 @@ import de.uka.ilkd.key.util.Debug;
 @SuppressWarnings("serial")
 public class CounterExampleAction extends MainWindowAction {
 
-	private static final String NAME = "CE";
+	private static final String NAME = "Generate Counterexample";
 	private static final String TOOLTIP = "Search for a counterexample for the selected goal";
 	
 	
@@ -51,6 +55,11 @@ public class CounterExampleAction extends MainWindowAction {
 		super(mainWindow);
 		setName(NAME);
 		setTooltip(TOOLTIP);
+		
+		Icon icon = IconFactory.counterExample(MainWindow.TOOLBAR_ICON_SIZE);
+        putValue(SMALL_ICON, icon);
+		
+		
 		init();
 		
 	}
@@ -65,13 +74,13 @@ public class CounterExampleAction extends MainWindowAction {
 
             public void selectedNodeChanged(KeYSelectionEvent e) {
                 final Proof proof = getMediator().getSelectedProof();
+                                        
                 if (proof == null) {
                     // no proof loaded
                     setEnabled(false);
                 } else {
-                    final Goal selGoal = getMediator().getSelectedGoal();
                     final Node selNode = getMediator().getSelectedNode();
-                    //Can be applied only to root nodes
+                    //Can be applied only to leaf nodes
                     setEnabled(selNode.childrenCount()==0);
                 }
             }
@@ -129,7 +138,7 @@ public class CounterExampleAction extends MainWindowAction {
     
     @Override
 	public void actionPerformed(ActionEvent e) {
-		createProof(getMediator());		
+			
 		CEWorker worker = new CEWorker();
 		worker.start();
 	}
@@ -166,6 +175,16 @@ public class CounterExampleAction extends MainWindowAction {
 		@Override
 		public Object construct() {
 			
+			if(!SolverType.Z3_CE_SOLVER.isInstalled(false)){
+            	
+				JOptionPane.showMessageDialog(mainWindow,
+					    "Z3 is not installed.",
+					    "Error",
+					    JOptionPane.ERROR_MESSAGE);
+				
+            	return null;
+            }
+			createProof(getMediator());					
 			KeYMediator mediator = getMediator();
 			Proof proof = mediator.getSelectedProof();
 			SemanticsBlastingMacro macro = new SemanticsBlastingMacro();

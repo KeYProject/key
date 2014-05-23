@@ -56,10 +56,11 @@ public class KeYLoopBodyTermination extends AbstractSEDLoopBodyTermination imple
    public KeYLoopBodyTermination(KeYDebugTarget target, 
                                     IKeYSEDDebugNode<?> parent, 
                                     ISEDThread thread, 
-                                    IExecutionTermination executionNode) {
+                                    IExecutionTermination executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
    
    /**

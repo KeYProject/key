@@ -30,7 +30,6 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewPart;
@@ -76,18 +75,7 @@ public abstract class AbstractSWTBotSetFileTest extends TestCase {
          // Do path replacements
          if (pathReplacements.length >= 1) {
             String setFileContent = ResourceUtil.readFrom(setFile);
-            for (PathReplacement replacement : pathReplacements) {
-               IResource resource = project.findMember(replacement.getPathToFileInWorkspace());
-               assertNotNull(resource);
-               assertTrue(resource.exists());
-               File location = ResourceUtil.getLocation(resource);
-               assertNotNull(location);
-               String newPath = location.toString();
-               newPath = newPath.replaceAll("\\\\", "\\\\\\\\"); // Make sure that it is a valid regular expression
-               String toReplace = replacement.getPathInSetFile();
-               toReplace = toReplace.replaceAll("\\\\", "\\\\\\\\"); // Make sure that it is a valid regular expression
-               setFileContent = setFileContent.replaceAll(toReplace, newPath);
-            }
+            setFileContent = applyPathReplacements(project, setFileContent, pathReplacements);
             setFile.setContents(new ByteArrayInputStream(setFileContent.getBytes()), true, true, null);
          }
          // Compute path in project explorer
@@ -101,8 +89,9 @@ public abstract class AbstractSWTBotSetFileTest extends TestCase {
          SWTWorkbenchBot bot = new SWTWorkbenchBot();
          TestUtilsUtil.closeWelcomeView(bot);
          propertiesView = TestUtilsUtil.openView(IPageLayout.ID_PROP_SHEET); // Has to be opened to avoid exceptions.
-         SWTBotTreeItem setFileItem = TestUtilsUtil.selectInProjectExplorer(bot, uiPath.toArray(new String[uiPath.size()]));
-         setFileItem.contextMenu("Debug As").menu("&1 Symbolic Execution Tree File").click();
+         TestUtilsUtil.selectInProjectExplorer(bot, uiPath.toArray(new String[uiPath.size()]));
+         SWTBotView viewBot = TestUtilsUtil.getProjectExplorer(bot);
+         TestUtilsUtil.clickContextMenu(viewBot.bot().tree(), "Debug As", "&1 Symbolic Execution Tree File");
          // Switch into symbolic debug perspective
          TestUtilsUtil.confirmPerspectiveSwitch(bot, SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID);
          // Find the launched ILaunch in the debug view
@@ -138,6 +127,29 @@ public abstract class AbstractSWTBotSetFileTest extends TestCase {
       }
    }
    
+   /**
+    * Applies the path replacements.
+    * @param project The new {@link IProject}.
+    * @param setFileContent The content to update.
+    * @param pathReplacements The {@link PathReplacement} to apply.
+    * @return The updated content.
+    */
+   protected String applyPathReplacements(IProject project, String setFileContent, PathReplacement... pathReplacements) {
+      for (PathReplacement replacement : pathReplacements) {
+         IResource resource = project.findMember(replacement.getPathToFileInWorkspace());
+         assertNotNull(resource);
+         assertTrue(resource.exists());
+         File location = ResourceUtil.getLocation(resource);
+         assertNotNull(location);
+         String newPath = location.toString();
+         newPath = newPath.replaceAll("\\\\", "\\\\\\\\"); // Make sure that it is a valid regular expression
+         String toReplace = replacement.getPathInSetFile();
+         toReplace = toReplace.replaceAll("\\\\", "\\\\\\\\"); // Make sure that it is a valid regular expression
+         setFileContent = setFileContent.replaceAll(toReplace, newPath);
+      }
+      return setFileContent;
+   }
+
    /**
     * A path replacement do be done in 
     * {@link AbstractSWTBotSetFileTest#doSetFileTest(String, String, String, ISetFileTestSteps)}.

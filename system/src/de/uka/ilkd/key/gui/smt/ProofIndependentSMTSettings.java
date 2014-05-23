@@ -104,7 +104,21 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
                 copy(data);
         }
         
-        public void copy(ProofIndependentSMTSettings data){
+        
+        
+        public int getMaxConcurrentProcesses() {
+			return maxConcurrentProcesses;
+		}
+
+
+
+		public void setMaxConcurrentProcesses(int maxConcurrentProcesses) {
+			this.maxConcurrentProcesses = maxConcurrentProcesses;
+		}
+
+
+
+		public void copy(ProofIndependentSMTSettings data){
                 this.showResultsAfterExecution     = data.showResultsAfterExecution;
                 this.storeSMTTranslationToFile     = data.storeSMTTranslationToFile;
                 this.storeTacletTranslationToFile  = data.storeTacletTranslationToFile;

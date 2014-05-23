@@ -131,7 +131,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
       IExampleTestSteps steps = new IExampleTestSteps() {
          @Override
          public void doTest(IJavaProject javaProject) throws Exception {
-            IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+            IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
                @Override
                public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                   SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
@@ -141,7 +141,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
                   assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false);
                }
             };
-            doKeYDebugTargetTest(javaProject, true, true, selector, useExistingContract, preconditionOrExistingContract, false, false, false, false, false, 10, executor);
+            doKeYDebugTargetTest(javaProject, true, true, selector, useExistingContract, preconditionOrExistingContract, false, false, false, false, false, true, 10, executor);
          }
       };
       doExampleTest(projectName, steps);
@@ -169,7 +169,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
          @Override
          public void doTest(IJavaProject javaProject) throws Exception {
             IKeYDebugTargetTestExecutor executor = createResumeExecutor(false, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false, false, false, useMethodContracts, useLoopInvariants, false, false);
-            doKeYDebugTargetTest(javaProject, true, true, selector, useExistingContract, preconditionOrExistingContract, false, false, false, false, false, 10, executor);
+            doKeYDebugTargetTest(javaProject, true, true, selector, useExistingContract, preconditionOrExistingContract, false, false, false, false, false, true, 10, executor);
          }
       };
       doExampleTest(projectName, steps);

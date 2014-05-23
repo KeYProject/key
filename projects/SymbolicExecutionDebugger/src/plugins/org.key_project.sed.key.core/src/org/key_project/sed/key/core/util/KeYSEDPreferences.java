@@ -56,6 +56,11 @@ public class KeYSEDPreferences {
     * Preference key to define that pretty printing is used or not.
     */
    public static final String USE_PRETTY_PRINTING = "org.key_project.sed.key.core.preference.usePrettyPrinting";
+
+   /**
+    * Preference key to define that the full signature will be shown on method return nodes.
+    */
+   public static final String SHOW_SIGNATURE_ON_METHOD_RETURN_NODES = "org.key_project.sed.key.core.preference.showSignatureOnMethodReturnNodes";
    
    /**
     * Returns the managed {@link IPreferenceStore}.
@@ -255,5 +260,37 @@ public class KeYSEDPreferences {
     */
    public static void setDefaultUsePrettyPrinting(boolean defaultValue) {
       getStore().setDefault(USE_PRETTY_PRINTING, defaultValue);
+   }
+   
+   /**
+    * Checks if the full signature will be shown or not.
+    * @return Use pretty printing?
+    */
+   public static boolean isShowSignatureOnMethodReturnNodes() {
+      return getStore().getBoolean(SHOW_SIGNATURE_ON_METHOD_RETURN_NODES);
+   }
+   
+   /**
+    * Checks if the full signature will be shown or not by default.
+    * @return Use pretty printing?
+    */
+   public static boolean isDefaultShowSignatureOnMethodReturnNodes() {
+      return getStore().getDefaultBoolean(SHOW_SIGNATURE_ON_METHOD_RETURN_NODES);
+   }
+   
+   /**
+    * Sets if the full signature will be shown or not.
+    * @param value Use pretty printing?
+    */
+   public static void setShowSignatureOnMethodReturnNodes(boolean value) {
+      getStore().setValue(SHOW_SIGNATURE_ON_METHOD_RETURN_NODES, value);
+   }
+   
+   /**
+    * Sets the full signature will be shown or not by default.
+    * @param defaultValue Use pretty printing?
+    */
+   public static void setDefaultShowSignatureOnMethodReturnNodes(boolean defaultValue) {
+      getStore().setDefault(SHOW_SIGNATURE_ON_METHOD_RETURN_NODES, defaultValue);
    }
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="org.key_project.sed.core.annotationTypes" name="Annotation Types" schema="schema/org.key_project.sed.core.annotationTypes.exsd"/>
       <extension
             point="org.eclipse.core.runtime.preferences">
          <initializer
@@ -16,5 +17,21 @@
                properties="stackFrameHasVariables"
                type="org.eclipse.debug.core.model.IStackFrame">
          </propertyTester>
+         <propertyTester
+               class="org.key_project.sed.core.propertyTester.HasSEDDebugTargetPropertyTester"
+               id="org.key_project.sed.core.hasSEDDebugTargetPropertyTester"
+               namespace="org.key_project.sed.core"
+               properties="hasSEDDebugTarget"
+               type="org.eclipse.debug.core.ILaunch">
+         </propertyTester>
+      </extension>
+      <extension
+            point="org.key_project.sed.core.annotationTypes">
+         <annotationType
+               class="org.key_project.sed.core.annotation.impl.SearchAnnotationType">
+         </annotationType>
+         <annotationType
+               class="org.key_project.sed.core.annotation.impl.CommentAnnotationType">
+         </annotationType>
       </extension>
 </plugin>

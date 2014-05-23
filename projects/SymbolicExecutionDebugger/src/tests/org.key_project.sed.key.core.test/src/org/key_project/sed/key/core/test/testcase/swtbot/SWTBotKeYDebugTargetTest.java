@@ -1099,7 +1099,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     */
    @Test
    public void testSuspendResumeDebugTarget_Resume_Suspend_Resume() throws Exception {
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+      IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Test launch commands after loading completed
@@ -1181,8 +1181,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.FALSE,
-                           6, 
-                           executor);
+                           Boolean.TRUE, 
+                           6, executor);
    }
    
    /**
@@ -1345,8 +1345,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.valueOf(showKeYMainWindow),
                            Boolean.valueOf(mergeBranchConditions),
                            Boolean.FALSE,
-                           timeoutFactor, 
-                           executor);
+                           Boolean.TRUE, 
+                           timeoutFactor, executor);
    }
 
    /**
@@ -1406,7 +1406,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
    protected void doTestSuspendResumeWhileDisconnected(String projectName,
                                                        final boolean clearProofListInKeYBeforeDisconnect,
                                                        final int... pathToElementInDebugTreeWhichProvidesDisconnectMenuItem) throws Exception {
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+      IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Test launch commands after loading completed
@@ -1464,8 +1464,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.TRUE,
                            Boolean.FALSE,
                            Boolean.FALSE,
-                           8, 
-                           executor);
+                           Boolean.TRUE, 
+                           8, executor);
    }
 
    /**
@@ -1513,7 +1513,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
    protected void doTerminationTest(String projectName,
                                     final boolean clearProofListInKeYBeforeTermination,
                                     final int... pathToElementInDebugTreeWhichProvidesTerminateMenuItem) throws Exception {
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+      IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Test launch commands after loading completed
@@ -1563,7 +1563,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.TRUE,
                            Boolean.FALSE,
                            Boolean.FALSE,
-                           8, 
-                           executor);
+                           Boolean.TRUE, 
+                           8, executor);
    }
 }

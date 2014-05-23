@@ -39,11 +39,25 @@ public interface IExecutionMethodReturn extends IExecutionStateNode<SourceElemen
    public IExecutionMethodCall getMethodCall();
    
    /**
+    * Returns a human readable signature which describes this element.
+    * @return The human readable signature which describes this element.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public String getSignature() throws ProofInputException;
+   
+   /**
     * Returns the human readable node name including the return value ({@link #getReturnValues()}).
     * @return The human readable node name including the return value.
     * @throws ProofInputException Occurred Exception.
     */
    public String getNameIncludingReturnValue() throws ProofInputException;
+   
+   /**
+    * Returns the human readable signature including the return value ({@link #getReturnValues()}).
+    * @return The human readable signature including the return value.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public String getSignatureIncludingReturnValue() throws ProofInputException;
 
    /**
     * Checks if the values of {@link #getReturnValues()} are already computed.

@@ -142,7 +142,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
          branchCondition = SymbolicExecutionUtil.improveReadability(branchCondition, getServices());
       }
       else {
-         branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true, true);
+         branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true);
       }
       // Format branch condition
       formatedBranchCondition = formatTerm(branchCondition);
@@ -242,7 +242,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
          Term[] result = new Term[mergedProofNodes.size()];
          Iterator<Node> iter = mergedProofNodes.iterator();
          for (int i = 0; i < result.length; i++) {
-            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), true, true);
+            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), true);
          }
          return result;
       }

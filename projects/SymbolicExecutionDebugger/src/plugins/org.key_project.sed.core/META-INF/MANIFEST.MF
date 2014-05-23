@@ -14,7 +14,11 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
-Export-Package: org.key_project.sed.core.model,
+Export-Package: org.key_project.sed.core.annotation,
+ org.key_project.sed.core.annotation.event,
+ org.key_project.sed.core.annotation.impl,
+ org.key_project.sed.core.model,
+ org.key_project.sed.core.model.event,
  org.key_project.sed.core.model.impl,
  org.key_project.sed.core.model.memory,
  org.key_project.sed.core.model.serialization,

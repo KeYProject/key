@@ -42,7 +42,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
     * @throws Exception Occurred Exception.
     */
    protected void doFlatStepsTest(String projectName, final ITestSteps steps) throws Exception {
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+      IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Resume on thread
@@ -82,6 +82,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
                            Boolean.FALSE, 
                            Boolean.FALSE,
                            Boolean.FALSE,
+                           Boolean.TRUE,
                            8, 
                            executor);
    }
