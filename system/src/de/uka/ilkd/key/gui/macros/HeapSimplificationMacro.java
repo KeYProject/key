@@ -41,8 +41,6 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         
         "dismissNonSelectedField",
         "dismissNonSelectedFieldEQ",
-        
-        // these are in ruleset concrete, but listed here to be applied when OSS is off
         "replaceKnownSelect",
         "dropEffectlessStores",
         "memsetEmpty",
@@ -63,7 +61,6 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         
         
         // EQ versions of the above
-        // XXX do not really work....
         "selectOfStoreEQ",
         "selectOfCreateEQ",
         "selectOfAnonEQ",
@@ -101,9 +98,30 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "elementOfInfiniteUnion",
         "elementOfInfiniteUnion2Vars",
         
-        "disjointDefinition", // TODO: may have own rules in future
+        "allFieldsEq",
+        "subsetSingletonRight",
+        "subsetSingletonRightEQ",
+        "subsetOfIntersectWithItSelfEQ1",
+        "subsetOfIntersectWithItSelfEQ2",
+        "allFieldsSubsetOf",
+        "disjointAllFields",
+        "disjointAllObjects",
+        "disjointInfiniteUnion",
+        "disjointInfiniteUnion_2",
+        "intersectAllFieldsFreshLocs",
         
-        // TODO: add derived simplification rules
+        "createdInHeapWithSingleton",
+        "createdInHeapWithAllFields",
+        "createdInHeapWithArrayRange",
+        "createdInHeapWithSingletonEQ",
+        "createdInHeapWithUnionEQ",
+        "createdInHeapWithSetMinusFreshLocsEQ",
+        "createdInHeapWithAllFieldsEQ",
+        "createdInHeapWithArrayRangeEQ",
+        "createdInHeapWithSelectEQ",
+        "createdInHeapWithObserverEQ",
+        
+        // TODO: the "other lemma" locset rules are not yet here
         
         "elementOfEmptyEQ",
         "elementOfAllLocsEQ",
@@ -117,14 +135,23 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "elementOfFreshLocsEQ",
         "elementOfInfiniteUnion2VarsEQ",
         
+        // semantics blasting rules
+        "equalityToElementOfRight",
+        "subsetToElementOfRight",
+        "disjointDefinition", // TODO: may have own rules in future
+        
+        // alpha rules
+        "impRight",
+        "andLeft",
+        "orRight",
+        "close",
+        "closeTrue",
+        "closeFalse",
+        
         // others
         "nonNull",
         "nonNullZero",
-        
         "allRight",
-        "close",
-        "closeTrue",
-        "closeFalse"
     });
 
 
