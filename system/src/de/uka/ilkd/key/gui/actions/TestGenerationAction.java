@@ -27,7 +27,7 @@ public class TestGenerationAction extends MainWindowAction {
 	private static final String NAME = "Generate Testcases";
 	private static final String TOOLTIP = "Generate test cases for open goals";
 	
-	public static Proof originalProof;
+	//public static Proof originalProof;
 
 	public TestGenerationAction(MainWindow mainWindow) {
 		super(mainWindow);
