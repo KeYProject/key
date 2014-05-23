@@ -493,6 +493,7 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
       monitor.beginTask("Computing statistics", IProgressMonitor.UNKNOWN);
       SWTUtil.checkCanceled(monitor);
       int nodeCount = 0;
+      int splitCount = 0;
       int terminatedBranchesCount = 0;
       int notTerminatedBranchesCount = 0;
       ISEDIterator iter = new SEDPreorderIterator(this);
@@ -502,7 +503,8 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
          if (next instanceof ISEDDebugNode) {
             ISEDDebugNode node = (ISEDDebugNode)next;
             nodeCount++;
-            if (!node.hasChildren()) {
+            ISEDDebugNode[] children = node.getChildren();
+            if (children.length == 0) {
                if (node instanceof ISEDTermination) {
                   terminatedBranchesCount++;
                }
@@ -510,14 +512,18 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
                   notTerminatedBranchesCount++;
                }
             }
+            else if (children.length >= 2) {
+               splitCount++;
+            }
          }
          monitor.worked(1);
       }
       // Create result
       Map<String, String> statistics = new LinkedHashMap<String, String>();
       statistics.put("Number of nodes", nodeCount + "");
-      statistics.put("Number of completed branches", terminatedBranchesCount + "");
-      statistics.put("Number of not completed branches", notTerminatedBranchesCount + "");
+      statistics.put("Number of splits", splitCount + "");
+      statistics.put("Number of completed paths", terminatedBranchesCount + "");
+      statistics.put("Number of not completed paths", notTerminatedBranchesCount + "");
       monitor.done();
       return statistics;
    }
