@@ -12,7 +12,6 @@
 //
 package de.uka.ilkd.key.proof.io;
 
-
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -30,88 +29,100 @@ import javax.swing.SwingWorker;
  *
  * @author Martin Hentschel
  */
-public final class ProblemLoader extends DefaultProblemLoader implements Runnable {
+public final class ProblemLoader extends DefaultProblemLoader {
 
-    private SwingWorker worker;
     private ProverTaskListener ptl;
 
     public ProblemLoader(File file, List<File> classPath, File bootClassPath, Profile profileOfNewProofs, KeYMediator mediator) {
         super(file, classPath, bootClassPath, profileOfNewProofs, mediator);
     }
 
-    public void addTaskListener(ProverTaskListener ptl) {
+    public void addTaskListener(final ProverTaskListener ptl) {
         this.ptl = ptl;
     }
 
-    @Override
-    public void run() {
-        /*
-         * Invoking execute() on the SwingWorker causes a new Thread to be
-         * created that will call construct(), and then finished(). Note
-         * that done() is called even if the worker is interrupted
-         * because we catch the InterruptedException in doWork().
-         */
-        worker = new SwingWorker<Object, Object>() {
+    public void runSynchronously() {
+        getMediator().stopInterface(true);
+        fireTaskStarted();
 
-            private long time;
+        final long currentTime = System.currentTimeMillis();
+        final Throwable message = doWork();
+        long runTime = System.currentTimeMillis() - currentTime;
+
+        fireTaskFinished(runTime, message);
+        reportException(message);
+    }
+
+    private Throwable doWork() {
+        try {
+            return load();
+        } catch (final ExceptionHandlerException exception) {
+            final String errorMessage = "Failed to load "
+                    + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
+            getMediator().getUI().notify(new ExceptionFailureEvent(errorMessage, exception));
+            getMediator().getUI().reportStatus(this, errorMessage);
+            return exception;
+        } catch (final Throwable throwable) {
+            reportException(throwable);
+            return throwable;
+        }
+    }
+
+    private void fireTaskStarted() {
+        if (ptl != null) {
+            ptl.taskStarted("Loading problem ...", 0);
+        }
+    }
+
+    private void fireTaskFinished(long runningTime, final Throwable message) {
+        if (ptl != null) {
+            final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, message,
+                    getProof(), runningTime, (getProof() != null ? getProof().countNodes() : 0),
+                    (getProof() != null ? getProof().countBranches() - getProof().openGoals().size() : 0));
+            ptl.taskFinished(tfi);
+        }
+    }
+
+    private void reportException(final Throwable message) {
+        if (message != null) {
+            getExceptionHandler().reportException(message);
+        }
+    }
+
+    public KeYExceptionHandler getExceptionHandler() {
+        return getMediator().getExceptionHandler();
+    }
+
+    public void runAsynchronously() {
+        final SwingWorker worker = new SwingWorker<Throwable, Void>() {
+
+            private long runTime;
 
             @Override
-            protected Object doInBackground() throws Exception {
-                time = System.currentTimeMillis();
-                Object res = doWork();
-                time = System.currentTimeMillis() - time;
-                return res;
+            protected Throwable doInBackground() throws Exception {
+                long currentTime = System.currentTimeMillis();
+                final Throwable message = doWork();
+                runTime = System.currentTimeMillis() - currentTime;
+                return message;
             }
 
             @Override
             protected void done() {
                 getMediator().startInterface(true);
-                Object msg;
+                Throwable message = null;
                 try {
-                    msg = get();
-                } catch (Exception exception) {
+                    message = get();
+                } catch (final Exception exception) {
                     getExceptionHandler().reportException(exception);
-                    msg = null;
-                }
-
-                if (ptl != null) {
-                    final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, msg, getProof(), time, (getProof() != null ? getProof().countNodes() : 0), (getProof() != null ? getProof().countBranches() - getProof().openGoals().size() : 0));
-                    ptl.taskFinished(tfi);
+                } finally {
+                    fireTaskFinished(runTime, message);
                 }
             }
-
         };
 
         getMediator().stopInterface(true);
-        if (ptl != null) {
-            ptl.taskStarted("Loading problem ...", 0);
-        }
+        fireTaskStarted();
         worker.execute();
-    }
-
-    private Throwable doWork() {
-        Throwable status = null;
-        try {
-            try {
-                status = load();
-            } catch (ExceptionHandlerException e) {
-                // e.printStackTrace();
-                throw e;
-            } catch (Throwable thr) {
-                getExceptionHandler().reportException(thr);
-                status = thr;
-            }
-        } catch (ExceptionHandlerException ex) {
-            String errorMessage = "Failed to load " + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
-            getMediator().getUI().notify(new ExceptionFailureEvent(errorMessage, ex));
-            getMediator().getUI().reportStatus(this, errorMessage);
-            status = ex;
-        }
-        return status;
-    }
-
-    public KeYExceptionHandler getExceptionHandler() {
-        return getMediator().getExceptionHandler();
     }
 
     @Override
