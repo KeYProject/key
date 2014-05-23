@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <state name="One Step Simplification resulting in return x.value+x.next.value;">
-      <association name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" target="o3"/>
    </state>
-   <object xml:id="o1" name="x" type="SimpleLinkedOjbectsDeletion">
+   <object xml:id="o1" name="SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next)" type="SimpleLinkedOjbectsDeletion">
       <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </object>
-   <object xml:id="o2" name="SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next)" type="SimpleLinkedOjbectsDeletion">
-      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o3"/>
+   <object xml:id="o2" name="SimpleLinkedOjbectsDeletion::select(heap,SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),SimpleLinkedOjbectsDeletion::$next)" type="SimpleLinkedOjbectsDeletion">
    </object>
-   <object xml:id="o3" name="SimpleLinkedOjbectsDeletion::select(heap,SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),SimpleLinkedOjbectsDeletion::$next)" type="SimpleLinkedOjbectsDeletion">
+   <object xml:id="o3" name="x" type="SimpleLinkedOjbectsDeletion">
+      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o1"/>
    </object>
 </model>

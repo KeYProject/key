@@ -92,6 +92,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           boolean showVariablesOfSelectedDebugNode = KeySEDUtil.isShowVariablesOfSelectedDebugNode(configuration);
           boolean executeMethodRange = KeySEDUtil.isExecuteMethodRange(configuration);
           boolean usePrettyPrinting = KeySEDUtil.isUsePrettyPrinting(configuration);
+          boolean showSignatureOnMethodReturnNodes = KeySEDUtil.isShowSignatureOnMethodReturnNodes(configuration);
           Position methodRangeStart = new KeYUtil.CursorPosition(KeySEDUtil.getMethodRangeStartLine(configuration), KeySEDUtil.getMethodRangeStartColumn(configuration));
           Position methodRangeEnd = new KeYUtil.CursorPosition(KeySEDUtil.getMethodRangeEndLine(configuration), KeySEDUtil.getMethodRangeEndColumn(configuration));
           // Determine location and class path entries
@@ -138,7 +139,8 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                              location, 
                                                              classPaths, 
                                                              bootClassPath, 
-                                                             usePrettyPrinting); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
+                                                             usePrettyPrinting,
+                                                             showSignatureOnMethodReturnNodes); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
           // Validate proof settings
           if (newDebugSession) {
              if (method == null) {

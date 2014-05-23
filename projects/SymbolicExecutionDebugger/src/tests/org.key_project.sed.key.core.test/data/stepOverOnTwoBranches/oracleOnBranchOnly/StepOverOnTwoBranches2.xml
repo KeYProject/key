@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_4af31dee-b02a-451e-b115-3ce9e2186676" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_f094767b-94dd-4d8c-b311-5246723ae949" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_0693e9a3-2223-4ac0-a2f6-469ca3709915" name="self.main(a);" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56">
+   <sedTarget xml:id="_07be892d-60b1-4828-b5eb-533bcfe2e991" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_b65cfd77-8684-46a4-b522-c1633de5698a" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_20cb32a7-89b1-445f-82b1-580200564271" name="self.main(a);" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
          </sedMethodCall>
       </sedThread>
    </sedTarget>

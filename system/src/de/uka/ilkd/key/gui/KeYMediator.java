@@ -111,11 +111,9 @@ public class KeYMediator {
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
      */
-    public KeYMediator(UserInterface ui, boolean useAutoSaver) {
+    public KeYMediator(UserInterface ui) {
 	this.ui             = ui;
-	if (useAutoSaver) {
-		autoSaver = new AutoSaver();
-	}
+	this.autoSaver = AutoSaver.getDefaultInstance();
 
 	notationInfo        = new NotationInfo();
 	proofListener       = new KeYMediatorProofListener();

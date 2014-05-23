@@ -98,6 +98,13 @@ class TacletMenu extends JMenu {
         CLUTTER_RULES.add(new Name("typeStatic"));
         CLUTTER_RULES.add(new Name("less_is_total"));
         CLUTTER_RULES.add(new Name("less_zero_is_total"));
+        CLUTTER_RULES.add(new Name("applyEqReverse"));
+        
+        
+        // the following are used for drag'n'drop interactions
+        CLUTTER_RULES.add(new Name("eqTermCut"));
+        CLUTTER_RULES.add(new Name("instAll"));
+        CLUTTER_RULES.add(new Name("instEx"));
     }
 
     private TacletAppComparator comp = new TacletAppComparator();

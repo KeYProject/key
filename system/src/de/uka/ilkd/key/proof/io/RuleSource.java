@@ -56,7 +56,7 @@ public class RuleSource {
 		}
 		input.close();
 	    } catch (IOException ioex){
-		System.err.println("IOException in class RuleSource");
+	        throw new RuntimeException("IOException in class RuleSource",ioex);
 	    }
 	}
     }
@@ -128,12 +128,12 @@ public class RuleSource {
 	    }
 	}
 	catch (IOException ioe) {
-	    System.err.println("*******************************************");
-	    System.err.println("IO-Error occured while opening rule stream.");
-	    System.err.println("URL: "+url);
-	    System.err.println(ioe);
-	    System.err.println("*******************************************");
-	    ioe.printStackTrace();
+//	    System.err.println("*******************************************");
+//	    System.err.println("IO-Error occured while opening rule stream.");
+//	    System.err.println("URL: "+url);
+//	    System.err.println(ioe);
+//	    System.err.println("*******************************************");
+//	    ioe.printStackTrace();
 	    throw new RuntimeException("Error while parsing rules.", ioe);
 	}
     }

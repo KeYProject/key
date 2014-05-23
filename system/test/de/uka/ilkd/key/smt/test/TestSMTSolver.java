@@ -140,6 +140,12 @@ public long getLocSetBound() {
 	return 3;
 }
 
+@Override
+public boolean invarianForall() {
+	// TODO Auto-generated method stub
+	return false;
+}
+
     
 }
 

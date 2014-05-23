@@ -74,10 +74,11 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    public KeYMethodReturn(KeYDebugTarget target, 
                           IKeYSEDDebugNode<?> parent, 
                           ISEDThread thread, 
-                          IExecutionMethodReturn executionNode) {
+                          IExecutionMethodReturn executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
    
    /**
@@ -127,9 +128,16 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    @Override
    public String getName() throws DebugException {
       try {
-         return (executionNode.isReturnValuesComputed() || !executionNode.isDisposed()) && getDebugTarget().isShowMethodReturnValuesInDebugNodes() ? 
-                 executionNode.getNameIncludingReturnValue() : 
-                 executionNode.getName();
+         if (getDebugTarget().isShowSignatureOnMethodReturnNodes()) {
+            return (executionNode.isReturnValuesComputed() || !executionNode.isDisposed()) && getDebugTarget().isShowMethodReturnValuesInDebugNodes() ? 
+                    executionNode.getSignatureIncludingReturnValue() : 
+                    executionNode.getSignature();
+         }
+         else {
+            return (executionNode.isReturnValuesComputed() || !executionNode.isDisposed()) && getDebugTarget().isShowMethodReturnValuesInDebugNodes() ? 
+                    executionNode.getNameIncludingReturnValue() : 
+                    executionNode.getName();
+         }
       }
       catch (ProofInputException e) {
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute method return name including return value.", e));
