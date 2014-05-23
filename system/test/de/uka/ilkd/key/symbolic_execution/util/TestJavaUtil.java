@@ -28,6 +28,34 @@ import junit.framework.TestCase;
  */
 public class TestJavaUtil extends TestCase {
    /**
+    * Tests {@link JavaUtil#contains(Object[], Object)}
+    */
+   public void testContains() {
+      String[] array = {"A", "B", "C"};
+      assertFalse(JavaUtil.contains(array, null));
+      assertFalse(JavaUtil.contains(null, "A"));
+      assertTrue(JavaUtil.contains(array, "A"));
+      assertTrue(JavaUtil.contains(array, "B"));
+      assertTrue(JavaUtil.contains(array, "C"));
+      assertFalse(JavaUtil.contains(array, "D"));
+      String[] arrayWithNull = {"A", "B", null, "D"};
+      assertTrue(JavaUtil.contains(arrayWithNull, null));
+      assertFalse(JavaUtil.contains(null, "A"));
+      assertTrue(JavaUtil.contains(arrayWithNull, "A"));
+      assertTrue(JavaUtil.contains(arrayWithNull, "B"));
+      assertFalse(JavaUtil.contains(arrayWithNull, "C"));
+      assertTrue(JavaUtil.contains(arrayWithNull, "D"));
+      assertFalse(JavaUtil.contains(arrayWithNull, "E"));
+      String[] arrayWithDoubleElements = {"B", "A", "C", "B", "C"};
+      assertFalse(JavaUtil.contains(arrayWithDoubleElements, null));
+      assertFalse(JavaUtil.contains(null, "A"));
+      assertTrue(JavaUtil.contains(arrayWithDoubleElements, "A"));
+      assertTrue(JavaUtil.contains(arrayWithDoubleElements, "B"));
+      assertTrue(JavaUtil.contains(arrayWithDoubleElements, "C"));
+      assertFalse(JavaUtil.contains(arrayWithDoubleElements, "D"));
+   }
+   
+   /**
     * Tests for {@link JavaUtil#toSortedString(java.util.Map)}
     */
    public void testSoSortedString() {

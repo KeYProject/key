@@ -79,10 +79,11 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
    public KeYMethodContract(KeYDebugTarget target, 
                             IKeYSEDDebugNode<?> parent, 
                             ISEDThread thread, 
-                            IExecutionOperationContract executionNode) {
+                            IExecutionOperationContract executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
    
    /**

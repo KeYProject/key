@@ -56,10 +56,11 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
    public KeYBranchCondition(KeYDebugTarget target, 
                              IKeYSEDDebugNode<?> parent, 
                              ISEDThread thread, 
-                             IExecutionBranchCondition executionNode) {
+                             IExecutionBranchCondition executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
    
    /**

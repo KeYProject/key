@@ -131,7 +131,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
       IExampleTestSteps steps = new IExampleTestSteps() {
          @Override
          public void doTest(IJavaProject javaProject) throws Exception {
-            IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+            IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
                @Override
                public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                   SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread

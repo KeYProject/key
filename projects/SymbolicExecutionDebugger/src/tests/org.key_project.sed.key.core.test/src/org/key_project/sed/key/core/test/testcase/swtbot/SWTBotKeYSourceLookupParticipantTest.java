@@ -71,7 +71,7 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             KeYResourceProperties.setClassPathEntries(project, entries);
          }
       };
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+      IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             IFolder srcFolder = project.getProject().getFolder("src");

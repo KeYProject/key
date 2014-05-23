@@ -17,7 +17,7 @@ post: result_0 = self.subMagic(x)
 &amp; exc_0 = null
 mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-            <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchCondition name="geq(x,Z(0(#)))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="geq(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="return magicValue+this.instanceField+classField;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false">
                   <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(0(2(1(#)))) as result of self.main(x);&gt;" isReturnValueComputed="true">
                      <methodReturnValue name="Z(0(2(1(#))))" returnValueString="Z(0(2(1(#))))" hasCondition="false">
@@ -27,7 +27,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                   </methodReturn>
                </statement>
             </branchCondition>
-            <branchCondition name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchCondition name="leq(x,Z(neglit(1(#))))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="leq(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="return magicValue+this.instanceField+classField;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
                   <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(7(8(7(4(#)))))) as result of self.main(x);&gt;" isReturnValueComputed="true">
                      <methodReturnValue name="Z(neglit(7(8(7(4(#))))))" returnValueString="Z(neglit(7(8(7(4(#))))))" hasCondition="false">

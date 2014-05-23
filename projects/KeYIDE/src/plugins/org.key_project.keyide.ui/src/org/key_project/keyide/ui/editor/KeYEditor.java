@@ -51,7 +51,6 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.key4eclipse.starter.core.util.ProofUserManager;
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.keyide.ui.breakpoints.KeYBreakpointManager;
@@ -79,6 +78,7 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.ProofUserManager;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -353,7 +353,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             else {
                throw new CoreException(LogUtil.getLogger().createErrorStatus("Unsupported editor input \"" + input + "\"."));
             }
-            breakpointManager = new KeYBreakpointManager(environment, currentProof);
+            breakpointManager = new KeYBreakpointManager(currentProof);
             DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(breakpointManager);
             ProofUserManager.getInstance().addUser(currentProof, environment, this);
             this.environment.getMediator().setProof(currentProof);

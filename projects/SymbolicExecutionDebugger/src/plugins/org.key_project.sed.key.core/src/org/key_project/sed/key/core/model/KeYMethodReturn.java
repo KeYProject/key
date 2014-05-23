@@ -74,10 +74,11 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    public KeYMethodReturn(KeYDebugTarget target, 
                           IKeYSEDDebugNode<?> parent, 
                           ISEDThread thread, 
-                          IExecutionMethodReturn executionNode) {
+                          IExecutionMethodReturn executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
    
    /**

@@ -165,6 +165,12 @@
                     id="org.key_project.sed.ui.visualization.source.tab"
                     label="Source">
               </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.visualization.source.tab"
+                    category="Graphiti"
+                    id="org.key_project.sed.ui.visualization.annotationLinks.tab"
+                    label="Annotation Links">
+              </propertyTab>
           </propertyTabs>
       </extension>
        
@@ -187,6 +193,12 @@
                     filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiSourceTreeFilter"
                     id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiSourcePropertySection"
                     tab="org.key_project.sed.ui.visualization.source.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiAnnotationLinkPropertySection"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiReadonlyDebugNodeTreeFilter"
+                    id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiAnnotationLinkPropertySection"
+                    tab="org.key_project.sed.ui.visualization.annotationLinks.tab">
               </propertySection>
           </propertySections>
       </extension>    

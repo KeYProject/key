@@ -5,36 +5,70 @@
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <loopInvariant name="
-invariant: i &gt;= 0 &amp; (i &lt;= array.length &amp; result_1 = i);
+            <loopInvariant name="invariant: i &gt;= 0 &amp; (i &lt;= array.length &amp; result_1 = i);
 variant: javaSubInt(array.length, i)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
-               <branchCondition name="not(or(or(or(and(and(geq(i_0,Z(1(#))),geq(length(array),Z(0(#)))),lt(length(array),i_0)),and(and(leq(i_0,Z(neglit(1(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0))),not(imp(and(and(geq(i_0,Z(0(#))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(equals(result_1_0,i_0),geq(i_0,Z(0(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),and(wellFormed(heap),equals(i,Z(neglit(1(#)))))))))" pathCondition="not(and(geq(length(array),Z(0(#))),or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),geq(length(array),i_0)),and(wellFormed(heap),equals(i,Z(neglit(1(#))))))))))" pathConditionChanged="true" branchCondition="not(or(or(or(and(and(geq(i_0,Z(1(#))),geq(length(array),Z(0(#)))),lt(length(array),i_0)),and(and(leq(i_0,Z(neglit(1(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0))),not(imp(and(and(geq(i_0,Z(0(#))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(and(equals(result_1_0,i_0),geq(i_0,Z(0(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),and(wellFormed(heap),equals(i,Z(neglit(1(#)))))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+               <branchCondition name="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
+    b_6=goOnNice(array,i);
+  }
+}\] (and(equals(b_6,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
+    b_6=goOnNice(array,i);
+  }
+}\] (and(equals(b_6,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
+    b_6=goOnNice(array,i);
+  }
+}\] (and(equals(b_6,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <callStackEntry path="/0"/>
-                  <branchCondition name="and(leq(i_2,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#)))))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),geq(length(array),i_0)),and(wellFormed(heap),equals(i,Z(neglit(1(#))))))))),and(leq(i_2,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#)))))))" pathConditionChanged="true" branchCondition="and(leq(i_2,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
-                     <methodCall name="WhileWithLoopInvariantInCondition.goOnNice(array_3,i_3);" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),geq(length(array),i_0)),and(wellFormed(heap),equals(i,Z(neglit(1(#))))))))),and(leq(i_2,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#)))))))" pathConditionChanged="false">
+                  <branchCondition name="equals(i_2_0,Z(neglit(1(#))))" pathCondition="not(or(not(equals(i_2_0,Z(neglit(1(#))))),not(imp(equals(i_2_0,Z(neglit(1(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
+    b_6=goOnNice(array,i);
+  }
+}\] (and(equals(b_6,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))))))" pathConditionChanged="true" branchCondition="equals(i_2_0,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                     <methodCall name="WhileWithLoopInvariantInCondition.goOnNice(array_3,i_3);" pathCondition="not(or(not(equals(i_2_0,Z(neglit(1(#))))),not(imp(equals(i_2_0,Z(neglit(1(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
+    b_6=goOnNice(array,i);
+  }
+}\] (and(equals(b_6,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))))))" pathConditionChanged="false">
                         <callStackEntry path="/0"/>
-                        <loopInvariant name="
-invariant: i_3 = javaUnaryMinusInt(1);
+                        <loopInvariant name="invariant: i_3 = javaUnaryMinusInt(1);
 variant: i_3
-mod: false" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),geq(length(array),i_0)),and(wellFormed(heap),equals(i,Z(neglit(1(#))))))))),and(leq(i_2,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#)))))))" pathConditionChanged="false" initiallyValid="false">
+mod: false" pathCondition="not(or(not(equals(i_2_0,Z(neglit(1(#))))),not(imp(equals(i_2_0,Z(neglit(1(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
+    b_6=goOnNice(array,i);
+  }
+}\] (and(equals(b_6,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))))))" pathConditionChanged="false" initiallyValid="false">
                            <callStackEntry path="/0"/>
                            <callStackEntry path="/0/0/0/0/0/0/0"/>
-                           <branchCondition name="and(leq(i_3,Z(neglit(1(#)))),equals(i_3_0,Z(neglit(1(#)))))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),geq(length(array),i_0)),and(wellFormed(heap),equals(i,Z(neglit(1(#))))))))),and(leq(i_2,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#)))))),and(leq(i_3,Z(neglit(1(#)))),equals(i_3_0,Z(neglit(1(#)))))))" pathConditionChanged="true" branchCondition="and(leq(i_3,Z(neglit(1(#)))),equals(i_3_0,Z(neglit(1(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                           <branchCondition name="equals(i_3_0,Z(neglit(1(#))))" pathCondition="not(or(or(not(equals(i_3_0,Z(neglit(1(#))))),not(imp(equals(i_3_0,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#))))))),not(imp(and(equals(i_2_0,Z(neglit(1(#)))),equals(i_3_0,Z(neglit(1(#))))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
+    b_6=goOnNice(array,i);
+  }
+}\] (and(equals(b_6,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))))))" pathConditionChanged="true" branchCondition="equals(i_3_0,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                               <callStackEntry path="/0"/>
                               <callStackEntry path="/0/0/0/0/0/0/0"/>
-                              <statement name="return true;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),geq(length(array),i_0)),and(wellFormed(heap),equals(i,Z(neglit(1(#))))))))),and(leq(i_2,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#)))))),and(leq(i_3,Z(neglit(1(#)))),equals(i_3_0,Z(neglit(1(#)))))))" pathConditionChanged="false">
+                              <statement name="return true;" pathCondition="not(or(or(not(equals(i_3_0,Z(neglit(1(#))))),not(imp(equals(i_3_0,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#))))))),not(imp(and(equals(i_2_0,Z(neglit(1(#)))),equals(i_3_0,Z(neglit(1(#))))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
+    b_6=goOnNice(array,i);
+  }
+}\] (and(equals(b_6,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))))))" pathConditionChanged="false">
                                  <callStackEntry path="/0"/>
                                  <callStackEntry path="/0/0/0/0/0/0/0"/>
-                                 <methodReturn name="&lt;return of WhileWithLoopInvariantInCondition.goOnNice(array_3,i_3);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),geq(length(array),i_0)),and(wellFormed(heap),equals(i,Z(neglit(1(#))))))))),and(leq(i_2,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#)))))),and(leq(i_3,Z(neglit(1(#)))),equals(i_3_0,Z(neglit(1(#)))))))" pathConditionChanged="false" isReturnValueComputed="false">
+                                 <methodReturn name="&lt;return of WhileWithLoopInvariantInCondition.goOnNice(array_3,i_3);&gt;" pathCondition="not(or(or(not(equals(i_3_0,Z(neglit(1(#))))),not(imp(equals(i_3_0,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#))))))),not(imp(and(equals(i_2_0,Z(neglit(1(#)))),equals(i_3_0,Z(neglit(1(#))))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
+    b_6=goOnNice(array,i);
+  }
+}\] (and(equals(b_6,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))))))" pathConditionChanged="false" isReturnValueComputed="false">
                                     <callStackEntry path="/0"/>
                                     <callStackEntry path="/0/0/0/0/0/0/0"/>
-                                    <statement name="result_1++;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),geq(length(array),i_0)),and(wellFormed(heap),equals(i,Z(neglit(1(#))))))))),and(leq(i_2,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#)))))),and(leq(i_3,Z(neglit(1(#)))),equals(i_3_0,Z(neglit(1(#)))))))" pathConditionChanged="false">
+                                    <statement name="result_1++;" pathCondition="not(or(or(not(equals(i_3_0,Z(neglit(1(#))))),not(imp(equals(i_3_0,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#))))))),not(imp(and(equals(i_2_0,Z(neglit(1(#)))),equals(i_3_0,Z(neglit(1(#))))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
+    b_6=goOnNice(array,i);
+  }
+}\] (and(equals(b_6,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))))))" pathConditionChanged="false">
                                        <callStackEntry path="/0"/>
-                                       <statement name="i++;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),geq(length(array),i_0)),and(wellFormed(heap),equals(i,Z(neglit(1(#))))))))),and(leq(i_2,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#)))))),and(leq(i_3,Z(neglit(1(#)))),equals(i_3_0,Z(neglit(1(#)))))))" pathConditionChanged="false">
+                                       <statement name="i++;" pathCondition="not(or(or(not(equals(i_3_0,Z(neglit(1(#))))),not(imp(equals(i_3_0,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#))))))),not(imp(and(equals(i_2_0,Z(neglit(1(#)))),equals(i_3_0,Z(neglit(1(#))))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
+    b_6=goOnNice(array,i);
+  }
+}\] (and(equals(b_6,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))))))" pathConditionChanged="false">
                                           <callStackEntry path="/0"/>
-                                          <termination name="&lt;loop body end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),not(imp(and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),geq(length(array),i_0)),and(wellFormed(heap),equals(i,Z(neglit(1(#))))))))),and(leq(i_2,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#)))))),and(leq(i_3,Z(neglit(1(#)))),equals(i_3_0,Z(neglit(1(#)))))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+                                          <termination name="&lt;loop body end&gt;" pathCondition="not(or(or(not(equals(i_3_0,Z(neglit(1(#))))),not(imp(equals(i_3_0,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#))))))),not(imp(and(equals(i_2_0,Z(neglit(1(#)))),equals(i_3_0,Z(neglit(1(#))))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
+    b_6=goOnNice(array,i);
+  }
+}\] (and(equals(b_6,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                                           </termination>
                                        </statement>
                                     </statement>
@@ -45,9 +79,21 @@ mod: false" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(or(and(and(
                      </methodCall>
                   </branchCondition>
                </branchCondition>
-               <branchCondition name="not(or(or(or(or(and(and(geq(i_0,Z(1(#))),geq(length(array),Z(0(#)))),lt(length(array),i_0)),and(and(leq(i_0,Z(neglit(1(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0))),not(imp(and(and(geq(i_0,Z(0(#))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),equals(result_1_0,i_0)))),and(and(and(and(and(equals(result_1_0,i_0),geq(i_0,Z(0(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),wellFormed(anon_heap_loop_4&lt;&lt;anonHeapFunction&gt;&gt;)),equals(i_5,Z(neglit(1(#)))))),not(imp(and(and(and(equals(result_1_0,i_0),geq(i_0,Z(0(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),and(wellFormed(heap),equals(i,Z(neglit(1(#)))))))))" pathCondition="not(and(geq(length(array),Z(0(#))),or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),and(and(and(and(wellFormed(anon_heap_loop_4&lt;&lt;anonHeapFunction&gt;&gt;),geq(i_0,Z(0(#)))),equals(i_5,Z(neglit(1(#))))),equals(result_1_0,i_0)),geq(length(array),i_0))),not(imp(and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),geq(length(array),i_0)),and(wellFormed(heap),equals(i,Z(neglit(1(#))))))))))" pathConditionChanged="true" branchCondition="not(or(or(or(or(and(and(geq(i_0,Z(1(#))),geq(length(array),Z(0(#)))),lt(length(array),i_0)),and(and(leq(i_0,Z(neglit(1(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0))),not(imp(and(and(geq(i_0,Z(0(#))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),equals(result_1_0,i_0)))),and(and(and(and(and(equals(result_1_0,i_0),geq(i_0,Z(0(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),wellFormed(anon_heap_loop_4&lt;&lt;anonHeapFunction&gt;&gt;)),equals(i_5,Z(neglit(1(#)))))),not(imp(and(and(and(equals(result_1_0,i_0),geq(i_0,Z(0(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),and(wellFormed(heap),equals(i,Z(neglit(1(#)))))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+               <branchCondition name="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
+    b_6=goOnNice(array,i);
+  }
+}\&gt; (and(not(equals(b_6,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
+    b_6=goOnNice(array,i);
+  }
+}\&gt; (and(not(equals(b_6,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
+    b_6=goOnNice(array,i);
+  }
+}\&gt; (and(not(equals(b_6,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                   <callStackEntry path="/0"/>
-                  <statement name="return result_1;" pathCondition="not(and(geq(length(array),Z(0(#))),or(or(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0)))),and(and(and(and(wellFormed(anon_heap_loop_4&lt;&lt;anonHeapFunction&gt;&gt;),geq(i_0,Z(0(#)))),equals(i_5,Z(neglit(1(#))))),equals(result_1_0,i_0)),geq(length(array),i_0))),not(imp(and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),geq(length(array),i_0)),and(wellFormed(heap),equals(i,Z(neglit(1(#))))))))))" pathConditionChanged="false">
+                  <statement name="return result_1;" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
+    b_6=goOnNice(array,i);
+  }
+}\&gt; (and(not(equals(b_6,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
                   </statement>
                </branchCondition>

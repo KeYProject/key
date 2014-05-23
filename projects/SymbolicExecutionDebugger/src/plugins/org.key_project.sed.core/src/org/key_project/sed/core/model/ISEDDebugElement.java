@@ -49,7 +49,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDDebugElement;
  * </p>
  * @author Martin Hentschel
  */
-public interface ISEDDebugElement extends IDebugElement {
+public interface ISEDDebugElement extends IDebugElement, ISEDIDElement {
    /**
     * Returns the debug target this element is contained in.
     * @return the debug target this element is contained in
@@ -61,11 +61,4 @@ public interface ISEDDebugElement extends IDebugElement {
     * @return the launch this element is contained in
     */
    public ILaunch getLaunch();
-   
-   /**
-    * Returns a unique ID which identifies this element uniquely in
-    * the whole debug model. The ID must be a valid XML name.
-    * @return The unique ID of this element which is a valid XML name.
-    */
-   public String getId();
 }
