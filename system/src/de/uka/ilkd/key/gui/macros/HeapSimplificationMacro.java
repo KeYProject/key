@@ -15,7 +15,14 @@ package de.uka.ilkd.key.gui.macros;
 
 import java.util.Set;
 
-
+/**
+ * This macro performs simplification of Heap and LocSet terms.
+ * It applies simplification rules (including the "unoptimized" select rules),
+ * One Step Simplification, alpha, and delta rules.
+ * Currently all rules (except OSS) have zero costs.
+ * @author bruns
+ *
+ */
 public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro {
 
     @Override
@@ -25,7 +32,9 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
 
     @Override
     public String getDescription() {
-        return "todo";
+        return "This macro performs simplification of Heap and LocSet terms.\n"
+                    +"It applies simplification rules (including the \"unoptimized\" select rules), "
+                    +"One Step Simplification, alpha, and delta rules.";
     }
     
     private static final Set<String> ADMITTED_RULES_SET = asSet(new String[]{
