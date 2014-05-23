@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ASCII"?>
-<pi:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:al="http://eclipse.org/graphiti/mm/algorithms" xmlns:pi="http://eclipse.org/graphiti/mm/pictograms" visible="true" gridUnit="10" diagramTypeId="symbolicExecutionTreeDiagram" name="Empty Diagram" snapToGrid="true" version="0.9.2">
+<pi:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:al="http://eclipse.org/graphiti/mm/algorithms" xmlns:pi="http://eclipse.org/graphiti/mm/pictograms" visible="true" gridUnit="10" diagramTypeId="symbolicExecutionTreeDiagram" name="Empty Diagram" snapToGrid="true" version="0.10.0">
   <properties key="independentObject" value="_1fb53e22-623c-46fe-9e3d-dccb3de44e60"/>
-  <properties key="domainModelFile" value="platform:/resource/SWTBotSymbolicExecutionTreeStyleTest_testConnectionColorChange/CurrentNumber.set"/>
+  <properties key="domainModelFile" value="platform:/resource/SWTBotSymbolicExecutionTreeStyleTest_testAddAnnotationLink/CurrentNumber.set"/>
   <graphicsAlgorithm xsi:type="al:Rectangle" background="//@colors.1" foreground="//@colors.0" lineWidth="1" transparency="0.0" width="1000" height="1000"/>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
     <properties key="independentObject" value="_35610221-6779-4503-9ee4-484311de1af1"/>
