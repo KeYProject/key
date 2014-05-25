@@ -12,7 +12,6 @@
 //
 package de.uka.ilkd.key.parser;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -21,51 +20,29 @@ import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.ANTLRReaderStream;
 import org.antlr.runtime.ANTLRStringStream;
 
-import antlr.Token;
-import antlr.TokenStreamException;
-
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
-public class KeYLexerF {
+public class KeYLexerF extends KeYLexer {
 
-    private KeYLexer keYLexer;
-
-    public KeYLexerF(InputStream file, String filename, KeYExceptionHandler keh)
-            throws FileNotFoundException {
-        try {
-            final ANTLRInputStream stream = new ANTLRInputStream(file);
-            stream.name = filename;
-            this.keYLexer = new KeYLexer(stream, keh);
-        } catch (IOException e) {
-            throw new FileNotFoundException(e.getMessage());
-        }
+    public KeYLexerF(InputStream file, String fileName, KeYExceptionHandler keh) throws IOException{
+        super(getStream(new ANTLRInputStream(file), fileName), keh);
     }
 
-    public KeYLexerF(Reader file, String filename, KeYExceptionHandler keh)
-            throws FileNotFoundException {
-        try {
-            final ANTLRReaderStream stream = new ANTLRReaderStream(file);
-            stream.name = filename;
-            this.keYLexer = new KeYLexer(stream, keh);
-        } catch (IOException e) {
-            throw new FileNotFoundException(e.getMessage());
-        }
+    public KeYLexerF(Reader file, String fileName, KeYExceptionHandler keh)
+            throws IOException {
+        super(getStream(new ANTLRReaderStream(file), fileName), keh);
     }
 
-    public KeYLexerF(String file, String filename, KeYExceptionHandler keh) {
-        final ANTLRStringStream stream = new ANTLRStringStream(file);
-        stream.name = filename;
-        this.keYLexer = new KeYLexer(stream, keh);
+    public KeYLexerF(String file, String fileName, KeYExceptionHandler keh) {
+        super(getStream(new ANTLRStringStream(file), fileName), keh);
     }
 
-    public KeYLexer getKeYLexer() {
-        return this.keYLexer;
-    }
-
-    public Token nextToken() throws TokenStreamException {
-        org.antlr.runtime.Token token = this.keYLexer.nextToken();
-
-        return new Token(token.getType(), token.getText());
+    /*
+    * Use this to set stream name before sending it to super constructor.
+    */
+    static ANTLRStringStream getStream(ANTLRStringStream stream, String fileName) {
+        stream.name = fileName;
+        return stream;
     }
 
 }

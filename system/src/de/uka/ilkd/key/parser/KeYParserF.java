@@ -38,14 +38,14 @@ import de.uka.ilkd.key.speclang.Contract;
 
 public class KeYParserF {
 
-    private KeYParser keYParser;
+    private final KeYParser keYParser;
 
     @SuppressWarnings("unchecked")
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF,
 	    ParserConfig schemaConfig, ParserConfig normalConfig,
 	    HashMap taclet2Builder, ImmutableSet<Taclet> taclets) {
 	LegacyCommonTokenStream stream = new LegacyCommonTokenStream(
-		keYLexerF.getKeYLexer());
+		keYLexerF);
 	this.keYParser = new KeYParser(mode, stream, schemaConfig,
 		normalConfig, taclet2Builder, taclets);
     }
@@ -60,14 +60,14 @@ public class KeYParserF {
 
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF) {
 	LegacyCommonTokenStream stream = new LegacyCommonTokenStream(
-		keYLexerF.getKeYLexer());
+		keYLexerF);
 	this.keYParser = new KeYParser(mode, stream);
     }
 
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF,
 	    JavaReader jr, Services services, NamespaceSet nss, AbbrevMap scm) {
 	LegacyCommonTokenStream stream = new LegacyCommonTokenStream(
-		keYLexerF.getKeYLexer());
+		keYLexerF);
 	this.keYParser = new KeYParser(mode, stream, jr, services,
 		nss, scm);
     }
@@ -75,7 +75,7 @@ public class KeYParserF {
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF, Services services,
 	    NamespaceSet nss) {
 	LegacyCommonTokenStream stream = new LegacyCommonTokenStream(
-		keYLexerF.getKeYLexer());
+		keYLexerF);
 	this.keYParser = new KeYParser(mode, stream, services, nss);
     }
 

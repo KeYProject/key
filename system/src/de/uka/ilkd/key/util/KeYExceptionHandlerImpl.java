@@ -10,35 +10,31 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 package de.uka.ilkd.key.util;
 
 import java.util.*;
 
-
 public abstract class KeYExceptionHandlerImpl implements KeYExceptionHandler {
 
-    protected List<Throwable> exceptions = null; 
+    protected final List<Throwable> exceptions;
 
     public KeYExceptionHandlerImpl() {
-	exceptions = new LinkedList<Throwable>();
+        exceptions = new LinkedList<Throwable>();
     }
 
-    
     @Override
     public void reportException(Throwable e) {
-	exceptions.add(e);
+        exceptions.add(e);
     }
 
-    
-    @Override    
+    @Override
     public List<Throwable> getExceptions() {
-	return exceptions;
+        return exceptions;
     }
 
-        
-    @Override    
+    @Override
     public void clear() {
-	exceptions.clear();
+        exceptions.clear();
     }
+
 }
