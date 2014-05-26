@@ -161,9 +161,11 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
 //        "replace_known_right",
         
         // others
+        "castDel",
         "nonNull",
         "nonNullZero",
         "allRight",
+        "exLeft",
     });
 
 
