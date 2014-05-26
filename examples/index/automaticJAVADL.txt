@@ -74,6 +74,7 @@ provable: ./heap/block_contracts/Simple__unnecessaryLoopInvariant.key
 provable: ./standard_key/java_dl/jml-assert/assert.key
 
 # Other tests:
+provable: ./heap/coincidence_count/project.key
 provable: ./heap/fm12_01_LRS/lcp.key
 provable: ./heap/SemanticSlicing/project.key
 provable: ./heap/information_flow/ArrayList_contains.key
@@ -127,6 +128,14 @@ provable: ./heap/list_recursiveSpec/ListOperationsNonNull_getNextNN_normal_behav
 provable: ./heap/list_recursiveSpec/ListOperationsNonNull_setValueAt_normal_behavior.key
 provable: ./heap/list_recursiveSpec/ListOperationsNonNull_remove_normal_behavior.key
 provable: ./heap/list_seq/SimplifiedLinkedList.remove.key
+provable: ./heap/list_seq/ArrayList.ArrayList.key
+provable: ./heap/list_seq/ArrayList.add.key
+provable: ./heap/list_seq/ArrayList.contains.key
+provable: ./heap/list_seq/ArrayList.enlarge.key
+provable: ./heap/list_seq/ArrayList.get.key
+provable: ./heap/list_seq/ArrayList.newArray.key
+provable: ./heap/list_seq/ArrayList.remove.0.key
+provable: ./heap/list_seq/ArrayList.remove.1.key
 provable: ./heap/observer/ExampleObserver_ExampleObserver.key
 provable: ./heap/observer/ExampleObserver_inv.key
 provable: ./heap/observer/ExampleObserver_subject.key

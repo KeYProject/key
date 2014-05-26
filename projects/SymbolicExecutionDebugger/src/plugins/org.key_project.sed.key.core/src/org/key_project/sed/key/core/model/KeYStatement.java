@@ -75,10 +75,11 @@ public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNo
    public KeYStatement(KeYDebugTarget target, 
                        IKeYSEDDebugNode<?> parent, 
                        ISEDThread thread, 
-                       IExecutionStatement executionNode) {
+                       IExecutionStatement executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
    
    /**

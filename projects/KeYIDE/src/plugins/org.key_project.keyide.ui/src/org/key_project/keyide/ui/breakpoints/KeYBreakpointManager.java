@@ -50,7 +50,6 @@ import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.ExceptionBreakpoin
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.FieldWatchpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.LineBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.MethodBreakpoint;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 @SuppressWarnings("restriction")
 public class KeYBreakpointManager implements IBreakpointListener {
@@ -64,15 +63,12 @@ public class KeYBreakpointManager implements IBreakpointListener {
     */
    private final Map<IBreakpoint, de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint> breakpointMap = new HashMap<IBreakpoint, de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint>();;
    
-   private final KeYEnvironment<?> environment;
-   
    private final Proof proof;
    
    /**
     * Creates a new {@link KeYBreakpointManager}
     */
-   public KeYBreakpointManager(KeYEnvironment<?> environment, Proof proof){
-      this.environment=environment;
+   public KeYBreakpointManager(Proof proof) {
       this.proof = proof;
       addBreakpoints();
    }
@@ -132,7 +128,7 @@ public class KeYBreakpointManager implements IBreakpointListener {
    public void javaWatchpointAdded(JavaWatchpoint javaWatchpoint) throws CoreException, ProofInputException {
       IResource resource = javaWatchpoint.getMarker().getResource();
       if (JDTUtil.isJavaFile(resource)) {
-         JavaInfo javaInfo = environment.getServices().getJavaInfo();
+         JavaInfo javaInfo = proof.getServices().getJavaInfo();
          String containerTypeName = KeYUtil.getType(resource).getFullyQualifiedName();
          containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
          KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);

@@ -33,6 +33,27 @@ public final class JavaUtil {
     */
    private JavaUtil() {
    }
+
+   /**
+    * Checks if the given array contains the element to search.
+    * @param <T> The type of the array.
+    * @param array The array.
+    * @param toSearch The element to search.
+    * @return {@code true} if the array contains the element or {@code false} if not or if the array is {@code null}.
+    */
+   public static <T> boolean contains(T[] array, T toSearch) {
+      boolean contains = false;
+      if (array != null) {
+         int i = 0;
+         while (!contains && i < array.length) {
+            if (equals(array[i], toSearch)) {
+               contains = true;
+            }
+            i++;
+         }
+      }
+      return contains;
+   }
    
    /**
     * Adds all elements to the {@link Collection}. 

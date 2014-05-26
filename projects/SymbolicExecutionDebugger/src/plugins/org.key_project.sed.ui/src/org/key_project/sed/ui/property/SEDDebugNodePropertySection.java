@@ -13,7 +13,6 @@
 
 package org.key_project.sed.ui.property;
 
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.key_project.sed.core.model.ISEDDebugNode;
 
@@ -26,7 +25,7 @@ public class SEDDebugNodePropertySection extends AbstractSEDDebugNodePropertySec
     * {@inheritDoc}
     */
    @Override
-   protected AbstractSEDDebugNodeTabComposite createContentComposite(Composite parent, int style) {
-      return new NodeTabComposite(parent, style, getWidgetFactory());
+   protected ISEDDebugNodeTabContent createContent() {
+      return new NodeTabComposite();
    }
 }

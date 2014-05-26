@@ -75,10 +75,11 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
    public KeYLoopCondition(KeYDebugTarget target, 
                            IKeYSEDDebugNode<?> parent, 
                            ISEDThread thread, 
-                           IExecutionLoopCondition executionNode) {
+                           IExecutionLoopCondition executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
    
    /**
