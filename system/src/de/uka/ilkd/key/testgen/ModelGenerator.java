@@ -18,9 +18,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTObjTranslator;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
@@ -36,17 +34,21 @@ public class ModelGenerator implements SolverLauncherListener{
 	private KeYMediator mediator;
 	private Sequent seq;
 
+
 	//models that have been found until now
 	private List<Model> models;
 	//how many models we are looking for
 	private int target;
 
+
 	public ModelGenerator(Sequent s, int target, KeYMediator mediator) {
 		this.mediator = mediator;
 		this.seq = s;	
+
 		this.target = target;
 		models = new LinkedList<Model>();
 	}
+
 
 	/**
 	 * Try finding a model for the term with z3.
@@ -65,42 +67,41 @@ public class ModelGenerator implements SolverLauncherListener{
 	 */
 	private SolverLauncher prepareLauncher(){
 		TestGenerationSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
-		final ProofIndependentSMTSettings piSettings = ProofIndependentSettings.DEFAULT_INSTANCE
-				.getSMTSettings().clone();
+		final ProofIndependentSMTSettings piSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().clone();
+		
 
 		piSettings.setMaxConcurrentProcesses(settings.getNumberOfProcesses());
 		final ProofDependentSMTSettings pdSettings = ProofDependentSMTSettings.getDefaultSettingsData();
 		pdSettings.invariantForall = settings.invaraiantForAll();
 		// invoke z3 for counterexamples
 		final SMTSettings smtsettings = new SMTSettings(pdSettings,
-				piSettings, null);		
-
+				piSettings, null);
 		return new SolverLauncher(smtsettings);
 	}
 
 	@Override
-	public void launcherStopped(SolverLauncher launcher,
-			Collection<SMTSolver> finishedSolvers) {
+    public void launcherStopped(SolverLauncher launcher,
+            Collection<SMTSolver> finishedSolvers) {
+		
 		for(SMTSolver solver : finishedSolvers){
+			
 			SMTSolverResult result = solver.getFinalResult();
-			if(result.equals(SMTSolverResult.createInvalidResult(""))){
+			if(result.equals(SMTSolverResult.ThreeValuedTruth.VALID) && models.size() < target){
 				Model model = solver.getSocket().getQuery().getModel();
 				models.add(model);
-				if(models.size() < target){
-					//if term has been changed
-					if(addModelToTerm(model)){
-						launch();
-					}					
-				}				
-				else{
-					finish();					
-				}
+				addModelToTerm(model);
+				launch();
+
 			}
 			else{
 				finish();
 			}			
 		}	    
+
 	}
+
+
+
 	/**
 	 * Changes the term such that when evaluated again with z3 another model will be generated.
 	 * If we have a model (c1=v1 & c2 = v2 & ...) where c1, c2, ... are integer constants we change the term t to the following form:
@@ -182,4 +183,5 @@ public class ModelGenerator implements SolverLauncherListener{
 		return tb.imp(tb.and(ante), tb.or(succ));
 
 	}
+
 }
