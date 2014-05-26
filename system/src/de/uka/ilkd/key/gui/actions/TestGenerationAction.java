@@ -12,7 +12,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.testgen.TGInfoDialog;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.testgen.OracleGenerator;
 
 /**
  * Action which generates test cases for all open nodes. If the proof is closed,

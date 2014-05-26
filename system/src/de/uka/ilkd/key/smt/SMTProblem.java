@@ -74,6 +74,12 @@ public class SMTProblem {
                 name = "Goal " + goal.node().serialNr();
                 term = goalToTerm(goal);
         }
+        
+        public SMTProblem(Term t){
+        	this.goal = null;
+        	name = "Term "+t.toString();
+        	this.term = t;
+        }
 
         public Goal getGoal() {
                 return goal;
