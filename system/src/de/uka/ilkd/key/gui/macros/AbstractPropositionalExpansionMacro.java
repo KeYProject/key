@@ -111,7 +111,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            return true;
+            return delegate.isApprovedApp(app, pio, goal);
         }
 
         @Override
