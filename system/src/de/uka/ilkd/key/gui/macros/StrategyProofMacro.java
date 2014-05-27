@@ -122,7 +122,7 @@ public abstract class StrategyProofMacro implements ProofMacro {
     }
 
     @Override
-    public javax.swing.KeyStroke getKeyStroke () {
+    public final javax.swing.KeyStroke getKeyStroke () {
 	return KeyStrokeManager.get(this);
     }
 

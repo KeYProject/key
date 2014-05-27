@@ -29,10 +29,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -91,6 +91,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                     System.out.println("Proof steps: "+stat.nodes);
                     System.out.println("Branches: "+stat.branches);
                     System.out.println("Automode Time: "+stat.autoModeTime+"ms");
+                    System.out.println("Time per step: "+stat.timePerStep+"ms");
                 }
                 System.out.println("Number of goals remaining open: " +
                         openGoals);
@@ -253,12 +254,12 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
 	@Override
     public void loadProblem(File file) {
-		super.loadProblem(file, null, null, mediator);
+		super.getProblemLoader(file, null, null, mediator).runSynchronously();
 	}
 
    @Override
    public void loadProblem(File file, List<File> classPath, File bootClassPath) {
-      super.loadProblem(file, classPath, bootClassPath, mediator);
+      super.getProblemLoader(file, classPath, bootClassPath, mediator).runSynchronously();
    }
 
 	@Override
