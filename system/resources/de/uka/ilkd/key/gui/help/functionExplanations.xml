@@ -46,6 +46,10 @@ This predicate takes an argument of type Heap. It is true if the following condi
 <entry key="locset/freshLocs">tbd</entry>
 <entry key="locset/allElementsOfArray">tbd</entry>
 <entry key="locset/allElementsOfArrayLocsets">tbd</entry>
+<entry key="locset/elementOf">tbd</entry>
+<entry key="locset/subset">tbd</entry>
+<entry key="locset/disjoint">tbd</entry>
+<entry key="locset/createdInHeap">tbd</entry>
 
 <entry key="map/mapGet">Retrieve the mapping value of a key.</entry>
 <entry key="map/mapUndef">A unique value, which is returned by mapGet in case no mapping value is declared for the specified key.</entry>
@@ -101,6 +105,8 @@ seqDef is related to the lambda operator in lambda calculus.
 cast
 </entry>
 
+<entry key="null">tbd</entry>
+
 <entry key="TODO">dd
 <![CDATA[TRUE
 FALSE
@@ -110,20 +116,11 @@ FALSE
     //array length
     int length(Object);
 
-    //null
-    Null null; 
-    wellFormed(Heap);
     arrayStoreValid(any, any);
     nonNull(Heap,Object,int);
                             java...
-inInt(int);
-
-\predicates {
-    elementOf(Object, Field, LocSet);
-    subset(LocSet, LocSet);
-    disjoint(LocSet, LocSet);
-    createdInHeap(LocSet, Heap);
-}]]>
+    inInt(int);
+]]>
 
 </entry>
 </properties>
