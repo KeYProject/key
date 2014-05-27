@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Term;
@@ -92,11 +91,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             initConfig.setActivatedChoices(settings.getChoiceSettings()
         	      		                   .getDefaultChoicesAsSet());
         
-        } catch (antlr.ANTLRException e) {
+        } catch (Exception e) {
             throw new ProofInputException(e);      
-        } catch (FileNotFoundException fnfe) {
-            throw new ProofInputException(fnfe);
-        }        
+        }     
 	
         //read in-code specifications
         SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), 
@@ -162,10 +159,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
             initConfig.setTaclets(problemParser.getTaclets());
             lastParser = problemParser;
-        } catch (antlr.ANTLRException e) {
+        } catch (Exception e) {
             throw new ProofInputException(e);
-        } catch (FileNotFoundException fnfe) {
-            throw new ProofInputException(fnfe);
         }
     }
 

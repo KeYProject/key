@@ -113,7 +113,7 @@ public class KeYFile implements EnvInput {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private KeYParserF createDeclParser(InputStream is) throws FileNotFoundException {
+    private KeYParserF createDeclParser(InputStream is) throws IOException {
         return new KeYParserF(ParserMode.DECLARATION,
                              new KeYLexerF(is,
                                           file.toString(),
@@ -132,7 +132,6 @@ public class KeYFile implements EnvInput {
         return input;
     }
     
-    
     protected ProofSettings getPreferences() throws ProofInputException {
         if (initConfig.getSettings() == null) {
             if (file.isDirectory()) {
@@ -147,12 +146,8 @@ public class KeYFile implements EnvInput {
                 settings.loadSettingsFromString(problemParser.preferences());
                 initConfig.setSettings(settings);
                 return settings;                
-            } catch (antlr.ANTLRException e) {
+            } catch (Exception e) {
                 throw new ProofInputException(e);
-            } catch (FileNotFoundException fnfe) {
-                throw new ProofInputException(fnfe);
-            } catch (de.uka.ilkd.key.util.ExceptionHandlerException ehe) {
-                throw new ProofInputException(ehe.getCause().getMessage());
             }
         } else {
             return initConfig.getSettings();
@@ -204,12 +199,8 @@ public class KeYFile implements EnvInput {
                                 null); 
                 problemParser.parseIncludes(); 
                 includes = problemParser.getIncludes();
-            } catch (antlr.ANTLRException e) {
+            } catch (Exception e) {
                 throw new ProofInputException(e);
-            } catch (FileNotFoundException fnfe) {
-                throw new ProofInputException(fnfe);
-            } catch(de.uka.ilkd.key.util.ExceptionHandlerException ehe){
-                throw new ProofInputException(ehe);
             }
         }
         return includes;            
