@@ -6,41 +6,23 @@
     Put descriptions for JavaDL function symbols in here.
 </comment>
 
-<entry key="field/arr">
-tbd
-</entry>
+<entry key="field/arr">tbd</entry>
 
-<entry key="field/java.lang.Object::&lt;transient&gt;">
-tbd
-</entry>
+<entry key="field/java.lang.Object::&lt;transient&gt;">tbd</entry>
 
-<entry key="field/java.lang.Object::&lt;transactionConditionallyUpdated&gt;">
-tbd
-</entry>
+<entry key="field/java.lang.Object::&lt;transactionConditionallyUpdated&gt;">tbd</entry>
 
-<entry key="field/java.lang.Object::&lt;created&gt;">
-tbd
-</entry>
+<entry key="field/java.lang.Object::&lt;created&gt;">tbd</entry>
 
-<entry key="field/java.lang.Object::&lt;initialized&gt;">
-tbd
-</entry>
+<entry key="field/java.lang.Object::&lt;initialized&gt;">tbd</entry>
 
-<entry key="field/alpha::&lt;classPrepared&gt;">
-tbd
-</entry>
+<entry key="field/alpha::&lt;classPrepared&gt;">tbd</entry>
 
-<entry key="field/alpha::&lt;classInitialized&gt;">
-tbd
-</entry>
+<entry key="field/alpha::&lt;classInitialized&gt;">tbd</entry>
 
-<entry key="field/alpha::&lt;classInitializationInProgress&gt;">
-tbd
-</entry>
+<entry key="field/alpha::&lt;classInitializationInProgress&gt;">tbd</entry>
 
-<entry key="field/alpha::&lt;classErroneous&gt;">
-tbd
-</entry>
+<entry key="field/alpha::&lt;classErroneous&gt;">tbd</entry>
 
 <entry key="heap">
 This program variable holds to the current heap state. Its type is Heap.
@@ -54,21 +36,27 @@ This predicate takes an argument of type Heap. It is true if the following condi
 4. Only finitely many objects are created on the heap.
 </entry>
 
-<entry key="heap/store">
-tbd
-</entry>
+<entry key="heap/store">tbd</entry>
 
-<entry key="heap/create">
-tbd
-</entry>
+<entry key="heap/create">tbd</entry>
 
-<entry key="heap/anon">
-tbd
-</entry>
+<entry key="heap/anon">tbd</entry>
 
-<entry key="heap/memset">
-tbd
-</entry>
+<entry key="heap/memset">tbd</entry>
+    
+<entry key="locset/empty">tbd</entry>
+<entry key="locset/allLocs">tbd</entry>
+<entry key="locset/singleton">tbd</entry>
+<entry key="locset/union">tbd</entry>
+<entry key="locset/intersect">tbd</entry>
+<entry key="locset/setMinus">tbd</entry>
+<entry key="locset/infiniteUnion">tbd</entry>
+<entry key="locset/allFields">tbd</entry>
+<entry key="locset/allObjects">tbd</entry>
+<entry key="locset/arrayRange">tbd</entry>
+<entry key="locset/freshLocs">tbd</entry>
+<entry key="locset/allElementsOfArray">tbd</entry>
+<entry key="locset/allElementsOfArrayLocsets">tbd</entry>
 
 <entry key="seq/seqLen">
 Return the length of a sequence.
@@ -169,26 +157,6 @@ FALSE
     nonNull(Heap,Object,int);
                             java...
 inInt(int);
-
-\functions {
-    // unique function symbols 
-    \unique LocSet empty;
-    \unique LocSet allLocs;
-
-    // other constructors 
-    LocSet singleton(Object, Field);
-    LocSet union(LocSet, LocSet);
-    LocSet intersect(LocSet, LocSet);
-    LocSet setMinus(LocSet, LocSet);
-    LocSet infiniteUnion{true}(LocSet);
-    LocSet allFields(Object);
-    LocSet allObjects(Field);
-    LocSet arrayRange(Object, int, int);
-    LocSet freshLocs(Heap);
-    // work-a-round
-    LocSet allElementsOfArray(Heap, Object, LocSet);
-    LocSet allElementsOfArrayLocsets(Heap, Object, LocSet);
-}
 
 \predicates {
     elementOf(Object, Field, LocSet);
