@@ -6,6 +6,9 @@
     Put descriptions for JavaDL function symbols in here.
 </comment>
 
+<entry key="array/length">tbd</entry>
+<entry key="array/arrayStoreValid">tbd</entry>
+
 <entry key="field/arr">tbd</entry>
 <entry key="field/java.lang.Object::&lt;transient&gt;">tbd</entry>
 <entry key="field/java.lang.Object::&lt;transactionConditionallyUpdated&gt;">tbd</entry>
@@ -32,6 +35,7 @@ This predicate takes an argument of type Heap. It is true if the following condi
 <entry key="heap/create">tbd</entry>
 <entry key="heap/anon">tbd</entry>
 <entry key="heap/memset">tbd</entry>
+<entry key="heap/alpha::select">tbd</entry>
     
 <entry key="locset/empty">The unique location set, which does not contain any elements.</entry>
 <entry key="locset/allLocs">The unique location set containing all locations, i.e. elementOf(o, f, allLocs) will always return true for arbitrary values f &#8712; Field and o &#8712; Object.</entry>
@@ -101,27 +105,10 @@ seqDef is related to the lambda operator in lambda calculus.
 
 <entry key="instance">A boolean function which is true iff the dynamic type of its argument is a subtype of the type which is part of the function name.</entry>
 
-<entry key="cast">
-cast
-</entry>
-
+<entry key="cast">tbd</entry>
 <entry key="null">tbd</entry>
+<entry key="nonNull">tbd</entry>
+<entry key="inInt">tbd</entry>
 
-<entry key="TODO">dd
-<![CDATA[TRUE
-FALSE
-    select/store
-    alpha alpha::select(Heap, Object, Field);
-    
-    //array length
-    int length(Object);
-
-    arrayStoreValid(any, any);
-    nonNull(Heap,Object,int);
-                            java...
-    inInt(int);
-]]>
-
-</entry>
 </properties>
 
