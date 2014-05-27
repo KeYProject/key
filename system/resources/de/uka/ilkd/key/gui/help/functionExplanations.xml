@@ -56,7 +56,7 @@ This predicate takes an argument of type Heap. It is true if the following condi
 <entry key="map/mapForeach">Generalized quantifier for maps. This is a generic constructor for maps.</entry>
 <entry key="map/mapEmpty">The empty map, which does not contain any entries.</entry>
 <entry key="map/mapSingleton">A map, which contains only one entry.</entry>
-<entry key="map/mapOverride">Takes as arguments two maps and creates a new map from their entries. In case their domains overlap, the second map is favored over the first one for keys from the intersection.</entry>
+<entry key="map/mapOverride">Takes as arguments two maps and creates a new map from their entries. In case their domains overlap, entries of the second map are used for keys from the intersection.</entry>
 <entry key="map/seq2map">Converts a sequence to a map. The map domain consists of exactly those integers, which are inside the sequence bounds.</entry>
 <entry key="map/mapUpdate">Adds an entry to a map or overwrites an existing one.</entry>
 <entry key="map/mapRemove">Removes an entry from a map.</entry>
