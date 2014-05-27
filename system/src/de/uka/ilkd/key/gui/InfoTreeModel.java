@@ -60,13 +60,13 @@ public class InfoTreeModel extends DefaultTreeModel {
 
             for (String key : sortedKeys) {
                 String[] parts = key.split("/", 2);
-                if(parts.length == 1) {
+                if (parts.length == 1) {
                     // no "/"
                     insertAsLast(new InfoTreeNode(key, functionExplanations), this);
                 } else {
                     String category = parts[0];
                     InfoTreeNode categoryNode = categoryMap.get(category);
-                    if(categoryNode == null) {
+                    if (categoryNode == null) {
                         categoryNode = new InfoTreeNode(category, "This collects a category of symbols.");
                         categoryMap.put(category, categoryNode);
                         insertAsLast(categoryNode, this);

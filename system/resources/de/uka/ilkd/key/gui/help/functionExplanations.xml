@@ -18,6 +18,22 @@ This predicate takes an argument of type Heap. It is true if the following condi
 4. Only finitely many objects are created on the heap.
 </entry>
 
+<entry key="heap/store">
+tbd
+</entry>
+
+<entry key="heap/create">
+tbd
+</entry>
+
+<entry key="heap/anon">
+tbd
+</entry>
+
+<entry key="heap/memset">
+tbd
+</entry>
+
 <entry key="seq/seqLen">
 Return the length of a sequence.
 </entry>
@@ -70,14 +86,24 @@ The first and second argument give the range over which the variable goes. Again
 seqDef is related to the lambda operator in lambda calculus.
 </entry>
 
-<entry key="seq/seqSwap">tbd </entry>
-<entry key="seq/seqRemove">tbd</entry>
-<entry key="seq/seqNPermInv">tbd </entry>
+<entry key="seq/seqSwap">
+Takes a sequence and two indices. The elements at the specified indices are exchanged in the resulting sequence.
+In case one of the indices is out of bounds, the sequence is left unchanged.
+</entry>
 
-<entry key="seq/array2seq">tbd </entry>
-<entry key="pair/pair">tbd </entry>
-<entry key="pair/first">tbd</entry>
-<entry key="pair/second">tbd</entry>
+<entry key="seq/seqRemove">Takes a sequence and removes the element at the specified index.
+In case the index is out of bounds, the sequence is left unchanged.
+</entry>
+
+<entry key="seq/seqNPermInv">Takes a sequence of naturals (zero included) and treats it as a permutation.
+The resulting sequence is the inverse permutation of the original one.
+</entry>
+
+<entry key="seq/array2seq">Convert a Java array to a JavaDL sequence.</entry>
+
+<entry key="pair/pair">Return the (unique) ordered pair of two specified elements.</entry>
+<entry key="pair/first">Return the first element of an ordered pair.</entry>
+<entry key="pair/second">Return the second element of an ordered pair.</entry>
 
 <entry key="exactInstance">
 A boolean function which is true iff the dynamic type of its argument is precisely the type which is part of the function name.
@@ -96,10 +122,6 @@ cast
 FALSE
     select/store
     alpha alpha::select(Heap, Object, Field);
-    Heap store(Heap, Object, Field, any);
-    Heap create(Heap, Object);
-    Heap anon(Heap, LocSet, Heap);
-    Heap memset(Heap, LocSet, any);
     
     //fields
     \unique Field arr(int);
