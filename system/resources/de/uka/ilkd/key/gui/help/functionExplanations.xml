@@ -7,21 +7,13 @@
 </comment>
 
 <entry key="field/arr">tbd</entry>
-
 <entry key="field/java.lang.Object::&lt;transient&gt;">tbd</entry>
-
 <entry key="field/java.lang.Object::&lt;transactionConditionallyUpdated&gt;">tbd</entry>
-
 <entry key="field/java.lang.Object::&lt;created&gt;">tbd</entry>
-
 <entry key="field/java.lang.Object::&lt;initialized&gt;">tbd</entry>
-
 <entry key="field/alpha::&lt;classPrepared&gt;">tbd</entry>
-
 <entry key="field/alpha::&lt;classInitialized&gt;">tbd</entry>
-
 <entry key="field/alpha::&lt;classInitializationInProgress&gt;">tbd</entry>
-
 <entry key="field/alpha::&lt;classErroneous&gt;">tbd</entry>
 
 <entry key="heap">
@@ -37,11 +29,8 @@ This predicate takes an argument of type Heap. It is true if the following condi
 </entry>
 
 <entry key="heap/store">tbd</entry>
-
 <entry key="heap/create">tbd</entry>
-
 <entry key="heap/anon">tbd</entry>
-
 <entry key="heap/memset">tbd</entry>
     
 <entry key="locset/empty">tbd</entry>
@@ -58,6 +47,18 @@ This predicate takes an argument of type Heap. It is true if the following condi
 <entry key="locset/allElementsOfArray">tbd</entry>
 <entry key="locset/allElementsOfArrayLocsets">tbd</entry>
 
+<entry key="map/mapGet">Retrieve the mapping value of a key.</entry>
+<entry key="map/mapUndef">Is returned by mapGet in case no mapping value is declared for the specified key.</entry>
+<entry key="map/mapForeach">Generalized quantifier for maps. This is a generic constructor for maps.</entry>
+<entry key="map/mapEmpty">The empty map, which does not contain any entries.</entry>
+<entry key="map/mapSingleton">A map, which contains only one entry.</entry>
+<entry key="map/mapOverride">Takes as arguments two maps and creates a new map from their entries. In case their domains overlap, the second map is favored over the first one for keys from the intersection.</entry>
+<entry key="map/seq2map">Converts a sequence to a map. The map domain consists of exactly those integers, which are inside the sequence bounds.</entry>
+<entry key="map/mapUpdate">Adds an entry to a map or overwrites an existing one.</entry>
+<entry key="map/mapRemove">Removes an entry from a map.</entry>
+<entry key="map/mapSize">Returns the number of entries of a map.</entry>
+<entry key="map/isFinite">Returns true iff the specified map contains a finite amount of entries.</entry>
+    
 <entry key="seq/seqLen">
 Return the length of a sequence.
 </entry>
