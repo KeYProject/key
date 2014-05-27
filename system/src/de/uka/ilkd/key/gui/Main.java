@@ -99,7 +99,7 @@ public final class Main {
             " (internal: "+INTERNAL_VERSION+")";
 
     public static final String COPYRIGHT=UnicodeHelper.COPYRIGHT
-            +" Copyright 2001"+UnicodeHelper.ENDASH+"2013 "
+            +" Copyright 2001"+UnicodeHelper.ENDASH+"2014 "
             +"Karlsruhe Institute of Technology, "
             +"Chalmers University of Technology, and Technische Universit\u00e4t Darmstadt";
     
