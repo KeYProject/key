@@ -21,5 +21,19 @@
          </description>
       </wizard>
    </extension>
+   <extension
+         point="org.eclipse.help.toc">
+      <toc
+            file="help/toc.xml"
+            primary="true">
+      </toc>
+   </extension>
+   <extension
+         point="org.eclipse.ui.intro.configExtension">
+      <configExtension
+            configId="org.eclipse.ui.intro.universalConfig"
+            content="intro/sedExamples.xml">
+      </configExtension>
+   </extension>
 
 </plugin>
