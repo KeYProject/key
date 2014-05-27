@@ -33,13 +33,13 @@ This predicate takes an argument of type Heap. It is true if the following condi
 <entry key="heap/anon">tbd</entry>
 <entry key="heap/memset">tbd</entry>
     
-<entry key="locset/empty">tbd</entry>
-<entry key="locset/allLocs">tbd</entry>
-<entry key="locset/singleton">tbd</entry>
-<entry key="locset/union">tbd</entry>
-<entry key="locset/intersect">tbd</entry>
-<entry key="locset/setMinus">tbd</entry>
-<entry key="locset/infiniteUnion">tbd</entry>
+<entry key="locset/empty">The unique location set, which does not contain any elements.</entry>
+<entry key="locset/allLocs">The unique location set containing all locations, i.e. elementOf(o, f, allLocs) will always return true for arbitrary values f &#8712; Field and o &#8712; Object.</entry>
+<entry key="locset/singleton">Converts a single location to a locations set with one element.</entry>
+<entry key="locset/union">Union between location sets.</entry>
+<entry key="locset/intersect">Intersection between location sets.</entry>
+<entry key="locset/setMinus">Realizes relative complement between locations sets. It takes as arguments two location sets and returns another location set which contains all elements from the first argument except those that are elements of the second argument.</entry>
+<entry key="locset/infiniteUnion">Takes as argument a term of type LocSet, which may contain a free variable. The term represents a family of locations sets, which is parameterized by the unbound variable. The returned location set is the union over all members of the parameterized family.</entry>
 <entry key="locset/allFields">tbd</entry>
 <entry key="locset/allObjects">tbd</entry>
 <entry key="locset/arrayRange">tbd</entry>
@@ -48,7 +48,7 @@ This predicate takes an argument of type Heap. It is true if the following condi
 <entry key="locset/allElementsOfArrayLocsets">tbd</entry>
 
 <entry key="map/mapGet">Retrieve the mapping value of a key.</entry>
-<entry key="map/mapUndef">Is returned by mapGet in case no mapping value is declared for the specified key.</entry>
+<entry key="map/mapUndef">A unique value, which is returned by mapGet in case no mapping value is declared for the specified key.</entry>
 <entry key="map/mapForeach">Generalized quantifier for maps. This is a generic constructor for maps.</entry>
 <entry key="map/mapEmpty">The empty map, which does not contain any entries.</entry>
 <entry key="map/mapSingleton">A map, which contains only one entry.</entry>
@@ -59,48 +59,21 @@ This predicate takes an argument of type Heap. It is true if the following condi
 <entry key="map/mapSize">Returns the number of entries of a map.</entry>
 <entry key="map/isFinite">Returns true iff the specified map contains a finite amount of entries.</entry>
     
-<entry key="seq/seqLen">
-Return the length of a sequence.
-</entry>
-
-<entry key="seq/seqGet">
-Return the element at a position within a sequence. The type read from the sequence is part of the function name.
-</entry>
-
-<entry key="seq/seqIndexOf"> 
-Return the first index in a sequence that holds a value.
-</entry>
-
-<entry key="seq/seqGetOutside">
-The underspecified error value if a sequence is accessed outside its idnex range.
-</entry>
-    
-<entry key="seq/seqEmpty">
-The empty sequence
-</entry>
-
-<entry key="seq/seqSingleton">
-A singleton sequence that has the argument as only entry
-</entry>
-
-<entry key="seq/seqConcat">
-Concatenates two sequences
-</entry>
-
-<entry key="seq/seqSub">
-Takes a subsequence from a sequence. 
+<entry key="seq/seqLen">Return the length of a sequence.</entry>
+<entry key="seq/seqGet">Return the element at a position within a sequence. The type read from the sequence is part of the function name.</entry>
+<entry key="seq/seqIndexOf">Return the first index in a sequence that holds a value.</entry>
+<entry key="seq/seqGetOutside">The underspecified error value if a sequence is accessed outside its idnex range.</entry>
+<entry key="seq/seqEmpty">The empty sequence.</entry>
+<entry key="seq/seqSingleton">A singleton sequence that has the argument as only entry.</entry>
+<entry key="seq/seqConcat">Concatenates two sequences.</entry>
+<entry key="seq/seqSub">Takes a subsequence from a sequence. 
 The first argument is the original sequence,
 the second is the first index to consider (inclusive) and
 the third is the last index to consider (!exclusive!).
 </entry>
-
-<entry key="seq/seqReverse">
-Reverses a sequence. The result has the same entries as the argument but in reverse order.
-</entry>
-
-<entry key="seq/seqDef">
-This function binds an integer variable and evaluates an expression over this variable for a range of values to obtain the entries of a sequence.
-
+<entry key="seq/seqReverse">Reverses a sequence. The result has the same entries as the argument but in reverse order.</entry>
+<entry key="seq/seqDef">This function binds an integer variable and evaluates an expression over this variable for a range of values to obtain the entries of a sequence.
+    
 The sequence 
   seqDef{int i;}(-2, 3, i*i)
 has, for instance, the entries
@@ -111,32 +84,18 @@ The first and second argument give the range over which the variable goes. Again
 seqDef is related to the lambda operator in lambda calculus.
 </entry>
 
-<entry key="seq/seqSwap">
-Takes a sequence and two indices. The elements at the specified indices are exchanged in the resulting sequence.
-In case one of the indices is out of bounds, the sequence is left unchanged.
-</entry>
-
-<entry key="seq/seqRemove">Takes a sequence and removes the element at the specified index.
-In case the index is out of bounds, the sequence is left unchanged.
-</entry>
-
-<entry key="seq/seqNPermInv">Takes a sequence of naturals (zero included) and treats it as a permutation.
-The resulting sequence is the inverse permutation of the original one.
-</entry>
-
+<entry key="seq/seqSwap">Takes a sequence and two indices. The elements at the specified indices are exchanged in the resulting sequence. In case one of the indices is out of bounds, the sequence is left unchanged.</entry>
+<entry key="seq/seqRemove">Takes a sequence and removes the element at the specified index. In case the index is out of bounds, the sequence is left unchanged.</entry>
+<entry key="seq/seqNPermInv">Takes a sequence of naturals (zero included) and treats it as a permutation. The resulting sequence is the inverse permutation of the original one.</entry>
 <entry key="seq/array2seq">Convert a Java array to a JavaDL sequence.</entry>
 
 <entry key="pair/pair">Return the (unique) ordered pair of two specified elements.</entry>
 <entry key="pair/first">Return the first element of an ordered pair.</entry>
 <entry key="pair/second">Return the second element of an ordered pair.</entry>
 
-<entry key="exactInstance">
-A boolean function which is true iff the dynamic type of its argument is precisely the type which is part of the function name.
-</entry>
+<entry key="exactInstance">A boolean function which is true iff the dynamic type of its argument is precisely the type which is part of the function name.</entry>
 
-<entry key="instance">
-A boolean function which is true iff the dynamic type of its argument is a subtype of the type which is part of the function name.
-</entry>
+<entry key="instance">A boolean function which is true iff the dynamic type of its argument is a subtype of the type which is part of the function name.</entry>
 
 <entry key="cast">
 cast
