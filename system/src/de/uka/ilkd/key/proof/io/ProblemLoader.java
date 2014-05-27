@@ -111,9 +111,11 @@ public final class ProblemLoader extends DefaultProblemLoader {
                 getMediator().startInterface(true);
                 Throwable message = null;
                 try {
-                    message = get();
+                    message = get();                    
                 } catch (final Exception exception) {
-                    getExceptionHandler().reportException(exception);
+                    message = exception;
+                    getExceptionHandler().reportException(exception.getCause() != null ? 
+                            exception.getCause() : exception);
                 } finally {
                     fireTaskFinished(runTime, message);
                 }

@@ -142,7 +142,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 			}
 			mainWindow.displayResults(info.toString());
 		} else if (info.getSource() instanceof ProblemLoader) {
-			if (info.getResult() == null) {
+			if (info.getResult() != null) {
 				final KeYExceptionHandler exceptionHandler = ((ProblemLoader) info
 				        .getSource()).getExceptionHandler();
 				ExceptionDialog.showDialog(
