@@ -156,7 +156,6 @@ import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.ldt.MapLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -690,6 +689,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 	doDefaultAction(x);
     }
 
+    @Override
     public void performActionOnModulo(Modulo x) {
 	doDefaultAction(x);
     }
@@ -986,11 +986,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     @Override    
     public void performActionOnTransactionStatement(TransactionStatement x) {
     doDefaultAction(x);
-    }
-    
-    @Override
-    public void performActionOnMapConstructor(MapLDT.MapConstructor x) {
-        doDefaultAction(x);
     }
 
     @Override
