@@ -32,6 +32,11 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.MiscTools;
 
+/**
+ * Extension of {@link DefaultTreeModel} used by {@link InfoTree}.
+ *
+ * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ */
 public class InfoTreeModel extends DefaultTreeModel {
 
     private static final String LEMMAS = "Lemmas";

@@ -10,7 +10,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 
 /**
- *
+ * {@link JTabbedPane} displayed in {@link MainWindow}, to the left of
+ * {@link de.uka.ilkd.key.gui.nodeviews.SequentView}.
+ * 
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class MainWindowTabbedPane extends JTabbedPane {
@@ -62,9 +64,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
 
         // set strategySelectionView
         strategySelectionView = new StrategySelectionView(mainWindow);
-        if (mediator != null) {
-            strategySelectionView.setMediator(mediator);
-        }
+        strategySelectionView.setMediator(mediator);
         addTab("Proof Search Strategy", null, strategySelectionView,
                 "Select strategy for automated proof search");
 

@@ -19,6 +19,11 @@ import javax.swing.event.TreeSelectionListener;
 import de.uka.ilkd.key.util.GuiUtilities;
 import javax.swing.event.TreeSelectionEvent;
 
+/**
+ * Class for info contents displayed in {@link MainWindow}.
+ *
+ * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ */
 public class InfoView extends JSplitPane {
 
     private final InfoTree infoTree;
