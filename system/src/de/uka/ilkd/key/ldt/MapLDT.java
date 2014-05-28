@@ -25,6 +25,11 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.ExtList;
 
+/**
+ * LDT for maps.
+ *
+ * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ */
 public final class MapLDT extends LDT {
 
     public static final Name NAME = new Name("Map");
