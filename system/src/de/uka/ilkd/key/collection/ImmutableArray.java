@@ -18,8 +18,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import de.uka.ilkd.key.util.NotSupported;
-
 public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Serializable {
 
     /**
@@ -166,7 +164,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	}
 
 	public void remove() {
-	    throw new NotSupported("Illegal modification access on unmodifiable array.");
+	    throw new UnsupportedOperationException("Illegal modification access on unmodifiable array.");
 	}
     }
 

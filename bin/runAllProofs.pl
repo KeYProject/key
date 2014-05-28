@@ -94,7 +94,7 @@ open (AUTOMATIC, $testFile) or die $testFile . " couldn't be opened.";
 close AUTOMATIC;
 
 my $counter = 0;
-my $total = trim(`grep provable "$path_to_index" | grep -v "\#" | wc -l`);
+my $total = trim(`grep provable "$testFile" | grep -v "\#" | wc -l`);
 my $correct = 0;
 my $failures = 0;
 my $errors = 0;
@@ -476,11 +476,13 @@ sub calculateSummas {
     }
     close IN;
     
-    # compute averages instead of sums
-    # extra handling of the average time per step and memory consumption 
-    # (which should be in the last two columns)
-    $sum[@sum-2] = $sum[@sum-2] / $countExamples;
-    $sum[@sum-1] = $sum[@sum-1] / $countExamples;
+    # Compute average time per step.
+    # This is the ratio between sums.
+    # Previously, we wrongly calculated the average of ratios (bug #1442).
+    $sum[6] = $sum[4] / $sum[1];
+
+    # Compute averages instead of sums for memory consumption.
+    $sum[7] = $sum[7] / $countExamples;
     return @sum;
 }
 
