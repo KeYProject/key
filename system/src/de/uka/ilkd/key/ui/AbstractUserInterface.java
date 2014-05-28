@@ -20,7 +20,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
-import de.uka.ilkd.key.gui.WindowUserInterface;
 import de.uka.ilkd.key.gui.macros.DummyProofMacro;
 import de.uka.ilkd.key.gui.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -40,7 +39,7 @@ import de.uka.ilkd.key.util.Debug;
 
 public abstract class AbstractUserInterface implements UserInterface {
 
-    protected ProofMacro autoMacro = new DummyProofMacro();
+    private ProofMacro autoMacro = new DummyProofMacro();
     protected boolean saveOnly = false;
 
 	public void loadProblem(File file, List<File> classPath,
@@ -75,37 +74,35 @@ public abstract class AbstractUserInterface implements UserInterface {
         return this.autoMacro;
     }
 
+    protected abstract String getMacroConsoleOutput();
+
     public boolean macroChosen() {
         return !(getMacro() instanceof DummyProofMacro);
     }
 
     public boolean applyMacro() {
         assert macroChosen();
-        if (autoMacro.canApplyTo(getMediator(), null)) {
-            if (this instanceof ConsoleUserInterface) {
-                System.out.println("[ APPLY " + autoMacro.getClass().getSimpleName() + " ]");
-            } else if (this instanceof WindowUserInterface) {
-                System.out.println("Applying: " + autoMacro.getClass().getSimpleName());
-            }
+        if (getMacro().canApplyTo(getMediator(), null)) {
+            System.out.println(getMacroConsoleOutput());
             try {
                 getMediator().stopInterface(true);
                 getMediator().setInteractive(false);
-                autoMacro.applyTo(getMediator(), null, this);
+                getMacro().applyTo(getMediator(), null, this);
                 getMediator().setInteractive(true);
                 getMediator().startInterface(true);
             } catch(InterruptedException ex) {
                 Debug.out("Proof macro has been interrupted:");
                 Debug.out(ex);
             } finally {
-				Proof proof = getMediator().getSelectedProof();
-				TaskFinishedInfo info =
-						new DefaultTaskFinishedInfo(autoMacro, null, proof, proof.getAutoModeTime(),
-													proof.countNodes(), proof.openGoals().size());
-				taskFinished(info);
+                Proof proof = getMediator().getSelectedProof();
+                TaskFinishedInfo info =
+                        new DefaultTaskFinishedInfo(getMacro(), null, proof, proof.getAutoModeTime(),
+                                proof.countNodes(), proof.openGoals().size());
+                taskFinished(info);
             }
             return true;
         } else {
-            System.out.println(autoMacro.getClass().getSimpleName() + " not applicable!");
+            System.out.println(getMacro().getClass().getSimpleName() + " not applicable!");
         }
         return false;
     }

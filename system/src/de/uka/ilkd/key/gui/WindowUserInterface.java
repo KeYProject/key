@@ -69,6 +69,10 @@ public class WindowUserInterface extends AbstractUserInterface {
         completions.add(new BlockContractCompletion(mainWindow));
     }
 
+    protected String getMacroConsoleOutput() {
+        return "Applying: " + getMacro().getClass().getSimpleName();
+    }
+
     public void loadProblem(File file, List<File> classPath,
                             File bootClassPath) {
         mainWindow.addRecentFile(file.getAbsolutePath());

@@ -60,12 +60,12 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
     private final BatchMode batchMode;
     private final byte verbosity;
-	private ProofStarter ps;
-	private KeYMediator mediator;
-	private boolean autoMode;
+    private ProofStarter ps;
+    private KeYMediator mediator;
+    private boolean autoMode;
 
-	// for a progress bar
-	private int progressMax = 0;
+    // for a progress bar
+    private int progressMax = 0;
 
     public boolean isAutoMode() {
         return autoMode;
@@ -79,6 +79,10 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
    public ConsoleUserInterface(BatchMode batchMode, boolean useAutoSaver, boolean verbose) {
        this(batchMode, useAutoSaver, verbose? DEBUG: NORMAL);
+   }
+
+   protected String getMacroConsoleOutput() {
+       return "[ APPLY " + getMacro().getClass().getSimpleName() + " ]";
    }
 
    public void finish() {
