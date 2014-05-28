@@ -66,6 +66,8 @@ This predicate takes an argument of type Heap. It is true if the following condi
 <entry key="map/mapRemove">Removes an entry from a map.</entry>
 <entry key="map/mapSize">Returns the number of entries of a map.</entry>
 <entry key="map/isFinite">Returns true iff the specified map contains a finite amount of entries.</entry>
+<entry key="map/inDomain">Takes two arguments: key &#8712; any and map &#8712; Map. Returns true iff key is in the domain of map.</entry>
+<entry key="map/inDomainImpliesCreated">Returns true iff the domain of the specified map contains only objects that are &lt;created&gt; in the implicit heap (additional non-object values may also be part of the domain). This can be used in a JML specification as an invariant to ensure, that non-created objects are not (yet) part of the domain of a map.</entry>
     
 <entry key="seq/seqLen">Return the length of a sequence.</entry>
 <entry key="seq/seqGet">Return the element at a position within a sequence. The type read from the sequence is part of the function name.</entry>
