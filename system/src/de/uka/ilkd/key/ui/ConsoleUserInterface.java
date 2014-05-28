@@ -32,13 +32,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ProofStarter;
 
 public class ConsoleUserInterface extends AbstractUserInterface {
     private static final int PROGRESS_BAR_STEPS = 50;
@@ -56,11 +54,11 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
     private final BatchMode batchMode;
     private final byte verbosity;
-	private KeYMediator mediator;
-	private boolean autoMode;
+    private KeYMediator mediator;
+    private boolean autoMode;
 
-	// for a progress bar
-	private int progressMax = 0;
+    // for a progress bar
+    private int progressMax = 0;
 
     public boolean isAutoMode() {
         return autoMode;
@@ -74,6 +72,10 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
    public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
        this(batchMode, verbose? DEBUG: NORMAL);
+   }
+
+   protected String getMacroConsoleOutput() {
+       return "[ APPLY " + getMacro().getClass().getSimpleName() + " ]";
    }
 
    public void finish(Proof proof) {
