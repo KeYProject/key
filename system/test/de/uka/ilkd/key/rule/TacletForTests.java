@@ -63,14 +63,13 @@ public class TacletForTests {
     public static Namespace variables = null;
 
     public static Profile profile = new JavaProfile() {
-            //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
-            @Override
-            public RuleCollection getStandardRules() {
-                return new RuleCollection(
-                                RuleSource.initRuleFile("ldt.key"), 
-                                ImmutableSLList.<BuiltInRule>nil());
-            }
-        };
+        @Override
+        public RuleCollection getStandardRules() {
+            return new RuleCollection(
+                    RuleSource.initRuleFile("ldt.key"),
+                    ImmutableSLList.<BuiltInRule>nil());
+        }
+    };
         
     public static void clear() {
         lastFile = null;
