@@ -99,7 +99,12 @@ public class TryCloseMacro implements ProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(KeYMediator mediator, Goal goal, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(KeYMediator mediator, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
+        return canApplyTo(mediator, posInOcc);
+    }
+
+    @Override
+    public boolean canApplyTo(KeYMediator mediator, Node node, PosInOccurrence posInOcc) {
         return canApplyTo(mediator, posInOcc);
     }
 
@@ -109,14 +114,12 @@ public class TryCloseMacro implements ProofMacro {
     @Override
     public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
-
         //
         // create the rule application engine
         final IGoalChooser chooser =
                 mediator.getProfile().getSelectedGoalChooserBuilder().create();
         final ApplyStrategy applyStrategy =
                 new ApplyStrategy(chooser, finishAfterMacro());
-
         final Proof proof = mediator.getInteractiveProver().getProof();
 
         //
@@ -181,10 +184,10 @@ public class TryCloseMacro implements ProofMacro {
     }
 
     /*
-     * Run the automation on the goal. Retreat if not successful.
+     * Run the automation on the goals. Retreat if not successful.
      */
     @Override
-    public void applyTo(KeYMediator mediator, Goal goal, PosInOccurrence posInOcc,
+    public void applyTo(KeYMediator mediator, Node node, PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
         //
         // create the rule application engine
@@ -192,7 +195,80 @@ public class TryCloseMacro implements ProofMacro {
                 mediator.getProfile().getSelectedGoalChooserBuilder().create();
         final ApplyStrategy applyStrategy =
                 new ApplyStrategy(chooser, finishAfterMacro());
+        final Proof proof = mediator.getInteractiveProver().getProof();
 
+        //
+        // find the targets
+        ImmutableList<Goal> goals = proof.getSubtreeEnabledGoals(node);
+
+        //
+        // The observer to handle the progress bar
+        TaskObserver taskObserver = new TaskObserver(mediator.getUI(), finishAfterMacro());
+        taskObserver.setNumberGoals(goals.size());
+
+        //
+        // set the max number of steps if given
+        int oldNumberOfSteps = mediator.getMaxAutomaticSteps();
+        if(numberSteps > 0) {
+            mediator.setMaxAutomaticSteps(numberSteps);
+            taskObserver.setNumberSteps(numberSteps);
+        } else {
+            taskObserver.setNumberSteps(oldNumberOfSteps);
+        }
+
+        applyStrategy.addProverTaskObserver(taskObserver);
+
+        //
+        // inform the listener
+        int goalsClosed = 0;
+        long time = 0;
+        int appliedRules = 0;
+
+        //
+        // start actual autoprove
+        try {
+            for (Goal goal : goals) {
+                Node n = goal.node();
+                ApplyStrategyInfo result =
+                        applyStrategy.start(proof, ImmutableSLList.<Goal>nil().prepend(goal));
+
+                // retreat if not closed
+                if(!n.isClosed()) {
+                    proof.pruneProof(n);
+                } else {
+                    goalsClosed ++;
+                }
+
+                // update statistics
+                time += result.getTime();
+                appliedRules += result.getAppliedRuleApps();
+
+                // only now reraise the interruption exception
+                if(applyStrategy.hasBeenInterrupted()) {
+                    throw new InterruptedException();
+                }
+
+            }
+        } finally {
+            // reset the old number of steps
+            mediator.setMaxAutomaticSteps(oldNumberOfSteps);
+            // inform the listener
+            taskObserver.allTasksFinished(proof, time, appliedRules, goalsClosed);
+        }
+    }
+
+    /*
+     * Run the automation on the goal. Retreat if not successful.
+     */
+    @Override
+    public void applyTo(KeYMediator mediator, ImmutableList<Goal> goals, PosInOccurrence posInOcc,
+                        ProverTaskListener listener) throws InterruptedException {
+        //
+        // create the rule application engine
+        final IGoalChooser chooser =
+                mediator.getProfile().getSelectedGoalChooserBuilder().create();
+        final ApplyStrategy applyStrategy =
+                new ApplyStrategy(chooser, finishAfterMacro());
         final Proof proof = mediator.getInteractiveProver().getProof();
 
         //
@@ -221,24 +297,26 @@ public class TryCloseMacro implements ProofMacro {
         //
         // start actual autoprove
         try {
-            Node node = goal.node();
-            ApplyStrategyInfo result =
-                    applyStrategy.start(proof, ImmutableSLList.<Goal>nil().prepend(goal));
+            for (Goal goal : goals) {
+                Node node = goal.node();
+                ApplyStrategyInfo result =
+                        applyStrategy.start(proof, ImmutableSLList.<Goal>nil().prepend(goal));
 
-            // retreat if not closed
-            if(!node.isClosed()) {
-                proof.pruneProof(node);
-            } else {
-                goalsClosed  = 1;
-            }
+                // retreat if not closed
+                if(!node.isClosed()) {
+                    proof.pruneProof(node);
+                } else {
+                    goalsClosed++;
+                }
 
-            // update statistics
-            time = result.getTime();
-            appliedRules = result.getAppliedRuleApps();
+                // update statistics
+                time += result.getTime();
+                appliedRules += result.getAppliedRuleApps();
 
-            // only now reraise the interruption exception
-            if(applyStrategy.hasBeenInterrupted()) {
-                throw new InterruptedException();
+                // only now reraise the interruption exception
+                if(applyStrategy.hasBeenInterrupted()) {
+                    throw new InterruptedException();
+                }
             }
         } finally {
             // reset the old number of steps

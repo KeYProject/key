@@ -19,10 +19,12 @@ import java.util.List;
 
 import javax.swing.KeyStroke;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 
 public abstract class AlternativeMacro implements ProofMacro {
 
@@ -75,11 +77,22 @@ public abstract class AlternativeMacro implements ProofMacro {
      */
     @Override
     public boolean canApplyTo(KeYMediator mediator,
-                              Goal goal,
+                              ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
         List<ProofMacro> macros = getProofMacros();
         for (int i = 0; i < macros.size(); i++) {
-            if (macros.get(i).canApplyTo(mediator, goal, posInOcc)) {
+            if (macros.get(i).canApplyTo(mediator, goals, posInOcc)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean canApplyTo(KeYMediator mediator, Node node, PosInOccurrence posInOcc) {
+        List<ProofMacro> macros = getProofMacros();
+        for (int i = 0; i < macros.size(); i++) {
+            if (macros.get(i).canApplyTo(mediator, node, posInOcc)) {
                 return true;
             }
         }
@@ -118,12 +131,25 @@ public abstract class AlternativeMacro implements ProofMacro {
      */
     @Override
     public void applyTo(KeYMediator mediator,
-                        Goal goal,
+                        ImmutableList<Goal> goals,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
         for (ProofMacro macro : getProofMacros()) {
-            if(macro.canApplyTo(mediator, goal, posInOcc)) {
-                macro.applyTo(mediator, goal, posInOcc, listener);
+            if(macro.canApplyTo(mediator, goals, posInOcc)) {
+                macro.applyTo(mediator, goals, posInOcc, listener);
+                return;
+            }
+        }
+    }
+
+    @Override
+    public void applyTo(KeYMediator mediator,
+                        Node node,
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) throws InterruptedException {
+        for (ProofMacro macro : getProofMacros()) {
+            if(macro.canApplyTo(mediator, node, posInOcc)) {
+                macro.applyTo(mediator, node, posInOcc, listener);
                 return;
             }
         }

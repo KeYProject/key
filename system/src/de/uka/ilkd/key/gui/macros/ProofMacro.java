@@ -13,10 +13,12 @@
 
 package de.uka.ilkd.key.gui.macros;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 
 /**
  * The interface ProofMacro is the entry point to a general strategy extension
@@ -111,15 +113,19 @@ public interface ProofMacro {
      *
      * @param mediator
      *            the mediator (not <code>null</code>)
-     * @param goal
-     *            the goal (not <code>null</code>)
+     * @param goals
+     *            the goals (not <code>null</code>)
      * @param posInOcc
      *            the position in occurrence (may be <code>null</code>)
      *
      * @return <code>true</code>, if the macro is allowed to be applied
      */
     public boolean canApplyTo(KeYMediator mediator,
-                              Goal goal,
+                              ImmutableList<Goal> goals,
+                              PosInOccurrence posInOcc);
+
+    public boolean canApplyTo(KeYMediator mediator,
+                              Node node,
                               PosInOccurrence posInOcc);
 
     /**
@@ -165,8 +171,8 @@ public interface ProofMacro {
      *
      * @param mediator
      *            the mediator (not <code>null</code>)
-     * @param goal
-     *            the goal (not <code>null</code>)
+     * @param goals
+     *            the goals (not <code>null</code>)
      * @param posInOcc
      *            the position in occurrence (may be <code>null</code>)
      * @param listener
@@ -176,7 +182,12 @@ public interface ProofMacro {
      *             if the application of the macro has been interrupted.
      */
     public void applyTo(KeYMediator mediator,
-                        Goal goal,
+                        ImmutableList<Goal> goals,
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) throws InterruptedException;
+
+    public void applyTo(KeYMediator mediator,
+                        Node node,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException;
 

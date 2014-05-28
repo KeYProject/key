@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.gui.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
@@ -21,6 +22,7 @@ import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
@@ -73,7 +75,22 @@ public abstract class StrategyProofMacro implements ProofMacro {
      */
     @Override
     public boolean canApplyTo(KeYMediator mediator,
-                              Goal goal,
+                              ImmutableList<Goal> goals,
+                              PosInOccurrence posInOcc) {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * This macro can always be applied (does not change anything perhaps)
+     *
+     * TODO make this only applicable if it has an impact.
+     *
+     */
+    @Override
+    public boolean canApplyTo(KeYMediator mediator,
+                              Node node,
                               PosInOccurrence posInOcc) {
         return true;
     }
@@ -96,8 +113,17 @@ public abstract class StrategyProofMacro implements ProofMacro {
     @Override 
     public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
             ProverTaskListener listener) throws InterruptedException {
-            Goal goal = mediator.getSelectedGoal();
-            applyTo(mediator, goal, posInOcc, listener);
+        applyTo(mediator, ImmutableSLList.<Goal>nil().prepend(mediator.getSelectedGoal()), posInOcc, listener);
+    }
+
+    @Override 
+    public void applyTo(KeYMediator mediator, Node node, PosInOccurrence posInOcc,
+                        ProverTaskListener listener) throws InterruptedException {
+        // find the relevant goals
+        // and start
+        ImmutableList<Goal> goals =
+                mediator.getSelectedProof().getSubtreeEnabledGoals(node);
+        applyTo(mediator, goals, posInOcc, listener);
     }
 
     /*
@@ -110,7 +136,7 @@ public abstract class StrategyProofMacro implements ProofMacro {
      */
     @Override
     public void applyTo(KeYMediator mediator,
-                        Goal goal,
+                        ImmutableList<Goal> goals,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
         IGoalChooser goalChooser = mediator.getProfile().getSelectedGoalChooserBuilder().create();
@@ -121,12 +147,15 @@ public abstract class StrategyProofMacro implements ProofMacro {
         }
 
         // add a focus manager if there is a focus
-        if(posInOcc != null && goal != null) {
-            AutomatedRuleApplicationManager realManager = goal.getRuleAppManager();
-            realManager.clearCache();
-            FocussedRuleApplicationManager manager =
-                    new FocussedRuleApplicationManager(realManager, goal, posInOcc);
-            goal.setRuleAppManager(manager);
+        if(posInOcc != null && goals != null) {
+            AutomatedRuleApplicationManager realManager = null;
+            FocussedRuleApplicationManager manager = null;
+            for (Goal goal: goals) {
+                realManager = goal.getRuleAppManager();
+                realManager.clearCache();
+                manager = new FocussedRuleApplicationManager(realManager, goal, posInOcc);
+                goal.setRuleAppManager(manager);
+            }
         }
 
         // set a new strategy.
@@ -134,12 +163,10 @@ public abstract class StrategyProofMacro implements ProofMacro {
         Strategy oldStrategy = proof.getActiveStrategy();
         proof.setActiveStrategy(createStrategy(mediator, posInOcc));
 
-        // find the relevant goals
-        // and start
-        ImmutableList<Goal> goals = proof.getSubtreeEnabledGoals(mediator.getSelectedNode());
-
         try {
-            applyStrategy.start(proof, goals);
+            // find the relevant goals
+            // and start
+            applyStrategy.start(proof, proof.getSubtreeEnabledGoals(mediator.getSelectedNode()));
         } finally {
             // this resets the proof strategy and the managers after the automation
             // has run
@@ -161,7 +188,6 @@ public abstract class StrategyProofMacro implements ProofMacro {
         if(applyStrategy.hasBeenInterrupted()) {
             throw new InterruptedException();
         }
-
     }
 
     @Override

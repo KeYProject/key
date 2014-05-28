@@ -2,11 +2,13 @@ package de.uka.ilkd.key.gui.macros;
 
 import javax.swing.KeyStroke;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 
 public class DoWhileFinallyMacro implements ProofMacro {
 
@@ -27,10 +29,10 @@ public class DoWhileFinallyMacro implements ProofMacro {
         this.steps = steps;
     }
 
-        @Override
-        public boolean finishAfterMacro() {
-                return true;
-        }
+    @Override
+    public boolean finishAfterMacro() {
+        return true;
+    }
 
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.gui.macros.ProofMacro#getName()
@@ -61,11 +63,20 @@ public class DoWhileFinallyMacro implements ProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(KeYMediator mediator, Goal goal, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(KeYMediator mediator, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
         if (getCondition()) {
-            return getProofMacro().canApplyTo(mediator, goal, posInOcc);
+            return getProofMacro().canApplyTo(mediator, goals, posInOcc);
         } else {
-            return getAltProofMacro().canApplyTo(mediator, goal, posInOcc);
+            return getAltProofMacro().canApplyTo(mediator, goals, posInOcc);
+        }
+    }
+
+    @Override
+    public boolean canApplyTo(KeYMediator mediator, Node node, PosInOccurrence posInOcc) {
+        if (getCondition()) {
+            return getProofMacro().canApplyTo(mediator, node, posInOcc);
+        } else {
+            return getAltProofMacro().canApplyTo(mediator, node, posInOcc);
         }
     }
 
@@ -87,17 +98,34 @@ public class DoWhileFinallyMacro implements ProofMacro {
 
     @Override
     public void applyTo(KeYMediator mediator,
-                        Goal goal,
+                        ImmutableList<Goal> goals,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
         int steps = getMaxSteps(mediator);
-        while (steps > 0 && getCondition() && canApplyTo(mediator, goal, posInOcc)) {
-            getProofMacro().applyTo(mediator, goal, posInOcc, listener);
+        while (steps > 0 && getCondition() && canApplyTo(mediator, goals, posInOcc)) {
+            getProofMacro().applyTo(mediator, goals, posInOcc, listener);
             posInOcc = null;
             steps--;
         }
-        if (steps > 0 && getAltProofMacro().canApplyTo(mediator, goal, posInOcc)) {
-            getAltProofMacro().applyTo(mediator, goal, posInOcc, listener);
+        if (steps > 0 && getAltProofMacro().canApplyTo(mediator, goals, posInOcc)) {
+            getAltProofMacro().applyTo(mediator, goals, posInOcc, listener);
+        }
+
+    }
+
+    @Override
+    public void applyTo(KeYMediator mediator,
+                        Node node,
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) throws InterruptedException {
+        int steps = getMaxSteps(mediator);
+        while (steps > 0 && getCondition() && canApplyTo(mediator, node, posInOcc)) {
+            getProofMacro().applyTo(mediator, node, posInOcc, listener);
+            posInOcc = null;
+            steps--;
+        }
+        if (steps > 0 && getAltProofMacro().canApplyTo(mediator, node, posInOcc)) {
+            getAltProofMacro().applyTo(mediator, node, posInOcc, listener);
         }
 
     }

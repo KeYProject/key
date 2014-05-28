@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
@@ -86,13 +87,25 @@ public abstract class SequentialProofMacro implements ProofMacro {
      */
     @Override
     public boolean canApplyTo(KeYMediator mediator,
-                              Goal goal,
+                              ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
         List<ProofMacro> macros = getProofMacros();
         if(macros.isEmpty()) {
             return false;
         } else {
-            return macros.get(0).canApplyTo(mediator, goal, posInOcc);
+            return macros.get(0).canApplyTo(mediator, goals, posInOcc);
+        }
+    }
+
+    @Override
+    public boolean canApplyTo(KeYMediator mediator,
+                              Node node,
+                              PosInOccurrence posInOcc) {
+        List<ProofMacro> macros = getProofMacros();
+        if(macros.isEmpty()) {
+            return false;
+        } else {
+            return macros.get(0).canApplyTo(mediator, node, posInOcc);
         }
     }
 
@@ -133,14 +146,27 @@ public abstract class SequentialProofMacro implements ProofMacro {
      */
     @Override
     public void applyTo(KeYMediator mediator,
-                        Goal goal,
+                        ImmutableList<Goal> goals,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
         final Node initNode = mediator.getSelectedNode();
         for (ProofMacro macro : getProofMacros()) {
             // reverse to original node
             mediator.getSelectionModel().setSelectedNode(initNode);
-            macro.applyTo(mediator, goal, posInOcc, listener);
+            macro.applyTo(mediator, goals, posInOcc, listener);
+        }
+    }
+
+    @Override
+    public void applyTo(KeYMediator mediator,
+                        Node node,
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) throws InterruptedException {
+        final Node initNode = mediator.getSelectedNode();
+        for (ProofMacro macro : getProofMacros()) {
+            // reverse to original node
+            mediator.getSelectionModel().setSelectedNode(initNode);
+            macro.applyTo(mediator, node, posInOcc, listener);
         }
     }
 

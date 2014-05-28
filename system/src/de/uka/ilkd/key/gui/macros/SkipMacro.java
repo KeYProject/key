@@ -4,10 +4,12 @@
  */
 package de.uka.ilkd.key.gui.macros;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 
 import javax.swing.KeyStroke;
 
@@ -42,9 +44,16 @@ public class SkipMacro implements ProofMacro {
 
     @Override
     public boolean canApplyTo(KeYMediator mediator,
-                              Goal goal,
+                              ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
-        return canApplyTo(mediator, posInOcc);
+        return false;
+    }
+
+    @Override
+    public boolean canApplyTo(KeYMediator mediator,
+                              Node node,
+                              PosInOccurrence posInOcc) {
+        return false;
     }
 
     @Override
@@ -56,10 +65,18 @@ public class SkipMacro implements ProofMacro {
 
     @Override
     public void applyTo(KeYMediator mediator,
-                        Goal goal,
+                        ImmutableList<Goal> goals,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
-        applyTo(mediator, posInOcc, listener);
+        // do nothing
+    }
+
+    @Override
+    public void applyTo(KeYMediator mediator,
+                        Node node,
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) throws InterruptedException {
+        // do nothing
     }
 
     @Override

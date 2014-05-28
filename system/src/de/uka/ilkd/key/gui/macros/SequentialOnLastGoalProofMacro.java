@@ -13,10 +13,12 @@
 
 package de.uka.ilkd.key.gui.macros;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 
 /**
  *
@@ -37,7 +39,6 @@ public abstract class SequentialOnLastGoalProofMacro extends SequentialProofMacr
     @Override
     public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
             ProverTaskListener listener) throws InterruptedException {
-
         for (ProofMacro macro : getProofMacros()) {
             // (here we do not reverse to original node)
             macro.applyTo(mediator, posInOcc, listener);
@@ -59,13 +60,26 @@ public abstract class SequentialOnLastGoalProofMacro extends SequentialProofMacr
      */
     @Override
     public void applyTo(KeYMediator mediator,
-                        Goal goal,
+                        ImmutableList<Goal> goals,
                         PosInOccurrence posInOcc,
             ProverTaskListener listener) throws InterruptedException {
-
         for (ProofMacro macro : getProofMacros()) {
             // (here we do not reverse to original node)
-            macro.applyTo(mediator, goal, posInOcc, listener);
+            macro.applyTo(mediator, goals, posInOcc, listener);
+            // after the first macro the posInOcc does not match any more,
+            // because we changed the goal / node
+            posInOcc = null;
+        }
+    }
+
+    @Override
+    public void applyTo(KeYMediator mediator,
+                        Node node,
+                        PosInOccurrence posInOcc,
+            ProverTaskListener listener) throws InterruptedException {
+        for (ProofMacro macro : getProofMacros()) {
+            // (here we do not reverse to original node)
+            macro.applyTo(mediator, node, posInOcc, listener);
             // after the first macro the posInOcc does not match any more,
             // because we changed the goal / node
             posInOcc = null;
