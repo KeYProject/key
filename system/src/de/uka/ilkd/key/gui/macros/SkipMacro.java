@@ -7,6 +7,8 @@ package de.uka.ilkd.key.gui.macros;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.Goal;
+
 import javax.swing.KeyStroke;
 
 
@@ -14,7 +16,7 @@ import javax.swing.KeyStroke;
  *
  * @author christoph
  */
-public class DummyProofMacro implements ProofMacro {
+public class SkipMacro implements ProofMacro {
 
     @Override
     public String getName() {
@@ -38,6 +40,12 @@ public class DummyProofMacro implements ProofMacro {
         return false;
     }
 
+    @Override
+    public boolean canApplyTo(KeYMediator mediator,
+                              Goal goal,
+                              PosInOccurrence posInOcc) {
+        return canApplyTo(mediator, posInOcc);
+    }
 
     @Override
     public void applyTo(KeYMediator mediator,
@@ -46,6 +54,13 @@ public class DummyProofMacro implements ProofMacro {
         // do nothing
     }
 
+    @Override
+    public void applyTo(KeYMediator mediator,
+                        Goal goal,
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) throws InterruptedException {
+        applyTo(mediator, posInOcc, listener);
+    }
 
     @Override
     public KeyStroke getKeyStroke() {

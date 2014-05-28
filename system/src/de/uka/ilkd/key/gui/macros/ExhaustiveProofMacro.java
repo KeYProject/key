@@ -41,7 +41,7 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
     private PosInOccurrence getApplicablePosInOcc(KeYMediator mediator,
                                                   Goal goal,
                                                   PosInOccurrence posInOcc,
-                                                  ExtendedProofMacro macro) {
+                                                  ProofMacro macro) {
         if (posInOcc == null || posInOcc.subTerm() == null) {
             return null;
         } else if (macro.canApplyTo(mediator, goal, posInOcc)) {
@@ -59,7 +59,7 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
     @Override
     public boolean canApplyTo(KeYMediator mediator,
                               PosInOccurrence posInOcc) {
-        final ExtendedProofMacro macro = getProofMacro();
+        final ProofMacro macro = getProofMacro();
 
         assert macro != null;
         assert mediator != null;
@@ -84,7 +84,7 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
     public boolean canApplyTo(KeYMediator mediator,
                               Goal goal,
                               PosInOccurrence posInOcc,
-                              ExtendedProofMacro macro) {
+                              ProofMacro macro) {
         final Sequent seq = goal.sequent();
         if (!applicableOnNodeAtPos.containsKey(goal.node())) {
             // node has not been checked before, so do it
@@ -107,7 +107,7 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
         final Proof proof = mediator.getSelectedProof();
 
         for (Goal goal : proof.openGoals()) {
-            final ExtendedProofMacro macro = getProofMacro();
+            final ProofMacro macro = getProofMacro();
             if (!applicableOnNodeAtPos.containsKey(goal.node())) {
                 // node has not been checked before, so do it
                 boolean canBeApplied = canApplyTo(mediator, goal,
@@ -132,7 +132,7 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
      * <p/>
      * @return the proofMacro.
      */
-    abstract ExtendedProofMacro getProofMacro();
+    abstract ProofMacro getProofMacro();
 
     @Override
     public KeyStroke getKeyStroke() {

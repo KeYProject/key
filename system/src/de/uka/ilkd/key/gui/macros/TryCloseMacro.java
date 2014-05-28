@@ -98,19 +98,24 @@ public class TryCloseMacro implements ProofMacro {
         return true;
     }
 
-    /* 
+    @Override
+    public boolean canApplyTo(KeYMediator mediator, Goal goal, PosInOccurrence posInOcc) {
+        return canApplyTo(mediator, posInOcc);
+    }
+
+    /*
      * Run the automation on the goals. Retreat if not successful.
      */
-    @Override 
+    @Override
     public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
-            ProverTaskListener listener) throws InterruptedException {
+                        ProverTaskListener listener) throws InterruptedException {
 
         //
         // create the rule application engine
-		final IGoalChooser chooser =
-				mediator.getProfile().getSelectedGoalChooserBuilder().create();
-		final ApplyStrategy applyStrategy =
-				new ApplyStrategy(chooser, finishAfterMacro());
+        final IGoalChooser chooser =
+                mediator.getProfile().getSelectedGoalChooserBuilder().create();
+        final ApplyStrategy applyStrategy =
+                new ApplyStrategy(chooser, finishAfterMacro());
 
         final Proof proof = mediator.getInteractiveProver().getProof();
 
@@ -136,7 +141,7 @@ public class TryCloseMacro implements ProofMacro {
 
         applyStrategy.addProverTaskObserver(taskObserver);
 
-        // 
+        //
         // inform the listener
         int goalsClosed = 0;
         long time = 0;
@@ -147,7 +152,7 @@ public class TryCloseMacro implements ProofMacro {
         try {
             for (Goal goal : enabledGoals) {
                 Node node = goal.node();
-                ApplyStrategyInfo result = 
+                ApplyStrategyInfo result =
                         applyStrategy.start(proof, ImmutableSLList.<Goal>nil().prepend(goal));
 
                 // retreat if not closed
@@ -173,7 +178,74 @@ public class TryCloseMacro implements ProofMacro {
             // inform the listener
             taskObserver.allTasksFinished(proof, time, appliedRules, goalsClosed);
         }
+    }
 
+    /*
+     * Run the automation on the goal. Retreat if not successful.
+     */
+    @Override
+    public void applyTo(KeYMediator mediator, Goal goal, PosInOccurrence posInOcc,
+                        ProverTaskListener listener) throws InterruptedException {
+        //
+        // create the rule application engine
+        final IGoalChooser chooser =
+                mediator.getProfile().getSelectedGoalChooserBuilder().create();
+        final ApplyStrategy applyStrategy =
+                new ApplyStrategy(chooser, finishAfterMacro());
+
+        final Proof proof = mediator.getInteractiveProver().getProof();
+
+        //
+        // The observer to handle the progress bar
+        TaskObserver taskObserver = new TaskObserver(mediator.getUI(), finishAfterMacro());
+        taskObserver.setNumberGoals(1);
+
+        //
+        // set the max number of steps if given
+        int oldNumberOfSteps = mediator.getMaxAutomaticSteps();
+        if(numberSteps > 0) {
+            mediator.setMaxAutomaticSteps(numberSteps);
+            taskObserver.setNumberSteps(numberSteps);
+        } else {
+            taskObserver.setNumberSteps(oldNumberOfSteps);
+        }
+
+        applyStrategy.addProverTaskObserver(taskObserver);
+
+        //
+        // inform the listener
+        int goalsClosed = 0;
+        long time = 0;
+        int appliedRules = 0;
+
+        //
+        // start actual autoprove
+        try {
+            Node node = goal.node();
+            ApplyStrategyInfo result =
+                    applyStrategy.start(proof, ImmutableSLList.<Goal>nil().prepend(goal));
+
+            // retreat if not closed
+            if(!node.isClosed()) {
+                proof.pruneProof(node);
+            } else {
+                goalsClosed  = 1;
+            }
+
+            // update statistics
+            time = result.getTime();
+            appliedRules = result.getAppliedRuleApps();
+
+            // only now reraise the interruption exception
+            if(applyStrategy.hasBeenInterrupted()) {
+                throw new InterruptedException();
+            }
+        } finally {
+            // reset the old number of steps
+            mediator.setMaxAutomaticSteps(oldNumberOfSteps);
+            // inform the listener
+            taskObserver.allTasksFinished(proof, time, appliedRules, goalsClosed);
+        }
     }
 
     @Override
@@ -200,7 +272,7 @@ public class TryCloseMacro implements ProofMacro {
         private int completedGoals;
 
         public TaskObserver(ProverTaskListener backListener,
-							boolean finishAfterMacro) {
+                            boolean finishAfterMacro) {
             this.backListener = backListener;
             this.finishAfterMacro = finishAfterMacro;
         }
@@ -231,8 +303,7 @@ public class TryCloseMacro implements ProofMacro {
             this.numberSteps = numberSteps;
         }
 
-        private void allTasksFinished(Proof proof, long time,
-                int appliedRules, int closedGoals) {
+        private void allTasksFinished(Proof proof, long time, int appliedRules, int closedGoals) {
 			TaskFinishedInfo info =
 					new DefaultTaskFinishedInfo(this, null, proof, time,
                                                 appliedRules, closedGoals);
@@ -245,5 +316,4 @@ public class TryCloseMacro implements ProofMacro {
             }
         }
     }
-
 }

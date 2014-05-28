@@ -63,7 +63,7 @@ public abstract class SequentialOnLastGoalProofMacro extends SequentialProofMacr
                         PosInOccurrence posInOcc,
             ProverTaskListener listener) throws InterruptedException {
 
-        for (ExtendedProofMacro macro : getProofMacros()) {
+        for (ProofMacro macro : getProofMacros()) {
             // (here we do not reverse to original node)
             macro.applyTo(mediator, goal, posInOcc, listener);
             // after the first macro the posInOcc does not match any more,

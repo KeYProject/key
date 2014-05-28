@@ -17,7 +17,7 @@ import javax.swing.KeyStroke;
  *
  * @author christoph
  */
-public class ProofMacroWrapper implements ExtendedProofMacro {
+public class ProofMacroWrapper implements ProofMacro {
     final ProofMacro wrappedMacro;
 
     /**

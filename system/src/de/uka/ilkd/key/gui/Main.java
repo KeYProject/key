@@ -24,7 +24,7 @@ import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
-import de.uka.ilkd.key.gui.macros.DummyProofMacro;
+import de.uka.ilkd.key.gui.macros.SkipMacro;
 import de.uka.ilkd.key.gui.macros.ProofMacro;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
@@ -150,7 +150,7 @@ public final class Main {
     private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES =
         {de.uka.ilkd.key.proof.delayedcut.DelayedCut.FEATURE};
 
-    private static ProofMacro autoMacro = new DummyProofMacro();
+    private static ProofMacro autoMacro = new SkipMacro();
 
     /**
      * <p>
@@ -391,7 +391,7 @@ public final class Main {
                     break;
                 }
             }
-            if (macro.equals("") || autoMacro instanceof DummyProofMacro) {
+            if (macro.equals("") || autoMacro instanceof SkipMacro) {
                 System.err.println("No automatic proof macro specified.");
             }
         }

@@ -6,19 +6,20 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.Goal;
 
-public class DoWhileElseMacro implements ProofMacro {
+public class DoWhileFinallyMacro implements ProofMacro {
 
-    ProofMacro macro;
-    ProofMacro elseMacro;
-    boolean condition;
-    int steps;
+    private final ProofMacro macro;
+    private final ProofMacro elseMacro;
+    private final boolean condition;
+    private final int steps;
 
-    public DoWhileElseMacro(ProofMacro macro, int steps) {
-        this(macro, new DummyProofMacro(), steps, true);
+    public DoWhileFinallyMacro(ProofMacro macro, int steps) {
+        this(macro, new SkipMacro(), steps, true);
     }
 
-    public DoWhileElseMacro(ProofMacro macro, ProofMacro elseMacro,
+    public DoWhileFinallyMacro(ProofMacro macro, ProofMacro elseMacro,
                             int steps, boolean condition) {
         this.macro = macro;
         this.elseMacro = elseMacro;
@@ -60,6 +61,15 @@ public class DoWhileElseMacro implements ProofMacro {
     }
 
     @Override
+    public boolean canApplyTo(KeYMediator mediator, Goal goal, PosInOccurrence posInOcc) {
+        if (getCondition()) {
+            return getProofMacro().canApplyTo(mediator, goal, posInOcc);
+        } else {
+            return getAltProofMacro().canApplyTo(mediator, goal, posInOcc);
+        }
+    }
+
+    @Override
     public void applyTo(KeYMediator mediator,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
@@ -71,6 +81,23 @@ public class DoWhileElseMacro implements ProofMacro {
         }
         if (steps > 0 && getAltProofMacro().canApplyTo(mediator, posInOcc)) {
             getAltProofMacro().applyTo(mediator, posInOcc, listener);
+        }
+
+    }
+
+    @Override
+    public void applyTo(KeYMediator mediator,
+                        Goal goal,
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) throws InterruptedException {
+        int steps = getMaxSteps(mediator);
+        while (steps > 0 && getCondition() && canApplyTo(mediator, goal, posInOcc)) {
+            getProofMacro().applyTo(mediator, goal, posInOcc, listener);
+            posInOcc = null;
+            steps--;
+        }
+        if (steps > 0 && getAltProofMacro().canApplyTo(mediator, goal, posInOcc)) {
+            getAltProofMacro().applyTo(mediator, goal, posInOcc, listener);
         }
 
     }

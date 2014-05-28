@@ -24,14 +24,14 @@ import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 
-public abstract class AlternativeProofMacro implements ExtendedProofMacro {
+public abstract class AlternativeMacro implements ProofMacro {
 
     /**
      * The proof macro alternatives in their order according to their priority.
      *
      * This array is created on demand using {@link #createProofMacroArray()}.
      */
-    private ExtendedProofMacro[] proofMacros = null;
+    private ProofMacro[] proofMacros = null;
 
     /**
      * Creates the proof macro array.
@@ -41,7 +41,7 @@ public abstract class AlternativeProofMacro implements ExtendedProofMacro {
      *
      * @return a non-null array which should not be altered afterwards.
      */
-    protected abstract ExtendedProofMacro[] createProofMacroArray();
+    protected abstract ProofMacro[] createProofMacroArray();
 
     @Override
     public boolean finishAfterMacro() {
@@ -57,7 +57,7 @@ public abstract class AlternativeProofMacro implements ExtendedProofMacro {
      */
     @Override
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        List<ExtendedProofMacro> macros = getProofMacros();
+        List<ProofMacro> macros = getProofMacros();
         for (int i = 0; i < macros.size(); i++) {
             if (macros.get(i).canApplyTo(mediator, posInOcc)) {
                 return true;
@@ -77,7 +77,7 @@ public abstract class AlternativeProofMacro implements ExtendedProofMacro {
     public boolean canApplyTo(KeYMediator mediator,
                               Goal goal,
                               PosInOccurrence posInOcc) {
-        List<ExtendedProofMacro> macros = getProofMacros();
+        List<ProofMacro> macros = getProofMacros();
         for (int i = 0; i < macros.size(); i++) {
             if (macros.get(i).canApplyTo(mediator, goal, posInOcc)) {
                 return true;
@@ -121,7 +121,7 @@ public abstract class AlternativeProofMacro implements ExtendedProofMacro {
                         Goal goal,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
-        for (ExtendedProofMacro macro : getProofMacros()) {
+        for (ProofMacro macro : getProofMacros()) {
             if(macro.canApplyTo(mediator, goal, posInOcc)) {
                 macro.applyTo(mediator, goal, posInOcc, listener);
                 return;
@@ -134,7 +134,7 @@ public abstract class AlternativeProofMacro implements ExtendedProofMacro {
      *
      * @return the proofMacros as an unmodifiable list.
      */
-    public List<ExtendedProofMacro> getProofMacros() {
+    public List<ProofMacro> getProofMacros() {
         if(proofMacros == null) {
             this.proofMacros = createProofMacroArray();
             assert proofMacros != null;

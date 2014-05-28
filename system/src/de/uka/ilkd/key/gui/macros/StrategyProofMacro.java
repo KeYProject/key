@@ -41,7 +41,7 @@ import de.uka.ilkd.key.strategy.Strategy;
  * @see ProverTaskListener
  * @see Strategy
  */
-public abstract class StrategyProofMacro implements ExtendedProofMacro {
+public abstract class StrategyProofMacro implements ProofMacro {
 
     protected abstract Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc);
 

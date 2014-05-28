@@ -36,14 +36,14 @@ import de.uka.ilkd.key.proof.Node;
  *
  * @author mattias ulbrich
  */
-public abstract class SequentialProofMacro implements ExtendedProofMacro {
+public abstract class SequentialProofMacro implements ProofMacro {
 
     /**
      * The proof macros to be applied in their order.
      *
      * This array is created on demand using {@link #createProofMacroArray()}.
      */
-    private ExtendedProofMacro[] proofMacros = null;
+    private ProofMacro[] proofMacros = null;
 
     @Override
     public boolean finishAfterMacro() {
@@ -58,7 +58,7 @@ public abstract class SequentialProofMacro implements ExtendedProofMacro {
      *
      * @return a non-null array which should not be altered afterwards.
      */
-    protected abstract ExtendedProofMacro[] createProofMacroArray();
+    protected abstract ProofMacro[] createProofMacroArray();
 
     /**
      * {@inheritDoc}
@@ -69,7 +69,7 @@ public abstract class SequentialProofMacro implements ExtendedProofMacro {
      */
     @Override
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        List<ExtendedProofMacro> macros = getProofMacros();
+        List<ProofMacro> macros = getProofMacros();
         if(macros.isEmpty()) {
             return false;
         } else {
@@ -88,7 +88,7 @@ public abstract class SequentialProofMacro implements ExtendedProofMacro {
     public boolean canApplyTo(KeYMediator mediator,
                               Goal goal,
                               PosInOccurrence posInOcc) {
-        List<ExtendedProofMacro> macros = getProofMacros();
+        List<ProofMacro> macros = getProofMacros();
         if(macros.isEmpty()) {
             return false;
         } else {
@@ -112,7 +112,7 @@ public abstract class SequentialProofMacro implements ExtendedProofMacro {
             ProverTaskListener listener) throws InterruptedException {
 
         final Node initNode = mediator.getSelectedNode();
-        for (ExtendedProofMacro macro : getProofMacros()) {
+        for (ProofMacro macro : getProofMacros()) {
             // reverse to original node
             mediator.getSelectionModel().setSelectedNode(initNode);
             macro.applyTo(mediator, posInOcc, listener);
@@ -135,9 +135,9 @@ public abstract class SequentialProofMacro implements ExtendedProofMacro {
     public void applyTo(KeYMediator mediator,
                         Goal goal,
                         PosInOccurrence posInOcc,
-            ProverTaskListener listener) throws InterruptedException {
+                        ProverTaskListener listener) throws InterruptedException {
         final Node initNode = mediator.getSelectedNode();
-        for (ExtendedProofMacro macro : getProofMacros()) {
+        for (ProofMacro macro : getProofMacros()) {
             // reverse to original node
             mediator.getSelectionModel().setSelectedNode(initNode);
             macro.applyTo(mediator, goal, posInOcc, listener);
@@ -149,7 +149,7 @@ public abstract class SequentialProofMacro implements ExtendedProofMacro {
      *
      * @return the proofMacros as an unmodifiable list.
      */
-    public List<ExtendedProofMacro> getProofMacros() {
+    public List<ProofMacro> getProofMacros() {
         if(proofMacros == null) {
             this.proofMacros = createProofMacroArray();
             assert proofMacros != null;

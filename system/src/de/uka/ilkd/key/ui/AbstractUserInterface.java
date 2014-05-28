@@ -20,7 +20,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
-import de.uka.ilkd.key.gui.macros.DummyProofMacro;
+import de.uka.ilkd.key.gui.macros.SkipMacro;
 import de.uka.ilkd.key.gui.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -38,7 +38,7 @@ import de.uka.ilkd.key.util.Debug;
 
 public abstract class AbstractUserInterface implements UserInterface {
 
-    private ProofMacro autoMacro = new DummyProofMacro();
+    private ProofMacro autoMacro = new SkipMacro();
 
     protected ProblemLoader getProblemLoader(File file, List<File> classPath,
                                              File bootClassPath, KeYMediator mediator) {
@@ -68,7 +68,7 @@ public abstract class AbstractUserInterface implements UserInterface {
     protected abstract String getMacroConsoleOutput();
 
     public boolean macroChosen() {
-        return !(getMacro() instanceof DummyProofMacro);
+        return !(getMacro() instanceof SkipMacro);
     }
 
     public boolean applyMacro() {
