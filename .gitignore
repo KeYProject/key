@@ -5,7 +5,9 @@
 *~
 system/genSrc
 system/binary
+system/eclipse-binary
 system/lib
+system/doc
 *#*
 system/key.jar
 system/setup.jar

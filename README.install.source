@@ -23,16 +23,17 @@ Optionally, KeY can make use of the following binaries:
               (export to SMT input file possible)        
 
 
-(2) Contents of the KeY-Distribution
+(2) Contents of the KeY distribution
 -------------------------------------
 
-  At the KeY-Homepage you can find the following parts:
+  At the KeY homepage you can find the following parts:
 
    * README.xxx-src.txt: this file
-   * KeY-xxx-src.tgz: the source code version of KeY-system
-   * KeYExtLib_xxx.tgz: contains the external libraries
+   * KeY-xxx-src.tgz or KeY-xxx-src.zip: the source code version of KeY-system
+   * KeYExtLib_xxx.tgz or KeYExtLib-xxx.zip: contains the external libraries
    * quicktour_xxx.zip or quicktour_xxx.tgz: a short tutorial
 
+	where xxx stands for the current version.
 
 (3) Installation (Source Code)
 -------------------------------------

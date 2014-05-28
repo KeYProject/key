@@ -18,29 +18,31 @@ Java SE 6 or newer (already installed)
 Needed additional Libraries:
 	antlr.jar Version >= 2.7.2: parser generator
 	recoderKey.jar
-                 a transformation framework for java patched by the KeY group
+                 a transformation framework for Java patched by the KeY group
 
 Optionally, KeY can make use of the following binaries:
 	SMT Solvers: bindings exist currently for Z3, Simplify, Yices and CVC3
               (export to SMT input file possible)        
 
 
-(2) Contents of the KeY-Distribution
+(2) Contents of the KeY distribution
 -------------------------------------
 
   At the KeY-Homepage you can find the following parts:
 
    * README-xxx.txt: this file
-   * KeY-xxx.tgz: the KeY-system in the jar-file version. That is the
+   * KeY-xxx.tgz or KeY-xxx.zip: the KeY-system in the jar-file version. That is the
                   distribution version without the source code.
-   * KeYExtLib_xxx.tgz: contains the external libraries (see above) 
+   * KeYExtLib_xxx.tgz or KeYExtLib-xxx.zip: contains the external libraries (see above)
    * quicktour_xxx.zip or quicktour_xxx.tgz: a short tutorial
+
+	where xxx stands for the current version.
 
 
 (3) Installation (Byte Code)
 ----------------------------
 
-	1) Copy the KeY-xxx.tgz to a temporary directory; 
+	1) Copy the KeY-xxx.tgz or KeY-xxx.zip to a temporary directory;
 	   Here: tmp/
 
 	2) Unpack KeY.tgz 
@@ -48,8 +50,7 @@ Optionally, KeY can make use of the following binaries:
 		Linux: 
 		   tar -xzvf KeY-xxx.tgz 
 
-		Windows ( use your favorite unpack program that can handle
-			  tar-gzipped archives, e.g. WinZip) 
+		Windows (use your favorite unpack program, e.g. WinZip)
 
 	3) The following files should be found in the directory (tmp/):
 		setup.jar key.jar LICENSE.TXT
