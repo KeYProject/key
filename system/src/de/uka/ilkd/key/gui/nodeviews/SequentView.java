@@ -188,7 +188,7 @@ public abstract class SequentView extends JTextArea {
             }
         } catch (BadLocationException badLocation) {
             System.err.println("SequentView tried to highlight an area "
-                    + "that does not exist.");
+                    + "that does not exist: "+range);
             badLocation.printStackTrace();
         }
     }

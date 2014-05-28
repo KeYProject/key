@@ -67,45 +67,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 
-import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
-import de.uka.ilkd.key.gui.actions.AboutAction;
-import de.uka.ilkd.key.gui.actions.AutoModeAction;
-import de.uka.ilkd.key.gui.actions.CounterExampleAction;
-import de.uka.ilkd.key.gui.actions.TestGenerationAction;
-import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
-import de.uka.ilkd.key.gui.actions.ExitMainAction;
-import de.uka.ilkd.key.gui.actions.FontSizeAction;
-import de.uka.ilkd.key.gui.actions.GoalBackAction;
-import de.uka.ilkd.key.gui.actions.HidePackagePrefixToggleAction;
-import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
-import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
-import de.uka.ilkd.key.gui.actions.LicenseAction;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
-import de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction;
-import de.uka.ilkd.key.gui.actions.OpenExampleAction;
-import de.uka.ilkd.key.gui.actions.OpenFileAction;
-import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
-import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
-import de.uka.ilkd.key.gui.actions.ProofManagementAction;
-import de.uka.ilkd.key.gui.actions.PruneProofAction;
-import de.uka.ilkd.key.gui.actions.QuickLoadAction;
-import de.uka.ilkd.key.gui.actions.QuickSaveAction;
-import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
-import de.uka.ilkd.key.gui.actions.ToggleConfirmExitAction;
-import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
-import de.uka.ilkd.key.gui.actions.SaveFileAction;
-import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
-import de.uka.ilkd.key.gui.actions.SearchInSequentAction;
-import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
-import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
-import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
-import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
-import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
-import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
-import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
-import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
-import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
+import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
@@ -473,8 +435,6 @@ public final class MainWindow extends JFrame  {
         toolBarPanel.add(controlToolBar);
         toolBarPanel.add(fileOpToolBar);
 
-        // FIXME double entry?
-        getContentPane().add(GuiUtilities.getClipBoardArea(), BorderLayout.PAGE_START);
         getContentPane().add(toolBarPanel, BorderLayout.PAGE_START);
 
         // create tabbed pane
@@ -554,7 +514,6 @@ public final class MainWindow extends JFrame  {
         toolBar.add(comp.getSelectionComponent());
         toolBar.addSeparator();        
         toolBar.add(new CounterExampleAction(this));
-        toolBar.addSeparator();        
         toolBar.add(new TestGenerationAction(this));
         toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
@@ -827,9 +786,9 @@ public final class MainWindow extends JFrame  {
         proof.add(new SearchInProofTreeAction(this));
         proof.add(new SearchInSequentAction(this));
         proof.addSeparator();
-	proof.add(new ShowUsedContractsAction(this));
+        proof.add(new ShowUsedContractsAction(this));
         proof.add(new ShowActiveTactletOptionsAction(this));
-	proof.add(showActiveSettingsAction);
+        proof.add(showActiveSettingsAction);
         proof.add(new ShowProofStatistics(this));
         proof.add(new ShowKnownTypesAction(this));
         proof.addSeparator();
@@ -862,6 +821,7 @@ public final class MainWindow extends JFrame  {
         help.setMnemonic(KeyEvent.VK_A);
 
         help.add(new AboutAction(this));
+        help.add(new SystemInfoAction(this));
         help.add(new LicenseAction(this));
         return help;
     }
@@ -966,6 +926,13 @@ public final class MainWindow extends JFrame  {
 
     public ProofTreeView getProofView() {
         return proofTreeView;
+    }
+    
+    /**
+     * Returns the current goal view.
+     */
+    public CurrentGoalView getGoalView() {
+        return currentGoalView;
     }
 
     /** saves a proof */

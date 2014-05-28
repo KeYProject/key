@@ -58,6 +58,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
@@ -931,6 +932,22 @@ public class TestUtilsUtil {
    }
 
    /**
+    * Returns {@link TableItem#getData()}.
+    * @param item The {@link SWTBotTableItem} to return from.
+    * @return The data {@link Object}.
+    */   
+   public static Object getTableItemData(final SWTBotTableItem item) {
+      IRunnableWithResult<Object> run = new AbstractRunnableWithResult<Object>() {
+         @Override
+         public void run() {
+            setResult(item.widget.getData());
+         }
+      };
+      item.widget.getDisplay().syncExec(run);
+      return run.getResult();
+   }
+
+   /**
     * Selects the item in the tree that is defined by the path indices.
     * @param debugTree The {@link SWTBotTree} to select a {@link SWTBotTreeItem} in.
     * @param indexPathToItem The path to the item to select which consists of the path indices.
@@ -1632,5 +1649,29 @@ public class TestUtilsUtil {
       IPerspectiveDescriptor debugPerspective = TestUtilsUtil.getActivePerspective();
       bot.waitUntil(org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses(switchShel));
       assertEquals(expectedTargetPerspectiveId, debugPerspective.getId());
+   }
+
+   /**
+    * Returns the selection of the given {@link SWTBotTree}.
+    * @param tree The {@link SWTBotTree}.
+    * @return The selected {@link Object}s.
+    * @throws Exception Occurred Exception.
+    */
+   public static Object[] getSelectedObjects(final SWTBotTree tree) throws Exception {
+      IRunnableWithResult<Object[]> run = new AbstractRunnableWithResult<Object[]>() {
+         @Override
+         public void run() {
+            List<Object> result = new LinkedList<Object>();
+            for (TreeItem item : tree.widget.getSelection()) {
+               result.add(item.getData());
+            }
+            setResult(result.toArray(new Object[result.size()]));
+         }
+      };
+      tree.widget.getDisplay().syncExec(run);
+      if (run.getException() != null) {
+         throw run.getException();
+      }
+      return run.getResult();
    }
 }

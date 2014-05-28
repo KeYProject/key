@@ -69,7 +69,7 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      */
     boolean confirmTaskRemoval(String message);
 
-    void finish();
+    void finish(Proof proof);
 
     /**
      * loads the problem or proof from the given file

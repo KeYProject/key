@@ -16,6 +16,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 import javax.swing.text.DefaultCaret;
 
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
@@ -31,6 +32,9 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener {
 	private final JTextArea textArea;
 	private final JButton stopButton;
 	private final JButton exitButton;
+	private final JButton startButton;
+	
+	private TGWorker worker;
 
 	public TGInfoDialog() {
 		super(MainWindow.getInstance());
@@ -43,6 +47,9 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener {
 		        .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		final DefaultCaret caret = (DefaultCaret) textArea.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		
+		
+		
 		stopButton = new JButton(new AbstractAction("Stop") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -56,16 +63,29 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener {
 				TGInfoDialog.this.dispose();
 			}
 		});
+		startButton = new JButton(new AbstractAction("Start") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				KeYMediator mediator = MainWindow.getInstance().getMediator();
+				mediator.stopInterface(true);
+				mediator.setInteractive(false);				
+				worker = new TGWorker(TGInfoDialog.this);
+				mediator.addInterruptedListener(worker);
+				worker.execute();
+			}
+		});
 		exitButton.setEnabled(false);
 		final JPanel flowPanel = new JPanel(new FlowLayout());
+		flowPanel.add(startButton);
 		flowPanel.add(stopButton);
 		flowPanel.add(exitButton);
 		getContentPane().add(scrollpane, BorderLayout.CENTER);
 		getContentPane().add(flowPanel, BorderLayout.SOUTH);
+		getContentPane().add(new TestGenOptionsPanel(), BorderLayout.EAST);
 		setModal(false);
 		// this.pack();
 		setTitle("Test Suite Generation");
-		this.setSize(500, 300);
+		this.setSize(700, 300);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setLocationRelativeTo(MainWindow.getInstance());
 		setVisible(true);
@@ -127,7 +147,7 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener {
 	public void launcherStopped(SolverLauncher launcher,
 	        Collection<SMTSolver> problemSolvers) {
 		writeln("Finished solving SMT problems: " + problemSolvers.size());
-		final TestCaseGenerator tg = new TestCaseGenerator();
+		final TestCaseGenerator tg = new TestCaseGenerator(worker.getOriginalProof());
 		tg.setLogger(this);
 		problemSolvers = filterSolverResultsAndShowSolverStatistics(problemSolvers);
 		if (problemSolvers.size() > 0) {

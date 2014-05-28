@@ -75,10 +75,11 @@ public class KeYLoopStatement extends AbstractSEDLoopStatement implements IKeYSE
    public KeYLoopStatement(KeYDebugTarget target, 
                            IKeYSEDDebugNode<?> parent, 
                            ISEDThread thread, 
-                           IExecutionLoopStatement executionNode) {
+                           IExecutionLoopStatement executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
    
    /**

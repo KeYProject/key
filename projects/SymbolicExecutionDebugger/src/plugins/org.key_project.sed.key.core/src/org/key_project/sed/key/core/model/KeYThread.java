@@ -50,10 +50,11 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param executionNode The {@link IExecutionStart} to represent by this debug node.
     */
-   public KeYThread(KeYDebugTarget target, IExecutionStart executionNode) {
+   public KeYThread(KeYDebugTarget target, IExecutionStart executionNode) throws DebugException {
       super(target);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
 
    /**

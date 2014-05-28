@@ -30,11 +30,16 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.jface.resource.StringConverter;
+import org.key_project.sed.core.annotation.ISEDAnnotation;
+import org.key_project.sed.core.annotation.ISEDAnnotationLink;
+import org.key_project.sed.core.annotation.ISEDAnnotationType;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchStatement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.ISEDIDElement;
 import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
 import org.key_project.sed.core.model.ISEDLoopInvariant;
@@ -174,6 +179,16 @@ public class SEDXMLWriter {
    public static final String TAG_LOOP_INVARIANT = "sedLoopInvariant";
 
    /**
+    * Tag name to store {@link ISEDAnnotation}s.
+    */
+   public static final String TAG_ANNOTATION = "sedAnnotation";
+
+   /**
+    * Tag name to store {@link ISEDAnnotationLink}s.
+    */
+   public static final String TAG_ANNOTATION_LINK = "sedAnnotationLink";
+
+   /**
     * Attribute name to store encodings.
     */
    private static final String ATTRIBUTE_ENCODING = "encoding";
@@ -184,7 +199,7 @@ public class SEDXMLWriter {
    public static final String ATTRIBUTE_NAMESPACE = "xmlns";
 
    /**
-    * Attribute name to store IDs.
+    * Attribute name to store IDs ({@link ISEDIDElement#getId()}).
     */
    public static final String ATTRIBUTE_ID = "xml:id";
 
@@ -272,6 +287,52 @@ public class SEDXMLWriter {
     * Attribute name to store {@link ISourcePathProvider#getSourcePath()}.
     */
    public static final String ATTRIBUTE_SOURCE_PATH = "sourcePath";
+
+   /**
+    * Attribute name to store {@link ISEDAnnotationType#getTypeId()}.
+    */
+   public static final String ATTRIBUTE_TYPE_ID = "typeId";
+
+   /**
+    * Attribute name to store {@link ISEDAnnotationType#saveAnnotation(ISEDAnnotation)} and
+    * {@link ISEDAnnotationType#saveAnnotationLink(ISEDAnnotationLink)}.
+    */
+   public static final String ATTRIBUTE_CONTENT = "content";
+
+   /**
+    * Attribute name to store {@link ISEDAnnotation#isEnabled()}.
+    */
+   public static final String ATTRIBUTE_ENABLED = "enabled";
+
+   /**
+    * Attribute name to store {@link ISEDAnnotation#isHighlightBackground()}.
+    */
+   public static final String ATTRIBUTE_HIGHLIGHT_BACKGROUND = "highlightBackground";
+
+   /**
+    * Attribute name to store {@link ISEDAnnotation#getBackgroundColor()}.
+    */
+   public static final String ATTRIBUTE_BACKGROUND_COLOR = "backgroundColor";
+
+   /**
+    * Attribute name to store {@link ISEDAnnotation#isHighlightForeground()}.
+    */
+   public static final String ATTRIBUTE_HIGHLIGHT_FOREGROUND = "highlightForeground";
+
+   /**
+    * Attribute name to store {@link ISEDAnnotation#getForegroundColor()}.
+    */
+   public static final String ATTRIBUTE_FOREGROUND_COLOR = "foregroundColor";
+
+   /**
+    * Refers to an existing {@link ISEDAnnotation} with the defined id.
+    */
+   public static final String ATTRIBUTE_ANNOTATION_LINK_SOURCE = "sourceIdRef";
+
+   /**
+    * Refers to an existing {@link ISEDDebugNode} with the defined id.
+    */
+   public static final String ATTRIBUTE_ANNOTATION_LINK_TARGET = "targetIdRef";
    
    /**
     * Writes the given {@link ISEDDebugTarget}s into the {@link OutputStream} with the defined encoding.
@@ -487,6 +548,10 @@ public class SEDXMLWriter {
          appenSourcePathAttribute(target, sb);
          sb.append(">");
          appendNewLine(sb);
+         ISEDAnnotation[] annotations = target.getRegisteredAnnotations();
+         for (ISEDAnnotation annotation : annotations) {
+            sb.append(toXML(level + 1, annotation));
+         }
          ISEDThread[] threads = target.getSymbolicThreads();
          for (ISEDThread thread : threads) {
             sb.append(toXML(level + 1, thread, saveVariables, saveCallStack));
@@ -868,6 +933,11 @@ public class SEDXMLWriter {
       if (node != null) {
          // Append start tag
          appendStartTag(level, tagName, attributeValues, sb);
+         // Append annotation links
+         ISEDAnnotationLink[] links = node.getAnnotationLinks();
+         for (ISEDAnnotationLink link : links) {
+            sb.append(toXML(level + 1, link));
+         }
          // Append variables
          if (node instanceof IStackFrame) {
             appendVariables(level + 1, (IStackFrame)node, saveVariables, sb);
@@ -975,6 +1045,54 @@ public class SEDXMLWriter {
       }
       // Append end tag
       appendEndTag(level, TAG_VALUE, sb);
+   }
+
+   /**
+    * Serializes the given {@link ISEDAnnotation} into a {@link String}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param annotation The {@link ISEDAnnotation} to serialize.
+    * @return The result.
+    */
+   protected String toXML(int level, ISEDAnnotation annotation) {
+      StringBuffer sb = new StringBuffer();
+      if (annotation != null) {
+         Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+         attributeValues.put(ATTRIBUTE_ID, annotation.getId());
+         attributeValues.put(ATTRIBUTE_TYPE_ID, annotation.getType().getTypeId());
+         attributeValues.put(ATTRIBUTE_ENABLED, annotation.isEnabled() + "");
+         attributeValues.put(ATTRIBUTE_HIGHLIGHT_BACKGROUND, annotation.isHighlightBackground() + "");
+         attributeValues.put(ATTRIBUTE_BACKGROUND_COLOR, StringConverter.asString(annotation.getBackgroundColor()));
+         attributeValues.put(ATTRIBUTE_HIGHLIGHT_FOREGROUND, annotation.isHighlightForeground() + "");
+         attributeValues.put(ATTRIBUTE_FOREGROUND_COLOR, StringConverter.asString(annotation.getForegroundColor()));
+         String savedContent = annotation.getType().saveAnnotation(annotation);
+         if (!StringUtil.isTrimmedEmpty(savedContent)) {
+            attributeValues.put(ATTRIBUTE_CONTENT, XMLUtil.encodeText(savedContent));
+         }
+         appendEmptyTag(level, TAG_ANNOTATION, attributeValues, sb);
+      }
+      return sb.toString();
+   }
+
+   /**
+    * Serializes the given {@link ISEDAnnotationLink} into a {@link String}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param link The {@link ISEDAnnotationLink} to serialize.
+    * @return The result.
+    */
+   protected String toXML(int level, ISEDAnnotationLink link) {
+      StringBuffer sb = new StringBuffer();
+      if (link != null) {
+         Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+         attributeValues.put(ATTRIBUTE_ID, link.getId());
+         attributeValues.put(ATTRIBUTE_ANNOTATION_LINK_SOURCE, link.getSource().getId());
+         attributeValues.put(ATTRIBUTE_ANNOTATION_LINK_TARGET, link.getTarget().getId());
+         String savedContent = link.getSource().getType().saveAnnotationLink(link);
+         if (!StringUtil.isTrimmedEmpty(savedContent)) {
+            attributeValues.put(ATTRIBUTE_CONTENT, XMLUtil.encodeText(savedContent));
+         }
+         appendEmptyTag(level, TAG_ANNOTATION_LINK, attributeValues, sb);
+      }
+      return sb.toString();
    }
 
    /**

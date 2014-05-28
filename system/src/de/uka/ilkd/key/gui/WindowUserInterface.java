@@ -68,8 +68,8 @@ public class WindowUserInterface extends AbstractUserInterface {
 	public void loadProblem(File file, List<File> classPath,
 	        File bootClassPath) {
 		mainWindow.addRecentFile(file.getAbsolutePath());
-		super.loadProblem(
-		        file, classPath, bootClassPath, mainWindow.getMediator());
+		super.getProblemLoader(
+		        file, classPath, bootClassPath, mainWindow.getMediator()).runAsynchronously();
 	}
 
 	@Override
@@ -118,7 +118,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 		mainWindow.setStandardStatusLine();
 	}
 
-	public void finish() {
+	public void finish(Proof proof) {
 	    // do nothing
 	}
 

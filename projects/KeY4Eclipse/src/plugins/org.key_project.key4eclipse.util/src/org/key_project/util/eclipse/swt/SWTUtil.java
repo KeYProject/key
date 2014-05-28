@@ -23,6 +23,8 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jface.viewers.AbstractTableViewer;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -520,5 +522,118 @@ public final class SWTUtil {
          }
       }
       return result;
+   }
+
+   /**
+    * Invokes {@link Viewer#refresh()} thread save.
+    * @param viewer The {@link Viewer} to invoke {@link Viewer#refresh()} on.
+    */
+   public static void refresh(final Viewer viewer) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.refresh();
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link AbstractTableViewer#replace(Object, int)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param element The new element.
+    * @param index The index to replace element at.
+    */
+   public static void replace(final AbstractTableViewer viewer, final Object element, final int index) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.replace(element, index);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link AbstractTableViewer#add(Object)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param element The new element to add.
+    */
+   public static void add(final AbstractTableViewer viewer, final Object element) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.add(element);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link AbstractTableViewer#add(Object)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param elements The new elements to add.
+    */
+   public static void add(final AbstractTableViewer viewer, final Object[] elements) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.add(elements);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link AbstractTableViewer#remove(Object)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param element The old element to remove.
+    */
+   public static void remove(final AbstractTableViewer viewer, final Object element) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.remove(element);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link AbstractTableViewer#remove(Object)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param elements The old elements to remove.
+    */
+   public static void remove(final AbstractTableViewer viewer, final Object[] elements) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.remove(elements);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link CheckboxTableViewer#setChecked(Object, boolean)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param element The element to modify its checked state.
+    * @param state The new checked state to set.
+    */
+   public static void setChecked(final CheckboxTableViewer viewer, final Object element, final boolean state) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.setChecked(element, state);
+            }
+         });
+      }
    }
 }

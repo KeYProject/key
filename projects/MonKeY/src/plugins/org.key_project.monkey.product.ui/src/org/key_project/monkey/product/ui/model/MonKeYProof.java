@@ -20,7 +20,6 @@ import java.util.Iterator;
 
 import org.eclipse.core.runtime.Assert;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.key4eclipse.starter.core.util.ProofUserManager;
 import org.key_project.monkey.product.ui.util.MonKeYUtil;
 import org.key_project.util.bean.Bean;
 import org.key_project.util.java.StringUtil;
@@ -42,6 +41,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.ProofUserManager;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 

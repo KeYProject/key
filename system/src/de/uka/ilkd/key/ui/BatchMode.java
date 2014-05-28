@@ -132,7 +132,7 @@ public class BatchMode {
                                      statistics.time + " | " +
                                      statistics.autoModeTime + " | " +
                                      (proofClosed ? 1 : 0) + " | " +
-                                     ((double)statistics.autoModeTime / (double)statistics.totalRuleApps) + " | " +
+                                     statistics.timePerStep + " | " +
                                      memory);
             statPrinter.close();
         } catch ( IOException e ) {

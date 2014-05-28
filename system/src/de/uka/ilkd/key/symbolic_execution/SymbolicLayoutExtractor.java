@@ -29,6 +29,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ApplyStrategy;
+import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -55,6 +56,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -73,6 +75,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicValue;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.ProofStarter;
 
@@ -272,7 +275,7 @@ public class SymbolicLayoutExtractor {
       synchronized (this) {
          if (!isAnalysed()) {
             // Get path condition
-            pathCondition = SymbolicExecutionUtil.computePathCondition(node, true, false);
+            pathCondition = SymbolicExecutionUtil.computePathCondition(node, false);
             pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
             // Compute all locations used in path conditions and updates. The values of the locations will be later computed in the state computation (and finally shown in a memory layout).
             Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractLocationParameter>();
@@ -293,13 +296,19 @@ public class SymbolicLayoutExtractor {
             symbolicObjectsResultingInCurrentState.add(getServices().getTermBuilder().NULL()); // Add null because it can happen that a object is null and this option must be included in equivalence class computation
             // Compute a Sequent with the initial conditions of the proof without modality
             Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation(pathCondition);
-            // Instantiate proof in which equivalent classes of symbolic objects are computed.
-            ProofStarter equivalentClassesProofStarter = SymbolicExecutionUtil.createSideProof(getProof(), initialConditionsSequent);
+            ApplyStrategyInfo info = null;
             try {
+               // Instantiate proof in which equivalent classes of symbolic objects are computed.
+               ProofStarter equivalentClassesProofStarter = SideProofUtil.createSideProof(getProof(), initialConditionsSequent);
                // Apply cut rules to compute equivalent classes
                applyCutRules(equivalentClassesProofStarter, symbolicObjectsResultingInCurrentState);
                // Finish proof automatically
-               SymbolicExecutionUtil.startSideProof(getProof(), equivalentClassesProofStarter, StrategyProperties.SPLITTING_NORMAL);
+               info = SideProofUtil.startSideProof(getProof(), 
+                                                   equivalentClassesProofStarter, 
+                                                   StrategyProperties.METHOD_CONTRACT,
+                                                   StrategyProperties.LOOP_INVARIANT,
+                                                   StrategyProperties.QUERY_ON,
+                                                   StrategyProperties.SPLITTING_NORMAL);
                // Compute the available instance memory layout via the opened goals of the equivalent proof.
                appliedCutsPerLayout = extractAppliedCutsFromGoals(equivalentClassesProofStarter.getProof());
                // Create predicate required for state computation
@@ -311,7 +320,7 @@ public class SymbolicLayoutExtractor {
                layoutsEquivalentClasses = new LinkedHashMap<Integer, ImmutableList<ISymbolicEquivalenceClass>>();
             }
             finally {
-               equivalentClassesProofStarter.getProof().dispose();
+               SideProofUtil.disposeOrStore("Equivalence class computation on node " + node.serialNr() + ".", info);
             }
          }
       }
@@ -1113,14 +1122,19 @@ public class SymbolicLayoutExtractor {
          ImmutableList<Term> newUpdates = ImmutableSLList.<Term>nil().append(getServices().getTermBuilder().parallel(additionalUpdates));
          Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, layoutCondition, layoutTerm, newUpdates);
          // Instantiate and run proof
-         ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequent, StrategyProperties.SPLITTING_NORMAL);
+         ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
+                                                                             sequent, 
+                                                                             StrategyProperties.METHOD_CONTRACT,
+                                                                             StrategyProperties.LOOP_INVARIANT,
+                                                                             StrategyProperties.QUERY_ON,
+                                                                             StrategyProperties.SPLITTING_NORMAL);
          try {
             // Extract values and objects from result predicate and store them in variable value pairs
             Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();
             int goalCount = info.getProof().openGoals().size();
             for (Goal goal : info.getProof().openGoals()) {
-               Term resultTerm = SymbolicExecutionUtil.extractOperatorTerm(goal, layoutTerm.op());
-               Term condition = goalCount == 1 ? null : SymbolicExecutionUtil.computePathCondition(goal.node(), true, true);
+               Term resultTerm = SideProofUtil.extractOperatorTerm(goal, layoutTerm.op());
+               Term condition = goalCount == 1 ? null : SymbolicExecutionUtil.computePathCondition(goal.node(), true);
                for (ExtractLocationParameter param : locations) {
                   ExecutionVariableValuePair pair;
                   if (param.isArrayIndex()) {
@@ -1136,7 +1150,7 @@ public class SymbolicLayoutExtractor {
             return createLayoutFromExecutionVariableValuePairs(equivalentClasses, pairs, stateName);
          }
          finally {
-            info.getProof().dispose();
+            SideProofUtil.disposeOrStore("Layout computation on node " + node.serialNr() + " with layout term " + ProofSaver.printAnything(layoutTerm, getServices()) + ".", info);
          }
       }
       else {

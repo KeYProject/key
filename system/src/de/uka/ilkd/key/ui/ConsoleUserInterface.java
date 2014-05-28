@@ -32,6 +32,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -55,7 +56,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
     private final BatchMode batchMode;
     private final byte verbosity;
-	private ProofStarter ps;
 	private KeYMediator mediator;
 	private boolean autoMode;
 
@@ -76,14 +76,13 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        this(batchMode, verbose? DEBUG: NORMAL);
    }
 
-   public void finish() {
+   public void finish(Proof proof) {
        // setInteractive(false) has to be called because the ruleAppIndex
        // has to be notified that we work in auto mode (CS)
        mediator.setInteractive(false);
-
-       final Object result = ps.start(true);
-       if (verbosity >= HIGH) {
-           System.out.println(result);
+       startAndWaitForAutoMode(proof);
+       if (verbosity >= HIGH) { // WARNING: Is never executed since application terminates via System.exit() before.
+       	System.out.println(proof.statistics());
        }
    }
 
@@ -92,7 +91,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        final Proof proof = info.getProof();
        if (proof==null) {
            if (verbosity > SILENT) System.out.println("Proof loading failed");
-           return;
+           System.exit(1);
        }
        final int openGoals = proof.openGoals().size();
        final Object result2 = info.getResult();
@@ -108,6 +107,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                    System.out.println("Proof steps: "+stat.nodes);
                    System.out.println("Branches: "+stat.branches);
                    System.out.println("Automode Time: "+stat.autoModeTime+"ms");
+                   System.out.println("Time per step: "+stat.timePerStep+"ms");
                }
                System.out.println("Number of goals remaining open: " +
                        openGoals);
@@ -153,8 +153,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             ProofAggregate proofAggregate) {
         // TODO Implement ProblemInitializerListener.proofCreated
         // XXX WHY AT THE MAINWINDOW?!?!
-    	ps = new ProofStarter(this, mediator.getAutoSaver() != null);
-        ps.init(proofAggregate);
         mediator.setProof(proofAggregate.getFirstProof());
         proofStack = proofStack.prepend(proofAggregate.getFirstProof());
     }
@@ -264,12 +262,12 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
     @Override
     public void loadProblem(File file) {
-        super.loadProblem(file, null, null, mediator);
-    }
+		super.getProblemLoader(file, null, null, mediator).runSynchronously();
+	}
 
    @Override
    public void loadProblem(File file, List<File> classPath, File bootClassPath) {
-      super.loadProblem(file, classPath, bootClassPath, mediator);
+      super.getProblemLoader(file, classPath, bootClassPath, mediator).runSynchronously();
    }
 
    @Override

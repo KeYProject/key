@@ -96,8 +96,8 @@ termination: diamond" pathCondition="not(equals(array,null))" pathConditionChang
                         </value>
                      </variable>
                      <callStackEntry path="/0"/>
-                     <branchCondition name="lt(length(array),Z(1(#)))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),leq(length(array),Z(0(#)))))" pathConditionChanged="true" branchCondition="lt(length(array),Z(1(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <termination name="&lt;uncaught java.lang.ArithmeticException&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),leq(length(array),Z(0(#)))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                     <branchCondition name="equals(length(array),Z(0(#)))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(0(#)))))" pathConditionChanged="true" branchCondition="equals(length(array),Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <termination name="&lt;uncaught java.lang.ArithmeticException&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(0(#)))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                         </termination>
                      </branchCondition>
                      <branchCondition name="not(equals(length(array),Z(0(#))))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(0(#))))))" pathConditionChanged="true" branchCondition="not(equals(length(array),Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">

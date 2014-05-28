@@ -102,6 +102,10 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         }
     }
 
+    @Override
+    public String toString() {
+        return ""+getValue();
+    }
 
     /**
      * Implementation of the <code>RuleAppCost</code> interface that uses
@@ -119,10 +123,6 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         @Override
         public final long getValue () {
             return cost;
-        }
-        
-        public String toString () {
-            return "Costs " + cost;
         }
     }
 

@@ -10,11 +10,11 @@ pre: -123 &gt;= 0 &amp; obj.&lt;inv&gt;
 post: result_0 = 42 &amp; obj.&lt;inv&gt; &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="true">
-                     <branchCondition name="not(equals(obj,null))" pathCondition="not(equals(obj,null))" pathConditionChanged="true" branchCondition="not(equals(obj,null))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
-                        <statement name="int magicNumberCopy = magicNumber;" pathCondition="not(equals(obj,null))" pathConditionChanged="false">
-                           <statement name="return magicNumber+magicNumberCopy;" pathCondition="not(equals(obj,null))" pathConditionChanged="false">
-                              <methodReturn name="&lt;return of UseOperationContractInvalidPreconditionTest.main();&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" isReturnValueComputed="false">
-                                 <termination name="&lt;end&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                     <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
+                        <statement name="int magicNumberCopy = magicNumber;" pathCondition="true" pathConditionChanged="false">
+                           <statement name="return magicNumber+magicNumberCopy;" pathCondition="true" pathConditionChanged="false">
+                              <methodReturn name="&lt;return of UseOperationContractInvalidPreconditionTest.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                 <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>
                               </methodReturn>
                            </statement>

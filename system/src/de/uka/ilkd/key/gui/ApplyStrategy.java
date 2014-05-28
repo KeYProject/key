@@ -535,7 +535,7 @@ public class ApplyStrategy {
         } else {
             for (ProverTaskListener ptl : proverTaskObservers) {
                 if (ptl instanceof UserInterface && !((UserInterface)ptl).macroChosen()) {
-                    ((UserInterface)ptl).finish();
+                    ((UserInterface)ptl).finish(info.getProof());
                 }
             }
         }
