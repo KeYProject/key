@@ -14,14 +14,11 @@ package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -37,31 +34,6 @@ public final class MapLDT extends LDT {
     public MapLDT(TermServices services) {
         super(NAME, services);
         mapEmpty = addFunction(services, "mapEmpty");
-        new MapConstructor("mapSingleton", "\\map_singleton", services) {
-
-            @Override
-            public int getArity() {
-                return 2;
-            }
-
-            @Override
-            public void visit(Visitor v) {
-                v.performActionOnMapConstructor(this);
-            }
-
-        };
-
-//        new MapConstructor("inDomain", "\\map_inDomain", services) {};
-//        mapGet = addFunction(services, "mapGet");
-//        isFinite = addFunction(services, "isFinite");
-//        mapSize = addFunction(services, "mapSize");
-//
-//        //constructors
-//        mapSingleton = addFunction(services, "mapSingleton");
-//        mapOverride = addFunction(services, "mapOverride");
-//        seq2map = addFunction(services, "seq2map");
-//        mapUpdate = addFunction(services, "mapUpdate");
-//        mapRemove = addFunction(services, "mapRemove");
     }
 
     @Override
@@ -86,7 +58,7 @@ public final class MapLDT extends LDT {
             Term sub,
             TermServices services,
             ExecutionContext ec) {
-        return op instanceof MapConstructor;
+        return false;
     }
 
     @Override
@@ -99,9 +71,6 @@ public final class MapLDT extends LDT {
     public Function getFunctionFor(Operator op,
             Services serv,
             ExecutionContext ec) {
-        if (op instanceof MapConstructor) {
-            return ((MapConstructor) op).function;
-        }
         assert false;
         return null;
     }
@@ -128,33 +97,6 @@ public final class MapLDT extends LDT {
 
     public Function getMapEmpty() {
         return mapEmpty;
-    }
-
-    public abstract class MapConstructor extends Operator {
-
-        final Function function;
-
-        MapConstructor(String javaDLName,
-                String JMLName,
-                TermServices services) {
-            function = addFunction(services, javaDLName);
-        }
-
-        @Override
-        public int getPrecedence() {
-            return 0;
-        }
-
-        @Override
-        public int getNotation() {
-            return PREFIX;
-        }
-
-        @Override
-        public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-            return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_MAP);
-        }
-
     }
 
 }
