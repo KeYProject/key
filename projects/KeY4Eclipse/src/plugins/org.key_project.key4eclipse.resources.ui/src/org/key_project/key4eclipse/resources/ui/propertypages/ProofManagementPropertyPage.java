@@ -39,6 +39,8 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
 
    private Button enableBuildRequiredProofsOnlyButton;
    
+   private Button enableAutoInterruptBuildButton;
+   
    private Spinner setNumberOfThreadsSpinner;
    
    private Text setNumberOfThreadsText;
@@ -59,11 +61,12 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
          boolean isSelected = enableBuildProofsButton.getSelection();
          if(isSelected){
             enableBuildRequiredProofsOnlyButton.setEnabled(true);
+            enableAutoInterruptBuildButton.setEnabled(true);
          }
          else{
             enableBuildRequiredProofsOnlyButton.setEnabled(false);
+            enableAutoInterruptBuildButton.setEnabled(false);
          }
-         
       }
       
       @Override
@@ -72,7 +75,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    };
    
    
-private SelectionListener enableMultiThreadingButtonSelectionListener = new SelectionListener() {
+   private SelectionListener enableMultiThreadingButtonSelectionListener = new SelectionListener() {
       
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -119,6 +122,10 @@ private SelectionListener enableMultiThreadingButtonSelectionListener = new Sele
       setSelectionForEnableBuildRequiredProofsOnlyButton();
       setEnabledForBuildProofsEfficientButton();
       
+      enableAutoInterruptBuildButton = new Button(builderSettingsComposite, SWT.CHECK);
+      enableAutoInterruptBuildButton.setText("Automatically interrupt and restart build");
+      setSelectionForEnableBuildJobButton();
+      setEnabledForBuildJobButton();
       
       Group multiThreadingSettings = new Group(root, SWT.NONE);
       multiThreadingSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -201,6 +208,27 @@ private SelectionListener enableMultiThreadingButtonSelectionListener = new Sele
    
    private void setEnabledForBuildProofsEfficientButton(){
       enableBuildRequiredProofsOnlyButton.setEnabled(enableBuildProofsButton.getSelection());
+   }
+   
+   
+   /**
+    * Sets the selection for the EnableBuildJobButton CheckBox.
+    */
+   private void setSelectionForEnableBuildJobButton(){
+      try {
+         IProject project = getProject();
+         enableAutoInterruptBuildButton.setSelection(KeYProjectProperties.isEnableAutoInterruptBuild(project));
+      }
+      catch (CoreException e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+         enableAutoInterruptBuildButton.setEnabled(false);
+      }
+   }
+   
+   
+   private void setEnabledForBuildJobButton(){
+      enableAutoInterruptBuildButton.setEnabled(enableBuildProofsButton.getSelection());
    }
    
    
@@ -288,6 +316,7 @@ private SelectionListener enableMultiThreadingButtonSelectionListener = new Sele
          IProject project = getProject();
          KeYProjectProperties.setEnableBuildProofs(project, enableBuildProofsButton.getSelection());
          KeYProjectProperties.setEnableBuildProofsEfficient(project, enableBuildRequiredProofsOnlyButton.getSelection());
+         KeYProjectProperties.setEnableAutoInterruptBuild(project, enableAutoInterruptBuildButton.getSelection());
          KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreadingButton.getSelection());
          KeYProjectProperties.setNumberOfThreads(project, String.valueOf(setNumberOfThreadsSpinner.getSelection()));
          KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection());
@@ -310,6 +339,7 @@ private SelectionListener enableMultiThreadingButtonSelectionListener = new Sele
    protected void performDefaults() {
       enableBuildProofsButton.setSelection(true);
       enableBuildRequiredProofsOnlyButton.setSelection(true);
+      enableAutoInterruptBuildButton.setSelection(true);
       enableMultiThreadingButton.setSelection(true);
       setNumberOfThreadsSpinner.setSelection(2);
       autoDeleteProofFilesButton.setSelection(true);

@@ -3,7 +3,7 @@ package org.key_project.key4eclipse.resources.io;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -57,33 +57,37 @@ public class ProofMetaFileWriter {
    /**
     * Creates the meta file for the given {@link ProofElement}.
     * @param pe - the {@link ProofElement} to use
-    * @throws Exception
+    * @throws ProofMetaFileException
     */
-   public void writeMetaFile() throws Exception {
-      IFile metaIFile = pe.getMetaFile();
-      this.addedTypes = new LinkedHashSet<String>();
-      createDoument();
-
-      TransformerFactory transFactory = TransformerFactory.newInstance();
-      Transformer transformer = transFactory.newTransformer();
-      DOMSource source = new DOMSource(doc);
-      if(!metaIFile.exists()){
-         metaIFile.create(null, true, null);
-      }
-      else{
+   public void writeMetaFile() throws ProofMetaFileException {
+      try{
+         IFile metaIFile = pe.getMetaFile();
+         this.addedTypes = new LinkedHashSet<String>();
+         createDoument();
+   
+         TransformerFactory transFactory = TransformerFactory.newInstance();
+         Transformer transformer = transFactory.newTransformer();
+         DOMSource source = new DOMSource(doc);
+         if(!metaIFile.exists()){
+            metaIFile.create(null, true, null);
+         }
+         else{
+            metaIFile.refreshLocal(IResource.DEPTH_ZERO, null);
+            ResourceAttributes resAttr = metaIFile.getResourceAttributes();
+            resAttr.setReadOnly(false);
+            metaIFile.setResourceAttributes(resAttr);
+         }
+         File metaFile = metaIFile.getLocation().toFile();
+         StreamResult result = new StreamResult(metaFile);
+         transformer.transform(source, result);
+         metaIFile.setHidden(KeYProjectProperties.isHideMetaFiles(metaIFile.getProject()));
          metaIFile.refreshLocal(IResource.DEPTH_ZERO, null);
          ResourceAttributes resAttr = metaIFile.getResourceAttributes();
-         resAttr.setReadOnly(false);
+         resAttr.setReadOnly(true);
          metaIFile.setResourceAttributes(resAttr);
+      } catch (Exception e){
+         throw new ProofMetaFileException("Problem creating the meta file " + pe.getMetaFile());
       }
-      File metaFile = metaIFile.getLocation().toFile();
-      StreamResult result = new StreamResult(metaFile);
-      transformer.transform(source, result);
-      metaIFile.setHidden(KeYProjectProperties.isHideMetaFiles(metaIFile.getProject()));
-      metaIFile.refreshLocal(IResource.DEPTH_ZERO, null);
-      ResourceAttributes resAttr = metaIFile.getResourceAttributes();
-      resAttr.setReadOnly(true);
-      metaIFile.setResourceAttributes(resAttr);
    }
    
    
@@ -235,7 +239,7 @@ public class ProofMetaFileWriter {
    
    private Element createUsedContracts() throws ProofReferenceException{
       Element usedContractsElement = doc.createElement("usedContracts");
-      LinkedList<ProofElement> usedContractsProofElements = pe.getUsedContracts();
+      List<ProofElement> usedContractsProofElements = pe.getUsedContracts();
       for(ProofElement usedContractProofElement : usedContractsProofElements){
          Element usedContractElement = doc.createElement("usedContract");
          usedContractElement.setAttribute("proofFile", usedContractProofElement.getProofFile().getFullPath().toString());

@@ -15,12 +15,14 @@ package org.key_project.key4eclipse.resources.util;
 
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -127,7 +129,7 @@ public class KeYResourcesUtil {
    }
    
    
-   public static LinkedList<ProofElement> getUsedContractsProofElements(ProofElement pe, LinkedList<ProofElement> proofElements){
+   public static LinkedList<ProofElement> getUsedContractsProofElements(ProofElement pe, List<ProofElement> proofElements){
       LinkedList<ProofElement> usedContracts = new LinkedList<ProofElement>();
       LinkedHashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
       if(proofReferences != null && !proofReferences.isEmpty()){
@@ -148,9 +150,9 @@ public class KeYResourcesUtil {
    }
    
    
-   public static LinkedList<ProofElement> getProofElementsByProofFiles(LinkedList<IFile> proofFiles, LinkedList<ProofElement> proofElements){
-      LinkedList<ProofElement> tmpProofElements = cloneLinkedList(proofElements);
-      LinkedList<ProofElement> foundproofElements = new LinkedList<ProofElement>();
+   public static List<ProofElement> getProofElementsByProofFiles(List<IFile> proofFiles, List<ProofElement> proofElements){
+      List<ProofElement> tmpProofElements = cloneList(proofElements);
+      List<ProofElement> foundproofElements = new LinkedList<ProofElement>();
       for(IFile proofFile : proofFiles){
          for(ProofElement pe : tmpProofElements){
             if(proofFile.equals(pe.getProofFile())){
@@ -164,15 +166,10 @@ public class KeYResourcesUtil {
    }
    
    
-   /**
-    * Clones the given {@link LinkedList} of {@link ProofElement}s.
-    * @param proofElements - the {@link LinkedList} to clone
-    * @return the cloned {@link LinkedList}
-    */
-   public static LinkedList<ProofElement> cloneLinkedList(LinkedList<ProofElement> proofElements){
-      LinkedList<ProofElement> clone = new LinkedList<ProofElement>();
-      for(ProofElement pe : proofElements){
-         clone.add(pe);
+   public static <T> List<T> cloneList(List<T> list){
+      List<T> clone = new LinkedList<T>();
+      for(T t : list){
+         clone.add(t);
       }
       return clone;
    }
@@ -202,21 +199,25 @@ public class KeYResourcesUtil {
    /**
     * Returns a {@link LinkedList} with all Java source folders ais {@link IPath}.
     * @param project - the project to search the source folders for.
-    * @return the {@link LinkedList} with the source folders.
-    * @throws JavaModelException
+    * @return the {@link LinkedList} with the source folders
     */
-   public static LinkedList<IPath> getAllJavaSrcFolders(IProject project) throws JavaModelException{
+   public static LinkedList<IPath> getAllJavaSrcFolders(IProject project) {
       LinkedList<IPath> srcFolders = new LinkedList<IPath>();
 
       IJavaProject javaProject = JavaCore.create(project);
-      IClasspathEntry[] classpathEntries = javaProject.getResolvedClasspath(true);
-      
-      for(int i = 0; i<classpathEntries.length;i++){
-         IClasspathEntry entry = classpathEntries[i];
-         if(entry.getContentKind() == IPackageFragmentRoot.K_SOURCE){
-            IPath path = entry.getPath();
-            srcFolders.add(path);
+      IClasspathEntry[] classpathEntries;
+      try {
+         classpathEntries = javaProject.getResolvedClasspath(true);
+         for(int i = 0; i<classpathEntries.length;i++){
+            IClasspathEntry entry = classpathEntries[i];
+            if(entry.getContentKind() == IPackageFragmentRoot.K_SOURCE){
+               IPath path = entry.getPath();
+               srcFolders.add(path);
+            }
          }
+      }
+      catch (JavaModelException e) {
+         srcFolders = new LinkedList<IPath>();
       }
       return srcFolders;
    }
@@ -243,5 +244,26 @@ public class KeYResourcesUtil {
    public static boolean isKeYProject(IProject project) throws CoreException {
       return project != null &&
              project.hasNature(KeYProjectNature.NATURE_ID);
+   }
+   
+   public static IProject getProject(IResourceDelta delta){
+      IResource res = delta.getResource();
+      if(res instanceof IWorkspaceRoot){
+         return null;
+      }
+      else{
+         while(!(res instanceof IProject)){
+            res = res.getParent();
+         }
+         return (IProject) res;
+      }
+   }
+   
+   public static <T> void mergeLists(List<T> dest, List<T> inserts){
+      for(T t : inserts){
+         if(!dest.contains(t)){
+            dest.add(t);
+         }
+      }
    }
 }

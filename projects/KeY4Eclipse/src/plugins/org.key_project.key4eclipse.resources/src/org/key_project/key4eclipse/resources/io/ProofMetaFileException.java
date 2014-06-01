@@ -5,12 +5,12 @@ package org.key_project.key4eclipse.resources.io;
  * @author Stefan Käsdorf
  */
 @SuppressWarnings("serial")
-public class ProofMetaFileContentException extends Exception{
+public class ProofMetaFileException extends Exception{
    
    /**
     * The Constructor
     */
-   public ProofMetaFileContentException(String message){
+   public ProofMetaFileException(String message){
       super(message);
    }
 }

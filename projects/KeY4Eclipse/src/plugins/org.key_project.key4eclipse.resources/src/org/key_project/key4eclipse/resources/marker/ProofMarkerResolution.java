@@ -43,14 +43,16 @@ public class ProofMarkerResolution implements IMarkerResolution2{
     */
    public ProofMarkerResolution(IMarker marker) throws CoreException {
       IFile proofFile = getProofFile(marker);
-      String proofFileName = proofFile.getFullPath().lastSegment();
-      if(MarkerManager.CLOSEDMARKER_ID.equals(marker.getType())){
-         description = "Open proof: " + proofFileName;
+      if(proofFile != null){
+         String proofFileName = proofFile.getFullPath().lastSegment();
+         if(MarkerManager.CLOSEDMARKER_ID.equals(marker.getType())){
+            description = "Open proof: " + proofFileName;
+         }
+         else if(MarkerManager.NOTCLOSEDMARKER_ID.equals(marker.getType())){
+            description = "Open proof to close it manually: " + proofFileName;
+         }
+         this.label = "Open proof: " + proofFileName;
       }
-      else if(MarkerManager.NOTCLOSEDMARKER_ID.equals(marker.getType())){
-         description = "Open proof to close it manually: " + proofFileName;
-      }
-      this.label = "Open proof: " + proofFileName;
    }
    
    /**
@@ -69,11 +71,13 @@ public class ProofMarkerResolution implements IMarkerResolution2{
    public void run(IMarker marker) {
       try {
          IFile file = getProofFile(marker);
-         if(!openInKeY){
-            StarterUtil.openFileStarter(null, file);
-         }
-         else{
-            KeYUtil.loadAsync(file);
+         if(file != null){
+            if(!openInKeY){
+               StarterUtil.openFileStarter(null, file);
+            }
+            else{
+               KeYUtil.loadAsync(file);
+            }
          }
       }
       catch (Exception e) {
@@ -101,9 +105,12 @@ public class ProofMarkerResolution implements IMarkerResolution2{
    
    private IFile getProofFile(IMarker marker) throws CoreException{
       String str = (String) marker.getAttribute(IMarker.SOURCE_ID);
-      IPath proofFilePath = new Path(str);
-      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      IFile proofFile = root.getFile(proofFilePath);
-      return proofFile;
+      if(str != null){
+         IPath proofFilePath = new Path(str);
+         IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+         IFile proofFile = root.getFile(proofFilePath);
+         return proofFile;
+      }
+      return null;
    }
 }

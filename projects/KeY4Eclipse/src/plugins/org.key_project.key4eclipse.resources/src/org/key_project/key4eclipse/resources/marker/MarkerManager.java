@@ -14,6 +14,7 @@
 package org.key_project.key4eclipse.resources.marker;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -34,7 +35,7 @@ public class MarkerManager {
    public final static String NOTCLOSEDMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker";
    public final static String PROBLEMLOADEREXCEPTIONMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.problemLoaderExceptionMarker";
    public final static String RECURSIONMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.cycleDetectedMarker";
-   public final static String OLDPROOFMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.oldProofMarker";
+   public final static String OVERDUEPROOFMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.overdueProofMarker";
    
    
    /**
@@ -89,12 +90,12 @@ public class MarkerManager {
     * @param pe - the {@link ProofElement} to use
     * @throws CoreException
     */
-   public void setRecursionMarker(LinkedList<ProofElement> cycle) throws CoreException{
+   public void setRecursionMarker(List<ProofElement> cycle) throws CoreException{
       ProofElement pe = cycle.get(0);
       LinkedList<IMarker> oldMarker = pe.getMarker();
       LinkedList<IMarker> toBeRemoved = new LinkedList<IMarker>();
       for(IMarker marker : oldMarker){
-         if(marker != null && !RECURSIONMARKER_ID.equals(marker.getType()) && !OLDPROOFMARKER_ID.equals(marker.getType())){
+         if(marker != null && !RECURSIONMARKER_ID.equals(marker.getType()) && !OVERDUEPROOFMARKER_ID.equals(marker.getType())){
             toBeRemoved.add(marker);
          }
       }
@@ -113,12 +114,34 @@ public class MarkerManager {
    }
    
    
+   public void setOverdueProofMarker(ProofElement pe) throws CoreException{
+      IMarker overdueProofMarker = pe.getOverdueProofMarker();
+      if(overdueProofMarker != null){
+         overdueProofMarker.delete();
+      }
+      SourceLocation scl = pe.getSourceLocation();
+      if(scl != null){
+         IMarker marker = pe.getJavaFile().createMarker(OVERDUEPROOFMARKER_ID);
+         if (marker.exists()) {
+            marker.setAttribute(IMarker.MESSAGE, "Overdue proof");
+            marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+            marker.setAttribute(IMarker.LINE_NUMBER, scl.getLineNumber()); // Required for compatibility with other tools like FeatureIDE even if char start and end is defined.
+            marker.setAttribute(IMarker.LOCATION, "line " + scl.getLineNumber()); // Otherwise value "Unknown" is shown in Problems-View
+            marker.setAttribute(IMarker.CHAR_START, scl.getCharStart());
+            marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
+            marker.setAttribute(IMarker.SOURCE_ID, pe.getProofFile().getFullPath().toString());
+            pe.setOverdueProofMarker(marker);
+         }
+      }
+   }
+   
+   
    /** 
     * Generates the message for the cyclemarker of the given cycle,
     * @param cycle - the cycle to use
     * @return the marker message
     */
-   private String generateCycleDetectedMarkerMessage(LinkedList<ProofElement> cycle){
+   private String generateCycleDetectedMarkerMessage(List<ProofElement> cycle){
       StringBuffer sb = new StringBuffer();
       sb.append("Cycle detected:");
       for(ProofElement pe : cycle){
@@ -166,7 +189,7 @@ public class MarkerManager {
     */
    public LinkedList<IMarker> getOldProofMarker(IFile javaFile, SourceLocation scl, IFile proofFile) throws CoreException{
       LinkedList<IMarker> oldMarker = new LinkedList<IMarker>();
-      LinkedList<IMarker> allFileKeYMarker = getAllkeYMarkerForScl(javaFile, scl);
+      LinkedList<IMarker> allFileKeYMarker = getAllkeYMarkerForSclByType(javaFile, scl, CLOSEDMARKER_ID, NOTCLOSEDMARKER_ID, PROBLEMLOADEREXCEPTIONMARKER_ID, RECURSIONMARKER_ID);
       for(IMarker marker : allFileKeYMarker){
          String source = marker.getAttribute(IMarker.SOURCE_ID, "");
          if(source.equals(proofFile.getFullPath().toString())){
@@ -174,6 +197,17 @@ public class MarkerManager {
          }
       }
       return oldMarker;
+   }
+   
+   public IMarker getOverdueProofMarker(IFile javaFile, SourceLocation scl, IFile proofFile) throws CoreException{
+      LinkedList<IMarker> allFileKeYMarker = getAllkeYMarkerForSclByType(javaFile, scl, OVERDUEPROOFMARKER_ID);
+      for(IMarker marker : allFileKeYMarker){
+         String source = marker.getAttribute(IMarker.SOURCE_ID, "");
+         if(source.equals(proofFile.getFullPath().toString())){
+            return marker;
+         }
+      }
+      return null;
    }
    
    
@@ -184,9 +218,9 @@ public class MarkerManager {
     * @return all {@link IMarker} for the {@link SourceLocation}
     * @throws CoreException
     */
-   private LinkedList<IMarker> getAllkeYMarkerForScl(IResource res, SourceLocation scl) throws CoreException{
+   private LinkedList<IMarker> getAllkeYMarkerForSclByType(IResource res, SourceLocation scl, String... types) throws CoreException{
       LinkedList<IMarker> newMarkerList = new LinkedList<IMarker>();
-      LinkedList<IMarker> markerList = getAllKeYMarker(res, IResource.DEPTH_ZERO);
+      LinkedList<IMarker> markerList = getKeYMarkerByType(res, IResource.DEPTH_ZERO, types);
       for(IMarker marker : markerList){
          Integer startChar = (Integer) marker.getAttribute(IMarker.CHAR_START);
          Integer endChar = (Integer) marker.getAttribute(IMarker.CHAR_END);
@@ -205,7 +239,7 @@ public class MarkerManager {
     * @throws CoreException
     */
    public LinkedList<IMarker> getAllKeYMarker(IResource res, int depth) throws CoreException{
-      return getKeYMarkerByType(res, depth, CLOSEDMARKER_ID, NOTCLOSEDMARKER_ID, PROBLEMLOADEREXCEPTIONMARKER_ID, RECURSIONMARKER_ID, OLDPROOFMARKER_ID);
+      return getKeYMarkerByType(res, depth, CLOSEDMARKER_ID, NOTCLOSEDMARKER_ID, PROBLEMLOADEREXCEPTIONMARKER_ID, RECURSIONMARKER_ID, OVERDUEPROOFMARKER_ID);
    }
    
    
@@ -220,7 +254,7 @@ public class MarkerManager {
    public LinkedList<IMarker> getKeYMarkerByType(IResource res, int depth, String... types) throws CoreException{
       LinkedList<IMarker> markerList = new LinkedList<IMarker>();
       for(String type : types){
-         if(CLOSEDMARKER_ID.equals(type) || NOTCLOSEDMARKER_ID.equals(type) || PROBLEMLOADEREXCEPTIONMARKER_ID.equals(type) || RECURSIONMARKER_ID.equals(type) || OLDPROOFMARKER_ID.equals(type)){
+         if(CLOSEDMARKER_ID.equals(type) || NOTCLOSEDMARKER_ID.equals(type) || PROBLEMLOADEREXCEPTIONMARKER_ID.equals(type) || RECURSIONMARKER_ID.equals(type) || OVERDUEPROOFMARKER_ID.equals(type)){
             markerList.addAll(markerArrayToList(res.findMarkers(type, true, depth)));
          }
       }
@@ -243,7 +277,7 @@ public class MarkerManager {
    
    
    public void deleteAllKeYMarker(IResource res, int depth) throws CoreException{
-      deleteKeYMarkerByType(res, depth, CLOSEDMARKER_ID, NOTCLOSEDMARKER_ID, PROBLEMLOADEREXCEPTIONMARKER_ID, RECURSIONMARKER_ID, OLDPROOFMARKER_ID);
+      deleteKeYMarkerByType(res, depth, CLOSEDMARKER_ID, NOTCLOSEDMARKER_ID, PROBLEMLOADEREXCEPTIONMARKER_ID, RECURSIONMARKER_ID, OVERDUEPROOFMARKER_ID);
    }
    
    
@@ -266,5 +300,15 @@ public class MarkerManager {
             res.deleteMarkers(RECURSIONMARKER_ID, true, depth);
          }
       }
+   }
+
+
+   public void deleteOverdueProofMarker(ProofElement pe) throws CoreException {
+      IMarker overdueProofMarker = pe.getOverdueProofMarker();
+      if(overdueProofMarker != null){
+         pe.setOverdueProofMarker(null);
+         overdueProofMarker.delete();
+      }
+      
    }
 }

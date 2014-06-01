@@ -15,6 +15,7 @@ package org.key_project.key4eclipse.resources.builder;
 
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -36,6 +37,7 @@ public class ProofElement {
    private IFile javaFile;
    private SourceLocation scl;
    private LinkedList<IMarker> marker;
+   private IMarker overdueProofMarker;
    private String markerMsg;
    
    private IFolder proofFolder;
@@ -50,7 +52,7 @@ public class ProofElement {
    private boolean proofClosed;
    
    private LinkedHashSet<IProofReference<?>> proofReferences;
-   private LinkedList<ProofElement> usedContracts;
+   private List<ProofElement> usedContracts;
    
    
 
@@ -75,6 +77,13 @@ public class ProofElement {
    }
    public void removeMarker(int index){
       this.marker.remove(index);
+   }
+   
+   public IMarker getOverdueProofMarker(){
+      return overdueProofMarker;
+   }
+   public void setOverdueProofMarker(IMarker overdueProofMarker){
+      this.overdueProofMarker = overdueProofMarker;
    }
    
    public String getMarkerMsg() {
@@ -127,17 +136,18 @@ public class ProofElement {
    public void setProofReferences(LinkedHashSet<IProofReference<?>> proofReferences){
       this.proofReferences = proofReferences;
    }
-   public LinkedList<ProofElement> getUsedContracts() {
+   public List<ProofElement> getUsedContracts() {
       return usedContracts;
    }
-   public void setUsedContracts(LinkedList<ProofElement> usedContracts) {
+   public void setUsedContracts(List<ProofElement> usedContracts) {
       this.usedContracts = usedContracts;
    }
    
-   public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<CustomConsoleUserInterface> environment, IFolder proofFolder, IFile proofFile, IFile metaFile, LinkedList<IMarker> marker, Contract contract){
+   public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<CustomConsoleUserInterface> environment, IFolder proofFolder, IFile proofFile, IFile metaFile, LinkedList<IMarker> marker, IMarker overdueProofMarker, Contract contract){
       this.javaFile = javaFile;
       this.scl = scl;
       this.marker = marker;
+      this.overdueProofMarker = overdueProofMarker;
       
       this.proofFolder = proofFolder;
       this.proofFile = proofFile;
