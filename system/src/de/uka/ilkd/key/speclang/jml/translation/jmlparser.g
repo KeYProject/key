@@ -1865,7 +1865,7 @@ sequence returns [SLExpression result = null] throws SLTranslationException
     |   ((LPAREN SEQDEF | LPAREN SEQ) quantifiedvardecls SEMI) => result=seqdefterm
     |   (SEQSINGLETON | SEQ) LPAREN list=exprList RPAREN
         {
-            result = new SLExpression(tb.seqSingleton(e1.getTerm()));
+            result = translator.translate("\\seq", SLExpression.class, list, services);
         }
 
     |   SEQSUB LPAREN e1=expression COMMA e2=expression COMMA e3=expression RPAREN
