@@ -109,7 +109,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         // create heap_Before_LOOP
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         Name heapAtPreName = new Name(tb.newName(baseHeap + "_Before_LOOP"));
-        final Function heapAtPreFunc = new Function(heapAtPreName, heapLDT.targetSort());
+        final Function heapAtPreFunc = new Function(heapAtPreName, heapLDT.targetSort(), true);
 	services.getNamespaces().functions().addSafely(heapAtPreFunc);
         final Term heapAtPre = tb.func(heapAtPreFunc);
 
