@@ -600,7 +600,7 @@ public class BlockContractRule implements BuiltInRule {
                 final String anonymisationName =
                         tb.newName(ANONYMISATION_PREFIX + variable.name());
                 final Function anonymisationFunction =
-                        new Function(new Name(anonymisationName), variable.sort());
+                        new Function(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 result.put(variable, anonymisationFunction);
             }
@@ -925,7 +925,7 @@ public class BlockContractRule implements BuiltInRule {
             for (LocationVariable variable : localOutVariables) {
                 final String anonymisationName = newName(ANONYMISATION_PREFIX + variable.name());
                 final Function anonymisationFunction =
-                        new Function(new Name(anonymisationName), variable.sort());
+                        new Function(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 final Term elementaryUpdate = elementary(variable, func(anonymisationFunction));
                 result = parallel(result, elementaryUpdate);

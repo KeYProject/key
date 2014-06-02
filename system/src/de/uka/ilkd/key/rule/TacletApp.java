@@ -359,15 +359,15 @@ public abstract class TacletApp implements RuleApp {
      * returns a new SVInstantiations that modifies the given SVInstantiations
      * insts at the bound SchemaVariable varSV to a new LogicVariable.
      */
-    protected static SVInstantiations replaceInstantiation(
-	    Taclet taclet,
-	    SVInstantiations insts, 
-	    SchemaVariable varSV,
-	    Services services) {
+    protected static SVInstantiations replaceInstantiation(Taclet taclet,
+                                                           SVInstantiations insts, 
+                                                           SchemaVariable varSV,
+                                                           Services services) {
 	Term term = getTermBelowQuantifier(taclet, varSV);
-	LogicVariable newVariable = new LogicVariable(new Name(((Term) insts
-		.getInstantiation(varSV)).op().name().toString()
-		+ "0"), ((Term) insts.getInstantiation(varSV)).sort());
+	LogicVariable newVariable =
+	        new LogicVariable(new Name(((Term) insts.getInstantiation(varSV))
+	                                    .op().name().toString() + "0"),
+	                          ((Term) insts.getInstantiation(varSV)).sort());
 	// __CHANGE__ How to name the new variable? TODO
 	Term newVariableTerm = services.getTermBuilder().var(newVariable);
 	return replaceInstantiation(insts, 
@@ -750,9 +750,8 @@ public abstract class TacletApp implements RuleApp {
      *         <code>null</code> if any of the generic sorts found cannot be
      *         instantiated (at least at the time)
      */
-    private SVInstantiations forceGenericSortInstantiations(
-	    SVInstantiations insts,
-	    Services services) {
+    private SVInstantiations forceGenericSortInstantiations(SVInstantiations insts,
+                                                            Services services) {
 	// force all generic sorts to be instantiated
 	try {
 	    for (final SchemaVariable sv : uninstantiatedVars()) {
@@ -805,7 +804,7 @@ public abstract class TacletApp implements RuleApp {
 	    				  boolean interesting,
 	    				  Services services) {
 	final Function c 
-		= new Function(new Name(instantiation), sort, new Sort[0]);
+		= new Function(new Name(instantiation), sort, true, new Sort[0]);
 	return addInstantiation(sv, services.getTermBuilder().func(c), interesting, services);
     }
     
@@ -820,7 +819,7 @@ public abstract class TacletApp implements RuleApp {
 		final Namespace functions =
                         services.getNamespaces().functions();
 
-                // skolem constant might already be registed in
+                // skolem constant might already be registered in
                 // case it is used in the \addrules() section of a rule
                 if (functions.lookup(inst.op().name()) == null) {
                     functions.addSafely(inst.op());
