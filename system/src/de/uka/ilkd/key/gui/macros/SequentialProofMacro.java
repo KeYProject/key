@@ -123,14 +123,12 @@ public abstract class SequentialProofMacro implements ProofMacro {
     @Override 
     public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
             ProverTaskListener listener) throws InterruptedException {
-
         final Node initNode = mediator.getSelectedNode();
         for (ProofMacro macro : getProofMacros()) {
             // reverse to original node
             mediator.getSelectionModel().setSelectedNode(initNode);
             macro.applyTo(mediator, posInOcc, listener);
         }
-
     }
 
     /**

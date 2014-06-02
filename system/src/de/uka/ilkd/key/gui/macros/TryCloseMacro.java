@@ -171,7 +171,9 @@ public class TryCloseMacro implements ProofMacro {
 
                 // only now reraise the interruption exception
                 if(applyStrategy.hasBeenInterrupted()) {
-                    throw new InterruptedException();
+                    synchronized(applyStrategy) { // wait for applyStrategy to finish it last rule application
+                        throw new InterruptedException();
+                    }
                 }
 
             }
@@ -245,7 +247,9 @@ public class TryCloseMacro implements ProofMacro {
 
                 // only now reraise the interruption exception
                 if(applyStrategy.hasBeenInterrupted()) {
-                    throw new InterruptedException();
+                    synchronized(applyStrategy) { // wait for applyStrategy to finish it last rule application
+                        throw new InterruptedException();
+                    }
                 }
 
             }
@@ -315,7 +319,9 @@ public class TryCloseMacro implements ProofMacro {
 
                 // only now reraise the interruption exception
                 if(applyStrategy.hasBeenInterrupted()) {
-                    throw new InterruptedException();
+                    synchronized(applyStrategy) { // wait for applyStrategy to finish it last rule application
+                        throw new InterruptedException();
+                    }
                 }
             }
         } finally {

@@ -559,7 +559,7 @@ public class ApplyStrategy {
     }
 
 
-    public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals) {
+    public synchronized ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals) {
 
         ProofSettings settings = proof.getSettings();
         StrategySettings stratSet = settings.getStrategySettings();
@@ -585,11 +585,11 @@ public class ApplyStrategy {
      *             beforehand if needed
      */
     @Deprecated
-    public ApplyStrategyInfo start(Proof proof,
-                                   ImmutableList<Goal> goals,
-                                   int maxSteps,
-                                   long timeout,
-                                   boolean stopAtFirstNonCloseableGoal) {
+    public synchronized ApplyStrategyInfo start(Proof proof,
+                                   				ImmutableList<Goal> goals,
+                                   				int maxSteps,
+                                   				long timeout,
+                                   				boolean stopAtFirstNonCloseableGoal) {
         assert proof != null;
 
         this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal;

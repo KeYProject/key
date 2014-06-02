@@ -23,9 +23,11 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.util.Debug;
+
 import java.util.Iterator;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
@@ -602,9 +604,11 @@ public class InteractiveProver implements InterruptListener {
                 // when the user canceled it's not an error
             }
 
-            mediator().setInteractive(true);
-            mediator().startInterface(true);
-
+            synchronized(applyStrategy) {
+                // wait for apply Strategy to terminate
+                mediator().setInteractive(true);
+                mediator().startInterface(true);
+            }
             // make it possible to free memory
             worker = null;
         }
