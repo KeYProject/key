@@ -106,15 +106,8 @@ public abstract class TestCommons extends TestCase {
 	 *            the path to the file
 	 * @return the resulttype of the external solver
 	 */
-	private SMTSolverResult checkFile(String filepath) throws IOException {
-		ProofAggregate p;
-		if (!proofs.containsKey(filepath)) {
-			File file = new File(filepath);
-			p = parse(file);
-			proofs.put(filepath, p);
-		} else {
-			p = proofs.get(filepath);
-		}
+	protected SMTSolverResult checkFile(String filepath) throws IOException {
+		ProofAggregate p = loadProof(filepath);
 		Assert.assertTrue(p.getProofs().length == 1);
 		Proof proof = p.getProofs()[0];
 		Assert.assertTrue(proof.openGoals().size() == 1);
@@ -124,6 +117,18 @@ public abstract class TestCommons extends TestCase {
 		launcher.launch(problem, proof.getServices(), getSolverType());
 		return problem.getFinalResult();
 	}
+
+	protected ProofAggregate loadProof(String filepath) {
+	    ProofAggregate p;
+		if (!proofs.containsKey(filepath)) {
+			File file = new File(filepath);
+			p = parse(file);
+			proofs.put(filepath, p);
+		} else {
+			p = proofs.get(filepath);
+		}
+	    return p;
+    }
 
 	/**
 	 * Returns a set of taclets that can be used for tests. REMARK: First you

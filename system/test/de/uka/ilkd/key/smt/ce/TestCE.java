@@ -2,9 +2,18 @@ package de.uka.ilkd.key.smt.ce;
 
 import java.io.File;
 
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.macros.FinishSymbolicExecutionMacro;
 import de.uka.ilkd.key.gui.macros.SemanticsBlastingMacro;
+import de.uka.ilkd.key.gui.macros.TryCloseMacro;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.test.TestCommons;
+import de.uka.ilkd.key.ui.BatchMode;
+import de.uka.ilkd.key.ui.ConsoleUserInterface;
+import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.util.HelperClassForTests;
 
 public class TestCE extends TestCommons {
 	
@@ -52,7 +61,34 @@ public class TestCE extends TestCommons {
     }
     
     public void testArrayClear(){
+    	UserInterface ui = new ConsoleUserInterface(new BatchMode("test", true), false, false);
+    	KeYMediator mediator = new KeYMediator(ui, false);
+    
     	SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
+    	TryCloseMacro close = new TryCloseMacro();
+    	FinishSymbolicExecutionMacro se = new FinishSymbolicExecutionMacro();
+    	
+    	HelperClassForTests helper = new HelperClassForTests();
+    	
+    	File file = new File(testFile+"Middle.java");
+    	ui.loadProblem(file);
+    	
+    	
+    	
+    	Proof proof = mediator.getSelectedProof();
+    	System.out.println(proof.root());
+    	//mediator.setProof(proof);
+    	
+    	try {
+    		se.applyTo(mediator, null, null);
+    		close.applyTo(mediator, null, null);
+	        macro.applyTo(mediator, null, null);
+        } catch (InterruptedException e) {	        
+	        e.printStackTrace();
+        }
+    	
+    	
+    	
     	
     }
 }
