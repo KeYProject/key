@@ -136,6 +136,11 @@ public class TermLabelMenu extends JMenu {
 
     private class HideAllCheckBox extends KeYMenuCheckBox {
 
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1848906013431722616L;
+
         public HideAllCheckBox(MainWindow mainWindow) {
             super(mainWindow, "Hide all term labels");
             setTooltip("Use this checkbox to toggle visibility for all term labels.");
@@ -159,6 +164,10 @@ public class TermLabelMenu extends JMenu {
 
     private class TermLabelCheckBox extends KeYMenuCheckBox implements Comparable<TermLabelCheckBox> {
 
+        /**
+         *
+         */
+        private static final long serialVersionUID = -3473419737628245958L;
         Name labelName;
 
         TermLabelCheckBox(Name labelName) {

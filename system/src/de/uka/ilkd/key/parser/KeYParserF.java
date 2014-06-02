@@ -40,7 +40,6 @@ public class KeYParserF {
 
     private KeYParser keYParser;
 
-    @SuppressWarnings("unchecked")
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF,
 	    ParserConfig schemaConfig, ParserConfig normalConfig,
 	    HashMap taclet2Builder, ImmutableSet<Taclet> taclets) {

@@ -24,11 +24,20 @@ import javax.swing.JCheckBoxMenuItem;
  */
 public abstract class KeYMenuCheckBox extends JCheckBoxMenuItem {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -4156054085757784178L;
     protected final MainWindowAction mainWindowAction;
 
     KeYMenuCheckBox(MainWindow mainWindow, String label) {
         final KeYMenuCheckBox checkBox = this;
         mainWindowAction = new MainWindowAction(mainWindow) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = -8553172978879292800L;
+
             @Override
             public void actionPerformed(ActionEvent ae) {
                 handleClickEvent();
