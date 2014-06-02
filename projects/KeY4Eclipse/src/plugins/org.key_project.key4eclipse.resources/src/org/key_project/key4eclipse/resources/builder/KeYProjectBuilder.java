@@ -13,12 +13,8 @@
 
 package org.key_project.key4eclipse.resources.builder;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
@@ -43,8 +39,6 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
     */
    public final static String BUILDER_ID = "org.key_project.key4eclipse.resources.KeYProjectBuilder";
    final static MutexRule mutexRule = new MutexRule();
-   public List<IFile> changedJavaFiles = new LinkedList<IFile>();
-   public List<IFile> jobChangedFiles = Collections.synchronizedList(new LinkedList<IFile>());
    
    
    /**
@@ -54,26 +48,28 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
       IProject project = getProject();
       IResourceDelta delta = getDelta(project);
-      KeYProjectDeltaManager deltaManager = KeYProjectDeltaManager.getInstance();
-      deltaManager.update(delta);
-      KeYProjectDelta keyDelta = deltaManager.getDelta(project);
-      if(keyDelta.isBuildRequired()){
-         IJobManager jobMan = Job.getJobManager();
-         Job[] jobs = jobMan.find("KeYResourcesBuildJob");
-
-         if(KeYProjectProperties.isEnableAutoInterruptBuild(project)){
-            for(Job job : jobs){
-               if(Job.RUNNING == job.getState()){
-                  job.cancel();
-                  break;
+      if(delta != null){
+         KeYProjectDeltaManager deltaManager = KeYProjectDeltaManager.getInstance();
+         deltaManager.update(delta);
+         KeYProjectDelta keyDelta = deltaManager.getDelta(project);
+         if(keyDelta.isBuildRequired()){
+            IJobManager jobMan = Job.getJobManager();
+            Job[] jobs = jobMan.find("KeYResourcesBuildJob");
+   
+            if(KeYProjectProperties.isEnableAutoInterruptBuild(project)){
+               for(Job job : jobs){
+                  if(Job.RUNNING == job.getState()){
+                     job.cancel();
+                     break;
+                  }
                }
             }
-         }
-         
-         if(jobs.length <= 1){
-            KeYProjectBuildJob proofManagerJob = new KeYProjectBuildJob("KeY Resources build", project);
-            proofManagerJob.setRule(KeYProjectBuilder.mutexRule);
-            proofManagerJob.schedule();
+            
+            if(jobs.length <= 1){
+               KeYProjectBuildJob proofManagerJob = new KeYProjectBuildJob("KeY Resources build", project);
+               proofManagerJob.setRule(KeYProjectBuilder.mutexRule);
+               proofManagerJob.schedule();
+            }
          }
       }
       return null;

@@ -3,7 +3,6 @@ package org.key_project.key4eclipse.resources.builder;
 import org.eclipse.core.internal.resources.Folder;
 import org.eclipse.core.internal.resources.Project;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 public class MutexRule implements ISchedulingRule{

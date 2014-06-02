@@ -52,6 +52,8 @@ public class ProofMetaFileWriter {
    
    public ProofMetaFileWriter(ProofElement pe){
       this.pe = pe;
+      this.addedTypes = new LinkedHashSet<String>();
+      this.doc = null;
    }
    
    /**
