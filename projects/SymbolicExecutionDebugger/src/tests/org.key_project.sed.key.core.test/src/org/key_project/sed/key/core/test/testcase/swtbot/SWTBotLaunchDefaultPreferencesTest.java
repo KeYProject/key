@@ -420,13 +420,13 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                String expectedModelPathInBundle;
                if (showSignature) {
                   expectedModelPathInBundle = showMethodReturnValuesInDebugNodes ? 
-                                              "data/simpleIf/oracle/SimpleIf_Signature.xml" : 
-                                              "data/simpleIf/oracle_noMethodReturnValues/SimpleIf_Signature.xml";
+                                              "data/simpleIf/oracle/SimpleIf.xml" : 
+                                              "data/simpleIf/oracle_noMethodReturnValues/SimpleIf.xml";
                }
                else {
                   expectedModelPathInBundle = showMethodReturnValuesInDebugNodes ? 
-                                              "data/simpleIf/oracle/SimpleIf.xml" : 
-                                              "data/simpleIf/oracle_noMethodReturnValues/SimpleIf.xml";
+                                              "data/simpleIf/oracle/SimpleIf_NoSignature.xml" : 
+                                              "data/simpleIf/oracle_noMethodReturnValues/SimpleIf_NoSignature.xml";
                }
                resume(bot, item, target);
                assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false);

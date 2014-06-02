@@ -831,11 +831,11 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
             // Evaluate created tree
             if (clearProofListInKeYBeforeResume) {
                assertTrue(launch.canTerminate());
-               assertFalse(launch.isTerminated());
-               assertTrue(target.canDisconnect());
+               assertTrue(launch.isTerminated()); // launch.isTerminated() returns true if terminated or disconnected.
+               assertFalse(target.canDisconnect());
                assertFalse(target.canSuspend());
                assertTrue(target.canTerminate());
-               assertFalse(target.isDisconnected());
+               assertTrue(target.isDisconnected());
                assertTrue(target.isSuspended());
                assertFalse(target.isTerminated());
                assertFalse(target.canResume());

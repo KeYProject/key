@@ -249,8 +249,8 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
       boolean updateRequired = false;
       int i = 0;
       while (!updateRequired && i < events.length) {
-         if (DebugEvent.SUSPEND == events[i].getDetail() ||
-             DebugEvent.SUSPEND == events[i].getDetail()) {
+         if (DebugEvent.SUSPEND == events[i].getKind() ||
+             DebugEvent.SUSPEND == events[i].getKind()) {
             if (events[i].getSource() instanceof IDebugElement) {
                IDebugTarget target = ((IDebugElement)events[i].getSource()).getDebugTarget();
                if (target instanceof ISEDDebugTarget) {

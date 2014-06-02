@@ -60,10 +60,10 @@ public class DebugTargetResumeSuspendListener implements IDebugEventSetListener 
    public void handleDebugEvents(DebugEvent[] events) {
       for (DebugEvent event : events) {
          if (ObjectUtil.equals(target, event.getSource())) {
-            if (event.getDetail() == DebugEvent.SUSPEND) {
+            if (event.getKind() == DebugEvent.SUSPEND) {
                suspendDetected = true;
             }
-            else if (event.getDetail() == DebugEvent.RESUME) {
+            else if (event.getKind() == DebugEvent.RESUME) {
                resumeDetected = true;
             }
          }

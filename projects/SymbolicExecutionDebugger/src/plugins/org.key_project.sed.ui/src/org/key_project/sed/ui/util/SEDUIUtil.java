@@ -354,7 +354,7 @@ public final class SEDUIUtil {
     * @return The parent element if available or {@code null} otherwise.
     * @throws DebugException Occurred Exception.
     */
-   protected static Object getParent(Object element) throws DebugException {
+   public static Object getParent(Object element) throws DebugException {
       if (element instanceof ISEDDebugNode) {
          return SEDDebugNodeContentProvider.getDefaultInstance().getDebugNodeParent(element);
       }
@@ -373,7 +373,7 @@ public final class SEDUIUtil {
     * @return The available children.
     * @throws DebugException Occurred Exception.
     */
-   protected static Object[] getChildren(Object element) throws DebugException {
+   public static Object[] getChildren(Object element) throws DebugException {
       if (element instanceof ISEDDebugTarget) {
          return SEDDebugTargetContentProvider.getDefaultInstance().getAllChildren(element);
       }

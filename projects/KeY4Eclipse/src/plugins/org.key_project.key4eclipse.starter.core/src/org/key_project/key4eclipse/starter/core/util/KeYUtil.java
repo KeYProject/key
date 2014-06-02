@@ -550,10 +550,16 @@ public final class KeYUtil {
           Object child = model.getChild(model.getRoot(), 0);
           if (child instanceof EnvNode) {
              EnvNode envChild = (EnvNode)child;
+             for (Proof proof : envChild.allProofs()) {
+                main.getUserInterface().removeProof(proof);
+             }
              for (int j = 0; j < envChild.getChildCount(); j++) {
                 Object envTaskChild = envChild.getChildAt(j);
                 if (envTaskChild instanceof TaskTreeNode) {
-                   main.getProofList().removeTask((TaskTreeNode)envTaskChild);
+                   TaskTreeNode ttn = (TaskTreeNode)envTaskChild;
+                   for (Proof proof : ttn.allProofs()) {
+                      main.getUserInterface().removeProof(proof);
+                   }
                 }
              }
           }

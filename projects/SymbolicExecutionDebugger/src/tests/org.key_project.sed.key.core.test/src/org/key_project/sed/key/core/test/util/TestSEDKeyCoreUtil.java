@@ -248,7 +248,7 @@ public final class TestSEDKeyCoreUtil {
       target.setModelIdentifier(KeYDebugTarget.MODEL_IDENTIFIER);
       target.setName(targetName);
       // Add thread
-      SEDMemoryThread thread = new SEDMemoryThread(target);
+      SEDMemoryThread thread = new SEDMemoryThread(target, false);
       thread.setName(IExecutionStart.DEFAULT_START_NODE_NAME);
       target.addSymbolicThread(thread);
       return target;

@@ -43,6 +43,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
@@ -137,6 +139,11 @@ public class Proof implements Named {
     /** list of rule app listeners */
     private List<RuleAppListener> ruleAppListenerList = Collections.synchronizedList(new ArrayList<RuleAppListener>(10));
 
+    /**
+     * Contains all registered {@link ProofDisposedListener}.
+     */
+    private final List<ProofDisposedListener> proofDisposedListener = new LinkedList<ProofDisposedListener>();
+    
     /** constructs a new empty proof with name */
     private Proof(Name name, Services services, ProofSettings settings) {
         this.name = name;
@@ -272,6 +279,7 @@ public class Proof implements Named {
         disposed = true;
         ruleAppListenerList = null;
         listenerList = null;
+        fireProofDisposed(new ProofDisposedEvent(this));
     }
 
 
@@ -1189,6 +1197,45 @@ public class Proof implements Named {
    public void removeRuleAppListener(RuleAppListener p) {
       synchronized (ruleAppListenerList) {
          ruleAppListenerList.remove(p);
+      }
+   }
+   
+   /**
+    * Registers the given {@link ProofDisposedListener}.
+    * @param l The {@link ProofDisposedListener} to register.
+    */
+   public void addProofDisposedListener(ProofDisposedListener l) {
+      if (l != null) {
+         proofDisposedListener.add(l);
+      }
+   }
+   
+   /**
+    * Unregisters the given {@link ProofDisposedListener}.
+    * @param l The {@link ProofDisposedListener} to unregister.
+    */
+   public void removeProofDisposedListener(ProofDisposedListener l) {
+      if (l != null) {
+         proofDisposedListener.remove(l);
+      }
+   }
+   
+   /**
+    * Returns all registered {@link ProofDisposedListener}.
+    * @return All registered {@link ProofDisposedListener}.
+    */
+   public ProofDisposedListener[] getProofDisposedListeners() {
+      return proofDisposedListener.toArray(new ProofDisposedListener[proofDisposedListener.size()]);
+   }
+   
+   /**
+    * Fires the event {@link ProofDisposedListener#proofDisposed(ProofDisposedEvent)} to all listener.
+    * @param e The event to fire.
+    */
+   protected void fireProofDisposed(ProofDisposedEvent e) {
+      ProofDisposedListener[] listener = getProofDisposedListeners();
+      for (ProofDisposedListener l : listener) {
+         l.proofDisposed(e);
       }
    }
 }
