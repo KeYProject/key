@@ -1,22 +1,23 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.parser;
 
+import org.antlr.runtime.RecognitionException;
+
 import antlr.Token;
 
-public class NotDeclException extends antlr.SemanticException {
+public class NotDeclException extends RecognitionException {
     /**
      * 
      */
@@ -24,24 +25,23 @@ public class NotDeclException extends antlr.SemanticException {
     String cat;
     String undeclared_symbol;
     String addtl;
+    private String fileName;
     
     public NotDeclException(String cat, Token t, String filename) {
-	super("NotDeclared");
 	this.cat      = cat;
 	this.fileName = filename;
 	this.undeclared_symbol = t.getText();
 	this.line     = t.getLine();
-	this.column   = t.getColumn();
+	this.charPositionInLine   = t.getColumn();
     }
 
     public NotDeclException(String cat, String undeclared_symbol, 
 			    String filename, int line, int column, String addtl) {
-	super("NotDeclared");
 	this.fileName = filename;
 	this.cat      = cat;
 	this.undeclared_symbol = undeclared_symbol;
 	this.line     = line;
-	this.column   = column;
+	this.charPositionInLine   = column;
 	this.addtl    = addtl;
     }
 
@@ -72,7 +72,7 @@ public class NotDeclException extends antlr.SemanticException {
      * Returns a string representation of this exception.
      */
     public String toString() {
-	return getFilename()+"("+this.getLine()+", "+this.getColumn()+"): "
+	return this.fileName+"("+this.line+", "+this.charPositionInLine+"): "
 	    +getMessage();
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -146,6 +146,21 @@ public final class BundleUtil {
    public static void extractFromBundleToWorkspace(String bundleId,
                                                    String pathInBundle,
                                                    IContainer target) throws CoreException {
+      extractFromBundleToWorkspace(bundleId, pathInBundle, target, false);
+   }
+   
+   /**
+    * Extracts or files and folders form the bundle into the workspace target.
+    * @param bundleId The ID of the bundle to extract from.
+    * @param pathInBundle The path in the bundle.
+    * @param target The target in the workspace.
+    * @param unifyLineBreaks {@code true} line breaks are unified to {@code \n}, {@code false} original line breaks are kept.
+    * @throws CoreException Occurred Exception.
+    */
+   public static void extractFromBundleToWorkspace(String bundleId,
+                                                   String pathInBundle,
+                                                   IContainer target,
+                                                   boolean unifyLineBreaks) throws CoreException {
        // Make sure that all parameters are defined.
        if (bundleId == null) {
            throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "No plug-in ID defined."));
@@ -192,10 +207,15 @@ public final class BundleUtil {
                        InputStream in = connection.getInputStream();
                        IFile file = target.getFile(new Path(pathInTarget));
                        if (file.exists()) {
-                          file.setContents(in, true, true, null);
+                          file.setContents(unifyLineBreaks ? IOUtil.unifyLineBreaks(in) : in, 
+                                           true, 
+                                           true, 
+                                           null);
                        }
                        else {
-                          file.create(in, true, null);
+                          file.create(unifyLineBreaks ? IOUtil.unifyLineBreaks(in) : in, 
+                                      true, 
+                                      null);
                        }
                     }
                     else {

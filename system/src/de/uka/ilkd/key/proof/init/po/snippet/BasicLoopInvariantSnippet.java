@@ -16,7 +16,7 @@ public class BasicLoopInvariantSnippet extends ReplaceAndRegisterMethod
         assert Term.class.equals(BasicSnippetData.Key.LOOP_INVARIANT_TERM.getType());
         Term origLoopInv = (Term) d.get(
                 BasicSnippetData.Key.LOOP_INVARIANT_TERM);
-        return replace(origLoopInv, d.origVars, poVars.pre);
+        return replace(origLoopInv, d.origVars, poVars.pre, d.tb);
     }
 
 }

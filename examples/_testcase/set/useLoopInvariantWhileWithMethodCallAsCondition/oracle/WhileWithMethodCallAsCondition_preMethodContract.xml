@@ -5,40 +5,26 @@
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <loopInvariant name="
-invariant: i &gt;= 0 &amp; (i &lt;= array.length &amp; result_1 = i);
+            <loopInvariant name="invariant: i &gt;= 0 &amp; (i &lt;= array.length &amp; result_1 = i);
 variant: javaSubInt(array.length, i)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
-               <branchCondition name="!(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
-  | i_0 &lt;= -1
-  &amp; array.length &gt;= 0
-  &amp; array.length &gt;= i_0
-  | !(     i_0 &gt;= 0
-         &amp; array.length &gt;= 0
-         &amp; array.length &gt;= i_0
-      -&gt; result_1_0 = i_0))" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; result_1_0 = i_0)))" pathConditionChanged="true" branchCondition="!(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
-  | i_0 &lt;= -1
-  &amp; array.length &gt;= 0
-  &amp; array.length &gt;= i_0
-  | !(     i_0 &gt;= 0
-         &amp; array.length &gt;= 0
-         &amp; array.length &gt;= i_0
-      -&gt; result_1_0 = i_0))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+               <branchCondition name="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+    b_3=goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+    b_3=goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+    b_3=goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <callStackEntry path="/0"/>
                   <operationContract name="result_3 = goOnNice(array, i) catch(exc_3)
 pre: i &lt; 0 | !array = null &amp; i &gt;= 0
 post: (   i &lt; 0
    -&gt;   !exc_3 = null
-      &amp; (    java.lang.RuntimeException::instance(exc_3)
-           = TRUE
-         |   java.lang.RuntimeException::instance(exc_3)
-           = TRUE))
+      &amp; java.lang.Exception::instance(exc_3) = TRUE)
 &amp; (   !array = null &amp; i &gt;= 0
    -&gt;     result_3
         = \if (i &lt; array.length)
@@ -63,79 +49,55 @@ mod: \if (true)
 \cap \if (!array = null &amp; i &gt;= 0)
          \then (allLocs)
          \else (allLocs)
-termination: diamond" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; result_1_0 = i_0)))" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+    b_3=goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                      <callStackEntry path="/0"/>
-                     <statement name="result_1++;" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; result_1_0 = i_0)))" pathConditionChanged="false">
+                     <statement name="result_1++;" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+    b_3=goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false">
                         <callStackEntry path="/0"/>
-                        <statement name="i++;" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; result_1_0 = i_0)))" pathConditionChanged="false">
+                        <statement name="i++;" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+    b_3=goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false">
                            <callStackEntry path="/0"/>
-                           <termination name="&lt;loop body end&gt;" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; result_1_0 = i_0)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+                           <termination name="&lt;loop body end&gt;" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+    b_3=goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                            </termination>
                         </statement>
                      </statement>
                   </operationContract>
                </branchCondition>
-               <branchCondition name="!(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
-  | i_0 &lt;= -1
-  &amp; array.length &gt;= 0
-  &amp; array.length &gt;= i_0
-  | !(     i_0 &gt;= 0
-         &amp; array.length &gt;= 0
-         &amp; array.length &gt;= i_0
-      -&gt; result_1_0 = i_0))" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; result_1_0 = i_0)))" pathConditionChanged="true" branchCondition="!(  i_0 &gt;= 1 &amp; array.length &gt;= 0 &amp; array.length &lt; i_0
-  | i_0 &lt;= -1
-  &amp; array.length &gt;= 0
-  &amp; array.length &gt;= i_0
-  | !(     i_0 &gt;= 0
-         &amp; array.length &gt;= 0
-         &amp; array.length &gt;= i_0
-      -&gt; result_1_0 = i_0))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+               <branchCondition name="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+    b_3=goOnNice(array,i);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+    b_3=goOnNice(array,i);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+    b_3=goOnNice(array,i);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                   <callStackEntry path="/0"/>
-                  <statement name="return result_1;" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; result_1_0 = i_0)))" pathConditionChanged="false">
+                  <statement name="return result_1;" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+    b_3=goOnNice(array,i);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
-                     <methodReturn name="&lt;return of WhileWithMethodCallAsCondition.size(array);&gt;" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; result_1_0 = i_0)))" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of WhileWithMethodCallAsCondition.size(array);&gt;" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+    b_3=goOnNice(array,i);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false" isReturnValueComputed="false">
                         <callStackEntry path="/0"/>
-                        <termination name="&lt;end&gt;" pathCondition="!(  array.length &gt;= 0
-  &amp; (    !i_0 = 0
-       &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
-       &amp; (i_0 &lt;= -1 | array.length &lt; i_0)
-     | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; result_1_0 = i_0)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <termination name="&lt;end&gt;" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+    b_3=goOnNice(array,i);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

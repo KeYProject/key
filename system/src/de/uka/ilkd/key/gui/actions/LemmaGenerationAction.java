@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -37,7 +37,8 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderLis
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public abstract class LemmaGenerationAction extends MainWindowAction {
-    public enum Mode {ProveUserDefinedTaclets,ProveKeYTaclets,ProveAndAddUserDefinedTaclets};    
+    public enum Mode {ProveUserDefinedTaclets,ProveKeYTaclets,ProveAndAddUserDefinedTaclets}
+
     private static final long serialVersionUID = 1L;
 
 
@@ -191,7 +192,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 final ProblemInitializer problemInitializer = new ProblemInitializer(mainWindow.getUserInterface(),
                                 new Services(profile,
                                                 new KeYRecoderExcHandler()),
-                                false, mainWindow.getUserInterface());
+                                mainWindow.getUserInterface());
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(mainWindow.getUserInterface(),
                                                       mainWindow.getUserInterface(),
@@ -269,7 +270,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 final ProblemInitializer problemInitializer = new ProblemInitializer(mainWindow.getUserInterface(),
                                 new Services(proof.getServices().getProfile(),
                                                 new KeYRecoderExcHandler()),
-                                false, mainWindow.getUserInterface());
+                                mainWindow.getUserInterface());
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(mainWindow.getUserInterface(),
                                                       mainWindow.getUserInterface(),

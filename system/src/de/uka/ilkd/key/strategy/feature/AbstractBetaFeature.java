@@ -1,18 +1,19 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.strategy.feature;
 
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -22,7 +23,6 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.util.LRUCache;
 
 
 /**
@@ -31,15 +31,6 @@ import de.uka.ilkd.key.util.LRUCache;
  * Diss. by Martin Giese.
  */
 public abstract class AbstractBetaFeature implements Feature {
-
-    /*
-     * Table of formulas which could be splitted using the beta rule
-     * This is the cache the method "isBetaCandidate" uses
-     *
-     *    keys: Term              values: TermInfo
-     */
-    private static LRUCache<Term, TermInfo> betaCandidates = new LRUCache<Term, TermInfo> (1000);
-
     /** helper for computing maxPosPath_* in TermInfo */
     private static MaxPosPathHelper maxPosPathHelper = new MaxPosPathHelper();
 
@@ -48,18 +39,19 @@ public abstract class AbstractBetaFeature implements Feature {
     
     /**
      * Get the informations about a term
+    * @param caches TODO
      */
-    private static TermInfo termInfo (Term p_t) {
+    private static TermInfo termInfo (Term p_t, ServiceCaches caches) {
         TermInfo ti;
-        synchronized ( betaCandidates ) {
-            ti = betaCandidates.get ( p_t );
+        synchronized ( caches.getBetaCandidates() ) {
+            ti = caches.getBetaCandidates().get ( p_t );
         }
 
         if ( ti == null ) {
             ti = new TermInfo ();
 
-            ti.purePosPath_positive = hasPurePosPathHelp ( p_t, true );
-            ti.purePosPath_negative = hasPurePosPathHelp ( p_t, false );
+            ti.purePosPath_positive = hasPurePosPathHelp ( p_t, true, caches );
+            ti.purePosPath_negative = hasPurePosPathHelp ( p_t, false, caches );
 
             ti.maxPosPath_positive = maxPosPathHelp ( p_t, true );
             ti.maxPosPath_negative = maxPosPathHelp ( p_t, false );
@@ -67,15 +59,15 @@ public abstract class AbstractBetaFeature implements Feature {
             ti.maxDPath_positive = maxDPathHelp ( p_t, true );
             ti.maxDPath_negative = maxDPathHelp ( p_t, false );
 
-            ti.containsNegAtom_positive = containsNegAtomHelp ( p_t, true );
-            ti.containsNegAtom_negative = containsNegAtomHelp ( p_t, false );
+            ti.containsNegAtom_positive = containsNegAtomHelp ( p_t, true, caches );
+            ti.containsNegAtom_negative = containsNegAtomHelp ( p_t, false, caches );
 
-            ti.containsQuantifier = containsQuantifierHelp ( p_t );
+            ti.containsQuantifier = containsQuantifierHelp ( p_t, caches );
 
             ti.candidate = candidateHelp ( p_t, ti );
 
-            synchronized ( betaCandidates ) {
-                betaCandidates.put ( p_t, ti );
+            synchronized ( caches.getBetaCandidates() ) {
+               caches.getBetaCandidates().put ( p_t, ti );
             }
         }
 
@@ -147,55 +139,56 @@ public abstract class AbstractBetaFeature implements Feature {
      * TODO: It would be nice to integrate this with the framework for
      * computing maxPosPath/maxDPath, however different return types pose
      * a problem. Perhaps this could be solved using generics? 
+    * @param caches TODO
      */
-    private static boolean hasPurePosPathHelp (Term p_t, boolean p_positive) {
+    private static boolean hasPurePosPathHelp (Term p_t, boolean p_positive, ServiceCaches caches) {
         if ( p_t.op () == ( p_positive ? Junctor.AND : Junctor.OR ) )
-            return hasPurePosPath ( p_t.sub ( 0 ), p_positive )
-                   && hasPurePosPath ( p_t.sub ( 1 ), p_positive );
+            return hasPurePosPath ( p_t.sub ( 0 ), p_positive, caches )
+                   && hasPurePosPath ( p_t.sub ( 1 ), p_positive, caches );
 
         else if ( p_t.op () == ( p_positive ? Junctor.OR : Junctor.AND ) )
-            return hasPurePosPath ( p_t.sub ( 0 ), p_positive )
-                   || hasPurePosPath ( p_t.sub ( 1 ), p_positive );
+            return hasPurePosPath ( p_t.sub ( 0 ), p_positive, caches )
+                   || hasPurePosPath ( p_t.sub ( 1 ), p_positive, caches );
 
         else if ( p_t.op () == Junctor.NOT )
-            return hasPurePosPath ( p_t.sub ( 0 ), !p_positive );
+            return hasPurePosPath ( p_t.sub ( 0 ), !p_positive, caches );
 
         else if ( p_positive && p_t.op () == Junctor.IMP )
-            return hasPurePosPath ( p_t.sub ( 0 ), !p_positive )
-                   || hasPurePosPath ( p_t.sub ( 1 ), p_positive );
+            return hasPurePosPath ( p_t.sub ( 0 ), !p_positive, caches )
+                   || hasPurePosPath ( p_t.sub ( 1 ), p_positive, caches );
 
         else if ( !p_positive && p_t.op () == Junctor.IMP )
-            return hasPurePosPath ( p_t.sub ( 0 ), !p_positive )
-                   && hasPurePosPath ( p_t.sub ( 1 ), p_positive );
+            return hasPurePosPath ( p_t.sub ( 0 ), !p_positive, caches )
+                   && hasPurePosPath ( p_t.sub ( 1 ), p_positive, caches );
 
         else if ( p_positive && p_t.op () == Equality.EQV )
-            return ( hasPurePosPath ( p_t.sub ( 0 ), p_positive ) &&
-                     hasPurePosPath ( p_t.sub ( 1 ), p_positive ) )
-                   || ( hasPurePosPath ( p_t.sub ( 0 ), !p_positive ) &&
-                        hasPurePosPath ( p_t.sub ( 1 ), !p_positive ) );
+            return ( hasPurePosPath ( p_t.sub ( 0 ), p_positive, caches ) &&
+                     hasPurePosPath ( p_t.sub ( 1 ), p_positive, caches ) )
+                   || ( hasPurePosPath ( p_t.sub ( 0 ), !p_positive, caches ) &&
+                        hasPurePosPath ( p_t.sub ( 1 ), !p_positive, caches ) );
 
         else if ( !p_positive && p_t.op () == Equality.EQV )
-            return ( hasPurePosPath ( p_t.sub ( 0 ), !p_positive ) &&
-                     hasPurePosPath ( p_t.sub ( 1 ), p_positive ) )
-                   || ( hasPurePosPath ( p_t.sub ( 0 ), p_positive ) &&
-                        hasPurePosPath ( p_t.sub ( 1 ), !p_positive ) );
+            return ( hasPurePosPath ( p_t.sub ( 0 ), !p_positive, caches ) &&
+                     hasPurePosPath ( p_t.sub ( 1 ), p_positive, caches ) )
+                   || ( hasPurePosPath ( p_t.sub ( 0 ), p_positive, caches ) &&
+                        hasPurePosPath ( p_t.sub ( 1 ), !p_positive, caches ) );
 
         else if ( alwaysReplace ( p_t ) ) return true;
 
         return !p_positive;
     }
 
-    private static boolean containsNegAtomHelp (Term p_t, boolean p_positive) {
+    private static boolean containsNegAtomHelp (Term p_t, boolean p_positive, ServiceCaches caches) {
         if ( p_t.op () == Junctor.AND || p_t.op () == Junctor.OR )
-            return containsNegAtom ( p_t.sub ( 0 ), p_positive )
-                   || containsNegAtom ( p_t.sub ( 1 ), p_positive );
+            return containsNegAtom ( p_t.sub ( 0 ), p_positive, caches )
+                   || containsNegAtom ( p_t.sub ( 1 ), p_positive, caches );
 
         else if ( p_t.op () == Junctor.NOT )
-            return containsNegAtom ( p_t.sub ( 0 ), !p_positive );
+            return containsNegAtom ( p_t.sub ( 0 ), !p_positive, caches );
 
         else if ( p_t.op () == Junctor.IMP )
-            return containsNegAtom ( p_t.sub ( 0 ), !p_positive )
-                   || containsNegAtom ( p_t.sub ( 1 ), p_positive );
+            return containsNegAtom ( p_t.sub ( 0 ), !p_positive, caches )
+                   || containsNegAtom ( p_t.sub ( 1 ), p_positive, caches );
 
         else if ( p_t.op () == Equality.EQV || alwaysReplace ( p_t ) )
             return true;
@@ -203,13 +196,13 @@ public abstract class AbstractBetaFeature implements Feature {
         return !p_positive;
     }
 
-    private static boolean containsQuantifierHelp (Term p_t) {
+    private static boolean containsQuantifierHelp (Term p_t, ServiceCaches caches) {
         if ( p_t.op () == Junctor.AND || p_t.op () == Junctor.OR || p_t.op () == Junctor.IMP
              || p_t.op () == Equality.EQV )
-            return containsQuantifier ( p_t.sub ( 0 ) )
-                   || containsQuantifier ( p_t.sub ( 1 ) );
+            return containsQuantifier ( p_t.sub ( 0 ), caches )
+                   || containsQuantifier ( p_t.sub ( 1 ), caches );
         else if ( p_t.op () == Junctor.NOT )
-            return containsQuantifier ( p_t.sub ( 0 ) );
+            return containsQuantifier ( p_t.sub ( 0 ), caches );
         else
             return alwaysReplace ( p_t );
     }
@@ -245,44 +238,49 @@ public abstract class AbstractBetaFeature implements Feature {
     /**
      * p_t contains a d-path consisting only of positive literals (as a formula
      * of the antecedent)
+    * @param caches TODO
      */
-    protected static boolean hasPurePosPath (Term p_t, boolean p_positive) {
-        TermInfo ti = termInfo ( p_t );
+    protected static boolean hasPurePosPath (Term p_t, boolean p_positive, ServiceCaches caches) {
+        TermInfo ti = termInfo ( p_t, caches );
         return p_positive ? ti.purePosPath_positive : ti.purePosPath_negative;
     }
 
     /**
      * The maximal number of positive literals occurring within a
      * d-path of "p_t" as a formula of the antecedent
+    * @param caches TODO
      */
-    protected static int maxPosPath (Term p_t, boolean p_positive) {
-        TermInfo ti = termInfo ( p_t );
+    protected static int maxPosPath (Term p_t, boolean p_positive, ServiceCaches caches) {
+        TermInfo ti = termInfo ( p_t, caches );
         return p_positive ? ti.maxPosPath_positive : ti.maxPosPath_negative;
     }
 
     /**
      * The length (number of literals) of the maximum d-path of the given
      * formula as a formula of the antecedent
+    * @param caches TODO
      */
-    protected static int maxDPath (Term p_t, boolean p_positive) {
-        TermInfo ti = termInfo ( p_t );
+    protected static int maxDPath (Term p_t, boolean p_positive, ServiceCaches caches) {
+        TermInfo ti = termInfo ( p_t, caches );
         return p_positive ? ti.maxDPath_positive : ti.maxDPath_negative;
     }
 
     /**
-     * @return true iff "p_t" contains a quantifier or a modality
+     * @param caches TODO
+    * @return true iff "p_t" contains a quantifier or a modality
      */
-    protected static boolean containsQuantifier (Term p_t) {
-        TermInfo ti = termInfo ( p_t );
+    protected static boolean containsQuantifier (Term p_t, ServiceCaches caches) {
+        TermInfo ti = termInfo ( p_t, caches );
         return ti.containsQuantifier;
     }
 
     /**
+    * @param caches TODO
     * @return true iff the given
     * formula contains a negated atom as a formula of the antecedent
      */
-    protected static boolean containsNegAtom (Term p_t, boolean p_positive) {
-        TermInfo ti = termInfo ( p_t );
+    protected static boolean containsNegAtom (Term p_t, boolean p_positive, ServiceCaches caches) {
+        TermInfo ti = termInfo ( p_t, caches );
         return p_positive ? ti.containsNegAtom_positive : ti.containsNegAtom_negative;
     }
 
@@ -295,11 +293,12 @@ public abstract class AbstractBetaFeature implements Feature {
     }
 
     /**
-     * @return true iff the formula p_t could be splitted using the
+     * @param caches TODO
+    * @return true iff the formula p_t could be splitted using the
      * beta rule
      */
-    protected static boolean isBetaCandidate (Term p_t, boolean p_inAntec) {
-        TermInfo ti = termInfo ( p_t );
+    protected static boolean isBetaCandidate (Term p_t, boolean p_inAntec, ServiceCaches caches) {
+        TermInfo ti = termInfo ( p_t, caches );
         return ti.candidate == TermInfo.Candidate.CAND_BOTH
                || ti.candidate == ( p_inAntec ? TermInfo.Candidate.CAND_LEFT
                                              : TermInfo.Candidate.CAND_RIGHT );
@@ -308,10 +307,10 @@ public abstract class AbstractBetaFeature implements Feature {
     /**
      * Informations about a term as cached within "betaCandidates"
      */
-    static class TermInfo {
+    public static class TermInfo {
         
         enum Candidate {
-            CAND_NEVER, CAND_LEFT, CAND_RIGHT, CAND_BOTH;
+            CAND_NEVER, CAND_LEFT, CAND_RIGHT, CAND_BOTH
         }
 
         /** formula is positive (not negated) */
@@ -355,13 +354,10 @@ public abstract class AbstractBetaFeature implements Feature {
     
         final Term findTerm = pos.constrainedFormula ().formula ();
         
-        return doComputation ( pos, findTerm );
+        return doComputation ( pos, findTerm, goal.proof().getServices().getCaches() );
     }
 
     protected abstract RuleAppCost doComputation (PosInOccurrence pos,
-                                                  Term findTerm);
-
-    public static void clearCache(){
-        betaCandidates.clear();
-    }
+                                                  Term findTerm, 
+                                                  ServiceCaches caches);
 }

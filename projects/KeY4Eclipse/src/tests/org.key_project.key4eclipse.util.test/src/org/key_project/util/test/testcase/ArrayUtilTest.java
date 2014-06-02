@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -28,6 +28,52 @@ import org.key_project.util.java.StringUtil;
  * @author Martin Hentschel
  */
 public class ArrayUtilTest extends TestCase {
+   /**
+    * Tests {@link ArrayUtil#insert(int[], int, int)}.
+    */
+   @Test
+   public void testInsert() {
+      String[] array = {"A", "B", "C"};
+      // Test possible indices
+      assertArray(ArrayUtil.insert(array, "X", 0), "X", "A", "B", "C");
+      assertArray(ArrayUtil.insert(array, "X", 1), "A", "X", "B", "C");
+      assertArray(ArrayUtil.insert(array, "X", 2), "A", "B", "X", "C");
+      assertArray(ArrayUtil.insert(array, "X", 3), "A", "B", "C", "X");
+      // Test null array
+      assertArray(ArrayUtil.insert(null, "X", 0), "X");
+      // Test null element
+      assertArray(ArrayUtil.insert(array, null, 1), "A", null, "B", "C");
+      // Test null array an delement
+      try {
+         ArrayUtil.insert(null, null, 0);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Can not create an array if array and element to insert are null.", e.getMessage());
+      }
+      // Test invalid indices
+      try {
+         ArrayUtil.insert(array, "X", -1);
+         fail();
+      }
+      catch (ArrayIndexOutOfBoundsException e) {
+      }
+      try {
+         ArrayUtil.insert(array, "X", 4);
+         fail();
+      }
+      catch (ArrayIndexOutOfBoundsException e) {
+      }
+   }
+   
+   private <T> void assertArray(T[] current, T... expected) {
+      assertNotNull(current);
+      assertEquals(current.length, expected.length);
+      for (int i = 0; i < current.length; i++) {
+         assertEquals(current[i], expected[i]);
+      }
+   }
+
    /**
     * Tests {@link ArrayUtil#getLast(Object[])}
     */

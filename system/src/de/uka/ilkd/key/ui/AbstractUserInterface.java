@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -33,7 +33,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.Debug;
 
@@ -42,12 +41,12 @@ public abstract class AbstractUserInterface implements UserInterface {
     private ProofMacro autoMacro = new DummyProofMacro();
     protected boolean saveOnly = false;
 
-	public void loadProblem(File file, List<File> classPath,
-	        File bootClassPath, KeYMediator mediator) {
+	protected ProblemLoader getProblemLoader(File file, List<File> classPath,
+	                                         File bootClassPath, KeYMediator mediator) {
 		final ProblemLoader pl = new ProblemLoader(file, classPath,
 		        bootClassPath, AbstractProfile.getDefaultProfile(), mediator);
 		pl.addTaskListener(this);
-		pl.run();
+		return pl;
 	}
 
     @Override
@@ -120,9 +119,9 @@ public abstract class AbstractUserInterface implements UserInterface {
           getMediator().stopInterface(true);
           loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile, getMediator());
           if (isSaveOnly()) {
-              loader.saveAll(isRegisterProofs());
+              loader.saveAll();
           } else {
-              loader.load(isRegisterProofs());
+              loader.load();
           }
           return loader;
        }
@@ -136,12 +135,6 @@ public abstract class AbstractUserInterface implements UserInterface {
           getMediator().startInterface(true);
        }
     }
-    
-    /**
-     * Checks if loaded {@link Proof}s are registered in the {@link GlobalProofMgt}.
-     * @return {@code true} register, {@code false} do not register.
-     */
-    protected abstract boolean isRegisterProofs();
 
    /**
      * {@inheritDoc}

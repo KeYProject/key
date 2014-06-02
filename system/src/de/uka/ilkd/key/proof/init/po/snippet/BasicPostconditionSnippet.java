@@ -25,6 +25,6 @@ class BasicPostconditionSnippet extends ReplaceAndRegisterMethod implements Fact
         assert Term.class.equals(BasicSnippetData.Key.POSTCONDITION.getType());
         Term origPost = (Term) d.get(
                 BasicSnippetData.Key.POSTCONDITION);
-        return replace(origPost, d.origVars, poVars.post);
+        return replace(origPost, d.origVars, poVars.post, d.tb);
     }
 }

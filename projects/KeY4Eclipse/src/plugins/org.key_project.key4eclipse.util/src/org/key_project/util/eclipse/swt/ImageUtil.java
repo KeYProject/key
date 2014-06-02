@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -149,12 +149,23 @@ public final class ImageUtil {
      * @return The created {@link BufferedImage} with the content from the given {@link Image}.
      */
     public static BufferedImage toBufferedImage(Image image) {
+       return toBufferedImage(image, 0, 0);
+    }
+    
+    /**
+     * Converts the given {@link Image} into a {@link BufferedImage}.
+     * @param image The {@link Image} to convert.
+     * @param x The x position to place image at.
+     * @param y The y position to place image at.
+     * @return The created {@link BufferedImage} with the content from the given {@link Image}.
+     */
+    public static BufferedImage toBufferedImage(Image image, int x, int y) {
         BufferedImage result = new BufferedImage(image.getWidth(null), 
                                                  image.getHeight(null), 
                                                  BufferedImage.TYPE_INT_ARGB);
         Graphics g = result.getGraphics();
         try {
-            g.drawImage(image, 0, 0, null);
+            g.drawImage(image, x, y, null);
             return result;
         }
         finally {
@@ -174,12 +185,29 @@ public final class ImageUtil {
      * @return The created {@link BufferedImage}.
      */
     public static BufferedImage toBufferedImage(Icon icon) {
+       return toBufferedImage(icon, 0, 0);
+    }
+    
+    /**
+     * <p>
+     * Converts the given {@link Icon} into a {@link BufferedImage}.
+     * </p>
+     * <p>
+     * Fore more details have a look at
+     * <a href="http://www.java2s.com/Tutorial/Java/0280__SWT/ConvertsanAWTimagetoSWT.htm">http://www.java2s.com/Tutorial/Java/0280__SWT/ConvertsanAWTimagetoSWT.htm</a>.
+     * </p>
+     * @param icon The {@link Icon} to convert.
+     * @param x The x position to place image at.
+     * @param y The y position to place image at.
+     * @return The created {@link BufferedImage}.
+     */
+    public static BufferedImage toBufferedImage(Icon icon, int x, int y) {
         if (icon != null) {
             Graphics2D g = null;
             try {
                 BufferedImage image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), Transparency.TRANSLUCENT);
                 g = image.createGraphics();
-                icon.paintIcon(null, g, 0, 0);
+                icon.paintIcon(null, g, x, y);
                 return image;
             }
             finally {

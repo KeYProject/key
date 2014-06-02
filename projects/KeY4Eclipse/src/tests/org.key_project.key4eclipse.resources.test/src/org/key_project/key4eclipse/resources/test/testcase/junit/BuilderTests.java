@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -333,7 +333,7 @@ public class BuilderTests extends AbstractResourceTest {
             project.getFullPath().append("src").append("cleanBuild").append("File.java"));
       IFile proofFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("cleanBuild").append("File.java").append("cleanBuild_File[cleanBuild_File__add(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().addFileExtension("meta"));
+      IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/BuilderTests/testCleanBuild", project.getFolder("src"));
 
@@ -347,19 +347,22 @@ public class BuilderTests extends AbstractResourceTest {
       assertTrue(proofFolder.exists());
       assertTrue(proofFile.exists() && metaFile.exists());
       
-      long proofFolderModStamp = proofFolder.getLocalTimeStamp();
-      long proofFileModStamp = proofFile.getLocalTimeStamp();
-      long metaFileModStamp = metaFile.getLocalTimeStamp();
+//      long proofFolderModStamp = proofFolder.getLocalTimeStamp();
+//      long proofFileModStamp = proofFile.getLocalTimeStamp();
+//      long metaFileModStamp = metaFile.getLocalTimeStamp();
       
       KeY4EclipseResourcesTestUtil.cleanBuild(project);
-
-      assertTrue(javaFile.exists());
-      assertTrue(proofFolder.exists());
-      assertTrue(proofFile.exists() && metaFile.exists());
       
-      assertTrue(proofFolder.getLocalTimeStamp() != proofFolderModStamp);
-      assertTrue(proofFile.getLocalTimeStamp() != proofFileModStamp);
-      assertTrue(metaFile.getLocalTimeStamp() != metaFileModStamp);
+      assertTrue(javaFile.exists());
+      assertTrue(!proofFolder.exists());
+      assertTrue(!proofFile.exists() && !metaFile.exists());
+      
+//      assertTrue(proofFolder.exists());
+//      assertTrue(proofFile.exists() && metaFile.exists());
+//      
+//      assertTrue(proofFolder.getLocalTimeStamp() != proofFolderModStamp);
+//      assertTrue(proofFile.getLocalTimeStamp() != proofFileModStamp);
+//      assertTrue(metaFile.getLocalTimeStamp() != metaFileModStamp);
    }
    
    
@@ -371,8 +374,8 @@ public class BuilderTests extends AbstractResourceTest {
             project.getFullPath().append("proofs").append("single").append("javaFile").append("SingleJavaFileTest.java").append("single_javaFile_SingleJavaFileTest[single_javaFile_SingleJavaFileTest__add(int,int)]_JML_operation_contract_0.proof"));
       IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("single").append("javaFile").append("SingleJavaFileTest.java").append("single_javaFile_SingleJavaFileTest[single_javaFile_SingleJavaFileTest__sub(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().addFileExtension("meta"));
-      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().addFileExtension("meta"));
+      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!proofFolder.exists());
       assertTrue(!javaFile.exists());
@@ -400,8 +403,8 @@ public class BuilderTests extends AbstractResourceTest {
             project.getFullPath().append("proofs").append("add").append("method").append("AddMethodTest.java").append("add_method_AddMethodTest[add_method_AddMethodTest__add(int,int)]_JML_operation_contract_0.proof"));
       IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("add").append("method").append("AddMethodTest.java").append("add_method_AddMethodTest[add_method_AddMethodTest__sub(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().addFileExtension("meta"));
-      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().addFileExtension("meta"));
+      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile.exists());
       assertTrue(!proofFolder.exists());
@@ -449,8 +452,8 @@ public class BuilderTests extends AbstractResourceTest {
             project.getFullPath().append("proofs").append("file").append("one").append("FirstFile.java").append("file_one_FirstFile[file_one_FirstFile__add(int,int)]_JML_operation_contract_0.proof"));
       IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("file").append("two").append("SecondFile.java").append("file_two_SecondFile[file_two_SecondFile__add(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().addFileExtension("meta"));
-      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().addFileExtension("meta"));
+      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile0.exists() && !javaFile1.exists());
       assertTrue(!proofFolder.exists());
@@ -503,8 +506,8 @@ public class BuilderTests extends AbstractResourceTest {
             project.getFullPath().append("proofs").append("file").append("to").append("change").append("TrivealChangeFile.java").append("file_to_change_TrivealChangeFile[file_to_change_TrivealChangeFile__add(int,int)]_JML_operation_contract_0.proof"));
       IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("file").append("to").append("change").append("AnotherFile.java").append("file_to_change_AnotherFile[file_to_change_AnotherFile__add(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().addFileExtension("meta"));
-      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().addFileExtension("meta"));
+      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile0.exists() && !javaFile1.exists());
       assertTrue(!proofFolder.exists());
@@ -558,7 +561,7 @@ public class BuilderTests extends AbstractResourceTest {
             project.getFullPath().append("src").append("File.java"));
       IFile proofFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("File.java").append("File[File__add(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().addFileExtension("meta"));
+      IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile.exists());
       assertTrue(!proofFolder.exists());
@@ -603,8 +606,8 @@ public class BuilderTests extends AbstractResourceTest {
             project.getFullPath().append("proofs").append("MD5").append("changed").append("FileToAdd.java").append("MD5_changed_FileToAdd[MD5_changed_FileToAdd__add(int,int)]_JML_operation_contract_0.proof"));
       IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("MD5").append("changed").append("FileToAdd.java").append("MD5_changed_FileToAdd[MD5_changed_FileToAdd__sub(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().addFileExtension("meta"));
-      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().addFileExtension("meta"));
+      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile.exists());
       assertTrue(!proofFolder.exists());
@@ -662,7 +665,7 @@ public class BuilderTests extends AbstractResourceTest {
             project.getFullPath().append("src").append("type").append("changed").append("A.java"));
       IFile proofFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("type").append("changed").append("Main.java").append("type_changed_Main[type_changed_Main__main(type_changed_A)]_JML_operation_contract_0.proof"));
-      IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().addFileExtension("meta"));
+      IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile0.exists() && !javaFile1.exists());
       assertTrue(!proofFolder.exists());
@@ -707,7 +710,7 @@ public class BuilderTests extends AbstractResourceTest {
             project.getFullPath().append("src").append("subType").append("changed").append("B.java"));
       IFile proofFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("subType").append("changed").append("Main.java").append("subType_changed_Main[subType_changed_Main__main(subType_changed_A)]_JML_operation_contract_0.proof"));
-      IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().addFileExtension("meta"));
+      IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile0.exists() && !javaFile1.exists() && !javaFile2.exists());
       assertTrue(!proofFolder.exists());
@@ -754,7 +757,7 @@ public class BuilderTests extends AbstractResourceTest {
             project.getFullPath().append("src").append("newSubType").append("changed").append("C.java"));
       IFile proofFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("newSubType").append("changed").append("Main.java").append("newSubType_changed_Main[newSubType_changed_Main__main(newSubType_changed_A)]_JML_operation_contract_0.proof"));
-      IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().addFileExtension("meta"));
+      IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
 
       assertTrue(!javaFile0.exists() && !javaFile1.exists() && !javaFile2.exists() && !javaFile3.exists());
       assertTrue(!proofFolder.exists());
@@ -798,7 +801,7 @@ public class BuilderTests extends AbstractResourceTest {
             project.getFullPath().append("src").append("Type.java"));
       IFile proofFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("Type.java").append("Type[Type__add(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().addFileExtension("meta"));
+      IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
 
       assertTrue(!javaFile0.exists() && !javaFile1.exists());
       assertTrue(!proofFolder.exists());
@@ -822,7 +825,6 @@ public class BuilderTests extends AbstractResourceTest {
       InputStream is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/BuilderTests/testEfficientSuperTypeChanged/SuperType.java");
       javaFile0.setContents(is, IResource.FORCE, null);
       is.close();
-//      javaFile0.touch(null);
       
       KeY4EclipseResourcesTestUtil.build(project);
       

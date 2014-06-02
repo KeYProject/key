@@ -1,20 +1,17 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.gui.macros;
-
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.KeyStroke;
 
@@ -22,6 +19,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
@@ -111,7 +109,7 @@ public class TryCloseMacro implements ProofMacro {
         // create the rule application engine
         final IGoalChooser goalChooser =
                 mediator.getProfile().getSelectedGoalChooserBuilder().create();
-        final ApplyStrategy applyStrategy = new ApplyStrategy(goalChooser, false);
+        final ApplyStrategy applyStrategy = new ApplyStrategy(goalChooser, finishAfterMacro());
 
         final Proof proof = mediator.getInteractiveProver().getProof();
 
@@ -121,20 +119,27 @@ public class TryCloseMacro implements ProofMacro {
         ImmutableList<Goal> enabledGoals = proof.getSubtreeEnabledGoals(invokedNode);
 
         //
+        // The observer to handle the progress bar
+        TaskObserver taskObserver = new TaskObserver(mediator.getUI(), finishAfterMacro());
+        taskObserver.setNumberGoals(enabledGoals.size());
+
+        //
         // set the max number of steps if given
         int oldNumberOfSteps = mediator.getMaxAutomaticSteps();
         if(numberSteps > 0) {
             mediator.setMaxAutomaticSteps(numberSteps);
+            taskObserver.setNumberSteps(numberSteps);
+        } else {
+            taskObserver.setNumberSteps(oldNumberOfSteps);
         }
-        
+
+        applyStrategy.addProverTaskObserver(taskObserver);
+
         // 
         // inform the listener
-        int goalsTotal = enabledGoals.size();
         int goalsClosed = 0;
-        int goalsDone = 0;
         long time = 0;
         int appliedRules = 0;
-        fireStart(listener, goalsTotal);
 
         //
         // start actual autoprove
@@ -152,7 +157,6 @@ public class TryCloseMacro implements ProofMacro {
                 }
 
                 // update statistics
-                goalsDone++;
                 time += result.getTime();
                 appliedRules += result.getAppliedRuleApps();
 
@@ -160,48 +164,84 @@ public class TryCloseMacro implements ProofMacro {
                 if(applyStrategy.hasBeenInterrupted()) {
                     throw new InterruptedException();
                 }
-                
-                fireProgress(listener, goalsDone);
+
             }
         } finally {
             // reset the old number of steps
             mediator.setMaxAutomaticSteps(oldNumberOfSteps);
             // inform the listener
-            fireStop(listener, proof, time, appliedRules, goalsClosed);
+            taskObserver.allTasksFinished(proof, time, appliedRules, goalsClosed);
         }
 
     }
-    
+
     @Override
     public KeyStroke getKeyStroke () {
-    	return KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK);
+        return KeyStrokeManager.get(this);
     }
 
-    private void fireStop(ProverTaskListener listener, Proof proof, long time, 
-                          int appliedRules, int closedGoals) {
-        if(listener != null) {
-            TaskFinishedInfo info = new DefaultTaskFinishedInfo(this, null, proof, time,
-                                                                appliedRules, closedGoals);
-            if (finishAfterMacro()) {
-                listener.taskFinished(info);
-            } else if (listener instanceof UserInterface
-                    && !((UserInterface)listener).macroChosen()) {
-                ((UserInterface)listener).finish();
+    /**
+     * This observer acts as intermediate instance between the reports by the
+     * strategy and the UI reporting progress.
+     *
+     * The number of total steps is computed and all local reports are
+     * translated in termini of the total number of steps such that a continuous
+     * progress is reported.
+     *
+     * fixes #1356
+     */
+    private static class TaskObserver implements ProverTaskListener {
+
+        private int numberGoals;
+        private int numberSteps;
+        private final ProverTaskListener backListener;
+        private final boolean finishAfterMacro;
+        private int completedGoals;
+
+        public TaskObserver(ProverTaskListener backListener,
+                            boolean finishAfterMacro) {
+            this.backListener = backListener;
+            this.finishAfterMacro = finishAfterMacro;
+        }
+
+        @Override
+        public void taskStarted(String message, int size) {
+            assert size == numberSteps;
+            String suffix = " [" + (completedGoals + 1) + "/" + numberGoals + "]";
+            backListener.taskStarted(message + suffix, numberGoals * numberSteps);
+            backListener.taskProgress(completedGoals * numberSteps);
+        }
+
+        @Override
+        public void taskProgress(int position) {
+            backListener.taskProgress(completedGoals * numberSteps + position);
+        }
+
+        @Override
+        public void taskFinished(TaskFinishedInfo info) {
+            completedGoals ++;
+        }
+
+        public void setNumberGoals(int numberGoals) {
+            this.numberGoals = numberGoals;
+        }
+
+        public void setNumberSteps(int numberSteps) {
+            this.numberSteps = numberSteps;
+        }
+
+        private void allTasksFinished(Proof proof, long time, 
+                int appliedRules, int closedGoals) {
+            TaskFinishedInfo info =
+                    new DefaultTaskFinishedInfo(this, null, proof, time,
+                            appliedRules, closedGoals);
+            assert backListener instanceof UserInterface;
+            final UserInterface ui = (UserInterface)backListener;
+            if (finishAfterMacro) {
+                backListener.taskFinished(info);
+            } else if (!ui.macroChosen()) {
+                ui.finish(proof);
             }
         }
     }
-
-    private void fireStart(ProverTaskListener ptl, int numberGoals) {
-        if(ptl != null) {
-            ptl.taskStarted("Trying to close " + numberGoals
-                            + " open goal" + (numberGoals != 1 ? "s" : ""), numberGoals);
-        }
-    }
-
-    private void fireProgress(ProverTaskListener ptl, int steps) {
-        if (ptl != null) {
-            ptl.taskProgress(steps);
-        }
-    }
-
 }

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
@@ -43,17 +44,17 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         final ImmutableList<Term> termList =
                 extractTermListForPredicate(pm, poVars, d.hasMby);
         final Function contApplPred =
-                generateContApplPredicate(nameString, termList, d.tb);
+                generateContApplPredicate(nameString, termList, d.tb, d.services);
         return instantiateContApplPredicate(contApplPred, termList, d.tb);
     }
 
 
     private Function generateContApplPredicate(String nameString,
                                                ImmutableList<Term> termList,
-                                               TermBuilder.Serviced tb) {
+                                               TermBuilder tb,
+                                               Services services) {
         final Name name = new Name(nameString);
-        final Namespace functionNS =
-                tb.getServices().getNamespaces().functions();
+        final Namespace functionNS = services.getNamespaces().functions();
         Function pred = (Function) functionNS.lookup(name);
 
         if (pred == null) {
@@ -66,7 +67,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
             }
 
             pred = new Function(name, Sort.FORMULA, argSorts);
-            tb.getServices().getNamespaces().functions().addSafely(pred);
+            services.getNamespaces().functions().addSafely(pred);
         }
         return pred;
     }
@@ -74,7 +75,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
     private Term instantiateContApplPredicate(Function pred,
                                               ImmutableList<Term> termList,
-                                              TermBuilder.Serviced tb) {
+                                              TermBuilder tb) {
         final Sort[] predArgSorts = new Sort[pred.argSorts().size()];
         pred.argSorts().toArray(predArgSorts);
         Term[] predArgs = new Term[predArgSorts.length];

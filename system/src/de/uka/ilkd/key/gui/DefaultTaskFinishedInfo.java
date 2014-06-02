@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 /**
  * 
@@ -71,16 +70,16 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
             StringBuilder message = new StringBuilder();
             String timeString = (time/1000) + "." + ((time%1000)/100);
 
-            message.append("Strategy: Applied " + appliedRules + " rule");
+            message.append("Strategy: Applied ").append(appliedRules).append(" rule");
             if ( appliedRules != 1 ) {
                 message.append("s");
             }
-            message.append(" (" + timeString + " sec), ");
-            message.append(" closed " + closedGoals + " goal");
+            message.append(" (").append(timeString).append(" sec), ");
+            message.append(" closed ").append(closedGoals).append(" goal");
             if ( closedGoals != 1 ) {
                 message.append("s");             
             }
-            message.append(", " + proof.openGoals().size());
+            message.append(", ").append(proof.openGoals().size());
             message.append(" remaining");
             return message.toString();
         } else {

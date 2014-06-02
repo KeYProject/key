@@ -1,21 +1,21 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -41,13 +41,13 @@ public class SeqContainsExecutableCodeFeature extends BinaryFeature {
         new SeqContainsExecutableCodeFeature ( true );
 
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return containsExec ( goal.sequent ().succedent ().iterator () )
-            || containsExec ( goal.sequent ().antecedent().iterator () );
+        return containsExec ( goal.sequent ().succedent ().iterator (), goal.proof().getServices() )
+            || containsExec ( goal.sequent ().antecedent().iterator (), goal.proof().getServices() );
     }
 
-    private boolean containsExec(Iterator<SequentFormula> it) {
+    private boolean containsExec(Iterator<SequentFormula> it, Services services) {
         while ( it.hasNext () ) {
-            if ( tf.compute ( it.next ().formula () ).equals (
+            if ( tf.compute ( it.next ().formula (), services ).equals (
                  BinaryTermFeature.ZERO_COST ) )
                 return true;
         }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -15,8 +15,12 @@ package org.key_project.sed.key.ui.presentation;
 
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.jdt.internal.debug.ui.JDIModelPresentation;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
+import org.key_project.sed.key.core.breakpoints.KeYWatchpoint;
 import org.key_project.sed.ui.presentation.AbstractSEDDebugModelPresentation;
+import org.key_project.sed.ui.util.LogUtil;
+import org.key_project.sed.ui.util.SEDImages;
 
 /**
  * {@link IDebugModelPresentation} for the Symbolic Execution Debugger (SED)
@@ -49,6 +53,36 @@ public class KeYDebugModelPresentation extends AbstractSEDDebugModelPresentation
    @Override
    public String getEditorId(IEditorInput input, Object element) {
       return helper.getEditorId(input, element);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getText(Object element) {
+      try {
+         if(element instanceof KeYWatchpoint){
+            KeYWatchpoint watchpoint = (KeYWatchpoint)element;
+            String result = watchpoint.getTypeName()+" ["+watchpoint.getCondition()+"] ";
+            return result;
+         }else{
+            return super.getText(element); // Text is computed somewhere else in the Eclipse Debug API.
+         }
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+         return null; // Text is computed somewhere else in the Eclipse Debug API.
+      }
+   }
+   
+   @Override
+   public Image getImage(Object element) {
+      if (element instanceof KeYWatchpoint) {
+         return SEDImages.getImage(SEDImages.KEY_WATCHPOINT);
+      }
+      else {
+         return super.getImage(element); // Image is computed somewhere else in the Eclipse Debug API.
+      }
    }
    
    /**

@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -24,10 +24,8 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -164,17 +162,17 @@ public class DLEmbeddedExpression extends Operator {
         }
     }
 
-    public Term makeTerm(LocationVariable heap, Term[] subs) {
+    public Term makeTerm(LocationVariable heap, Term[] subs, Services services) {
         Function f = getFunctionSymbol();
         // we silently assume that check has been called earlier
 
         if(f.arity() == subs.length) {
-            return TermFactory.DEFAULT.createTerm(f, subs); 
+            return services.getTermFactory().createTerm(f, subs); 
         } else {
             Term[] extSubs = new Term[subs.length + 1];
             System.arraycopy(subs, 0, extSubs, 1, subs.length);
-            extSubs[0] = TermBuilder.DF.var(heap);
-            return TermFactory.DEFAULT.createTerm(f, extSubs);
+            extSubs[0] = services.getTermBuilder().var(heap);
+            return services.getTermFactory().createTerm(f, extSubs);
         }
     }
 }

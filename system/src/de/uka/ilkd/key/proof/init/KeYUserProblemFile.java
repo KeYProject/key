@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof.init;
 
@@ -20,8 +19,8 @@ import java.io.FileNotFoundException;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.DeclPicker;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedReader;
@@ -42,7 +41,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     private Term problemTerm = null;
     private String problemHeader = "";
     
-    private KeYParser lastParser;
+    private KeYParserF lastParser;
     
     
     //-------------------------------------------------------------------------
@@ -81,10 +80,10 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             ParserConfig pc = new ParserConfig
                 (initConfig.getServices(), 
                  initConfig.namespaces());
-            KeYParser problemParser = new KeYParser
-                (ParserMode.PROBLEM, new KeYLexer(getNewStream(),
+            KeYParserF problemParser = new KeYParserF
+                (ParserMode.PROBLEM, new KeYLexerF(getNewStream(), file.toString(),
                         initConfig.getServices().getExceptionHandler()), 
-                        file.toString(), pc, pc, null, null);    
+                        pc, pc, null, null);
             problemParser.parseWith();            
         
             settings.getChoiceSettings()
@@ -121,18 +120,18 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             CountingBufferedReader cinp = 
                 new CountingBufferedReader
                     (getNewStream(),monitor,getNumberOfChars()/100);
-            DeclPicker lexer =
-                    new DeclPicker(new KeYLexer(cinp,initConfig.getServices().getExceptionHandler()));
-            
+	    DeclPicker lexer = new DeclPicker(new KeYLexerF(cinp,
+		    file.toString(),
+		    initConfig.getServices().getExceptionHandler()));
+
             final ParserConfig normalConfig 
                 = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
             final ParserConfig schemaConfig 
                 = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
             
-            KeYParser problemParser 
-                    = new KeYParser(ParserMode.PROBLEM, 
-                                    lexer, 
-                                    file.toString(), 
+            KeYParserF problemParser
+                    = new KeYParserF(ParserMode.PROBLEM,
+                                    lexer,
                                     schemaConfig, 
                                     normalConfig,
                                     initConfig.getTaclet2Builder(),
@@ -155,12 +154,13 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 	       }
 	    }
 
-            problemHeader = lexer.getText();
-            if(problemHeader != null && 
+            problemHeader = lexer.getCapturedText();
+            if(problemHeader != null &&
                problemHeader.lastIndexOf(searchS) != -1){
                 problemHeader = problemHeader.substring(
                     0, problemHeader.lastIndexOf(searchS));
             }
+
             initConfig.setTaclets(problemParser.getTaclets());
             lastParser = problemParser;
         } catch (antlr.ANTLRException e) {
@@ -250,7 +250,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     * @throws Exception Occurred Exception.
     */
    protected Profile readProfileFromFile() throws Exception {
-      KeYParser problemParser = new KeYParser(ParserMode.GLOBALDECL, new KeYLexer(getNewStream(), null), file.toString());
+      KeYParserF problemParser = new KeYParserF(ParserMode.GLOBALDECL, new KeYLexerF(getNewStream(), file.toString(), null));
       problemParser.profile();
       String profileName = problemParser.getProfileName();
       if (profileName != null && !profileName.isEmpty()) {

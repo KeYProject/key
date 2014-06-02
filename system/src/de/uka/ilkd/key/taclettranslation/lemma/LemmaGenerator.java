@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -16,8 +16,8 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletTranslator;
@@ -28,7 +28,7 @@ import de.uka.ilkd.key.taclettranslation.TacletTranslator;
  * of the taclet.
  */
 public interface LemmaGenerator extends TacletTranslator {
-         public TacletFormula translate(Taclet taclet, Services services);
+         public TacletFormula translate(Taclet taclet, TermServices services);
 }
 
 class LemmaFormula implements TacletFormula {
@@ -46,7 +46,7 @@ class LemmaFormula implements TacletFormula {
         }
 
         @Override
-        public Term getFormula() {
+        public Term getFormula(TermServices services) {
                 return formula.getFirst();
         }
 

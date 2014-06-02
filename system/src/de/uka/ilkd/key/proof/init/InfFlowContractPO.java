@@ -78,7 +78,7 @@ public class InfFlowContractPO extends AbstractOperationPO
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
         final Term post =
                 f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
-        final Term finalTerm = TB.imp(selfComposedExec, post);
+        final Term finalTerm = tb.imp(selfComposedExec, post);
         addLabeledIFSymbol(selfComposedExec);
 
         // register final term, taclets and collect class axioms

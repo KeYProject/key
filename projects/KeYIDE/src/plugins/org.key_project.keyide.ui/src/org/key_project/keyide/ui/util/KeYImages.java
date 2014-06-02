@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -53,6 +53,11 @@ public final class KeYImages {
    public static final String NODE = "org.key_project.keyide.ui.images.node";
    
    /**
+    * The key of a {@link Node} image.
+    */
+   public static final String NODE_INTERACTIVE = "org.key_project.keyide.ui.images.nodeInteractive";
+   
+   /**
     * The key of a proved {@link Node} image.
     */
    public static final String NODE_PROVED = "org.key_project.keyide.ui.images.nodeProved";
@@ -97,16 +102,19 @@ public final class KeYImages {
        // Compute path to image in bundle.
        String path = null;
        if (FOLDER.equals(key)) {
-          path = "icons/folder16.gif";
+          path = "icons/folder16.png";
        }
        else if (FOLDER_PROVED.equals(key)) {
-          path = "icons/folderproved16.gif";
+          path = "icons/folderproved16.png";
        }
        else if (NODE.equals(key)) {
-          path = "icons/ekey-mono16.gif";
+          path = "icons/ekey-mono16.png";
        }
        else if (NODE_PROVED.equals(key)) {
-          path = "icons/keyproved16.gif";
+          path = "icons/keyproved16.png";
+       }
+       else if (NODE_INTERACTIVE.equals(key)) {
+          path = "icons/interactiveAppLogo16.png";
        }
        // Load image if possible
        if (path != null) {

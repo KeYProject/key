@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.gui.macros;
 
@@ -82,7 +82,7 @@ public interface ProofMacro {
     public String getDescription();
 
     /**
-     * Can apply this macro be applied?
+     * Can this macro be applied?
      * 
      * This method should not make any changes but check if the macro can be
      * applied or not in the given context.
@@ -127,7 +127,9 @@ public interface ProofMacro {
             ProverTaskListener listener) throws InterruptedException;
 
     /**
-     * Assigns a key shortcut to the macro (optional).
+     * Gets the keyboard shortcut to invoke the macro (optional).
+     * 
+     * @return null if no shortcut or the key stroke to invoke the macro.
      */
     public javax.swing.KeyStroke getKeyStroke();
 

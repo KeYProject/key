@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Symbolic Execution Debugger (SED) KeY Core Test
-Bundle-SymbolicName: org.key_project.sed.key.core.test
+Bundle-SymbolicName: org.key_project.sed.key.core.test;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.sed.key.core.test.Activator
 Require-Bundle: org.eclipse.ui,
@@ -11,7 +11,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.debug.ui;bundle-version="3.7.0",
  org.eclipse.jdt.core;bundle-version="3.7.0",
  org.eclipse.jdt.launching;bundle-version="3.6.1",
- org.eclipse.jdt.ui;bundle-version="3.7.0",
  org.junit4;bundle-version="4.8.1",
  org.eclipse.swtbot.go;bundle-version="2.0.4",
  org.key_project.util;bundle-version="1.0.0",
@@ -24,7 +23,11 @@ Require-Bundle: org.eclipse.ui,
  org.key_project.sed.core.test;bundle-version="1.0.0",
  org.key_project.sed.core;bundle-version="1.0.0",
  org.key_project.sed.ui.visualization;bundle-version="1.0.0",
- org.key_project.key4eclipse.starter.core.test;bundle-version="1.0.0"
+ org.key_project.key4eclipse.starter.core.test;bundle-version="1.0.0",
+ org.eclipse.jdt.ui;bundle-version="3.7.2",
+ org.eclipse.jdt.debug;bundle-version="3.7.1",
+ org.eclipse.jdt.debug.ui;bundle-version="3.6.1",
+ org.key_project.sed.ui;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project

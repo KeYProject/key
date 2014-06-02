@@ -3,15 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
-
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
@@ -21,26 +19,27 @@ import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.SwingWorker;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
+import javax.swing.SwingWorker;
 
 /**
- * This class extends the functionality of the {@link DefaultProblemLoader}.
- * It allows to do the loading process as {@link SwingWorker} {@link Thread}
- * and it opens the proof obligation browser it is not possible to instantiate
- * a proof configured by the opened file.
+ * This class extends the functionality of the {@link DefaultProblemLoader}. It
+ * allows to do the loading process as {@link SwingWorker3} {@link Thread} and
+ * it opens the proof obligation browser it is not possible to instantiate a
+ * proof configured by the opened file.
+ *
  * @author Martin Hentschel
  */
-public final class ProblemLoader extends DefaultProblemLoader implements Runnable {
-   private SwingWorker worker;
+public final class ProblemLoader extends DefaultProblemLoader {
    private ProverTaskListener ptl;
 
-   public ProblemLoader(File file, List<File> classPath, File bootClassPath, Profile profileOfNewProofs, KeYMediator mediator) {
+   public ProblemLoader(File file, List<File> classPath, File bootClassPath,
+                        Profile profileOfNewProofs, KeYMediator mediator) {
       super(file, classPath, bootClassPath, profileOfNewProofs, mediator);
    }
 
@@ -48,90 +47,100 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
       this.ptl = ptl;
    }
 
-   public void run() {
-      /*
-       * Invoking start() on the SwingWorker causes a new Thread to be created
-       * that will call construct(), and then finished(). Note that finished()
-       * is called even if the worker is interrupted because we catch the
-       * InterruptedException in doWork().
-       */
-      worker = new SwingWorker() {
-         private long time;
+   public void runSynchronously() {
+       getMediator().stopInterface(true);
+       fireTaskStarted();
 
-         @Override
-         public Object construct() {
-             time = System.currentTimeMillis();
-             Object res = doWork();
-             time = System.currentTimeMillis() - time;
-             return res;
-         }
+       final long currentTime = System.currentTimeMillis();
+       final Throwable message = doWork();
+       long runTime = System.currentTimeMillis() - currentTime;
 
-         @Override
-         public void finished() {
-             KeYMediator mediator = getMediator();
-             UserInterface ui = mediator.getUI();
-             if (getMediator().getUI().isSaveOnly()) {
-                 System.out.println("Saving completed.");
-                 System.exit(0);
-             }
-             getMediator().startInterface(true);
-             final Object msg = get();
-             if (ptl != null) {
-                 final TaskFinishedInfo tfi =
-                         new DefaultTaskFinishedInfo(ProblemLoader.this, msg, getProof(), time,
-                                 (getProof() != null ?
-                                         getProof().countNodes() : 0),
-                                         (getProof() != null ?
-                                                 getProof().countBranches()
-                                                 - getProof().openGoals().size() : 0));
-                 ptl.taskFinished(tfi);
-                 if (ui.macroChosen()) {
-                     ui.applyMacro();
-                 } else if (ptl instanceof UserInterface) {
-                     ((UserInterface)ptl).finish();
-                 }
-             }
-         }
-      };
-
-      getMediator().stopInterface(true);
-      if (ptl != null) {
-          ptl.taskStarted("Loading problem ...", 0);
-      }
-      worker.start();
+       fireTaskFinished(runTime, message);
+       reportException(message);
    }
 
    private Throwable doWork() {
-      Throwable status = null;
       try {
-         try {
-             if (getMediator().getUI().isSaveOnly()) {
-                 saveAll(true);
-             } else {
-                 status = load(true);
-             }
-         }
-         catch (ExceptionHandlerException e) {
-            // e.printStackTrace();
-            throw e;
-         }
-         catch (Throwable thr) {
-            getExceptionHandler().reportException(thr);
-            status = thr;
-         }
+          if (getMediator().getUI().isSaveOnly()) {
+              return saveAll();
+          } else {
+              return load();
+          }
+      } catch (final ExceptionHandlerException exception) {
+          final String errorMessage = "Failed to load "
+                  + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
+          getMediator().getUI().notify(new ExceptionFailureEvent(errorMessage, exception));
+          getMediator().getUI().reportStatus(this, errorMessage);
+          return exception;
+      } catch (final Throwable throwable) {
+          reportException(throwable);
+          return throwable;
       }
-      catch (ExceptionHandlerException ex) {
-         String errorMessage =
-                 "Failed to load " + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
-         getMediator().getUI().notify(new ExceptionFailureEvent(errorMessage, ex));
-         getMediator().getUI().reportStatus(this, errorMessage);
-         status = ex;
-      }
-      return status;
+   }
+
+   private void fireTaskStarted() {
+       if (ptl != null) {
+           ptl.taskStarted("Loading problem ...", 0);
+       }
+   }
+
+   private void fireTaskFinished(long runningTime, final Throwable message) {
+       if (ptl != null) {
+           final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, message,
+                   getProof(), runningTime, (getProof() != null ? getProof().countNodes() : 0),
+                   (getProof() != null ? getProof().countBranches() - getProof().openGoals().size() : 0));
+           final UserInterface ui = getMediator().getUI();
+           ptl.taskFinished(tfi);
+           if (ui.macroChosen()) {
+               ui.applyMacro();
+           } else if (ptl instanceof UserInterface) {
+               ((UserInterface)ptl).finish(getProof());
+           }
+       }
+   }
+
+   private void reportException(final Throwable message) {
+       if (message != null) {
+           getExceptionHandler().reportException(message);
+       }
    }
 
    public KeYExceptionHandler getExceptionHandler() {
        return getMediator().getExceptionHandler();
+   }
+
+   public void runAsynchronously() {
+       final SwingWorker<Throwable, Void> worker = new SwingWorker<Throwable, Void>() {
+
+           private long runTime;
+
+           @Override
+           protected Throwable doInBackground() throws Exception {
+               long currentTime = System.currentTimeMillis();
+               final Throwable message = doWork();
+               runTime = System.currentTimeMillis() - currentTime;
+               return message;
+           }
+
+           @Override
+           protected void done() {
+               getMediator().startInterface(true);
+               Throwable message = null;
+               try {
+                   message = get();                    
+               } catch (final Exception exception) {
+                   message = exception;
+                   getExceptionHandler().reportException(exception.getCause() != null ? 
+                           exception.getCause() : exception);
+               } finally {
+                   fireTaskFinished(runTime, message);
+               }
+           }
+       };
+
+       getMediator().stopInterface(true);
+       fireTaskStarted();
+       worker.execute();
    }
 
    @Override

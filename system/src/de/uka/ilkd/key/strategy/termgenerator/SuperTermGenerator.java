@@ -1,26 +1,26 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SortedOperator;
@@ -39,18 +39,18 @@ public abstract class SuperTermGenerator implements TermGenerator {
         this.cond = cond;
     }
     
-    public static TermGenerator upwards(TermFeature cond) {
+    public static TermGenerator upwards(TermFeature cond, final Services services) {
         return new SuperTermGenerator ( cond ) {
             protected Iterator<Term> createIterator(PosInOccurrence focus) {
-                return new UpwardsIterator ( focus );
+                return new UpwardsIterator ( focus, services );
             }
         };
     }
     
-    public static TermGenerator upwardsWithIndex(TermFeature cond) {
+    public static TermGenerator upwardsWithIndex(TermFeature cond, final Services services) {
         return new SuperTermWithIndexGenerator ( cond ) {
             protected Iterator<Term> createIterator(PosInOccurrence focus) {
-                return new UpwardsIterator ( focus );
+                return new UpwardsIterator ( focus, services );
             }
         };
     }
@@ -65,8 +65,8 @@ public abstract class SuperTermGenerator implements TermGenerator {
         return superterm;
     }
 
-    private boolean generateFurther(Term t) {
-        return ! ( cond.compute ( t ) instanceof TopRuleAppCost );
+    private boolean generateFurther(Term t, Services services) {
+        return ! ( cond.compute ( t, services ) instanceof TopRuleAppCost );
     }
 
     abstract static class SuperTermWithIndexGenerator extends SuperTermGenerator {
@@ -137,16 +137,19 @@ public abstract class SuperTermGenerator implements TermGenerator {
         }
 
         protected Term generateOneTerm(Term superterm, int child) {
-            final Term index = TermBuilder.DF.zTerm ( services, "" + child );
-            return TermBuilder.DF.tf().createTerm( binFunc, superterm, index );
+            final Term index = services.getTermBuilder().zTerm ( "" + child );
+            return services.getTermBuilder().tf().createTerm( binFunc, superterm, index );
         }
     }
     
     class UpwardsIterator implements Iterator<Term> {
         private PosInOccurrence currentPos;
+        
+        private final Services services;
 
-        private UpwardsIterator(PosInOccurrence startPos) {
+        private UpwardsIterator(PosInOccurrence startPos, Services services) {
             this.currentPos = startPos;
+            this.services = services;
         }
 
         public boolean hasNext() {
@@ -157,7 +160,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
             final int child = currentPos.getIndex ();
             currentPos = currentPos.up ();
             final Term res = generateOneTerm ( currentPos.subTerm (), child );
-            if ( !generateFurther ( res ) ) currentPos = null;
+            if ( !generateFurther ( res, services ) ) currentPos = null;
             return res;
         }
         

@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -47,6 +48,7 @@ import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.ContractPostOrExcPostExceptionVariableResult;
 
@@ -57,11 +59,14 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.ContractPos
 public class ExecutionOperationContract extends AbstractExecutionStateNode<SourceElement> implements IExecutionOperationContract {
    /**
     * Constructor.
+    * @param settings The {@link ITreeSettings} to use.
     * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
-   public ExecutionOperationContract(KeYMediator mediator, Node proofNode) {
-      super(mediator, proofNode);
+   public ExecutionOperationContract(ITreeSettings settings, 
+                                     KeYMediator mediator, 
+                                     Node proofNode) {
+      super(settings, mediator, proofNode);
    }
 
    /**
@@ -85,15 +90,17 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
             // Result variable not found in child, create a temporary variable to use in specification
             resultVar = UseOperationContractRule.computeResultVar(inst, getServices());
          }
-         resultTerm = TermBuilder.DF.var(resultVar);
+         resultTerm = getServices().getTermBuilder().var(resultVar);
       }
-      ContractPostOrExcPostExceptionVariableResult search = SymbolicExecutionUtil.serachContractPostOrExcPostExceptionVariable(getProofNode().child(0), getServices()); // Post branch
+      ContractPostOrExcPostExceptionVariableResult search =
+              SymbolicExecutionUtil.searchContractPostOrExcPostExceptionVariable(
+                      getProofNode().child(0), getServices()); // Post branch
       // Rename variables in contract to the current one
       List<LocationVariable> heapContext = HeapContext.getModHeaps(getServices(), inst.transaction);
       Map<LocationVariable,LocationVariable> atPreVars = UseOperationContractRule.computeAtPreVars(heapContext, getServices(), inst);
       Map<LocationVariable,Term> atPres = HeapContext.getAtPres(atPreVars, getServices());
       LocationVariable baseHeap = getServices().getTypeConverter().getHeapLDT().getHeap();
-      Term baseHeapTerm = TermBuilder.DF.getBaseHeap(getServices());
+      Term baseHeapTerm = getServices().getTermBuilder().getBaseHeap();
       
       Term contractSelf = null;
       if (contract.hasSelfVar()) {
@@ -124,22 +131,33 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
             }
          }
          else {
-            contractSelf = UseOperationContractRule.computeSelf(baseHeapTerm, atPres, baseHeap, inst, resultTerm);
+            contractSelf = UseOperationContractRule.computeSelf(baseHeapTerm, atPres, baseHeap, 
+                    inst, resultTerm, getServices().getTermFactory());
          }
       }
-      ImmutableList<Term> contractParams = UseOperationContractRule.computeParams(baseHeapTerm, atPres, baseHeap, inst);
+      ImmutableList<Term> contractParams = UseOperationContractRule.computeParams(baseHeapTerm, atPres, 
+              baseHeap, inst, getServices().getTermFactory());
       // Compute contract text
-      return FunctionalOperationContractImpl.getText(contract, 
-                                                     contractParams, 
-                                                     resultTerm, 
-                                                     contractSelf, 
-                                                     search.getExceptionEquality().sub(0), 
-                                                     baseHeap, 
-                                                     baseHeapTerm, 
-                                                     heapContext, 
-                                                     atPres, 
-                                                     false, 
-                                                     getServices());
+      synchronized (NotationInfo.class) {
+         boolean originalPrettySyntax = NotationInfo.PRETTY_SYNTAX;
+         try {
+            NotationInfo.PRETTY_SYNTAX = true;
+            return FunctionalOperationContractImpl.getText(contract, 
+                                                           contractParams, 
+                                                           resultTerm, 
+                                                           contractSelf, 
+                                                           search.getExceptionEquality().sub(0), 
+                                                           baseHeap, 
+                                                           baseHeapTerm, 
+                                                           heapContext, 
+                                                           atPres, 
+                                                           false, 
+                                                           getServices()).trim();
+         }
+         finally {
+            NotationInfo.PRETTY_SYNTAX = originalPrettySyntax;
+         }
+      }
    }
    
    /**
@@ -150,7 +168,7 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
     */
    protected static LocationVariable extractResultVariableFromPostBranch(Node node, Services services) {
       Term postModality = SymbolicExecutionUtil.posInOccurrenceInOtherNode(node, node.getAppliedRuleApp().posInOccurrence(), node.child(0));
-      postModality = TermBuilder.DF.goBelowUpdates(postModality);
+      postModality = TermBuilder.goBelowUpdates(postModality);
       MethodFrame mf = JavaTools.getInnermostMethodFrame(postModality.javaBlock(), services);
       SourceElement firstElement = NodeInfo.computeActiveStatement(mf.getFirstElement());
       if (!(firstElement instanceof CopyAssignment)) {

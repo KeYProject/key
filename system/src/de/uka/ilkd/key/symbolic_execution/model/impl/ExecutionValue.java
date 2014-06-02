@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -43,42 +43,42 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
    /**
     * The parent {@link IExecutionVariable} which provides this {@link IExecutionValue}.
     */
-   private ExecutionVariable variable;
+   private final ExecutionVariable variable;
    
    /**
     * Is the value unknown?
     */
-   private boolean valueUnknown;
+   private final boolean valueUnknown;
    
    /**
     * The value.
     */
-   private Term value;
+   private final Term value;
    
    /**
     * The value as human readable {@link String}.
     */
-   private String valueString;
+   private final String valueString;
    
    /**
     * The type of the value.
     */
-   private String typeString;
+   private final String typeString;
+
+   /**
+    * The condition under which the variable has this value.
+    */
+   private final Term condition;
+
+   /**
+    * The condition under which the variable has this value as human readable {@link String}.
+    */
+   private final String conditionString;
 
    /**
     * The child {@link IExecutionVariable}s.
     */
    private ExecutionVariable[] childVariables;
-
-   /**
-    * The condition under which the variable has this value.
-    */
-   private Term condition;
-
-   /**
-    * The condition under which the variable has this value as human readable {@link String}.
-    */
-   private String conditionString;
 
    /**
     * Constructor.
@@ -100,8 +100,7 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
                          String typeString,
                          Term condition,
                          String conditionString) {
-      super(mediator, proofNode);
-      assert variable != null;
+      super(variable.getSettings(), mediator, proofNode);
       this.variable = variable;
       this.valueUnknown = valueUnknown;
       this.value = value;

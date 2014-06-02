@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -30,6 +30,7 @@ import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.launch.KeYLaunchConfigurationDelegate;
 import org.key_project.sed.key.core.test.Activator;
+import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -67,7 +68,7 @@ public class SWTBotKeYLaunchConfigurationDelegateTest extends AbstractKeYDebugTa
          // Start launch
          outlineView.bot().tree().contextMenu("Debug As").menu("&1 Symbolic Execution Debugger (SED)").click();
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective();
+         TestUtilsUtil.confirmPerspectiveSwitch(bot, SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
@@ -78,7 +79,7 @@ public class SWTBotKeYLaunchConfigurationDelegateTest extends AbstractKeYDebugTa
          SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
          resume(bot, item, target);
          // Make sure that correct tree is created
-         assertDebugTargetViaOracle(target, "data/methodPartPOTest/oracle/MethodPartPOTest_methodName.xml", false, false);
+         assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/methodPartPOTest/oracle/MethodPartPOTest_methodName.xml", false, false);
       }
       finally {
          // Restore timeout
@@ -216,7 +217,7 @@ public class SWTBotKeYLaunchConfigurationDelegateTest extends AbstractKeYDebugTa
          SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
          resume(bot, item, target);
          // Make sure that correct tree is created
-         assertDebugTargetViaOracle(target, expectedModelPathInBundle, false, false);
+         assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false);
       }
       finally {
          // Restore timeout

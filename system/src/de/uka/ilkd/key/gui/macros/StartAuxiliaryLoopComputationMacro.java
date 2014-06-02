@@ -138,7 +138,7 @@ public class StartAuxiliaryLoopComputationMacro implements ExtendedProofMacro {
                                        proof.getServices());
         ProblemInitializer pi =
                 new ProblemInitializer(mediator.getUI(),
-                                       mediator.getServices(), true,
+                                       mediator.getServices(),
                                        mediator.getUI());
         try {
             Proof p = pi.startProver(initConfig, loopInvExecPO, 0);

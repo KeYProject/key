@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -57,7 +57,7 @@ public class SWTBotKeyInteractiveMainTest extends AbstractSetupTestCase {
       try {
          // Create project and fill it with test data
          IProject project = TestUtilsUtil.createProject("SWTBotInteractiveKeyMainTest_testDisconnectingConnection");
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/quicktour/paycard", project);
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/quicktour/test/paycard", project);
          // Open connection
          File location = ResourceUtil.getLocation(project); 
          TestCase.assertNotNull(location);
@@ -104,7 +104,7 @@ public class SWTBotKeyInteractiveMainTest extends AbstractSetupTestCase {
       try {
          // Create project and fill it with test data
          IProject project = TestUtilsUtil.createProject("SWTBotInteractiveKeyMainTest_testClosingEvent");
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/quicktour/paycard", project);
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/quicktour/test/paycard", project);
          // Open connection
          File location = ResourceUtil.getLocation(project); 
          TestCase.assertNotNull(location);

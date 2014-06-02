@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -38,7 +38,7 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
    /**
     * The {@link IExecutionLoopCondition} to represent by this debug node.
     */
-   private IExecutionLoopCondition executionNode;
+   private final IExecutionLoopCondition executionNode;
 
    /**
     * The contained children.
@@ -75,10 +75,11 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
    public KeYLoopCondition(KeYDebugTarget target, 
                            IKeYSEDDebugNode<?> parent, 
                            ISEDThread thread, 
-                           IExecutionLoopCondition executionNode) {
+                           IExecutionLoopCondition executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
    
    /**
@@ -213,7 +214,7 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
    public boolean hasVariables() throws DebugException {
       try {
          return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
-                SymbolicExecutionUtil.canComputeVariables(executionNode) &&
+                SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
                 super.hasVariables();
       }
       catch (ProofInputException e) {

@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -19,12 +19,11 @@ import java.util.List;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -32,6 +31,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * @author Martin Hentschel
  */
 public class ExecutionBranchCondition extends AbstractExecutionNode implements IExecutionBranchCondition {
+   /**
+    * The optional additional branch label.
+    */
+   private final String additionalBranchLabel;
+   
    /**
     * The {@link Term} which represents the branch condition.
     */
@@ -61,20 +65,19 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     * Contains the merged branch conditions.
     */
    private Term[] mergedBranchCondtions;
-
-   /**
-    * The optional additional branch label.
-    */
-   private String additionalBranchLabel;
    
    /**
     * Constructor.
+    * @param settings The {@link ITreeSettings} to use.
     * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param additionalBranchLabel The optional additional branch label.
     */
-   public ExecutionBranchCondition(KeYMediator mediator, Node proofNode, String additionalBranchLabel) {
-      super(mediator, proofNode);
+   public ExecutionBranchCondition(ITreeSettings settings, 
+                                   KeYMediator mediator, 
+                                   Node proofNode, 
+                                   String additionalBranchLabel) {
+      super(settings, mediator, proofNode);
       this.additionalBranchLabel = additionalBranchLabel;
    }
 
@@ -133,17 +136,16 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
       // Compute branch condition
       if (isMergedBranchCondition()) {
          // Add all merged branch conditions
-         branchCondition = TermBuilder.DF.and(getMergedBranchCondtions());
+         branchCondition = getServices().getTermBuilder().and(getMergedBranchCondtions());
          // Simplify merged branch conditions
          branchCondition = SymbolicExecutionUtil.simplify(getProof(), branchCondition);
          branchCondition = SymbolicExecutionUtil.improveReadability(branchCondition, getServices());
       }
       else {
-         branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true, true);
+         branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true);
       }
       // Format branch condition
-      StringBuffer sb = ProofSaver.printTerm(branchCondition, getServices(), true);
-      formatedBranchCondition = sb.toString();
+      formatedBranchCondition = formatTerm(branchCondition);
    }
 
    /**
@@ -188,16 +190,15 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
          parentPath = getParent().getPathCondition();
       }
       else {
-         parentPath = TermBuilder.DF.tt();
+         parentPath = getServices().getTermBuilder().tt();
       }
       // Add current branch condition to path
-      pathCondition = TermBuilder.DF.and(parentPath, getBranchCondition());
+      pathCondition = getServices().getTermBuilder().and(parentPath, getBranchCondition());
       // Simplify path condition
       pathCondition = SymbolicExecutionUtil.simplify(getProof(), pathCondition);
       pathCondition = SymbolicExecutionUtil.improveReadability(pathCondition, getServices());
       // Format path condition
-      StringBuffer sb = ProofSaver.printTerm(pathCondition, getServices(), true);
-      formatedPathCondition = sb.toString();
+      formatedPathCondition = formatTerm(pathCondition);
    }
 
    /**
@@ -241,7 +242,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
          Term[] result = new Term[mergedProofNodes.size()];
          Iterator<Node> iter = mergedProofNodes.iterator();
          for (int i = 0; i < result.length; i++) {
-            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), true, true);
+            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), true);
          }
          return result;
       }

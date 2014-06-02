@@ -16,7 +16,13 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
-Export-Package: org.key_project.sed.ui.perspective,
+Export-Package: org.key_project.sed.ui.action,
+ org.key_project.sed.ui.composite,
+ org.key_project.sed.ui.edit,
+ org.key_project.sed.ui.perspective,
  org.key_project.sed.ui.presentation,
  org.key_project.sed.ui.property,
- org.key_project.sed.ui.util
+ org.key_project.sed.ui.provider,
+ org.key_project.sed.ui.util,
+ org.key_project.sed.ui.wizard,
+ org.key_project.sed.ui.wizard.page

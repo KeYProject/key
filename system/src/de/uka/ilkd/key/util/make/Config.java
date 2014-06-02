@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 /** this class parses in a config file that has to use the following grammar:
  *  S -> (IDENTIFIER ':'  (alles ausser ';')* ';')* 
@@ -21,10 +20,15 @@
 
 package de.uka.ilkd.key.util.make;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public class Config {
@@ -46,7 +50,7 @@ public class Config {
     public static final String SIMPLIFY_PATH_KEY = "[SimplifyPath]";
 
     
-    static HashMap<String,StringBuffer> map = new LinkedHashMap<String,StringBuffer>();
+    static Map<String,StringBuffer> map = new LinkedHashMap<String,StringBuffer>();
 
     /** loads a resource and returns its URL 
      * @param cl the Class used to determine the resource 
@@ -94,8 +98,7 @@ public class Config {
     }
     
     private static int readIdentifier(FileReader fr) {
-	StringBuffer identifier = new StringBuffer();	
-	identifier = readUntil(fr,'[');
+	StringBuffer identifier = readUntil(fr,'[');
 	if (identifier.length()==0) return -1;
 	if (identifier.length()==0) {
 	    throw new RuntimeException("IDENTIFIER EXPECTED.");
@@ -103,11 +106,8 @@ public class Config {
 	StringBuffer path = new StringBuffer();
 	path = readUntil(fr,']');
 
-	StringBuffer result = map.get(identifier.toString());
 	if (map.get(identifier.toString()) == null) {
 	    map.put(identifier.toString(), path);
-	} else {
-	    result.append(File.pathSeparator+path);
 	}
 	return 0;
     }

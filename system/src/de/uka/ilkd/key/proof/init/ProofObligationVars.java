@@ -10,12 +10,12 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -43,12 +43,15 @@ public class ProofObligationVars {
      */
     public final String postfix;
 
+    private final TermBuilder tb;
+
 
     public ProofObligationVars(IProgramMethod pm,
                                KeYJavaType kjt,
                                Services services) {
         this.pre = StateVars.buildMethodContractPreVars(pm, kjt, services);
         this.post = StateVars.buildMethodContractPostVars(this.pre, pm, kjt, services);
+        this.tb = services.getTermBuilder();
         this.exceptionParameter = buildExceptionParameter(services);
         this.formalParams = buildFormalParamVars(services);
         this.postfix = "";
@@ -60,6 +63,7 @@ public class ProofObligationVars {
                                Services services) {
         this.pre = StateVars.buildInfFlowPreVars(orig.pre, postfix, services);
         this.post = StateVars.buildInfFlowPostVars(orig.pre, orig.post, pre, postfix, services);
+        this.tb = services.getTermBuilder();
         this.exceptionParameter = buildExceptionParameter(services);
         this.formalParams = orig.formalParams != null ?
                             buildFormalParamVars(services) : null;
@@ -70,12 +74,27 @@ public class ProofObligationVars {
     public ProofObligationVars(StateVars pre,
                                StateVars post,
                                Term exceptionParameter,
-                               ImmutableList<Term> formalParams) {
+                               ImmutableList<Term> formalParams,
+                               Services services) {
         this.pre = pre;
         this.post = post;
         this.exceptionParameter = exceptionParameter;
         this.formalParams = formalParams;
         this.postfix = "";
+        this.tb = services.getTermBuilder();
+    }
+
+    public ProofObligationVars(StateVars pre,
+                               StateVars post,
+                               Term exceptionParameter,
+                               ImmutableList<Term> formalParams,
+                               TermBuilder tb) {
+        this.pre = pre;
+        this.post = post;
+        this.exceptionParameter = exceptionParameter;
+        this.formalParams = formalParams;
+        this.postfix = "";
+        this.tb = tb;
     }
 
     public ProofObligationVars(StateVars pre,
@@ -84,6 +103,7 @@ public class ProofObligationVars {
         this.pre = pre;
         this.post = post;
         this.postfix = "";
+        this.tb = services.getTermBuilder();
         this.exceptionParameter = buildExceptionParameter(services);
         // formal parameters are need only for proof obligations
         // of methods
@@ -91,19 +111,18 @@ public class ProofObligationVars {
     }
 
     public ProofObligationVars labelHeapAtPreAsAnonHeapFunc() {
-            final TermBuilder TB = TermBuilder.DF;
         if (pre.heap.op() instanceof Function &&
-            !pre.heap.containsLabel(AnonHeapTermLabel.INSTANCE)) {
-            ImmutableArray<ITermLabel> labels = pre.heap.getLabels();
-            ITermLabel[] newLabels = new ITermLabel[labels.size()+1];
+            !pre.heap.containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL)) {
+            ImmutableArray<TermLabel> labels = pre.heap.getLabels();
+            TermLabel[] newLabels = new TermLabel[labels.size()+1];
             labels.toArray(newLabels);
-            newLabels[labels.size()] = AnonHeapTermLabel.INSTANCE;
+            newLabels[labels.size()] = ParameterlessTermLabel.ANON_HEAP_LABEL;
             StateVars newPre = new StateVars(pre.self, pre.guard,
                                              pre.localVars, pre.result,
                                              pre.exception,
-                                             TB.label(pre.heap, new ImmutableArray<ITermLabel>(newLabels)),
+                                             tb.label(pre.heap, new ImmutableArray<TermLabel>(newLabels)),
                                              pre.mbyAtPre);
-            return new ProofObligationVars(newPre, post, exceptionParameter, formalParams);
+            return new ProofObligationVars(newPre, post, exceptionParameter, formalParams, tb);
         } else {
             return this;
         }
@@ -120,7 +139,7 @@ public class ProofObligationVars {
         final KeYJavaType eType =
             javaInfo.getTypeByClassName("java.lang.Exception");
         final ProgramElementName ePEN = new ProgramElementName("e");
-        return TermBuilder.DF.var(new LocationVariable(ePEN, eType));
+        return tb.var(new LocationVariable(ePEN, eType));
     }
 
     /**
@@ -137,7 +156,7 @@ public class ProofObligationVars {
             LocationVariable formalParamVar =
                     new LocationVariable(pen, paramVar.getKeYJavaType());
             register(formalParamVar, services);
-            Term formalParam = TermBuilder.DF.var(formalParamVar);
+            Term formalParam = tb.var(formalParamVar);
             formalParamVars = formalParamVars.append(formalParam);
         }
         return formalParamVars;

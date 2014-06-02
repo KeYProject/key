@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.gui.prooftree;
 
@@ -19,14 +18,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -84,11 +76,13 @@ import de.uka.ilkd.key.util.Debug;
 public class ProofTreeView extends JPanel {
 
     private static final long serialVersionUID = 3732875161168302809L;
-    private static final Color PASTEL_COLOR = new Color(255,255,204);
     private static final Color GRAY_COLOR = Color.DARK_GRAY;
     private static final Color BISQUE_COLOR = new Color(240,228,196);
-    private static final Color PALE_RED_COLOR = new Color(255,153,153);
-    private static final Color LIGHT_BLUE_COLOR = new Color(230,230,255);
+    private static final Color LIGHT_BLUE_COLOR = new Color(230,254,255);
+    private static final Color DARK_BLUE_COLOR = new Color(31,77,153);
+    private static final Color DARK_GREEN_COLOR = new Color(0,128,51);
+    private static final Color DARK_RED_COLOR = new Color(191,0,0);
+    private static final Color ORANGE_COLOR = new Color(255,140,0);
 
     /** the mediator is stored here */
     private KeYMediator mediator;
@@ -163,8 +157,8 @@ public class ProofTreeView extends JPanel {
 
         delegateView.setUI(new CacheLessMetalTreeUI());
 
-        delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.CTRL_MASK));
-        delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ActionEvent.CTRL_MASK));
+        delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_MASK));
+        delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_MASK));
 
 
 	delegateView.setInvokesStopCellEditing(true);
@@ -718,18 +712,18 @@ public class ProofTreeView extends JPanel {
 	    if (node.leaf()) {
 		Goal goal = proof.getGoal(node);
 		if ( goal == null || node.isClosed() ) {
-		    tree_cell.setForeground(Color.green);
+		    tree_cell.setForeground(DARK_GREEN_COLOR);
 		    tree_cell.setIcon(IconFactory.keyHoleClosed(20,20));
 		    ProofTreeView.this.setToolTipText("Closed Goal");
 		    tree_cell.setToolTipText("A closed goal");
 		} else {
 		    if ( !goal.isAutomatic() ) {
-		        tree_cell.setForeground(Color.orange);
+		        tree_cell.setForeground(ORANGE_COLOR);
 		        tree_cell.setIcon(IconFactory.keyHoleInteractive(20, 20));
 		        ProofTreeView.this.setToolTipText("Disabled Goal");
 		        tree_cell.setToolTipText("Interactive goal - no automatic rule application");
 		    } else {
-			tree_cell.setForeground(new Color(250, 90, 90));
+			tree_cell.setForeground(DARK_RED_COLOR);
 			tree_cell.setIcon(keyHole20x20);
 			ProofTreeView.this.setToolTipText("Open Goal");
 			tree_cell.setToolTipText("An open goal");
@@ -766,7 +760,7 @@ public class ProofTreeView extends JPanel {
 	    }
 
 	    if (node.getNodeInfo().getNotes() != null) {
-	        tree_cell.setBackgroundNonSelectionColor(Color.yellow);
+	        tree_cell.setBackgroundNonSelectionColor(ORANGE_COLOR);
 	    } else
             if (node.getNodeInfo().getActiveStatement() != null ) {
                 tree_cell.setBackgroundNonSelectionColor(LIGHT_BLUE_COLOR);
@@ -774,7 +768,7 @@ public class ProofTreeView extends JPanel {
             } else {
                 tree_cell.setBackgroundNonSelectionColor(Color.white);
             }
-	    if (sel) tree_cell.setBackground(Color.blue);
+	    if (sel) tree_cell.setBackground(DARK_BLUE_COLOR);
 
 	    tree_cell.setFont(tree.getFont());
 	    tree_cell.setText(nodeText);
@@ -786,26 +780,27 @@ public class ProofTreeView extends JPanel {
     class ProofTreePopupMenu extends JPopupMenu
 	implements ActionListener, ItemListener {
 
+        private static final int ICON_SIZE = 16;
         private static final long serialVersionUID = -8905927848074190941L;
-    private JMenuItem expandAll   = new JMenuItem("Expand All");
+        private JMenuItem expandAll   = new JMenuItem("Expand All", IconFactory.plus(ICON_SIZE));
 	private JMenuItem expandAllBelow   = new JMenuItem("Expand All Below");
-	private JMenuItem expandGoals = new JMenuItem("Expand Goals Only");
+	private JMenuItem expandGoals = new JMenuItem("Expand Goals Only", IconFactory.expandGoals(ICON_SIZE));
 	private JMenuItem expandGoalsBelow =
 		new JMenuItem("Expand Goals Only Below");
-	private JMenuItem collapseAll = new JMenuItem("Collapse All");
+	private JMenuItem collapseAll = new JMenuItem("Collapse All", IconFactory.minus(ICON_SIZE));
 	private JMenuItem collapseOtherBranches =
 		new JMenuItem("Collapse Other Branches");
 	private JMenuItem collapseBelow = new JMenuItem("Collapse Below");
-	private JMenuItem prevSibling = new JMenuItem("Previous Sibling");
-	private JMenuItem nextSibling = new JMenuItem("Next Sibling");
-	private Map<JCheckBoxMenuItem, ProofTreeViewFilter> filters = 
+	private JMenuItem prevSibling = new JMenuItem("Previous Sibling", IconFactory.previous(ICON_SIZE));
+	private JMenuItem nextSibling = new JMenuItem("Next Sibling", IconFactory.next(ICON_SIZE));
+	private Map<JCheckBoxMenuItem, ProofTreeViewFilter> filters =
 		new LinkedHashMap<JCheckBoxMenuItem, ProofTreeViewFilter> (); // TODO: change to radio button ?
 	private JMenuItem notes = new JMenuItem("Edit Notes");
-	private JMenuItem search = new JMenuItem("Search");
+	private JMenuItem search = new JMenuItem("Search", IconFactory.search2(ICON_SIZE));
 	private JMenuItem prune    = new JMenuItem("Prune Proof");
 	private JMenuItem delayedCut = new JMenuItem("Delayed Cut");
 	private JMenuItem runStrategy = new JMenuItem("Apply Strategy",
-	    IconFactory.autoModeStartLogo(10));
+	    IconFactory.autoModeStartLogo(ICON_SIZE));
 
 	private TreePath path;
 	private TreePath branch;
@@ -843,7 +838,7 @@ public class ProofTreeView extends JPanel {
 	    this.add(prune);
 	    if (branch != path) {
 		prune.addActionListener(this);
-		prune.setIcon(IconFactory.pruneLogo(16));
+		prune.setIcon(IconFactory.pruneLogo(ICON_SIZE));
 		prune.setEnabled(false);
 		if (proof != null) {
 		    if (proof.isGoal(invokedNode) ||
@@ -869,7 +864,7 @@ public class ProofTreeView extends JPanel {
 	    // modifying the node
         this.add(new JSeparator());
         this.add(notes);
-        notes.setIcon(IconFactory.editFile(20));
+        notes.setIcon(IconFactory.editFile(ICON_SIZE));
         notes.addActionListener(this);
 
 	    // modifying the view
@@ -894,14 +889,14 @@ public class ProofTreeView extends JPanel {
 	    prevSibling.addActionListener(this);
 	    this.add(nextSibling);
 	    nextSibling.addActionListener(this);
-        
+
 	    this.add(new JSeparator());
         for (ProofTreeViewFilter filter: ProofTreeViewFilter.ALL) {
-        	final JCheckBoxMenuItem m = new JCheckBoxMenuItem(filter.name());
-        	filters.put(m, filter);
-        	this.add(m);
-        	m.setSelected(filter.isActive());
-        	m.addItemListener(this);
+            final JCheckBoxMenuItem m = new JCheckBoxMenuItem(filter.name());
+            filters.put(m, filter);
+            this.add(m);
+            m.setSelected(filter.isActive());
+            m.addItemListener(this);
         }
 	    this.add(search);
 	    search.addActionListener(this);
@@ -1148,10 +1143,10 @@ public class ProofTreeView extends JPanel {
 		final Object source = e.getSource();
 		final ProofTreeViewFilter filter = filters.get(source);
 		if (filter==null) return;
-		
+
 		if (!filter.global()) {
 			delegateModel.setFilter(filter, selected);
-			
+
 			// enable / disable others
 			// TODO: change to radio button and remove this
 			for (JCheckBoxMenuItem item: filters.keySet()) {

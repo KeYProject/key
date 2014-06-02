@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -45,7 +45,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofVisitor;
@@ -71,6 +70,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionOperationContract;
+import de.uka.ilkd.key.symbolic_execution.model.impl.TreeSettings;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -199,10 +199,9 @@ public class SymbolicExecutionTreeBuilder {
    private IProgramVariable exceptionVariable;
    
    /**
-    * {@code true} merge branch conditions which means that a branch condition never contains another branch condition
-    * or {@code false} allow that branch conditions contains branch conditions.
+    * The {@link TreeSettings} to use.
     */
-   private boolean mergeBranchConditions = false;
+   private final TreeSettings settings;
 
    /**
     * Constructor.
@@ -211,14 +210,15 @@ public class SymbolicExecutionTreeBuilder {
     */
    public SymbolicExecutionTreeBuilder(KeYMediator mediator, 
                                        Proof proof,
-                                       boolean mergeBranchConditions) {
+                                       boolean mergeBranchConditions,
+                                       boolean usePrettyPrinting) {
       assert mediator != null;
       assert proof != null;
       this.mediator = mediator;
       this.proof = proof;
-      this.mergeBranchConditions = mergeBranchConditions;
+      this.settings = new TreeSettings(mergeBranchConditions, usePrettyPrinting);
       this.exceptionVariable = SymbolicExecutionUtil.extractExceptionVariable(proof);
-      this.startNode = new ExecutionStart(mediator, proof.root());
+      this.startNode = new ExecutionStart(settings, mediator, proof.root());
       this.keyNodeMapping.put(proof.root(), this.startNode);
       initMethodCallStack(proof.root(), proof.getServices());
    }
@@ -490,7 +490,7 @@ public class SymbolicExecutionTreeBuilder {
          // Check if the current node has branch conditions which should be added to the execution tree model
          if (!(parentToAddTo instanceof IExecutionStart) && // Ignore branch conditions before starting with code execution
              hasBranchCondition(visitedNode)) {
-            NodeIterator iter = visitedNode.childrenIterator();
+             Iterator<Node> iter = visitedNode.childrenIterator();
             while (iter.hasNext()) {
                Node childNode = iter.next();
                if (!keyNodeBranchConditionMapping.containsKey(childNode)) {
@@ -500,7 +500,7 @@ public class SymbolicExecutionTreeBuilder {
                      if (visitedNode.getAppliedRuleApp().rule() instanceof BuiltInRule) {
                         additionalBranchLabel = childNode.getNodeInfo().getBranchLabel();
                      }
-                     ExecutionBranchCondition condition = new ExecutionBranchCondition(mediator, childNode, additionalBranchLabel);
+                     ExecutionBranchCondition condition = new ExecutionBranchCondition(settings, mediator, childNode, additionalBranchLabel);
                      // Add branch condition to the branch condition attributes for later adding to the proof tree. This is required for instance to filter out branches after the symbolic execution has finished.
                      List<ExecutionBranchCondition> list = parentToBranchConditionMapping.get(parentToAddTo);
                      if (list == null) {
@@ -535,7 +535,7 @@ public class SymbolicExecutionTreeBuilder {
              for (ExecutionBranchCondition condition : entry.getValue()) {
                 AbstractExecutionNode[] conditionsChildren = condition.getChildren(); 
                 if (!JavaUtil.isEmpty(conditionsChildren)) {
-                   if (mergeBranchConditions) {
+                   if (settings.isMergeBranchConditions()) {
                       // Merge branch conditions if possible
                       boolean addingToParentRequired = false;
                       for (AbstractExecutionNode child : conditionsChildren) {
@@ -610,7 +610,7 @@ public class SymbolicExecutionTreeBuilder {
                 !SymbolicExecutionUtil.isForLoopCondition(node, statement)) { // do while and for loops exists only in the first iteration where the loop condition is not evaluated. They are transfered into while loops in later proof nodes. 
                ExecutionLoopCondition condition = keyNodeLoopConditionMapping.get(node);
                if (condition == null) {
-                  condition = new ExecutionLoopCondition(mediator, node);
+                  condition = new ExecutionLoopCondition(settings, mediator, node);
                   addChild(parentToAddTo, condition);
                   keyNodeLoopConditionMapping.put(node, condition);
                   // Set call stack on new created node
@@ -687,46 +687,46 @@ public class SymbolicExecutionTreeBuilder {
             PositionInfo posInfo = statement.getPositionInfo();
             // Determine the node representation and create it if one is available
             if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement)) {
-               result = new ExecutionMethodCall(mediator, node);
+               result = new ExecutionMethodCall(settings, mediator, node);
             }
             else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp())) {
                if (!SymbolicExecutionUtil.hasLoopBodyLabel(node.getAppliedRuleApp())) {
-                  result = new ExecutionTermination(mediator, node, exceptionVariable, null);
+                  result = new ExecutionTermination(settings, mediator, node, exceptionVariable, null);
                }
             }
             else if (SymbolicExecutionUtil.isBranchStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
                if (isNotInImpliciteMethod(node)) {
-                  result = new ExecutionBranchStatement(mediator, node);
+                  result = new ExecutionBranchStatement(settings, mediator, node);
                }
             }
             else if (SymbolicExecutionUtil.isLoopStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
                if (isNotInImpliciteMethod(node)) {
                   if (SymbolicExecutionUtil.isFirstLoopIteration(node, node.getAppliedRuleApp(), statement)) {
-                     result = new ExecutionLoopStatement(mediator, node);
+                     result = new ExecutionLoopStatement(settings, mediator, node);
                   }
                }
             }
             else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
                if (isNotInImpliciteMethod(node)) {
-                  result = new ExecutionStatement(mediator, node);
+                  result = new ExecutionStatement(settings, mediator, node);
                }
             }
          }
          else if (SymbolicExecutionUtil.isOperationContract(node, node.getAppliedRuleApp())) {
             if (isNotInImpliciteMethod(node)) {
-               result = new ExecutionOperationContract(mediator, node);
+               result = new ExecutionOperationContract(settings, mediator, node);
             }
          }
          else if (SymbolicExecutionUtil.isLoopInvariant(node, node.getAppliedRuleApp())) {
             if (isNotInImpliciteMethod(node)) {
-               result = new ExecutionLoopInvariant(mediator, node);
+               result = new ExecutionLoopInvariant(settings, mediator, node);
                // Initialize new call stack of the preserves loop invariant branch
                initNewLoopBodyMethodCallStack(node);
             }
          }
       }
       else if (SymbolicExecutionUtil.isLoopBodyTermination(node, node.getAppliedRuleApp())) {
-         result = new ExecutionTermination(mediator, node, exceptionVariable, TerminationKind.LOOP_BODY);
+         result = new ExecutionTermination(settings, mediator, node, exceptionVariable, TerminationKind.LOOP_BODY);
       }
       return result;
    }
@@ -747,7 +747,7 @@ public class SymbolicExecutionTreeBuilder {
                      // Find the call Node representation in SED, if not available ignore it.
                      IExecutionNode callSEDNode = keyNodeMapping.get(callNode);
                      if (callSEDNode instanceof IExecutionMethodCall) { // Could be the start node if the initial sequent already contains some method frames.
-                        result = new ExecutionMethodReturn(mediator, node, (IExecutionMethodCall)callSEDNode);
+                        result = new ExecutionMethodReturn(settings, mediator, node, (IExecutionMethodCall)callSEDNode);
                      }
                   }
                }
@@ -759,7 +759,7 @@ public class SymbolicExecutionTreeBuilder {
    
    protected boolean isNotInImpliciteMethod(Node node) {
       Term term = node.getAppliedRuleApp().posInOccurrence().subTerm();
-      term = TermBuilder.DF.goBelowUpdates(term);
+      term = TermBuilder.goBelowUpdates(term);
       Services services = proof.getServices();
       IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), services);
       IProgramMethod pm = ec.getMethodContext();
@@ -782,7 +782,7 @@ public class SymbolicExecutionTreeBuilder {
       MethodFrameCounterJavaASTVisitor newCounter = new MethodFrameCounterJavaASTVisitor(jb.program(), proof.getServices());
       int newCount = newCounter.run();
       Term oldModality = node.getAppliedRuleApp().posInOccurrence().subTerm();
-      oldModality = TermBuilder.DF.goBelowUpdates(oldModality);
+      oldModality = TermBuilder.goBelowUpdates(oldModality);
       MethodFrameCounterJavaASTVisitor oldCounter = new MethodFrameCounterJavaASTVisitor(oldModality.javaBlock().program(), proof.getServices());
       int oldCount = oldCounter.run();
       LinkedList<Node> currentMethodCallStack = getMethodCallStack(node.getAppliedRuleApp());
@@ -860,7 +860,8 @@ public class SymbolicExecutionTreeBuilder {
             Node stackEntry = stackIter.next();
             if (stackEntry != proof.root()) { // Ignore call stack entries provided by the initial sequent
                IExecutionNode executionNode = getExecutionNode(stackEntry);
-               assert executionNode != null : "Can't find execution node for KeY's proof node " + stackEntry.serialNr() + ": " + ProofSaver.printAnything(stackEntry, proof.getServices()) + ".";
+               assert executionNode != null :
+                   "Can't find execution node for KeY's proof node " + stackEntry.serialNr() + ": " + ProofSaver.printAnything(stackEntry, proof.getServices()) + ".";
                callStack.add(executionNode);
             }
          }
@@ -907,7 +908,7 @@ public class SymbolicExecutionTreeBuilder {
    protected boolean hasBranchCondition(Node node) {
       if (node.childrenCount() >= 2) { // Check if it is a possible branch statement, otherwise there is no need for complex computation to filter out not relevant branches
          int openChildrenCount = 0;
-         NodeIterator childIter = node.childrenIterator();
+         Iterator<Node> childIter = node.childrenIterator();
          while (childIter.hasNext()) {
             Node child = childIter.next();
             // Make sure that the branch is not closed

@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -27,7 +27,6 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -41,7 +40,9 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 import de.uka.ilkd.key.util.MiscTools;
@@ -54,7 +55,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
    /**
     * The {@link IExecutionMethodCall} which is now returned.
     */
-   private IExecutionMethodCall methodCall;
+   private final IExecutionMethodCall methodCall;
    
    /**
     * The node name including the return value.
@@ -68,12 +69,16 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
    
    /**
     * Constructor.
+    * @param settings The {@link ITreeSettings} to use.
     * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param methodCall The {@link IExecutionMethodCall} which is now returned.
     */
-   public ExecutionMethodReturn(KeYMediator mediator, Node proofNode, IExecutionMethodCall methodCall) {
-      super(mediator, proofNode);
+   public ExecutionMethodReturn(ITreeSettings settings,
+                                KeYMediator mediator, 
+                                Node proofNode, 
+                                IExecutionMethodCall methodCall) {
+      super(settings, mediator, proofNode);
       assert methodCall != null;
       this.methodCall = methodCall;
    }
@@ -171,7 +176,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
       if (resultVar == null) {
          IProgramMethod pm = mbs.getProgramMethod(getServices());
          if (!pm.isVoid()) {
-            resultVar = new LocationVariable(new ProgramElementName(TermBuilder.DF.newName(getServices(), "TmpResultVar")), pm.getReturnType());
+            resultVar = new LocationVariable(new ProgramElementName(getServices().getTermBuilder().newName("TmpResultVar")), pm.getReturnType());
          }
       }
       if (resultVar != null) {
@@ -186,22 +191,27 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                                                                                                               methodReturnNode,
                                                                                                               getProofNode(),
                                                                                                               resultVar);
-            ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), input.getSequentToProve(), StrategyProperties.SPLITTING_NORMAL);
+            ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
+                                                                                input.getSequentToProve(), 
+                                                                                StrategyProperties.METHOD_NONE,
+                                                                                StrategyProperties.LOOP_NONE,
+                                                                                StrategyProperties.QUERY_OFF,
+                                                                                StrategyProperties.SPLITTING_NORMAL);
             try {
                if (info.getProof().openGoals().size() == 1) {
                   Goal goal = info.getProof().openGoals().head();
-                  Term returnValue = SymbolicExecutionUtil.extractOperatorValue(goal, input.getOperator());
+                  Term returnValue = SideProofUtil.extractOperatorValue(goal, input.getOperator());
                   assert returnValue != null;
-                  returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), returnValue);
-                  return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getMediator(), getProofNode(), returnValue, null)};
+                  returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), returnValue, getServices());
+                  return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), returnValue, null)};
                }
                else {
                   // Group equal values of different branches
                   Map<Term, List<Node>> valueNodeMap = new LinkedHashMap<Term, List<Node>>();
                   for (Goal goal : info.getProof().openGoals()) {
-                     Term returnValue = SymbolicExecutionUtil.extractOperatorValue(goal, input.getOperator());
+                     Term returnValue = SideProofUtil.extractOperatorValue(goal, input.getOperator());
                      assert returnValue != null;
-                     returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.node().sequent(), returnValue);
+                     returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.node().sequent(), returnValue, getServices());
                      List<Node> nodeList = valueNodeMap.get(returnValue);
                      if (nodeList == null) {
                         nodeList = new LinkedList<Node>();
@@ -212,7 +222,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                   // Create result
                   if (valueNodeMap.size() == 1) {
                      Term returnValue = valueNodeMap.keySet().iterator().next();
-                     return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getMediator(), getProofNode(), returnValue, null)};
+                     return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), returnValue, null)};
                   }
                   else {
                      IExecutionMethodReturnValue[] result = new IExecutionMethodReturnValue[valueNodeMap.size()];
@@ -220,13 +230,13 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                      for (Entry<Term, List<Node>> entry : valueNodeMap.entrySet()) {
                         List<Term> conditions = new LinkedList<Term>();
                         for (Node node : entry.getValue()) {
-                           Term condition = SymbolicExecutionUtil.computePathCondition(node, false, false);
+                           Term condition = SymbolicExecutionUtil.computePathCondition(node, false);
                            conditions.add(condition);
                         }
-                        Term condition = TermBuilder.DF.or(conditions);
+                        Term condition = getServices().getTermBuilder().or(conditions);
                         condition = SymbolicExecutionUtil.simplify(info.getProof(), condition);
                         condition = SymbolicExecutionUtil.improveReadability(condition, info.getProof().getServices());
-                        result[i] = new ExecutionMethodReturnValue(getMediator(), getProofNode(), entry.getKey(), condition);
+                        result[i] = new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), entry.getKey(), condition);
                         i++;
                      }
                      return result;
@@ -234,7 +244,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                }
             }
             finally {
-               info.getProof().dispose();
+               SideProofUtil.disposeOrStore("Return value computation on method return node " + methodReturnNode.serialNr() + ".", info);
             }
          }
          else {

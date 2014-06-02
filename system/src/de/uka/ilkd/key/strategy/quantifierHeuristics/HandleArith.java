@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
@@ -31,10 +30,7 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
  *   
  */
 public class HandleArith {
-	
-	private final static TermBuilder tb = TermBuilder.DF;	
-	private final static Term trueT = tb.tt (), falseT = tb.ff ();
-	
+		
 	private HandleArith() {}
     
 	/**
@@ -46,7 +42,10 @@ public class HandleArith {
      *         cann't be proved.
      */
     public static Term provedByArith(Term problem, Services services) {
-        Term arithTerm = formatArithTerm ( problem, services );
+       final Term trueT = services.getTermBuilder().tt(); 
+       final Term falseT = services.getTermBuilder().ff(); 
+
+       Term arithTerm = formatArithTerm ( problem, services );
         if ( arithTerm.equals ( falseT ) )
             return provedArithEqual ( problem, services );
         Polynomial poly1 = Polynomial.create ( arithTerm.sub ( 0 ), services );
@@ -66,6 +65,9 @@ public class HandleArith {
      *         equal, else return atom
      */
     public static Term provedArithEqual(Term problem, Services services) {
+       final Term trueT = services.getTermBuilder().tt(); 
+       final Term falseT = services.getTermBuilder().ff(); 
+
         boolean temp = true;
         Term pro = problem;
         Operator op = pro.op ();
@@ -101,17 +103,19 @@ public class HandleArith {
     public static Term provedByArith(Term problem, Term axiom, Services services) {
         Term cd = formatArithTerm ( problem, services );
         Term ab = formatArithTerm ( axiom, services );
+        final TermBuilder tb = services.getTermBuilder();
+        final Term trueT = services.getTermBuilder().tt(); 
+        final Term falseT = services.getTermBuilder().ff(); 
+
         if ( cd.op() == Junctor.FALSE || ab.op() == Junctor.FALSE ) return problem;
         Function addfun = services.getTypeConverter ().getIntegerLDT ().getAdd();
         Term arithTerm = tb.geq ( tb.func ( addfun, cd.sub ( 0 ), ab.sub ( 1 ) ),
-                                  tb.func ( addfun, ab.sub ( 0 ), cd.sub ( 1 ) ),
-                                  services );
+                                  tb.func ( addfun, ab.sub ( 0 ), cd.sub ( 1 ) ) );
         Term res = provedByArith ( arithTerm, services );
         if ( res.op() == Junctor.TRUE ) return trueT;
         Term t0 = formatArithTerm ( tb.not ( problem ), services );
         arithTerm = tb.geq ( tb.func ( addfun, t0.sub ( 0 ), ab.sub ( 1 ) ),
-                             tb.func ( addfun, ab.sub ( 0 ), t0.sub ( 1 ) ),
-                             services );
+                             tb.func ( addfun, ab.sub ( 0 ), t0.sub ( 1 ) ) );
         res = provedByArith ( arithTerm, services );
         if ( res.op() == Junctor.TRUE ) return falseT;
         return problem;
@@ -136,23 +140,24 @@ public class HandleArith {
         IntegerLDT ig = services.getTypeConverter ().getIntegerLDT ();
         Function geq = ig.getGreaterOrEquals ();
         Function leq = ig.getLessOrEquals ();
+        final TermBuilder tb = services.getTermBuilder();
+        final Term falseT = services.getTermBuilder().ff(); 
+
         if ( op == geq ) {
             if ( opNot )
                         pro = tb.geq ( pro.sub ( 1 ),
                                        tb.func ( ig.getAdd(),
                                                  pro.sub ( 0 ),
-                                                 ig.one() ),
-                                       services );
+                                                 ig.one() ) );
         } else {
             if ( op == leq ) {
                 if ( opNot )
                     pro = tb.geq ( pro.sub ( 0 ),
                                    tb.func ( ig.getAdd (),
                                              pro.sub ( 1 ),
-                                             ig.one() ),
-                                   services );
+                                             ig.one() ) );
                 else
-                    pro = tb.geq ( pro.sub ( 1 ), pro.sub ( 0 ), services );
+                    pro = tb.geq ( pro.sub ( 1 ), pro.sub ( 0 ) );
             } else
                 pro = falseT;
         }

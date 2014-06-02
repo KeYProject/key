@@ -107,8 +107,8 @@ public class LoopInvExecutionPO extends AbstractOperationPO
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.LOOP_EXEC_WITH_INV);
 
         // final symbolic execution term
-        Term finalTerm = TB.applyElementary(services, symbExecVars.pre.heap,
-                                            TB.not(symExec));
+        Term finalTerm = tb.applyElementary(symbExecVars.pre.heap,
+                                            tb.not(symExec));
 
         // register final term
         assignPOTerms(finalTerm);

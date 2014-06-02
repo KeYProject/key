@@ -1,63 +1,55 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.parser;
 
-import antlr.CharScanner;
-import antlr.Token;
-import antlr.TokenStream;
+import org.antlr.runtime.LegacyCommonTokenStream;
+
 import antlr.TokenStreamSelector;
 
-
-public class DeclPicker implements TokenStream {
-
-  protected CharScanner input;
+public class DeclPicker extends LegacyCommonTokenStream {
   private String text = null;
   private int lastMark = 0;
 
   /** Stream to read tokens from */
-  public DeclPicker(CharScanner in) {
-    input = in;
+  public DeclPicker(KeYLexerF in) {
+      super(in.getKeYLexer());
   }
 
-
-  public Token nextToken() throws antlr.TokenStreamException {
-    return getSelector().nextToken();
-  }
-
-  public TokenStreamSelector getSelector() {
-    return ((KeYLexer)input).getSelector();
-  }
-  
-  public void commit() {
-     input.commit();
-  }
-
-  public int mark() {
-     lastMark = input.mark();
+  public int begin() {
+     // see super.mark() implementation
+     if (super.index() == -1) {
+	 super.fillBuffer();
+     }
+     lastMark = super.index();
      return lastMark;
   }
   
   public void capture() {
-     text = input.getInputBuffer().getMarkedChars();
-     //workaround for using antlr with multiple marks
-     text = text.substring(lastMark);
+     text = this.toString(lastMark, super.index() - 1);
   }
   
-  public String getText() {
+  public String getCapturedText() {
       return text;
   }
+
+    /**
+     * @return <code>null</code>
+     * @deprecated
+     */
+    public TokenStreamSelector getSelector() {
+	return null;
+    }
   
 
 

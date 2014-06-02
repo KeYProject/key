@@ -25,6 +25,6 @@ class BasicPreconditionSnippet extends ReplaceAndRegisterMethod implements Facto
         assert Term.class.equals(BasicSnippetData.Key.PRECONDITION.getType());
         Term origPre = (Term) d.get(
                 BasicSnippetData.Key.PRECONDITION);
-        return replace(origPre, d.origVars, poVars.pre);
+        return replace(origPre, d.origVars, poVars.pre, d.tb);
     }
 }

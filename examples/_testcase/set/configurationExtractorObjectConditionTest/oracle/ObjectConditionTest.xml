@@ -1,369 +1,109 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.compute(a);" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (this.x==1) {if (this.next.x==2) {if (this.next.next.x==3) {if (ObjectConditionTest.instance.x==4) {if (ObjectConditionTest.instance.next.x==5) {if (ObjectConditionTest.instance.next.next.x==6) {return 42;           }else  {return              -600;           }         }else  {return            -500;         }       }else  {return          -400;       }     }else  {return        -300;     }   }else  {return      -200;   } }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="self.x = 1" pathCondition="self.x = 1" pathConditionChanged="true" branchCondition="self.x = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <branchStatement name="if (this.next.x==2) {if (this.next.next.x==3) {if (ObjectConditionTest.instance.x==4) {if (ObjectConditionTest.instance.next.x==5) {if (ObjectConditionTest.instance.next.next.x==6) {return 42;         }else  {return            -600;         }       }else  {return          -500;       }     }else  {return        -400;     }   }else  {return      -300;   } }else  {return    -200; }" pathCondition="self.x = 1" pathConditionChanged="false">
-               <branchCondition name="!self.next = null" pathCondition="!self.next = null &amp; self.x = 1" pathConditionChanged="true" branchCondition="!self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <branchCondition name="self.next.x = 2" pathCondition="!self.next = null &amp; self.x = 1 &amp; self.next.x = 2" pathConditionChanged="true" branchCondition="self.next.x = 2" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <branchStatement name="if (this.next.next.x==3) {if (ObjectConditionTest.instance.x==4) {if (ObjectConditionTest.instance.next.x==5) {if (ObjectConditionTest.instance.next.next.x==6) {return 42;       }else  {return          -600;       }     }else  {return        -500;     }   }else  {return      -400;   } }else  {return    -300; }" pathCondition="!self.next = null &amp; self.x = 1 &amp; self.next.x = 2" pathConditionChanged="false">
-                        <branchCondition name="!self.next.next = null" pathCondition="  !self.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; self.next.x = 2" pathConditionChanged="true" branchCondition="!self.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                           <branchCondition name="self.next.next.x = 3" pathCondition="  !self.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; self.next.x = 2
-&amp; self.next.next.x = 3" pathConditionChanged="true" branchCondition="self.next.next.x = 3" mergedBranchCondition="false" isBranchConditionComputed="true">
-                              <branchStatement name="if (ObjectConditionTest.instance.x==4) {if (ObjectConditionTest.instance.next.x==5) {if (ObjectConditionTest.instance.next.next.x==6) {return 42;     }else  {return        -600;     }   }else  {return      -500;   } }else  {return    -400; }" pathCondition="  !self.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; self.next.x = 2
-&amp; self.next.next.x = 3" pathConditionChanged="false">
-                                 <branchCondition name="!ObjectConditionTest.instance = null" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; self.next.x = 2
-&amp; self.next.next.x = 3" pathConditionChanged="true" branchCondition="!ObjectConditionTest.instance = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                    <branchCondition name="ObjectConditionTest.instance.x = 4" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; self.next.next.x = 3" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance.x = 4" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                       <branchStatement name="if (ObjectConditionTest.instance.next.x==5) {if (ObjectConditionTest.instance.next.next.x==6) {return 42;   }else  {return      -600;   } }else  {return    -500; }" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; self.next.next.x = 3" pathConditionChanged="false">
-                                          <branchCondition name="!ObjectConditionTest.instance.next = null" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; self.next.next.x = 3" pathConditionChanged="true" branchCondition="!ObjectConditionTest.instance.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                             <branchCondition name="ObjectConditionTest.instance.next.x = 5" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance.next.x = 5" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                                <branchStatement name="if (ObjectConditionTest.instance.next.next.x==6) {return 42; }else  {return    -600; }" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3" pathConditionChanged="false">
-                                                   <branchCondition name="!ObjectConditionTest.instance.next.next = null" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; !ObjectConditionTest.instance.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3" pathConditionChanged="true" branchCondition="!ObjectConditionTest.instance.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                                      <branchCondition name="ObjectConditionTest.instance.next.next.x = 6" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; !ObjectConditionTest.instance.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3
-&amp; ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance.next.next.x = 6" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                                         <statement name="return 42;" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; !ObjectConditionTest.instance.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3
-&amp; ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="false">
-                                                            <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; !ObjectConditionTest.instance.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3
-&amp; ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="false" isReturnValueComputed="false">
-                                                               <termination name="&lt;end&gt;" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; !ObjectConditionTest.instance.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3
-&amp; ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+      <branchStatement name="if (this.x==1)" pathCondition="true" pathConditionChanged="false">
+         <branchCondition name="equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))" pathCondition="equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))" pathConditionChanged="true" branchCondition="equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchStatement name="if (this.next.x==2)" pathCondition="equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))" pathConditionChanged="false">
+               <branchCondition name="not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))" pathCondition="and(not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null)),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#))))" pathConditionChanged="true" branchCondition="not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <branchCondition name="equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))" pathCondition="and(and(not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null)),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#))))" pathConditionChanged="true" branchCondition="equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <branchStatement name="if (this.next.next.x==3)" pathCondition="and(and(not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null)),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#))))" pathConditionChanged="false">
+                        <branchCondition name="not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))" pathCondition="and(and(and(not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null)),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#))))" pathConditionChanged="true" branchCondition="not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <branchCondition name="equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#)))" pathCondition="and(and(and(and(not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null)),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="true" branchCondition="equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                              <branchStatement name="if (ObjectConditionTest.instance.x==4)" pathCondition="and(and(and(and(not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null)),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="false">
+                                 <branchCondition name="not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null))" pathCondition="and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="true" branchCondition="not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                    <branchCondition name="equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))" pathCondition="and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="true" branchCondition="equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                       <branchStatement name="if (ObjectConditionTest.instance.next.x==5)" pathCondition="and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="false">
+                                          <branchCondition name="not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))" pathCondition="and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="true" branchCondition="not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                             <branchCondition name="equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#)))" pathCondition="and(and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="true" branchCondition="equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                                <branchStatement name="if (ObjectConditionTest.instance.next.next.x==6)" pathCondition="and(and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="false">
+                                                   <branchCondition name="not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),null))" pathCondition="and(and(and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="true" branchCondition="not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                                      <branchCondition name="equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(6(#)))" pathCondition="and(and(and(and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(6(#))))" pathConditionChanged="true" branchCondition="equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(6(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                                         <statement name="return 42;" pathCondition="and(and(and(and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(6(#))))" pathConditionChanged="false">
+                                                            <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="and(and(and(and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(6(#))))" pathConditionChanged="false" isReturnValueComputed="false">
+                                                               <termination name="&lt;end&gt;" pathCondition="and(and(and(and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(6(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                </termination>
                                                             </methodReturn>
                                                          </statement>
                                                       </branchCondition>
-                                                      <branchCondition name="!ObjectConditionTest.instance.next.next.x = 6" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; !ObjectConditionTest.instance.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3
-&amp; !ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="true" branchCondition="!ObjectConditionTest.instance.next.next.x = 6" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                                         <statement name="return -600;" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; !ObjectConditionTest.instance.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3
-&amp; !ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="false">
-                                                            <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; !ObjectConditionTest.instance.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3
-&amp; !ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="false" isReturnValueComputed="false">
-                                                               <termination name="&lt;end&gt;" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; !ObjectConditionTest.instance.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3
-&amp; !ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                                      <branchCondition name="not(equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(6(#))))" pathCondition="and(and(and(and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(6(#)))))" pathConditionChanged="true" branchCondition="not(equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(6(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                                         <statement name="return -600;" pathCondition="and(and(and(and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(6(#)))))" pathConditionChanged="false">
+                                                            <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="and(and(and(and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(6(#)))))" pathConditionChanged="false" isReturnValueComputed="false">
+                                                               <termination name="&lt;end&gt;" pathCondition="and(and(and(and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(6(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                </termination>
                                                             </methodReturn>
                                                          </statement>
                                                       </branchCondition>
                                                    </branchCondition>
-                                                   <branchCondition name="ObjectConditionTest.instance.next.next = null" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; ObjectConditionTest.instance.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                                      <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; ObjectConditionTest.instance.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                                                   <branchCondition name="equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),null)" pathCondition="and(and(and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),null)),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="true" branchCondition="equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                                      <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(and(and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$next),null)),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                                                       </termination>
                                                    </branchCondition>
                                                 </branchStatement>
                                              </branchCondition>
-                                             <branchCondition name="!ObjectConditionTest.instance.next.x = 5" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; !ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3" pathConditionChanged="true" branchCondition="!ObjectConditionTest.instance.next.x = 5" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                                <statement name="return -500;" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; !ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3" pathConditionChanged="false">
-                                                   <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; !ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3" pathConditionChanged="false" isReturnValueComputed="false">
-                                                      <termination name="&lt;end&gt;" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; !ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                             <branchCondition name="not(equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#))))" pathCondition="and(and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#))))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="true" branchCondition="not(equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                                <statement name="return -500;" pathCondition="and(and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#))))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="false">
+                                                   <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="and(and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#))))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="false" isReturnValueComputed="false">
+                                                      <termination name="&lt;end&gt;" pathCondition="and(and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(5(#))))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                       </termination>
                                                    </methodReturn>
                                                 </statement>
                                              </branchCondition>
                                           </branchCondition>
-                                          <branchCondition name="ObjectConditionTest.instance.next = null" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; self.next.next.x = 3" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                             <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; ObjectConditionTest.instance.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; self.next.next.x = 3" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                                          <branchCondition name="equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null)" pathCondition="and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null)),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="true" branchCondition="equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                             <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$next),null)),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                                              </termination>
                                           </branchCondition>
                                        </branchStatement>
                                     </branchCondition>
-                                    <branchCondition name="!ObjectConditionTest.instance.x = 4" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; !ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; self.next.next.x = 3" pathConditionChanged="true" branchCondition="!ObjectConditionTest.instance.x = 4" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                       <statement name="return -400;" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; !ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; self.next.next.x = 3" pathConditionChanged="false">
-                                          <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; !ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; self.next.next.x = 3" pathConditionChanged="false" isReturnValueComputed="false">
-                                             <termination name="&lt;end&gt;" pathCondition="  !ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; !ObjectConditionTest.instance.x = 4
-&amp; self.next.x = 2
-&amp; self.next.next.x = 3" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                    <branchCondition name="not(equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#))))" pathCondition="and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#))))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="true" branchCondition="not(equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                       <statement name="return -400;" pathCondition="and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#))))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="false">
+                                          <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#))))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="false" isReturnValueComputed="false">
+                                             <termination name="&lt;end&gt;" pathCondition="and(and(and(and(and(and(not(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),ObjectConditionTest::$x),Z(4(#))))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                              </termination>
                                           </methodReturn>
                                        </statement>
                                     </branchCondition>
                                  </branchCondition>
-                                 <branchCondition name="ObjectConditionTest.instance = null" pathCondition="  ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; self.next.x = 2
-&amp; self.next.next.x = 3" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                    <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="  ObjectConditionTest.instance = null
-&amp; !self.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; self.next.x = 2
-&amp; self.next.next.x = 3" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                                 <branchCondition name="equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)" pathCondition="and(and(and(and(and(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="true" branchCondition="equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                    <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(and(and(and(and(equals(ObjectConditionTest::select(heap,null,ObjectConditionTest::$instance),null),not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null))),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                                     </termination>
                                  </branchCondition>
                               </branchStatement>
                            </branchCondition>
-                           <branchCondition name="!self.next.next.x = 3" pathCondition="  !self.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; self.next.x = 2
-&amp; !self.next.next.x = 3" pathConditionChanged="true" branchCondition="!self.next.next.x = 3" mergedBranchCondition="false" isBranchConditionComputed="true">
-                              <statement name="return -300;" pathCondition="  !self.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; self.next.x = 2
-&amp; !self.next.next.x = 3" pathConditionChanged="false">
-                                 <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="  !self.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; self.next.x = 2
-&amp; !self.next.next.x = 3" pathConditionChanged="false" isReturnValueComputed="false">
-                                    <termination name="&lt;end&gt;" pathCondition="  !self.next = null
-&amp; !self.next.next = null
-&amp; self.x = 1
-&amp; self.next.x = 2
-&amp; !self.next.next.x = 3" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           <branchCondition name="not(equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" pathCondition="and(and(and(and(not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null)),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#)))))" pathConditionChanged="true" branchCondition="not(equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                              <statement name="return -300;" pathCondition="and(and(and(and(not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null)),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#)))))" pathConditionChanged="false">
+                                 <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="and(and(and(and(not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null)),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#)))))" pathConditionChanged="false" isReturnValueComputed="false">
+                                    <termination name="&lt;end&gt;" pathCondition="and(and(and(and(not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null)),not(equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null))),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),ObjectConditionTest::$x),Z(3(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                     </termination>
                                  </methodReturn>
                               </statement>
                            </branchCondition>
                         </branchCondition>
-                        <branchCondition name="self.next.next = null" pathCondition="  !self.next = null
-&amp; self.next.next = null
-&amp; self.x = 1
-&amp; self.next.x = 2" pathConditionChanged="true" branchCondition="self.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                           <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="  !self.next = null
-&amp; self.next.next = null
-&amp; self.x = 1
-&amp; self.next.x = 2" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                        <branchCondition name="equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null)" pathCondition="and(and(and(not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null)),equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null)),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#))))" pathConditionChanged="true" branchCondition="equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(and(and(not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null)),equals(ObjectConditionTest::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$next),null)),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                            </termination>
                         </branchCondition>
                      </branchStatement>
                   </branchCondition>
-                  <branchCondition name="!self.next.x = 2" pathCondition="!self.next = null &amp; self.x = 1 &amp; !self.next.x = 2" pathConditionChanged="true" branchCondition="!self.next.x = 2" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <statement name="return -200;" pathCondition="!self.next = null &amp; self.x = 1 &amp; !self.next.x = 2" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="!self.next = null &amp; self.x = 1 &amp; !self.next.x = 2" pathConditionChanged="false" isReturnValueComputed="false">
-                           <termination name="&lt;end&gt;" pathCondition="!self.next = null &amp; self.x = 1 &amp; !self.next.x = 2" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  <branchCondition name="not(equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#))))" pathCondition="and(and(not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null)),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))))" pathConditionChanged="true" branchCondition="not(equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <statement name="return -200;" pathCondition="and(and(not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null)),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))))" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="and(and(not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null)),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))))" pathConditionChanged="false" isReturnValueComputed="false">
+                           <termination name="&lt;end&gt;" pathCondition="and(and(not(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null)),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#)))),not(equals(int::select(heap,ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),ObjectConditionTest::$x),Z(2(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>
                   </branchCondition>
                </branchCondition>
-               <branchCondition name="self.next = null" pathCondition="self.next = null &amp; self.x = 1" pathConditionChanged="true" branchCondition="self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="self.next = null &amp; self.x = 1" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+               <branchCondition name="equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null)" pathCondition="and(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#))))" pathConditionChanged="true" branchCondition="equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(equals(ObjectConditionTest::select(heap,self,ObjectConditionTest::$next),null),equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                   </termination>
                </branchCondition>
             </branchStatement>
          </branchCondition>
-         <branchCondition name="!self.x = 1" pathCondition="!self.x = 1" pathConditionChanged="true" branchCondition="!self.x = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <statement name="return -100;" pathCondition="!self.x = 1" pathConditionChanged="false">
-               <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="!self.x = 1" pathConditionChanged="false" isReturnValueComputed="false">
-                  <termination name="&lt;end&gt;" pathCondition="!self.x = 1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+         <branchCondition name="not(equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#))))" pathCondition="not(equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#))))" pathConditionChanged="true" branchCondition="not(equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="return -100;" pathCondition="not(equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#))))" pathConditionChanged="false">
+               <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="not(equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#))))" pathConditionChanged="false" isReturnValueComputed="false">
+                  <termination name="&lt;end&gt;" pathCondition="not(equals(int::select(heap,self,ObjectConditionTest::$x),Z(1(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>

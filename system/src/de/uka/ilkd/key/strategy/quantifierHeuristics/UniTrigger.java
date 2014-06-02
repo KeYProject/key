@@ -1,24 +1,23 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.util.LRUCache;
@@ -47,13 +46,13 @@ class UniTrigger implements Trigger {
     }
         
     public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm, 
-            Services services) {
+            TermServices services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
         for (Term aTargetTerm : targetTerm) allsubs = allsubs.union(getSubstitutionsFromTerm(aTargetTerm, services));
         return allsubs;
     }
 
-    private ImmutableSet<Substitution> getSubstitutionsFromTerm(Term t, Services services) {
+    private ImmutableSet<Substitution> getSubstitutionsFromTerm(Term t, TermServices services) {
         ImmutableSet<Substitution> res = matchResults.get ( t );
         if ( res == null ) {
             res = getSubstitutionsFromTermHelp ( t, services );
@@ -62,7 +61,7 @@ class UniTrigger implements Trigger {
         return res;
     }
 
-    private ImmutableSet<Substitution> getSubstitutionsFromTermHelp(Term t, Services services) {
+    private ImmutableSet<Substitution> getSubstitutionsFromTermHelp(Term t, TermServices services) {
         ImmutableSet<Substitution> newSubs = DefaultImmutableSet.<Substitution>nil();
         if ( t.freeVars ().size () > 0 || t.op () instanceof Quantifier )
             newSubs = Matching.twoSidedMatching ( this, t, services );
@@ -169,4 +168,3 @@ class UniTrigger implements Trigger {
 
 
 }
-     

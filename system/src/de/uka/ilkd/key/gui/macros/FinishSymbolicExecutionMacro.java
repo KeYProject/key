@@ -1,22 +1,17 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.gui.macros;
-
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
@@ -24,7 +19,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.SelfCompositionTermLabel;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -35,7 +30,7 @@ import de.uka.ilkd.key.strategy.Strategy;
  * The macro FinishSymbolicExecutionMacro continues automatic rule application
  * until there is no more modality on the sequent.
  *
- * This is done by implementing a delegationg {@link Strategy} which assigns to
+ * This is done by implementing a delegation {@link Strategy} which assigns to
  * any rule application infinite costs if there is no modality on the sequent.
  *
  * @author mattias ulbrich
@@ -70,7 +65,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
      * recursively descent into the term to detect a modality.
      */
     private static boolean hasModality(Term term) {
-        if(term.containsLabel(SelfCompositionTermLabel.INSTANCE)) {
+        if(term.containsLabel(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)) {
             // ignore self composition terms
             return false;
         }
@@ -92,11 +87,6 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     protected Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
         return new FilterSymbexStrategy(
                 mediator.getInteractiveProver().getProof().getActiveStrategy());
-    }
-    
-    @Override
-    public KeyStroke getKeyStroke () {
-    	return KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.SHIFT_DOWN_MASK);
     }
 
     /**

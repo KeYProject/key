@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -49,14 +49,14 @@ public final class ApplicationUtil {
             return new File(folder, launcher).getAbsolutePath();
          }
          else {
-            return launcher; 
+            return launcher;
          }
       }
       else {
          return launcher;
       }
    }
-   
+
    /**
     * Returns the path to the launcher which has started this application.
     * @return The path to the launcher which has started this application.

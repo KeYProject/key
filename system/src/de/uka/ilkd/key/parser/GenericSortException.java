@@ -1,23 +1,24 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.parser;
+
+import org.antlr.runtime.RecognitionException;
 
 import antlr.Token;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-public class GenericSortException extends antlr.SemanticException {
+public class GenericSortException extends RecognitionException {
     /**
      * 
      */
@@ -29,24 +30,22 @@ public class GenericSortException extends antlr.SemanticException {
     
     public GenericSortException(String cat, String reason,
 				Sort sort, Token t, String filename) {
-	super("GenericSort");
 	this.cat      = cat;
 	this.reason   = reason;
 	this.filename = filename;
 	this.sort     = sort;
 	this.line     = t.getLine();
-	this.column   = t.getColumn();
+	this.charPositionInLine   = t.getColumn();
     }
 
     public GenericSortException(String cat, String reason, Sort sort, 
 			    String filename, int line, int column) {
-	super("GenericSort");
 	this.cat      = cat;
 	this.reason   = reason;
 	this.filename = filename;
 	this.sort     = sort;
 	this.line     = line;
-	this.column   = column;
+	this.charPositionInLine   = column;
     }
 
     /**
@@ -72,7 +71,7 @@ public class GenericSortException extends antlr.SemanticException {
      * Returns a string representation of this exception.
      */
     public String toString() {
-	return filename+"("+this.getLine()+", "+this.getColumn()+"): "
+	return filename+"("+this.line+", "+this.charPositionInLine+"): "
 	    +getMessage();
     }
 }

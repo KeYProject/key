@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="org.key_project.sed.ui.annotationActions" name="Annotation Actions" schema="schema/org.key_project.sed.ui.annotationActions.exsd"/>
+   <extension-point id="org.key_project.sed.ui.annotationEditors" name="Annotation Editors" schema="schema/org.key_project.sed.ui.annotationEditors.exsd"/>
+   <extension-point id="org.key_project.sed.ui.annotationLinkActions" name="Annotation Link Actions" schema="schema/org.key_project.sed.ui.annotationLinkActions.exsd"/>
+   <extension-point id="org.key_project.sed.ui.annotationLinkEditActions" name="Annotation Link Edit Actions" schema="schema/org.key_project.sed.ui.annotationLinkEditActions.exsd"/>
+   <extension-point id="org.key_project.sed.ui.annotationTypeImages" name="Annotation Type Images" schema="schema/org.key_project.sed.ui.annotationTypeImages.exsd"/>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
@@ -96,6 +101,17 @@
                     id="org.key_project.sed.ui.source.tab"
                     label="Source">
               </propertyTab>
+              <propertyTab
+                    category="Debug"
+                    id="org.key_project.sed.ui.annotations.tab"
+                    label="Annotations">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.source.tab"
+                    category="Debug"
+                    id="org.key_project.sed.ui.annotationLinks.tab"
+                    label="Annotation Links">
+              </propertyTab>
           </propertyTabs>
       </extension>
        
@@ -119,6 +135,18 @@
                     id="org.key_project.sed.ui.property.SourcePropertySection"
                     tab="org.key_project.sed.ui.source.tab">
               </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.property.AnnotationPropertySection"
+                    filter="org.key_project.sed.ui.property.SEDDebugTargetTreeFilter"
+                    id="org.key_project.sed.ui.property.AnnotationPropertySection"
+                    tab="org.key_project.sed.ui.annotations.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.property.AnnotationLinkPropertySection"
+                    filter="org.key_project.sed.ui.property.SEDDebugNodeTreeFilter"
+                    id="org.key_project.sed.ui.property.AnnotationLinkPropertySection"
+                    tab="org.key_project.sed.ui.annotationLinks.tab">
+              </propertySection>
           </propertySections>
       </extension>
       <extension
@@ -135,6 +163,12 @@
                id="org.key_project.sed.ui.preference.page.symbolic_debug"
                name="Symbolic Execution Debugger (SED)">
          </page>
+         <page
+               category="org.key_project.sed.ui.preference.page.symbolic_debug"
+               class="org.key_project.sed.ui.preference.page.AnnotationsColorsPreferencePage"
+               id="org.key_project.sed.ui.preference.page.AnnotationTypePreferencePage"
+               name="Annotation Colors">
+         </page>
       </extension>
       <extension
             point="org.eclipse.ui.views">
@@ -148,5 +182,52 @@
          <participant
                class="org.key_project.sed.ui.setup.PreferenceSetupParticipant">
          </participant>
-      </extension>  
+      </extension>
+      <extension
+            point="org.key_project.sed.ui.annotationActions">
+         <action
+               class="org.key_project.sed.ui.action.SearchAnnotationAction"
+               icon="icons/search.gif"
+               text="Search"
+               toolTipText="Perform a new text search within the nodes of the symbolic execution tree.">
+         </action>
+      </extension>
+      <extension
+            point="org.key_project.sed.ui.annotationEditors">
+         <editor
+               annotationTypeID="org.key_project.sed.core.annotationType.search"
+               class="org.key_project.sed.ui.edit.SearchAnnotationEditor">
+         </editor>
+         <editor
+               annotationTypeID="org.key_project.sed.core.annotationType.comment"
+               class="org.key_project.sed.ui.edit.CommentAnnotationEditor">
+         </editor>
+      </extension>
+      <extension
+            point="org.key_project.sed.ui.annotationLinkActions">
+         <action
+               class="org.key_project.sed.ui.action.CommentAnnotationLinkAction"
+               icon="icons/comment.gif"
+               text="New Comment"
+               toolTipText="Adds a new comment to the selected node.">
+         </action>
+      </extension>
+      <extension
+            point="org.key_project.sed.ui.annotationLinkEditActions">
+         <editAction
+               annotationTypeID="org.key_project.sed.core.annotationType.comment"
+               class="org.key_project.sed.ui.action.CommentAnnotationLinkEditAction">
+         </editAction>
+      </extension>
+      <extension
+            point="org.key_project.sed.ui.annotationTypeImages">
+         <image
+               annotationTypeID="org.key_project.sed.core.annotationType.comment"
+               icon="icons/comment.gif">
+         </image>
+         <image
+               annotationTypeID="org.key_project.sed.core.annotationType.search"
+               icon="icons/search.gif">
+         </image>
+      </extension>
 </plugin>

@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -27,7 +27,6 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
@@ -121,7 +120,7 @@ public class JoinProcessor implements Runnable{
 
     private void orRight(Goal goal){
         SequentFormula sf =goal.sequent().succedent().get(0);
-        PosInOccurrence pio =new PosInOccurrence(sf,PosInTerm.TOP_LEVEL,false);
+        PosInOccurrence pio =new PosInOccurrence(sf,PosInTerm.getTopLevel(),false);
         apply(new String[]{OR_RIGHT_TACLET}, goal, pio);
   
     }
@@ -140,7 +139,7 @@ public class JoinProcessor implements Runnable{
 
         SequentFormula sf = findFormula(goal.sequent(), cut.getFormula(), false);
         
-        PosInOccurrence pio = new PosInOccurrence(sf,PosInTerm.TOP_LEVEL.down(0),false);
+        PosInOccurrence pio = new PosInOccurrence(sf,PosInTerm.getTopLevel().down(0),false);
         Goal result = apply(SIMPLIFY_UPDATE, goal, pio).head();
 
         return result == null ? goal : result;
@@ -183,7 +182,7 @@ public class JoinProcessor implements Runnable{
     	}
         int index = goal.sequent().formulaNumberInSequent(false,partner.getFormulaForHiding());
         PosInOccurrence pio = PosInOccurrence.findInSequent(goal.sequent(),
-                index, PosInTerm.TOP_LEVEL);
+                index, PosInTerm.getTopLevel());
         return apply(new String [] {HIDE_RIGHT_TACLET}, goal, pio).head();
         
     }
@@ -192,14 +191,14 @@ public class JoinProcessor implements Runnable{
     private Term createCutFormula(){
         Term ifElseTerm = buildIfElseTerm();
         Term phi = createPhi();
-        return TermBuilder.DF.or(ifElseTerm, phi);
+        return services.getTermBuilder().or(ifElseTerm, phi);
     }
     
     private Term buildIfElseTerm(){
-         Term thenTerm = TermBuilder.DF.apply(partner.getUpdate(0), partner.getCommonFormula(), null);
-         Term elseTerm = TermBuilder.DF.apply(partner.getUpdate(1), partner.getCommonFormula(), null);
+         Term thenTerm = services.getTermBuilder().apply(partner.getUpdate(0), partner.getCommonFormula(), null);
+         Term elseTerm = services.getTermBuilder().apply(partner.getUpdate(1), partner.getCommonFormula(), null);
          
-         return TermBuilder.DF.ife(partner.getCommonPredicate(), thenTerm,elseTerm);
+         return services.getTermBuilder().ife(partner.getCommonPredicate(), thenTerm,elseTerm);
         
     }
     
@@ -217,13 +216,13 @@ public class JoinProcessor implements Runnable{
          Collection<Term> gamma2      = computeDifference(partner.getSequent(1).antecedent(),commonGamma,null);
          
          Collection<Term> constrainedGamma1 = createConstrainedTerms(gamma1, partner.getCommonPredicate(), true);
-         Collection<Term> constrainedGamma2 = createConstrainedTerms(gamma2, TermBuilder.DF.not(partner.getCommonPredicate()), true);
+         Collection<Term> constrainedGamma2 = createConstrainedTerms(gamma2, services.getTermBuilder().not(partner.getCommonPredicate()), true);
          
 
          Collection<Term> constrainedDelta1 = createConstrainedTerms(delta1, partner.getCommonPredicate(), false);
-         Collection<Term> constrainedDelta2 = createConstrainedTerms(delta2, TermBuilder.DF.not(partner.getCommonPredicate()), false);
+         Collection<Term> constrainedDelta2 = createConstrainedTerms(delta2, services.getTermBuilder().not(partner.getCommonPredicate()), false);
          
-         Term phi = TermBuilder.DF.ff();
+         Term phi = services.getTermBuilder().ff();
          phi = createDisjunction(phi,commonGamma,true);
          phi = createDisjunction(phi,constrainedGamma1,true);
          phi = createDisjunction(phi,constrainedGamma2,true);
@@ -239,9 +238,9 @@ public class JoinProcessor implements Runnable{
     private Term createDisjunction(Term seed, Collection<Term> formulas, boolean needNot ){
         for(Term formula : formulas){
             if(needNot){
-                seed = TermBuilder.DF.or(seed,TermBuilder.DF.not(formula));
+                seed = services.getTermBuilder().or(seed,services.getTermBuilder().not(formula));
             }else{
-                seed = TermBuilder.DF.or(seed,formula);
+                seed = services.getTermBuilder().or(seed,formula);
             }
         }
         return seed;
@@ -251,9 +250,9 @@ public class JoinProcessor implements Runnable{
         Collection<Term> result = new LinkedList<Term>();
         for(Term term : terms){
             if(gamma){
-                result.add(TermBuilder.DF.imp(predicate,term));
+                result.add(services.getTermBuilder().imp(predicate,term));
             }else{
-                result.add(TermBuilder.DF.and(predicate,term));
+                result.add(services.getTermBuilder().and(predicate,term));
             }
         }
         return result;

@@ -26,15 +26,7 @@
             <variable name="multiArray" arrayIndex="-1" isArrayIndex="false">
                <value name="multiArray {true}" typeString="int[][]" valueString="x_arr_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="length" arrayIndex="-1" isArrayIndex="false">
-                     <value name="length {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                     </value>
-                  </variable>
-                  <variable name="[0]" arrayIndex="0" isArrayIndex="true">
-                     <value name="[0] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                     </value>
-                  </variable>
-                  <variable name="[1]" arrayIndex="1" isArrayIndex="true">
-                     <value name="[1] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="length {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </value>
@@ -51,27 +43,7 @@
                <variable name="multiArray" arrayIndex="-1" isArrayIndex="false">
                   <value name="multiArray {true}" typeString="int[][]" valueString="x_arr_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="length" arrayIndex="-1" isArrayIndex="false">
-                        <value name="length {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                        </value>
-                     </variable>
-                     <variable name="[0]" arrayIndex="0" isArrayIndex="true">
-                        <value name="[0] {true}" typeString="int[]" valueString="x_arr_4" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                           <variable name="length" arrayIndex="-1" isArrayIndex="false">
-                              <value name="length {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                              </value>
-                           </variable>
-                           <variable name="[0]" arrayIndex="0" isArrayIndex="true">
-                              <value name="[0] {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                              </value>
-                           </variable>
-                           <variable name="[1]" arrayIndex="1" isArrayIndex="true">
-                              <value name="[1] {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                              </value>
-                           </variable>
-                        </value>
-                     </variable>
-                     <variable name="[1]" arrayIndex="1" isArrayIndex="true">
-                        <value name="[1] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="length {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
@@ -88,43 +60,7 @@
                   <variable name="multiArray" arrayIndex="-1" isArrayIndex="false">
                      <value name="multiArray {true}" typeString="int[][]" valueString="x_arr_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="length" arrayIndex="-1" isArrayIndex="false">
-                           <value name="length {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                           </value>
-                        </variable>
-                        <variable name="[0]" arrayIndex="0" isArrayIndex="true">
-                           <value name="[0] {true}" typeString="int[]" valueString="x_arr_4" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                              <variable name="length" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="length {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                                 </value>
-                              </variable>
-                              <variable name="[0]" arrayIndex="0" isArrayIndex="true">
-                                 <value name="[0] {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                                 </value>
-                              </variable>
-                              <variable name="[1]" arrayIndex="1" isArrayIndex="true">
-                                 <value name="[1] {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                                 </value>
-                              </variable>
-                           </value>
-                        </variable>
-                        <variable name="[1]" arrayIndex="1" isArrayIndex="true">
-                           <value name="[1] {true}" typeString="int[]" valueString="x_arr_9" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                              <variable name="length" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="length {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                                 </value>
-                              </variable>
-                              <variable name="[0]" arrayIndex="0" isArrayIndex="true">
-                                 <value name="[0] {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                                 </value>
-                              </variable>
-                              <variable name="[1]" arrayIndex="1" isArrayIndex="true">
-                                 <value name="[1] {true}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                                 </value>
-                              </variable>
-                              <variable name="[2]" arrayIndex="2" isArrayIndex="true">
-                                 <value name="[2] {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                                 </value>
-                              </variable>
+                           <value name="length {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>

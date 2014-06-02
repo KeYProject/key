@@ -1,28 +1,28 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Sequent;
 
 /**
  * Label attached to a symbolic execution thread. 
  * Currently realized as singleton. In case one wants to track and distinguish 
  * different lines of execution, this needs to be changed.
  */
-public class SymbolicExecutionTermLabel implements ITermLabel {
+public class SymbolicExecutionTermLabel implements TermLabel {
    /**
     * The unique name of this label.
     */
@@ -38,33 +38,33 @@ public class SymbolicExecutionTermLabel implements ITermLabel {
     * The unique ID of this term label in the {@link Sequent}.
     */
    private int id;
-	
-	/**
-	 * Constructor.
-	 * @param id The unique ID of this term label in the {@link Sequent}.
-	 */
-	public SymbolicExecutionTermLabel(int id) {
-	   this.id = id;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean equals(Object o) {
-		return this == o;
-	}
-		
-	/**
-	 * {@inheritDoc}
-	 */
-	public String toString() {
-		return NAME.toString() + "(" + getId() + ")";
-	}
+
+   /**
+    * Constructor.
+    * @param id The unique ID of this term label in the {@link Sequent}.
+    */
+   public SymbolicExecutionTermLabel(int id) {
+       this.id = id;
+   }
 
    /**
     * {@inheritDoc}
     */
-	@Override
+   public boolean equals(Object o) {
+       return this == o;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   public String toString() {
+       return NAME.toString() + "(" + getId() + ")";
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public Object getChild(int i) {
 	   switch (i) {
 	      case 0 : return getId();
@@ -75,15 +75,15 @@ public class SymbolicExecutionTermLabel implements ITermLabel {
    /**
     * {@inheritDoc}
     */
-	@Override
+   @Override
    public int getChildCount() {
       return 1;
    }
 
-	/**
-	 * Returns the unique ID of this label in the {@link Sequent}.
-	 * @return The unique ID of this label in the {@link Sequent}.
-	 */
+   /**
+    * Returns the unique ID of this label in the {@link Sequent}.
+    * @return The unique ID of this label in the {@link Sequent}.
+    */
    public int getId() {
       return id;
    }

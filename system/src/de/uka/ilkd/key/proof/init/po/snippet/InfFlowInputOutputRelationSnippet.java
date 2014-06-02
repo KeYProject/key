@@ -7,10 +7,9 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.label.PostConditionTermLabel;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -40,12 +39,12 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                 (ImmutableList<InfFlowSpec>) d.get(BasicSnippetData.Key.INF_FLOW_SPECS);
 
         // the information-flow-specification-sequents evaluated in the pre-state
-        InfFlowSpec[] infFlowSpecsAtPre1 = replace(origInfFlowSpecs, d.origVars, poVars1.pre);
-        InfFlowSpec[] infFlowSpecsAtPre2 = replace(origInfFlowSpecs, d.origVars, poVars2.pre);
+        InfFlowSpec[] infFlowSpecsAtPre1 = replace(origInfFlowSpecs, d.origVars, poVars1.pre, d.tb);
+        InfFlowSpec[] infFlowSpecsAtPre2 = replace(origInfFlowSpecs, d.origVars, poVars2.pre, d.tb);
 
         // the information-flow-specification-sequents evaluated in the post-state
-        InfFlowSpec[] infFlowSpecsAtPost1 = replace(origInfFlowSpecs, d.origVars, poVars1.post);
-        InfFlowSpec[] infFlowSpecsAtPost2 = replace(origInfFlowSpecs, d.origVars, poVars2.post);
+        InfFlowSpec[] infFlowSpecsAtPost1 = replace(origInfFlowSpecs, d.origVars, poVars1.post, d.tb);
+        InfFlowSpec[] infFlowSpecsAtPost2 = replace(origInfFlowSpecs, d.origVars, poVars2.post, d.tb);
 
         // create input-output-relations
         final Term[] relations = new Term[infFlowSpecsAtPre1.length];
@@ -77,7 +76,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
 
         return d.tb.imp(inputRelation,
                         d.tb.label(outputRelation,
-                                   PostConditionTermLabel.INSTANCE));
+                                   ParameterlessTermLabel.POST_CONDITION_LABEL));
     }
 
 
@@ -156,9 +155,8 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         // build isomorphism term for newObjects
         final Term newObjsSeq1 = d.tb.seq(infFlowSpec1.newObjects);
         final Term newObjsSeq2 = d.tb.seq(infFlowSpec2.newObjects);
-        final Services services = d.tb.getServices();
         final Function newObjectsIso =
-                (Function)services.getNamespaces().functions().lookup("newObjectsIsomorphic");
+                (Function)d.services.getNamespaces().functions().lookup("newObjectsIsomorphic");
         final Term isoTerm = d.tb.func(newObjectsIso, newObjsSeq1, vs1.pre.heap,
                                        newObjsSeq2, vs2.pre.heap);
 

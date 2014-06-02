@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -15,7 +15,6 @@ package de.uka.ilkd.key.gui.smt;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -48,6 +47,16 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
 
 
         private static final String MAX_CONCURRENT_PROCESSES = "[SMTSettings]maxConcurrentProcesses";
+        
+        /* The following properties are used to set the bit sizes for bounded 
+         * counter example generation.
+         */
+        private static final String INT_BOUND = "[SMTSettings]intBound";
+        private static final String HEAP_BOUND = "[SMTSettings]heapBound";
+        private static final String FIELD_BOUND = "[SMTSettings]fieldBound";
+        private static final String OBJECT_BOUND = "[SMTSettings]objectBound";
+        private static final String LOCSET_BOUND = "[SMTSettings]locsetBound";
+        private static final int DEFAULT_BIT_LENGTH_FOR_CE_GENERATION = 3;        
 
    
         private static final String SOLVER_PARAMETERS  = "[SMTSettings]solverParametersV1";
@@ -67,16 +76,24 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
         public boolean storeTacletTranslationToFile = false;
         
         public long    timeout                      = 5000;
-        public int     maxConcurrentProcesses        = 5;
+        public int     maxConcurrentProcesses       = 5;
     
-        public int     modeOfProgressDialog          = PROGRESS_MODE_USER;
+        public int     modeOfProgressDialog         = PROGRESS_MODE_USER;
 
         public String   pathForSMTTranslation      = "";
         public String   pathForTacletTranslation   = "";
         public String   activeSolver               = "";
-    
-        private Collection<SettingsListener> listeners = new LinkedHashSet<SettingsListener>();
+        
 
+
+        public long intBound    = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
+        public long heapBound   = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
+        public long seqBound    = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
+        public long objectBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
+        public long locsetBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
+
+        private Collection<SettingsListener> listeners = new LinkedHashSet<SettingsListener>();
+    
         private SolverTypeCollection activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
         private LinkedList<SolverTypeCollection> solverUnions = new LinkedList<SolverTypeCollection>();
 
@@ -87,7 +104,21 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
                 copy(data);
         }
         
-        public void copy(ProofIndependentSMTSettings data){
+        
+        
+        public int getMaxConcurrentProcesses() {
+			return maxConcurrentProcesses;
+		}
+
+
+
+		public void setMaxConcurrentProcesses(int maxConcurrentProcesses) {
+			this.maxConcurrentProcesses = maxConcurrentProcesses;
+		}
+
+
+
+		public void copy(ProofIndependentSMTSettings data){
                 this.showResultsAfterExecution     = data.showResultsAfterExecution;
                 this.storeSMTTranslationToFile     = data.storeSMTTranslationToFile;
                 this.storeTacletTranslationToFile  = data.storeTacletTranslationToFile;
@@ -97,6 +128,11 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
                 this.pathForTacletTranslation      = data.pathForTacletTranslation;
                 this.modeOfProgressDialog          = data.modeOfProgressDialog;
                 this.checkForSupport			   = data.checkForSupport;
+                this.intBound                      = data.intBound;
+                this.heapBound                     = data.heapBound;
+                this.seqBound                      = data.seqBound;
+                this.locsetBound                   = data.locsetBound;
+                this.objectBound                   = data.objectBound;
 
 
                 for(Entry<SolverType, SolverData> entry : data.dataOfSolvers.entrySet()){
@@ -172,8 +208,13 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
                 pathForTacletTranslation = SettingsConverter.read(props, PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation);
                 modeOfProgressDialog     = SettingsConverter.read(props,PROGRESS_DIALOG_MODE,modeOfProgressDialog);
                 maxConcurrentProcesses   = SettingsConverter.read(props,MAX_CONCURRENT_PROCESSES,maxConcurrentProcesses);
-                checkForSupport	         = SettingsConverter.read(props, SOLVER_CHECK_FOR_SUPPORT, checkForSupport);
-          
+                checkForSupport	         = SettingsConverter.read(props, SOLVER_CHECK_FOR_SUPPORT, checkForSupport);                
+                intBound                 = SettingsConverter.read(props, INT_BOUND, intBound);
+                heapBound                = SettingsConverter.read(props, HEAP_BOUND, heapBound);
+                seqBound                 = SettingsConverter.read(props, FIELD_BOUND, seqBound);
+                locsetBound              = SettingsConverter.read(props, LOCSET_BOUND, locsetBound);
+                objectBound              = SettingsConverter.read(props, OBJECT_BOUND, objectBound);
+
                 for(SolverData solverData : dataOfSolvers.values()){
                         solverData.readSettings(props);
                 }     
@@ -193,6 +234,11 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
                 SettingsConverter.store(props,ACTIVE_SOLVER,activeSolver);
                 SettingsConverter.store(props,MAX_CONCURRENT_PROCESSES,maxConcurrentProcesses);
                 SettingsConverter.store(props,SOLVER_CHECK_FOR_SUPPORT,checkForSupport);
+                SettingsConverter.store(props, INT_BOUND, intBound);
+                SettingsConverter.store(props, HEAP_BOUND, heapBound);
+                SettingsConverter.store(props, OBJECT_BOUND, objectBound);
+                SettingsConverter.store(props, FIELD_BOUND, seqBound);
+                SettingsConverter.store(props, LOCSET_BOUND, locsetBound);
 
                 for(SolverData solverData : dataOfSolvers.values()){
                         solverData.writeSettings(props);

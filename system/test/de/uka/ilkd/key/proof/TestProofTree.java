@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof;
 
@@ -31,6 +30,7 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.rule.TacletForTests;
 
 /** class tests the tree of proof
 */
@@ -45,7 +45,6 @@ public class TestProofTree extends TestCase {
     Node n5;
     Node n6;
     Node n7;
-    final static TermFactory tf=TermFactory.DEFAULT;
 
 
     public TestProofTree(String name) {
@@ -62,6 +61,8 @@ public class TestProofTree extends TestCase {
 	LogicVariable b6=new LogicVariable(new Name("b6"),s);
 	LogicVariable b7=new LogicVariable(new Name("b7"),s);
 
+	TermFactory tf = TacletForTests.services().getTermFactory();
+	
 	Term t_b1=tf.createTerm(Equality.EQUALS,
 		                tf.createTerm(b1),
 		                tf.createTerm(b1));
@@ -213,5 +214,3 @@ public class TestProofTree extends TestCase {
 
     
 }
-
-

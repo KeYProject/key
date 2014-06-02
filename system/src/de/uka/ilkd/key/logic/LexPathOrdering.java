@@ -1,30 +1,28 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
 import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.WeakHashMap;
-
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -174,10 +172,10 @@ public class LexPathOrdering implements TermOrdering {
      */
     private int compare (Operator aOp,
                          Sort aSort,
-                         ImmutableArray<ITermLabel> aLabels,
+                         ImmutableArray<TermLabel> aLabels,
                          Operator bOp,
                          Sort bSort,
-                         ImmutableArray<ITermLabel> bLabels) {
+                         ImmutableArray<TermLabel> bLabels) {
         if ( aOp == bOp ) return 0;
 
         // Search for literals
@@ -204,8 +202,8 @@ public class LexPathOrdering implements TermOrdering {
 
         // compare anonHeap labels: if only one term has an anonHeap label,
         // then this is smaller
-        v = (aLabels.contains(AnonHeapTermLabel.INSTANCE) ? -1 : 0);
-        v += (bLabels.contains(AnonHeapTermLabel.INSTANCE) ? 1 : 0);
+        v = (aLabels.contains(ParameterlessTermLabel.ANON_HEAP_LABEL) ? -1 : 0);
+        v += (bLabels.contains(ParameterlessTermLabel.ANON_HEAP_LABEL) ? 1 : 0);
         if ( v != 0 ) return v;
 
         // use the names of the symbols

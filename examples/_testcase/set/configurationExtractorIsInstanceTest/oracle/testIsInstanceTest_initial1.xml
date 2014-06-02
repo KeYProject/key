@@ -2,7 +2,7 @@
 <model>
    <equivalenceClass representativeTerm="obj">
       <term term="obj"/>
-      <term term="IsInstanceTest.A"/>
+      <term term="IsInstanceTest::select(heap,null,IsInstanceTest::$A)"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return 1;">
       <association name="IsInstanceTest::A" programVariable="IsInstanceTest::A" isArrayIndex="false" arrayIndex="-1" target="o1"/>

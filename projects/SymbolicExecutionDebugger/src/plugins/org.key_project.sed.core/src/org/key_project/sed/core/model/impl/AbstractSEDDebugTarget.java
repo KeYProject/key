@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,6 +13,9 @@
 
 package org.key_project.sed.core.model.impl;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugEvent;
@@ -24,8 +27,14 @@ import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentProvider;
+import org.key_project.sed.core.annotation.ISEDAnnotation;
+import org.key_project.sed.core.annotation.ISEDAnnotationLink;
+import org.key_project.sed.core.annotation.ISEDAnnotationType;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.event.ISEDAnnotationListener;
+import org.key_project.sed.core.model.event.SEDAnnotationEvent;
 import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * Provides a basic implementation of {@link ISEDDebugTarget}.
@@ -35,9 +44,15 @@ import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
 @SuppressWarnings("restriction")
 public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement implements ISEDDebugTarget {
    /**
+    * Is this {@link ISEDDebugTarget} executable meaning that
+    * suspend, resume, step operations and disconnect are supported?;
+    */
+   private final boolean executable;
+   
+   /**
     * The {@link ILaunch} in that this {@link IDebugTarget} is used.
     */
-   private ILaunch launch;
+   private final ILaunch launch;
    
    /**
     * Indicates that the connection to the process is disconnected or not.
@@ -65,12 +80,25 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
    private String name;
    
    /**
+    * All registered annotations.
+    */
+   private final List<ISEDAnnotation> registeredAnnotations = new LinkedList<ISEDAnnotation>();
+   
+   /**
+    * All registered {@link ISEDAnnotationListener}.
+    */
+   private final List<ISEDAnnotationListener> annotationListener = new LinkedList<ISEDAnnotationListener>();
+   
+   /**
     * Constructor.
     * @param launch The {@link ILaunch} in that this {@link IDebugTarget} is used.
+    * @param executable {@code true} Support suspend, resume, etc.; {@code false} Do not support suspend, resume, etc.
     */
-   public AbstractSEDDebugTarget(ILaunch launch) {
+   public AbstractSEDDebugTarget(ILaunch launch, boolean executable) {
       super(null);
+      this.executable = executable;
       this.launch = launch;
+      
    }
    
    /**
@@ -183,7 +211,7 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public boolean canResume() {
-      return isSuspended() && !isTerminated() && !isDisconnected();
+      return executable && isSuspended() && !isTerminated() && !isDisconnected();
    }
 
    /**
@@ -191,7 +219,7 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public boolean canSuspend() {
-      return !isSuspended() && !isTerminated() && !isDisconnected();
+      return executable && !isSuspended() && !isTerminated() && !isDisconnected();
    }
 
    /**
@@ -246,7 +274,7 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public boolean canDisconnect() {
-      return !isDisconnected() && !isTerminated();
+      return executable && !isDisconnected() && !isTerminated();
    }
 
    /**
@@ -296,6 +324,151 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    protected void setName(String name) {
       this.name = name;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void registerAnnotation(ISEDAnnotation annotation) {
+      if (annotation != null && !registeredAnnotations.contains(annotation)) {
+         if (registeredAnnotations.add(annotation)) {
+            fireAnnotationRegistered(new SEDAnnotationEvent(this, annotation));
+         }
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void unregisterAnnotation(ISEDAnnotation annotation) {
+      if (annotation != null) {
+         if (registeredAnnotations.remove(annotation)) {
+            ISEDAnnotationLink[] links = annotation.getLinks();
+            for (ISEDAnnotationLink link : links) {
+               link.getTarget().removeAnnotationLink(link);
+            }
+            fireAnnotationUnregistered(new SEDAnnotationEvent(this, annotation));
+         }
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDAnnotation[] getRegisteredAnnotations() {
+      return registeredAnnotations.toArray(new ISEDAnnotation[registeredAnnotations.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDAnnotation[] getRegisteredAnnotations(ISEDAnnotationType type) {
+      List<ISEDAnnotation> result = new LinkedList<ISEDAnnotation>();
+      for (ISEDAnnotation annotation : registeredAnnotations) {
+         if (ObjectUtil.equals(type, annotation.getType())) {
+            result.add(annotation);
+         }
+      }
+      return result.toArray(new ISEDAnnotation[result.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isRegistered(ISEDAnnotation annotation) {
+      return annotation != null && registeredAnnotations.contains(annotation);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void moveRegisteredAnnotation(ISEDAnnotation annotation, int newIndex) {
+      if (annotation != null && newIndex >= 0 && newIndex < registeredAnnotations.size()) {
+         if (registeredAnnotations.remove(annotation)) {
+            registeredAnnotations.add(newIndex, annotation);
+            fireAnnotationMoved(new SEDAnnotationEvent(this, annotation));
+         }
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int indexOfRegisteredAnnotation(ISEDAnnotation annotation) {
+      if (annotation != null) {
+         return registeredAnnotations.indexOf(annotation);
+      }
+      else {
+         return -1;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int countRegisteredAnnotations() {
+      return registeredAnnotations.size();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addAnnotationListener(ISEDAnnotationListener l) {
+      if (l != null) {
+         annotationListener.add(l);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeAnnotationListener(ISEDAnnotationListener l) {
+      if (l != null) {
+         annotationListener.remove(l);
+      }
+   }
+   
+   /**
+    * Fires the event {@link ISEDAnnotationListener#annotationRegistered(SEDAnnotationEvent)}.
+    * @param e The {@link SEDAnnotationEvent}.
+    */
+   protected void fireAnnotationRegistered(SEDAnnotationEvent e) {
+      ISEDAnnotationListener[] listener = annotationListener.toArray(new ISEDAnnotationListener[annotationListener.size()]);
+      for (ISEDAnnotationListener l : listener) {
+         l.annotationRegistered(e);
+      }
+   }
+   
+   /**
+    * Fires the event {@link ISEDAnnotationListener#annotationUnregistered(SEDAnnotationEvent)}.
+    * @param e The {@link SEDAnnotationEvent}.
+    */
+   protected void fireAnnotationUnregistered(SEDAnnotationEvent e) {
+      ISEDAnnotationListener[] listener = annotationListener.toArray(new ISEDAnnotationListener[annotationListener.size()]);
+      for (ISEDAnnotationListener l : listener) {
+         l.annotationUnregistered(e);
+      }
+   }
+   
+   /**
+    * Fires the event {@link ISEDAnnotationListener#annotationMoved(SEDAnnotationEvent)}.
+    * @param e The {@link SEDAnnotationEvent}.
+    */
+   protected void fireAnnotationMoved(SEDAnnotationEvent e) {
+      ISEDAnnotationListener[] listener = annotationListener.toArray(new ISEDAnnotationListener[annotationListener.size()]);
+      for (ISEDAnnotationListener l : listener) {
+         l.annotationMoved(e);
+      }
    }
 
    /**

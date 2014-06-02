@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -14,13 +14,13 @@
 package org.key_project.key4eclipse.resources.builder;
 
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.Contract;
@@ -35,7 +35,8 @@ public class ProofElement {
 
    private IFile javaFile;
    private SourceLocation scl;
-   private IMarker marker;
+   private LinkedHashSet<IMarker> marker;
+   private String markerMsg;
    
    private IFolder proofFolder;
    private IFile proofFile;
@@ -46,9 +47,10 @@ public class ProofElement {
    private Contract contract;
    private ProofOblInput proofObl;
    
-   private Proof proof;
+   private boolean proofClosed;
    
    private LinkedHashSet<IProofReference<?>> proofReferences;
+   private LinkedList<ProofElement> usedContracts;
    
    
 
@@ -58,11 +60,25 @@ public class ProofElement {
    public SourceLocation getSourceLocation() {
       return scl;
    }
-   public IMarker getMarker(){
+   
+   public LinkedHashSet<IMarker> getMarker(){
       return marker;
    }
-   public void setMarker(IMarker marker){
+   public void setMarker(LinkedHashSet<IMarker> marker){
       this.marker = marker;
+   }
+   public void addMarker(IMarker marker){
+      this.marker.add(marker);
+   }
+   public void removeMarker(IMarker marker){
+      this.marker.remove(marker);
+   }
+   
+   public String getMarkerMsg() {
+      return markerMsg;
+   }
+   public void setMarkerMsg(String markerMsg) {
+      this.markerMsg = markerMsg;
    }
    
    public IFolder getProofFolder(){
@@ -71,14 +87,8 @@ public class ProofElement {
    public IFile getProofFile(){
       return proofFile;
    }
-   public void setProofFile(IFile proofFile){
-      this.proofFile = proofFile;
-   }
    public IFile getMetaFile(){
       return metaFile;
-   }
-   public void setMetaFile(IFile metaFile){
-      this.metaFile = metaFile;
    }
    
    public KeYEnvironment<CustomConsoleUserInterface> getKeYEnvironment(){
@@ -100,11 +110,11 @@ public class ProofElement {
    }
 
    
-   public Proof getProof(){
-      return proof;
+   public boolean getProofClosed(){
+      return proofClosed;
    }
-   public void setProof(Proof proof){
-      this.proof = proof;
+   public void setProofClosed(boolean proofStatus){
+      this.proofClosed = proofStatus;
    }
    
    
@@ -113,21 +123,33 @@ public class ProofElement {
    }
    public void setProofReferences(LinkedHashSet<IProofReference<?>> proofReferences){
       this.proofReferences = proofReferences;
-   } 
+   }
+   public LinkedList<ProofElement> getUsedContracts() {
+      return usedContracts;
+   }
+   public void setUsedContracts(LinkedList<ProofElement> usedContracts) {
+      this.usedContracts = usedContracts;
+   }
    
-   
-   public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<CustomConsoleUserInterface> environment, IFolder proofFolder, Contract contract){
+   public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<CustomConsoleUserInterface> environment, IFolder proofFolder, IFile proofFile, IFile metaFile, LinkedHashSet<IMarker> marker, Contract contract){
       this.javaFile = javaFile;
       this.scl = scl;
+      this.marker = marker;
       
       this.proofFolder = proofFolder;
+      this.proofFile = proofFile;
+      this.metaFile = metaFile;
       
       this.environment = environment;
       
       this.contract = contract;
       
-      this.proof = null;
-      
       this.proofReferences = new LinkedHashSet<IProofReference<?>>();
+      this.usedContracts = new LinkedList<ProofElement>();
+   }
+   
+   @Override
+   public String toString(){
+      return contract.getName();
    }
 }

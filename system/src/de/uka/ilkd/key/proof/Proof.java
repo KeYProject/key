@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,7 +43,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
@@ -90,7 +90,7 @@ public class Proof implements Named {
      * attention: firing events makes use of array list's random access
      * nature
      */
-    private List<ProofTreeListener> listenerList = new ArrayList<ProofTreeListener>(10);
+    private List<ProofTreeListener> listenerList = new LinkedList<ProofTreeListener>();
 
     /** list with the open goals of the proof */
     private ImmutableList<Goal> openGoals = ImmutableSLList.<Goal>nil();
@@ -158,6 +158,7 @@ public class Proof implements Named {
                         updateStrategyOnGoals();
                     }
                 };
+
         setSettings(settings);
         pis = ProofIndependentSettings.DEFAULT_INSTANCE;
     }
@@ -269,7 +270,6 @@ public class Proof implements Named {
         setSettings(null);
         // set every reference (except the name) to null
         root = null;
-        listenerList = null;
         openGoals = null;
         problemHeader = null;
         services = null;
@@ -282,8 +282,9 @@ public class Proof implements Named {
         keyVersionLog = null;
         activeStrategy = null;
         settingsListener = null;
-        ruleAppListenerList = null;
         disposed = true;
+        ruleAppListenerList = null;
+        listenerList = null;
     }
 
 
@@ -740,11 +741,9 @@ public class Proof implements Named {
 
                         @Override
                         public void visit(Proof proof, Node visitedNode) {
-                                final Iterator<NoPosTacletApp> it = visitedNode.getLocalIntroducedRules().iterator();
-                                while ( it.hasNext () ){
-
-                                     firstGoal.ruleAppIndex().removeNoPosTacletApp(it.next ());
-                                }
+                            for (final NoPosTacletApp app :  visitedNode.getLocalIntroducedRules()){
+                                firstGoal.ruleAppIndex().removeNoPosTacletApp(app);
+                            }
 
                                 firstGoal.pruneToParent();
 
@@ -846,7 +845,7 @@ public class Proof implements Named {
      *  The first reported node is <code>startNode</code>.
      */
     public void breadthFirstSearch(Node startNode, ProofVisitor visitor){
-            LinkedList<Node> queue = new LinkedList<Node>();
+            ArrayDeque<Node> queue = new ArrayDeque<Node>();
             queue.add(startNode);
             while(!queue.isEmpty()){
                     Node currentNode = queue.poll();
@@ -873,8 +872,8 @@ public class Proof implements Named {
     /** fires the event that the proof has been expanded at the given node */
     public void fireProofExpanded(Node node) {
 	ProofTreeEvent e = new ProofTreeEvent(this, node);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofExpanded(e);
+    for (ProofTreeListener listener : listenerList) {
+	    listener.proofExpanded(e);
 	}
     }
 
@@ -882,8 +881,8 @@ public class Proof implements Named {
     /** fires the event that the proof has been pruned at the given node */
     protected void fireProofIsBeingPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
-        for (int i = 0; i<listenerList.size(); i++) {
-            listenerList.get(i).proofIsBeingPruned(e);
+        for (ProofTreeListener listener : listenerList) {
+            listener.proofIsBeingPruned(e);
         }
     }
 
@@ -891,8 +890,8 @@ public class Proof implements Named {
     /** fires the event that the proof has been pruned at the given node */
     protected void fireProofPruned(Node below) {
 	ProofTreeEvent e = new ProofTreeEvent(this, below);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofPruned(e);
+    for (ProofTreeListener listener : listenerList) {
+        listener.proofPruned(e);
 	}
     }
 
@@ -900,8 +899,8 @@ public class Proof implements Named {
     /** fires the event that the proof has been restructured */
     public void fireProofStructureChanged() {
 	ProofTreeEvent e = new ProofTreeEvent(this);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofStructureChanged(e);
+    for (ProofTreeListener listener : listenerList) {
+	    listener.proofStructureChanged(e);
 	}
     }
 
@@ -909,8 +908,8 @@ public class Proof implements Named {
     /** fires the event that a goal has been removed from the list of goals */
     protected void fireProofGoalRemoved(Goal goal) {
 	ProofTreeEvent e = new ProofTreeEvent(this, goal);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofGoalRemoved(e);
+    for (ProofTreeListener listener : listenerList) {
+	    listener.proofGoalRemoved(e);
 	}
     }
 
@@ -920,8 +919,8 @@ public class Proof implements Named {
      */
     protected void fireProofGoalsAdded(ImmutableList<Goal> goals) {
 	ProofTreeEvent e = new ProofTreeEvent(this, goals);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofGoalsAdded(e);
+    for (ProofTreeListener listener : listenerList) {
+	    listener.proofGoalsAdded(e);
 	}
     }
 
@@ -935,24 +934,24 @@ public class Proof implements Named {
 
 
     /** fires the event that the proof has been restructured */
-	public void fireProofGoalsChanged() {
-		ProofTreeEvent e = new ProofTreeEvent(this, openGoals());
-		for (int i = 0; i<listenerList.size(); i++) {
-			listenerList.get(i).proofGoalsChanged(e);
-		}
+    public void fireProofGoalsChanged() {
+	ProofTreeEvent e = new ProofTreeEvent(this, openGoals());
+	for (ProofTreeListener listener : listenerList) {
+	    listener.proofGoalsChanged(e);
 	}
+    }
 
 
     /** fires the event that the proof has closed.
      * This event fired instead of the proofGoalRemoved event when
      * the last goal in list is removed.
      */
-	protected void fireProofClosed() {
-		ProofTreeEvent e = new ProofTreeEvent(this);
-		for (int i = 0; i<listenerList.size(); i++) {
-			listenerList.get(i).proofClosed(e);
-		}
-	}
+    protected void fireProofClosed() {
+        ProofTreeEvent e = new ProofTreeEvent(this);
+        for (ProofTreeListener listener : listenerList) {
+            listener.proofClosed(e);
+        }
+    }
 
 
     /**
@@ -1002,10 +1001,7 @@ public class Proof implements Named {
      * node is an inner one
      */
     public Goal getGoal(Node node) {
-	Goal result = null;
-	Iterator<Goal> it = openGoals.iterator();
-	while (it.hasNext()) {
-	    result = it.next();
+	for (final Goal result : openGoals) {
 	    if (result.node() == node) {
 		return result;
 	    }
@@ -1021,9 +1017,7 @@ public class Proof implements Named {
      */
     public ImmutableList<Goal> getSubtreeGoals(Node node) {
 	ImmutableList<Goal> result = ImmutableSLList.<Goal>nil();
-	final Iterator<Goal> goalsIt  = openGoals.iterator();
-	while (goalsIt.hasNext()) {
-	    final Goal goal = goalsIt.next();
+	for (final Goal goal : openGoals) {
 	    final Iterator<Node> leavesIt = node.leavesIterator();
 	    while (leavesIt.hasNext()) {
 		if (leavesIt.next() == goal.node()) {
@@ -1033,7 +1027,6 @@ public class Proof implements Named {
 	}
 	return result;
     }
-
 
     /**
      * get the list of goals of the subtree starting with node which are enabled.
@@ -1073,17 +1066,15 @@ public class Proof implements Named {
      * control the contents of the rule app index
      */
     public void setRuleAppIndexToAutoMode () {
-	Iterator<Goal> it = openGoals.iterator ();
-	while ( it.hasNext () ) {
-	    it.next ().ruleAppIndex ().autoModeStarted ();
+    for (final Goal g : openGoals) {
+	    g.ruleAppIndex ().autoModeStarted ();
 	}
     }
 
 
     public void setRuleAppIndexToInteractiveMode () {
-	Iterator<Goal> it = openGoals.iterator ();
-	while ( it.hasNext () ) {
-	    it.next ().ruleAppIndex ().autoModeStopped ();
+	for (final Goal g : openGoals) {
+	    g.ruleAppIndex ().autoModeStopped ();
 	}
     }
 
@@ -1118,6 +1109,12 @@ public class Proof implements Named {
 	return result.toString();
     }
 
+    /**
+     * Instances of this class encapsulate statistical information about proofs,
+     * such as the number of nodes, or the number of interactions.
+     * @author bruns
+     *
+     */
     public final static class Statistics {
         public final int nodes;
         public final int branches;
@@ -1131,24 +1128,25 @@ public class Proof implements Named {
         public final int loopInvApps;
         public final long autoModeTime;
         public final long time;
+        public final float timePerStep;
 
         private List<Pair<String, String>> summaryList =
                 new ArrayList<Pair<String, String>>(14);
 
 
         private Statistics(Proof proof) {
-            final NodeIterator it = proof.root().subtreeIterator();
+            final Iterator<Node> it = proof.root().subtreeIterator();
 
-            int tmpNodes = 0;
-            int tmpBranches = 1;
-            int tmpInteractive = 0;
-            int tmpQuant = 0;
-            int tmpOss = 0;
-            int tmpOssCaptured = 0;
-            int tmpSmt = 0;
-            int tmpDep = 0;
-            int tmpContr = 0;
-            int tmpInv = 0;
+            int tmpNodes = 0; // proof nodes
+            int tmpBranches = 1; // proof branches
+            int tmpInteractive = 0; // interactive steps
+            int tmpQuant = 0; // quantifier instantiations
+            int tmpOss = 0; // OSS applications
+            int tmpOssCaptured = 0; // rules apps in OSS protocol
+            int tmpSmt = 0; // SMT rule apps
+            int tmpDep = 0; // dependency contract apps
+            int tmpContr = 0; // functional contract apps
+            int tmpInv = 0; // loop invariants
 
             while (it.hasNext()) {
                 tmpNodes++;
@@ -1183,7 +1181,7 @@ public class Proof implements Named {
                     } else if (ruleApp instanceof TacletApp) {
                         final de.uka.ilkd.key.rule.Taclet t = ((TacletApp)ruleApp).taclet();
                         final String tName = t.name().toString();
-                        if (tName.startsWith("allLeft") || tName.startsWith("exRight")) {
+                        if (tName.startsWith("allLeft") || tName.startsWith("exRight") || tName.startsWith("inst")) {
                             tmpQuant++;
                         }
                     }
@@ -1202,29 +1200,19 @@ public class Proof implements Named {
             this.loopInvApps = tmpInv;
             this.autoModeTime = proof.getAutoModeTime();
             this.time = System.currentTimeMillis() - Main.getStartTime();
+            timePerStep = autoModeTime/(float)nodes;
 
-            generateSummary(proof, tmpNodes, tmpBranches, tmpInteractive, tmpQuant, tmpOss, tmpSmt, tmpDep, tmpContr, tmpInv, tmpOssCaptured);
+            generateSummary(proof);
         }
 
-
-        private void generateSummary(Proof proof,
-                                     int tmpNodes,
-                                     int tmpBranches,
-                                     int tmpInteractive,
-                                     int quant,
-                                     int tmpOss,
-                                     int tmpSmt,
-                                     int tmpDep,
-                                     int tmpContr,
-                                     int tmpInv,
-                                     int tmpOssCaptured) {
+        private void generateSummary(Proof proof) {
             final String nodeString =
-                    EnhancedStringBuffer.format(tmpNodes).toString();
+                    EnhancedStringBuffer.format(nodes).toString();
             summaryList.add(new Pair<String, String>("Nodes", nodeString));
             summaryList.add(new Pair<String, String>("Branches",
-                                                     EnhancedStringBuffer.format(tmpBranches).toString()));
+                                                     EnhancedStringBuffer.format(branches).toString()));
             summaryList.add(new Pair<String, String>("Interactive steps", "" +
-                                                                          tmpInteractive));
+                                                                          interactiveSteps));
             final long time = proof.getAutoModeTime();
             summaryList.add(new Pair<String, String>("Automode time",
                                                      EnhancedStringBuffer.formatTime(time).toString()));
@@ -1233,31 +1221,31 @@ public class Proof implements Named {
                                                                           time +
                                                                           "ms"));
             }
-            if (tmpNodes > 0) { // TODO: real rounding
-                final String avgTime = "" + (time / tmpNodes) + "." + ((time *
-                                                                        10 /
-                                                                        tmpNodes) %
-                                                                       10);
+            if (nodes > 0) {
+                String avgTime = "" + timePerStep;
+                // round to 3 digits after point
+                int i = avgTime.indexOf('.')+4;
+                if (i > avgTime.length()) i = avgTime.length();
+                avgTime = avgTime.substring(0,i);
                 summaryList.add(new Pair<String, String>("Avg. time per step", "" +
                                                                                avgTime +
                                                                                "ms"));
             }
 
             summaryList.add(new Pair<String, String>("Rule applications", ""));
-            summaryList.add(new Pair<String, String>("Quantifier instantiations", ""+quant));
+            summaryList.add(new Pair<String, String>("Quantifier instantiations", ""+quantifierInstantiations));
             summaryList.add(new Pair<String, String>("One-step Simplifier apps", "" +
-                                                                                 tmpOss));
+                                                                                 ossApps));
             summaryList.add(new Pair<String, String>("SMT solver apps", "" +
-                                                                        tmpSmt));
+                                                                        smtSolverApps));
             summaryList.add(new Pair<String, String>("Dependency Contract apps", "" +
-                                                                                 tmpDep));
+                                                                                 dependencyContractApps));
             summaryList.add(new Pair<String, String>("Operation Contract apps", "" +
-                                                                                tmpContr));
+                                                                                operationContractApps));
             summaryList.add(new Pair<String, String>("Loop invariant apps", "" +
-                                                                            tmpInv));
+                                                                            loopInvApps));
             summaryList.add(new Pair<String, String>("Total rule apps",
-                                                     EnhancedStringBuffer.format(tmpNodes +
-                                                                                 tmpOssCaptured).toString()));
+                                                     EnhancedStringBuffer.format(totalRuleApps).toString()));
         }
 
 
@@ -1286,9 +1274,8 @@ public class Proof implements Named {
    /** fires the event that a rule has been applied */
    protected void fireRuleApplied(ProofEvent p_e) {
       synchronized (ruleAppListenerList) {
-         Iterator<RuleAppListener> it = ruleAppListenerList.iterator();
-         while (it.hasNext()) {
-            it.next().ruleApplied(p_e);
+         for (RuleAppListener ral : ruleAppListenerList) {
+            ral.ruleApplied(p_e);
          }
       }
    }

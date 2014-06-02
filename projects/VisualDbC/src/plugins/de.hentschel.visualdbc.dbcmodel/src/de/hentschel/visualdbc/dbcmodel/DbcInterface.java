@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -31,6 +31,7 @@ import org.eclipse.emf.common.util.EList;
  * The following features are supported:
  * <ul>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.DbcInterface#getExtends <em>Extends</em>}</li>
+ *   <li>{@link de.hentschel.visualdbc.dbcmodel.DbcInterface#getExtendsFullNames <em>Extends Full Names</em>}</li>
  * </ul>
  * </p>
  *
@@ -55,4 +56,20 @@ public interface DbcInterface extends AbstractDbcInterface {
     * @generated
     */
    EList<DbcInterface> getExtends();
+
+   /**
+    * Returns the value of the '<em><b>Extends Full Names</b></em>' attribute list.
+    * The list contents are of type {@link java.lang.String}.
+    * <!-- begin-user-doc -->
+    * <p>
+    * If the meaning of the '<em>Extends Full Names</em>' attribute list isn't clear,
+    * there really should be more of a description here...
+    * </p>
+    * <!-- end-user-doc -->
+    * @return the value of the '<em>Extends Full Names</em>' attribute list.
+    * @see de.hentschel.visualdbc.dbcmodel.DbcmodelPackage#getDbcInterface_ExtendsFullNames()
+    * @model
+    * @generated
+    */
+   EList<String> getExtendsFullNames();
 } // DbcInterface

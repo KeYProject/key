@@ -5,24 +5,24 @@
          <operationContract name="result_0 = magic(x) catch(exc_0)
 pre: true
 post: result_0 = subMagic(x) &amp; exc_0 = null
-mod: {}
+mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-            <branchCondition name="x = TRUE" pathCondition="x = TRUE" pathConditionChanged="true" branchCondition="x = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <statement name="return magicValue;" pathCondition="x = TRUE" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of SimpleBooleanQuery.main(x);&gt;" pathCondition="x = TRUE" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of SimpleBooleanQuery.main(x);&gt;" isReturnValueComputed="true">
-                     <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+            <branchCondition name="equals(x,TRUE)" pathCondition="equals(x,TRUE)" pathConditionChanged="true" branchCondition="equals(x,TRUE)" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="return magicValue;" pathCondition="equals(x,TRUE)" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of SimpleBooleanQuery.main(x);&gt;" pathCondition="equals(x,TRUE)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of SimpleBooleanQuery.main(x);&gt;" isReturnValueComputed="true">
+                     <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                      </methodReturnValue>
-                     <termination name="&lt;end&gt;" pathCondition="x = TRUE" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                     <termination name="&lt;end&gt;" pathCondition="equals(x,TRUE)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>
             </branchCondition>
-            <branchCondition name="!x = TRUE" pathCondition="!x = TRUE" pathConditionChanged="true" branchCondition="!x = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <statement name="return magicValue;" pathCondition="!x = TRUE" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of SimpleBooleanQuery.main(x);&gt;" pathCondition="!x = TRUE" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -4711 as result of SimpleBooleanQuery.main(x);&gt;" isReturnValueComputed="true">
-                     <methodReturnValue name="-4711" returnValueString="-4711" hasCondition="false">
+            <branchCondition name="not(equals(x,TRUE))" pathCondition="not(equals(x,TRUE))" pathConditionChanged="true" branchCondition="not(equals(x,TRUE))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="return magicValue;" pathCondition="not(equals(x,TRUE))" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of SimpleBooleanQuery.main(x);&gt;" pathCondition="not(equals(x,TRUE))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of SimpleBooleanQuery.main(x);&gt;" isReturnValueComputed="true">
+                     <methodReturnValue name="Z(neglit(1(1(7(4(#))))))" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="false">
                      </methodReturnValue>
-                     <termination name="&lt;end&gt;" pathCondition="!x = TRUE" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                     <termination name="&lt;end&gt;" pathCondition="not(equals(x,TRUE))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>

@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
@@ -313,9 +312,9 @@ public final class SupportedTaclets {
         public enum Category {
                 ALL_SUPPORTED, PROOF_DEPENDENT, PROOF_INDEPENDENT, BOOLEAN_RULES, INTEGER_RULES, CONSTANT_REPLACEMENT_RULES, TRANSLATION_JAVA_OPERATOR, CAST_OPERATOR, MISCELLANEOUS, EXACT_INSTANCE_RULES, ONLY_CREATED_OBJECTS_ARE_REFERENCED, ONLY_CREATED_OBJECTS_ARE_REFERENCED_NORMAL, ONLY_CREATED_OBJECTS_ARE_REFERENCED_ARRAY, SYTEM_INVARIANTS, NEXT_TO_CREATE, ARRAY_LENGTH, CLASS_INITIALISATION, NO_CATEGORY, LOC_SETS, LOC_SETS_AXIOMS, LOC_SETS_LEMATA, HEAP, HEAP_AXIOMS, HEAP_LEMATA, REACH, REACH_AXIOMS, REACH_LEMATA
 
-        };
+        }
 
-        /**
+    /**
          * This is the real interesting method of this class. Change this method
          * to change the range of supported taclets.
          * 
@@ -596,9 +595,9 @@ public final class SupportedTaclets {
 
                 public enum SelectionMode {
                         all, nothing, user
-                };
+                }
 
-                private String text;
+            private String text;
 
                 private SelectionMode mode = SelectionMode.nothing;
                 private int selectedChildCount = 0;

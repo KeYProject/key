@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -37,11 +37,10 @@ public class ProofMarkerResolutionGenerator implements IMarkerResolutionGenerato
       LinkedList<IMarkerResolution> resolutions = new LinkedList<IMarkerResolution>();
       try{
          if (StarterUtil.areFileStartersAvailable()) {
-            resolutions.add(new ProofMarkerResolution(marker.getType(), false));
-            resolutions.add(new ProofMarkerResolution(marker.getType(), true));
+            resolutions.add(new ProofMarkerResolution(marker));
          }
       } catch (CoreException e){
-         LogUtil.getLogger().createErrorStatus(e); // TODO: You do nothing with the created status. I guess you mean LogUtil.getLogger().logError(e); which writes the exception into the eclipse log
+         LogUtil.getLogger().logError(e);
       }
       return (IMarkerResolution[])resolutions.toArray(new IMarkerResolution[resolutions.size()]);
    }

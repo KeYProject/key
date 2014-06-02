@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -17,11 +17,13 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.resources.ProjectExplorer;
@@ -36,6 +38,21 @@ import org.key_project.util.test.view.GraphitiEditorInViewView;
  * @author Martin Hentschel
  */
 public class WorkbenchUtilTest extends TestCase {
+   /**
+    * Tests {@link WorkbenchUtil#findWorkbenchWindow(org.eclipse.swt.widgets.Shell)}.
+    */
+   @Test
+   public void testFindWorkbenchWindow() {
+      assertNull(WorkbenchUtil.findWorkbenchWindow(null));
+      for (IWorkbenchWindow window : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+         assertSame(window, WorkbenchUtil.findWorkbenchWindow(window.getShell()));
+      }
+      Shell nowWorkbenchWindowShell = new Shell();
+      assertNull(WorkbenchUtil.findWorkbenchWindow(nowWorkbenchWindowShell));
+      nowWorkbenchWindowShell.dispose();
+      assertNull(WorkbenchUtil.findWorkbenchWindow(nowWorkbenchWindowShell));
+   }
+   
    /**
     * Tests {@link WorkbenchUtil#getPerspectiveName(String)}.
     */

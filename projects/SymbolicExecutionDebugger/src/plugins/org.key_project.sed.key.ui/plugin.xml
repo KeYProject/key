@@ -124,15 +124,21 @@
       </command>
       <command
             categoryId="org.eclipse.debug.ui.category.run"
-            description="Generates an Object Diagram for configurations of the current node."
-            id="org.key_project.sed.key.ui.visualizeConfigurationsCommand"
-            name="Visualize Configurations">
+            description="Computes all memory layouts of the current node and visualizes them."
+            id="org.key_project.sed.key.ui.visualizeMemoryLayoutsCommand"
+            name="Visualize Memory Layouts">
       </command>
       <command
             categoryId="org.eclipse.debug.ui.category.run"
             description="Opens KeY&apos;s proof from which the symbolic execution tree was extracted."
             id="org.key_project.sed.key.ui.openProofCommand"
             name="Open Proof">
+      </command>
+      <command
+            categoryId="org.eclipse.debug.ui.category.run"
+            description="Add a KeY Watchpoint."
+            id="org.key_project.sed.key.ui.addWatchpointCommand"
+            name="Add Watchpoint">
       </command>
    </extension>
       <extension
@@ -146,8 +152,12 @@
                icon="icons/saveKeYProof.gif">
          </image>
          <image
-               commandId="org.key_project.sed.key.ui.visualizeConfigurationsCommand"
-               icon="icons/configurations_object_diagram.gif">
+               commandId="org.key_project.sed.key.ui.visualizeMemoryLayoutsCommand"
+               icon="icons/memory_layouts_object_diagram.gif">
+         </image>
+         <image
+               commandId="org.key_project.sed.key.ui.addWatchpointCommand"
+               icon="icons/watchpoint.gif">
          </image>
          <image
                commandId="org.key_project.sed.key.ui.openProofCommand"
@@ -189,8 +199,8 @@
             </enabledWhen>
          </handler>
          <handler
-               class="org.key_project.sed.key.ui.visualization.execution_tree.command.VisualizeConfigurationsCommand"
-               commandId="org.key_project.sed.key.ui.visualizeConfigurationsCommand">
+               class="org.key_project.sed.key.ui.visualization.execution_tree.command.VisualizeMemoryLayoutsCommand"
+               commandId="org.key_project.sed.key.ui.visualizeMemoryLayoutsCommand">
             <enabledWhen>
                <iterate
                      ifEmpty="false"
@@ -202,7 +212,7 @@
                         </instanceof>
                         <test
                               forcePluginActivation="true"
-                              property="org.key_project.sed.key.ui.canVisualizeConfigurations">
+                              property="org.key_project.sed.key.ui.canVisualizeMemoryLayouts">
                         </test>
                      </and>
                   </or>
@@ -241,6 +251,10 @@
                </iterate>
             </enabledWhen>
          </handler>
+         <handler
+               class="org.key_project.sed.key.ui.command.AddWatchpointHandler"
+               commandId="org.key_project.sed.key.ui.addWatchpointCommand">
+         </handler>
       </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -257,7 +271,7 @@
             sequence="M1+M2+K">
       </key>
       <key
-            commandId="org.key_project.sed.key.ui.visualizeConfigurationsCommand"
+            commandId="org.key_project.sed.key.ui.visualizeMemoryLayoutsCommand"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+C">
@@ -370,8 +384,8 @@
                allPopups="true"
                locationURI="popup:org.eclipse.debug.ui.DebugView?after=additions">
             <command
-                  commandId="org.key_project.sed.key.ui.visualizeConfigurationsCommand"
-                  icon="icons/configurations_object_diagram.gif"
+                  commandId="org.key_project.sed.key.ui.visualizeMemoryLayoutsCommand"
+                  icon="icons/memory_layouts_object_diagram.gif"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -385,7 +399,7 @@
                            </instanceof>
                            <test
                                  forcePluginActivation="true"
-                                 property="org.key_project.sed.key.ui.canVisualizeConfigurations">
+                                 property="org.key_project.sed.key.ui.canVisualizeMemoryLayouts">
                            </test>
                         </and>
                      </or>
@@ -469,6 +483,15 @@
                </visibleWhen>
             </command>
          </menuContribution>
+         <menuContribution
+               allPopups="false"
+               locationURI="toolbar:org.eclipse.debug.ui.BreakpointView?after=additions">
+            <command
+                  commandId="org.key_project.sed.key.ui.addWatchpointCommand"
+                  icon="icons/watchpoint.gif"
+                  style="push">
+            </command>
+         </menuContribution>
       </extension>
       <extension
             point="org.eclipse.core.expressions.propertyTesters">
@@ -487,37 +510,34 @@
                type="org.eclipse.debug.core.model.IDebugElement">
          </propertyTester>
          <propertyTester
-               class="org.key_project.sed.key.ui.propertyTester.CanVisualizeConfigurationsPropertyTester"
-               id="org.key_project.sed.key.ui.canVisualizeConfigurationsPropertyTester"
+               class="org.key_project.sed.key.ui.propertyTester.CanVisualizeMemoryLayoutsPropertyTester"
+               id="org.key_project.sed.key.ui.canVisualizeMemoryLayoutsPropertyTester"
                namespace="org.key_project.sed.key.ui"
-               properties="canVisualizeConfigurations"
+               properties="canVisualizeMemoryLayouts"
                type="java.lang.Object">
          </propertyTester>
       </extension>
       <extension
             point="org.key_project.sed.ui.visualization.executionTree.contextMenuEntries">
          <entry
-               factory="org.key_project.sed.key.ui.visualization.execution_tree.feature.DebugNodeVisualizeConfigurationsFeatureFactory"
-               icon="icons/configurations_object_diagram.gif"
-               iconId="org.key_project.sed.key.ui.visualization.VisualizeConfigurationsFeature"
+               factory="org.key_project.sed.key.ui.visualization.execution_tree.feature.DebugNodeVisualizeMemoryLayoutsFeatureFactory"
+               icon="icons/memory_layouts_object_diagram.gif"
+               iconId="org.key_project.sed.key.ui.visualization.VisualizeMemoryLayoutsFeature"
                inButtonPad="true"
                inMenu="true"
                modes="READ_ONLY"
-               text="Visualize Configurations">
+               text="Visualize Memory Layouts">
          </entry>
       </extension>
       <extension
             point="org.eclipse.ui.editors">
          <editor
-               class="org.key_project.sed.key.ui.visualization.object_diagram.editor.ConfigurationObjectDiagramEditor"
+               class="org.key_project.sed.key.ui.visualization.object_diagram.editor.MemoryLayoutDiagramEditor"
                contributorClass="org.key_project.sed.ui.visualization.object_diagram.editor.ReadonlyObjectDiagramActionBarContributor"
                default="false"
-               icon="icons/configurations_object_diagram.gif"
-               id="org.key_project.sed.key.ui.ConfigurationObjectDiagramEditor"
-               name="Configurations Object Diagram Editor">
-            <contentTypeBinding
-                  contentTypeId="org.eclipse.graphiti.content.diagram">
-            </contentTypeBinding>
+               icon="icons/memory_layouts_object_diagram.gif"
+               id="org.key_project.sed.key.ui.MemoryLayoutDiagramEditor"
+               name="Memory Layout Diagram Editor">
          </editor>
       </extension>
       <extension
@@ -528,6 +548,14 @@
                icon="icons/logo16.gif"
                id="org.key_project.sed.key.ui.view.SymbolicExecutionProofSearchStragyView"
                name="Symbolic Execution Settings"
+               restorable="true">
+         </view>
+         <view
+               category="org.key_project.sed.ui.category"
+               class="org.key_project.sed.key.ui.view.SideProofsView"
+               icon="icons/logo16.gif"
+               id="org.key_project.sed.key.ui.view.SideProofsView"
+               name="Side Proofs"
                restorable="true">
          </view>
       </extension>
@@ -547,5 +575,71 @@
                   id="org.key_project.sed.key.ui.view.SymbolicExecutionProofSearchStragyView">
             </viewShortcut>
          </perspectiveExtension>
+      </extension>
+      <extension
+            point="org.eclipse.core.expressions.definitions">
+         <definition
+               id="oneElementSelected">
+            <with
+                  variable="activeMenuSelection">
+               <count
+                     value="1">
+               </count>
+            </with>
+         </definition>
+      </extension>
+      <extension
+            point="org.eclipse.debug.core.breakpoints">
+         <breakpoint
+               class="org.key_project.sed.key.core.breakpoints.KeYWatchpoint"
+               id="org.key_project.sed.key.ui.breakpoints.watchpoint"
+               markerType="org.key_project.sed.key.ui.breakpointMarkers.watchpointMarker"
+               name="KeY Watchpoint">
+         </breakpoint>
+      </extension>
+      <extension
+            id="org.key_project.sed.key.ui.breakpointMarkers.watchpointMarker"
+            name="KeY Watchpoint"
+            point="org.eclipse.core.resources.markers">
+         <persistent
+               value="true">
+         </persistent>
+         <super
+               type="org.eclipse.debug.core.breakpointMarker">
+         </super>
+      </extension>
+      <extension
+            point="org.eclipse.debug.ui.detailPaneFactories">
+         <detailFactories
+               class="org.key_project.sed.key.ui.detailFactories.WatchpointDetailPaneFactory"
+               id="org.key_project.sed.key.ui.detailFactories.watchpointDetailPane">
+            <enablement>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.key_project.sed.key.core.breakpoints.KeYWatchpoint">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </enablement>
+         </detailFactories>
+      </extension>
+      <extension
+            point="org.eclipse.ui.propertyPages">
+         <page
+               class="org.key_project.sed.key.ui.propertyPages.WatchpointPropertyPage"
+               icon="icons/watchpoint.gif"
+               id="org.key_project.sed.key.ui.propertyPages.watchpointPropertyPage"
+               name="Watchpoint Properties">
+            <enabledWhen>
+               <instanceof
+                     value="org.key_project.sed.key.core.breakpoints.KeYWatchpoint">
+               </instanceof>
+            </enabledWhen>
+         </page>
       </extension>
 </plugin>

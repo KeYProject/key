@@ -64,7 +64,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
     private Term buildProgramTerm(BasicSnippetData d,
                                   ProofObligationVars vs,
                                   Term postTerm,
-                                  TermBuilder.Serviced tb) {
+                                  TermBuilder tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException("Tried to produce a "
                     + "program-term for a contract without modality.");
@@ -125,7 +125,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
             throw new UnsupportedOperationException("Tried to produce a "
                     + "java-block for an observer which is no program method.");
         }
-        JavaInfo javaInfo = d.tb.getServices().getJavaInfo();
+        JavaInfo javaInfo = d.services.getJavaInfo();
         IProgramMethod pm = (IProgramMethod) targetMethod;
 
         //create method call

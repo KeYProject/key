@@ -24,6 +24,6 @@ class BasicModifiesSnippet extends ReplaceAndRegisterMethod implements FactoryMe
         }
         assert Term.class.equals(BasicSnippetData.Key.MODIFIES.getType());
         Term origMod = (Term) d.get(BasicSnippetData.Key.MODIFIES);
-        return replace(origMod, d.origVars, poVars.pre);
+        return replace(origMod, d.origVars, poVars.pre, d.tb);
     }
 }

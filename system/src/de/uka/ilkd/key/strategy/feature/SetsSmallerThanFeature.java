@@ -1,18 +1,20 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
+
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -51,12 +53,12 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
         final Term leftTerm = left.toTerm(app, pos, goal);
         final Term rightTerm = right.toTerm(app, pos, goal);
 
-        return origLessThan(leftTerm, rightTerm);
+        return origLessThan(leftTerm, rightTerm, goal.proof().getServices().getCaches());
     }
 
 
     protected boolean origLessThan(Term leftTerm,
-                                   Term rightTerm) {
+                                   Term rightTerm, ServiceCaches caches) {// TODO: Why is this method needed?
         final LiteralCollector m1 = new LiteralCollector();
         m1.collect(leftTerm);
         final ImmutableList<Term> literalsLeftTerm = m1.getResult();
@@ -68,7 +70,7 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
         if (literalsLeftTerm.size() > literalsRightTerm.size()) {
             return true;
         } else {
-            return super.lessThan(literalsLeftTerm, literalsRightTerm);
+            return super.lessThan(literalsLeftTerm, literalsRightTerm, caches);
         }
     }
 

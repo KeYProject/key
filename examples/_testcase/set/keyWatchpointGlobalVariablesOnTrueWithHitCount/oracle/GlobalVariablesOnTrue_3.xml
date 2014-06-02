@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="GlobalVariablesOnTrue.doSomething();" pathCondition="true" pathConditionChanged="false">
+      <statement name="x_global=17;" pathCondition="true" pathConditionChanged="false">
+         <statement name="main(x_global);" pathCondition="true" pathConditionChanged="false">
+            <methodCall name="GlobalVariablesOnTrue.main(x_1);" pathCondition="true" pathConditionChanged="false">
+               <branchStatement name="if (x_1&gt;=0)" pathCondition="true" pathConditionChanged="false">
+                  <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of GlobalVariablesOnTrue.main(x_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                        <statement name="x_global=-1;" pathCondition="true" pathConditionChanged="false">
+                        </statement>
+                     </methodReturn>
+                  </statement>
+               </branchStatement>
+            </methodCall>
+         </statement>
+      </statement>
+   </methodCall>
+</start>

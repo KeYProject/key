@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof;
 
@@ -23,16 +22,19 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.rulefilter.AndRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
@@ -286,8 +288,8 @@ public class TacletAppIndex  {
 
     /** 
      * collects all RewriteTacletInstantiations in a subterm of the
-     * constrainedFormula described by a
-     * PosInOccurrence
+     * constrainedFormula described by a PosInOccurrence.
+     * RewriteTaclets with wrong prefix are filtered out.
      * @param pos the PosInOccurrence to focus 
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
@@ -295,7 +297,7 @@ public class TacletAppIndex  {
      */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence pos, 
                                                  TacletFilter    filter,
-                                                 Services        services) { 
+                                                 TermServices        services) { 
 
         final Iterator<NoPosTacletApp> it =
             getFindTaclet ( pos, filter, services ).iterator();
@@ -304,7 +306,11 @@ public class TacletAppIndex  {
 
         while ( it.hasNext () ) {
             final NoPosTacletApp tacletApp = it.next ();
-            if ( tacletApp.taclet () instanceof RewriteTaclet )
+            final Taclet t = tacletApp.taclet();
+            if (t instanceof RewriteTaclet
+                    && ((RewriteTaclet)t).checkPrefix(
+                            pos, MatchConditions.EMPTY_MATCHCONDITIONS)
+                            != null)
                 result = result.prepend ( tacletApp );
         }
 
@@ -320,7 +326,7 @@ public class TacletAppIndex  {
      */
     public ImmutableList<NoPosTacletApp> getFindTaclet(PosInOccurrence pos,
                                               TacletFilter    filter,
-                                              Services        services) { 
+                                              TermServices        services) { 
         return getIndex ( pos ).getTacletAppAt ( pos, filter );
     }
 

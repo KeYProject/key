@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.speclang.translation;
 
@@ -38,14 +37,14 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 public abstract class SLResolverManager {
     
     public final SLTranslationExceptionManager excManager;
-    private static final TermBuilder TB = TermBuilder.DF;
 
     private ImmutableList<SLExpressionResolver> resolvers 
     	= ImmutableSLList.<SLExpressionResolver>nil();
     private final KeYJavaType specInClass;
     private final ParsableVariable selfVar;
     private final boolean useLocalVarsAsImplicitReceivers;
-        
+    private final TermBuilder tb;    
+    
     private ImmutableList<Namespace> /*ParsableVariable*/
         localVariablesNamespaces = ImmutableSLList.<Namespace>nil();
 
@@ -59,12 +58,14 @@ public abstract class SLResolverManager {
     protected SLResolverManager(SLTranslationExceptionManager excManager, 
                                 KeYJavaType specInClass,
                                 ParsableVariable selfVar,
-                                boolean useLocalVarsAsImplicitReceivers) {
+                                boolean useLocalVarsAsImplicitReceivers,
+                                TermBuilder tb) {
         assert excManager != null;
         this.excManager = excManager;
         this.specInClass = specInClass;
         this.selfVar = selfVar;
         this.useLocalVarsAsImplicitReceivers = useLocalVarsAsImplicitReceivers;
+        this.tb = tb;
     }
     
     
@@ -97,7 +98,7 @@ public abstract class SLResolverManager {
         for(Namespace ns : localVariablesNamespaces) {
             ParsableVariable localVar = (ParsableVariable) ns.lookup(n);
             if(localVar != null) {
-                Term varTerm = TB.var(localVar);
+                Term varTerm = tb.var(localVar);
                 return new SLExpression(varTerm, kjts.get(localVar));
             }
         }
@@ -117,7 +118,7 @@ public abstract class SLResolverManager {
                 for(Named n : ns.elements()) {
                     ParsableVariable localVar = (ParsableVariable) n;
                     SLExpression receiver 
-                    	= new SLExpression(TB.var(localVar),
+                    	= new SLExpression(tb.var(localVar),
                     		           kjts.get(localVar));
                     
                     SLExpression result = resolveExplicit(receiver, 
@@ -129,7 +130,7 @@ public abstract class SLResolverManager {
                 }
             }
         } else if(selfVar != null) {
-            SLExpression receiver = new SLExpression(TB.var(selfVar), 
+            SLExpression receiver = new SLExpression(tb.var(selfVar), 
                 	                             specInClass);
             SLExpression result = resolveExplicit(receiver, 
                                   		  name,

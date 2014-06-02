@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
- 
+//
 
 package de.uka.ilkd.key.proof.init;
 
@@ -21,6 +20,8 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
@@ -29,7 +30,6 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.label.ITermLabelWorker;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooserBuilder;
@@ -49,28 +49,9 @@ public abstract class AbstractProfile implements Profile {
 
     private GoalChooserBuilder prototype;
 
-    private final ImmutableList<ITermLabelWorker> labelInstantiators;
-    
-    protected AbstractProfile(String standardRuleFilename,
-            ImmutableSet<GoalChooserBuilder> supportedGCB) {
-        standardRules = new RuleCollection(RuleSource
-                .initRuleFile(standardRuleFilename),
-                initBuiltInRules());
-        strategies = getStrategyFactories();
-        this.supportedGCB = supportedGCB;
-        this.supportedGC = extractNames(supportedGCB);
-        this.prototype = getDefaultGoalChooserBuilder();
-        assert( this.prototype!=null );
-        this.labelInstantiators = computeLabelInstantiators();
-    }
+    private TermLabelManager termLabelManager;
 
-   /**
-    * Computes the {@link ITermLabelWorker} to use in this {@link Profile}.
-    * @return The {@link ITermLabelWorker} to use in this {@link Profile}.
-    */
-   protected abstract ImmutableList<ITermLabelWorker> computeLabelInstantiators();
-
-   private static
+    private static
         ImmutableSet<String> extractNames(ImmutableSet<GoalChooserBuilder> supportedGCB) {
 
         ImmutableSet<String> result = DefaultImmutableSet.<String>nil();
@@ -83,6 +64,19 @@ public abstract class AbstractProfile implements Profile {
         return result;
     }
 
+    protected AbstractProfile(String standardRuleFilename,
+            ImmutableSet<GoalChooserBuilder> supportedGCB) {
+        standardRules = new RuleCollection(RuleSource
+                .initRuleFile(standardRuleFilename),
+                initBuiltInRules());
+        strategies = getStrategyFactories();
+        this.supportedGCB = supportedGCB;
+        this.supportedGC = extractNames(supportedGCB);
+        this.prototype = getDefaultGoalChooserBuilder();
+        assert( this.prototype!=null );
+        this.termLabelManager = new TermLabelManager(computeTermLabelConfiguration());
+    }
+
     public AbstractProfile(String standardRuleFilename) {
         this(standardRuleFilename,
                 DefaultImmutableSet.<GoalChooserBuilder>nil().
@@ -90,6 +84,12 @@ public abstract class AbstractProfile implements Profile {
                 add(new DepthFirstGoalChooserBuilder()).
                 add(new SymbolicExecutionGoalChooserBuilder()));
     }
+
+    /**
+     * Computes the {@link TermLabelConfiguration} to use in this {@link Profile}.
+     * @return The {@link TermLabelConfiguration} to use in this {@link Profile}.
+     */
+    protected abstract ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration();
 
     public RuleCollection getStandardRules() {
         return standardRules;
@@ -238,7 +238,7 @@ public abstract class AbstractProfile implements Profile {
          return null;
       }
    }
-   
+
    /**
     * Returns the default profile which is used if no profile is defined in custom problem files (loaded via {@link KeYUserProblemFile}).
     * @return The default profile which is used if no profile is defined in custom problem files (loaded via {@link KeYUserProblemFile}).
@@ -255,12 +255,9 @@ public abstract class AbstractProfile implements Profile {
       assert defaultProfile != null;
       AbstractProfile.defaultProfile = defaultProfile;
    }
-   
-   /**
-    * {@inheritDoc}
-    */
+
    @Override
-   public ImmutableList<ITermLabelWorker> getLabelInstantiators() {
-      return labelInstantiators;
+   public TermLabelManager getTermLabelManager() {
+       return termLabelManager;
    }
 }

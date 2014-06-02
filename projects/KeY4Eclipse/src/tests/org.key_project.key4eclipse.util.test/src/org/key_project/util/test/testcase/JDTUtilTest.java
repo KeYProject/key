@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -19,6 +19,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -48,6 +49,68 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class JDTUtilTest extends TestCase {
+   /**
+    * Tests {@link JDTUtil#isInSourceFolder(IResource)}.
+    */
+   @Test
+   public void testIsInSourceFolder() throws CoreException, InterruptedException {
+      // Test general Project
+      IProject generalProject = TestUtilsUtil.createProject("JDTUtilTest_testIsInSourceFolder_general");
+      IFolder generalSrcFolder = TestUtilsUtil.createFolder(generalProject, "src");
+      IFile generalJavaFile = TestUtilsUtil.createFile(generalProject, "MyClass.java", "public class MyClass {}");
+      IFile generalSoureJavaFile = TestUtilsUtil.createFile(generalSrcFolder, "MyClass.java", "public class MyClass {}");
+      IFolder generalPackageFolder = TestUtilsUtil.createFolder(generalSrcFolder, "aPackage");
+      IFile generalPackageJavaFile = TestUtilsUtil.createFile(generalPackageFolder, "MyClass.java", "package aPackage;\npublic class MyClass {}");
+      assertFalse(JDTUtil.isInSourceFolder(null));
+      assertFalse(JDTUtil.isInSourceFolder(generalProject));
+      assertFalse(JDTUtil.isInSourceFolder(generalSrcFolder));
+      assertFalse(JDTUtil.isInSourceFolder(generalJavaFile));
+      assertFalse(JDTUtil.isInSourceFolder(generalSoureJavaFile));
+      assertFalse(JDTUtil.isInSourceFolder(generalPackageFolder));
+      assertFalse(JDTUtil.isInSourceFolder(generalPackageJavaFile));
+      // Test Java Project
+      IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testIsInSourceFolder_java");
+      IFolder javaProjectSrcFolder = javaProject.getProject().getFolder("src");
+      IFile javaJavaFile = TestUtilsUtil.createFile(javaProject.getProject(), "MyClass.java", "public class MyClass {}");
+      IFile javaSoureJavaFile = TestUtilsUtil.createFile(javaProjectSrcFolder, "MyClass.java", "public class MyClass {}");
+      IFolder javaPackageFolder = TestUtilsUtil.createFolder(javaProjectSrcFolder, "aPackage");
+      IFile javaPackageJavaFile = TestUtilsUtil.createFile(javaPackageFolder, "MyClass.java", "package aPackage;\npublic class MyClass {}");
+      assertFalse(JDTUtil.isInSourceFolder(null));
+      assertFalse(JDTUtil.isInSourceFolder(javaProject.getProject()));
+      assertTrue(JDTUtil.isInSourceFolder(javaProjectSrcFolder));
+      assertFalse(JDTUtil.isInSourceFolder(javaJavaFile));
+      assertTrue(JDTUtil.isInSourceFolder(javaSoureJavaFile));
+      assertTrue(JDTUtil.isInSourceFolder(javaPackageFolder));
+      assertTrue(JDTUtil.isInSourceFolder(javaPackageJavaFile));
+      // Test Java Project (no bin/src folders)
+      IJavaProject noBinSrcJavaProject = TestUtilsUtil.createJavaProjectNoBinSourceFolders("JDTUtilTest_testIsInSourceFolder_javaNoBinSrc");
+      IFile noBinSrcJavaJavaFile = TestUtilsUtil.createFile(noBinSrcJavaProject.getProject(), "MyClass.java", "public class MyClass {}");
+      IFolder noBinSrcJavaPackageFolder = TestUtilsUtil.createFolder(noBinSrcJavaProject.getProject(), "aPackage");
+      IFile noBinSrcJavaPackageJavaFile = TestUtilsUtil.createFile(noBinSrcJavaPackageFolder, "MyClass.java", "package aPackage;\npublic class MyClass {}");
+      assertFalse(JDTUtil.isInSourceFolder(null));
+      assertTrue(JDTUtil.isInSourceFolder(noBinSrcJavaProject.getProject()));
+      assertTrue(JDTUtil.isInSourceFolder(noBinSrcJavaJavaFile));
+      assertTrue(JDTUtil.isInSourceFolder(noBinSrcJavaPackageFolder));
+      assertTrue(JDTUtil.isInSourceFolder(noBinSrcJavaPackageJavaFile));
+   }
+   
+   /**
+    * Tests {@link JDTUtil#isJavaFile(org.eclipse.core.resources.IFile)}.
+    */
+   @Test
+   public void testIsJavaFile() throws CoreException {
+      IProject project = TestUtilsUtil.createProject("JDTUtilTest_testIsJavaFile");
+      IFile file = TestUtilsUtil.createFile(project, "noExtension", "noExtension");
+      IFile txtFile = TestUtilsUtil.createFile(project, "txtFile.txt", "txtFile");
+      IFile javaFile = TestUtilsUtil.createFile(project, "javaFile.java", "javaFile");
+      IFile javaDifferentCasesFile = TestUtilsUtil.createFile(project, "javaDifferentCasesFile.jAVa", "javaDifferentCasesFile");
+      assertFalse(JDTUtil.isJavaFile(null));
+      assertFalse(JDTUtil.isJavaFile(file));
+      assertFalse(JDTUtil.isJavaFile(txtFile));
+      assertTrue(JDTUtil.isJavaFile(javaFile));
+      assertTrue(JDTUtil.isJavaFile(javaDifferentCasesFile));
+   }
+
    /**
     * Tests {@link JDTUtil#getTabWidth(IJavaElement)}.
     */

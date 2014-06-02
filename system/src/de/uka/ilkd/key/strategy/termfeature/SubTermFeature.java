@@ -1,21 +1,21 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.strategy.termfeature;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
@@ -47,14 +47,14 @@ public class SubTermFeature implements TermFeature {
     private final TermFeature[] features;
     private final RuleAppCost arityMismatchCost;
     
-    public RuleAppCost compute(Term term) {
+    public RuleAppCost compute(Term term, Services services) {
         if ( term.arity () != features.length ) return arityMismatchCost;
         
-        RuleAppCost res = LongRuleAppCost.ZERO_COST;
+        RuleAppCost res = NumberRuleAppCost.getZeroCost();
 
         for ( int i = 0; i < features.length
                          && !( res instanceof TopRuleAppCost ); i++ )
-            res = res.add ( features[i].compute ( term.sub(i) ) );
+            res = res.add ( features[i].compute ( term.sub(i), services ) );
 
         return res;
     }

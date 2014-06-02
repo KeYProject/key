@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -26,7 +26,6 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.ClassAxiom;
@@ -34,9 +33,11 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Provides the basic functionality to test the proof reference API.
@@ -298,7 +299,10 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
       KeYEnvironment<?> environment = null;
       Proof proof = null;
       HashMap<String, String> originalTacletOptions = null;
+      boolean usePrettyPrinting = SymbolicExecutionUtil.isUsePrettyPrinting();
       try {
+         // Disable pretty printing to make tests more robust against different term representations
+         SymbolicExecutionUtil.setUsePrettyPrinting(false);
          // Make sure that required files exists
          File javaFile = new File(baseDir, javaPathInBaseDir);
          assertTrue(javaFile.exists());
@@ -307,7 +311,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          // Load java file
          environment = KeYEnvironment.load(javaFile, null, null);
          // Search type
-         KeYJavaType containerKJT = environment.getJavaInfo().getTypeByClassName(containerTypeName);
+         KeYJavaType containerKJT = environment.getJavaInfo().getTypeByClassName(containerTypeName, null);
          assertNotNull(containerKJT);
          // Search observer function
          ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(containerKJT);
@@ -329,6 +333,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          doProofTest(environment, proof, useContracts, tester);
       }
       finally {
+         SymbolicExecutionUtil.setUsePrettyPrinting(usePrettyPrinting);
          // Restore taclet options
          restoreTacletOptions(originalTacletOptions);
          // Dispose proof and environment
@@ -361,7 +366,10 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
       KeYEnvironment<?> environment = null;
       Proof proof = null;
       HashMap<String, String> originalTacletOptions = null;
+      boolean usePrettyPrinting = SymbolicExecutionUtil.isUsePrettyPrinting();
       try {
+         // Disable pretty printing to make tests more robust against different term representations
+         SymbolicExecutionUtil.setUsePrettyPrinting(false);
          // Make sure that required files exists
          File javaFile = new File(baseDir, javaPathInBaseDir);
          assertTrue(javaFile.exists());
@@ -382,6 +390,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          doProofTest(environment, proof, useContracts, tester);
       }
       finally {
+         SymbolicExecutionUtil.setUsePrettyPrinting(usePrettyPrinting);
          // Restore taclet options
          restoreTacletOptions(originalTacletOptions);
          // Dispose proof and environment
@@ -411,19 +420,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
       assertNotNull(proof);
       assertNotNull(tester);
       // Start auto mode
-      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-      sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_EXPAND);
-      sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_EXPAND);
-      sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, useContracts ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
-      sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_ON);
-      sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
-      sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_OFF);
-      sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF);
-      sp.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_ON);
-      sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_DELAYED);
-      sp.setProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, StrategyProperties.RETREAT_MODE_NONE);
-      sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
-      sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_INSTANTIATE);
+      StrategyProperties sp = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, useContracts, false, false, false);
       proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
       proof.getSettings().getStrategySettings().setMaxSteps(1000);
       environment.getUi().startAndWaitForAutoMode(proof);

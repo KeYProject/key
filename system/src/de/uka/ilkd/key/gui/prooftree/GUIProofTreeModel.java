@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.gui.prooftree;
 
@@ -71,11 +70,11 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
         }
         this.proof = p;
         proofTreeListener = new ProofTreeListener();
-        
+
         // set initial active node filter
         for (ProofTreeViewFilter f: ProofTreeViewFilter.ALL) {
-        	if (f instanceof NodeFilter && f.isActive())
-        		activeNodeFilter = (NodeFilter)f;
+            if (f instanceof NodeFilter && f.isActive())
+                activeNodeFilter = (NodeFilter)f;
         }
     }
 
@@ -195,24 +194,24 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 
 
     public boolean hideClosedSubtrees () {
-    	return ProofTreeViewFilter.HIDE_CLOSED_SUBTREES.isActive();
+        return ProofTreeViewFilter.HIDE_CLOSED_SUBTREES.isActive();
     }
-    
+
     /**
      * Set filters active or inactive and update tree if necessary.
      * @param filter
      * @param active
      */
     public void setFilter (ProofTreeViewFilter filter, boolean active) {
-    	if (active != filter.isActive()) {
-    		if (!filter.global()) {
-    			if (activeNodeFilter != null)
-    				activeNodeFilter.setActive(false);
-    			activeNodeFilter = active? (NodeFilter)filter: null;
-    		}
-    		filter.setActive(active);
-    		updateTree((TreeNode) null);
-    	}
+        if (active != filter.isActive()) {
+            if (!filter.global()) {
+                if (activeNodeFilter != null)
+                    activeNodeFilter.setActive(false);
+                activeNodeFilter = active? (NodeFilter)filter: null;
+            }
+            filter.setActive(active);
+            updateTree((TreeNode) null);
+        }
     }
 
     /**
@@ -232,9 +231,9 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
                 return guiParent.getChildAt(index);
             }
         } else {
-        	return activeNodeFilter.getChild(parent, index);
+            return activeNodeFilter.getChild(parent, index);
         }
-		return null;
+        return null;
     }
 
     /**
@@ -246,11 +245,11 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
      * @return  the number of children of the node <I>parent</I>
      */
     public int getChildCount(Object parent) {
-    	if (activeNodeFilter == null) {
-    		return ((TreeNode) parent).getChildCount();
-    	} else {
-    		return activeNodeFilter.getChildCount(parent);
-    	}
+        if (activeNodeFilter == null) {
+            return ((TreeNode) parent).getChildCount();
+        } else {
+            return activeNodeFilter.getChildCount(parent);
+        }
     }
 
     /**
@@ -262,17 +261,17 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 
      */
     public int getIndexOfChild(Object parent, Object child) {
-    	TreeNode guiParent = (TreeNode)parent;
-    	if (activeNodeFilter == null) {
-    		for (int i = 0; i < guiParent.getChildCount();i++) {
-    			if (guiParent.getChildAt(i) == child) {
-    				return i;
-    			}
-    		}
-    	} else {
-    		return activeNodeFilter.getIndexOfChild(parent, child);
-    	}
-    	return -1;
+        TreeNode guiParent = (TreeNode)parent;
+        if (activeNodeFilter == null) {
+            for (int i = 0; i < guiParent.getChildCount();i++) {
+                if (guiParent.getChildAt(i) == child) {
+                    return i;
+                }
+            }
+        } else {
+            return activeNodeFilter.getIndexOfChild(parent, child);
+        }
+        return -1;
     }
 
     /**

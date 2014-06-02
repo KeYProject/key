@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof.io;
 
@@ -19,8 +18,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedReader;
@@ -57,8 +56,8 @@ public class KeYFileForTests extends KeYFile {
 	    final ParserConfig pc = 
 		new ParserConfig(initConfig.getServices(), 
 				 initConfig.namespaces());
-	    KeYParser problemParser = new KeYParser
-		(ParserMode.PROBLEM,new KeYLexer(cinp,null), file.toString(), pc, pc,initConfig.
+	    KeYParserF problemParser = new KeYParserF
+		(ParserMode.PROBLEM,new KeYLexerF(cinp, file.toString(), null), pc, pc,initConfig.
 		 getTaclet2Builder(), initConfig.getTaclets()); 
             problemParser.problem(); 
 	    initConfig.setTaclets(problemParser.getTaclets()); 

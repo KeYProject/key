@@ -17,7 +17,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.InfFlowContractAppTaclet;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
@@ -49,7 +49,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
         TacletApp app = (TacletApp) ruleApp;
 
         if (!app.ifInstsComplete()) {
-            return LongRuleAppCost.ZERO_COST;
+            return NumberRuleAppCost.getZeroCost();
         }
 
         final Term focusFor = pos.constrainedFormula().formula();
@@ -61,7 +61,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
         for (Term appl : contractAppls) {
             if (isSubFormula(focusFor, appl)) {
-                return LongRuleAppCost.ZERO_COST;
+                return NumberRuleAppCost.getZeroCost();
             }
         }
 

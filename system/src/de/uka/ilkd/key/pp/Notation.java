@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.pp;
 
@@ -135,6 +134,21 @@ public abstract class Notation {
     }
     
 
+    public static final class LabelNotation extends Notation {
+        
+        private final String left;
+        private final String right;
+        
+        public LabelNotation(String beginLabel, String endLabel, int prio) {
+            super(prio);
+            left = beginLabel;
+            right = endLabel;
+        }
+        
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printLabels(t, left, right);
+        }
+    }
     
     /**
      * The standard concrete syntax for quantifiers.
@@ -322,49 +336,97 @@ public abstract class Notation {
 	}
     }
     
-    
-    /**
-     * The standard concrete syntax for select.
-     */
-    public static final class SelectNotation extends Notation {
-	public SelectNotation() {
-	    super(140);
-	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printSelect(t);
-	}
-    }
-    
-    
-    /**
-     * The standard concrete syntax for length.
-     */
-    public static final class LengthNotation extends Notation {
-	public LengthNotation() {
-	    super(130);
-	}
-
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printLength(t);
-	}
-    }       
-    
-    
     /**
      * The standard concrete syntax for observer function terms.
      */
-    static final class ObserverNotation extends Notation {
+    static class ObserverNotation extends Notation {
 
-	public ObserverNotation() {
+        public ObserverNotation() {
+            super(130);
+        }
+
+        protected ObserverNotation(int assoc) {
+            super(assoc);
+        }
+
+        @Override
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printObserver(t, null);
+        }
+
+        public void printWithHeap(Term t, LogicPrinter sp, Term heapTerm) throws IOException {
+            sp.printObserver(t, heapTerm);
+        }
+    }
+
+    /**
+     * The standard concrete syntax for select.
+     */
+    public static final class SelectNotation extends ObserverNotation {
+        public SelectNotation() {
+            super(140);
+        }
+
+        @Override
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printSelect(t, null);
+        }
+
+        @Override
+        public void printWithHeap(Term t, LogicPrinter sp, Term heapTerm) throws IOException {
+            sp.printSelect(t, heapTerm);
+        }
+    }
+
+    /**
+     * The standard concrete syntax for heap constructors.
+     */
+    public static class HeapConstructorNotation extends Notation {
+        public HeapConstructorNotation() {
+            super(140);
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printHeapConstructor(t, true);
+        }
+
+        public void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException {
+            sp.printHeapConstructor(t, false);
+        }
+    }
+
+    /**
+     * The standard concrete syntax for store.
+     */
+    public static final class StoreNotation extends HeapConstructorNotation {
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printStore(t, true);
+        }
+
+        public void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException {
+            sp.printStore(t, false);
+        }
+    }
+
+
+    /**
+     * The standard concrete syntax for length.
+     */
+    public static final class Postfix extends Notation {
+        
+        private final String postfix;
+        
+	public Postfix(String postfix) {
 	    super(130);
+	    this.postfix = postfix;
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printObserver(t);
+	    sp.printPostfix(t,postfix);
 	}
-    }
-    
+    }       
     
     
     /**
@@ -450,7 +512,8 @@ public abstract class Notation {
     
     public static final class SchemaVariableNotation extends VariableNotation {
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@SuppressWarnings("unchecked")
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    // logger.debug("SSV: " + t+ " [" + t.op() + "]");
 	    Debug.assertTrue(t.op() instanceof SchemaVariable);
 	    Object o = sp.getInstantiations().getInstantiation(
@@ -468,7 +531,6 @@ public abstract class Notation {
 		    // logger.debug("Instantiation of " + t+ " [" + t.op() +
                         // "]" + " known.");
 		    if (o instanceof ImmutableList) {
-            @SuppressWarnings("unchecked")
             final Iterator<Object> it = ((ImmutableList<Object>) o)
 				.iterator();
 			sp.getLayouter().print("{");
@@ -580,7 +642,7 @@ public abstract class Notation {
 		return null;
 	    }
 
-	    return ("'" + Character.valueOf(charVal)).toString() + "'";
+	    return ("'" + Character.valueOf(charVal)) + "'";
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {

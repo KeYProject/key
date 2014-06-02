@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.gui.configuration;
 
@@ -102,7 +101,7 @@ public class ChoiceSettings implements Settings, Cloneable {
 	while(it.hasNext()){
 	    c=(Choice)it.next();
 	    if(c2C.containsKey(c.category())){
-		soc=c2C.get(c.category().toString());
+		soc=c2C.get(c.category());
 		soc.add(c.name().toString());
 		c2C.put(c.category(),soc);
 	    }else{
@@ -181,8 +180,7 @@ public class ChoiceSettings implements Settings, Cloneable {
 	    if (choiceSequence.length() > 0) {
 	        choiceSequence += " , ";
 	    }
-	    choiceSequence += entry.getKey().toString()+"-"+
-		entry.getValue().toString();
+	    choiceSequence += entry.getKey() + "-" + entry.getValue();
 	}
 	props.setProperty(DEFAULTCHOICES_KEY, choiceSequence);
     }

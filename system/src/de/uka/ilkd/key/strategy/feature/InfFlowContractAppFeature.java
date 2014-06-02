@@ -32,7 +32,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import java.util.ArrayList;
@@ -136,9 +136,9 @@ public class InfFlowContractAppFeature implements Feature {
             return false;
         }
 
-        final ImmutableMap<SchemaVariable, InstantiationEntry> interesting0 =
+        final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting0 =
                 inst0.interesting();
-        final ImmutableMap<SchemaVariable, InstantiationEntry> interesting1 =
+        final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting1 =
                 inst1.interesting();
         return subset(interesting0, interesting1) &&
                subset(interesting1, interesting0);
@@ -146,13 +146,13 @@ public class InfFlowContractAppFeature implements Feature {
 
 
     private boolean subset(
-            ImmutableMap<SchemaVariable, InstantiationEntry> insts0,
-            ImmutableMap<SchemaVariable, InstantiationEntry> insts1) {
-        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry>> it =
+            ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts0,
+            ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts1) {
+        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
                 insts0.entryIterator();
 
         while (it.hasNext()) {
-            final ImmutableMapEntry<SchemaVariable, InstantiationEntry> entry0 =
+            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry0 =
                     it.next();
 
             if (entry0.key() instanceof SkolemTermSV ||
@@ -160,7 +160,7 @@ public class InfFlowContractAppFeature implements Feature {
                 continue;
             }
 
-            final InstantiationEntry instEntry1 = insts1.get(entry0.key());
+            final InstantiationEntry<?> instEntry1 = insts1.get(entry0.key());
 
             if (instEntry1 == null ||
                 !entry0.value().getInstantiation().equals(instEntry1.getInstantiation())) {
@@ -245,7 +245,7 @@ public class InfFlowContractAppFeature implements Feature {
         TacletApp app = (TacletApp) ruleApp;
 
         if (!app.ifInstsComplete()) {
-            return LongRuleAppCost.ZERO_COST;
+            return NumberRuleAppCost.getZeroCost();
         }
         
         if (app.ifFormulaInstantiations().size() < 1 ||
@@ -274,7 +274,7 @@ public class InfFlowContractAppFeature implements Feature {
             return TopRuleAppCost.INSTANCE;
         }
 
-        return LongRuleAppCost.create(assumesApplNumber);
+        return NumberRuleAppCost.create(assumesApplNumber);
     }
 
 

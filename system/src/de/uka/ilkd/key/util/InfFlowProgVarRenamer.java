@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -27,7 +26,7 @@ import java.util.Map;
  *
  * @author christoph
  */
-public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
+public class InfFlowProgVarRenamer extends TermBuilder {
     /** The set of terms on which the renaming should be applied. */
     private final Term[] terms;
 
@@ -50,7 +49,7 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
                                  String postfix,
                                  Goal goalForVariableRegistration,
                                  Services services) {
-        super(services);
+        super(services.getTermFactory(), services);
         this.terms = terms;
         this.postfix = postfix;
         this.goalForVariableRegistration = goalForVariableRegistration;
@@ -62,7 +61,7 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
 
         // the built-in heap symbol has to be handled with care; it is saver
         // not to replace it
-        this.replaceMap.put(getBaseHeap(services), getBaseHeap(services));
+        this.replaceMap.put(getBaseHeap(), getBaseHeap());
     }
     
 
@@ -131,7 +130,7 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
         // namespace); adds the renamedPv also to the namespace
         goalForVariableRegistration.addProgramVariable((ProgramVariable)renamedPv);
 
-        final Term pvTerm = label(TermFactory.DEFAULT.createTerm(renamedPv),
+        final Term pvTerm = label(var((ProgramVariable)renamedPv),
                                   term.getLabels());
         replaceMap.put(term, pvTerm);
     }
@@ -146,7 +145,7 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
         final Function renamedF = f.rename(newName);
         services.getNamespaces().functions().addSafely(renamedF);
         final Term fTerm =
-                label(TermFactory.DEFAULT.createTerm(renamedF),
+                label(func(renamedF),
                       term.getLabels());
         replaceMap.put(term, fTerm);
     }
@@ -160,7 +159,7 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
         final ElementaryUpdate renamedU =
                 ElementaryUpdate.getInstance((UpdateableOperator) renamedLhs.op());
         final Term uTerm =
-                label(TermFactory.DEFAULT.createTerm(renamedU, renamedSubs),
+                label(tf().createTerm(renamedU, renamedSubs),
                       term.getLabels());
         replaceMap.put(term, uTerm);
     }
@@ -169,10 +168,9 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
     private void applyRenamingsOnSubterms(Term term) {
         final Term[] renamedSubs = renameSubs(term);
         final Term renamedTerm =
-                TermFactory.DEFAULT.createTerm(term.op(), renamedSubs,
-                                               term.boundVars(),
-                                               term.javaBlock(),
-                                               term.getLabels());
+                tf().createTerm(term.op(), renamedSubs,
+                                term.boundVars(), term.javaBlock(),
+                                term.getLabels());
         replaceMap.put(term, renamedTerm);
     }
 
@@ -199,10 +197,9 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
                     applyProgramRenamingsToSubs(term, progVarReplaceMap);
 
             final Term renamedTerm =
-                    TermFactory.DEFAULT.createTerm(term.op(), appliedSubs,
-                                                   term.boundVars(),
-                                                   renamedJavaBlock,
-                                                   term.getLabels());
+                    tf().createTerm(term.op(), appliedSubs,
+                                    term.boundVars(), renamedJavaBlock,
+                                    term.getLabels());
             return renamedTerm;
         } else {
             return null;

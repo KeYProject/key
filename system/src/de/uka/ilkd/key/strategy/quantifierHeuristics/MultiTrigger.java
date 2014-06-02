@@ -1,24 +1,23 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 class MultiTrigger implements Trigger {
@@ -37,7 +36,7 @@ class MultiTrigger implements Trigger {
     }
 
     public ImmutableSet<Substitution> getSubstitutionsFromTerms(
-	    ImmutableSet<Term> targetTerms, Services services) {
+	    ImmutableSet<Term> targetTerms, TermServices services) {
 	ImmutableSet<Substitution> res = DefaultImmutableSet.<Substitution> nil();
 	
 	ImmutableSet<Substitution> mulsubs = setMultiSubstitution(triggers.iterator(),
@@ -54,7 +53,7 @@ class MultiTrigger implements Trigger {
 
     /** help function for getMultiSubstitution */
     private ImmutableSet<Substitution> setMultiSubstitution(
-	    Iterator<? extends Trigger> ts, ImmutableSet<Term> terms, Services services) {
+	    Iterator<? extends Trigger> ts, ImmutableSet<Term> terms, TermServices services) {
 	ImmutableSet<Substitution> res = DefaultImmutableSet.<Substitution> nil();
 	if (ts.hasNext()) {
 	    ImmutableSet<Substitution> subi = ts.next().getSubstitutionsFromTerms(

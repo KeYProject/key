@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -23,6 +23,8 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jface.viewers.AbstractTableViewer;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -32,10 +34,13 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -43,6 +48,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.key_project.util.java.StringUtil;
 
 /**
@@ -472,4 +478,162 @@ public final class SWTUtil {
           });
        }
     }
+    
+    /**
+     * Returns the new text which will be shown if {@link VerifyEvent#doit} is {@code true}.
+     * @param e The {@link VerifyEvent}.
+     * @return The new text.
+     */
+    public static String getNewText(VerifyEvent e) {
+       if (e.getSource() instanceof Text) {
+          String oldText = ((Text)e.widget).getText();
+          StringBuilder sb = new StringBuilder();
+          sb.append(oldText.substring(0, e.start));
+          sb.append(e.text);
+          sb.append(oldText.substring(e.end));
+          return sb.toString();
+       }
+       else {
+          throw new IllegalArgumentException("Widgets of type \"" + e.getSource().getClass() + " \" are not supported.");
+       }
+    }
+
+   /**
+    * Searches a {@link Button} with the given text in the given {@link Widget}.
+    * @param widget The {@link Widget} to search in.
+    * @param text The text of the {@link Button} to search.
+    * @return The found {@link Button} or {@code null} if no {@link Button} with that text is available.
+    */
+   public static Button findButtonByText(Widget widget, String text) {
+      Button result = null;
+      if (widget instanceof Button) {
+         Button button = (Button)widget;
+         if (button.getText().equals(text)) {
+            result = button;
+         }
+      }
+      else if (widget instanceof Composite) {
+         Composite composite = (Composite)widget;
+         Control[] children = composite.getChildren();
+         int i = 0;
+         while (result == null && i < children.length) {
+            result = findButtonByText(children[i], text);
+            i++;
+         }
+      }
+      return result;
+   }
+
+   /**
+    * Invokes {@link Viewer#refresh()} thread save.
+    * @param viewer The {@link Viewer} to invoke {@link Viewer#refresh()} on.
+    */
+   public static void refresh(final Viewer viewer) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.refresh();
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link AbstractTableViewer#replace(Object, int)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param element The new element.
+    * @param index The index to replace element at.
+    */
+   public static void replace(final AbstractTableViewer viewer, final Object element, final int index) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.replace(element, index);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link AbstractTableViewer#add(Object)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param element The new element to add.
+    */
+   public static void add(final AbstractTableViewer viewer, final Object element) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.add(element);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link AbstractTableViewer#add(Object)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param elements The new elements to add.
+    */
+   public static void add(final AbstractTableViewer viewer, final Object[] elements) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.add(elements);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link AbstractTableViewer#remove(Object)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param element The old element to remove.
+    */
+   public static void remove(final AbstractTableViewer viewer, final Object element) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.remove(element);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link AbstractTableViewer#remove(Object)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param elements The old elements to remove.
+    */
+   public static void remove(final AbstractTableViewer viewer, final Object[] elements) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.remove(elements);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link CheckboxTableViewer#setChecked(Object, boolean)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param element The element to modify its checked state.
+    * @param state The new checked state to set.
+    */
+   public static void setChecked(final CheckboxTableViewer viewer, final Object element, final boolean state) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.setChecked(element, state);
+            }
+         });
+      }
+   }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -60,6 +60,9 @@ public class KeYLaunchSymbolicDebugPreferencePage extends FieldEditorPreferenceP
       edit.fillIntoGrid(spacer, 2);
       addField(edit);
       edit = new BooleanFieldEditor(KeYSEDPreferences.MERGE_BRANCH_CONDITIONS, "&Merge branch conditions", SWT.NONE, spacer);
+      edit.fillIntoGrid(spacer, 2);
+      addField(edit);
+      edit = new BooleanFieldEditor(KeYSEDPreferences.USE_PRETTY_PRINTING, "Use &pretty printing", SWT.NONE, spacer);
       edit.fillIntoGrid(spacer, 2);
       addField(edit);
 

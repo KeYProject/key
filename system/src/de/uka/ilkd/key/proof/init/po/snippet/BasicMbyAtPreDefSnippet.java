@@ -31,7 +31,7 @@ class BasicMbyAtPreDefSnippet extends ReplaceAndRegisterMethod
         assert Term.class.equals(BasicSnippetData.Key.MEASURED_BY.getType());
         final Term origMby =
                 (Term) d.get(BasicSnippetData.Key.MEASURED_BY);
-        final Term mby = replace(origMby, d.origVars, poVars.pre);
+        final Term mby = replace(origMby, d.origVars, poVars.pre, d.tb);
 
         return d.tb.equals(poVars.pre.mbyAtPre, mby);
     }

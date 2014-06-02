@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.util;
 
@@ -20,6 +19,8 @@ import java.awt.Rectangle;
 import java.awt.Window;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import javax.swing.AbstractButton;
+import javax.swing.JMenu;
 
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -33,6 +34,7 @@ import javax.swing.JTabbedPane;
  * <li>Position and size of windows</li>
  * <li>Selected tab in a tabbed pane</li>
  * <li>Position of split dividers in a split pane</li>
+ * <li>State of JCheckBoxMenuItem (selected or not).</li>
  * </ul>
  * 
  * Only named components (use {@link Component#setName(String)}) have their
@@ -63,7 +65,8 @@ public class PreferenceSaver {
      * {@link Saver}s knwon to the system.
      */
     private static Saver<?> SAVERS[] = {
-            new WindowSaver(), new SplitPaneSaver(), new TabbedPaneSaver()
+            new WindowSaver(), new SplitPaneSaver(), new TabbedPaneSaver(),
+        new AbstractButtonSaver()
     };
 
     /**
@@ -80,7 +83,7 @@ public class PreferenceSaver {
     }
 
     /** do the storing/loading from this object */
-    private Preferences prefs;
+    private final Preferences prefs;
 
     /**
      * Create a new instance allowing to store and load UI properties from the
@@ -93,7 +96,19 @@ public class PreferenceSaver {
         assert prefs != null;
         this.prefs = prefs;
     }
-
+    
+    // JMenu.getComponents() returns an empty array.
+    // JMenu.getMenuComponents() has to be used instead.
+    private Component[] getChildren(Component component) {
+        Component[] children;
+        if (component instanceof JMenu) {
+            children = ((JMenu) component).getMenuComponents();
+        } else {
+            children = ((Container) component).getComponents();
+        }
+        return children;
+    }
+    
     /**
      * Save the properties of the argument and all its children (in depth).
      * 
@@ -106,13 +121,11 @@ public class PreferenceSaver {
      * @throws BackingStoreException
      *             possibly thrown by {@link Preferences}.
      */
-    public void save(Component component) throws BackingStoreException {
+    public void save(Component component) {
         assert component != null;
 
         saveComponent(component);
         saveChildren(component);
-
-        prefs.flush();
     }
 
     private <C extends Component> void saveComponent(C component) {
@@ -125,9 +138,9 @@ public class PreferenceSaver {
         }
     }
 
-    private void saveChildren(Component component) throws BackingStoreException {
+    private void saveChildren(Component component) {
         if (component instanceof Container) {
-            Component[] children = ((Container) component).getComponents();
+            Component[] children = getChildren(component);
             if (children != null) {
                 for (Component child : children) {
                     saveComponent(child);
@@ -162,7 +175,7 @@ public class PreferenceSaver {
 
     private void loadChildren(Component component) {
         if (component instanceof Container) {
-            Component[] children = ((Container) component).getComponents();
+            Component[] children = getChildren(component);
             if (children != null) {
                 for (Component child : children) {
                     load(child);
@@ -270,4 +283,35 @@ public class PreferenceSaver {
 
     }
 
+    private static class AbstractButtonSaver implements Saver<AbstractButton> {
+
+        private static String getButtonId(AbstractButton component) {
+            return component.getClass().getSimpleName() + "." + component.getName() + ".selected";
+        }
+
+        @Override
+        public void load(AbstractButton component, Preferences prefs) {
+            assert component.getName() != null;
+            boolean selected = prefs.getBoolean(getButtonId(component), component.isSelected());
+            component.setSelected(selected);
+        }
+
+        @Override
+        public void save(AbstractButton component, Preferences prefs) {
+            assert component.getName() != null;
+            boolean selected = component.isSelected();
+            prefs.putBoolean(getButtonId(component), selected);
+        }
+
+        @Override
+        public Class<AbstractButton> supportedClass() {
+            return AbstractButton.class;
+        }
+
+    }
+
+    public void flush() throws BackingStoreException {
+        prefs.flush();
+    }
+    
 }

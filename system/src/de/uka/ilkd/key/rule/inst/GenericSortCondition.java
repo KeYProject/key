@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.rule.inst;
 
@@ -41,19 +40,18 @@ public abstract class GenericSortCondition {
      * (no generic sorts) or never compatible (non generic sorts that
      * don't match)
      */
-    public static GenericSortCondition createCondition(
-	    				InstantiationEntry p_entry) {
+    public static GenericSortCondition createCondition(SchemaVariable sv,
+													   InstantiationEntry<?> p_entry) {
 
         if (!( p_entry instanceof TermInstantiation)) {
             return null;
         }
 
         final TermInstantiation ti = (TermInstantiation)p_entry;
-        final SchemaVariable ssv = p_entry.getSchemaVariable ();
         
-        return createCondition ( ssv.sort (),
-                                 ti.getTerm ().sort (),
-                                 !subSortsAllowed ( ssv ) );
+        return createCondition ( sv.sort (),
+                                 ti.getInstantiation ().sort (),
+                                 !subSortsAllowed ( sv ) );
     }
 
     /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -43,6 +43,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -59,6 +60,82 @@ import org.key_project.util.test.util.ArrayObjectLabelProvider;
  * @author Martin Hentschel
  */
 public class SWTUtilTest extends TestCase {
+   /**
+    * Tests {@link SWTUtil#findButtonByText(org.eclipse.swt.widgets.Widget, String)}.
+    */
+   @Test
+   public void testFindButtonByText() {
+      Shell shell = new Shell();
+      try {
+         // Create Buttons
+         Button b1shell = new Button(shell, SWT.PUSH);
+         b1shell.setText("b1shell");
+         Button b2shell = new Button(shell, SWT.RADIO);
+         b2shell.setText("b2shell");
+         Button b3shell = new Button(shell, SWT.CHECK);
+         b3shell.setText("b3shell");
+         Composite composite = new Composite(shell, SWT.NONE);
+         Button b1composite = new Button(composite, SWT.PUSH);
+         b1composite.setText("b1composite");
+         Button b2composite = new Button(composite, SWT.RADIO);
+         b2composite.setText("b2composite");
+         Button b3composite = new Button(composite, SWT.CHECK);
+         b3composite.setText("b3composite");
+         Composite childCmposite = new Composite(composite, SWT.NONE);
+         Button b1childComposite = new Button(childCmposite, SWT.PUSH);
+         b1childComposite.setText("b1childComposite");
+         Button b2childComposite = new Button(childCmposite, SWT.RADIO);
+         b2childComposite.setText("b2childComposite");
+         Button b3childComposite = new Button(childCmposite, SWT.CHECK);
+         b3childComposite.setText("b3childComposite");
+         // Search null
+         assertNull(SWTUtil.findButtonByText(shell, null));
+         assertNull(SWTUtil.findButtonByText(null, b1shell.getText()));
+         assertNull(SWTUtil.findButtonByText(null, null));
+         // Search on Shell
+         assertNull(SWTUtil.findButtonByText(shell, "INVALID"));
+         assertSame(b1shell, SWTUtil.findButtonByText(shell, b1shell.getText()));
+         assertSame(b2shell, SWTUtil.findButtonByText(shell, b2shell.getText()));
+         assertSame(b3shell, SWTUtil.findButtonByText(shell, b3shell.getText()));
+         assertSame(b1composite, SWTUtil.findButtonByText(shell, b1composite.getText()));
+         assertSame(b2composite, SWTUtil.findButtonByText(shell, b2composite.getText()));
+         assertSame(b3composite, SWTUtil.findButtonByText(shell, b3composite.getText()));
+         assertSame(b1childComposite, SWTUtil.findButtonByText(shell, b1childComposite.getText()));
+         assertSame(b2childComposite, SWTUtil.findButtonByText(shell, b2childComposite.getText()));
+         assertSame(b3childComposite, SWTUtil.findButtonByText(shell, b3childComposite.getText()));
+         // Search on Composite
+         assertNull(SWTUtil.findButtonByText(composite, "INVALID"));
+         assertNull(SWTUtil.findButtonByText(composite, b1shell.getText()));
+         assertNull(SWTUtil.findButtonByText(composite, b2shell.getText()));
+         assertNull(SWTUtil.findButtonByText(composite, b3shell.getText()));
+         assertSame(b1composite, SWTUtil.findButtonByText(composite, b1composite.getText()));
+         assertSame(b2composite, SWTUtil.findButtonByText(composite, b2composite.getText()));
+         assertSame(b3composite, SWTUtil.findButtonByText(composite, b3composite.getText()));
+         assertSame(b1childComposite, SWTUtil.findButtonByText(composite, b1childComposite.getText()));
+         assertSame(b2childComposite, SWTUtil.findButtonByText(composite, b2childComposite.getText()));
+         assertSame(b3childComposite, SWTUtil.findButtonByText(composite, b3childComposite.getText()));
+         // Search on child Composite
+         assertNull(SWTUtil.findButtonByText(childCmposite, "INVALID"));
+         assertNull(SWTUtil.findButtonByText(childCmposite, b1shell.getText()));
+         assertNull(SWTUtil.findButtonByText(childCmposite, b2shell.getText()));
+         assertNull(SWTUtil.findButtonByText(childCmposite, b3shell.getText()));
+         assertNull(SWTUtil.findButtonByText(childCmposite, b1composite.getText()));
+         assertNull(SWTUtil.findButtonByText(childCmposite, b2composite.getText()));
+         assertNull(SWTUtil.findButtonByText(childCmposite, b3composite.getText()));
+         assertSame(b1childComposite, SWTUtil.findButtonByText(childCmposite, b1childComposite.getText()));
+         assertSame(b2childComposite, SWTUtil.findButtonByText(childCmposite, b2childComposite.getText()));
+         assertSame(b3childComposite, SWTUtil.findButtonByText(childCmposite, b3childComposite.getText()));
+         // Search on Button
+         assertNull(SWTUtil.findButtonByText(b1shell, "INVALID"));
+         assertSame(b1shell, SWTUtil.findButtonByText(b1shell, b1shell.getText()));
+         assertSame(b2shell, SWTUtil.findButtonByText(b2shell, b2shell.getText()));
+         assertSame(b3shell, SWTUtil.findButtonByText(b3shell, b3shell.getText()));
+      }
+      finally {
+         shell.dispose();
+      }
+   }
+   
     /**
      * Tests {@link SWTUtil#select(Viewer, org.eclipse.jface.viewers.ISelection, boolean)}
      */

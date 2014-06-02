@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
@@ -31,6 +32,7 @@ import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
+import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
 import de.uka.ilkd.key.proof.Proof;
 
 
@@ -42,7 +44,8 @@ public class SMTOptionsAction extends MainWindowAction {
 
 public SMTOptionsAction(MainWindow mainWindow) {
 	super(mainWindow);
-	setName("SMT Solvers...");
+	setName("SMT Solvers Options...");
+        setIcon(IconFactory.toolbox(16));
     }
 
     @Override
@@ -66,8 +69,10 @@ public SMTOptionsAction(MainWindow mainWindow) {
             pdSettings.addSettingsListener(listener);
             piSettings.addSettingsListener(listener);
             JComponent bottomComponent = null;
+            
+            TestGenerationSettings tgSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
          
-            final SMTSettingsModel settingsModel = new SMTSettingsModel(new SMTSettings(pdSettings,piSettings,proof));
+            final SMTSettingsModel settingsModel = new SMTSettingsModel(new SMTSettings(pdSettings,piSettings,proof),tgSettings);
        
             if(proof == null){
                     bottomComponent = new JLabel("No proof has been loaded: those are the default settings.");

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -71,7 +71,7 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             KeYResourceProperties.setClassPathEntries(project, entries);
          }
       };
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+      IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             IFolder srcFolder = project.getProject().getFolder("src");
@@ -80,8 +80,8 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             IFile aFile = srcFolder.getFolder("a").getFile("SameName.java");
             IFile aSubFile = srcFolder.getFolder("a").getFolder("sub").getFile("SameName.java");
             IFile bFile = srcFolder.getFolder("b").getFile("SameName.java");
-            IFile cFile = project.getProject().getFolder("boot").getFolder("c").getFile("SameName.java");
-            IFile dFile = project.getProject().getFolder("specs").getFolder("d").getFile("SameName.java");
+            //IFile cFile = project.getProject().getFolder("boot").getFolder("c").getFile("SameName.java");
+            //IFile dFile = project.getProject().getFolder("specs").getFolder("d").getFile("SameName.java");
             List<IFile> expectedResources = new LinkedList<IFile>();
             expectedResources.add(mainFile);
             expectedResources.add(mainFile);
@@ -101,11 +101,11 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             expectedResources.add(bFile);
             expectedResources.add(bFile);
             expectedResources.add(mainFile);
-            expectedResources.add(cFile);
-            expectedResources.add(cFile);
-            expectedResources.add(cFile);
+            //expectedResources.add(cFile); // API files are not included in symbolic execution tree.
+            //expectedResources.add(cFile); // API files are not included in symbolic execution tree.
+            //expectedResources.add(cFile); // API files are not included in symbolic execution tree.
             expectedResources.add(mainFile);
-            expectedResources.add(dFile);
+            //expectedResources.add(dFile); // API files are not included in symbolic execution tree.
             expectedResources.add(mainFile);
             expectedResources.add(mainFile);
             // Configure method contract usage
@@ -140,6 +140,7 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
                            null,
                            null,
                            Boolean.FALSE, 
+                           Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.FALSE,

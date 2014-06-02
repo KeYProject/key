@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -18,7 +18,6 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
-import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -38,7 +37,6 @@ public class OneStepSimplificationToggleAction extends MainWindowAction {
         super(mainWindow);
         setName("One Step Simplification");
         putValue(MNEMONIC_KEY, KeyEvent.VK_O);
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control shift S"));
         putValue(SHORT_DESCRIPTION, "Toggle the aggregation of simplification rules." +
         		" Faster if on, more transparent if off.");
         

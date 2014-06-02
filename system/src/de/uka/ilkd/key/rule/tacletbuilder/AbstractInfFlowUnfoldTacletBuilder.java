@@ -69,18 +69,18 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         // create find term and replace information flow variables by
         // schema variables
         final Term find = createFindTerm(ifVars);
-        Term schemaFind = replace(find, ifVars, schemaVars);
+        Term schemaFind = replace(find, ifVars, schemaVars, services);
 
         // collect quantifaible variables of the find term and replace them
         // by schema variables
         Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
                 collectQuantifiableVariables(schemaFind, services);
-	final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars);
+	final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars, tf());
 	schemaFind = or.replace(schemaFind);
 
         // replace information flow variables by schema variables in the
         // replacewith term, too
-        Term schemaReplaceWith = replace(replacewith, ifVars, schemaVars);
+        Term schemaReplaceWith = replace(replacewith, ifVars, schemaVars, services);
 	schemaReplaceWith = or.replace(schemaReplaceWith);
 
         //create taclet
@@ -178,29 +178,32 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
         // return proof obligation schema variables
         return new ProofObligationVars(pre, post, poVars.exceptionParameter,
-                                       poVars.formalParams);
+                                       poVars.formalParams, services);
     }
 
 
     private static Term replace(Term term,
                                 IFProofObligationVars origVars,
-                                IFProofObligationVars schemaVars) {
-        Term intermediateResult = replace(term, origVars.c1, schemaVars.c1);
-        return replace(intermediateResult, origVars.c2, schemaVars.c2);
+                                IFProofObligationVars schemaVars,
+                                Services services) {
+        Term intermediateResult = replace(term, origVars.c1, schemaVars.c1, services);
+        return replace(intermediateResult, origVars.c2, schemaVars.c2, services);
     }
 
 
     private static Term replace(Term term,
                                 ProofObligationVars origVars,
-                                ProofObligationVars schemaVars) {
-        Term intermediateResult = replace(term, origVars.pre, schemaVars.pre);
-        return replace(intermediateResult, origVars.post, schemaVars.post);
+                                ProofObligationVars schemaVars,
+                                Services services) {
+        Term intermediateResult = replace(term, origVars.pre, schemaVars.pre, services);
+        return replace(intermediateResult, origVars.post, schemaVars.post, services);
     }
 
 
     private static Term replace(Term term,
                                 StateVars origVars,
-                                StateVars schemaVars) {
+                                StateVars schemaVars,
+                                Services services) {
         de.uka.ilkd.key.util.LinkedHashMap<Term, Term> map =
                 new de.uka.ilkd.key.util.LinkedHashMap<Term, Term>();
 
@@ -223,7 +226,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
                 map.put(origTerm, svTerm);
             }
         }
-        OpReplacer or = new OpReplacer(map);
+        OpReplacer or = new OpReplacer(map, services.getTermFactory());
         Term result = or.replace(term);
 
         return result;

@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.java;
 
@@ -245,8 +244,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      */
     public MethodBodyStatement convert(
             de.uka.ilkd.key.java.recoderext.RMethodBodyStatement l) {
-        final IProgramVariable resVar = (IProgramVariable) (l.getResultVar() == null ? null
-                : l.getResultVar().getSV());
+        final IProgramVariable resVar = l.getResultVar() == null ? null
+                : (IProgramVariable)l.getResultVar().getSV();
 
         final TypeReference tr;
         if (l.getBodySource() instanceof TypeSVWrapper) {

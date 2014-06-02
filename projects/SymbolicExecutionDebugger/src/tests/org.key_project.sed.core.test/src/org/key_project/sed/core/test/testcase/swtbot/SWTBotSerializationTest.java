@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -22,16 +22,25 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
+import org.key_project.sed.core.annotation.ISEDAnnotationLink;
+import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.annotation.impl.CommentAnnotation;
+import org.key_project.sed.core.annotation.impl.CommentAnnotationLink;
+import org.key_project.sed.core.annotation.impl.CommentAnnotationType;
+import org.key_project.sed.core.annotation.impl.SearchAnnotation;
+import org.key_project.sed.core.annotation.impl.SearchAnnotationType;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.serialization.SEDXMLReader;
 import org.key_project.sed.core.model.serialization.SEDXMLWriter;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
+import org.key_project.sed.core.util.SEDAnnotationUtil;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -142,7 +151,32 @@ public class SWTBotSerializationTest extends AbstractSetupTestCase {
          assertNotNull(target);
          ILaunch launch = target.getLaunch();
          assertNotNull(launch);
-         
+         // Simulate comments
+         ISEDAnnotationType commentType = SEDAnnotationUtil.getAnnotationtype(CommentAnnotationType.TYPE_ID);
+         CommentAnnotation commentAnnotation = (CommentAnnotation)commentType.createAnnotation();
+         commentAnnotation.setCommentType("MyCommentType");
+         CommentAnnotationLink firstCommentLink = (CommentAnnotationLink)commentType.createLink(commentAnnotation, target.getSymbolicThreads()[0].getChildren()[0]);
+         CommentAnnotationLink secondCommentLink = (CommentAnnotationLink)commentType.createLink(commentAnnotation, target.getSymbolicThreads()[0].getChildren()[0].getChildren()[0]);
+         firstCommentLink.setComment("Comment of first Link");
+         secondCommentLink.setComment("Comment of second Link");
+         target.registerAnnotation(commentAnnotation);
+         firstCommentLink.getTarget().addAnnotationLink(firstCommentLink);
+         secondCommentLink.getTarget().addAnnotationLink(secondCommentLink);
+         commentAnnotation.setEnabled(false);
+         // Simulate search
+         ISEDAnnotationType searchType = SEDAnnotationUtil.getAnnotationtype(SearchAnnotationType.TYPE_ID);
+         SearchAnnotation searchAnnotation = (SearchAnnotation)searchType.createAnnotation();
+         searchAnnotation.setSearch("My Search Content");
+         searchAnnotation.setEnabled(true);
+         searchAnnotation.setCustomHighlightBackground(Boolean.FALSE);
+         searchAnnotation.setCustomHighlightForeground(Boolean.TRUE);
+         searchAnnotation.setCustomBackgroundColor(new RGB(255, 128, 0));
+         searchAnnotation.setCustomForegroundColor(new RGB(0, 255, 128));
+         ISEDAnnotationLink firstSearchLink = searchType.createLink(searchAnnotation, target.getSymbolicThreads()[0].getChildren()[0]);
+         ISEDAnnotationLink secondSearchLink = searchType.createLink(searchAnnotation, target.getSymbolicThreads()[0].getChildren()[0].getChildren()[0]);
+         target.registerAnnotation(searchAnnotation);
+         firstSearchLink.getTarget().addAnnotationLink(firstSearchLink);
+         secondSearchLink.getTarget().addAnnotationLink(secondSearchLink);
          // Serialize launch to String
          SEDXMLWriter writer = new SEDXMLWriter();
          String xml = writer.toXML(launch, SEDXMLWriter.DEFAULT_ENCODING, saveVariables, saveCallStack);

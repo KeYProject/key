@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -22,6 +22,7 @@ import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ViewSettings;
@@ -42,14 +43,16 @@ public class ExitMainAction extends MainWindowAction {
    public ExitMainAction(MainWindow mainWindow) {
        super(mainWindow);
        setName("Exit");
+       setIcon(IconFactory.quit(16));
        setTooltip("Leave KeY.");
        setAcceleratorLetter(KeyEvent.VK_Q);
    }
 
    public final WindowListener windowListener = new WindowAdapter() {
+       @Override
        public void windowClosing(java.awt.event.WindowEvent e) {
            exitMain();
-       };
+       }
    };
 
    protected void exitMain() {
@@ -82,7 +85,8 @@ public class ExitMainAction extends MainWindowAction {
         getMediator().fireShutDown(new GUIEvent(this));
 
         System.out.println("Have a nice day.");
-        mainWindow.savePreferences();
+        mainWindow.savePreferences(mainWindow);
+        mainWindow.syncPreferences();
         if (exitSystem) {
             // TODO: why -1 and not 0 ???
            System.exit(-1);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -56,7 +56,7 @@ public class SWTBotExampeForSwingBot extends AbstractSetupTestCase {
       try {
          // Create project and fill it with java files from KeY Quicktour
          IProject project = TestUtilsUtil.createProject("SWTBotForSwing");
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/quicktour/paycard", project);
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/quicktour/test/paycard", project);
          File location = ResourceUtil.getLocation(project); 
          // Open data source connection to KeY in interactive modus
          connection = TestKeyUtil.createKeyConnection(true, location);

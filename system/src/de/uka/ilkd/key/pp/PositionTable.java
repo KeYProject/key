@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.pp;
 
@@ -21,20 +20,19 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 
 /**
- * A PositionTable describes the start and end positions of substrings
- * of a String in order to get a PosInSequent from an int describing a
- * position in a string representing a Term or a Sequent, etc. A
- * PositionTable therefore represents a table consisting of two
- * columns of type int (start and end position) and a reference to
- * another PositionTable representing the position information for
- * that substring.  A PositionTable is valid (in order to support
- * efficient putting of new entries to the table and an efficient
- * search for a Position), if the last entry that has been set is (s,
- * e, x) and the next entry is (s', e', x') with s'>e.
+ * A PositionTable describes the start and end positions of substrings of a
+ * String in order to get a PosInSequent from an int describing a position in a
+ * string representing a Term or a Sequent, etc. A PositionTable therefore
+ * represents a table consisting of two columns of type int (start and end
+ * position) and a reference to another PositionTable representing the position
+ * information for that substring. A PositionTable is valid (in order to support
+ * efficient putting of new entries to the table and an efficient search for a
+ * Position), if the last entry that has been set is (s, e, x) and the next
+ * entry is (s', e', x') with s'>e.
  * 
- * <p>Positions are reckoned with start positions inclusive and
- * end positions exclusive.  Start and end positions are relative
- * to each subterm.
+ * <p>
+ * Positions are reckoned with start positions inclusive and end positions
+ * exclusive. Start and end positions are relative to each subterm.
  */
 public class PositionTable {
 
@@ -47,11 +45,10 @@ public class PositionTable {
     // the PositionTables for the direct subterms (or parts of sequent, etc.)
     protected PositionTable[] child;    
 
-    // the entry number where the next entry in endPos will be set
-    private int currentEndEntry=0;
-
-    // the entry number where the next entry in startPos will be set
-    private int currentStartEntry=0;
+    // the current active entry number.
+    // When a new "in-order" element is started, the counter is increased.
+    // A new "out-of-order" element resets the counter to a fresh value.
+    private int currentEntry = -1;
 
     // the number of rows in the above arrays. Equals the number of direct 
     // subterms (or parts of sequent, etc.)
@@ -61,8 +58,10 @@ public class PositionTable {
      * creates a new PositionTable with the number of subterms (or number of
      * SequentFormula in a Semisequent, or the number of Semisequents in a
      * Sequent, etc.)
-     * @param rows the number of direct sub-elements in the term whose
-     * position information is represented by the constructed object.
+     *
+     * @param rows
+     *            the number of direct sub-elements in the term whose position
+     *            information is represented by the constructed object.
      */
     public PositionTable(int rows) {
 	this.rows=rows;
@@ -77,8 +76,7 @@ public class PositionTable {
     }
 
     /**
-     * returns the m with startPos[m]<=index<=endPos[m]. 
-     * -1 if no such m exists.
+     * returns the m with startPos[m]<=index<=endPos[m]. -1 if no such m exists.
      */
     private int searchEntry(int index) {
 
@@ -89,22 +87,12 @@ public class PositionTable {
 	    }
 	}
 
-
 	//binary search (ordered arrays are precondition!), NOT CHECKED SO FAR:
-/*	int l=0;
-	int r=rows-1;
-	int m;
-	while (r<l) { 
-	    m=(l+r)/2; 
-	    if ((startPos[m]<=index) && (endPos[m]>index)) {
-		return m; 
-	    } 
-	    if (index<startPos[m]) {
-		r=m; 
-	    } else { 
-		l=m; 
-	    }
-	    }*/
+        /*
+         * int l=0; int r=rows-1; int m; while (r<l) { m=(l+r)/2; if
+         * ((startPos[m]<=index) && (endPos[m]>index)) { return m; } if
+         * (index<startPos[m]) { r=m; } else { l=m; } }
+         */
 	return -1;
     }
 
@@ -123,12 +111,15 @@ public class PositionTable {
     }
 
     /**
-     * Returns the character range of the `lowest' subtable that
-     * includes <code>index</code> in its range.
-     * @param index the character index to search for.
-     * @param length the length of the whole string corresponding
-     *              to this position table.  Needed in case it
-     *              turns out the index belongs to the top level.
+     * Returns the character range of the `lowest' subtable that includes
+     * <code>index</code> in its range.
+     *
+     * @param index
+     *            the character index to search for.
+     * @param length
+     *            the length of the whole string corresponding to this position
+     *            table. Needed in case it turns out the index belongs to the
+     *            top level.
      */
     public Range rangeForIndex(int index,int length) {
 	int sub=searchEntry(index);
@@ -144,10 +135,10 @@ public class PositionTable {
     }
 
     /**
-     * Returns the character range of the first java statement in a
-     * program modality for the `lowest' subtable that includes
-     * <code>index</code> in its range.  If the lowest subtable
-     * does not correspond to a program modality, it returns null.
+     * Returns the character range of the first java statement in a program
+     * modality for the `lowest' subtable that includes <code>index</code> in
+     * its range. If the lowest subtable does not correspond to a program
+     * modality, it returns null.
      */
     public Range firstStatementRangeForIndex(int index) {
 	int sub=searchEntry(index);
@@ -164,19 +155,19 @@ public class PositionTable {
 	}
     }
     
-    /** Returns the character range of the first java statement in a
-     * program modality for <i>this</i>position table.  If this
-     * is not a program modality, returns null.  Note that this
-     * will be overridden in the subclass 
+    /**
+     * Returns the character range of the first java statement in a program
+     * modality for <i>this</i>position table. If this is not a program
+     * modality, returns null. Note that this will be overridden in the subclass
      * {@link ModalityPositionTable}.
      */
     public Range getFirstStatementRange(){
 	return null;
     }
 
-
-    /** Returns the character range for the subtable indicated
-     * by the given integer list.
+    /**
+     * Returns the character range for the subtable indicated by the given
+     * integer list.
      */
     public Range rangeForPath(ImmutableList<Integer> path,int length) {
 	if (path.isEmpty()) {
@@ -191,31 +182,46 @@ public class PositionTable {
 	}
     }
 
-
-
     /**
-     * sets end in the position table to the next free end entry in the 
-     * position
+     * sets end in the position table to the next free end entry in the position
      * table and sets the given PositionTable as child of the sub-element
      * finished by putting this end position
-     * @param end char position that ends the sub-element started by the 
+     *
+     * @param end
+     *            char position that ends the sub-element started by the
      * corresponding start entry in the position table
-     * @param child PositionTable for the sub-element from start to end
+     * @param child
+     *            PositionTable for the sub-element from start to end
      */
     public void setEnd(int end, PositionTable child) {
-	endPos[currentEndEntry]=end;
-	this.child[currentEndEntry]=child;
-	currentEndEntry++;
+        endPos[currentEntry] = end;
+        this.child[currentEntry] = child;
     }
 
     /**
-     * sets start in the position table to the next free start entry in the 
-     * position table 
-     * @param start char position that starts a sub-element
+     * Sets start in the position table for the next subterm to start.
+     *
+     * The number is determined by increment the counter of subterms by one.
+     *
+     * @param start
+     *            char position that starts a sub-element
      */
     public void setStart(int start) {
-	startPos[currentStartEntry]=start;
-	currentStartEntry++;
+        setStart(currentEntry + 1, start);
+    }
+
+    /**
+     * Sets start in the position table for the subterm with the given number to
+     * start.
+     *
+     * @param subTermNo
+     *            the 0-based number of the subterm to evaluate
+     * @param start
+     *            char position that starts a sub-element
+     */
+    public void setStart(int subTermNo, int start) {
+        currentEntry = subTermNo;
+        startPos[subTermNo] = start;
     }
 
     /**
@@ -233,23 +239,25 @@ public class PositionTable {
 	String result="[";
 	for (int i=0; i<rows; i++) {
 	    result=result+"<"+startPos[i]+","+endPos[i]+","+child[i]+">";
-	    if (rows-1!=i) result=result+",";
+            if (rows - 1 != i)
+                result = result + ",";
 	}
 	return result+"]";
     }
 
-
-    /** Returns a PosInSequent for a given position list, 
-     * but without filling in the bounds.  It is assumed
-     * that this is a position table which has one child table for
-     * every formula in the printed sequent, and that
-     * <code>posList</code> begins which the number of the formula.
-     * The returned PosInSequent will refer to (a subterm of) one 
-     * of the constrained formulae in the sequent.
-     * @param posList the position list that navigates through
-     *                the position tables.
-     * @param filter  the sequent print filter from that was used to
-     *                print the sequent
+    /**
+     * Returns a PosInSequent for a given position list, but without filling in
+     * the bounds. It is assumed that this is a position table which has one
+     * child table for every formula in the printed sequent, and that
+     * <code>posList</code> begins which the number of the formula. The returned
+     * PosInSequent will refer to (a subterm of) one of the constrained formulae
+     * in the sequent.
+     *
+     * @param posList
+     *            the position list that navigates through the position tables.
+     * @param filter
+     *            the sequent print filter from that was used to print the
+     *            sequent
      */    
     
     protected PosInSequent getSequentPIS(ImmutableList<Integer> posList,
@@ -263,25 +271,26 @@ public class PositionTable {
 	SequentFormula cfma = filterEntry.getOriginalFormula();
 
 	PosInOccurrence currentPos = 
-	    new PosInOccurrence ( cfma, PosInTerm.TOP_LEVEL,
+	    new PosInOccurrence ( cfma, PosInTerm.getTopLevel(),
 				  filter.getSequent ().antecedent().contains(cfma) );
 	
 	return child[cfmaNo].getTermPIS(filterEntry,tail,
 					currentPos);
     }
     
-
-    /** Returns a PosInSequent for a given position list, but without
-     * filling in the bounds.  It is assumed that this is a position
-     * table corresponding to the Term <code>term</code>, which has
-     * one child table for each subterm.
-     * @param filterEntry the print filter entry that contains
-     *                information about which constrained formula we
-     *                are in and how the constraint and metavariables
-     *                were printed.
-     * @param posList the position list that navigates through
-     *                the position tables.
-     * @param pio     the PosInOccurrence leading to the current term
+    /**
+     * Returns a PosInSequent for a given position list, but without filling in
+     * the bounds. It is assumed that this is a position table corresponding to
+     * the Term <code>term</code>, which has one child table for each subterm.
+     *
+     * @param filterEntry
+     *            the print filter entry that contains information about which
+     *            constrained formula we are in and how the constraint and
+     *            metavariables were printed.
+     * @param posList
+     *            the position list that navigates through the position tables.
+     * @param pio
+     *            the PosInOccurrence leading to the current term
      */
     private PosInSequent getTermPIS(SequentPrintFilterEntry filterEntry,
 				    ImmutableList<Integer> posList,
@@ -292,7 +301,6 @@ public class PositionTable {
 	    int subNo  =  posList.head().intValue();
 	    PosInOccurrence subpio = pio.down ( subNo );	   
 
-	  
 	    return child[subNo].getTermPIS(filterEntry,
 					   posList.tail(),
 					   subpio);
@@ -305,9 +313,8 @@ public class PositionTable {
 	int i = cfmaNo;
 	ImmutableList<SequentPrintFilterEntry> list =
 	    filter.getAntec().append(filter.getSucc());
-	while ( i-- != 0 ) list = list.tail ();
+        while (i-- != 0)
+            list = list.tail();
 	return list.head ();
     }
 }
-
-

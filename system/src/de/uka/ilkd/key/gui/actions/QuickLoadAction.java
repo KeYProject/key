@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -14,9 +14,7 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
-import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
@@ -35,7 +33,6 @@ public class QuickLoadAction extends MainWindowAction {
         setName("Quickload");
 //        setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Load previously quicksaved file");
-        setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F6,0));
     }
 
     public void actionPerformed(ActionEvent e) {

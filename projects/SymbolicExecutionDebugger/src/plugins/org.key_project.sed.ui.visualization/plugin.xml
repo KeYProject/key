@@ -96,20 +96,15 @@
              icon="icons/symbolic_debug.gif"
              id="org.key_project.sed.ui.visualization.symbolicExecutionTreeDiagramEditor"
              name="Symbolic Execution Tree Diagram Editor">
-          <contentTypeBinding
-                contentTypeId="org.eclipse.graphiti.content.diagram">
-          </contentTypeBinding>
        </editor>
        <editor
              class="org.eclipse.ui.editors.text.TextEditor"
              contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
-             default="false"
+             default="true"
+             extensions="set"
              icon="icons/symbolic_debug.gif"
              id="org.key_project.sed.ui.visualization.symbolicExecutionTreeEditor"
              name="Symbolic Execution Tree Editor">
-          <contentTypeBinding
-                contentTypeId="org.eclipse.core.runtime.xml">
-          </contentTypeBinding>
        </editor>
        <editor
              class="org.key_project.sed.ui.visualization.object_diagram.editor.ObjectDiagramEditor"
@@ -119,9 +114,6 @@
              icon="icons/object_diagram.gif"
              id="org.key_project.sed.ui.visualization.ObjectDiagramEditor"
              name="Object Diagram Editor">
-          <contentTypeBinding
-                contentTypeId="org.eclipse.graphiti.content.diagram">
-          </contentTypeBinding>
        </editor>
        <editor
              class="org.key_project.sed.ui.visualization.object_diagram.editor.ReadonlyObjectDiagramEditor"
@@ -130,9 +122,6 @@
              icon="icons/object_diagram.gif"
              id="org.key_project.sed.ui.visualization.ReadonlyObjectDiagramEditor"
              name="Read-only Object Diagram Editor">
-          <contentTypeBinding
-                contentTypeId="org.eclipse.graphiti.content.diagram">
-          </contentTypeBinding>
        </editor>
     </extension>
     <extension
@@ -140,6 +129,10 @@
        <file-association
              content-type="org.eclipse.graphiti.content.diagram"
              file-extensions="set_diagram">
+       </file-association>
+       <file-association
+             content-type="org.eclipse.graphiti.content.diagram"
+             file-extensions="od">
        </file-association>
        <file-association
              content-type="org.eclipse.core.runtime.xml"
@@ -172,6 +165,12 @@
                     id="org.key_project.sed.ui.visualization.source.tab"
                     label="Source">
               </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.visualization.source.tab"
+                    category="Graphiti"
+                    id="org.key_project.sed.ui.visualization.annotationLinks.tab"
+                    label="Annotation Links">
+              </propertyTab>
           </propertyTabs>
       </extension>
        
@@ -194,6 +193,12 @@
                     filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiSourceTreeFilter"
                     id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiSourcePropertySection"
                     tab="org.key_project.sed.ui.visualization.source.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiAnnotationLinkPropertySection"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiReadonlyDebugNodeTreeFilter"
+                    id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiAnnotationLinkPropertySection"
+                    tab="org.key_project.sed.ui.visualization.annotationLinks.tab">
               </propertySection>
           </propertySections>
       </extension>    
@@ -436,5 +441,99 @@
            id="org.key_project.sed.ui.visualization.preference.page.VisualizationPreferencePage"
            name="Visualization">
      </page>
+  </extension>
+  <extension
+        point="org.eclipse.debug.core.launchConfigurationTypes">
+     <launchConfigurationType
+           delegate="org.key_project.sed.ui.visualization.launch.SETFileLaunchConfigurationDelegate"
+           id="org.key_project.sed.ui.visualization.setFile"
+           modes="debug"
+           name="Symbolic Execution Tree File"
+           sourceLocatorId="org.key_project.sed.ui.visualization.setFile.sourceLocator"
+           sourcePathComputerId="org.key_project.sed.ui.visualization.setFile.sourcePathComputer">
+     </launchConfigurationType>
+  </extension>
+  <extension
+        point="org.eclipse.debug.ui.launchShortcuts">
+     <shortcut
+           class="org.key_project.sed.ui.visualization.launch.SETFileLaunchShortcut"
+           icon="icons/symbolic_debug.gif"
+           id="org.key_project.sed.ui.visualization.setFile.shortcut"
+           label="Symbolic Execution Tree File"
+           modes="debug">
+        <configurationType
+              id="org.key_project.sed.ui.visualization.setFile">
+        </configurationType>
+        <description
+              description="Symbolic Execution Debugger based on a SET file"
+              mode="debug">
+        </description>
+        <contextualLaunch>
+           <enablement>
+              <or>
+                 <with
+                       variable="selection">
+                    <and>
+                       <count
+                             value="1">
+                       </count>
+                       <iterate
+                             ifEmpty="false"
+                             operator="and">
+                          <instanceof
+                                value="org.eclipse.core.resources.IFile">
+                          </instanceof>
+                          <test
+                                forcePluginActivation="true"
+                                property="org.eclipse.core.resources.extension"
+                                value="set">
+                          </test>
+                       </iterate>
+                    </and>
+                 </with>
+              </or>
+           </enablement>
+        </contextualLaunch>
+     </shortcut>
+  </extension>
+  <extension
+        point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+     <launchConfigurationTypeImage
+           configTypeID="org.key_project.sed.ui.visualization.setFile"
+           icon="icons/symbolic_debug.gif"
+           id="org.key_project.sed.ui.visualization.setFile.typeImage">
+     </launchConfigurationTypeImage>
+  </extension>
+  <extension
+        point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+     <launchConfigurationTabGroup
+           class="org.key_project.sed.ui.visualization.launch.SETFileLaunchConfigurationTabGroup"
+           id="org.key_project.sed.ui.visualization.setFile.tabGroup"
+           type="org.key_project.sed.ui.visualization.setFile">
+     </launchConfigurationTabGroup>
+  </extension>
+  <extension
+        point="org.eclipse.debug.core.sourceLocators">
+     <sourceLocator
+           class="org.key_project.sed.ui.visualization.launch.SETFileSourceLookupDirector"
+           id="org.key_project.sed.ui.visualization.setFile.sourceLocator"
+           name="SET File Source Locator">
+     </sourceLocator>
+  </extension>
+  <extension
+        point="org.eclipse.debug.core.sourcePathComputers">
+     <sourcePathComputer
+           class="org.key_project.sed.ui.visualization.launch.SETFileSourcePathComputerDelegate"
+           id="org.key_project.sed.ui.visualization.setFile.sourcePathComputer">
+     </sourcePathComputer>
+  </extension>
+  <extension
+        point="org.eclipse.debug.core.sourceContainerTypes">
+     <sourceContainerType
+           class="org.key_project.sed.ui.visualization.launch.AbsoluteFileSystemPathSourceContainerTypeDelegate"
+           description="Absolute File System Paths"
+           id="org.key_project.sed.ui.visualization.absoluteFileSystemPathsSourceContainerType"
+           name="Absolute File System Paths">
+     </sourceContainerType>
   </extension>
 </plugin>

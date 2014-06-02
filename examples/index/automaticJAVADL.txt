@@ -14,8 +14,15 @@
 # It is used by bin/runAllProofs.pl.
 #
 
+# Examples used in the new book
+provable: ./newBook/09.list_modelfield/ArrayList.add.key
+provable: ./newBook/09.list_modelfield/ArrayList.remFirst.key
+provable: ./newBook/09.list_modelfield/ArrayList.empty.key
+provable: ./newBook/09.list_modelfield/ArrayList.size.key
+provable: ./newBook/09.list_modelfield/ArrayList.get.key
 
 # Comprehension Tests
+provable: ./heap/comprehensions/general_sum.key
 provable: ./heap/comprehensions/sum0.key
 provable: ./heap/comprehensions/sum1.key
 provable: ./heap/comprehensions/sum2.key
@@ -28,15 +35,15 @@ provable: ./heap/comprehensions/bprodSplit.key
 notprovable: ./heap/comprehensions/bsumSplitInvalid.key
 
 # Performance tests
-provable: ./performance-test/key-files/Disjoint(Disjoint__disjoint_08()).JML_operation_contract.0.key
-provable: ./performance-test/key-files/Disjoint(Disjoint__disjoint2_08()).JML_operation_contract.0.key
-provable: ./performance-test/key-files/AccessChain1(AccessChain1__foo_08()).JML_operation_contract.0.key
-provable: ./performance-test/key-files/AccessChain4(AccessChain4__foo_08()).JML_operation_contract.0.key
-provable: ./performance-test/key-files/Disjoint(Disjoint__xZero_08()).JML_operation_contract.0.key
-provable: ./performance-test/key-files/Dynamic(Dynamic__foo_08()).JML_operation_contract.0.key
-provable: ./performance-test/key-files/DynamicGhost(DynamicGhost__dynamicGhost_08()).JML_normal_behavior_operation_contract.0.key
-provable: ./performance-test/key-files/GhostFrame(GhostFrame__foo_08()).JML_operation_contract.0.key
-provable: ./performance-test/key-files/Modelfield(Modelfield__foo_08()).JML_operation_contract.0.key
+provable: ./performance-test/Disjoint(Disjoint__disjoint_08()).JML_operation_contract.0.key
+provable: ./performance-test/Disjoint(Disjoint__disjoint2_08()).JML_operation_contract.0.key
+provable: ./performance-test/AccessChain1(AccessChain1__foo_08()).JML_operation_contract.0.key
+provable: ./performance-test/AccessChain4(AccessChain4__foo_08()).JML_operation_contract.0.key
+provable: ./performance-test/Disjoint(Disjoint__xZero_08()).JML_operation_contract.0.key
+provable: ./performance-test/Dynamic(Dynamic__foo_08()).JML_operation_contract.0.key
+provable: ./performance-test/DynamicGhost(DynamicGhost__dynamicGhost_08()).JML_normal_behavior_operation_contract.0.key
+provable: ./performance-test/GhostFrame(GhostFrame__foo_08()).JML_operation_contract.0.key
+provable: ./performance-test/Modelfield(Modelfield__foo_08()).JML_operation_contract.0.key
 
 # # Test for information flow
 # provable: ./information_flow/collection/SumExample_SumExample__getSum___.JML_accessible_clause.0.key
@@ -209,7 +216,9 @@ provable: ./heap/block_contracts/Simple__unnecessaryLoopInvariant.key
 provable: ./standard_key/java_dl/jml-assert/assert.key
 
 # Other tests:
-provable: ./heap/fm12_01_LCP/lcp.key
+provable: ./heap/coincidence_count/project.key
+provable: ./heap/fm12_01_LRS/lcp.key
+provable: ./heap/SemanticSlicing/project.key
 provable: ./heap/information_flow/ArrayList_contains.key
 provable: ./heap/information_flow/ArrayList_get.key
 provable: ./heap/information_flow/ArrayList_size.key
@@ -260,6 +269,15 @@ provable: ./heap/list_ghost/ArrayList_size.key
 provable: ./heap/list_recursiveSpec/ListOperationsNonNull_getNextNN_normal_behavior.key
 provable: ./heap/list_recursiveSpec/ListOperationsNonNull_setValueAt_normal_behavior.key
 provable: ./heap/list_recursiveSpec/ListOperationsNonNull_remove_normal_behavior.key
+provable: ./heap/list_seq/SimplifiedLinkedList.remove.key
+provable: ./heap/list_seq/ArrayList.ArrayList.key
+provable: ./heap/list_seq/ArrayList.add.key
+provable: ./heap/list_seq/ArrayList.contains.key
+provable: ./heap/list_seq/ArrayList.enlarge.key
+provable: ./heap/list_seq/ArrayList.get.key
+provable: ./heap/list_seq/ArrayList.newArray.key
+provable: ./heap/list_seq/ArrayList.remove.0.key
+provable: ./heap/list_seq/ArrayList.remove.1.key
 provable: ./heap/observer/ExampleObserver_ExampleObserver.key
 provable: ./heap/observer/ExampleObserver_inv.key
 provable: ./heap/observer/ExampleObserver_subject.key
@@ -274,6 +292,9 @@ provable: ./heap/observer/ExampleSubject_inv.key
 provable: ./heap/observer/ExampleSubject_notifyObservers.key
 provable: ./heap/observer/ExampleSubject_value_dep.key
 provable: ./heap/observer/ExampleSubject_value.key
+provable: ./heap/removeDups/arrayPart.key
+provable: ./heap/removeDups/contains.key
+provable: ./heap/removeDups/removeDup.key
 provable: ./heap/saddleback_search/Saddleback_search.key
 provable: ./heap/simple/anonymise_datagroup.key
 provable: ./heap/simple/array_creation.key
@@ -355,6 +376,8 @@ provable: ./heap/WeideEtAl_02_BinarySearch/BinarySearch_search.key
 provable: ./heap/Wellfounded/ackermann.key
 provable: ./heap/strictly_pure/strictlyPureMethod.key
 provable: ./heap/strictly_pure/useStrictlyPureMethod.key
+# this file contains Unicode symbols for logic operators
+provable: ./standard_key/unicode_test.key
 provable: ./standard_key/arith/binomial1.key
 provable: ./standard_key/arith/binomial2.key
 provable: ./standard_key/arith/check_jdiv.key
@@ -431,6 +454,10 @@ provable: ./standard_key/java_dl/continue2.key
 provable: ./standard_key/java_dl/complexAssignment.key
 provable: ./standard_key/java_dl/danglingElseSolution1.key
 provable: ./standard_key/java_dl/danglingElseSolution2.key
+provable: ./standard_key/java_dl/deepNonNull/deepNonNull0.key
+provable: ./standard_key/java_dl/deepNonNull/deepNonNull1.key
+notprovable: ./standard_key/java_dl/deepNonNull/deepNonNull2.key
+provable: ./standard_key/java_dl/deepNonNull/deepNonNull3.key
 provable: ./standard_key/java_dl/exceptions.key
 provable: ./standard_key/java_dl/exceptions1.key
 provable: ./standard_key/java_dl/exceptions2.key
@@ -443,14 +470,17 @@ provable: ./standard_key/java_dl/incrementcounter.key
 # that needs a non-trivial fix.
 # provable: ./standard_key/java_dl/innerClasses/inner.key
 provable: ./standard_key/java_dl/iteratedAssignment.key
+notprovable: ./standard_key/java_dl/assert/assert1.key
+provable: ./standard_key/java_dl/assert/assert2.key
+notprovable: ./standard_key/java_dl/assert/assert3.key
 provable: ./standard_key/java_dl/java5/vararg.key
 provable: ./standard_key/java_dl/java5/for_Array.key
 provable: ./standard_key/java_dl/java5/for_Iterable.key
 provable: ./standard_key/java_dl/java5/for_ReferenceArray.key
 provable: ./standard_key/java_dl/jml-bigint/cast.key
-# commented out as proof gets too long
+# proof gets very long
 # requires further investigations
-#provable: ./standard_key/java_dl/jml-information-flow.key
+provable: ./standard_key/java_dl/jml-information-flow.key
 notprovable: ./standard_key/java_dl/jml-min/min-unprovable1.key
 notprovable: ./standard_key/java_dl/jml-min/min-unprovable2.key
 provable: ./standard_key/java_dl/methodCall.key
@@ -600,5 +630,38 @@ notprovable: ./standard_key/arrays/arrayStoreException/array2Dim.key
 notprovable: ./standard_key/arrays/arrayStoreException/array2DimClose.key
 notprovable: ./standard_key/arrays/arrayStoreException/throwASEForPrim.key
 notprovable: ./standard_key/java_dl/danglingElse.key
+
+# Model methods tests:
+# (Note: some of the problems are trivial, but they should be kept
+# here as these problems provide the only test base for model methods)
+
+provable: ./heap/model_methods/Cell_footprint_acc.key
+provable: ./heap/model_methods/Cell_footprint.key
+provable: ./heap/model_methods/Cell_get_acc.key
+provable: ./heap/model_methods/Cell_get.key
+provable: ./heap/model_methods/Cell_post_set.key
+provable: ./heap/model_methods/Cell_set.key
+provable: ./heap/model_methods/CellTest_callSet.key
+provable: ./heap/model_methods/CellTest_test2.key
+provable: ./heap/model_methods/CellTest_test.key
+provable: ./heap/model_methods/Coll1_add.key
+provable: ./heap/model_methods/Coll1_Coll1_add_pre.key
+provable: ./heap/model_methods/Coll1_Coll_add_pre.key
+provable: ./heap/model_methods/Coll2_add.key
+provable: ./heap/model_methods/Coll2_Coll2_add_pre.key
+provable: ./heap/model_methods/Coll2_Coll_add_pre.key
+provable: ./heap/model_methods/Coll_add.key
+provable: ./heap/model_methods/Coll_add_pre.key
+provable: ./heap/model_methods/Indirect_callAdd.key
+provable: ./heap/model_methods/Indirect_test.key
+provable: ./heap/model_methods/Recell_Cell_footprint.key
+provable: ./heap/model_methods/Recell_Cell_post_set.key
+provable: ./heap/model_methods/Recell_footprint_acc.key
+provable: ./heap/model_methods/Recell_get_acc.key
+provable: ./heap/model_methods/Recell_get.key
+provable: ./heap/model_methods/Recell_Recell_footprint.key
+provable: ./heap/model_methods/Recell_Recell_post_set.key
+provable: ./heap/model_methods/Recell_set.key
+provable: ./heap/model_methods/Recell_undo.key
 
 # End -- please do not remove this line.

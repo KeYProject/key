@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 /** common superclass of TacletIfSelectionDialog and TacletMatchCompletionDialog */
 package de.uka.ilkd.key.gui;
@@ -29,10 +28,9 @@ import javax.swing.border.TitledBorder;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
@@ -55,7 +53,6 @@ public abstract class ApplyTacletDialog extends JDialog {
 
     protected ApplyTacletDialogModel[] model; 
     private JTextArea statusArea;
-    private JPanel statusPanel;
 
     public ApplyTacletDialog(Frame parent, ApplyTacletDialogModel[] model,
 			     KeYMediator mediator) { 
@@ -72,10 +69,12 @@ public abstract class ApplyTacletDialog extends JDialog {
     
 	mediator.requestModalAccess(this); 
 	addWindowListener(new WindowAdapter() {
+                @Override
 		public void windowClosed(WindowEvent e) {
 		    ApplyTacletDialog.this.closeDlg();		    
 		}
 
+                @Override
 		public void windowClosing(WindowEvent e) {
 		    ApplyTacletDialog.this.closeDlg();
 		}
@@ -121,13 +120,14 @@ public abstract class ApplyTacletDialog extends JDialog {
         
         Taclet taclet = model[0].taclet();
         StringBackend backend = new StringBackend(68);
-        StringBuffer tacletSB = new StringBuffer();
+        StringBuilder tacletSB = new StringBuilder();
         
         Writer w = new StringWriter();
         //WriterBackend backend = new WriterBackend(w, 68);
         
-        LogicPrinter tp = new LogicPrinter(new ProgramPrinter(w), 
-                new NotationInfo(), backend, mediator.getServices(), true);
+        SequentViewLogicPrinter tp = new SequentViewLogicPrinter(new ProgramPrinter(w), 
+                new NotationInfo(), backend, mediator.getServices(), true,
+                MainWindow.getInstance().getVisibleTermLabels());
         
 //        tp.printTaclet(taclet, model[0].tacletApp().instantiations(),
         tp.printTaclet(taclet, 
@@ -162,16 +162,16 @@ public abstract class ApplyTacletDialog extends JDialog {
     }
 
     protected JPanel createStatusPanel() {
-        statusPanel = new JPanel(new BorderLayout());
+        JPanel statusPanel = new JPanel(new BorderLayout());
 
         statusArea = new JTextArea();
 	statusArea.setEditable(false);
 
         statusPanel.add(
-	    new JScrollPane(statusArea,
-	        ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED), 
-	    BorderLayout.CENTER);
+                new JScrollPane(statusArea,
+                        ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED),
+                BorderLayout.CENTER);
         statusPanel.setBorder(new TitledBorder("Input validation result"));
         setStatus(model[current()].getStatusString());
         return statusPanel;

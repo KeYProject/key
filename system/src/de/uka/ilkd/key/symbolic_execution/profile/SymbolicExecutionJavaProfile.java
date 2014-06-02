@@ -1,16 +1,40 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.profile;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabelFactory;
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelFactory;
+import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.label.ITermLabelWorker;
-import de.uka.ilkd.key.rule.label.LoopBodyTermLabelInstantiator;
-import de.uka.ilkd.key.rule.label.LoopInvariantNormalBehaviorTermLabelInstantiator;
-import de.uka.ilkd.key.rule.label.SymbolicExecutionTermLabelInstantiator;
+import de.uka.ilkd.key.rule.label.StayOnOperatorTermLabelPolicy;
+import de.uka.ilkd.key.rule.label.RemoveInCheckBranchesTermLabelRefactoring;
+import de.uka.ilkd.key.rule.label.LoopBodyTermLabelUpdate;
+import de.uka.ilkd.key.rule.label.LoopInvariantNormalBehaviorTermLabelUpdate;
+import de.uka.ilkd.key.rule.label.SymbolicExecutionTermLabelUpdate;
+import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
+import de.uka.ilkd.key.rule.label.TermLabelPolicy;
+import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.symbolic_execution.rule.ModalitySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
@@ -53,24 +77,55 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     * {@inheritDoc}
     */
    @Override
-   protected ImmutableList<ITermLabelWorker> computeLabelInstantiators() {
-      ImmutableList<ITermLabelWorker> result = super.computeLabelInstantiators();
-      result = result.prepend(getSymbolicExecutionLabelInstantiators());
+   protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
+      ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
+      result = result.prepend(getSymbolicExecutionTermLabelConfigurations());
       return result;
    }
-   
+
    /**
-    * Returns the special {@link ITermLabelWorker} used for symbolic execution-
-    * @return The special {@link ITermLabelWorker} used for symbolic execution-
+    * Returns the additional {@link TermLabelFactory} instances used for symbolic execution.
+    * @return The additional {@link TermLabelFactory} instances used for symbolic execution.
     */
-   public static ImmutableList<ITermLabelWorker> getSymbolicExecutionLabelInstantiators() {
-      ImmutableList<ITermLabelWorker> result = ImmutableSLList.nil();
-      result = result.prepend(SymbolicExecutionTermLabelInstantiator.INSTANCE);
-      result = result.prepend(LoopBodyTermLabelInstantiator.INSTANCE);
-      result = result.prepend(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
+   public static ImmutableList<TermLabelConfiguration> getSymbolicExecutionTermLabelConfigurations() {
+      ImmutableList<TermLabelPolicy> symExcPolicies = ImmutableSLList.<TermLabelPolicy>nil().prepend(new StayOnOperatorTermLabelPolicy());
+
+      ImmutableList<TermLabelUpdate> lbUps = ImmutableSLList.<TermLabelUpdate>nil().prepend(new LoopBodyTermLabelUpdate());
+      ImmutableList<TermLabelUpdate> nbUps = ImmutableSLList.<TermLabelUpdate>nil().prepend(new LoopInvariantNormalBehaviorTermLabelUpdate());
+      ImmutableList<TermLabelUpdate> seUps = ImmutableSLList.<TermLabelUpdate>nil().prepend(new SymbolicExecutionTermLabelUpdate());
+
+      ImmutableList<TermLabelRefactoring> lbRefs = ImmutableSLList.<TermLabelRefactoring>nil().prepend(new RemoveInCheckBranchesTermLabelRefactoring(ParameterlessTermLabel.LOOP_BODY_LABEL_NAME));
+      ImmutableList<TermLabelRefactoring> nbRefs = ImmutableSLList.<TermLabelRefactoring>nil().prepend(new RemoveInCheckBranchesTermLabelRefactoring(ParameterlessTermLabel.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME));
+      ImmutableList<TermLabelRefactoring> seRefs = ImmutableSLList.<TermLabelRefactoring>nil().prepend(new RemoveInCheckBranchesTermLabelRefactoring(SymbolicExecutionTermLabel.NAME));
+
+      ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
+      result = result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.LOOP_BODY_LABEL_NAME,
+                                                         new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.LOOP_BODY_LABEL),
+                                                         null,
+                                                         symExcPolicies,
+                                                         null,
+                                                         null,
+                                                         lbUps,
+                                                         lbRefs));
+      result = result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME,
+                                                         new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL),
+                                                         null,
+                                                         symExcPolicies,
+                                                         null,
+                                                         null,
+                                                         nbUps,
+                                                         nbRefs));
+      result = result.prepend(new TermLabelConfiguration(SymbolicExecutionTermLabel.NAME,
+                                                         new SymbolicExecutionTermLabelFactory(),
+                                                         null,
+                                                         symExcPolicies,
+                                                         null,
+                                                         null,
+                                                         seUps,
+                                                         seRefs));
       return result;
    }
-   
+
    /**
     * {@inheritDoc}
     */

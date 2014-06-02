@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.java.visitor;
 
@@ -31,9 +31,13 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramConstant;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.ExtList;
@@ -160,7 +164,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
 
     public void performActionOnProgramVariable(ProgramVariable pv) {
-    ProgramElement newPV = (ProgramElement) replaceMap.get(pv);
+    ProgramElement newPV = replaceMap.get(pv);
     if (newPV!=null) {
         addChild(newPV);
         changed();
@@ -175,10 +179,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
         if(t.op() instanceof ProgramVariable) {
             if(replaceMap.containsKey(t.op())) {
-            ProgramVariable replacement = replaceMap.get(t.op());
-            return TermFactory.DEFAULT.createTerm(replacement);
+                ProgramVariable replacement = replaceMap.get(t.op());
+                return services.getTermFactory().createTerm(replacement);
             } else {
-            return t;
+                return t;
             }
         } else {
             Term subTerms[] = new Term[t.arity()];
@@ -194,10 +198,11 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     op = ElementaryUpdate.getInstance(replacedLhs);
                 }
             }
-            return TermFactory.DEFAULT.createTerm(op,
-                    subTerms,
-                    t.boundVars(),
-                    t.javaBlock());
+            return services.getTermFactory().createTerm(op,
+                                                        subTerms,
+                                                        t.boundVars(),
+                                                        t.javaBlock(),
+                                                        t.getLabels());
         }
     }
 
@@ -286,7 +291,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             replaceVariable(variables.result),
             replaceVariable(variables.exception),
             replaceRemembranceHeaps(variables.remembranceHeaps),
-            replaceRemembranceLocalVariables(variables.remembranceLocalVariables)
+            replaceRemembranceLocalVariables(variables.remembranceLocalVariables),
+            services
         );
     }
 
@@ -294,12 +300,12 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         if (variable != null) {
             if (replaceMap.containsKey(variable)) {
                 // TODO Can we really safely assume that replaceMap contains a program variable?
-                return (ProgramVariable) replaceMap.get(variable);
+                return replaceMap.get(variable);
             }
             else {
                 if (replaceallbynew) {
                     replaceMap.put(variable, copy(variable));
-                    return (ProgramVariable) replaceMap.get(variable);
+                    return replaceMap.get(variable);
                 }
                 else {
                     return variable;
@@ -352,7 +358,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     public void performActionOnLoopInvariant(LoopStatement oldLoop,
                                              LoopStatement newLoop) {
-        final TermBuilder TB = TermBuilder.DF;
+        final TermBuilder tb = services.getTermBuilder();        
         LoopInvariant inv
             = services.getSpecificationRepository().getLoopInvariant(oldLoop);
         if(inv == null) {
@@ -403,8 +409,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
            atPres.put(h.getKey(), replaceVariablesInTerm(t));
         }
         
-        ImmutableList<Term> newLocalIns = TB.var(MiscTools.getLocalIns(newLoop, services));
-        ImmutableList<Term> newLocalOuts = TB.var(MiscTools.getLocalOuts(newLoop, services));
+        ImmutableList<Term> newLocalIns = tb.var(MiscTools.getLocalIns(newLoop, services));
+        ImmutableList<Term> newLocalOuts = tb.var(MiscTools.getLocalOuts(newLoop, services));
 
         LoopInvariant newInv = inv.create(newLoop, newInvariants, newMods, newInfFlowSpecs,
                                           newVariant, newSelfTerm, newLocalIns,

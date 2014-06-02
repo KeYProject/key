@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -56,6 +56,8 @@ import org.key_project.util.java.ObjectUtil;
  */
 @SuppressWarnings("restriction")
 public class JDTUtil {
+   public static final String JAVA_FILE_EXTENSION = "java";
+   
    /**
     * Forbid instances by this private constructor.
     */
@@ -420,6 +422,53 @@ public class JDTUtil {
        else {
            return false;
        }
+   }
+   
+   /**
+    * Checks if the given {@link IResource} is a "Java" file.
+    * @param file The {@link IResource} to check.
+    * @return {@code true} is Java file, {@code false} is something else or {@code null}.
+    */
+   public static boolean isJavaFile(IResource file) {
+      if (file != null) {
+         String extension = file.getFileExtension();
+         return extension != null && extension.equalsIgnoreCase(JAVA_FILE_EXTENSION);
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * Checks if the given {@link IResource} is or is contained in a source folder of its project.
+    * @param resource The {@link IResource} to check.
+    * @return {@code true} is source folder of its project or contained in a source folder of its project, {@code false} is somewhere else.
+    * @throws JavaModelException Occurred Exception.
+    */
+   public static boolean isInSourceFolder(IResource resource) throws JavaModelException {
+      boolean inSourceFolder = false;
+      if (resource != null) {
+         IJavaProject javaProject = getJavaProject(resource.getProject());
+         if (javaProject != null && javaProject.exists()) {
+             IClasspathEntry[] entries = javaProject.getRawClasspath();
+             int i = 0;
+             while (!inSourceFolder && i < entries.length) {
+                if (entries[i].getContentKind() == IPackageFragmentRoot.K_SOURCE) {
+                   IPackageFragmentRoot[] roots = javaProject.findPackageFragmentRoots(entries[i]);
+                   int j = 0;
+                   while (!inSourceFolder && j < roots.length) {
+                      IResource rootResource = roots[j].getResource();
+                      if (rootResource != null && rootResource.contains(resource)) {
+                         inSourceFolder = true;
+                      }
+                      j++;
+                   }
+                }
+                i++;
+             }
+         }
+      }
+      return inSourceFolder;
    }
    
    /**

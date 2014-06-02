@@ -1,17 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.strategy.termgenerator;
 
@@ -19,6 +17,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -51,7 +50,7 @@ public abstract class SubtermGenerator implements TermGenerator {
                                              TermFeature cond) {
         return new SubtermGenerator (cTerm, cond) {
             public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
-                return new LeftIterator ( getTermInst ( app, pos, goal ) );
+                return new LeftIterator ( getTermInst ( app, pos, goal ), goal.proof().getServices() );
             }
         };
     }
@@ -64,7 +63,7 @@ public abstract class SubtermGenerator implements TermGenerator {
                                               TermFeature cond) {
         return new SubtermGenerator (cTerm, cond) {
             public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
-                return new RightIterator ( getTermInst ( app, pos, goal ) );
+                return new RightIterator ( getTermInst ( app, pos, goal ), goal.proof().getServices() );
             }
         };
     }
@@ -73,15 +72,18 @@ public abstract class SubtermGenerator implements TermGenerator {
         return completeTerm.toTerm ( app, pos, goal );
     }
     
-    private boolean descendFurther(Term t) {
-        return ! ( cond.compute ( t ) instanceof TopRuleAppCost );
+    private boolean descendFurther(Term t, Services services) {
+        return ! ( cond.compute ( t, services ) instanceof TopRuleAppCost );
     }
         
     abstract class SubIterator implements Iterator<Term> {
         protected ImmutableList<Term> termStack;
+        
+        protected final Services services;
 
-        public SubIterator(Term t) {
+        public SubIterator(Term t, Services services) {
             termStack = ImmutableSLList.<Term>nil().prepend ( t );
+            this.services = services;
         }
 
         public boolean hasNext() {
@@ -90,15 +92,15 @@ public abstract class SubtermGenerator implements TermGenerator {
     }
 
     class LeftIterator extends SubIterator {
-        public LeftIterator(Term t) {
-            super ( t );
+        public LeftIterator(Term t, Services services) {
+            super ( t, services );
         }
 
         public Term next() {
             final Term res = termStack.head ();
             termStack = termStack.tail ();
             
-            if ( descendFurther ( res ) ) {
+            if ( descendFurther ( res, services ) ) {
                 for ( int i = res.arity () - 1; i >= 0; --i )
                     termStack = termStack.prepend ( res.sub ( i ) );
             }
@@ -116,15 +118,15 @@ public abstract class SubtermGenerator implements TermGenerator {
     }
 
     class RightIterator extends SubIterator {
-        public RightIterator(Term t) {
-            super ( t );
+        public RightIterator(Term t, Services services) {
+            super ( t, services );
         }
 
         public Term next() {
             final Term res = termStack.head ();
             termStack = termStack.tail ();
             
-            if ( descendFurther ( res ) ) {
+            if ( descendFurther ( res, services ) ) {
                 for ( int i = 0; i != res.arity (); ++i )
                     termStack = termStack.prepend ( res.sub ( i ) );
             }

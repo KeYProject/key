@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.gui.configuration;
 
@@ -32,21 +32,17 @@ public class GeneralSettings implements Settings, Cloneable {
     private static final String ONE_STEP_SIMPLIFICATION_KEY
         = "[General]OneStepSimplification";
     private static final String USE_JML_KEY = "[General]UseJML";
-    private static final String USE_OCL_KEY = "[General]UseOCL";
     private static final String RIGHT_CLICK_MACROS_KEY = "[General]RightClickMacros";
     private static final String AUTO_SAVE = "[General]AutoSave";
     private static final String DEFAULT_PROOF_FOLDER = "[General]DefaultProofFolder";
     
-    /** if true then JML/OCL specifications are globally disabled 
+    /** if true then JML specifications are globally disabled 
      * in this run of KeY, regardless of the regular settings 
      */
     public static boolean disableSpecs = false;
 
     /** minimize interaction is on by default */
     private boolean tacletFilter = true;
-
-    /** suggestive var names are off by default */
-    private boolean suggestiveVarNames = false;
 
     /** is drag and drop instantiation direction sensitive */
     private boolean dndDirectionSensitive = true;
@@ -66,9 +62,6 @@ public class GeneralSettings implements Settings, Cloneable {
 
     /** JML is active by default */
     private boolean useJML = true;
-    
-    /** OCL is not active by default */
-    private boolean useOCL = false;
 
     private LinkedList<SettingsListener> listenerList = 
         new LinkedList<SettingsListener>();
@@ -77,12 +70,6 @@ public class GeneralSettings implements Settings, Cloneable {
     public boolean tacletFilter() {
 	return tacletFilter;
     }
-
-    
-    public boolean suggestiveVarNames() {
-	return suggestiveVarNames;
-    }
-    
 
     public boolean isDndDirectionSensitive() {        
         return dndDirectionSensitive;
@@ -107,11 +94,6 @@ public class GeneralSettings implements Settings, Cloneable {
 
     public boolean useJML() {
         return useJML && !disableSpecs;
-    }
-    
-    
-    public boolean useOCL() {
-        return useOCL && !disableSpecs;
     }
     
 
@@ -170,14 +152,6 @@ public class GeneralSettings implements Settings, Cloneable {
           fireSettingsChanged();
         }
     }
-    
-    
-    public void setUseOCL(boolean b) {
-        if (useOCL != b) {
-            useOCL = b;
-          fireSettingsChanged();
-        }
-    }
 
 
 
@@ -220,11 +194,6 @@ public class GeneralSettings implements Settings, Cloneable {
         if (val != null) {
             useJML = Boolean.valueOf(val).booleanValue();
         }
-
-        val = props.getProperty(USE_OCL_KEY);
-        if (val != null) {
-            useOCL = Boolean.valueOf(val).booleanValue();
-        }
     }
 
 
@@ -241,7 +210,6 @@ public class GeneralSettings implements Settings, Cloneable {
         props.setProperty(AUTO_SAVE, "" + autoSave);
         props.setProperty(DEFAULT_PROOF_FOLDER, "" + defaultProofFolder);
         props.setProperty(USE_JML_KEY, "" + useJML);
-        props.setProperty(USE_OCL_KEY, "" + useOCL);
     }
 
     /** sends the message that the state of this setting has been

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -32,6 +32,7 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.serialization.SEDXMLWriter;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
+import org.key_project.sed.ui.visualization.execution_tree.wizard.page.ModelFileSaveOptionsWizardPage;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.wizard.page.ContentWizardNewFileCreationPage;
@@ -51,6 +52,11 @@ public abstract class AbstractExecutionTreeDiagramSaveAsWizard extends BasicNewR
     * The contained {@link WizardNewFileCreationPage} which is used to define the model file.
     */
    private ContentWizardNewFileCreationPage modelPage;
+   
+   /**
+    * The optionally contained {@link ModelFileSaveOptionsWizardPage}.
+    */
+   private ModelFileSaveOptionsWizardPage optionsPage;
 
    /**
     * {@inheritDoc}
@@ -69,6 +75,19 @@ public abstract class AbstractExecutionTreeDiagramSaveAsWizard extends BasicNewR
       modelPage.setDescription("Select file that will contain domain model."); 
       modelPage.setFileExtension(ExecutionTreeUtil.DOMAIN_FILE_EXTENSION);
       addPage(modelPage);
+      optionsPage = createModelFileSaveOptionsWizardPage("optionsPage");
+      if (optionsPage != null) {
+         addPage(optionsPage);
+      }
+   }
+   
+   /**
+    * Creates the {@link ModelFileSaveOptionsWizardPage} if it should be used.
+    * @param pageName The page name to use.
+    * @return The {@link ModelFileSaveOptionsWizardPage} to use or {@code null} otherwise.
+    */
+   protected ModelFileSaveOptionsWizardPage createModelFileSaveOptionsWizardPage(String pageName) {
+      return null;
    }
    
    /**
@@ -128,7 +147,10 @@ public abstract class AbstractExecutionTreeDiagramSaveAsWizard extends BasicNewR
          ISEDDebugTarget[] targets = getDebugTargetsToSave();
          // Create model file
          SEDXMLWriter writer = new SEDXMLWriter();
-         String modelContent = writer.toXML(targets, "UTF-8", false, false);
+         String modelContent = writer.toXML(targets, 
+                                            "UTF-8", 
+                                            optionsPage != null && optionsPage.isSaveVariables(), 
+                                            optionsPage != null && optionsPage.isSaveCallStack());
          getModelPage().setInitialContents(new ByteArrayInputStream(modelContent.getBytes(Charset.forName("UTF-8"))));
          IFile domainFile = getModelPage().createNewFile();
          if (domainFile != null) {

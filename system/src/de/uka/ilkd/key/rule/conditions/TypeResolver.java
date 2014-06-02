@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.rule.conditions;
 
@@ -19,6 +18,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -62,7 +62,7 @@ public abstract class TypeResolver {
     public abstract boolean isComplete(SchemaVariable sv, 
             			       SVSubstitute instCandidate, 
             			       SVInstantiations instMap, 
-            			       Services services);
+            			       TermServices services);
     
     public abstract Sort resolveSort(SchemaVariable sv, 
             			     SVSubstitute instCandidate, 
@@ -88,7 +88,7 @@ public abstract class TypeResolver {
         
         @Override
         public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate, 
-                SVInstantiations instMap, Services services) {            
+                SVInstantiations instMap, TermServices services) {            
             return instMap.getGenericSortInstantiations().getInstantiation(gs) != null;
         }
 
@@ -114,7 +114,7 @@ public abstract class TypeResolver {
 
         @Override
         public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate, 
-                SVInstantiations instMap, Services services) {            
+                SVInstantiations instMap, TermServices services) {            
             return true;
         }
 
@@ -144,7 +144,7 @@ public abstract class TypeResolver {
         
         @Override
         public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate, 
-                SVInstantiations instMap, Services services) {       
+                SVInstantiations instMap, TermServices services) {       
             return resolveSV == sv || instMap.getInstantiation(resolveSV) != null;
         }
 
@@ -193,7 +193,7 @@ public abstract class TypeResolver {
         @Override
         public boolean isComplete(SchemaVariable sv,
                 SVSubstitute instCandidate, SVInstantiations instMap,
-                Services services) {
+                TermServices services) {
             
             return sv == memberSV || instMap.getInstantiation(memberSV) != null;
         }
@@ -225,7 +225,7 @@ public abstract class TypeResolver {
             return result;
         }
     
-        private Sort getContainerSort(Operator op, Services services) {
+        private Sort getContainerSort(Operator op, TermServices services) {
             Sort result = null;
             if (op instanceof ProgramVariable) {
                 result  = ((ProgramVariable)op).getContainerType().getSort();
@@ -233,7 +233,7 @@ public abstract class TypeResolver {
         	result = ((IObserverFunction)op).getContainerType().getSort();
             } else if(op instanceof Function
         	      && ((Function)op).isUnique()
-        	      && ((Function)op).name().toString().contains("::")) {
+        	      && op.name().toString().contains("::")) {
         	//Heap
         	Function func = (Function) op;
         	String funcName = func.name().toString();

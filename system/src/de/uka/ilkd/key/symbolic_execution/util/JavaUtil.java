@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -33,6 +33,27 @@ public final class JavaUtil {
     */
    private JavaUtil() {
    }
+
+   /**
+    * Checks if the given array contains the element to search.
+    * @param <T> The type of the array.
+    * @param array The array.
+    * @param toSearch The element to search.
+    * @return {@code true} if the array contains the element or {@code false} if not or if the array is {@code null}.
+    */
+   public static <T> boolean contains(T[] array, T toSearch) {
+      boolean contains = false;
+      if (array != null) {
+         int i = 0;
+         while (!contains && i < array.length) {
+            if (equals(array[i], toSearch)) {
+               contains = true;
+            }
+            i++;
+         }
+      }
+      return contains;
+   }
    
    /**
     * Adds all elements to the {@link Collection}. 
@@ -42,9 +63,7 @@ public final class JavaUtil {
     */
    public static <T> void addAll(Collection<T> collection, T... elementsToAdd) {
       if (collection != null && elementsToAdd != null) {
-         for (T toAdd : elementsToAdd) {
-            collection.add(toAdd);
-         }
+          Collections.addAll(collection, elementsToAdd);
       }
    }
    

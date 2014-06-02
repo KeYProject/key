@@ -119,7 +119,7 @@ public class StartAuxiliaryMethodComputationMacro implements ExtendedProofMacro 
                                         goal, proof.getServices());
         ProblemInitializer pi =
                 new ProblemInitializer(mediator.getUI(),
-                                       mediator.getServices(), true,
+                                       mediator.getServices(),
                                        mediator.getUI());
         try {
             Proof p = pi.startProver(initConfig, symbExecPO, 0);

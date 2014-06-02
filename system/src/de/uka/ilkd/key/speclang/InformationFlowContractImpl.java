@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.init.ContractPO;
@@ -34,7 +33,6 @@ import java.util.Map;
  */
 public final class InformationFlowContractImpl implements InformationFlowContract {
 
-    protected static final TermBuilder TB = TermBuilder.DF;
     private final int id;
     private final KeYJavaType forClass;
     private final IProgramMethod pm;
@@ -659,5 +657,54 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                        Services services) {
         throw new UnsupportedOperationException("Not supported any more. "
                 + "Please use the POSnippetFactory instead.");
+    }
+
+
+    @Override
+    public OriginalVariables getOrigVars() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    @Override
+    public Term getDep(LocationVariable heap, boolean atPre,
+            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+            Services services) {
+        return null;
+    }
+
+
+    @Override
+    public Term getDep(LocationVariable heap, boolean atPre, Term heapTerm,
+            Term selfTerm, ImmutableList<Term> paramTerms,
+            Map<LocationVariable, Term> atPres, Services services) {
+        return null;
+    }
+
+
+    @Override
+    public Term getRequires(LocationVariable heap) {
+        return null;
+    }
+
+
+    @Override
+    public Term getAssignable(LocationVariable heap) {
+        return null;
+    }
+
+
+    @Override
+    public Term getAccessible(ProgramVariable heap) {
+        return null;
+    }
+
+
+    @Override
+    public Term getGlobalDefs() {
+        // information flow contracts do not have global defs (yet?)
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

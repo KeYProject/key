@@ -149,7 +149,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
         // return proof obligation schema variables
         return new ProofObligationVars(pre, post, poVars.exceptionParameter,
-                                       poVars.formalParams);
+                                       poVars.formalParams, services);
     }
 
 
@@ -174,7 +174,8 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         // by schema variables
         Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
                 collectQuantifiableVariables(replaceWithTerm, services);
-	final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars);
+	final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars,
+	                                     services.getTermFactory());
 	replaceWithTerm = or.replace(replaceWithTerm);
 
         //create sequents

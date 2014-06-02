@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -88,7 +88,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
      * The resulting contract has an empty precondition, the assert expression
      * as a postcondition, and strictly_nothing as frame.
      */
-    static TextualJMLSpecCase assert2blockContract (ImmutableList<String> mods, PositionedString assertStm) {
+    public static TextualJMLSpecCase assert2blockContract (ImmutableList<String> mods, PositionedString assertStm) {
         final TextualJMLSpecCase res = new TextualJMLSpecCase(mods, Behavior.NORMAL_BEHAVIOR);
         res.addName(new PositionedString("assert "+assertStm.text, assertStm.fileName, assertStm.pos));
         res.addEnsures(assertStm);

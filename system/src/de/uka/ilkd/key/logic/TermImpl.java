@@ -1,22 +1,22 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -33,9 +33,10 @@ class TermImpl implements Term {
     private static final ImmutableArray<QuantifiableVariable> EMPTY_VAR_LIST
     	= new ImmutableArray<QuantifiableVariable>();
 	
-    private static final ImmutableArray<ITermLabel> EMPTY_LABEL_LIST = new ImmutableArray<ITermLabel>();
+    private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST
+        = new ImmutableArray<TermLabel>();
     
-	private static int serialNumberCounter =0;
+    private static int serialNumberCounter =0;
 
     //content
     private final Operator op;
@@ -171,8 +172,8 @@ class TermImpl implements Term {
     @Override
     public Term subAt(PosInTerm pos) {
         Term sub = this;
-        for(final IntIterator it = pos.iterator(); it.hasNext(); ) {	
-            sub = sub.sub(it.next());
+        for(int i = 0; i<pos.depth(); i++) {	
+            sub = sub.sub(pos.getIndexAt(i));
         }
         return sub;
     }
@@ -552,20 +553,20 @@ class TermImpl implements Term {
         return serialNumber;
     }
 
-	@Override
-	public boolean hasLabels() {
-		return false;
-	}
+    @Override
+    public boolean hasLabels() {
+        return false;
+    }
 
-	@Override
-	public boolean containsLabel(ITermLabel label) {
-		return false;
-	}
+    @Override
+    public boolean containsLabel(TermLabel label) {
+        return false;
+    }
 
-	@Override
-	public ImmutableArray<ITermLabel> getLabels() {
-		return EMPTY_LABEL_LIST;
-	}
+    @Override
+    public ImmutableArray<TermLabel> getLabels() {
+        return EMPTY_LABEL_LIST;
+    }
     
     /**
      * {@inheritDoc}

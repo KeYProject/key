@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -77,7 +77,7 @@ public class BundleUtilTest extends TestCase {
       // Test content
       assertEquals("b10a8db164e0754105b7a99be72e3fe5", BundleUtil.computeMD5(Activator.PLUGIN_ID, "data/HelloWorld.txt"));
    }
-   
+
    /**
     * Tests {@link BundleUtil#extractFromBundleToFilesystem(String, String, java.io.File)}
     */

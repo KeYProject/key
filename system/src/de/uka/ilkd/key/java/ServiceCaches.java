@@ -1,11 +1,35 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.java;
 
 import java.util.Map;
+import java.util.WeakHashMap;
 
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TermTacletAppIndex;
 import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
+import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
+import de.uka.ilkd.key.strategy.RuleAppCost;
+import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature.TermInfo;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesGraph;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
 import de.uka.ilkd.key.util.LRUCache;
 
 /**
@@ -56,11 +80,82 @@ public class ServiceCaches {
     */
    private final Map<CacheKey, TermTacletAppIndex> termTacletAppIndexCache = new LRUCache<CacheKey, TermTacletAppIndex> ( MAX_TERM_TACLET_APP_INDEX_ENTRIES );
 
+   /*
+    * Table of formulas which could be splitted using the beta rule
+    * This is the cache the method "isBetaCandidate" uses
+    *
+    *    keys: Term              values: TermInfo
+    */
+   private final LRUCache<Term, TermInfo> betaCandidates = new LRUCache<Term, TermInfo> (1000);
+
+   private final LRUCache<PosInOccurrence, RuleAppCost> ifThenElseMalusCache = new LRUCache<PosInOccurrence, RuleAppCost>(1000); 
+
+   private final LRUCache<Operator, Integer> introductionTimeCache = new LRUCache<Operator, Integer> ( 10000 );
+   
+   private final LRUCache<Term, Monomial> monomialCache =  new LRUCache<Term, Monomial> ( 2000 );
+
+   private final LRUCache<Term, Polynomial> polynomialCache = new LRUCache<Term, Polynomial> ( 2000 );
+
+   /**a <code>HashMap</code> from <code>Term</code> to 
+    * <code>TriggersSet</code> uses to cache all created TriggersSets*/
+   private final Map<Term, TriggersSet> triggerSetCache = new LRUCache<Term, TriggersSet>(1000);
+
+   /**
+    * Map from  <code>Term</code>(allTerm) to <code>ClausesGraph</code> 
+    */
+   private final Map<Term, ClausesGraph> graphCache = new LRUCache<Term, ClausesGraph> (1000);
+
+   /**
+    * Cache used by the TermFactory to avoid unnecessary creation of terms
+    */
+   private final Map<Term, Term> termCache = new LRUCache<Term, Term>(20000);
+
+   /**
+    * Cache used by TypeComparisonCondition
+    */
+   private final Map<Sort,Map<Sort,Boolean>> disjointnessCache = new WeakHashMap<Sort,Map<Sort,Boolean>>();
+   
    /**
     * Returns the cache used by {@link TermTacletAppIndexCacheSet} instances.
     * @return The cache used by {@link TermTacletAppIndexCacheSet} instances.
     */
    public Map<CacheKey, TermTacletAppIndex> getTermTacletAppIndexCache() {
       return termTacletAppIndexCache;
+   }
+
+   public LRUCache<Term, TermInfo> getBetaCandidates() {
+      return betaCandidates;
+   }
+
+   public LRUCache<PosInOccurrence, RuleAppCost> getIfThenElseMalusCache() {
+      return ifThenElseMalusCache;
+   }
+
+   public LRUCache<Operator, Integer> getIntroductionTimeCache() {
+      return introductionTimeCache;
+   }
+   
+   public LRUCache<Term, Monomial> getMonomialCache() {
+      return monomialCache;
+   }
+
+   public LRUCache<Term, Polynomial> getPolynomialCache() {
+      return polynomialCache;
+   }
+
+   public Map<Term, TriggersSet> getTriggerSetCache() {
+      return triggerSetCache;
+   }
+
+   public Map<Term, ClausesGraph> getGraphCache() {
+      return graphCache;
+   }
+
+   public Map<Term, Term> getTermFactoryCache() {
+       return termCache;
+   }
+
+   public Map<Sort, Map<Sort, Boolean>> getDisjointnessCache() {
+       return disjointnessCache;
    }
 }

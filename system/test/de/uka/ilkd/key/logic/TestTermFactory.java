@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.logic;
 
@@ -31,13 +30,13 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
+import de.uka.ilkd.key.rule.TacletForTests;
 
 /** class tests the term factory
 */
 public class TestTermFactory extends TestCase {
     
 
-    private static final TermFactory tf = TermFactory.DEFAULT;
     private Term et1;
     private Sort sort1  = new SortImpl(new Name("S1"));
     private Sort sort2  = new SortImpl(new Name("S2"));
@@ -69,6 +68,9 @@ public class TestTermFactory extends TestCase {
     LogicVariable v4=new LogicVariable(new Name("v4"), osort4);
 
     Function g=new Function(new Name("g"), osort3, new Sort[]{osort2, osort1});
+   private TermBuilder TB;
+   private TermFactory tf;
+
 
     public TestTermFactory(String name) {
 	super(name);
@@ -78,6 +80,8 @@ public class TestTermFactory extends TestCase {
 	Term et_x=new TermImpl(x, new ImmutableArray<Term>(), null, null);
 	Term et_px=new TermImpl(p, new ImmutableArray<Term>(new Term[]{et_x}), null, null);
 	et1=et_px;       
+	TB = TacletForTests.services().getTermBuilder();
+	tf = TB.tf();
     }
 
     private Term t1(){
@@ -149,7 +153,7 @@ public class TestTermFactory extends TestCase {
     }
 
     public void testQuantifierTerm() {
-	Term t_forallx_px=TermBuilder.DF.all(ImmutableSLList.<QuantifiableVariable>nil().append(x),t1());
+	Term t_forallx_px=TB.all(ImmutableSLList.<QuantifiableVariable>nil().append(x),t1());
 	Assert.assertEquals(t_forallx_px,
 			    new TermImpl(Quantifier.ALL,new ImmutableArray<Term>(t1()), new ImmutableArray<QuantifiableVariable>(x), null));
     }
@@ -177,7 +181,7 @@ public class TestTermFactory extends TestCase {
     }
 
     public void testSubstitutionTerm() {
-	Term t_x_subst_fy_in_px=TermBuilder.DF.subst(WarySubstOp.SUBST, x, t3(),
+	Term t_x_subst_fy_in_px=TB.subst(WarySubstOp.SUBST, x, t3(),
 							  t1());
 	Assert.assertEquals(new TermImpl(WarySubstOp.SUBST, new ImmutableArray<Term>(new Term[]{ t3(),t1() }),
 				    	 new ImmutableArray<QuantifiableVariable>(x), null), 
@@ -213,7 +217,7 @@ public class TestTermFactory extends TestCase {
 	Exception exc=new Exception();
         Term result = null;
 	try {
-	    result=TermBuilder.DF.all(ImmutableSLList.<QuantifiableVariable>nil(), t1());
+	    result=TB.all(ImmutableSLList.<QuantifiableVariable>nil(), t1());
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}
@@ -260,7 +264,7 @@ public class TestTermFactory extends TestCase {
 //	Exception exc = null;
 //	try { XXX
 //	    tf.createEqualityTerm(tf.createVariableTerm(v1), 
-//				  TermBuilder.DF.skip());
+//				  TB.skip());
 //	} catch (TermCreationException e) {
 //	    exc=e;	    
 //	}
@@ -281,18 +285,18 @@ public class TestTermFactory extends TestCase {
 	Term t = tf.createTerm(g, new Term[]{tf.createTerm(v2), 
 				             tf.createTerm(v1)});
 	Function c=new Function(new Name("c"), osort2, new Sort[0]);
-	Term st = TermBuilder.DF.subst(WarySubstOp.SUBST, v2, 
+	Term st = TB.subst(WarySubstOp.SUBST, v2, 
 					    tf.createTerm(c), t);
 	c=new Function(new Name("c"), osort4, new Sort[0]);
-	st = TermBuilder.DF.subst(WarySubstOp.SUBST, v2, 
+	st = TB.subst(WarySubstOp.SUBST, v2, 
 					    tf.createTerm(c), t);
 	c=new Function(new Name("c"), osort3, new Sort[0]);
-	st = TermBuilder.DF.subst(WarySubstOp.SUBST, v1, 
+	st = TB.subst(WarySubstOp.SUBST, v1, 
 					    tf.createTerm(c), t);
 	Exception exc=new Exception();
 	try {
 	    c=new Function(new Name("c"), osort1, new Sort[0]);
-	    st = TermBuilder.DF.subst(WarySubstOp.SUBST, v2, 
+	    st = TB.subst(WarySubstOp.SUBST, v2, 
 					    tf.createTerm(c), t);
 	} catch (TermCreationException e) {
 	    exc=e;	    
@@ -301,7 +305,7 @@ public class TestTermFactory extends TestCase {
 	exc=new Exception();
 	try {
 	    c=new Function(new Name("c"), osort3, new Sort[0]);
-	    st = TermBuilder.DF.subst(WarySubstOp.SUBST, v2, 
+	    st = TB.subst(WarySubstOp.SUBST, v2, 
 					   tf.createTerm(c), t);
 	    
 	} catch (TermCreationException e) {

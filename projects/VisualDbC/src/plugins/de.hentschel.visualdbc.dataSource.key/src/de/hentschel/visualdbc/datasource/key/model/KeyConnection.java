@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -39,8 +39,6 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.SwingUtil;
-import org.key_project.util.java.thread.AbstractRunnableWithException;
-import org.key_project.util.java.thread.IRunnableWithException;
 
 import de.hentschel.visualdbc.datasource.key.intern.helper.KeyHacks;
 import de.hentschel.visualdbc.datasource.key.intern.helper.OpenedProof;
@@ -111,10 +109,8 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -123,6 +119,8 @@ import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * Implementation for {@link IDSConnection} to analyze code files with KeY.
@@ -173,16 +171,11 @@ public class KeyConnection extends MemoryConnection {
     * The opened KeY model represented as {@link InitConfig}.
     */
    private InitConfig initConfig;
-
-   /**
-    * The used {@link ProblemInitializer}.
-    */
-   private ProblemInitializer init;
    
    /**
-    * The used {@link MainWindow}.
+    * The used {@link KeYEnvironment}.
     */
-   private MainWindow main;
+   private KeYEnvironment<?> environment;
    
    /**
     * Maps all {@link IProgramMethod}s to their data source instance.
@@ -288,42 +281,19 @@ public class KeyConnection extends MemoryConnection {
          }
          final boolean skipLibraryClasses = isSkipLibraryClasses(connectionSettings);
          final DSPackageManagement packageManagement = getPackageManagent(connectionSettings);
-         // Instantiate KeY main window
-         SwingUtil.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-               // Open connection in key
-               if (interactive) {
-                  main = MainWindow.getInstance();
-                  main.setVisible(true);
-               }
-               else {
-                  main = MainWindow.getInstance();
-               }
-            }
-         });
-         // Open environment and analyse types
-         IRunnableWithException run = new AbstractRunnableWithException() {
-            @Override
-            public void run() {
-               try {
-                  KeYMediator mediator = main.getMediator();
-                  mediator.addGUIListener(mainGuiListener);
-                  DefaultProblemLoader loader = main.getUserInterface().load(null, location, classPathEntries, bootClassPath);
-                  init = loader.getProblemInitializer();
-                  initConfig = loader.getInitConfig();
-                  // Analyze classes, interfaces, enums and packages
-                  analyzeTypes(initConfig.getServices(), skipLibraryClasses, packageManagement, monitor);
-               }
-               catch (Exception e) {
-                  setException(e);
-               }
-            }
-         };
-         SwingUtil.invokeAndWait(run);
-         if (run.getException() != null) {
-            throw run.getException();
+         
+         // Establish connection
+         if (interactive) {
+            environment = KeYEnvironment.loadInMainWindow(location, classPathEntries, bootClassPath, true);
+            KeYMediator mediator = environment.getMediator();
+            mediator.addGUIListener(mainGuiListener);
          }
+         else {
+            environment = KeYEnvironment.load(location, classPathEntries, bootClassPath);
+         }
+         initConfig = environment.getInitConfig();
+         // Analyze classes, interfaces, enums and packages
+         analyzeTypes(environment.getServices(), skipLibraryClasses, packageManagement, monitor);
          super.connect(connectionSettings, interactive, monitor);
       }
       catch (DSException e) {
@@ -1565,31 +1535,32 @@ public class KeyConnection extends MemoryConnection {
          proof.dispose();
       }
       // Remove listener and proof environment
-      if (main != null) {
-         main.getMediator().removeGUIListener(mainGuiListener);
+      if (environment != null) {
+         environment.getMediator().removeGUIListener(mainGuiListener);
          try {
-            final MainWindow oldMain = main;
-            Runnable run = new Runnable() {
-               @Override
-               public void run() {
-                  if (closeKeYMain && KeYUtil.isProofListEmpty(oldMain) && oldMain.getExitMainAction() != null) {
-                     oldMain.getExitMainAction().exitMainWithoutInteraction();
+            final MainWindow oldMain = MainWindow.getInstance();
+            if (oldMain.getUserInterface() == environment.getUi()) {
+               Runnable run = new Runnable() {
+                  @Override
+                  public void run() {
+                     if (closeKeYMain && KeYUtil.isProofListEmpty(oldMain) && oldMain.getExitMainAction() != null) {
+                        oldMain.getExitMainAction().exitMainWithoutInteraction();
+                     }
                   }
+               };
+               if (SwingUtil.isSwingThread()) {
+                  run.run();
                }
-            };
-            if (SwingUtil.isSwingThread()) {
-               run.run();
-            }
-            else {
-               SwingUtil.invokeLater(run);
+               else {
+                  SwingUtil.invokeLater(run);
+               }
             }
          }
          catch (Exception e) {
             throw new DSException(e);
          }
       }
-      main = null;
-      init = null;
+      environment = null;
       initConfig = null;
       operationsMapping = null;
       operationContractsMapping = null;
@@ -1741,7 +1712,7 @@ public class KeyConnection extends MemoryConnection {
    public Proof openProof(ProofOblInput po) {
       try {
          if (po != null) {
-            Proof proof = init.startProver(initConfig, po, 0);
+            Proof proof = environment.createProof(po);
             return proof;
          }
          else {
@@ -1760,7 +1731,7 @@ public class KeyConnection extends MemoryConnection {
     */
    public void selectProof(Proof proof) {
       Assert.isNotNull(proof);
-      main.getMediator().setProof(proof);
+      environment.getMediator().setProof(proof);
    }
 
    /**
@@ -1768,22 +1739,22 @@ public class KeyConnection extends MemoryConnection {
     * @return The used {@link Services}.
     */
    public Services getServices() {
-      return main != null ? main.getMediator().getServices() : null;
+      return environment != null ? environment.getServices() : null;
    }
 
    /**
-    * Returns the treated {@link MainWindow}.
-    * @return The treated {@link MainWindow}.
+    * Returns the used {@link UserInterface}.
+    * @return The used {@link UserInterface}.
     */
-   public MainWindow getMain() {
-      return main;
+   public UserInterface getUserInterface() {
+      return environment != null ? environment.getUi() : null;
    }
 
    /**
     * Closes the active task without user interaction.
     */
    public void closeTaskWithoutInteraction() {
-      main.getUserInterface().removeProof(main.getMediator().getSelectedProof());
+      environment.getUi().removeProof(environment.getMediator().getSelectedProof());
    }
    
    /**

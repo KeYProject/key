@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.ldt;
 
@@ -19,11 +18,17 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.expression.operator.adt.*;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -49,7 +54,7 @@ public final class SeqLDT extends LDT {
     private final Function values;
     
     
-    public SeqLDT(Services services) {
+    public SeqLDT(TermServices services) {
 	super(NAME, services);
         seqGet        = addSortDependingFunction(services, "seqGet");
         seqLen        = addFunction(services, "seqLen");
@@ -64,7 +69,7 @@ public final class SeqLDT extends LDT {
     }
     
     
-    public Function getSeqGet(Sort instanceSort, Services services) {
+    public Function getSeqGet(Sort instanceSort, TermServices services) {
 	return seqGet.getInstanceFor(instanceSort, services);
     }
     
@@ -134,7 +139,7 @@ public final class SeqLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
 	    			 Term sub, 
-	    			 Services services, 
+	    			 TermServices services, 
 	    			 ExecutionContext ec) {
 	return op instanceof SeqSingleton
 	       || op instanceof SeqConcat
@@ -149,7 +154,7 @@ public final class SeqLDT extends LDT {
     @Override
     public Term translateLiteral(Literal lit, Services services) {
 	assert lit instanceof EmptySeqLiteral;
-	return TermBuilder.DF.func(seqEmpty);
+	return services.getTermBuilder().func(seqEmpty);
     }
     
 

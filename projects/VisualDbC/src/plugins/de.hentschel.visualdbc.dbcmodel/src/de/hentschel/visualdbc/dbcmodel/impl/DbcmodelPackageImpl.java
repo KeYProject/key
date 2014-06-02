@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -434,6 +434,15 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
     * <!-- end-user-doc -->
     * @generated
     */
+   public EAttribute getDbcClass_ExtendsFullNames() {
+      return (EAttribute)dbcClassEClass.getEStructuralFeatures().get(4);
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
    public EClass getAbstractDbcProofContainer() {
       return abstractDbcProofContainerEClass;
    }
@@ -695,6 +704,15 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
     * <!-- end-user-doc -->
     * @generated
     */
+   public EAttribute getAbstractDbcClass_ImplementsFullNames() {
+      return (EAttribute)abstractDbcClassEClass.getEStructuralFeatures().get(2);
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
    public EClass getAbstractDbcInterface() {
       return abstractDbcInterfaceEClass;
    }
@@ -733,6 +751,15 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
     */
    public EReference getDbcInterface_Extends() {
       return (EReference)dbcInterfaceEClass.getEStructuralFeatures().get(0);
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public EAttribute getDbcInterface_ExtendsFullNames() {
+      return (EAttribute)dbcInterfaceEClass.getEStructuralFeatures().get(1);
    }
 
    /**
@@ -1190,6 +1217,7 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
       createEAttribute(dbcClassEClass, DBC_CLASS__FINAL);
       createEReference(dbcClassEClass, DBC_CLASS__EXTENDS);
       createEAttribute(dbcClassEClass, DBC_CLASS__ANONYMOUS);
+      createEAttribute(dbcClassEClass, DBC_CLASS__EXTENDS_FULL_NAMES);
 
       abstractDbcProofContainerEClass = createEClass(ABSTRACT_DBC_PROOF_CONTAINER);
       createEReference(abstractDbcProofContainerEClass, ABSTRACT_DBC_PROOF_CONTAINER__PROOFS);
@@ -1225,6 +1253,7 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
       abstractDbcClassEClass = createEClass(ABSTRACT_DBC_CLASS);
       createEReference(abstractDbcClassEClass, ABSTRACT_DBC_CLASS__CONSTRUCTORS);
       createEReference(abstractDbcClassEClass, ABSTRACT_DBC_CLASS__IMPLEMENTS);
+      createEAttribute(abstractDbcClassEClass, ABSTRACT_DBC_CLASS__IMPLEMENTS_FULL_NAMES);
 
       abstractDbcInterfaceEClass = createEClass(ABSTRACT_DBC_INTERFACE);
       createEReference(abstractDbcInterfaceEClass, ABSTRACT_DBC_INTERFACE__METHODS);
@@ -1232,6 +1261,7 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
 
       dbcInterfaceEClass = createEClass(DBC_INTERFACE);
       createEReference(dbcInterfaceEClass, DBC_INTERFACE__EXTENDS);
+      createEAttribute(dbcInterfaceEClass, DBC_INTERFACE__EXTENDS_FULL_NAMES);
 
       abstractDbcTypeEClass = createEClass(ABSTRACT_DBC_TYPE);
       createEAttribute(abstractDbcTypeEClass, ABSTRACT_DBC_TYPE__NAME);
@@ -1374,6 +1404,7 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
       initEAttribute(getDbcClass_Final(), ecorePackage.getEBoolean(), "final", null, 0, 1, DbcClass.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
       initEReference(getDbcClass_Extends(), this.getDbcClass(), null, "extends", null, 0, -1, DbcClass.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
       initEAttribute(getDbcClass_Anonymous(), ecorePackage.getEBoolean(), "anonymous", null, 0, 1, DbcClass.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+      initEAttribute(getDbcClass_ExtendsFullNames(), ecorePackage.getEString(), "extendsFullNames", null, 0, -1, DbcClass.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
       initEClass(abstractDbcProofContainerEClass, AbstractDbcProofContainer.class, "AbstractDbcProofContainer", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
       initEReference(getAbstractDbcProofContainer_Proofs(), this.getDbcProof(), null, "proofs", null, 0, -1, AbstractDbcProofContainer.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1413,6 +1444,7 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
       initEClass(abstractDbcClassEClass, AbstractDbcClass.class, "AbstractDbcClass", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
       initEReference(getAbstractDbcClass_Constructors(), this.getDbcConstructor(), null, "constructors", null, 0, -1, AbstractDbcClass.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
       initEReference(getAbstractDbcClass_Implements(), this.getDbcInterface(), null, "implements", null, 0, -1, AbstractDbcClass.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+      initEAttribute(getAbstractDbcClass_ImplementsFullNames(), ecorePackage.getEString(), "implementsFullNames", "", 0, -1, AbstractDbcClass.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
       op = addEOperation(abstractDbcClassEClass, this.getDbcConstructor(), "getConstructor", 0, 1, IS_UNIQUE, IS_ORDERED);
       addEParameter(op, ecorePackage.getEString(), "signature", 0, 1, IS_UNIQUE, IS_ORDERED);
@@ -1429,6 +1461,7 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
 
       initEClass(dbcInterfaceEClass, DbcInterface.class, "DbcInterface", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
       initEReference(getDbcInterface_Extends(), this.getDbcInterface(), null, "extends", null, 0, -1, DbcInterface.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+      initEAttribute(getDbcInterface_ExtendsFullNames(), ecorePackage.getEString(), "extendsFullNames", null, 0, -1, DbcInterface.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
       initEClass(abstractDbcTypeEClass, AbstractDbcType.class, "AbstractDbcType", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
       initEAttribute(getAbstractDbcType_Name(), ecorePackage.getEString(), "name", null, 0, 1, AbstractDbcType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

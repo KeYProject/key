@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof.io;
 
@@ -26,8 +25,8 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedReader;
@@ -114,11 +113,11 @@ public class KeYFile implements EnvInput {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private KeYParser createDeclParser(InputStream is) throws FileNotFoundException {
-        return new KeYParser(ParserMode.DECLARATION,
-                             new KeYLexer(is,
+    private KeYParserF createDeclParser(InputStream is) throws FileNotFoundException {
+        return new KeYParserF(ParserMode.DECLARATION,
+                             new KeYLexerF(is,
+                                          file.toString(),
                                           initConfig.getServices().getExceptionHandler()),
-                             file.toString(), 
                              initConfig.getServices(),
                              initConfig.namespaces());
     }
@@ -140,11 +139,9 @@ public class KeYFile implements EnvInput {
                 return null;
             }
             try {
-                
-               KeYParser problemParser 
-                    = new KeYParser(ParserMode.PROBLEM,
-                                    new KeYLexer(getNewStream(), null), 
-                                    file.toString());
+               KeYParserF problemParser
+                    = new KeYParserF(ParserMode.PROBLEM,
+                                    new KeYLexerF(getNewStream(), file.toString(), null));
                problemParser.profile();
                ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
                 settings.loadSettingsFromString(problemParser.preferences());
@@ -197,10 +194,10 @@ public class KeYFile implements EnvInput {
                 // during collection of includes (it is enough to mispell \include) the error
                 // message is very uninformative - ProofInputException without filename, line and column
                 // numbers. Somebody please fix that. /Woj
-                KeYParser problemParser = new KeYParser(ParserMode.PROBLEM, 
-                        new KeYLexer(getNewStream(),
-                                null), 
-                                file.toString(), 
+                KeYParserF problemParser = new KeYParserF(ParserMode.PROBLEM,
+                        new KeYLexerF(getNewStream(),
+                                file.toString(),
+                                null),
                                 pc, 
                                 pc, 
                                 null, 
@@ -263,10 +260,10 @@ public class KeYFile implements EnvInput {
             return javaPath;       
         }
         try {
-            KeYParser problemParser = new KeYParser(ParserMode.PROBLEM,
-                                                    new KeYLexer(getNewStream(),
-                                                                 null), 
-                                                    file.toString());
+            KeYParserF problemParser = new KeYParserF(ParserMode.PROBLEM,
+                                                    new KeYLexerF(getNewStream(),
+                                                                 file.toString(),
+                                                                 null));
             
             problemParser.profile(); // skip profile
             problemParser.preferences(); // skip preferences
@@ -319,16 +316,16 @@ public class KeYFile implements EnvInput {
             final ParserConfig schemaConfig 
                     = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
 
-            CountingBufferedReader cinp = 
+            CountingBufferedReader cinp =
                     new CountingBufferedReader
                         (getNewStream(),monitor,getNumberOfChars()/100);
             try {
-                KeYParser problemParser 
-                = new KeYParser(ParserMode.PROBLEM, 
-                        new KeYLexer(cinp, 
+                KeYParserF problemParser
+                = new KeYParserF(ParserMode.PROBLEM,
+                        new KeYLexerF(cinp,
+                                file.toString(),
                                 initConfig.getServices()
                                 .getExceptionHandler()), 
-                                file.toString(), 
                                 schemaConfig, 
                                 normalConfig, 
                                 initConfig.getTaclet2Builder(), 
@@ -367,7 +364,7 @@ public class KeYFile implements EnvInput {
         try {
             InputStream is = getNewStream();
             try { 
-                KeYParser p=createDeclParser(is);          
+                KeYParserF p=createDeclParser(is);
                 p.parseSorts();
                 initConfig.addCategory2DefaultChoices(p.getCategory2Default());
             } finally {
@@ -391,7 +388,7 @@ public class KeYFile implements EnvInput {
 	try {
             InputStream is = getNewStream();
             try { 
-                KeYParser p=createDeclParser(getNewStream());
+                KeYParserF p=createDeclParser(getNewStream());
                 p.parseFuncAndPred();
             } finally {
                 is.close();
@@ -410,8 +407,7 @@ public class KeYFile implements EnvInput {
      * modifying the set of rules 
      * of the initial configuration 
      */
-    public void readRulesAndProblem() 
-            throws ProofInputException {
+    public void readRulesAndProblem() throws ProofInputException {
         final ParserConfig schemaConfig = 
 	    new ParserConfig(initConfig.getServices(), initConfig.namespaces());
         final ParserConfig normalConfig = 
@@ -421,16 +417,16 @@ public class KeYFile implements EnvInput {
             final CountingBufferedReader cinp = new CountingBufferedReader
                     (getNewStream(), monitor, getNumberOfChars()/100);
             try {
-                KeYParser problemParser 
-                = new KeYParser(ParserMode.PROBLEM,
-                        new KeYLexer(cinp, 
+                KeYParserF problemParser
+                = new KeYParserF(ParserMode.PROBLEM,
+                        new KeYLexerF(cinp,
+                                file.toString(),
                                 initConfig.getServices()
                                 .getExceptionHandler()), 
-                                file.toString(),
                                 schemaConfig,
                                 normalConfig,
                                 initConfig.getTaclet2Builder(),
-                                initConfig.getTaclets());                             
+                                initConfig.getTaclets());
                 problemParser.parseTacletsAndProblem();
                 initConfig.setTaclets(problemParser.getTaclets());
             } finally {

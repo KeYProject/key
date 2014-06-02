@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -38,17 +38,19 @@ public class ProofMarkerResolution implements IMarkerResolution2{
    
    /**
     * Initializes the global variables depending on the given {@link IMarker#getType()}.
-    * @param markerType - the given {@link IMarker#getType()}
+    * @param marker - the given {@link IMarker}
+    * @throws CoreException 
     */
-   public ProofMarkerResolution(String markerType, boolean openInKeY) {
-      this.openInKeY = openInKeY;
-      if(markerType.equals(MarkerManager.CLOSEDMARKER_ID)){
-         description = (openInKeY ? "Open proof in KeY" : "Open proof");
+   public ProofMarkerResolution(IMarker marker) throws CoreException {
+      IFile proofFile = getProofFile(marker);
+      String proofFileName = proofFile.getFullPath().lastSegment();
+      if(MarkerManager.CLOSEDMARKER_ID.equals(marker.getType())){
+         description = "Open proof: " + proofFileName;
       }
-      else if(markerType.equals(MarkerManager.NOTCLOSEDMARKER_ID)){
-         description = (openInKeY ? "Open proof in KeY to close it manually" : "Open proof to close it manually");
+      else if(MarkerManager.NOTCLOSEDMARKER_ID.equals(marker.getType())){
+         description = "Open proof to close it manually: " + proofFileName;
       }
-      this.label = (openInKeY ? "Open proof in KeY" : "Open proof");
+      this.label = "Open proof: " + proofFileName;
    }
    
    /**
@@ -75,7 +77,7 @@ public class ProofMarkerResolution implements IMarkerResolution2{
          }
       }
       catch (Exception e) {
-         LogUtil.getLogger().createErrorStatus(e); // TODO: You do nothing with the created status. I guess you mean LogUtil.getLogger().logError(e); which writes the exception into the eclipse log
+         LogUtil.getLogger().logError(e);
       }
    }
 
@@ -98,14 +100,8 @@ public class ProofMarkerResolution implements IMarkerResolution2{
    }
    
    private IFile getProofFile(IMarker marker) throws CoreException{
-      StringBuffer sb = new StringBuffer((String) marker.getAttribute(IMarker.MESSAGE));
-      if(marker.getType().equals(MarkerManager.CLOSEDMARKER_ID)){
-         sb.delete(0, 15);
-      }
-      else if(marker.getType().equals(MarkerManager.NOTCLOSEDMARKER_ID)){
-         sb.delete(0, 19);
-      }
-      IPath proofFilePath = new Path(sb.toString());
+      String str = (String) marker.getAttribute(IMarker.SOURCE_ID);
+      IPath proofFilePath = new Path(str);
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
       IFile proofFile = root.getFile(proofFilePath);
       return proofFile;

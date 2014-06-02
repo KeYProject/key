@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
@@ -31,9 +31,9 @@ import de.uka.ilkd.key.logic.op.Operator;
  */
 public class PredictCostProver {
 
-    private final static TermBuilder tb = TermBuilder.DF;
+    private final TermBuilder tb;
 
-    private final static Term trueT = tb.tt(), falseT = tb.ff();
+    private final Term trueT, falseT;
 
     /** assume that all literal in <code>assertLiterals</code> are true */
     private ImmutableSet<Term> assertLiterals;
@@ -41,12 +41,15 @@ public class PredictCostProver {
     /** clauses from <code>instance</code> of CNF */
     private Set<Clause> clauses = new LinkedHashSet<Clause>();
 
-    private Services services;
+    private final Services services;
 
     private PredictCostProver(Term instance, ImmutableSet<Term> assertList,
 	    Services services) {
 	this.assertLiterals = assertList;
 	this.services = services;
+	this.tb = services.getTermBuilder(); 
+	this.trueT = tb.tt();
+	this.falseT = tb.ff();
 	initClauses(instance);
     }
 

@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.util.install;
 
@@ -281,7 +280,7 @@ public abstract class KeYInstaller {
         File targetDir = new File(keyHome(), "examples" + File.separatorChar + "firstTouch");
         Enumeration<JarEntry> en = jarFile.entries();
         while(en.hasMoreElements()) {
-            JarEntry entry = ((JarEntry)en.nextElement());
+            JarEntry entry = en.nextElement();
             File file = new File(targetDir, entry.getName());
             if (entry.isDirectory()) {
                 if (!file.exists()) {
@@ -355,7 +354,7 @@ public abstract class KeYInstaller {
 		l.add ( keyLib () + File.separatorChar + libs () [i] );
 	    }
 	}
-	return ( String [] ) l.toArray ( new String [l.size ()] );
+	return l.toArray ( new String [l.size ()] );
     }
 
 
@@ -512,4 +511,3 @@ public abstract class KeYInstaller {
      */
 
 }
-

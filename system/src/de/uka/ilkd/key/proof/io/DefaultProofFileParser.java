@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -34,7 +34,6 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -46,7 +45,6 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.TacletInstantiationsTableModel;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -78,7 +76,7 @@ public class DefaultProofFileParser implements IProofFileParser {
    private Goal currGoal = null;
    private String currTacletName = null;
    private int currFormula = 0;
-   private PosInTerm currPosInTerm = PosInTerm.TOP_LEVEL;
+   private PosInTerm currPosInTerm = PosInTerm.getTopLevel();
    private Contract currContract = null;
    private Stack<Iterator<Node>> stack = new Stack<Iterator<Node>>();
    private LinkedList<String> loadedInsts = null;
@@ -148,7 +146,7 @@ public class DefaultProofFileParser implements IProofFileParser {
            currTacletName= s;
            // set default state
            currFormula   = 0;
-           currPosInTerm = PosInTerm.TOP_LEVEL;
+           currPosInTerm = PosInTerm.getTopLevel();
            loadedInsts   = null;
            ifFormulaList = ImmutableSLList.<IfFormulaInstantiation>nil();
            break;
@@ -211,7 +209,7 @@ public class DefaultProofFileParser implements IProofFileParser {
            currTacletName = s;
            // set default state
            currFormula   = 0;
-           currPosInTerm = PosInTerm.TOP_LEVEL;
+           currPosInTerm = PosInTerm.getTopLevel();
            builtinIfInsts = null;
            break;
        case 'c' : //contract
@@ -225,7 +223,7 @@ public class DefaultProofFileParser implements IProofFileParser {
         builtinIfInsts = ImmutableSLList.<PosInOccurrence>nil();
            }
            currIfInstFormula = 0;
-           currIfInstPosInTerm = PosInTerm.TOP_LEVEL;
+           currIfInstPosInTerm = PosInTerm.getTopLevel();
            break;
        case 'w' : //newnames
            final String[] newNames = s.split(",");
@@ -275,6 +273,11 @@ public class DefaultProofFileParser implements IProofFileParser {
                reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
                    ", goal "+currGoal.node().serialNr()+
                    ", rule "+currTacletName+NOT_APPLICABLE,e);
+           } catch (AssertionError e) {
+               skipBranch = 1;
+               reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
+                   ", goal "+currGoal.node().serialNr()+
+                   ", rule "+currTacletName+NOT_APPLICABLE,e);
            }
            break;
        case 'n' :
@@ -289,6 +292,16 @@ public class DefaultProofFileParser implements IProofFileParser {
            } catch (SkipSMTRuleException e) {
                // silently continue; status will be reported via polling
            } catch (BuiltInConstructionException e) {
+               skipBranch = 1;
+               reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
+                   ", goal "+currGoal.node().serialNr()+
+                   ", rule "+currTacletName+NOT_APPLICABLE,e);
+           } catch (RuntimeException e) {
+               skipBranch = 1;
+               reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
+                   ", goal "+currGoal.node().serialNr()+
+                   ", rule "+currTacletName+NOT_APPLICABLE,e);
+           } catch (AssertionError e) {
                skipBranch = 1;
                reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
                    ", goal "+currGoal.node().serialNr()+
@@ -309,6 +322,11 @@ public class DefaultProofFileParser implements IProofFileParser {
                reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
                    ", goal "+currGoal.node().serialNr()+
                    ", rule "+currTacletName+NOT_APPLICABLE,e);
+           } catch (AssertionError e) {
+               skipBranch = 1;
+               reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
+                   ", goal "+currGoal.node().serialNr()+
+                   ", rule "+currTacletName+NOT_APPLICABLE,e);
            }
            break;
        }
@@ -317,7 +335,7 @@ public class DefaultProofFileParser implements IProofFileParser {
 
 
    
-   private void reportError(String string, Exception e) {       
+   private void reportError(String string, Throwable e) {       
        status = "Errors while reading the proof. Not all branches could be load successfully.";
        errors.add(new ProblemLoaderException(loader, string, e));
    }
@@ -366,14 +384,25 @@ public class DefaultProofFileParser implements IProofFileParser {
        }
 
        if (currContract != null) {
-        BuiltInRule useContractRule =
-              currContract instanceof OperationContract
-              ? UseOperationContractRule.INSTANCE
-                    : UseDependencyContractRule.INSTANCE;
+          AbstractContractRuleApp contractApp = null;
 
-
-        ourApp = ((AbstractContractRuleApp)useContractRule.
-              createApp(pos)).setContract(currContract);
+          BuiltInRule useContractRule;
+          if (currContract instanceof OperationContract) {
+             useContractRule = UseOperationContractRule.INSTANCE;
+             contractApp = (((UseOperationContractRule)useContractRule).createApp(pos)).setContract(currContract);
+          }
+          else {
+             useContractRule = UseDependencyContractRule.INSTANCE;
+             contractApp = (((UseDependencyContractRule)useContractRule).createApp(pos)).setContract(currContract);
+          }
+          
+          if (contractApp.check(currGoal.proof().getServices()) == null) {
+              throw new BuiltInConstructionException
+              ("Cannot apply contract: " + currContract);
+          } else {
+              ourApp = contractApp;
+          }
+          
            currContract = null;
            if(builtinIfInsts != null) {
                ourApp = ourApp.setIfInsts(builtinIfInsts);
@@ -398,7 +427,7 @@ public class DefaultProofFileParser implements IProofFileParser {
                    "@ " + pos);
            }
        }
-       ourApp = (IBuiltInRuleApp) ruleApps.iterator().next();
+       ourApp = ruleApps.iterator().next();
        builtinIfInsts = null;
        return ourApp;
    }
@@ -447,7 +476,7 @@ public class DefaultProofFileParser implements IProofFileParser {
                                     String value, Services services) {
        LogicVariable lv = new LogicVariable(new Name(value),
                                           app.getRealSort(sv, services));
-       Term instance = TermFactory.DEFAULT.createTerm(lv);
+       Term instance = services.getTermFactory().createTerm(lv);
        return app.addCheckedInstantiation(sv, instance, services,true);
    }
 
@@ -465,8 +494,7 @@ public class DefaultProofFileParser implements IProofFileParser {
            result = app;
        } else if(sv instanceof ProgramSV) {
       final ProgramElement pe =
-          TacletInstantiationsTableModel.getProgramElement(
-         app, value, sv, services);
+          app.getProgramElement(value, sv, services);
       result = app.addCheckedInstantiation(sv, pe, services, true);
        } else if(sv instanceof SkolemTermSV) {
       result = app.createSkolemConstant ( value, sv, true, services );

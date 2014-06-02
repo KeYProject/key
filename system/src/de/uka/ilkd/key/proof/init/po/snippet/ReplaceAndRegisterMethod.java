@@ -9,6 +9,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -28,15 +29,17 @@ abstract class ReplaceAndRegisterMethod {
 
     final Term replace(Term term,
                        ProofObligationVars origVars,
-                       ProofObligationVars poVars) {
-        Term intermediateResult = replace(term, origVars.pre, poVars.pre);
-        return replace(intermediateResult, origVars.post, poVars.post);
+                       ProofObligationVars poVars,
+                       TermBuilder tb) {
+        Term intermediateResult = replace(term, origVars.pre, poVars.pre, tb);
+        return replace(intermediateResult, origVars.post, poVars.post, tb);
     }
 
 
     final Term replace(Term term,
                        StateVars origVars,
-                       StateVars poVars) {
+                       StateVars poVars,
+                       TermBuilder tb) {
         de.uka.ilkd.key.util.LinkedHashMap<Term, Term> map =
                 new de.uka.ilkd.key.util.LinkedHashMap<Term, Term>();
 
@@ -59,7 +62,7 @@ abstract class ReplaceAndRegisterMethod {
                 map.put(origTerm, poTerm);
             }
         }
-        OpReplacer or = new OpReplacer(map);
+        OpReplacer or = new OpReplacer(map, tb.tf());
         Term result = or.replace(term);
 
         return result;
@@ -68,10 +71,11 @@ abstract class ReplaceAndRegisterMethod {
 
     final Term[] replace(Term[] terms,
                          StateVars origVars,
-                         StateVars poVars) {
+                         StateVars poVars,
+                         TermBuilder tb) {
         final Term[] result = new Term[terms.length];
         for (int i = 0; i < terms.length; i++) {
-            result[i] = replace(terms[i], origVars, poVars);
+            result[i] = replace(terms[i], origVars, poVars, tb);
 
         }
         return result;
@@ -80,18 +84,19 @@ abstract class ReplaceAndRegisterMethod {
 
     final InfFlowSpec replace(InfFlowSpec terms,
                               StateVars origVars,
-                              StateVars poVars) {
+                              StateVars poVars,
+                              TermBuilder tb) {
         ImmutableList<Term> resultPreExps = ImmutableSLList.<Term>nil();
         for (Term t : terms.preExpressions) {
-            resultPreExps = resultPreExps.append(replace(t, origVars, poVars));
+            resultPreExps = resultPreExps.append(replace(t, origVars, poVars, tb));
         }
         ImmutableList<Term> resultPostExps = ImmutableSLList.<Term>nil();
         for (Term t : terms.postExpressions) {
-            resultPostExps = resultPostExps.append(replace(t, origVars, poVars));
+            resultPostExps = resultPostExps.append(replace(t, origVars, poVars, tb));
         }
         ImmutableList<Term> resultNewObjecs = ImmutableSLList.<Term>nil();
         for (Term t : terms.newObjects) {
-            resultNewObjecs = resultNewObjecs.append(replace(t, origVars, poVars));
+            resultNewObjecs = resultNewObjecs.append(replace(t, origVars, poVars, tb));
         }
         return new InfFlowSpec(resultPreExps, resultPostExps, resultNewObjecs);
     }
@@ -99,11 +104,12 @@ abstract class ReplaceAndRegisterMethod {
 
     final InfFlowSpec[] replace(ImmutableList<InfFlowSpec> termss,
                                 StateVars origVars,
-                                StateVars poVars) {
+                                StateVars poVars,
+                                TermBuilder tb) {
         final InfFlowSpec[] result = new InfFlowSpec[termss.size()];
         Iterator<InfFlowSpec> it = termss.iterator();
         for (int i = 0; it.hasNext(); i++) {
-            result[i] = replace(it.next(), origVars, poVars);
+            result[i] = replace(it.next(), origVars, poVars, tb);
         }
         return result;
     }
@@ -111,7 +117,8 @@ abstract class ReplaceAndRegisterMethod {
 
     final Term replace(Term term,
                        Term[] origVars,
-                       Term[] poVars) {
+                       Term[] poVars,
+                       TermBuilder tb) {
         de.uka.ilkd.key.util.LinkedHashMap<Term, Term> map =
                 new de.uka.ilkd.key.util.LinkedHashMap<Term, Term>();
 
@@ -125,7 +132,7 @@ abstract class ReplaceAndRegisterMethod {
             }
         }
 
-        OpReplacer or = new OpReplacer(map);
+        OpReplacer or = new OpReplacer(map, tb.tf());
         Term result = or.replace(term);
 
         return result;

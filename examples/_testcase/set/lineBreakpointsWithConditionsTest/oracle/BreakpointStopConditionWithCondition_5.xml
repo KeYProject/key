@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="SimpleConditionExample.somethingMain();" pathCondition="true" pathConditionChanged="false">
+      <statement name="int a = 2;" pathCondition="true" pathConditionChanged="false">
+         <statement name="int b = 3;" pathCondition="true" pathConditionChanged="false">
+         </statement>
+      </statement>
+   </methodCall>
+</start>

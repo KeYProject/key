@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,17 +11,12 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-
-
-
-
 /*
 
 Uses code by Hans Muller and Kathy Walrath from
 http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html
 
  */
-
 
 package de.uka.ilkd.key.gui;
 
@@ -31,7 +26,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
-import de.uka.ilkd.key.gui.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
@@ -363,14 +357,14 @@ public class ApplyStrategy {
         public String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append("Apply Strategy Info:");
-            sb.append("\n Message: " + message);
-            sb.append("\n Error:" + isError());
+            sb.append("\n Message: ").append(message);
+            sb.append("\n Error:").append(isError());
             if (isError()) {
-                sb.append("\n "+error.getMessage());
+                sb.append("\n ").append(error.getMessage());
             }
-            sb.append("\n Applied Rules: "+appliedRuleAppsCount);
-            sb.append("\n Time: "+time);
-            sb.append("\n Closed Goals: "+nrClosedGoals);
+            sb.append("\n Applied Rules: ").append(appliedRuleAppsCount);
+            sb.append("\n Time: ").append(time);
+            sb.append("\n Closed Goals: ").append(nrClosedGoals);
             return sb.toString();
         }
 
@@ -425,9 +419,9 @@ public class ApplyStrategy {
      * @return true iff a rule has been applied, false otherwise
      */
     private synchronized SingleRuleApplicationInfo
-                applyAutomaticRule (final IGoalChooser goalChooser,
-                                    final IStopCondition stopCondition,
-                                    boolean stopAtFirstNonClosableGoal) {
+                            applyAutomaticRule (final IGoalChooser goalChooser,
+                                                final IStopCondition stopCondition,
+                                                boolean stopAtFirstNonClosableGoal) {
         // Look for the strategy ...
         RuleApp               app = null;
         Goal                  g;
@@ -457,7 +451,8 @@ public class ApplyStrategy {
             }
         }
          if (app == null) {
-            return new SingleRuleApplicationInfo("No more rules automatically applicable to any goal.", g, app);
+            return new SingleRuleApplicationInfo("No more rules automatically applicable to any goal.",
+                                                 g, app);
         } else {
             assert g != null;
             g.apply(app);
@@ -495,17 +490,20 @@ public class ApplyStrategy {
                                                       time, countApplied, srInfo);
             }
             if (shouldStop) {
-                return new ApplyStrategyInfo(stopCondition.getStopMessage(maxApplications, timeout, proof, goalChooser, time, countApplied, srInfo), proof, null,
-                        (Goal) null, System.currentTimeMillis()-time, countApplied, closedGoals);
+                return new ApplyStrategyInfo(
+                        stopCondition.getStopMessage(maxApplications, timeout, proof, goalChooser,
+                                                     time, countApplied, srInfo),
+                        proof, null, (Goal) null, System.currentTimeMillis()-time,
+                        countApplied, closedGoals);
             }
         } catch (InterruptedException e) {
             cancelled = true;
-            return new ApplyStrategyInfo("Interrupted.", proof, null,
-                    goalChooser.getNextGoal(), System.currentTimeMillis()-time, countApplied, closedGoals);
+            return new ApplyStrategyInfo("Interrupted.", proof, null, goalChooser.getNextGoal(),
+                                         System.currentTimeMillis()-time, countApplied, closedGoals);
         } catch (Throwable t) { // treated later in finished()
             t.printStackTrace();
-            return new ApplyStrategyInfo("Error.", proof, t, null,
-                                         System.currentTimeMillis()-time, countApplied, closedGoals);
+            return new ApplyStrategyInfo("Error.", proof, t, null, System.currentTimeMillis()-time,
+                                         countApplied, closedGoals);
         } finally{
             time = System.currentTimeMillis()-time;
             Debug.out("Strategy stopped.");
@@ -513,8 +511,8 @@ public class ApplyStrategy {
             Debug.out("Time elapsed: ", time);
         }
         assert srInfo != null;
-        return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(),
-                                     time, countApplied, closedGoals);
+        return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(), time,
+                                     countApplied, closedGoals);
     }
 
     private synchronized void fireTaskStarted (int maxSteps) {
@@ -537,7 +535,7 @@ public class ApplyStrategy {
         } else {
             for (ProverTaskListener ptl : proverTaskObservers) {
                 if (ptl instanceof UserInterface && !((UserInterface)ptl).macroChosen()) {
-                    ((UserInterface)ptl).finish();
+                    ((UserInterface)ptl).finish(proof);
                 }
             }
         }
@@ -573,23 +571,13 @@ public class ApplyStrategy {
                 .getActiveStrategyProperties().getProperty(
                         StrategyProperties.STOPMODE_OPTIONS_KEY)
                         .equals(StrategyProperties.STOPMODE_NONCLOSE);
-
-        boolean retreatMode = proof.getSettings().getStrategySettings()
-                .getActiveStrategyProperties().getProperty(
-                        StrategyProperties.RETREAT_MODE_OPTIONS_KEY)
-                        .equals(StrategyProperties.RETREAT_MODE_RETREAT);
-
-        if(retreatMode) {
-            return startRetreat(proof, goals, maxSteps, timeout, stopAtFirstNonCloseableGoal);
-        } else {
-            return start(proof, goals, maxSteps, timeout, stopAtFirstNonCloseableGoal);
-        }
+        return start(proof, goals, maxSteps, timeout, stopAtFirstNonCloseableGoal);
     }
 
     /**
      * This entry point to the proof may provide inconsistent data. The
      * properties within the proof may differ to the explicit data. This is
-     * disencouraged.
+     * discouraged.
      *
      * @return
      *
@@ -613,46 +601,6 @@ public class ApplyStrategy {
         return result;
     }
 
-    /**
-     * RETREAT MODE WILL BE REMOVED SOON. Its functionality can be found
-     * in {@link TryCloseMacro} now.
-     */
-    @Deprecated
-    public ApplyStrategyInfo startRetreat(Proof proof,
-                                          ImmutableList<Goal> goals,
-                                          int maxSteps,
-                                          long timeout,
-                                          boolean stopAtFirstNonCloseableGoal) {
-        assert proof != null;
-        assert !goals.isEmpty();
-
-        ApplyStrategyInfo result = null;
-        for (Goal g : goals) {
-            ImmutableList<Goal> gList = ImmutableSLList.<Goal>nil().prepend(g);
-            Node n = g.node();
-
-            this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal;
-
-            ProofTreeListener treeListener =
-                    prepareStrategy(proof, gList, maxSteps, timeout);
-            ApplyStrategyInfo subResult = executeStrategy(treeListener);
-            /* This is the iterative case, where proofs are done separately on multiple branches,
-             * sequentially though. So each gets accumulated with the one done before. After the
-             * accumulation, the method finishStrategy should be called.
-             */
-            result = joinStrategyInfos(result, subResult);
-
-            Proof automaticProof = result.getProof();
-            if (!n.isClosed()) {
-                automaticProof.pruneProof(n);
-            }
-            if (result.isError() || cancelled) {
-                break;
-            }
-        }
-        finishStrategy(result);
-        return result;
-    }
 
     private ProofTreeListener prepareStrategy(Proof proof, ImmutableList<Goal> goals, int maxSteps,
             long timeout) {
@@ -698,7 +646,8 @@ public class ApplyStrategy {
     }
 
     // Used to combine multiple iteratively called proofs and integrate their results in final result
-    private ApplyStrategyInfo joinStrategyInfos(ApplyStrategyInfo result, ApplyStrategyInfo subResult) {
+    private ApplyStrategyInfo joinStrategyInfos(ApplyStrategyInfo result,
+                                                ApplyStrategyInfo subResult) {
         if(result == null)
             return subResult;
         String msg = subResult.reason();

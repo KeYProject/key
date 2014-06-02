@@ -28,10 +28,10 @@ import java.util.Set;
  * <p/>
  * @author christoph
  */
-abstract class AbstractInfFlowTacletBuilder extends TermBuilder.Serviced {
+abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
     public AbstractInfFlowTacletBuilder(final Services services) {
-        super(services);
+        super(services.getTermFactory(), services);
     }
 
 
@@ -52,7 +52,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder.Serviced {
         if (t == null) {
             return null;
         }
-        t = TermBuilder.DF.unlabel(t);
+        t = unlabel(t);
         String svName = MiscTools.toValidVariableName(schemaPrefix +
                                                       t.toString()).toString();
         Sort sort = t.sort();

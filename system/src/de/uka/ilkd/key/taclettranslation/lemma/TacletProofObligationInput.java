@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.io.File;
@@ -122,7 +135,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
             properties.setProperty("tacletFile", tacletFile);
         }
         if (definitionFile != null) {
-            properties.setProperty("definitionFile", definitionFile.toString());
+            properties.setProperty("definitionFile", definitionFile);
         }
         if (axiomFiles != null) {
             for (int i = 0; i < axiomFiles.length; i++) {
@@ -194,6 +207,8 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
 
     public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {
         String tacletName = properties.getProperty(PROPERTY_NAME);
+        // This string is parsed by "proveRules.pl"
+        System.out.println("Proof obligation for taclet: " + tacletName);
         TacletProofObligationInput proofOblInput =
                 new TacletProofObligationInput(tacletName, initConfig);
         proofOblInput.setLoadInfo(properties);
@@ -212,7 +227,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
             name = "axiomFile" + (axioms.size() + 1);
             axFile = properties.getProperty(name);
         }
-        this.axiomFiles = (String[]) axioms.toArray(new String[axioms.size()]);
+        this.axiomFiles = axioms.toArray(new String[axioms.size()]);
     }
 
     public void setLoadInfo(File tacletFile, File definitionFile,

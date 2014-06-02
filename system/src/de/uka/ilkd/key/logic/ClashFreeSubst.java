@@ -1,36 +1,35 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 public class ClashFreeSubst {
-    protected static final TermBuilder TB = TermBuilder.DF;
+    protected QuantifiableVariable v;
+    protected Term s;
+    protected ImmutableSet<QuantifiableVariable> svars;
+    protected final TermServices services;
 
-    QuantifiableVariable v;
-    Term s;
-    ImmutableSet<QuantifiableVariable> svars;
-
-    public ClashFreeSubst(QuantifiableVariable v,Term s) {
-	this.v = v;
-	this.s = s;
-	svars = s.freeVars();
+    public ClashFreeSubst(QuantifiableVariable v,Term s, TermServices services) {
+       this.services = services;
+       this.v = v;
+       this.s = s;
+       svars = s.freeVars();
     }
 
     protected QuantifiableVariable getVariable () {
@@ -97,7 +96,7 @@ public class ClashFreeSubst {
 	for ( int i=0; i<arity; i++ ) {
 	    applyOnSubterm ( t, i, newSubterms, newBoundVars );
         }
-	return TB.tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.javaBlock());
+	return services.getTermBuilder().tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.javaBlock());
     }
 
     /**
@@ -167,7 +166,7 @@ public class ClashFreeSubst {
 
 		// Substitute that for the old one.
 		newBoundVars[varInd] = qv1;
-		new ClashFreeSubst(qv, TB.var(qv1))
+		new ClashFreeSubst(qv, services.getTermBuilder().var(qv1), services)
 		    .applyOnSubterm1(varInd+1, boundVars, newBoundVars,
 				    subInd,subTerm,newSubterms);
 		// then continue recursively, on the result.

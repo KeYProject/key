@@ -18,15 +18,13 @@ public class SelfcomposedLoopSnippet extends ReplaceAndRegisterMethod implements
         final Term exec1 =
                 f1.create(BasicPOSnippetFactory.Snippet.LOOP_EXEC_WITH_INV);
         final Term updatedExec1 =
-                d.tb.apply(d.tb.elementary(d.tb.getServices(),
-                                           d.tb.getBaseHeap(),
+                d.tb.apply(d.tb.elementary(d.tb.getBaseHeap(),
                                            poVars1.pre.heap),
                            exec1);
         final Term exec2 =
                 f2.create(BasicPOSnippetFactory.Snippet.LOOP_EXEC_WITH_INV);
         final Term updatedExec2 =
-                d.tb.apply(d.tb.elementary(d.tb.getServices(),
-                                           d.tb.getBaseHeap(),
+                d.tb.apply(d.tb.elementary(d.tb.getBaseHeap(),
                                            poVars2.pre.heap),
                            exec2);
 

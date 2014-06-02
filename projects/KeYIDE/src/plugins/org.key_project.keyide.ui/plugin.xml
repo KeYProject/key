@@ -35,7 +35,7 @@
             contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
             default="true"
             extensions="proof, key"
-            icon="icons/logo16.gif"
+            icon="icons/prooffile16.png"
             id="org.key_project.keyide.ui.editor"
             name="KeY Editor">
       </editor>
@@ -71,19 +71,19 @@
          point="org.eclipse.ui.commandImages">
       <image
             commandId="org.key_project.keyide.ui.commands.startAutoModeCommand"
-            icon="icons/start.gif">
+            icon="icons/nav_go.gif">
       </image>
       <image
             commandId="org.key_project.keyide.ui.commands.stopAutoModeCommand"
-            icon="icons/stop.gif">
+            icon="icons/terminatedlaunch_obj.gif">
       </image>
       <image
             commandId="org.key_project.keyide.ui.commands.pruneProof"
-            icon="icons/prune.png">
+            icon="icons/prune16.png">
       </image>
       <image
             commandId="org.key_project.keyide.ui.commands.applyrule"
-            icon="icons/interactiveAppLogo.gif">
+            icon="icons/interactiveAppLogo16.png">
       </image>
    </extension>
    <extension
@@ -167,6 +167,10 @@
             </with>
          </enabledWhen>
       </handler>
+      <handler
+            class="org.key_project.keyide.ui.handlers.BreakpointToggleHandler"
+            commandId="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -174,10 +178,11 @@
             allPopups="false"
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
             <toolbar
-               id="org.key_project.keyide.ui.toolbar">
+                  id="org.key_project.keyide.ui.toolbar"
+                  label="KeY Editor">
                  <command
                        commandId="org.key_project.keyide.ui.commands.startAutoModeCommand"
-                       icon="icons/start.gif"
+                       icon="icons/nav_go.gif"
                        id="org.key_project.keyide.ui.commands.startAutoModeCommand"
                        label="Start Auto Mode"
                        tooltip="Start Auto Mode">
@@ -193,10 +198,26 @@
                 </command>
                  <command
                        commandId="org.key_project.keyide.ui.commands.stopAutoModeCommand"
-                       icon="icons/stop.gif"
+                       icon="icons/terminatedlaunch_obj.gif"
                        id="org.key_project.keyide.ui.commands.stopAutoModeCommand"
                        label="Stop Auto Mode"
                        style="push">
+                    <visibleWhen
+                          checkEnabled="false">
+                       <with
+                             variable="activeEditorId">
+                          <equals
+                                value="org.key_project.keyide.ui.editor">
+                          </equals>
+                       </with>
+                    </visibleWhen>
+                 </command>
+                 <command
+                       commandId="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand"
+                       icon="icons/breakpoints.gif"
+                       id="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand"
+                       label="Stop at Breakpoints"
+                       style="toggle">
                     <visibleWhen
                           checkEnabled="false">
                        <with
@@ -214,7 +235,7 @@
             locationURI="popup:org.key_project.keyide.ui.view.outline.popup?after=additions">
          <command
                commandId="org.key_project.keyide.ui.commands.pruneProof"
-               icon="icons/prune.png"
+               icon="icons/prune16.png"
                label="Prune Proof"
                style="push">
             <visibleWhen
@@ -246,6 +267,64 @@
             class="org.key_project.keyide.ui.editor.TacletContextMenu"
             locationURI="popup:#KeYEditorContext?before=group.undo">
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="Starts a new proof"
+            id="org.key_project.keyide.ui.commands.startProofCommand"
+            name="Start Proof">
+      </command>
+      <category
+            description="Contains all commands which are provided by the KeY Eclipse integration."
+            id="org.key_project.keyide.ui.commands.category"
+            name="KeY">
+      </category>
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="Starts the proof auto mode with the current specification."
+            id="org.key_project.keyide.ui.commands.startAutoModeCommand"
+            name="Start Auto Mode">
+      </command>
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="Stops the automode."
+            id="org.key_project.keyide.ui.commands.stopAutoModeCommand"
+            name="Stop Auto Mode">
+      </command>
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="Prunes the current prove at the selected position."
+            id="org.key_project.keyide.ui.commands.pruneProof"
+            name="Prune Proof">
+      </command>
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="Applies a Rule"
+            id="org.key_project.keyide.ui.commands.applyrule"
+            name="Apply Rule">
+      </command>
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="If selected auto mode will stop at breakpoints and ignore them otherwise."
+            id="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand"
+            name="Stop at Breakpoints">
+         <state
+               id="org.eclipse.ui.commands.toggleState">
+            <class
+                  class="org.eclipse.ui.handlers.RegistryToggleState">
+               <parameter
+                     name="default"
+                     value="false">
+               </parameter>
+               <parameter
+                     name="persisted"
+                     value="true">
+               </parameter>
+            </class>
+         </state>            
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
@@ -301,7 +380,7 @@
       <view
             category="org.key_project.keyide.ui.view.category"
             class="org.key_project.keyide.ui.views.StrategySettingsView"
-            icon="icons/releng_gears.gif"
+            icon="icons/debugtt_obj.gif"
             id="org.key_project.keyide.ui.view.StrategySettings"
             name="Strategy Settings"
             restorable="true">

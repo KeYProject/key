@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -15,6 +15,7 @@ package org.key_project.sed.key.ui.test.suite.swtbot;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotAddKeYWatchpointTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotCustomizationTabTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotGraphitiCustomizationTabTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotGraphitiKeYTabTest;
@@ -23,6 +24,7 @@ import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotKeYSourceCodeLookup
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotKeYTabTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotMainTabTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotOpenProofTest;
+import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotSideProofsViewTest;
 
 /**
  * Run all contained JUnit 4 test cases that requires SWT Bot.
@@ -37,7 +39,9 @@ import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotOpenProofTest;
    SWTBotKeYSourceCodeLookupTest.class,
    SWTBotKeYTabTest.class,
    SWTBotMainTabTest.class,
-   SWTBotOpenProofTest.class
+   SWTBotAddKeYWatchpointTest.class,
+   SWTBotOpenProofTest.class,
+   SWTBotSideProofsViewTest.class
 })
 public class SWTBotAllSEDKeYUITests {
 }

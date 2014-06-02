@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.gui;
 
@@ -285,7 +284,7 @@ public class GoalList extends JList {
 
     
     private void goalChosen() {
-	Goal goal = (Goal)getSelectedValue();
+	Goal goal = (Goal) getSelectedValue();
 	if (goal != null) {
 	    mediator().goalChosen(goal);
 	}
@@ -481,7 +480,7 @@ public class GoalList extends JList {
 	    return goals.size();
 	}
 
-	public Object getElementAt(int i) {
+	public Goal getElementAt(int i) {
 	    return goals.get(i);
 	} 
 
@@ -595,7 +594,7 @@ public class GoalList extends JList {
             return entries.size();
         }
 
-        public Object getElementAt (int i) {
+        public Goal getElementAt (int i) {
             if ( i < 0 || i >= getSize () ) return null;
             return delegate.getElementAt ( getDelegateIndex ( i ) );
         }
@@ -647,7 +646,7 @@ public class GoalList extends JList {
             int ind = delegatePosToMappingPos ( delegateBegin );
             
             for ( int i = delegateBegin; i < delegateEnd; ++i ) {
-                final Goal goal = (Goal)delegate.getElementAt ( i );
+                final Goal goal = delegate.getElementAt ( i );
                 if ( !isHiddenGoal ( goal ) )
                     entries.add ( ind++, Integer.valueOf ( i ) );
             }
@@ -775,7 +774,7 @@ public class GoalList extends JList {
                                                  mediator ().getNotationInfo (),
                                                  mediator().getServices(),
                                                  true );
-            seq.prettyprint ( sp );
+            sp.printSequent(seq);
             res = sp.toString ().replace ( '\n', ' ' );
             res = res.substring ( 0, Math.min ( MAX_DISPLAYED_SEQUENT_LENGTH,
                                                 res.length () ) );

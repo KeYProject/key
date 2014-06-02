@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KeY Development Utilities
+Bundle-SymbolicName: org.key_project.key4eclipse.development_utilities
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.key4eclipse.development_utilities.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.key_project.key4eclipse;bundle-version="1.0.0",
+ org.key_project.util;bundle-version="1.0.0",
+ org.junit;bundle-version="4.8.2"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: KeY Project

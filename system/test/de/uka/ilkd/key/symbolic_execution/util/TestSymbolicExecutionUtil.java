@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -41,34 +41,34 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
          Services services = environment.getServices();
          IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
          Sort intSort = integerLDT.targetSort();
-         final TermBuilder TB = TermBuilder.DF;
+         final TermBuilder TB = services.getTermBuilder();
          // Create test terms
          Term a = TB.var(new LogicVariable(new Name("a"), intSort));
          Term b = TB.var(new LogicVariable(new Name("b"), intSort));
-         Term aleqb = TB.leq(a, b, services);
-         Term altb = TB.lt(a, b, services);
-         Term agtb = TB.gt(a, b, services);
-         Term ageqb = TB.geq(a, b, services);
+         Term aleqb = TB.leq(a, b);
+         Term altb = TB.lt(a, b);
+         Term agtb = TB.gt(a, b);
+         Term ageqb = TB.geq(a, b);
          Term notAleqb = TB.not(aleqb);
          Term notAltb = TB.not(altb);
          Term notAgtb = TB.not(agtb);
          Term notAgeqb = TB.not(ageqb);
-         Term onePlusB = TB.add(services, TB.one(services), b);
-         Term bPlusOne = TB.add(services, b, TB.one(services));
-         Term altOnePlusB = TB.lt(a, onePlusB, services);
-         Term altBPlusOne = TB.lt(a, bPlusOne, services);
-         Term ageqOnePlusB = TB.geq(a, onePlusB, services);
-         Term ageqBPlusOne = TB.geq(a, bPlusOne, services);
+         Term onePlusB = TB.add(TB.one(), b);
+         Term bPlusOne = TB.add(b, TB.one());
+         Term altOnePlusB = TB.lt(a, onePlusB);
+         Term altBPlusOne = TB.lt(a, bPlusOne);
+         Term ageqOnePlusB = TB.geq(a, onePlusB);
+         Term ageqBPlusOne = TB.geq(a, bPlusOne);
          Term minusOne = services.getTypeConverter().getIntegerLDT().translateLiteral(new IntLiteral(-1), services);
-         Term minusOnePlusB = TB.add(services, minusOne, b);
-         Term bPlusMinusOne = TB.add(services, b, minusOne);
-         Term bMinusOne = TB.func(integerLDT.getSub(), b, TB.one(services));
-         Term aleqMinusOnePlusB = TB.leq(a, minusOnePlusB, services);
-         Term aleqBPlusMinusOne = TB.leq(a, bPlusMinusOne, services);
-         Term aleqBMinusOne = TB.leq(a, bMinusOne, services);
-         Term agtMinusOnePlusB = TB.gt(a, minusOnePlusB, services);
-         Term agtBPlusMinusOne = TB.gt(a, bPlusMinusOne, services);
-         Term agtBMinusOne = TB.gt(a, bMinusOne, services);
+         Term minusOnePlusB = TB.add(minusOne, b);
+         Term bPlusMinusOne = TB.add(b, minusOne);
+         Term bMinusOne = TB.func(integerLDT.getSub(), b, TB.one());
+         Term aleqMinusOnePlusB = TB.leq(a, minusOnePlusB);
+         Term aleqBPlusMinusOne = TB.leq(a, bPlusMinusOne);
+         Term aleqBMinusOne = TB.leq(a, bMinusOne);
+         Term agtMinusOnePlusB = TB.gt(a, minusOnePlusB);
+         Term agtBPlusMinusOne = TB.gt(a, bPlusMinusOne);
+         Term agtBMinusOne = TB.gt(a, bMinusOne);
          // Test null
          assertNull(SymbolicExecutionUtil.improveReadability(null, services));
          assertTerm(notAleqb, SymbolicExecutionUtil.improveReadability(notAleqb, null));
@@ -92,15 +92,15 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
          assertTerm(ageqb, SymbolicExecutionUtil.improveReadability(agtBPlusMinusOne, services));
          assertTerm(ageqb, SymbolicExecutionUtil.improveReadability(agtBMinusOne, services));
          // Test combined
-         assertTerm(agtb, SymbolicExecutionUtil.improveReadability(TermBuilder.DF.not(altOnePlusB), services));
-         assertTerm(aleqb, SymbolicExecutionUtil.improveReadability(TermBuilder.DF.not(ageqOnePlusB), services));
-         assertTerm(ageqb, SymbolicExecutionUtil.improveReadability(TermBuilder.DF.not(aleqBPlusMinusOne), services));
-         assertTerm(altb, SymbolicExecutionUtil.improveReadability(TermBuilder.DF.not(agtBMinusOne), services));
+         assertTerm(agtb, SymbolicExecutionUtil.improveReadability(TB.not(altOnePlusB), services));
+         assertTerm(aleqb, SymbolicExecutionUtil.improveReadability(TB.not(ageqOnePlusB), services));
+         assertTerm(ageqb, SymbolicExecutionUtil.improveReadability(TB.not(aleqBPlusMinusOne), services));
+         assertTerm(altb, SymbolicExecutionUtil.improveReadability(TB.not(agtBMinusOne), services));
          // Test complex term
-         Term complex = TermBuilder.DF.and(altOnePlusB,
-                                           TermBuilder.DF.or(ageqBPlusOne, agtMinusOnePlusB));
-         Term expectedComplex = TermBuilder.DF.and(aleqb,
-                                                   TermBuilder.DF.or(agtb, ageqb));
+         Term complex = TB.and(altOnePlusB,
+                               TB.or(ageqBPlusOne, agtMinusOnePlusB));
+         Term expectedComplex = TB.and(aleqb,
+                                       TB.or(agtb, ageqb));
          assertTerm(expectedComplex, SymbolicExecutionUtil.improveReadability(complex, services));
       }
       finally {

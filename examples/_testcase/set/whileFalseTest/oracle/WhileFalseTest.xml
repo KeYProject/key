@@ -2,7 +2,7 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
-         <loopStatement name="while ( false ) {   result_1++; }" pathCondition="true" pathConditionChanged="false">
+         <loopStatement name="while ( false )" pathCondition="true" pathConditionChanged="false">
             <loopCondition name="false" pathCondition="true" pathConditionChanged="false">
                <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">

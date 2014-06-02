@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
@@ -84,10 +83,8 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
 
         private HashSet<SchemaVariable> usedFormulaSV = new LinkedHashSet<SchemaVariable>();
 
-        private boolean quitInstantiationFailuresWithException = false;
 
-        
-        private final SMTSettings settings;
+    private final SMTSettings settings;
 
         public DefaultTacletSetTranslation(Services services, SMTSettings settings) {
  
@@ -231,7 +228,7 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
                 for (TacletFormula tf : list) {
                         toStore += "//" + tf.getTaclet().name().toString()
                                         + "\n";
-                        toStore += convertTerm(tf.getFormula());
+                        toStore += convertTerm(tf.getFormula(services));
                         if (i != list.size() - 1)
                                 toStore += "\n\n& //and\n\n";
                         i++;
@@ -287,7 +284,7 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
                  * "sort: "+ sort +"\n"; instantiationFailures =
                  * instantiationFailures.append(s);
                  */
-                return quitInstantiationFailuresWithException;
+            return false;
         }
 
 }

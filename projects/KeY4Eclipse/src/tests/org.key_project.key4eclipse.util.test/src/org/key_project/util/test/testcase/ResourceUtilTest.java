@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -393,5 +393,38 @@ public class ResourceUtilTest extends TestCase {
       assertNotNull(subFolderFileLocation);
       assertTrue(subFolderFileLocation.exists() && subFolderFileLocation.isFile());
       assertTrue(ArrayUtil.contains(subfolderLocation.listFiles(), subFolderFileLocation));
+   }
+   
+   /**
+    * Tests {@link ResourceUtil#copyIntoFileSystem(IFile, File)}
+    */
+   @Test
+   public void testCopyIntoFileSystem() throws Exception {
+      // Create project
+      IProject project = TestUtilsUtil.createProject("ResourceUtilTest_testCopyIntoFileSystem");
+      IFile file = TestUtilsUtil.createFile(project, "Test.txt", "Hello World!");
+      // Create tmp file
+      File tmpFile = File.createTempFile("Test", ".txt");
+      tmpFile.delete();
+      try {
+         // Test null
+         assertFalse(ResourceUtil.copyIntoFileSystem(null, tmpFile));
+         assertFalse(tmpFile.exists());
+         assertFalse(ResourceUtil.copyIntoFileSystem(file, null));
+         assertFalse(tmpFile.exists());
+         assertFalse(ResourceUtil.copyIntoFileSystem(null, null));
+         assertFalse(tmpFile.exists());
+         // Test copy not existing file
+         assertTrue(ResourceUtil.copyIntoFileSystem(file, tmpFile));
+         assertTrue(tmpFile.exists());
+         assertEquals("Hello World!", IOUtil.readFrom(tmpFile));
+         // Test copy existing file
+         assertTrue(ResourceUtil.copyIntoFileSystem(file, tmpFile));
+         assertTrue(tmpFile.exists());
+         assertEquals("Hello World!", IOUtil.readFrom(tmpFile));
+      }
+      finally {
+         tmpFile.delete();
+      }
    }
 }

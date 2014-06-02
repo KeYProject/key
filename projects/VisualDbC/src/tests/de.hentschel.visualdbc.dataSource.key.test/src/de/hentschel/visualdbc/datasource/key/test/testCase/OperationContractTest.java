@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -14,26 +14,26 @@
 package de.hentschel.visualdbc.datasource.key.test.testCase;
 
 import org.junit.Test;
-import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
-import de.hentschel.visualdbc.datasource.key.test.util.TestKeyUtil;
+import de.hentschel.visualdbc.datasource.key.test.Activator;
 import de.hentschel.visualdbc.datasource.model.DSPackageManagement;
 
 /**
  * Tests the handling of operation contracts in a {@link KeyConnection}.
  * @author Martin Hentschel
  */
-public class OperationContractTest extends AbstractSetupTestCase {
+public class OperationContractTest extends AbstractKeYTest {
    /**
     * Tests attributes.
     */
    @Test
    public void testOperationContractsOnMethodsAndConstructors() throws Exception {
-      TestKeyUtil.testKeyConnection("OperationContractTest_testOperationContractsOnMethodsAndConstructors",
-                                    "data/operationContractTest",
-                                    null,
-                                    DSPackageManagement.FLAT_LIST,
-                                    TestKeyUtil.createExpectedOperationContractTestModel());
+      testKeyConnection("OperationContractTest_testOperationContractsOnMethodsAndConstructors",
+                        "data/operationContractTest/test",
+                        null,
+                        DSPackageManagement.FLAT_LIST,
+                        Activator.PLUGIN_ID,
+                        "data/operationContractTest/oracle/operationContractTest.dbc");
    }
 }

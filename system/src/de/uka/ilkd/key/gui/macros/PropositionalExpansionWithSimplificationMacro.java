@@ -35,4 +35,8 @@ public class PropositionalExpansionWithSimplificationMacro extends AbstractPropo
         return ADMITTED_RULES_SET;
     }
 
+    @Override
+    protected boolean allowOSS() {
+        return false;
+    }
 }

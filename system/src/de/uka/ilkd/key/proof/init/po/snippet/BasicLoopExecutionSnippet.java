@@ -3,7 +3,6 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 import java.util.Iterator;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.expression.Assignment;
@@ -51,13 +50,11 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
     private Term buildProgramTerm(BasicSnippetData d,
                                   ProofObligationVars vs,
                                   Term postTerm,
-                                  TermBuilder.Serviced tb) {
+                                  TermBuilder tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException("Tried to produce a " +
                                                     "program-term for a loop without modality.");
         }
-        Services services = d.tb.getServices();
-
         //create java block
         Modality modality =
                 (Modality) d.get(BasicSnippetData.Key.MODALITY);
@@ -71,9 +68,9 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
             symbExecMod = Modality.BOX;
         }
         final Term guardPreTrueTerm = d.tb.equals(vs.pre.guard,
-                                                  d.tb.TRUE(services));
+                                                  d.tb.TRUE());
         final Term guardPreFalseTerm = d.tb.equals(vs.pre.guard,
-                                                   d.tb.FALSE(services));
+                                                   d.tb.FALSE());
         final Term guardPreEqTerm = d.tb.equals(d.origVars.guard,
                                                 vs.pre.guard);
         final Term guardPreTerm = tb.prog(modality, jb.second, guardPreEqTerm);
@@ -88,7 +85,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         Iterator<Term> origParamIt = d.origVars.localVars.iterator();
         while (paramIt.hasNext()) {
             Term paramUpdate =
-                    d.tb.elementary(d.tb.getServices(), origParamIt.next(), paramIt.next());
+                    d.tb.elementary(origParamIt.next(), paramIt.next());
             update = tb.parallel(update, paramUpdate);
         }
         return tb.apply(update, programTerm);

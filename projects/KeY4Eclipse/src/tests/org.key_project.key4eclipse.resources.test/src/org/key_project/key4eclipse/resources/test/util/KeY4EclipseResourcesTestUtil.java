@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -44,8 +44,8 @@ import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
@@ -140,6 +140,7 @@ public class KeY4EclipseResourcesTestUtil {
       TestUtilsUtil.waitForBuild();
    }
    
+   
    /**
     * Loads a given proof{@linkIFile} and returns the loaded {@link Proof}.
     * @param file - the {@link IFile} to load
@@ -196,7 +197,7 @@ public class KeY4EclipseResourcesTestUtil {
    public static LinkedList<IMarker> getAllKeYMarker(IResource res) throws CoreException{
       LinkedList<IMarker> allMarkerList = getKeYMarkerByType(MarkerManager.CLOSEDMARKER_ID, res);
       allMarkerList.addAll(getKeYMarkerByType(MarkerManager.NOTCLOSEDMARKER_ID, res));
-      allMarkerList.addAll(getKeYMarkerByType(MarkerManager.CYCLEDETECTEDMARKER_ID, res));
+      allMarkerList.addAll(getKeYMarkerByType(MarkerManager.RECURSIONMARKER_ID, res));
       allMarkerList.addAll(getKeYMarkerByType(MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID, res));
       return allMarkerList;
    }

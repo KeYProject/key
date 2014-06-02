@@ -1,10 +1,23 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -13,12 +26,10 @@ import de.uka.ilkd.key.rule.inst.TermLabelInstantiationEntry;
 /**
  * A schema variable which matches term labels
  */
-public class TermLabelSV implements SchemaVariable, ITermLabel {
-
-    private final Name name;
+public final class TermLabelSV extends AbstractSV implements SchemaVariable, TermLabel {
 
     protected TermLabelSV(Name name) {
-        this.name = name;
+        super(name, Sort.TERMLABEL, true, false);
     }
 
     @Override
@@ -28,25 +39,35 @@ public class TermLabelSV implements SchemaVariable, ITermLabel {
 
     @Override
     public String toString() {
-        return proofToString();
+        return toString("termLabel");
     }
 
     @Override
     public MatchConditions match(SVSubstitute subst, MatchConditions mc,
-            Services services) {
+                                 Services services) {
         if (!(subst instanceof Term)) {
             return null;
         }
 
         final Term t = (Term)subst;
-        if (!t.hasLabels()) {
-            return null;
-        }
+        /*if (!t.hasLabels()) { statements about the non-existence
+            return null;        of term labels should also be
+        }                       possible.*/
         final SVInstantiations svInsts = mc.getInstantiations();
         final TermLabelInstantiationEntry inst =
                 (TermLabelInstantiationEntry) svInsts.getInstantiation(this);
         if (inst != null) {
-            if (t.getLabels().equals(inst.getInstantiation())) {
+            boolean matched = false;
+            assert inst.getInstantiation() instanceof ImmutableArray<?>;
+            for (Object o: (ImmutableArray<?>)inst.getInstantiation()) {
+                assert o instanceof TermLabel;
+                if (t.containsLabel((TermLabel)o)) {
+                    matched = true;
+                } else {
+                    matched = false;
+                }
+            }
+            if (matched) {
                 return mc;
             }
             return null;
@@ -55,53 +76,8 @@ public class TermLabelSV implements SchemaVariable, ITermLabel {
     }
 
     @Override
-    public Sort sort() {
-        return null;
-    }
-
-    @Override
-    public Sort argSort(int i) {
-        return null;
-    }
-
-    @Override
-    public ImmutableArray<Sort> argSorts() {
-        return null;
-    }
-
-    @Override
-    public int arity() {
-        return 0;
-    }
-
-    @Override
-    public Sort sort(ImmutableArray<Term> terms) {
-        return null;
-    }
-
-    @Override
-    public boolean bindVarsAt(int n) {
-        return false;
-    }
-
-    @Override
-    public boolean isRigid() {
-        return true;
-    }
-
-    @Override
     public boolean validTopLevel(Term term) {
         return true;
-    }
-
-    @Override
-    public Name name() {
-        return name;
-    }
-
-    @Override
-    public boolean isStrict() {
-        return false;
     }
 
     @Override

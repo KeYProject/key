@@ -57,7 +57,7 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
     private Term buildProgramTerm(BasicSnippetData d,
                                   ProofObligationVars vs,
                                   Term postTerm,
-                                  TermBuilder.Serviced tb) {
+                                  TermBuilder tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException("Tried to produce a " +
                                                     "program-term for a contract without modality.");
@@ -83,7 +83,7 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
         Iterator<Term> origParamIt = d.origVars.localVars.iterator();
         while (paramIt.hasNext()) {
             Term paramUpdate =
-                    d.tb.elementary(d.tb.getServices(), origParamIt.next(), paramIt.next());
+                    d.tb.elementary(origParamIt.next(), paramIt.next());
             update = tb.parallel(update, paramUpdate);
         }
         return tb.apply(update, programTerm);
@@ -92,7 +92,6 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
 
     private JavaBlock buildJavaBlock(BasicSnippetData d,
                                      ProofObligationVars poVars) {
-        Services services = d.tb.getServices();
         ExecutionContext context =
                 (ExecutionContext) d.get(BasicSnippetData.Key.EXECUTION_CONTEXT);
         ProgramVariable exceptionParameter =
@@ -109,7 +108,7 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
                 new BlockContractRule.ValidityProgramConstructor(labels, block,
                                                                  variables,
                                                                  exceptionParameter,
-                                                                 services).construct();
+                                                                 d.services).construct();
         Statement s = new MethodFrame(null, context, sb);
         JavaBlock result = JavaBlock.createJavaBlock(new StatementBlock(s));
 

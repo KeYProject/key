@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,12 +13,10 @@
 
 package org.key_project.sed.ui.visualization.execution_tree.property;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.ui.property.AbstractSEDDebugNodeTabComposite;
 import org.key_project.sed.ui.property.CallStackTabComposite;
+import org.key_project.sed.ui.property.ISEDDebugNodeTabContent;
 
 /**
  * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
@@ -29,7 +27,7 @@ public class GraphitiCallStackPropertySection extends AbstractGraphitiDebugNodeP
     * {@inheritDoc}
     */
    @Override
-   protected AbstractSEDDebugNodeTabComposite createContentComposite(Composite parent, int style) {
-      return new CallStackTabComposite(parent, SWT.NONE, getWidgetFactory());
+   protected ISEDDebugNodeTabContent createContent() {
+      return new CallStackTabComposite();
    }
 }

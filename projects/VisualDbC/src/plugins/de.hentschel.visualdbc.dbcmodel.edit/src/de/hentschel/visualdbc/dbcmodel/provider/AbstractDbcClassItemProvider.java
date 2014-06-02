@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -39,6 +39,7 @@ import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
+import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 
 /**
@@ -77,6 +78,7 @@ public class AbstractDbcClassItemProvider
          super.getPropertyDescriptors(object);
 
          addImplementsPropertyDescriptor(object);
+         addImplementsFullNamesPropertyDescriptor(object);
       }
       return itemPropertyDescriptors;
    }
@@ -99,6 +101,28 @@ public class AbstractDbcClassItemProvider
              false,
              true,
              null,
+             null,
+             null));
+   }
+
+   /**
+    * This adds a property descriptor for the Implements Full Names feature.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   protected void addImplementsFullNamesPropertyDescriptor(Object object) {
+      itemPropertyDescriptors.add
+         (createItemPropertyDescriptor
+            (((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+             getResourceLocator(),
+             getString("_UI_AbstractDbcClass_implementsFullNames_feature"),
+             getString("_UI_PropertyDescriptor_description", "_UI_AbstractDbcClass_implementsFullNames_feature", "_UI_AbstractDbcClass_type"),
+             DbcmodelPackage.Literals.ABSTRACT_DBC_CLASS__IMPLEMENTS_FULL_NAMES,
+             true,
+             false,
+             false,
+             ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
              null,
              null));
    }
@@ -159,6 +183,9 @@ public class AbstractDbcClassItemProvider
       updateChildren(notification);
 
       switch (notification.getFeatureID(AbstractDbcClass.class)) {
+         case DbcmodelPackage.ABSTRACT_DBC_CLASS__IMPLEMENTS_FULL_NAMES:
+            fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
+            return;
          case DbcmodelPackage.ABSTRACT_DBC_CLASS__CONSTRUCTORS:
             fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
             return;

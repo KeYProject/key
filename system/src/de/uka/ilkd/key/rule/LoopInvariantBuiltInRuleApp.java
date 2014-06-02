@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -54,20 +55,23 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private ExecutionContext executionContext;
     private Term guard;
 
-    public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pos) {
-        this(rule, pos, null, null, null);
+   private final TermServices services;
+
+    public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pos, TermServices services) {
+        this(rule, pos, null, null, null, services);
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
-            LoopInvariant inv, List<LocationVariable> heapContext) {
+            LoopInvariant inv, List<LocationVariable> heapContext, TermServices services) {
         super(rule, pio, ifInsts);
         assert pio != null;
         this.loop = (While) JavaTools.getActiveStatement(programTerm()
                 .javaBlock());
         assert loop != null;
-        this.inv = instantiateIndexValues(inv);
+        this.inv = instantiateIndexValues(inv, services);
         this.heapContext = heapContext;
+        this.services = services;
     }
     
     /**
@@ -79,12 +83,13 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
      * if the second statement in the loop body has the form <code>v = xxx</code>,
      * where <code>v</code> is a ghost variable of type sequence, values is instantiated with <code>v</code>,
      * otherwise <code>rawInv</code> is returned.
+    * @param services TODO
      */
-    private LoopInvariant instantiateIndexValues(LoopInvariant rawInv){
+    private LoopInvariant instantiateIndexValues(LoopInvariant rawInv, TermServices services){
     	if (rawInv == null) return null;
     	Map<LocationVariable,Term> invs = rawInv.getInternalInvariants();
     	Term var = rawInv.getInternalVariant();
-        final TermBuilder tb = TermBuilder.DF;
+        final TermBuilder tb = services.getTermBuilder();
     	boolean skipIndex = false;
     	boolean skipValues = false;
     	
@@ -122,11 +127,11 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 				result = replace(visited);
 			}
 			
-			public Term getResult(){
+			public Term getResult() {
 				return result;
 			}
 			
-			private Term replace(Term visited){
+			private Term replace(Term visited) {
 			    ImmutableArray<Term> subs = visited.subs();
 			    if (subs.isEmpty()) {
 			    	if (visited.op().name().toString().equals("index"))
@@ -139,10 +144,11 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 				return tb.tf().createTerm(visited.op(),
 				                          new ImmutableArray<Term>(newSubs),
 				                          visited.boundVars(),
-				                          visited.javaBlock());
+				                          visited.javaBlock(),
+				                          visited.getLabels());
 			    }
 			}
-		};
+		}
         final class ValuesTermReplacementVisitor extends DefaultVisitor {
             
             private Term result;
@@ -152,11 +158,11 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                 result = replace(visited);
             }
             
-            public Term getResult(){
+            public Term getResult() {
                 return result;
             }
             
-            private Term replace(Term visited){
+            private Term replace(Term visited) {
                 ImmutableArray<Term> subs = visited.subs();
                 if (subs.isEmpty()) {
                     if (visited.op().name().toString().equals("values"))
@@ -167,12 +173,12 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                     for (int i= 0; i < subs.size(); i++)
                         newSubs[i] = replace(subs.get(i));
                     return tb.tf().createTerm(visited.op(), new ImmutableArray<Term>(newSubs),
-                            visited.boundVars(), visited.javaBlock());
+                            visited.boundVars(), visited.javaBlock(), visited.getLabels());
                 }
             }
-        };
-		
-		// replace index
+        }
+
+        // replace index
         Map<LocationVariable,Term> newInvs = new LinkedHashMap<LocationVariable,Term>(invs);
 		if (!skipIndex){
 		IndexTermReplacementVisitor v = new IndexTermReplacementVisitor();
@@ -204,7 +210,12 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             v.visit(var);
             var = v.getResult();
         }}
-        return rawInv.instantiate(newInvs, var);
+        return rawInv.instantiate(newInvs, var);    	
+    }
+
+    protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
+            PosInOccurrence pio, LoopInvariant inv, TermServices services) {
+        this(rule, pio, null, inv, null, services);
     }
 
     public boolean complete() {
@@ -241,14 +252,14 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     public Term programTerm() {
         if (posInOccurrence() != null) {
-            return TermBuilder.DF.goBelowUpdates(posInOccurrence().subTerm());
+            return TermBuilder.goBelowUpdates(posInOccurrence().subTerm());
         }
         return null;
     }
 
     @Override
     public LoopInvariantBuiltInRuleApp replacePos(PosInOccurrence newPos) {
-        return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, inv, heapContext);
+        return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, inv, heapContext, services);
     }
 
     public LoopInvariant retrieveLoopInvariantFromSpecification(
@@ -268,7 +279,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         assert inv != null;
         if (this.loop == (While)inv.getLoop())
             this.inv = inv;
-        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext);
+        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext, services);
     }
     
     public void setInformationFlowProofObligationVars(IFProofObligationVars vars) {
@@ -293,7 +304,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         Modality m = (Modality)programTerm().op();
         boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION); 
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv,
-                                               HeapContext.getModHeaps(services, transaction));
+                                               HeapContext.getModHeaps(goal.proof().getServices(),
+                                                                       transaction),
+                                               services);
     }
 
     public boolean variantAvailable() {

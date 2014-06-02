@@ -45,7 +45,9 @@ class BasicSnippetData {
     /**
      * TermBuilder used by the FactoryMethods.
      */
-    final TermBuilder.Serviced tb;
+    final TermBuilder tb;
+
+    final Services services;
 
     /**
      * Unified contract content.
@@ -115,7 +117,8 @@ class BasicSnippetData {
     BasicSnippetData(FunctionalOperationContract contract,
                      Services services) {
         this.hasMby = contract.hasMby();
-        this.tb = new TermBuilder.Serviced(services);
+        this.services = services;
+        this.tb = services.getTermBuilder();
 
         contractContents.put(Key.TARGET_METHOD, contract.getTarget());
         contractContents.put(Key.FOR_CLASS, contract.getKJT());
@@ -125,7 +128,7 @@ class BasicSnippetData {
         contractContents.put(Key.MEASURED_BY, contract.getMby());
         contractContents.put(Key.MODALITY, contract.getModality());
 
-        final Term heap = TermBuilder.DF.getBaseHeap(services);
+        final Term heap = tb.getBaseHeap();
         origVars =
                 new StateVars(contract.getSelf(), contract.getParams(),
                               contract.getResult(), contract.getExc(), heap);
@@ -136,7 +139,8 @@ class BasicSnippetData {
                      Term guardTerm,
                      Services services) {
         this.hasMby = false;
-        this.tb = new TermBuilder.Serviced(services);
+        this.services = services;
+        this.tb = services.getTermBuilder();
 
         contractContents.put(Key.TARGET_METHOD, invariant.getTarget());
         contractContents.put(Key.EXECUTION_CONTEXT, context);
@@ -164,7 +168,7 @@ class BasicSnippetData {
         }
         contractContents.put(Key.INF_FLOW_SPECS, modifedSpecs);
 
-        final Term heap = TermBuilder.DF.getBaseHeap(services);
+        final Term heap = tb.getBaseHeap();
         final ImmutableSet<ProgramVariable> localInVariables =
                 MiscTools.getLocalIns(invariant.getLoop(), services);
         final ImmutableSet<ProgramVariable> localOutVariables =
@@ -183,7 +187,8 @@ class BasicSnippetData {
     BasicSnippetData(InformationFlowContract contract,
                      Services services) {
         this.hasMby = contract.hasMby();
-        this.tb = new TermBuilder.Serviced(services);
+        this.services = services;
+        this.tb = services.getTermBuilder();
 
         contractContents.put(Key.TARGET_METHOD, contract.getTarget());
         contractContents.put(Key.FOR_CLASS, contract.getKJT());
@@ -194,7 +199,7 @@ class BasicSnippetData {
         contractContents.put(Key.MODALITY, contract.getModality());
         contractContents.put(Key.INF_FLOW_SPECS, contract.getInfFlowSpecs());
 
-        final Term heap = TermBuilder.DF.getBaseHeap(services);
+        final Term heap = tb.getBaseHeap();
         origVars =
                 new StateVars(contract.getSelf(), contract.getParams(),
                               contract.getResult(), contract.getExc(), heap);
@@ -205,7 +210,8 @@ class BasicSnippetData {
                      ExecutionContext context,
                      Services services) {
         this.hasMby = contract.hasMby();
-        this.tb = new TermBuilder.Serviced(services);
+        this.services = services;
+        this.tb = services.getTermBuilder();
 
         contractContents.put(Key.TARGET_METHOD, contract.getTarget());
         contractContents.put(Key.FOR_CLASS, contract.getKJT());
@@ -221,8 +227,8 @@ class BasicSnippetData {
                              labels.toArray(new Label[labels.size()]));
         contractContents.put(Key.EXECUTION_CONTEXT, context);
 
-        final Term heap = TermBuilder.DF.getBaseHeap(services);
-        BlockContract.Terms vars = contract.getVariablesAsTerms();
+        final Term heap = tb.getBaseHeap();
+        BlockContract.Terms vars = contract.getVariablesAsTerms(services);
         final ImmutableSet<ProgramVariable> localInVariables =
                 MiscTools.getLocalIns(contract.getBlock(), services);
         final ImmutableSet<ProgramVariable> localOutVariables =

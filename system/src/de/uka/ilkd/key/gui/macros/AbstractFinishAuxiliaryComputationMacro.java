@@ -28,8 +28,6 @@ import java.util.Map;
  */
 abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
 
-    static final TermBuilder TB = TermBuilder.DF;
-
     @Override
     public String getName() {
         return "Finish auxiliary computation";
@@ -49,20 +47,20 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
 
 
     static Term calculateResultingTerm(Proof proof,
-                                               IFProofObligationVars ifVars,
-                                               Goal initGoal) {
+                                       IFProofObligationVars ifVars,
+                                       Goal initGoal) {
         final Term[] goalFormulas1 =
                 buildExecution(ifVars.c1, ifVars.getMapFor(ifVars.c1),
                                proof.openGoals(), initGoal);
         final Term[] goalFormulas2 =
                 buildExecution(ifVars.c2, ifVars.getMapFor(ifVars.c2),
                                proof.openGoals(), initGoal);
-
-        Term composedStates = TB.ff();
+        final TermBuilder tb = proof.getServices().getTermBuilder();
+        Term composedStates = tb.ff();
         for (int i = 0; i < goalFormulas1.length; i++) {
             for (int j = i; j < goalFormulas2.length; j++) {
-                final Term composedState = TB.and(goalFormulas1[i], goalFormulas2[j]);
-                composedStates = TB.or(composedStates, composedState);
+                final Term composedState = tb.and(goalFormulas1[i], goalFormulas2[j]);
+                composedStates = tb.or(composedStates, composedState);
             }
         }
         return composedStates;
@@ -81,9 +79,10 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
         final Term[] renamedGoalFormulas =
                 renamer.renameVariablesAndSkolemConstants();
         Term[] result = new Term[renamedGoalFormulas.length];
+        final TermBuilder tb = services.getTermBuilder();
         for (int i = 0; i < renamedGoalFormulas.length; i++) {
             result[i] =
-                    TB.applyElementary(services, c.pre.heap, renamedGoalFormulas[i]);
+                    tb.applyElementary(c.pre.heap, renamedGoalFormulas[i]);
         }
         return result;
     }
@@ -101,12 +100,13 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
 
 
     private static Term buildFormulaFromGoal(Goal symbExecGoal) {
-        Term result = TB.tt();
+        final TermBuilder tb = symbExecGoal.proof().getServices().getTermBuilder();
+        Term result = tb.tt();
         for (final SequentFormula f : symbExecGoal.sequent().antecedent()) {
-            result = TB.and(result, f.formula());
+            result = tb.and(result, f.formula());
         }
         for (final SequentFormula f : symbExecGoal.sequent().succedent()) {
-            result = TB.and(result, TB.not(f.formula()));
+            result = tb.and(result, tb.not(f.formula()));
         }
         return result;
     }

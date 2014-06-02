@@ -1,21 +1,21 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -104,6 +104,7 @@ public interface Term extends SVSubstitute, Sorted {
     /**
      * The sort of the term.
      */
+    @Override
     public Sort sort();    
     
     /**
@@ -151,15 +152,15 @@ public interface Term extends SVSubstitute, Sorted {
     
     /**
      * checks if the given label is attached to the term
-     * @param label the ITermLabel for which to look (must not be null)
+     * @param label the TermLabel for which to look (must not be null)
      */
-    public boolean containsLabel(ITermLabel label);
+    public boolean containsLabel(TermLabel label);
     
     /**
      * returns list of labels attached to this term
      * @return list of labels (maybe be empty but never <code>null</code>
      */
-    public ImmutableArray<ITermLabel> getLabels();
+    public ImmutableArray<TermLabel> getLabels();
     
     /**
      * Returns a serial number for a term. The serial number is not persistent.

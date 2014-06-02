@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -45,7 +45,6 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
@@ -124,7 +123,8 @@ public class DefaultProblemLoader {
     * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
     * @param mediator The {@link KeYMediator} to use.
     */
-   public DefaultProblemLoader(File file, List<File> classPath, File bootClassPath, Profile profileOfNewProofs, KeYMediator mediator) {
+   public DefaultProblemLoader(File file, List<File> classPath, File bootClassPath,
+                               Profile profileOfNewProofs, KeYMediator mediator) {
       assert mediator != null;
       this.file = file;
       this.classPath = classPath;
@@ -139,19 +139,17 @@ public class DefaultProblemLoader {
    /**
     * Executes the loading process and tries to instantiate a proof
     * and to re-apply rules on it if possible.
-    * @param registerProof Register loaded {@link Proof} in {@link GlobalProofMgt}?
     * @throws ProofInputException Occurred Exception.
     * @throws IOException Occurred Exception.
     */
-   public ProblemLoaderException load(boolean registerProof)
-           throws ProblemLoaderException {
+   public ProblemLoaderException load() throws ProblemLoaderException {
       try {
           // Read environment
           boolean oneStepSimplifier =
                   ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
           ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
           envInput = createEnvInput();
-          problemInitializer = createProblemInitializer(registerProof);
+          problemInitializer = createProblemInitializer();
           initConfig = createInitConfig();
           // Read proof obligation settings
           LoadedPOContainer poContainer = createProofObligationContainer();
@@ -181,7 +179,7 @@ public class DefaultProblemLoader {
           throw(e);
       }
       catch (Exception e) { // TODO give more specific exception message
-         throw new ProblemLoaderException(this, e);
+          throw new ProblemLoaderException(this, e);
       }
    }
 
@@ -235,11 +233,11 @@ public class DefaultProblemLoader {
        return result;
    }
 
-   public void saveAll(boolean registerProof) throws ProblemLoaderException {
+   public Throwable saveAll() {
        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
        try {
            envInput = createEnvInput();
-           problemInitializer = createProblemInitializer(registerProof);
+           problemInitializer = createProblemInitializer();
            initConfig = createInitConfig();
            final SpecificationRepository specRepos =
                    initConfig.getServices().getSpecificationRepository();
@@ -267,9 +265,10 @@ public class DefaultProblemLoader {
                    }
                }
            }
-       } catch (Exception e) {
-           throw new ProblemLoaderException(this, e);
+       } catch (Throwable e) {
+           return new ProblemLoaderException(this, e);
        }
+       return null;
    }
 
    /**
@@ -318,14 +317,13 @@ public class DefaultProblemLoader {
 
    /**
     * Instantiates the {@link ProblemInitializer} to use.
-    * @param registerProof Register loaded {@link Proof} in {@link GlobalProofMgt}?
+    * @param registerProof Register loaded {@link Proof}
     * @return The {@link ProblemInitializer} to use.
     */
-   protected ProblemInitializer createProblemInitializer(boolean registerProof) {
+   protected ProblemInitializer createProblemInitializer() {
       UserInterface ui = mediator.getUI();
       return new ProblemInitializer(ui,
                                     new Services(envInput.getProfile(), mediator.getExceptionHandler()),
-                                    registerProof,
                                     ui);
    }
 
@@ -454,8 +452,9 @@ public class DefaultProblemLoader {
           if (errors != null &&
                   !errors.isEmpty()) {
               throw new ProblemLoaderException(this,
-                      "Proof could only be loaded partially. In summary " + errors.size() +
-                      " not loadable rule application(s) have been detected." +
+                      "Proof could only be loaded partially.\n" +
+                      "In summary " + errors.size() +
+                      " not loadable rule application(s) have been detected.\n" +
                       "The first one:\n"+errors.get(0).getMessage(), errors.get(0));
           }
       }

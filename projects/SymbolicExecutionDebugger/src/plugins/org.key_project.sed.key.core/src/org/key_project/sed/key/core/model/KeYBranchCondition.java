@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -34,7 +34,7 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
    /**
     * The {@link IExecutionBranchCondition} to represent by this debug node.
     */
-   private IExecutionBranchCondition executionNode;
+   private final IExecutionBranchCondition executionNode;
    
    /**
     * The contained children.
@@ -56,10 +56,11 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
    public KeYBranchCondition(KeYDebugTarget target, 
                              IKeYSEDDebugNode<?> parent, 
                              ISEDThread thread, 
-                             IExecutionBranchCondition executionNode) {
+                             IExecutionBranchCondition executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
    
    /**

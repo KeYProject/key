@@ -68,6 +68,11 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
     }
 
+    @Override
+    protected boolean allowOSS() {
+        return false;
+    }
+
     /**
      * This strategy accepts all rule apps for which the rule name is in the
      * admitted set or has INF_FLOW_UNFOLD_PREFIX as a prefix and rejects everything else.

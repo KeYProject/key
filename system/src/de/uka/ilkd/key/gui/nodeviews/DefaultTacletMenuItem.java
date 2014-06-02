@@ -1,27 +1,28 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.gui.nodeviews;
 
+import de.uka.ilkd.key.gui.MainWindow;
 import java.io.StringWriter;
 
 import javax.swing.JMenuItem;
 
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.pp.WriterBackend;
 
@@ -43,17 +44,18 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
      * @param notationInfo the NotationInfo used to print terms
      */
     public DefaultTacletMenuItem(JMenuItem menu, 
-            TacletApp connectedTo, NotationInfo notationInfo) {
+            TacletApp connectedTo, NotationInfo notationInfo, Services services) {
         super(connectedTo.taclet().displayName());
         this.connectedTo = connectedTo;	    	    
-        StringBuffer taclet_sb = new StringBuffer();
+        StringBuilder taclet_sb = new StringBuilder();
         StringWriter w = new StringWriter();
         
         WriterBackend backend = new WriterBackend(w, 68);
-        LogicPrinter tp = new LogicPrinter(new ProgramPrinter(w,
-    							  connectedTo.instantiations()),
-    				       notationInfo, backend, null,
-    				       true);
+        SequentViewLogicPrinter tp = new SequentViewLogicPrinter(new ProgramPrinter(w,
+                connectedTo.instantiations()),
+                notationInfo, backend, services,
+                true,
+                MainWindow.getInstance().getVisibleTermLabels());
         tp.printTaclet(connectedTo.taclet(), 
         	       connectedTo.instantiations(),
         	       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
@@ -97,7 +99,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
      * @param sb The StringBuffer with forbidden HTML characters
      * @return A new StringBuffer with the masked characters.
      */
-    protected StringBuffer ascii2html(StringBuffer sb) {
+    protected final StringBuffer ascii2html(StringBuffer sb) {
         StringBuffer nsb = new StringBuffer();
         StringBuffer asb = removeEmptyLines(sb);
         int sbl = asb.length();
@@ -113,35 +115,22 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         return nsb;
     }
 
-    protected StringBuffer removeEmptyLines(StringBuffer sb) {
-        String s = sb.toString();
-        String[] sa = s.split("\n");
-        StringBuffer result = new StringBuffer();
-        for (String aSa : sa) {
-            //logger.debug("'" + sa[i] + "'");
-            if ("".equals(aSa)) {
-                continue;
-            }
-            boolean onlySpaces = true;
-            for (int j = 0; j < aSa.length(); j++) {
-                if (aSa.charAt(j) != ' ') {
-                    onlySpaces = false;
-                }
-            }
-            if (onlySpaces) {
-                continue;
-            }
-            result.append(aSa).append("\n");
-        }
-        if (result.charAt(result.length()-1) == '\n') {
-    	result.setLength(result.length() - 1);
-        }
-        return result;
+    private static StringBuffer removeEmptyLines(StringBuffer sb) {
+        String string = sb.toString();
+        // This regular expression matches against lines that only have spaces
+        // (' ' or '\t') in them and against trailing new line characters and
+        // replaces them with "".
+        // This fixes bug #1435, MU
+        string = string.replaceAll("(?m)^[ \t]*\r?\n|\n$", "");
+        sb.setLength(0);
+        sb.append(string);
+        return sb;
     }
     
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.gui.TacletMenuItem#connectedTo()
      */
+    @Override
     public TacletApp connectedTo() {
         return connectedTo;
     }

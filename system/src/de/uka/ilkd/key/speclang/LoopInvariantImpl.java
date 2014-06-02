@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.speclang;
 
@@ -24,13 +23,17 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.util.InfFlowSpec;
+import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
+import de.uka.ilkd.key.pp.LogicPrinter;
 
 /**
  * Standard implementation of the LoopInvariant interface.
@@ -39,6 +42,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
     private final LoopStatement loop;
     private final IProgramMethod pm;
+    private final KeYJavaType kjt;
     private final Map<LocationVariable,Term> originalInvariants;
     private final Map<LocationVariable,Term> originalModifies;
     private final Map<LocationVariable,
@@ -48,7 +52,6 @@ public final class LoopInvariantImpl implements LoopInvariant {
     private final ImmutableList<Term> localIns;
     private final ImmutableList<Term> localOuts;
     private final Map<LocationVariable,Term> originalAtPres;
-    
     
     //-------------------------------------------------------------------------
     //constructors
@@ -66,6 +69,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
      */
     public LoopInvariantImpl(LoopStatement loop,
                              IProgramMethod pm,
+                             KeYJavaType kjt,
                              Map<LocationVariable, Term> invariants,
                              Map<LocationVariable, Term> modifies,
                              Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs,
@@ -79,6 +83,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         //assert heapAtPre != null;
         this.loop                       = loop;
         this.pm                         = pm;
+        this.kjt                        = kjt;
         this.originalInvariants         =
                 invariants == null ? new LinkedHashMap<LocationVariable,Term>() : invariants;
         this.originalVariant            = variant;
@@ -99,19 +104,12 @@ public final class LoopInvariantImpl implements LoopInvariant {
     /**
      * Creates an empty, default loop invariant for the passed loop.
      */
-    public LoopInvariantImpl(LoopStatement loop, 
+    public LoopInvariantImpl(LoopStatement loop,
+                             IProgramMethod pm,
+                             KeYJavaType kjt,
 	    		     Term selfTerm, 
 	    		     Map<LocationVariable,Term> atPres) {
-        this(loop,
-             null,
-             null,
-             null,
-             null,
-             null,
-             selfTerm,
-             null,
-             null,
-             atPres);
+        this(loop, pm, kjt, null, null, null, null, selfTerm, null, null, atPres);
     }
 
 
@@ -171,12 +169,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public LoopStatement getLoop() {
         return loop;
     }
-    
-    @Override
-    public IProgramMethod getTarget() {
-        return pm;
-    }
-    
+
     @Override    
     public Term getInvariant(LocationVariable heap,
                              Term selfTerm,
@@ -184,7 +177,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
             		     Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap);
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalInvariants.get(heap));
     }
     
@@ -194,7 +187,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         Map<Term, Term> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap);
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalModifies.get(baseHeap));
     }
     
@@ -210,7 +203,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap);
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalModifies.get(heap));
     }
     
@@ -220,7 +213,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         Map<Term, Term> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap);
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalModifies.get(baseHeap));
     }
 
@@ -232,7 +225,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap);
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replaceInfFlowSpec(originalInfFlowSpecs.get(heap));
     }
 
@@ -256,7 +249,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap);
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalVariant);
     }
 
@@ -303,6 +296,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public LoopInvariant create(LoopStatement loop,
                                 IProgramMethod pm,
+                                KeYJavaType kjt,
                                 Map<LocationVariable,Term> invariants,
                                 Map<LocationVariable,Term> modifies,
                                 Map<LocationVariable,
@@ -312,7 +306,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                 ImmutableList<Term> localIns,
                                 ImmutableList<Term> localOuts,
                                 Map<LocationVariable,Term> atPres) {
-        return new LoopInvariantImpl(loop, pm, invariants,
+        return new LoopInvariantImpl(loop, pm, kjt, invariants,
                                      modifies, infFlowSpecs, variant, selfTerm,
                                      localIns, localOuts, atPres);
     }
@@ -328,7 +322,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                 ImmutableList<Term> localIns,
                                 ImmutableList<Term> localOuts,
                                 Map<LocationVariable,Term> atPres) {
-        return create(loop, pm, invariants, modifies, infFlowSpecs,
+        return create(loop, pm, kjt, invariants, modifies, infFlowSpecs,
                       variant, selfTerm, localIns, localOuts, atPres);
     }
 
@@ -352,6 +346,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public LoopInvariant setLoop(LoopStatement loop) {
         return new LoopInvariantImpl(loop,
                                      pm,
+                                     kjt,
                                      originalInvariants,
                                      originalModifies,
                                      originalInfFlowSpecs,
@@ -366,6 +361,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public LoopInvariant setTarget(IProgramMethod newPM) {
         return new LoopInvariantImpl(loop,
                                      newPM,
+                                     kjt,
                                      originalInvariants,
                                      originalModifies,
                                      originalInfFlowSpecs,
@@ -384,13 +380,14 @@ public final class LoopInvariantImpl implements LoopInvariant {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> inverseReplaceMap 
             = getInverseReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(inverseReplaceMap);
+        OpReplacer or = new OpReplacer(inverseReplaceMap, services.getTermFactory());
         Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable heap : invariants.keySet()) {
            newInvariants.put(heap, or.replace(invariants.get(heap)));
         }
         return new LoopInvariantImpl(loop,
                                      pm,
+                                     kjt,
                                      newInvariants,
                                      originalModifies,
                                      originalInfFlowSpecs,
@@ -467,10 +464,14 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
 
+    public IProgramMethod getTarget() {
+        return this.pm;
+    }
+
+
     @Override
     public KeYJavaType getKJT() {
-        assert (pm != null);
-	return pm.getContainerType();
+	return this.kjt;
     }
 
     @Override
@@ -494,9 +495,39 @@ public final class LoopInvariantImpl implements LoopInvariant {
 	return null;
     }
 
-
     @Override
     public boolean hasInfFlowSpec(Services services) {
         return !getInfFlowSpecs(services).isEmpty();
+    }
+
+    public LoopInvariant setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
+        assert newPM instanceof IProgramMethod;
+        return new LoopInvariantImpl(loop, (IProgramMethod)newPM, newKJT,
+                                     originalInvariants, originalModifies,
+                                     originalInfFlowSpecs, originalVariant,
+                                     originalSelfTerm, localIns, localOuts,
+                                     originalAtPres);
+    }
+
+
+    @Override
+    public OriginalVariables getOrigVars() {
+        Map<LocationVariable, ProgramVariable> atPreVars =
+                new LinkedHashMap<LocationVariable, ProgramVariable>();
+        for (LocationVariable h: originalAtPres.keySet()) {
+            atPreVars.put(h, (ProgramVariable)originalAtPres.get(h).op());
+        }
+        final ProgramVariable self;
+        if(this.originalSelfTerm != null
+                && this.originalSelfTerm.op() instanceof ProgramVariable) {
+            self = (ProgramVariable)this.originalSelfTerm.op();
+        } else if (this.originalSelfTerm != null) {
+            self = new LocationVariable(
+                    new ProgramElementName(originalSelfTerm.op().toString()), kjt);
+        } else {
+            self = null;
+        }
+        return new OriginalVariables(self, null, null, atPreVars,
+                                     ImmutableSLList.<ProgramVariable>nil());
     }
 }

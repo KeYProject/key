@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -44,6 +44,7 @@ public class SymbolicDebugPerspectiveFactory implements IPerspectiveFactory {
       // Put the variables view on top.
       IFolderLayout topFolder = layout.createFolder("top", IPageLayout.TOP, 0.2f, editorArea);
       topFolder.addView(IDebugUIConstants.ID_VARIABLE_VIEW);
+      topFolder.addView(IDebugUIConstants.ID_BREAKPOINT_VIEW);
       // Perspective Shortcuts
       layout.addPerspectiveShortcut("org.eclipse.jdt.ui.JavaPerspective");
       layout.addPerspectiveShortcut("org.eclipse.jdt.ui.JavaHierarchyPerspective");
@@ -52,6 +53,7 @@ public class SymbolicDebugPerspectiveFactory implements IPerspectiveFactory {
       // View Shortcuts
       layout.addShowViewShortcut(IDebugUIConstants.ID_DEBUG_VIEW);
       layout.addShowViewShortcut(IDebugUIConstants.ID_VARIABLE_VIEW);
+      layout.addShowViewShortcut(IDebugUIConstants.ID_BREAKPOINT_VIEW);
       layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
    }
 }

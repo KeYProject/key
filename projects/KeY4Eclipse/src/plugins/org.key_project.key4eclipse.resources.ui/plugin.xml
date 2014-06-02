@@ -35,24 +35,40 @@
                <iterate
                      ifEmpty="false"
                      operator="and">
-                  <adapt
-                        type="org.eclipse.core.resources.IResource">
-                     <test
-                           forcePluginActivation="true"
-                           property="org.eclipse.core.resources.projectNature"
-                           value="org.eclipse.jdt.core.javanature">
-                     </test>
-                  </adapt>
-                  <not>
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
+                  <or>
+                     <and>
+                        <instanceof
+                              value="org.eclipse.core.resources.IProject">
+                        </instanceof>
                         <test
                               forcePluginActivation="true"
                               property="org.eclipse.core.resources.projectNature"
-                              value="org.key_project.key4eclipse.resources.KeYProjectNature">
+                              value="org.eclipse.jdt.core.javanature">
                         </test>
-                     </adapt>
-                  </not>
+                        <not>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.eclipse.core.resources.projectNature"
+                                 value="org.key_project.key4eclipse.resources.KeYProjectNature">
+                           </test>
+                        </not>
+                     </and>
+                     <and>
+                        <instanceof
+                              value="org.eclipse.jdt.core.IJavaProject">
+                        </instanceof>
+                        <adapt
+                              type="org.eclipse.core.resources.IProject">
+                           <not>
+                              <test
+                                    forcePluginActivation="true"
+                                    property="org.eclipse.core.resources.projectNature"
+                                    value="org.key_project.key4eclipse.resources.KeYProjectNature">
+                              </test>
+                           </not>
+                        </adapt>
+                     </and>
+                  </or>
                </iterate>
             </visibleWhen>
          </command>
@@ -60,12 +76,8 @@
    </extension>
    <extension
          point="org.eclipse.ui.commands">
-      <category
-            id="org.key_project.key4eclipse.resources.ui.category"
-            name="KeY">
-      </category>
       <command
-            categoryId="org.key_project.key4eclipse.resources.ui.category"
+            categoryId="org.key_project.key4eclipse.common.ui.category"
             description="Add functionality of a KeY project to the current project."
             id="org.key_project.key4eclipse.resources.ui.convertToKeYProject"
             name="Convert to KeY Project.">
@@ -87,24 +99,40 @@
             <iterate
                   ifEmpty="false"
                   operator="and">
-               <adapt
-                     type="org.eclipse.core.resources.IResource">
-                  <test
-                        forcePluginActivation="true"
-                        property="org.eclipse.core.resources.projectNature"
-                        value="org.eclipse.jdt.core.javanature">
-                  </test>
-               </adapt>
-               <not>
-                  <adapt
-                        type="org.eclipse.core.resources.IResource">
+               <or>
+                  <and>
+                     <instanceof
+                           value="org.eclipse.core.resources.IProject">
+                     </instanceof>
                      <test
                            forcePluginActivation="true"
                            property="org.eclipse.core.resources.projectNature"
-                           value="org.key_project.key4eclipse.resources.KeYProjectNature">
+                           value="org.eclipse.jdt.core.javanature">
                      </test>
-                  </adapt>
-               </not>
+                     <not>
+                        <test
+                              forcePluginActivation="true"
+                              property="org.eclipse.core.resources.projectNature"
+                              value="org.key_project.key4eclipse.resources.KeYProjectNature">
+                        </test>
+                     </not>
+                  </and>
+                  <and>
+                     <instanceof
+                           value="org.eclipse.jdt.core.IJavaProject">
+                     </instanceof>
+                     <adapt
+                           type="org.eclipse.core.resources.IProject">
+                        <not>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.eclipse.core.resources.projectNature"
+                                 value="org.key_project.key4eclipse.resources.KeYProjectNature">
+                           </test>
+                        </not>
+                     </adapt>
+                  </and>
+               </or>
             </iterate>
          </enabledWhen>
       </handler>
@@ -127,5 +155,17 @@
             </adapt>
          </enabledWhen>
       </page>
+   </extension>
+      <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.eclipse.ui.editors.text.TextEditor"
+            contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
+            default="true"
+            extensions="proofmeta"
+            icon="icons/proofmetafile16.png"
+            id="org.key_project.key4eclipse.common.ui.keyTextEditor"
+            name="Proof Meta Text Editor">
+      </editor>
    </extension>
 </plugin>

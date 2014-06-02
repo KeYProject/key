@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.test.Activator;
 import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
-import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
+import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.BundleUtil;
 
 public class HideMetaFilesTests extends AbstractResourceTest {
@@ -36,8 +36,8 @@ public class HideMetaFilesTests extends AbstractResourceTest {
             project.getFullPath().append("proofs").append("hideMetaFiles").append("HideMeta.java").append("hideMetaFiles_HideMeta[hideMetaFiles_HideMeta__add(int,int)]_JML_operation_contract_0.proof"));
       IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("hideMetaFiles").append("HideMeta.java").append("hideMetaFiles_HideMeta[hideMetaFiles_HideMeta__sub(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().addFileExtension("meta"));
-      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().addFileExtension("meta"));
+      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
    
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/HideMetaFilesTests/testHideMetaFiles", project.getFolder("src"));
       
@@ -49,7 +49,7 @@ public class HideMetaFilesTests extends AbstractResourceTest {
       assertTrue(!metaFile0.isHidden() && !metaFile1.isHidden());
       
       KeYProjectProperties.setHideMetaFiles(project, true);
-      KeY4EclipseResourcesUtil.hideMetaFiles(project);
+      KeYResourcesUtil.hideMetaFiles(project);
 
       assertTrue(!javaFile.isHidden());
       assertTrue(!proofFolder.isHidden());
@@ -70,8 +70,8 @@ public class HideMetaFilesTests extends AbstractResourceTest {
             project.getFullPath().append("proofs").append("showMetaFiles").append("ShowMeta.java").append("showMetaFiles_ShowMeta[showMetaFiles_ShowMeta__add(int,int)]_JML_operation_contract_0.proof"));
       IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("showMetaFiles").append("ShowMeta.java").append("showMetaFiles_ShowMeta[showMetaFiles_ShowMeta__sub(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().addFileExtension("meta"));
-      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().addFileExtension("meta"));
+      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
    
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/HideMetaFilesTests/testShowMetaFiles", project.getFolder("src"));
       
@@ -83,7 +83,7 @@ public class HideMetaFilesTests extends AbstractResourceTest {
       assertTrue(metaFile0.isHidden() && metaFile1.isHidden());
    
       KeYProjectProperties.setHideMetaFiles(project, false);
-      KeY4EclipseResourcesUtil.hideMetaFiles(project);
+      KeYResourcesUtil.hideMetaFiles(project);
    
       assertTrue(!javaFile.isHidden());
       assertTrue(!proofFolder.isHidden());

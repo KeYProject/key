@@ -137,7 +137,7 @@ public class StartAuxiliaryBlockComputationMacro implements ExtendedProofMacro {
                                      proof.getServices());
         ProblemInitializer pi =
                 new ProblemInitializer(mediator.getUI(),
-                                       mediator.getServices(), true,
+                                       mediator.getServices(),
                                        mediator.getUI());
         try {
             Proof p = pi.startProver(initConfig, blockExecPO, 0);

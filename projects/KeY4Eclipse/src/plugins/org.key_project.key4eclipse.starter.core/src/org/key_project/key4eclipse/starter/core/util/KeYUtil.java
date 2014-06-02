@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -19,7 +19,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.JOptionPane;
 
@@ -72,6 +77,8 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -84,6 +91,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -509,7 +517,7 @@ public final class KeYUtil {
                                               "! This is probably a syntax problem, " + 
                                               " check your import statements.");
             }
-            KeYJavaType kjt = javaInfo.getKeYJavaTypeByClassName(javaTypeName);
+            KeYJavaType kjt = javaInfo.getKeYJavaType(javaTypeName);
             result = result.append(kjt);
         }
         return result;
@@ -1044,6 +1052,78 @@ public final class KeYUtil {
    }
    
    /**
+    * Collects all {@link IMethod}s in the given {@link IResource}.
+    * @param res - the given {@link IResource}
+    * @return - the {@link LinkedList<IMethod>} with all {@link IMethod}s
+    * @throws JavaModelException
+    */
+   public static LinkedList<IMethod> getResourceMethods(IResource res) throws JavaModelException{
+      ICompilationUnit unit = (ICompilationUnit) JavaCore.create(res);
+      LinkedList<IMethod> methods = new LinkedList<IMethod>();
+      IType[] types = unit.getAllTypes();
+      for(IType type : types){
+         IMethod[] tmp = type.getMethods();
+         for(IMethod method : tmp){
+            methods.add(method);
+         }
+      }
+      return methods;
+   }
+   
+   /**
+    * Collects all {@link IMethod}s in the given {@link IResource}.
+    * @param res - the given {@link IResource}
+    * @return - the {@link LinkedList<IMethod>} with all {@link IMethod}s
+    * @throws JavaModelException
+    */
+   public static IType getType(IResource res) throws JavaModelException{
+      ICompilationUnit unit = (ICompilationUnit) JavaCore.create(res);
+      IType[] types = unit.getAllTypes();
+      return types[0];
+   }
+   
+   /**
+    * Returns the lineNumber of the given {@link IMethod}.
+    * @param method - the {@link IMethod} to use
+    * @return the lineNumber of the {@link IMethod}
+    * @throws CoreException
+    */
+   public static int getLineNumberOfMethod(IMethod method, int offset) throws CoreException {
+      Position pos = KeYUtil.getCursorPositionForOffset(method, offset);
+      return pos.getLine();
+   }
+
+   public static IMethod getContainingMethodForMethodStart(int charStart, IResource resource) throws CoreException {
+      ICompilationUnit unit = (ICompilationUnit) JavaCore.create(resource);
+      IJavaElement javaElement = unit.getElementAt(charStart);
+      if(javaElement instanceof IMethod){
+         return (IMethod) javaElement;
+      }
+      return null;
+   } 
+   
+   public static LinkedList<IProgramMethod> getProgramMethods(LinkedList<IMethod> methods, JavaInfo javaInfo) throws ProofInputException{
+      LinkedList<IProgramMethod> programMethods = new LinkedList<IProgramMethod>();
+      for(IMethod method : methods){
+         programMethods.add(getProgramMethod(method, javaInfo));
+      }
+      return programMethods;
+   }
+   
+
+   public static IMethod getContainingMethod(int lineNumber, IResource resource) throws CoreException {
+      LinkedList<IMethod>methods = getResourceMethods(resource);
+      for(IMethod method : methods){
+         int start = getLineNumberOfMethod(method, method.getSourceRange().getOffset());
+         int end = getLineNumberOfMethod(method, method.getSourceRange().getOffset()+method.getSourceRange().getLength());
+         if(lineNumber>start&&lineNumber<end){
+            return method;
+         }
+      }
+      return null;
+   }
+   
+   /**
     * Computes the offset for the given cursor position (line, column)
     * in the source document of the given {@link IJavaElement}.
     * @param element The given {@link IJavaElement}.
@@ -1317,5 +1397,29 @@ public final class KeYUtil {
       catch (IOException e) {
          throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
       }
+   }
+   
+   /**
+    * Filters the given {@link Set} of {@link KeYJavaType}s and sorts them.
+    * @param kjts - the {@link KeYJavaType}s to filter and sort
+    * @return the filtered and sorted {@link KeYJavaType[]}
+    */
+   public static KeYJavaType[] sortKeYJavaTypes(Set<KeYJavaType> kjts){ // TODO: Move to KeYUtil.sortKeYJavaTypes(Set<KeYJavaType>)
+      Iterator<KeYJavaType> it = kjts.iterator();
+      while (it.hasNext()) {
+         KeYJavaType kjt = it.next();
+         if (!(kjt.getJavaType() instanceof ClassDeclaration || 
+               kjt.getJavaType() instanceof InterfaceDeclaration) || 
+               KeYTypeUtil.isLibraryClass(kjt)) {
+            it.remove();
+         }
+      }
+      KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[kjts.size()]);
+      Arrays.sort(kjtsarr, new Comparator<KeYJavaType>() {
+         public int compare(KeYJavaType o1, KeYJavaType o2) {
+            return o1.getFullName().compareTo(o2.getFullName());
+         }
+      });
+      return kjtsarr;
    }
 }

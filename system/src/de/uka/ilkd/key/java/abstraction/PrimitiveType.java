@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,11 +11,10 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-
 package de.uka.ilkd.key.java.abstraction;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
@@ -48,10 +47,10 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 public final class PrimitiveType implements Type {
 
     // must be first in file.
-    private static final HashMap<String,PrimitiveType> typeMap = 
+    private static final Map<String,PrimitiveType> typeMap = 
             new LinkedHashMap<String, PrimitiveType>(); 
     // must be first in file.
-    private static final HashMap<Name,PrimitiveType> ldtMap = 
+    private static final Map<Name,PrimitiveType> ldtMap = 
             new LinkedHashMap<Name, PrimitiveType>(); 
 
     public static final PrimitiveType JAVA_BYTE  =
@@ -189,6 +188,28 @@ public final class PrimitiveType implements Type {
 	}
 	assert arrayElementName != null;
 	return arrayElementName;
+    }
+
+    /**
+     * Returns whether this is a Java type which translates to int in DL.
+     */
+    public boolean isIntegerType () {
+        return this == JAVA_BYTE
+            || this == JAVA_CHAR
+            || this == JAVA_SHORT
+            || this == JAVA_INT
+            || this == JAVA_LONG
+            || this == JAVA_BIGINT;
+    }
+
+    /**
+     * Returns true if this is an integer or floating point type.
+     */
+    public boolean isArithmeticType () {
+        return isIntegerType()
+            || this == JAVA_FLOAT
+            || this == JAVA_DOUBLE
+            || this == JAVA_REAL;
     }
 
     /**

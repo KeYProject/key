@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.util;
 
@@ -236,8 +236,10 @@ public final class MiscTools {
      * The resulting filename always uses UNIX directory delimiters.
      */
     public static String makeFilenameRelative(String origFilename, String toFilename){
-        String[] a = disectFilename(origFilename).toArray(new String[0]);
-        String[] b = disectFilename(toFilename).toArray(new String[0]);
+        final List<String> origFileNameSections = disectFilename(origFilename);
+        String[] a = origFileNameSections.toArray(new String[origFileNameSections.size()]);
+        final List<String> destinationFilenameSections = disectFilename(toFilename);
+        String[] b = destinationFilenameSections.toArray(new String[destinationFilenameSections.size()]);
 
         // check for Windows paths
         if (File.separatorChar == '\\' &&
@@ -629,12 +631,12 @@ public final class MiscTools {
 	}
     }
 
-    public static ImmutableList<Term> toTermList(
-            Iterable<ProgramVariable> list) {
+    public static ImmutableList<Term> toTermList(Iterable<ProgramVariable> list,
+                                                 TermBuilder tb) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
         for (ProgramVariable pv : list) {
             if (pv != null) {
-                Term t = TermBuilder.DF.var(pv);
+                Term t = tb.var(pv);
                 result = result.append(t);
             }
         }
@@ -658,7 +660,6 @@ public final class MiscTools {
         }
         return sb.toString();
     }
-
 
     public static ImmutableList<Term> filterOutDuplicates(ImmutableList<Term> localIns,
                                                           ImmutableList<Term> localOuts) {

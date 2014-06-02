@@ -91,7 +91,7 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
             for (int i = 1; i <= seq.size() &&
                             applicableOnNodeAtPos.get(goal.node()) == null; i++) {
                 PosInOccurrence searchPos =
-                        PosInOccurrence.findInSequent(seq, i, PosInTerm.TOP_LEVEL);
+                        PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
                 PosInOccurrence applicableAt =
                         getApplicablePosInOcc(mediator, goal, searchPos, macro);
                 applicableOnNodeAtPos.put(goal.node(), applicableAt);

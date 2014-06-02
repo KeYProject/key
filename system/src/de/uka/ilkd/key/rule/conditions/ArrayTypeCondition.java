@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.rule.conditions;
 
@@ -28,7 +27,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 /**
- *  This variable condition checks if an instantiation is an array. 
+ *  This variable condition checks if an instantiation is an array.
  *  
  *  @author mulbrich
  *  @since 2006-12-03
@@ -39,7 +38,7 @@ public final class ArrayTypeCondition extends VariableConditionAdapter {
     private final boolean negated;
 
     /**
-     * creates an instance of this condition checking if an instanciation of a schema variable is an array or not
+     * creates an instance of this condition checking if an instantiation of a schema variable is an array or not
      * @param var the SchemaVariable to be checked
      * @param negated if the result is to be negated upon finding
      */

@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.gui.nodeviews;
 
@@ -160,7 +159,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                
         
         if (applicableApps.isEmpty() && !targetPos.isSequent() &&
-                targetPos.getPosInOccurrence().posInTerm() != PosInTerm.TOP_LEVEL) {
+                targetPos.getPosInOccurrence().posInTerm() != PosInTerm.getTopLevel()) {
             // if no applicable taclet is found we relax the target position a bit
             applicableApps = 
                 getAllApplicableApps(sourcePos, 
@@ -181,7 +180,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             // open a pop up menu for user selection
             SimpleTacletSelectionMenu menu = new SimpleTacletSelectionMenu(
                     applicableApps, seqView.getMediator().getNotationInfo(),
-                    new PopupListener());
+                    new PopupListener(), services);
 
             JPopupMenu pm = menu.getPopupMenu();
             pm.show(seqView, (int) dropLocation.getX(), (int) dropLocation
@@ -681,4 +680,3 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         }
     }
 }
-

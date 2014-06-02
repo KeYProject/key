@@ -96,7 +96,7 @@ open (AUTOMATIC, $testFile) or die $testFile . " couldn't be opened.";
 close AUTOMATIC;
 
 my $counter = 0;
-my $total = trim(`grep provable "$path_to_index" | grep -v "\#" | wc -l`);
+my $total = trim(`grep provable "$testFile" | grep -v "\#" | wc -l`);
 my $correct = 0;
 my $failures = 0;
 my $errors = 0;
@@ -388,7 +388,7 @@ sub runAuto {
   if ($option{'verbose'}) { $verbosity = "--verbose 2"; }
   if ($option{'noAuto'}) { $automode = ""; }
   if ($option{'args'}) { $arguments = $option{'args'}; }
-  my $command = "'" . $path_to_key . "/bin/runProver' $automode $verbosity $statisticsCmd $arguments '$dk'";
+  my $command = "'" . $path_to_key . "/bin/key' --K-headless $automode $verbosity $statisticsCmd $arguments '$dk'";
   print "Command is: $command\n" unless $option{'silent'};
   my $starttime = time();
   my $result = &system_timeout($time_limit, $command);
@@ -422,7 +422,7 @@ sub reloadFile {
 	return;
     }
 
-    my $command = "'" . $path_to_key . "/bin/runProver' --auto-loadonly '$dk'";
+    my $command = "'" . $path_to_key . "/bin/key' --K-headless --auto-loadonly '$dk'";
     # print "Command is: $command\n";
     my $result = &system_timeout($time_limit, $command);
 #    print "\nReturn value: $result\n";

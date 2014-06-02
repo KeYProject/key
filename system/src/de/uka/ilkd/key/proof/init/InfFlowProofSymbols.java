@@ -379,7 +379,7 @@ public class InfFlowProofSymbols {
 
     public void add(Term t) {
         assert t != null;
-        t = TermBuilder.DF.goBelowUpdates(t);
+        t = TermBuilder.goBelowUpdates(t);
         if (!isPredicate(t.op())) {
             if (!t.subs().isEmpty()) {
                 for (final Term s: t.subs()) {
@@ -392,7 +392,7 @@ public class InfFlowProofSymbols {
 
     public void addLabeled(Term t) {
         assert t != null;
-        t = TermBuilder.DF.goBelowUpdates(t);
+        t = TermBuilder.goBelowUpdates(t);
         if (!t.subs().isEmpty()) {
             for (final Term s: t.subs()) {
                 addLabeled(s);
@@ -441,7 +441,7 @@ public class InfFlowProofSymbols {
         if (t.op() instanceof ElementaryUpdate) {
             add(((ElementaryUpdate)t.op()).lhs());
         }
-        t = TermBuilder.DF.goBelowUpdates(t);
+        t = TermBuilder.goBelowUpdates(t);
         if (!t.subs().isEmpty()) {
             for (final Term s: t.subs()) {
                 addTotalTerm(s);
@@ -459,7 +459,7 @@ public class InfFlowProofSymbols {
         if (t.op() instanceof ElementaryUpdate) {
             addLabeled(((ElementaryUpdate)t.op()).lhs());
         }
-        t = TermBuilder.DF.goBelowUpdates(t);
+        t = TermBuilder.goBelowUpdates(t);
         if (!t.subs().isEmpty()) {
             for (final Term s: t.subs()) {
                 addLabeledTotalTerm(s);

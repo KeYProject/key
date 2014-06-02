@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -36,9 +36,9 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 
 public final class AutoModeAction extends MainWindowAction {
 
-    private static final KeyStroke START_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK);
-	private static final KeyStroke STOP_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-	/**
+    private static final KeyStroke START_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK);
+    private static final KeyStroke STOP_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+    /**
      * 
      */
     private static final long serialVersionUID = -7702898691162947994L;
@@ -124,7 +124,7 @@ public final class AutoModeAction extends MainWindowAction {
         	}
         	putValue(Action.NAME, "Stop");
         	putValue(Action.SMALL_ICON, stopLogo);
-        	putValue(Action.ACCELERATOR_KEY, STOP_KEY);
+                putValue(Action.ACCELERATOR_KEY, STOP_KEY);
             }
     
             /**
@@ -137,7 +137,7 @@ public final class AutoModeAction extends MainWindowAction {
         	}
         	putValue(Action.NAME, getStartCommand());
         	putValue(Action.SMALL_ICON, startLogo);
-        	putValue(Action.ACCELERATOR_KEY, START_KEY);
+                putValue(Action.ACCELERATOR_KEY, START_KEY);
             }
     
         });

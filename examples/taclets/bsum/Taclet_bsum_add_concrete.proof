@@ -1,0 +1,199 @@
+\profile "Java Profile";
+
+\settings {
+"#Proof-Settings-Config-File
+#Tue Jan 21 19:53:55 CET 2014
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]RETREAT_MODE_OPTIONS_KEY=RETREAT_MODE_NONE
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_RESTRICTED
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=10000
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=JavaCard-JavaCard\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:allow , assertions-assertions\\:on , modelFields-modelFields\\:treatAsAxiom , initialisation-initialisation\\:disableStaticInitialisation , Strings-Strings\\:on , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , optimisedSelectRules-optimisedSelectRules\\:on , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]UseBuiltUniqueness=false
+[StrategyProperty]CLASS_AXIOM_PRIO=CLASS_AXIOM_HIGH
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+\proofObligation "#Proof Obligation Settings
+#Tue Jan 21 19:53:55 CET 2014
+name=bsum_add_concrete
+class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
+";
+
+\proof {
+(keyLog "0" (keyUser "mattias" ) (keyVersion "5ed59f29395c1a5b462ee136666be80924e10503"))
+
+(autoModeTime "1134")
+
+(branch "dummy ID"
+(rule "notRight" (formula "1") (userinteraction))
+(rule "andLeft" (formula "1") (userinteraction))
+(rule "notLeft" (formula "1") (userinteraction))
+(rule "apply_subst" (formula "2") (term "2,1") (userinteraction))
+(rule "eqClose" (formula "1") (term "0") (userinteraction))
+(rule "concrete_impl_1" (formula "1") (userinteraction))
+(rule "andLeft" (formula "1") (userinteraction))
+(rule "bsum_split" (formula "3") (term "1") (inst "middle=f_i1") (userinteraction))
+(rule "ifthenelse_split" (formula "3") (term "1") (userinteraction))
+(branch "f_i0 <= f_i1 & f_i1 <= f_i3 TRUE"
+   (rule "andLeft" (formula "1") (userinteraction))
+   (rule "cut" (inst "cutFormula=  bsum{int v_uSub1;}(f_i0, f_i1, f_t1(v_uSub1))
+= bsum{int v_uSub1;}(f_i0,
+                     f_i1,
+                     \\if (lt(v_uSub1, f_i1))
+                         \\then (f_t1(v_uSub1))
+                         \\else (f_t2(v_uSub1)))") (userinteraction))
+   (branch "CUT: bsum{int v_uSub1;}(f_i0, f_i1, f_t1(v_uSub1)) = bsum{int v_uSub1;}(f_i0, f_i1, if (v_uSub1 < f_i1) then (f_t1(v_uSub1)) else (f_t2(v_uSub1))) TRUE"
+      (rule "cut" (inst "cutFormula=  bsum{int v_uSub2;}(f_i1, f_i3, f_t2(v_uSub2))
+= bsum{int v_uSub1;}(f_i1,
+                     f_i3,
+                     \\if (lt(v_uSub1, f_i1))
+                         \\then (f_t1(v_uSub1))
+                         \\else (f_t2(v_uSub1)))") (userinteraction))
+      (branch "CUT: bsum{int v_uSub2;}(f_i1, f_i3, f_t2(v_uSub2)) = bsum{int v_uSub1;}(f_i1, f_i3, if (v_uSub1 < f_i1) then (f_t1(v_uSub1)) else (f_t2(v_uSub1))) TRUE"
+         (rule "eqSymm" (formula "2"))
+         (rule "polySimp_homoEq" (formula "5"))
+         (rule "polySimp_mulComm0" (formula "5") (term "1,0"))
+         (rule "inEqSimp_ltToLeq" (formula "1") (term "0,2,1"))
+         (rule "polySimp_mulComm0" (formula "1") (term "1,0,0,0,2,1"))
+         (rule "inEqSimp_ltToLeq" (formula "2") (term "0,2,0"))
+         (rule "polySimp_mulComm0" (formula "2") (term "1,0,0,0,2,0"))
+         (rule "inEqSimp_ltToLeq" (formula "5") (term "0,2,1,0,0"))
+         (rule "polySimp_mulComm0" (formula "5") (term "1,0,0,0,2,1,0,0"))
+         (rule "inEqSimp_ltToLeq" (formula "5") (term "0,2,0,0,0"))
+         (rule "polySimp_mulComm0" (formula "5") (term "1,0,0,0,2,0,0,0"))
+         (rule "polySimp_rightDist" (formula "5") (term "1,0"))
+         (rule "polySimp_mulComm0" (formula "5") (term "0,1,0"))
+         (rule "inEqSimp_commuteLeq" (formula "3"))
+         (rule "inEqSimp_commuteLeq" (formula "4"))
+         (rule "polySimp_addAssoc" (formula "5") (term "0"))
+         (rule "polySimp_addComm1" (formula "5") (term "0,0"))
+         (rule "polySimp_addComm0" (formula "5") (term "0,0,0"))
+         (rule "applyEqRigid" (formula "5") (term "0,1,0") (ifseqformula "1"))
+         (rule "polySimp_pullOutFactor1b" (formula "5") (term "0"))
+         (rule "add_literals" (formula "5") (term "1,1,0"))
+         (rule "times_zero_1" (formula "5") (term "1,0"))
+         (rule "add_zero_right" (formula "5") (term "0"))
+         (rule "applyEq" (formula "5") (term "1,0") (ifseqformula "2"))
+         (rule "polySimp_pullOutFactor2" (formula "5") (term "0"))
+         (rule "add_literals" (formula "5") (term "1,0"))
+         (rule "times_zero_1" (formula "5") (term "0"))
+         (rule "eqClose" (formula "5"))
+         (rule "closeTrue" (formula "5"))
+      )
+      (branch "CUT: bsum{int v_uSub2;}(f_i1, f_i3, f_t2(v_uSub2)) = bsum{int v_uSub1;}(f_i1, f_i3, if (v_uSub1 < f_i1) then (f_t1(v_uSub1)) else (f_t2(v_uSub1))) FALSE"
+         (rule "eqSymm" (formula "1"))
+         (rule "polySimp_homoEq" (formula "5"))
+         (rule "polySimp_mulComm0" (formula "5") (term "1,0"))
+         (rule "inEqSimp_ltToLeq" (formula "4") (term "0,2,1"))
+         (rule "polySimp_mulComm0" (formula "4") (term "1,0,0,0,2,1"))
+         (rule "inEqSimp_ltToLeq" (formula "1") (term "0,2,0"))
+         (rule "polySimp_mulComm0" (formula "1") (term "1,0,0,0,2,0"))
+         (rule "inEqSimp_ltToLeq" (formula "5") (term "0,2,1,0,0"))
+         (rule "polySimp_mulComm0" (formula "5") (term "1,0,0,0,2,1,0,0"))
+         (rule "inEqSimp_ltToLeq" (formula "5") (term "0,2,0,0,0"))
+         (rule "polySimp_mulComm0" (formula "5") (term "1,0,0,0,2,0,0,0"))
+         (rule "polySimp_rightDist" (formula "5") (term "1,0"))
+         (rule "polySimp_mulComm0" (formula "5") (term "0,1,0"))
+         (rule "inEqSimp_commuteLeq" (formula "3"))
+         (rule "inEqSimp_commuteLeq" (formula "2"))
+         (rule "polySimp_addAssoc" (formula "5") (term "0"))
+         (rule "polySimp_addComm1" (formula "5") (term "0,0"))
+         (rule "polySimp_addComm0" (formula "5") (term "0,0,0"))
+         (rule "applyEqRigid" (formula "5") (term "1,0,0,0") (ifseqformula "1"))
+         (rule "polySimp_pullOutFactor2" (formula "5") (term "0,0,0"))
+         (rule "add_literals" (formula "5") (term "1,0,0,0"))
+         (rule "times_zero_1" (formula "5") (term "0,0,0"))
+         (rule "add_zero_left" (formula "5") (term "0,0"))
+         (rule "polySimp_sepNegMonomial" (formula "5"))
+         (rule "polySimp_mulLiterals" (formula "5") (term "0"))
+         (rule "polySimp_elimOne" (formula "5") (term "0"))
+         (rule "inEqSimp_sepPosMonomial0" (formula "4") (term "0,2,1"))
+         (rule "polySimp_mulComm0" (formula "4") (term "1,0,2,1"))
+         (rule "polySimp_rightDist" (formula "4") (term "1,0,2,1"))
+         (rule "mul_literals" (formula "4") (term "0,1,0,2,1"))
+         (rule "polySimp_mulLiterals" (formula "4") (term "1,1,0,2,1"))
+         (rule "polySimp_elimOne" (formula "4") (term "1,1,0,2,1"))
+         (rule "inEqSimp_sepPosMonomial0" (formula "1") (term "0,2,0"))
+         (rule "polySimp_mulComm0" (formula "1") (term "1,0,2,0"))
+         (rule "polySimp_rightDist" (formula "1") (term "1,0,2,0"))
+         (rule "mul_literals" (formula "1") (term "0,1,0,2,0"))
+         (rule "polySimp_mulLiterals" (formula "1") (term "1,1,0,2,0"))
+         (rule "polySimp_elimOne" (formula "1") (term "1,1,0,2,0"))
+         (rule "equal_bsum1" (formula "4"))
+         (rule "allRight" (formula "4") (inst "sk=v_uSub2_0"))
+         (rule "impRight" (formula "4"))
+         (rule "andLeft" (formula "1"))
+         (rule "eqSymm" (formula "6"))
+         (rule "ifthenelse_concrete4" (formula "6"))
+         (rule "orRight" (formula "6"))
+         (rule "notRight" (formula "6"))
+         (rule "eqSymm" (formula "7"))
+         (rule "inEqSimp_ltToLeq" (formula "3"))
+         (rule "polySimp_mulComm0" (formula "3") (term "1,0,0"))
+         (rule "inEqSimp_sepPosMonomial0" (formula "3"))
+         (rule "polySimp_mulComm0" (formula "3") (term "1"))
+         (rule "polySimp_rightDist" (formula "3") (term "1"))
+         (rule "mul_literals" (formula "3") (term "0,1"))
+         (rule "polySimp_mulLiterals" (formula "3") (term "1,1"))
+         (rule "polySimp_elimOne" (formula "3") (term "1,1"))
+         (rule "inEqSimp_contradInEq0" (formula "2") (ifseqformula "1"))
+         (rule "andLeft" (formula "2"))
+         (rule "inEqSimp_homoInEq1" (formula "2"))
+         (rule "polySimp_mulComm0" (formula "2") (term "1,0"))
+         (rule "polySimp_rightDist" (formula "2") (term "1,0"))
+         (rule "mul_literals" (formula "2") (term "0,1,0"))
+         (rule "polySimp_addAssoc" (formula "2") (term "0"))
+         (rule "polySimp_addComm0" (formula "2") (term "0,0"))
+         (rule "polySimp_pullOutFactor1b" (formula "2") (term "0"))
+         (rule "add_literals" (formula "2") (term "1,1,0"))
+         (rule "times_zero_1" (formula "2") (term "1,0"))
+         (rule "add_zero_right" (formula "2") (term "0"))
+         (rule "leq_literals" (formula "2"))
+         (rule "closeFalse" (formula "2"))
+      )
+   )
+   (branch "CUT: bsum{int v_uSub1;}(f_i0, f_i1, f_t1(v_uSub1)) = bsum{int v_uSub1;}(f_i0, f_i1, if (v_uSub1 < f_i1) then (f_t1(v_uSub1)) else (f_t2(v_uSub1))) FALSE"
+      (rule "equal_bsum1" (formula "3") (userinteraction))
+      (rule "allRight" (formula "3") (inst "sk=v_uSub1_0"))
+      (rule "impRight" (formula "3"))
+      (rule "andLeft" (formula "1"))
+      (rule "eqSymm" (formula "6"))
+      (rule "eqSymm" (formula "5"))
+      (rule "ifthenelse_concrete3" (formula "5"))
+      (rule "orRight" (formula "5"))
+      (rule "close" (formula "5") (ifseqformula "2"))
+   )
+)
+(branch "f_i0 <= f_i1 & f_i1 <= f_i3 FALSE"
+   (rule "replace_known_left" (formula "3") (term "0") (ifseqformula "1"))
+   (rule "concrete_and_1" (formula "3"))
+   (rule "close" (formula "3") (ifseqformula "2"))
+)
+)
+
+}

@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.speclang;
 
@@ -18,12 +17,16 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.util.InfFlowSpec;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
+
 
 
 /**
@@ -111,6 +114,7 @@ public interface LoopInvariant extends SpecificationElement {
 
     public LoopInvariant create(LoopStatement loop,
                                 IProgramMethod pm,
+                                KeYJavaType kjt,
                                 Map<LocationVariable,Term> invariants,
                                 Map<LocationVariable,Term> modifies,
                                 Map<LocationVariable,
@@ -169,6 +173,15 @@ public interface LoopInvariant extends SpecificationElement {
      * Returns the invariant in pretty plain text format.
      */
     public String getPlainText(Services services);
-    
+
     public String getUniqueName();
+
+    public KeYJavaType getKJT();
+
+    public LoopInvariant setTarget(KeYJavaType newKJT, IObserverFunction newPM);
+
+    /**
+     * Returns the original Self Variable to replace it easier.
+     */
+    public OriginalVariables getOrigVars();
 }

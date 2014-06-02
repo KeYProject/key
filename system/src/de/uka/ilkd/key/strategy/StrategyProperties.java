@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.strategy;
 
@@ -18,7 +17,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import de.uka.ilkd.key.gui.macros.TryCloseMacro;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 
 
@@ -27,23 +25,15 @@ public final class StrategyProperties extends Properties {
     /**
      * 
      */
-    private static final long serialVersionUID = 8651946636880456925L;
+    private static final long serialVersionUID = -4647245742912258421L;
     public final static String INF_FLOW_CHECK_PROPERTY = "INF_FLOW_CHECK_PROPERTY";
     public final static String INF_FLOW_CHECK_TRUE = "INF_FLOW_CHECK_TRUE";
     public final static String INF_FLOW_CHECK_FALSE = "INF_FLOW_CHECK_FALSE";
-
+    private static final String STRATEGY_PROPERTY = "[StrategyProperty]";
     public final static String STOPMODE_OPTIONS_KEY = "STOPMODE_OPTIONS_KEY";
     public final static String STOPMODE_DEFAULT = "STOPMODE_DEFAULT";
     public final static String STOPMODE_NONCLOSE = "STOPMODE_NONCLOSE";
     
-    /**
-     * RETREAT MODE WILL BE REMOVED SOON. Its functionality can be found
-     * in {@link TryCloseMacro} now.
-     */
-    @Deprecated
-    public final static String RETREAT_MODE_OPTIONS_KEY = "RETREAT_MODE_OPTIONS_KEY";
-    public final static String RETREAT_MODE_NONE = "RETREAT_MODE_NONE";
-    public final static String RETREAT_MODE_RETREAT = "RETREAT_MODE_RETREAT";
 
     public final static String SPLITTING_OPTIONS_KEY = "SPLITTING_OPTIONS_KEY";
     public final static String SPLITTING_NORMAL = "SPLITTING_NORMAL";
@@ -94,6 +84,11 @@ public final class StrategyProperties extends Properties {
     public final static String VBT_SYM_EX = "VBT_SYM_EX";
     public final static String VBT_QUAN_INST = "VBT_QUAN_INST";
     public final static String VBT_MODEL_GEN = "VBT_MODEL_GEN";
+
+    public static final String CLASS_AXIOM_OPTIONS_KEY = "CLASS_AXIOM_OPTIONS_KEY";
+    public final static String CLASS_AXIOM_OFF = "CLASS_AXIOM_OFF";
+    public final static String CLASS_AXIOM_DELAYED= "CLASS_AXIOM_DELAYED";
+    public final static String CLASS_AXIOM_FREE = "CLASS_AXIOM_FREE";
     
     //chrisg
     public final static String AUTO_INDUCTION_OPTIONS_KEY          = "AUTO_INDUCTION_OPTIONS_KEY"; 
@@ -139,12 +134,12 @@ public final class StrategyProperties extends Properties {
      * Value of key {@link #SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY} in {@link StrategyProperties} to avoid branches caused by modalities not part of main execution by using site proofs in a {@link SymbolicExecutionStrategy}.
      */
     public static final String SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF = "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF";
+    
 
     //String identities.
     private static final String[] stringPool = {
         INF_FLOW_CHECK_PROPERTY, INF_FLOW_CHECK_TRUE, INF_FLOW_CHECK_FALSE,
         STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT, STOPMODE_NONCLOSE,
-    	RETREAT_MODE_OPTIONS_KEY, RETREAT_MODE_NONE, RETREAT_MODE_RETREAT,
     	SPLITTING_OPTIONS_KEY, SPLITTING_NORMAL, SPLITTING_OFF, SPLITTING_DELAYED,
     	LOOP_OPTIONS_KEY, LOOP_EXPAND, LOOP_EXPAND_BOUNDED, LOOP_INVARIANT, LOOP_NONE,
     	BLOCK_OPTIONS_KEY, BLOCK_CONTRACT, BLOCK_EXPAND, BLOCK_NONE,
@@ -155,6 +150,7 @@ public final class StrategyProperties extends Properties {
     	NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_NONE, NON_LIN_ARITH_DEF_OPS, NON_LIN_ARITH_COMPLETION,
     	QUANTIFIERS_OPTIONS_KEY, QUANTIFIERS_NONE, QUANTIFIERS_NON_SPLITTING, QUANTIFIERS_NON_SPLITTING_WITH_PROGS, QUANTIFIERS_INSTANTIATE,
     	VBT_PHASE, VBT_SYM_EX, VBT_QUAN_INST, VBT_MODEL_GEN,
+    	CLASS_AXIOM_OFF, CLASS_AXIOM_DELAYED, CLASS_AXIOM_FREE,
     	AUTO_INDUCTION_OPTIONS_KEY, AUTO_INDUCTION_OFF, AUTO_INDUCTION_RESTRICTED, AUTO_INDUCTION_ON,  AUTO_INDUCTION_LEMMA_ON,
     	USER_TACLETS_OPTIONS_KEY_BASE, USER_TACLETS_OFF, USER_TACLETS_LOW, USER_TACLETS_HIGH, 
     	USER_TACLETS_OPTIONS_KEY(1), USER_TACLETS_OPTIONS_KEY(2), USER_TACLETS_OPTIONS_KEY(3),
@@ -178,8 +174,8 @@ public final class StrategyProperties extends Properties {
             defaultMap.setProperty(USER_TACLETS_OPTIONS_KEY(i), USER_TACLETS_OFF);
         defaultMap.setProperty(INF_FLOW_CHECK_PROPERTY, INF_FLOW_CHECK_FALSE);
         defaultMap.setProperty(STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT);
-        defaultMap.setProperty(RETREAT_MODE_OPTIONS_KEY, RETREAT_MODE_NONE);
         defaultMap.setProperty(VBT_PHASE, VBT_SYM_EX);
+        defaultMap.setProperty(CLASS_AXIOM_OPTIONS_KEY, CLASS_AXIOM_FREE);
         defaultMap.setProperty(AUTO_INDUCTION_OPTIONS_KEY, AUTO_INDUCTION_OFF); //chrisg        
         defaultMap.setProperty(SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
         defaultMap.setProperty(SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
@@ -199,8 +195,8 @@ public final class StrategyProperties extends Properties {
             put(USER_TACLETS_OPTIONS_KEY(i), defaultMap.get(USER_TACLETS_OPTIONS_KEY(i)));
         put(INF_FLOW_CHECK_PROPERTY, defaultMap.get(INF_FLOW_CHECK_PROPERTY));
         put(STOPMODE_OPTIONS_KEY, defaultMap.get(STOPMODE_OPTIONS_KEY));
-        put(RETREAT_MODE_OPTIONS_KEY, defaultMap.get(RETREAT_MODE_OPTIONS_KEY));
         put(VBT_PHASE, defaultMap.getProperty(VBT_PHASE));
+        put(CLASS_AXIOM_OPTIONS_KEY, defaultMap.getProperty(CLASS_AXIOM_OPTIONS_KEY));
         put(AUTO_INDUCTION_OPTIONS_KEY, defaultMap.getProperty(AUTO_INDUCTION_OPTIONS_KEY));
     }
 
@@ -230,8 +226,8 @@ public final class StrategyProperties extends Properties {
             sp.put(USER_TACLETS_OPTIONS_KEY(i), readSingleOption(p,USER_TACLETS_OPTIONS_KEY(i)));
         sp.put(INF_FLOW_CHECK_PROPERTY, readSingleOption(p,INF_FLOW_CHECK_PROPERTY));
         sp.put(STOPMODE_OPTIONS_KEY, readSingleOption(p,STOPMODE_OPTIONS_KEY));
-        sp.put(RETREAT_MODE_OPTIONS_KEY, readSingleOption(p,RETREAT_MODE_OPTIONS_KEY));
         sp.put(VBT_PHASE, readSingleOption(p,VBT_PHASE));
+        sp.put(CLASS_AXIOM_OPTIONS_KEY, readSingleOption(p, CLASS_AXIOM_OPTIONS_KEY));
         sp.put(AUTO_INDUCTION_OPTIONS_KEY, readSingleOption(p,AUTO_INDUCTION_OPTIONS_KEY));
         sp.put(SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, readSingleOption(p,SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY));
         sp.put(SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, readSingleOption(p,SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY));
@@ -242,35 +238,35 @@ public final class StrategyProperties extends Properties {
      * @param p
      */
     private static Object readSingleOption(Properties p, String key) {
-        String o = (String)p.get("[StrategyProperty]"+key);
+        String o = (String)p.get(STRATEGY_PROPERTY+key);
         if (o == null) o = (String)defaultMap.get(key);
         return getUniqueString(o);
     }
 
     public void write(Properties p) {                
-        p.put("[StrategyProperty]"+SPLITTING_OPTIONS_KEY, get(SPLITTING_OPTIONS_KEY));
-        p.put("[StrategyProperty]"+LOOP_OPTIONS_KEY, get(LOOP_OPTIONS_KEY));
-        p.put("[StrategyProperty]"+BLOCK_OPTIONS_KEY, get(BLOCK_OPTIONS_KEY));
-        p.put("[StrategyProperty]"+METHOD_OPTIONS_KEY, get(METHOD_OPTIONS_KEY));
-        p.put("[StrategyProperty]"+DEP_OPTIONS_KEY, get(DEP_OPTIONS_KEY));              
-        p.put("[StrategyProperty]"+QUERY_OPTIONS_KEY, get(QUERY_OPTIONS_KEY));              
-        p.put("[StrategyProperty]"+QUERYAXIOM_OPTIONS_KEY, get(QUERYAXIOM_OPTIONS_KEY));              
-        p.put("[StrategyProperty]"+NON_LIN_ARITH_OPTIONS_KEY, get(NON_LIN_ARITH_OPTIONS_KEY));              
-        p.put("[StrategyProperty]"+QUANTIFIERS_OPTIONS_KEY, get(QUANTIFIERS_OPTIONS_KEY));              
+        p.put(STRATEGY_PROPERTY+SPLITTING_OPTIONS_KEY, get(SPLITTING_OPTIONS_KEY));
+        p.put(STRATEGY_PROPERTY+LOOP_OPTIONS_KEY, get(LOOP_OPTIONS_KEY));
+        p.put(STRATEGY_PROPERTY+BLOCK_OPTIONS_KEY, get(BLOCK_OPTIONS_KEY));
+        p.put(STRATEGY_PROPERTY+METHOD_OPTIONS_KEY, get(METHOD_OPTIONS_KEY));
+        p.put(STRATEGY_PROPERTY+DEP_OPTIONS_KEY, get(DEP_OPTIONS_KEY));              
+        p.put(STRATEGY_PROPERTY+QUERY_OPTIONS_KEY, get(QUERY_OPTIONS_KEY));              
+        p.put(STRATEGY_PROPERTY+QUERYAXIOM_OPTIONS_KEY, get(QUERYAXIOM_OPTIONS_KEY));              
+        p.put(STRATEGY_PROPERTY+NON_LIN_ARITH_OPTIONS_KEY, get(NON_LIN_ARITH_OPTIONS_KEY));              
+        p.put(STRATEGY_PROPERTY+QUANTIFIERS_OPTIONS_KEY, get(QUANTIFIERS_OPTIONS_KEY));              
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
-            p.put("[StrategyProperty]"+USER_TACLETS_OPTIONS_KEY(i), get(USER_TACLETS_OPTIONS_KEY(i)));
-        p.put("[StrategyProperty]"+INF_FLOW_CHECK_PROPERTY, get(INF_FLOW_CHECK_PROPERTY));
-        p.put("[StrategyProperty]"+STOPMODE_OPTIONS_KEY, get(STOPMODE_OPTIONS_KEY));
-        p.put("[StrategyProperty]"+RETREAT_MODE_OPTIONS_KEY, get(RETREAT_MODE_OPTIONS_KEY));
-        p.put("[StrategyProperty]"+VBT_PHASE, get(VBT_PHASE));
-        p.put("[StrategyProperty]"+AUTO_INDUCTION_OPTIONS_KEY, get(AUTO_INDUCTION_OPTIONS_KEY));
+            p.put(STRATEGY_PROPERTY+USER_TACLETS_OPTIONS_KEY(i), get(USER_TACLETS_OPTIONS_KEY(i)));
+        p.put(STRATEGY_PROPERTY+INF_FLOW_CHECK_PROPERTY, get(INF_FLOW_CHECK_PROPERTY));
+        p.put(STRATEGY_PROPERTY+STOPMODE_OPTIONS_KEY, get(STOPMODE_OPTIONS_KEY));
+        p.put(STRATEGY_PROPERTY+VBT_PHASE, get(VBT_PHASE));
+        p.put(STRATEGY_PROPERTY+AUTO_INDUCTION_OPTIONS_KEY, get(AUTO_INDUCTION_OPTIONS_KEY));
+        p.put(STRATEGY_PROPERTY+CLASS_AXIOM_OPTIONS_KEY, get(CLASS_AXIOM_OPTIONS_KEY));
         Object aliasCheckValue =  get(SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY);
         if (aliasCheckValue != null) {
-           p.put("[StrategyProperty]"+SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, aliasCheckValue);
+           p.put(STRATEGY_PROPERTY+SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, aliasCheckValue);
         }
         Object avoidBranchingValue =  get(SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY);
         if (avoidBranchingValue != null) {
-           p.put("[StrategyProperty]"+SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, avoidBranchingValue);
+           p.put(STRATEGY_PROPERTY+SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, avoidBranchingValue);
         }
     }
 

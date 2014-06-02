@@ -81,7 +81,7 @@ public class SymbolicExecutionPO extends AbstractOperationPO
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.SYMBOLIC_EXEC_WITH_PRE);
 
         // register final term
-        assignPOTerms(TB.not(symExec));
+        assignPOTerms(tb.not(symExec));
 
         // add class axioms
         final Proof initiatingProof = initiatingGoal.proof();

@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.pp;
 
@@ -18,12 +17,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.CharListLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.ldt.*;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -46,7 +41,6 @@ import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.UnicodeHelper;
-import java.io.IOException;
 
 
 /** 
@@ -145,6 +139,7 @@ public final class NotationInfo {
     static final int PRIORITY_CAST = 120;
     static final int PRIORITY_ATOM = 130;
     static final int PRIORITY_BOTTOM = 140;
+    static final int PRIORITY_LABEL = 140; // TODO: find appropriate value
 
 
     public static boolean PRETTY_SYNTAX = true;
@@ -154,7 +149,8 @@ public final class NotationInfo {
      * are printed.
      */
     public static boolean UNICODE_ENABLED = false;
-        
+    
+    public static boolean HIDE_PACKAGE_PREFIX = false;
     
     /** This maps operators and classes of operators to {@link
      * Notation}s.  The idea is that we first look whether the operator has
@@ -236,6 +232,7 @@ public final class NotationInfo {
 	tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
 	
 	tbl.put(Sort.CAST_NAME, new Notation.CastFunction("(",")",PRIORITY_CAST, PRIORITY_BOTTOM));
+	tbl.put(TermLabel.class, new Notation.LabelNotation("<<", ">>", PRIORITY_LABEL));
 	this.notationTable = tbl;
     }
         
@@ -273,19 +270,27 @@ public final class NotationInfo {
 	//heap operators
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
+	tbl.put(heapLDT.getStore(), new Notation.StoreNotation());
+        tbl.put(heapLDT.getAnon(), new Notation.HeapConstructorNotation());
+        tbl.put(heapLDT.getCreate(), new Notation.HeapConstructorNotation());
+        tbl.put(heapLDT.getMemset(), new Notation.HeapConstructorNotation());
 	tbl.put(IObserverFunction.class, new Notation.ObserverNotation());
 	tbl.put(IProgramMethod.class, new Notation.ObserverNotation());
-	tbl.put(heapLDT.getLength(), new Notation.LengthNotation());
+	tbl.put(heapLDT.getLength(), new Notation.Postfix(".length"));
+
+        // sequence operators
+        final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
+	tbl.put(seqLDT.getSeqLen(), new Notation.Postfix(".length"));
 	
 	//set operators
 	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
-	tbl.put(setLDT.getEmpty(), new Notation.Constant("{}", PRIORITY_ATOM));
 	tbl.put(setLDT.getSingleton(), new Notation.SingletonNotation());
 	tbl.put(setLDT.getUnion(), new Notation.Infix("\\cup", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
 	tbl.put(setLDT.getIntersect(), new Notation.Infix("\\cap", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
 	tbl.put(setLDT.getSetMinus(), new Notation.Infix("\\setMinus", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
 	tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation());
-    tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(setLDT.getAllFields(), new Notation.Postfix(".*"));
 	
 	//string operators
 	final CharListLDT charListLDT 
@@ -337,6 +342,7 @@ public final class NotationInfo {
         tbl.put(seqLDT.getSeqEmpty(), new Notation.Constant(""+UnicodeHelper.SEQ_SINGLETON_L+UnicodeHelper.SEQ_SINGLETON_R, PRIORITY_BOTTOM));
         tbl.put(seqLDT.getSeqSingleton(), new Notation.SeqSingletonNotation(""+UnicodeHelper.SEQ_SINGLETON_L,""+UnicodeHelper.SEQ_SINGLETON_R));
 
+        tbl.put(TermLabel.class, new Notation.LabelNotation(""+UnicodeHelper.FLQQ, ""+UnicodeHelper.FRQQ, PRIORITY_LABEL));
         this.notationTable = tbl;
     }
 
@@ -365,11 +371,14 @@ public final class NotationInfo {
 	scm = am;
     }
 
+    Notation getNotation(Class<?> c) {
+        return notationTable.get(c);
+    }
     
     /** Get the Notation for a given Operator.  
      * If no notation is registered, a Function notation is returned.
      */
-    public Notation getNotation(Operator op, Services services) {
+    Notation getNotation(Operator op) {
         Notation result = notationTable.get(op);
         if(result != null) {
             return result;

@@ -81,7 +81,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
             } else if (name.equals(AND_RIGHT_RULENAME)) {
                 RuleAppCost impLeftCost =
                         FocusIsSubFormulaOfInfFlowContractAppFeature.INSTANCE.compute(ruleApp, pio, goal);
-                return impLeftCost.add(LongRuleAppCost.create(1));
+                return impLeftCost.add(NumberRuleAppCost.create(1));
             } else {
                 return TopRuleAppCost.INSTANCE;
             }

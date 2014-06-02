@@ -13,7 +13,7 @@
    </extension>
    <extension
          id="org.key_project.key4eclipse.resources.KeYProjectBuilder"
-         name="KeYProjectBuilder"
+         name="KeY Builder"
          point="org.eclipse.core.resources.builders">
       <builder>
          <run
@@ -23,7 +23,7 @@
    <extension
          point="org.eclipse.ui.ide.projectNatureImages">
       <image
-            icon="icons/projectIcon.gif"
+            icon="icons/projectIcon.png"
             id="org.key_project.key4eclipse.resources.KeYProjectNatureImage"
             natureId="org.key_project.key4eclipse.resources.KeYProjectNature">
       </image>
@@ -35,6 +35,9 @@
       <super
             type="org.eclipse.core.resources.problemmarker">
       </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
       <persistent
             value="true">
       </persistent>
@@ -45,6 +48,9 @@
          point="org.eclipse.core.resources.markers">
       <super
             type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
       </super>
       <persistent
             value="true">
@@ -68,6 +74,9 @@
       <super
             type="org.eclipse.core.resources.problemmarker">
       </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
       <persistent
             value="true">
       </persistent>
@@ -86,5 +95,63 @@
             markerType="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker">
       </markerResolutionGenerator>
    </extension>
-
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerSeverity="0"
+            markerType="org.key_project.key4eclipse.resources.ui.marker.proofClosedMarker"
+            name="org.key_project.key4eclipse.resources.ui.marker.proofClosedMarkerAnnotationType"
+            super="org.eclipse.ui.workbench.texteditor.info">
+      </type>
+      <type
+            markerSeverity="1"
+            markerType="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker"
+            name="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarkerAnnotationType"
+            super="org.eclipse.ui.workbench.texteditor.info">
+      </type>
+      <type
+            markerSeverity="2"
+            markerType="org.key_project.key4eclipse.resources.ui.marker.cycleDetectedMarker"
+            name="org.key_project.key4eclipse.resources.ui.marker.cycleDetectedMarkerAnnotationType"
+            super="org.eclipse.ui.workbench.texteditor.error">
+      </type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="org.key_project.key4eclipse.resources.ui.marker.proofClosedMarkerAnnotationType"
+            icon="icons/keyinfo12x14.png"
+            includeOnPreferencePage="true">
+      </specification>
+      <specification
+            annotationType="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarkerAnnotationType"
+            icon="icons/keywarning12x14.png"
+            includeOnPreferencePage="true">
+      </specification>
+      <specification
+            annotationType="org.key_project.key4eclipse.resources.ui.marker.cycleDetectedMarkerAnnotationType"
+            icon="icons/keyerror12x14.png"
+            includeOnPreferencePage="true">
+      </specification>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+       <file-association
+             content-type="org.eclipse.core.runtime.xml"
+             file-extensions="proofmeta">
+       </file-association>
+   </extension>
+   <extension
+         point="org.eclipse.ui.decorators">
+      <decorator
+            adaptable="true"
+            class="org.key_project.key4eclipse.resources.decorator.ProofFolderLightweightLabelDecorator"
+            icon="icons/projectIcon.png"
+            id="org.key_project.key4eclipse.resources.proofFolderDecorator"
+            label="Proof Folders"
+            lightweight="true"
+            objectClass="org.eclipse.core.resources.IFolder"
+            state="true">
+      </decorator>
+   </extension>
 </plugin>

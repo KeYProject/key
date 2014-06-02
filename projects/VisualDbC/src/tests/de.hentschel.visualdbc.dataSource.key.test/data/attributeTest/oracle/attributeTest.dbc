@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel" driverId="de.hentschel.visualdbc.dataSource.key">
+  <types xsi:type="dbcmodel:DbcClass" name="AttributeTestParent">
+    <invariants name="JML class invariant nr 0 in AttributeTestParent" condition="!  MyClass::select(heap,&#xA;                   self,&#xA;                   AttributeTestParent::$onParentMyClass)&#xA; = null"/>
+    <invariants name="JML class invariant nr 1 in AttributeTestParent" condition="nonNull(heap,&#xA;        boolean[][]::select(heap,&#xA;                            self,&#xA;                            AttributeTestParent::$onParentBool),&#xA;        Z(1(#)))"/>
+    <invariants name="JML class invariant nr 2 in AttributeTestParent" condition="nonNull(heap,&#xA;        java.lang.String[]::select(heap,&#xA;                                   self,&#xA;                                   AttributeTestParent::$onParentStringArray),&#xA;        Z(1(#)))"/>
+    <attributes name="onParentMyClass" type="MyClass" visibility="default"/>
+    <attributes name="onParentBool" type="boolean[][]" visibility="default"/>
+    <attributes name="onParentInt" type="int" visibility="default"/>
+    <attributes name="onParentStringArray" type="java.lang.String[]" visibility="default"/>
+    <attributes name="PARENT_CONSTANT" type="int" visibility="default" static="true"/>
+    <constructors signature="AttributeTestParent()" visibility="default"/>
+    <extendsFullNames>java.lang.Object</extendsFullNames>
+  </types>
+  <types xsi:type="dbcmodel:DbcClass" name="AttributesTest" extends="//@types.0">
+    <invariants name="JML class invariant nr 3 in AttributesTest" condition="!  java.lang.String::select(heap,&#xA;                            self,&#xA;                            AttributesTest::$y)&#xA; = null"/>
+    <invariants name="JML class invariant nr 4 in AttributesTest" condition="!  boolean[]::select(heap,&#xA;                     self,&#xA;                     AttributesTest::$boolArray)&#xA; = null"/>
+    <invariants name="JML class invariant nr 5 in AttributesTest" condition="!  MyClass::select(heap,&#xA;                   self,&#xA;                   AttributesTest::$classInstance)&#xA; = null"/>
+    <invariants name="JML class invariant nr 6 in AttributesTest" condition="!  java.lang.String::select(heap,&#xA;                            self,&#xA;                            AttributesTest::$CONST)&#xA; = null"/>
+    <invariants name="JML class invariant nr 2 in AttributesTest" condition="nonNull(heap,&#xA;        java.lang.String[]::select(heap,&#xA;                                   self,&#xA;                                   AttributeTestParent::$onParentStringArray),&#xA;        Z(1(#)))"/>
+    <attributes name="x" type="int" visibility="default"/>
+    <attributes name="y" type="java.lang.String" visibility="default"/>
+    <attributes name="boolArray" type="boolean[]" visibility="default"/>
+    <attributes name="classInstance" type="MyClass" visibility="default"/>
+    <attributes name="CONST" type="java.lang.String" visibility="default"/>
+    <attributes name="counter" type="int" visibility="default" static="true"/>
+    <constructors signature="AttributesTest()" visibility="default"/>
+    <extendsFullNames>AttributeTestParent</extendsFullNames>
+  </types>
+  <types xsi:type="dbcmodel:DbcClass" name="MyClass">
+    <constructors signature="MyClass()" visibility="default"/>
+    <extendsFullNames>java.lang.Object</extendsFullNames>
+  </types>
+  <connectionSettings key="location" value="D:\Forschung\Development\KeY_Master\junit-workspace\AttributeTest_testAttributes"/>
+  <connectionSettings key="packageManagement" value="FLAT_LIST"/>
+  <connectionSettings key="packageManagementType" value="de.hentschel.visualdbc.datasource.model.DSPackageManagement"/>
+  <connectionSettings key="locationType" value="java.io.File"/>
+</dbcmodel:DbcModel>

@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.logic.op;
 
@@ -50,7 +49,6 @@ public final class LocationVariable extends ProgramVariable
     }
 
 
-
     public LocationVariable(ProgramElementName name, Sort s) {
         super(name, s, null, null, false, false, false);
     }
@@ -60,8 +58,8 @@ public final class LocationVariable extends ProgramVariable
     public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
         v.performActionOnLocationVariable(this);
     }
-    
-    
+
+
     @Override
     public UpdateableOperator rename(Name name) {
         if (getKeYJavaType() != null) {

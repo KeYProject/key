@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.smt.test;
 
@@ -34,6 +33,9 @@ import de.uka.ilkd.key.smt.SolverType;
 class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 
 
+	public long getGlobalBound(){
+		return 0;
+	}
 
     @Override
     public int getMaxConcurrentProcesses() {
@@ -58,7 +60,7 @@ class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 
     @Override
     public long getTimeout() {
-	return 5000;
+	return 300000;
     }
 
     @Override
@@ -110,6 +112,37 @@ public String getLogic() {
 
 @Override
 public boolean checkForSupport() {
+	return false;
+}
+
+@Override
+public long getIntBound() {
+	return 3;
+}
+
+@Override
+public long getHeapBound() {
+	return 3;
+}
+
+@Override
+public long getSeqBound() {
+	return 3;
+}
+
+@Override
+public long getObjectBound() {
+	return 3;
+}
+
+@Override
+public long getLocSetBound() {
+	return 3;
+}
+
+@Override
+public boolean invarianForall() {
+	// TODO Auto-generated method stub
 	return false;
 }
 

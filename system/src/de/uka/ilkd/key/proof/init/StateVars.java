@@ -10,13 +10,13 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import java.util.Iterator;
@@ -29,8 +29,6 @@ import java.util.Iterator;
  * <p/>
  */
 public class StateVars {
-
-    protected static final TermBuilder TB = TermBuilder.DF;
 
     public final ImmutableList<Term> termList;
 
@@ -182,10 +180,11 @@ public class StateVars {
                                      String postfix,
                                      Services services) {
         if (t != null) {
-            Term tWithoutLables = TB.unlabel(t);
+            final TermBuilder tb = services.getTermBuilder();
+            Term tWithoutLables = tb.unlabel(t);
             Term result =
                    newVariable(tWithoutLables, tWithoutLables.toString() + postfix, services);
-            return TB.label(result, t.getLabels());
+            return tb.label(result, t.getLabels());
         } else {
             return null;
         }
@@ -202,14 +201,15 @@ public class StateVars {
         assert t.op() instanceof ProgramVariable : "Expected a program " +
                                                    "variable.";
 
-        String newName = TB.newName(services, name);
+        final TermBuilder tb = services.getTermBuilder();
+        String newName = tb.newName(name);
         ProgramElementName pen = new ProgramElementName(newName);
         ProgramVariable progVar = (ProgramVariable) t.op();
         LocationVariable newVar = new LocationVariable(pen, progVar.getKeYJavaType(),
                                                        progVar.getContainerType(),
                                                        progVar.isStatic(), progVar.isModel());
         register(newVar, services);
-        return TB.var(newVar);
+        return tb.var(newVar);
     }
 
 
@@ -217,10 +217,11 @@ public class StateVars {
                                        String postfix,
                                        Services services) {
         if (t != null) {
-            Term tWithoutLables = TB.unlabel(t);
+            final TermBuilder tb = services.getTermBuilder();
+            Term tWithoutLables = tb.unlabel(t);
             Term result =
                    newHeapSymbol(tWithoutLables, tWithoutLables.toString() + postfix, services);
-            return TB.label(result, t.getLabels());
+            return tb.label(result, t.getLabels());
         } else {
             return null;
         }
@@ -253,9 +254,10 @@ public class StateVars {
         if (t == null) {
             return null;
         }
+        final TermBuilder tb = services.getTermBuilder();
         final Function newFunc = new Function(new Name(name), t.sort());
         register(newFunc, services);
-        return TB.func(newFunc);
+        return tb.func(newFunc);
     }
 
 
@@ -263,10 +265,11 @@ public class StateVars {
                                      String postfix,
                                      Services services) {
         if (t != null) {
-            Term tWithoutLables = TB.unlabel(t);
+            final TermBuilder tb = services.getTermBuilder();
+            Term tWithoutLables = tb.unlabel(t);
             Term result =
                    newFunction(tWithoutLables, tWithoutLables.toString() + postfix, services);
-            return TB.label(result, t.getLabels());
+            return tb.label(result, t.getLabels());
         } else {
             return null;
         }
@@ -276,8 +279,8 @@ public class StateVars {
     public static StateVars buildMethodContractPreVars(IProgramMethod pm,
                                                        KeYJavaType kjt,
                                                        Services services) {
-        ImmutableArray<ITermLabel> heapLabels =
-                new ImmutableArray<ITermLabel>(AnonHeapTermLabel.INSTANCE);
+        ImmutableArray<TermLabel> heapLabels =
+                new ImmutableArray<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL);
         return new StateVars(buildSelfVar(services, pm, kjt, ""),
                              buildParamVars(services, "", pm),
                              buildResultVar(pm, services, ""),
@@ -297,7 +300,7 @@ public class StateVars {
                              buildResultVar(pm, services, postfix),
                              buildExceptionVar(services, postfix, pm),
                              buildHeapFunc(postfix,
-                                           new ImmutableArray<ITermLabel>(),
+                                           new ImmutableArray<TermLabel>(),
                                            services),
                              preVars.mbyAtPre);
     }
@@ -364,7 +367,8 @@ public class StateVars {
         if (pm.isStatic()) {
             return null;
         }
-        Term selfVar = TB.var(TB.selfVar(services, pm, kjt, true, postfix));
+        final TermBuilder tb = services.getTermBuilder();
+        Term selfVar = tb.var(tb.selfVar(pm, kjt, true, postfix));
         register(selfVar.op(ProgramVariable.class), services);
         return selfVar;
     }
@@ -373,8 +377,9 @@ public class StateVars {
     private static ImmutableList<Term> buildParamVars(Services services,
                                                       String postfix,
                                                       IProgramMethod pm) {
+        final TermBuilder tb = services.getTermBuilder();
         ImmutableList<Term> paramVars =
-                TB.var(TB.paramVars(services, postfix, pm, true));
+                tb.var(tb.paramVars(postfix, pm, true));
         register(ops(paramVars, ProgramVariable.class), services);
         return paramVars;
     }
@@ -386,26 +391,28 @@ public class StateVars {
         if (pm.isVoid() || pm.isConstructor()) {
             return null;
         }
+        final TermBuilder tb = services.getTermBuilder();
         Term resultVar =
-                TB.var(TB.resultVar(services, "result" + postfix, pm, true));
+                tb.var(tb.resultVar("result" + postfix, pm, true));
         register(resultVar.op(ProgramVariable.class), services);
         return resultVar;
     }
 
 
     private static Term buildHeapFunc(String postfix,
-                                      ImmutableArray<ITermLabel> labels,
+                                      ImmutableArray<TermLabel> labels,
                                       Services services) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final TermBuilder tb = services.getTermBuilder();
         if ("".equals(postfix)) {
-            return TB.getBaseHeap(services);
+            return tb.getBaseHeap();
         } else {
             Name heapName = new Name("heap" + postfix);
             Function heap =
                      new Function(heapName, heapLDT.getHeap().sort());
-            Term heapFunc = TB.func(heap);
+            Term heapFunc = tb.func(heap);
             register(heap, services);
-            return TB.label(heapFunc, labels);
+            return tb.label(heapFunc, labels);
         }
     }
 
@@ -413,7 +420,8 @@ public class StateVars {
     private static Term buildExceptionVar(Services services,
                                           String postfix,
                                           IProgramMethod pm) {
-        Term excVar = TB.var(TB.excVar(services, "exc" + postfix, pm, true));
+        final TermBuilder tb = services.getTermBuilder();
+        Term excVar = tb.var(tb.excVar("exc" + postfix, pm, true));
         register(excVar.op(ProgramVariable.class), services);
         return excVar;
     }
@@ -421,13 +429,14 @@ public class StateVars {
 
     private static Term buildMbyVar(String postfix,
                                     Services services) {
+        final TermBuilder tb = services.getTermBuilder();
         final Sort intSort =
                 services.getTypeConverter().getIntegerLDT().targetSort();
-        String newName = TB.newName(services, "mbyAtPre" + postfix);
+        String newName = tb.newName("mbyAtPre" + postfix);
         final Function mbyAtPreFunc =
                 new Function(new Name(newName), intSort);
         register(mbyAtPreFunc, services);
-        return TB.func(mbyAtPreFunc);
+        return tb.func(mbyAtPreFunc);
     }
 
 
