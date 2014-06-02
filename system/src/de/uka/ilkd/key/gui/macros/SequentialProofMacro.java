@@ -35,7 +35,7 @@ import de.uka.ilkd.key.proof.Node;
  *
  * @author mattias ulbrich
  */
-public abstract class SequentialProofMacro implements ProofMacro {
+public abstract class SequentialProofMacro extends AbstractProofMacro {
 
     /**
      * The proof macros to be applied in their order.
@@ -83,16 +83,14 @@ public abstract class SequentialProofMacro implements ProofMacro {
      *             if one of the wrapped macros is interrupted.
      */
     @Override 
-    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
+    public void delegateApplyTo(KeYMediator mediator, PosInOccurrence posInOcc,
             ProverTaskListener listener) throws InterruptedException {
-
         final Node initNode = mediator.getSelectedNode();
         for (ProofMacro macro : getProofMacros()) {
             // reverse to original node
             mediator.getSelectionModel().setSelectedNode(initNode);
             macro.applyTo(mediator, posInOcc, listener);
         }
-
     }
 
     /**
