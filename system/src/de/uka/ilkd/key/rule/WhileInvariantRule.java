@@ -73,7 +73,6 @@ import de.uka.ilkd.key.speclang.LoopWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.properties.Properties.Property;
 import de.uka.ilkd.key.util.Triple;
 
 public final class WhileInvariantRule implements BuiltInRule {
@@ -457,20 +456,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         goal.proof().addIFSymbol(infData.applPredTerm);
         goal.proof().addIFSymbol(infData.infFlowApp);
         goal.proof().addGoalTemplates(infData.infFlowApp);
-    }
-
-    private static boolean isInfFlow(Goal goal) {
-        //StrategyProperties stratProps =
-        //        goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
-        Property<Boolean> ifProp = InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY;
-        //String ifStrat = StrategyProperties.INF_FLOW_CHECK_PROPERTY;
-        //String ifTrue = StrategyProperties.INF_FLOW_CHECK_TRUE;
-
-        boolean isOriginalIF =
-                (goal.getStrategyInfo(ifProp) != null && goal.getStrategyInfo(ifProp));
-        // For loaded proofs, InfFlowCheckInfo is not correct without the following
-        //boolean isLoadedIF = false; //stratProps.getProperty(ifStrat).equals(ifTrue);
-        return isOriginalIF/* || isLoadedIF*/;
     }
 
     private static InfFlowData setUpInfFlowValidityGoal(Goal infFlowGoal,
@@ -940,7 +925,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                    variantPO, bodyGoal, guardJb, guardTrueTerm,
                                    uBeforeLoopDefAnonVariant, uAnonInv);
 
-        if (isInfFlowProof(inst, goal, services)) {
+        if (InfFlowCheckInfo.isInfFlow(goal) && inst.inv.hasInfFlowSpec(services)) {
             // set up information flow validity goal
             InfFlowData infFlowData =
                     setUpInfFlowValidityGoal(bodyGoal, loopRuleApp, inst,
@@ -971,15 +956,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         return result;
     }
 
-
-private boolean isInfFlowProof(Instantiation inst,
-                               Goal goal,
-                               Services services) {
-        LoopInvariant inv = inst.inv;
-        final boolean isInfFlow = isInfFlow(goal);
-        final boolean hasIFSpecs = inv.hasInfFlowSpec(services);
-        return isInfFlow && hasIFSpecs;
-    }
 
     @Override
     public Name name() {

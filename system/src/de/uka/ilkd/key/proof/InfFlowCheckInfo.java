@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.util.properties.Properties;
+import de.uka.ilkd.key.util.properties.Properties.Property;
 
 
 /**
@@ -35,4 +36,17 @@ public class InfFlowCheckInfo {
         return goal.getStrategyInfo(INF_FLOW_CHECK_PROPERTY);
     }
 
+    public static boolean isInfFlow(Goal goal) {
+        //StrategyProperties stratProps =
+        //        goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
+        Property<Boolean> ifProp = InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY;
+        //String ifStrat = StrategyProperties.INF_FLOW_CHECK_PROPERTY;
+        //String ifTrue = StrategyProperties.INF_FLOW_CHECK_TRUE;
+
+        boolean isOriginalIF =
+                (goal.getStrategyInfo(ifProp) != null && goal.getStrategyInfo(ifProp));
+        // For loaded proofs, InfFlowCheckInfo is not correct without the following
+        //boolean isLoadedIF = false; //stratProps.getProperty(ifStrat).equals(ifTrue);
+        return isOriginalIF/* || isLoadedIF*/;
+    }
 }

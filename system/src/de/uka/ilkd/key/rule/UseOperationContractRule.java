@@ -81,7 +81,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.properties.Properties.Property;
 
 
 /**
@@ -447,22 +446,6 @@ public final class UseOperationContractRule implements BuiltInRule {
 	return result;
     }
 
-
-    private static boolean isInfFlow(Goal goal) {
-        //StrategyProperties stratProps =
-        //        goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
-        Property<Boolean> ifProp = InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY;
-        //String ifStrat = StrategyProperties.INF_FLOW_CHECK_PROPERTY;
-        //String ifTrue = StrategyProperties.INF_FLOW_CHECK_TRUE;
-
-        boolean isOriginalIF =
-                (goal.getStrategyInfo(ifProp) != null && goal.getStrategyInfo(ifProp));
-        // For loaded proofs, InfFlowCheckInfo is not correct without the following
-        //boolean isLoadedIF = false; //stratProps.getProperty(ifStrat).equals(ifTrue);
-        return isOriginalIF/* || isLoadedIF*/;
-    }
-
-
     private static void applyInfFlow(Goal goal,
                                      final FunctionalOperationContract contract,
                                      final Instantiation inst,
@@ -475,7 +458,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                      final Term finalPreTerm,
                                      final ImmutableList<AnonUpdateData> anonUpdateDatas,
                                      Services services) {
-        if (!isInfFlow(goal)) {
+        if (!InfFlowCheckInfo.isInfFlow(goal)) {
             return;
         }
 
@@ -855,7 +838,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	}
 
         Term finalPreTerm;
-        if(!isInfFlow(goal)) {
+        if(!InfFlowCheckInfo.isInfFlow(goal)) {
             final ContractPO po
                     = services.getSpecificationRepository()
                               .getPOForProof(goal.proof());
