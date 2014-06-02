@@ -60,7 +60,9 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
     @Override
     protected Void doInBackground() throws Exception {
         try {
-            macro.applyTo(mediator, posInOcc, mediator.getUI());
+            synchronized(macro) {
+                macro.applyTo(mediator, posInOcc, mediator.getUI());
+            }
         } catch (final InterruptedException exception) {
             Debug.out("Proof macro has been interrupted:");
             Debug.out(exception);
