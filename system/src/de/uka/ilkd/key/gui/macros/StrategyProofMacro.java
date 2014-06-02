@@ -40,7 +40,7 @@ import de.uka.ilkd.key.strategy.Strategy;
  * @see ProverTaskListener
  * @see Strategy
  */
-public abstract class StrategyProofMacro implements ProofMacro {
+public abstract class StrategyProofMacro extends AbstractProofMacro {
 
     protected abstract Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc);
 
@@ -66,7 +66,7 @@ public abstract class StrategyProofMacro implements ProofMacro {
      * If the automation is interrupted, report the interruption as an exception.
      */
     @Override 
-    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
+    public void delegateApplyTo(KeYMediator mediator, PosInOccurrence posInOcc,
             ProverTaskListener listener) throws InterruptedException {
 
         final ApplyStrategy applyStrategy = 
@@ -116,7 +116,9 @@ public abstract class StrategyProofMacro implements ProofMacro {
         }
         
         if(applyStrategy.hasBeenInterrupted()) {
-            throw new InterruptedException();
+            synchronized(applyStrategy) { // wait for applyStrategy to finish it last rule application
+                throw new InterruptedException();
+            }
         }
 
     }

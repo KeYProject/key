@@ -19,16 +19,15 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left
@@ -41,7 +40,7 @@ import de.uka.ilkd.key.ui.UserInterface;
  *
  * @author mattias ulbrich
  */
-public class TryCloseMacro implements ProofMacro {
+public class TryCloseMacro extends AbstractProofMacro {
 
     /**
      * The max number of steps to be applied.
@@ -96,7 +95,7 @@ public class TryCloseMacro implements ProofMacro {
      * Run the automation on the goals. Retreat if not successful.
      */
     @Override 
-    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
+    public void delegateApplyTo(KeYMediator mediator, PosInOccurrence posInOcc,
             ProverTaskListener listener) throws InterruptedException {
 
         //
@@ -155,7 +154,9 @@ public class TryCloseMacro implements ProofMacro {
 
                 // only now reraise the interruption exception
                 if(applyStrategy.hasBeenInterrupted()) {
-                    throw new InterruptedException();
+                    synchronized(applyStrategy) { // wait for applyStrategy to finish it last rule application
+                        throw new InterruptedException();
+                    }
                 }
 
             }

@@ -15,6 +15,7 @@ package de.uka.ilkd.key.gui.macros;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.util.Debug;
+
 import javax.swing.SwingWorker;
 
 /**
@@ -77,8 +78,10 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
 
     @Override
     protected void done() {
-        mediator.setInteractive(true);
-        mediator.startInterface(true);
-        mediator.removeInterruptedListener(this);
+        synchronized(macro) {
+            mediator.setInteractive(true);
+            mediator.startInterface(true);
+            mediator.removeInterruptedListener(this);
+        }
     }
 }
