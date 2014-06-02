@@ -33,6 +33,8 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaProject;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuilder;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
@@ -124,6 +126,12 @@ public class KeY4EclipseResourcesTestUtil {
       return oldEnabled;
    }
    
+   public static boolean isAutoBuilding(){
+      IWorkspace workspace = ResourcesPlugin.getWorkspace();
+      IWorkspaceDescription desc = workspace.getDescription();
+      return desc.isAutoBuilding(); 
+   }
+   
    
    /**
     * Runs an {@link IncrementalProjectBuilder}s INCREMENTAL_BUILD for the given {@link IProject} and waits for the build to finish.
@@ -132,7 +140,20 @@ public class KeY4EclipseResourcesTestUtil {
     */
    public static void build(IProject project) throws CoreException{
       project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
-      TestUtilsUtil.waitForBuild();
+      IJobManager jobMan = Job.getJobManager();
+      Job[] jobs = jobMan.find("KeYProjectBuildJob");
+      if (jobs != null) {
+         for (Job job : jobs) {
+             TestUtilsUtil.waitForJob(job);
+         }
+      }
+      project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
+      jobs = jobMan.find("KeYProjectBuildJob");
+      if (jobs != null) {
+         for (Job job : jobs) {
+             TestUtilsUtil.waitForJob(job);
+         }
+      }
    }
    
    public static void cleanBuild(IProject project) throws CoreException{

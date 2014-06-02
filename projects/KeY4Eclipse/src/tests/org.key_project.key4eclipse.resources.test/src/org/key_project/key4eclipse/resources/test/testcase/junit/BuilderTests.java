@@ -20,7 +20,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.jobs.Job;
 import org.junit.Test;
 import org.key_project.key4eclipse.resources.test.Activator;
 import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
@@ -579,7 +581,7 @@ public class BuilderTests extends AbstractResourceTest {
       assertTrue(proofFolder.exists());
       assertTrue(proofFile.exists());
       assertTrue(metaFile.exists());
-      
+
       if(proofDeleted){
          proofFile.delete(IResource.FORCE, null);
          assertTrue(!proofFile.exists());

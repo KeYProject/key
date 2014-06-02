@@ -17,7 +17,7 @@ public class KeYProjectBuildJob extends Job{
    
    @Override
    public boolean belongsTo(Object family) {
-      return "KeYResourcesBuildJob".equals(family);
+      return "KeYProjectBuildJob".equals(family);
    }
 
    @Override

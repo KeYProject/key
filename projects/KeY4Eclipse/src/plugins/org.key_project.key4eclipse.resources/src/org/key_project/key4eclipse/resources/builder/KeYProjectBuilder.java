@@ -54,7 +54,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
          KeYProjectDelta keyDelta = deltaManager.getDelta(project);
          if(keyDelta.isBuildRequired()){
             IJobManager jobMan = Job.getJobManager();
-            Job[] jobs = jobMan.find("KeYResourcesBuildJob");
+            Job[] jobs = jobMan.find("KeYProjectBuildJob");
    
             if(KeYProjectProperties.isEnableAutoInterruptBuild(project)){
                for(Job job : jobs){
