@@ -86,11 +86,13 @@ public final class SideProofStore {
     * @param proof The {@link Proof} to add.
     */
    public void addProof(String description, Proof proof) {
-      if (!containsEntry(proof)) {
-         Entry entry = new Entry(description, proof);
-         ProofUserManager.getInstance().addUser(entry.getProof(), entry.getEnvironment(), this);
-         entries.add(entry);
-         fireEntriesAdded(new SideProofStoreEvent(this, new Entry[] {entry}));
+      synchronized (entries) {
+         if (!containsEntry(proof)) {
+            Entry entry = new Entry(description, proof);
+            ProofUserManager.getInstance().addUser(entry.getProof(), entry.getEnvironment(), this);
+            entries.add(entry);
+            fireEntriesAdded(new SideProofStoreEvent(this, new Entry[] {entry}));
+         }
       }
    }
    
@@ -99,11 +101,13 @@ public final class SideProofStore {
     * @param entries The {@link Entry}s to remove.
     */
    public void removeEntries(Collection<Entry> entries) {
-      if (this.entries.removeAll(entries)) {
-         for (Entry entry : entries) {
-            ProofUserManager.getInstance().removeUserAndDispose(entry.getProof(), this);
+      synchronized (entries) {
+         if (this.entries.removeAll(entries)) {
+            for (Entry entry : entries) {
+               ProofUserManager.getInstance().removeUserAndDispose(entry.getProof(), this);
+            }
+            fireEntriesRemoved(new SideProofStoreEvent(this, entries.toArray(new Entry[entries.size()])));
          }
-         fireEntriesRemoved(new SideProofStoreEvent(this, entries.toArray(new Entry[entries.size()])));
       }
    }
    
