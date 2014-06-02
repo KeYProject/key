@@ -602,9 +602,11 @@ public class InteractiveProver implements InterruptListener {
                 // when the user canceled it's not an error
             }
 
-            mediator().setInteractive(true);
-            mediator().startInterface(true);
-
+            synchronized(applyStrategy) {
+                // wait for apply Strategy to terminate
+                mediator().setInteractive(true);
+                mediator().startInterface(true);
+            }
             // make it possible to free memory
             worker = null;
         }
