@@ -180,7 +180,8 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
                                                                           StrategyProperties.METHOD_NONE,
                                                                           StrategyProperties.LOOP_NONE,
                                                                           StrategyProperties.QUERY_OFF,
-                                                                          StrategyProperties.SPLITTING_DELAYED);
+                                                                          StrategyProperties.SPLITTING_DELAYED,
+                                                                          true);
       try {
          List<ExecutionValue> result = new ArrayList<ExecutionValue>(info.getProof().openGoals().size());
          // Group values of the branches

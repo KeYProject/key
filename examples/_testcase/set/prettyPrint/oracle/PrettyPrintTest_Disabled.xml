@@ -15,7 +15,7 @@
             </value>
          </variable>
          <callStackEntry path="/0"/>
-         <branchCondition name="geq(x,Z(0(#)))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="geq(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+         <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <callStackEntry path="/0"/>
             <statement name="return magic();" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false">
                <variable name="x" arrayIndex="-1" isArrayIndex="false">
@@ -63,7 +63,7 @@ termination: diamond" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged
                </operationContract>
             </statement>
          </branchCondition>
-         <branchCondition name="leq(x,Z(neglit(1(#))))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="leq(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+         <branchCondition name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <callStackEntry path="/0"/>
             <loopInvariant name="invariant: x &lt;= javaUnaryMinusInt(1);
 variant: javaSubInt(0, x)
@@ -77,7 +77,7 @@ mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initially
                   </value>
                </variable>
                <callStackEntry path="/0"/>
-               <branchCondition name="leq(x_0,Z(neglit(2(#))))" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(x_0,Z(neglit(2(#)))))" pathConditionChanged="true" branchCondition="leq(x_0,Z(neglit(2(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+               <branchCondition name="lt(x_0,Z(neglit(1(#))))" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(x_0,Z(neglit(2(#)))))" pathConditionChanged="true" branchCondition="lt(x_0,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <callStackEntry path="/0"/>
                   <statement name="x++;" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(x_0,Z(neglit(2(#)))))" pathConditionChanged="false">
                      <variable name="x" arrayIndex="-1" isArrayIndex="false">
