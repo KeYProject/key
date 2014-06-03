@@ -104,6 +104,13 @@
                   type="org.eclipse.debug.internal.ui.viewers.model.provisional.IElementLabelProvider">
             </adapter>
          </factory>
+         <factory
+               adaptableType="org.key_project.sed.core.model.ISEDDebugTarget"
+               class="org.key_project.sed.ui.adapter.SEDDebugTargetModelProxyFactoryAdapterFactory">
+            <adapter
+                  type="org.eclipse.debug.internal.ui.viewers.model.provisional.IModelProxyFactory">
+            </adapter>
+         </factory>
       </extension>
       <extension
           point="org.eclipse.ui.views.properties.tabbed.propertyContributor">

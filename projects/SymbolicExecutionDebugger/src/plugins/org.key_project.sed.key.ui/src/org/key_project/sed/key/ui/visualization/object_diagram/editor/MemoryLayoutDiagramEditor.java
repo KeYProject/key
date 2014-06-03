@@ -50,7 +50,7 @@ import org.key_project.sed.ui.visualization.util.EmptyDiagramPersistencyBehavior
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.NonPersistableDiagramEditorInput;
 import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.eclipse.job.AbstractWorkbenchPartJob;
+import org.key_project.util.eclipse.job.AbstractDependingOnObjectJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
 
@@ -181,7 +181,7 @@ public class MemoryLayoutDiagramEditor extends ReadonlyObjectDiagramEditor {
       SWTUtil.setText(equivalenceClassesText, null);
       if (node != null && node.getExecutionNode() instanceof IExecutionStateNode<?>) {
          this.node = (IExecutionStateNode<?>)node.getExecutionNode();
-         new AbstractWorkbenchPartJob("Computing memory layouts.", this) {
+         new AbstractDependingOnObjectJob("Computing memory layouts.", this) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                try {
@@ -229,7 +229,7 @@ public class MemoryLayoutDiagramEditor extends ReadonlyObjectDiagramEditor {
     * @param initial The memory layout mode ({@code true} = initial, {@code false} = current).
     */
    protected void showLayout(final int index, final boolean initial) {
-      new AbstractWorkbenchPartJob("Show " + (initial ? "initial" : "current") + " memory layout " + index + ".", this) {
+      new AbstractDependingOnObjectJob("Show " + (initial ? "initial" : "current") + " memory layout " + index + ".", this) {
          @Override
          protected IStatus run(IProgressMonitor monitor) {
             try {

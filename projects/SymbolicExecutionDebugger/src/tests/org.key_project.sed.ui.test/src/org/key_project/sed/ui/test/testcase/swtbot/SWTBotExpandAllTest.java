@@ -40,7 +40,7 @@ public class SWTBotExpandAllTest extends AbstractSetupTestCase {
          TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Select debug target to expand
          SWTBotTreeItem targetItem = TestUtilsUtil.selectInTree(debugTree, 0, 0);
-         assertFalse(targetItem.isExpanded());
+         targetItem.collapse();
          // Expand all
          TestUtilsUtil.clickContextMenu(debugTree, "Expand All");
          TestUtilsUtil.waitUntilExpanded(bot, targetItem);

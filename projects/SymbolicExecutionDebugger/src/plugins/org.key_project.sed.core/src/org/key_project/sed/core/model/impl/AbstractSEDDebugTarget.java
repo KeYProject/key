@@ -38,12 +38,16 @@ import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDTermination;
+import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.event.ISEDAnnotationListener;
 import org.key_project.sed.core.model.event.SEDAnnotationEvent;
 import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
 import org.key_project.sed.core.util.ISEDIterator;
+import org.key_project.sed.core.util.LogUtil;
 import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 
 /**
@@ -68,11 +72,6 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     * Indicates that the connection to the process is disconnected or not.
     */
    private boolean disconnected = false;
-   
-   /**
-    * Indicates that the process is currently suspended or not.
-    */
-   private boolean suspended = true;
 
    /**
     * Indicates that the process is termianted or not.
@@ -237,7 +236,38 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public boolean isSuspended() {
-      return suspended;
+      try {
+         return ArrayUtil.search(getSymbolicThreads(), new IFilter<ISEDThread>() {
+            @Override
+            public boolean select(ISEDThread element) {
+               return !element.isSuspended();
+            }
+         }) == null;
+      }
+      catch (DebugException e) {
+         LogUtil.getLogger().logError(e);
+         return false;
+      }
+   }
+   
+   /**
+    * This method should be called after an {@link ISEDThread} is resumed.
+    * @param thread The resumed {@link ISEDThread}.
+    */
+   public void threadResumed(ISEDThread thread) {
+      if (!isSuspended()) {
+         fireResumeEvent(DebugEvent.CLIENT_REQUEST);
+      }
+   }
+   
+   /**
+    * This method should be called after an {@link ISEDThread} is suspended.
+    * @param thread The suspended {@link ISEDThread}.
+    */
+   public void threadSuspended(ISEDThread thread) {
+      if (isSuspended()) {
+         fireSuspendEvent(DebugEvent.CLIENT_REQUEST);
+      }
    }
 
    /**
@@ -245,8 +275,11 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public void resume() throws DebugException {
-      suspended = false;
-      fireResumeEvent(DebugEvent.RESUME);
+      ISEDThread[] threads = getSymbolicThreads();
+      for (ISEDThread thread : threads) {
+         thread.resume();
+      }
+      fireResumeEvent(DebugEvent.CLIENT_REQUEST);
    }
 
    /**
@@ -254,8 +287,11 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public void suspend() throws DebugException {
-      suspended = true;
-      fireSuspendEvent(DebugEvent.SUSPEND);
+      ISEDThread[] threads = getSymbolicThreads();
+      for (ISEDThread thread : threads) {
+         thread.suspend();
+      }
+      fireSuspendEvent(DebugEvent.CLIENT_REQUEST);
    }
 
    /**

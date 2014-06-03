@@ -17,10 +17,12 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.swt.widgets.Event;
+import org.key_project.keyide.ui.editor.BuiltInRuleCommandContributionItem;
 import org.key_project.keyide.ui.editor.TacletCommandContributionItem;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -34,11 +36,25 @@ public class ApplyRuleHandler extends AbstractHandler {
     */
    @Override
    public Object execute(ExecutionEvent event) throws ExecutionException {
-      TacletCommandContributionItem item = (TacletCommandContributionItem)((Event)event.getTrigger()).widget.getData();
-      TacletApp app = item.getTacletApp();
-      KeYMediator mediator = item.getMediator();
-      PosInSequent pos = item.getPosInSequent();
-      mediator.selectedTaclet(app, pos);
+      Object trigger = event.getTrigger();
+      if (trigger instanceof Event) {
+         Event swtEvent = (Event)trigger;
+         Object data = swtEvent.widget.getData();
+         if (data instanceof TacletCommandContributionItem) {
+            TacletCommandContributionItem item = (TacletCommandContributionItem)data;
+            TacletApp app = item.getTacletApp();
+            KeYMediator mediator = item.getMediator();
+            PosInSequent pos = item.getPosInSequent();
+            mediator.selectedTaclet(app, pos);
+         }
+         else if (data instanceof BuiltInRuleCommandContributionItem) {
+            BuiltInRuleCommandContributionItem item = (BuiltInRuleCommandContributionItem)data;
+            BuiltInRule rule = item.getRule();
+            KeYMediator mediator = item.getMediator();
+            PosInSequent pos = item.getPosInSequent();
+            mediator.selectedBuiltInRule(rule, pos.getPosInOccurrence(), false);
+         }
+      }
       return null;
    }
 }

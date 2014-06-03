@@ -840,7 +840,7 @@ public class SEDXMLReader {
     * @return The created {@link SEDMemoryThread}.
     */   
    protected SEDMemoryThread createThread(ISEDDebugTarget target, String uri, String localName, String qName, Attributes attributes) {
-      SEDMemoryThread thread = new SEDMemoryThread(target);
+      SEDMemoryThread thread = new SEDMemoryThread(target, executable);
       fillDebugNode(thread, attributes);
       return thread;
    }

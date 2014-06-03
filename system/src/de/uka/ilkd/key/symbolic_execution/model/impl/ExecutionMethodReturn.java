@@ -271,7 +271,8 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                                                                                 StrategyProperties.METHOD_NONE,
                                                                                 StrategyProperties.LOOP_NONE,
                                                                                 StrategyProperties.QUERY_OFF,
-                                                                                StrategyProperties.SPLITTING_NORMAL);
+                                                                                StrategyProperties.SPLITTING_NORMAL,
+                                                                                true);
             try {
                if (info.getProof().openGoals().size() == 1) {
                   Goal goal = info.getProof().openGoals().head();

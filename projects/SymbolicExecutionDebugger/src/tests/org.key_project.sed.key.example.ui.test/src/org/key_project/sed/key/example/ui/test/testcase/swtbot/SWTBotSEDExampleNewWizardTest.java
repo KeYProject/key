@@ -211,7 +211,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
          TestUtilsUtil.unifyLineBreaks(project, "java");
          // Test opened editor
          SWTBotEditor editor = bot.activeEditor();
-         assertEquals(project.getFile(new Path("src/example1/Number.java")), editor.getReference().getEditorInput().getAdapter(IFile.class));
+         assertEquals(project.getFile(new Path("Readme.txt")), editor.getReference().getEditorInput().getAdapter(IFile.class));
          editor.close();
          // Do test
          steps.doTest(javaProject);

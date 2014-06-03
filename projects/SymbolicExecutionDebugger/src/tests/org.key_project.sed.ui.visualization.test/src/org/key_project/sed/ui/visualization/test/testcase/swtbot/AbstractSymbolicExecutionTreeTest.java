@@ -16,6 +16,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.test.Activator;
@@ -117,6 +118,8 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
             public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
                try {
                   testSteps.init(bot, project, setFile, debugView, debugTree, launch, target);
+                  // Select debug target
+                  TestSedCoreUtil.selectInDebugTree(debugView, 0, 0);
                   // Wait until diagram is completely constructed
                   TestUtilsUtil.openView(ExecutionTreeView.VIEW_ID);
                   TestUtilsUtil.waitForJobs();

@@ -37,7 +37,7 @@ import org.eclipse.graphiti.ui.internal.action.AbstractPreDefinedAction;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchPart;
-import org.key_project.util.eclipse.job.AbstractWorkbenchPartJob;
+import org.key_project.util.eclipse.job.AbstractDependingOnObjectJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
 import org.key_project.util.eclipse.view.editorInView.GlobalEnablementWrapperAction;
@@ -115,7 +115,7 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
    public void executeFeatureInJob(String jobName, 
                                    final IFeature feature, 
                                    final IContext context) {
-      new AbstractWorkbenchPartJob(jobName, this) {
+      new AbstractDependingOnObjectJob(jobName, this) {
          @Override
          protected IStatus run(IProgressMonitor monitor) {
             try {

@@ -42,7 +42,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * Provides utility method to work with starts registered via extension points.
@@ -379,7 +378,7 @@ public final class StarterUtil {
     */
    public static void openProofStarter(Shell parentShell, 
                                        Proof proof, 
-                                       KeYEnvironment<CustomConsoleUserInterface> environment, 
+                                       KeYEnvironment<?> environment, 
                                        IMethod method,
                                        boolean canStartAutomode,
                                        boolean canApplyRules,

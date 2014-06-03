@@ -20,15 +20,13 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IPageLayout;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.eclipse.job.AbstractWorkbenchPartJob;
+import org.key_project.util.eclipse.job.AbstractDependingOnObjectJob;
+import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
  * An {@link ISection} implementation to show statistics of an {@link ISEDDebugTarget}.
@@ -79,11 +77,10 @@ public class StatisticsPropertySection extends AbstractSEDDebugTargetPropertySec
       final ISEDDebugTarget target = getDebugTarget();
       if (target != null) {
          showLabel("Please wait until statisitcs are computed.");
-         IWorkbenchPart parentPart = WorkbenchUtil.findView(IPageLayout.ID_PROP_SHEET);
-         AbstractWorkbenchPartJob.cancelJobs(parentPart);
-         Job job = new AbstractWorkbenchPartJob("Computing statistics", parentPart) {
+         AbstractDependingOnObjectJob.cancelJobs(this);
+         Job job = new AbstractDependingOnObjectJob("Computing statistics", this) {
             @Override
-            protected IStatus run(IProgressMonitor monitor) {
+            protected IStatus run(final IProgressMonitor monitor) {
                try {
                   Map<String, String> statistics;
                   try {
@@ -94,20 +91,23 @@ public class StatisticsPropertySection extends AbstractSEDDebugTargetPropertySec
                      statistics.put("Error", e.getMessage());
                   }
                   final Map<String, String> statisticsToShow = statistics;
+                  SWTUtil.checkCanceled(monitor);
                   containerComposite.getDisplay().asyncExec(new Runnable() {
                      @Override
                      public void run() {
-                        recreateContent(statisticsToShow);
+                        if (!monitor.isCanceled()) {
+                           recreateContent(statisticsToShow);
+                        }
                      }
                   });
                   return Status.OK_STATUS;
                }
                catch (OperationCanceledException e) {
-                  showLabel("Statisitcs computation canceled.");
                   return Status.CANCEL_STATUS;
                }
             }
          };
+         job.setSystem(true);
          job.schedule();
       }
       else {

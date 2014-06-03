@@ -19,7 +19,6 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDBranchStatement;
-import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDBranchStatement;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
@@ -69,19 +68,27 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param parent The parent in that this node is contained as child.
-    * @param thread The {@link ISEDThread} in that this node is contained.
+    * @param thread The {@link KeYThread} in that this node is contained.
     * @param executionNode The {@link IExecutionBranchStatement} to represent by this debug node.
     */
    public KeYBranchStatement(KeYDebugTarget target, 
                              IKeYSEDDebugNode<?> parent, 
-                             ISEDThread thread, 
+                             KeYThread thread, 
                              IExecutionBranchStatement executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
       initializeAnnotations();
    }
-   
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYThread getThread() {
+      return (KeYThread)super.getThread();
+   }
+
    /**
     * {@inheritDoc}
     */
@@ -237,7 +244,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public boolean canStepInto() {
-      return getDebugTarget().canStepInto(this);
+      return getThread().canStepInto(this);
    }
 
    /**
@@ -245,7 +252,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public void stepInto() throws DebugException {
-      getDebugTarget().stepInto(this);
+      getThread().stepInto(this);
    }
 
    /**
@@ -253,7 +260,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public boolean canStepOver() {
-      return getDebugTarget().canStepOver(this);
+      return getThread().canStepOver(this);
    }
 
    /**
@@ -261,7 +268,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public void stepOver() throws DebugException {
-      getDebugTarget().stepOver(this);
+      getThread().stepOver(this);
    }
 
    /**
@@ -269,7 +276,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public boolean canStepReturn() {
-      return getDebugTarget().canStepReturn(this);
+      return getThread().canStepReturn(this);
    }
 
    /**
@@ -277,7 +284,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public void stepReturn() throws DebugException {
-      getDebugTarget().stepReturn(this);
+      getThread().stepReturn(this);
    }
    
    /**
@@ -285,7 +292,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public boolean canResume() {
-      return getDebugTarget().canResume(this);
+      return getThread().canResume(this);
    }
    
    /**
@@ -293,7 +300,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public void resume() throws DebugException {
-      getDebugTarget().resume(this);
+      getThread().resume(this);
    }
 
    /**
@@ -301,7 +308,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public boolean canSuspend() {
-      return getDebugTarget().canSuspend(this);
+      return getThread().canSuspend(this);
    }
 
    /**
@@ -309,7 +316,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public void suspend() throws DebugException {
-      getDebugTarget().suspend(this);
+      getThread().suspend(this);
    }
 
    /**
