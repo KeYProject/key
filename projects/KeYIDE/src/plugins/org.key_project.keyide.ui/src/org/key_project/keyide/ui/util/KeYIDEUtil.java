@@ -152,7 +152,7 @@ public final class KeYIDEUtil {
     * @param method An optional {@link IMethod} from which the {@link Proof} was started.
     * @throws PartInitException Occurred Exception.
     */
-   public static void openEditor(Contract contract, KeYEnvironment<CustomConsoleUserInterface> environment, IMethod method)throws PartInitException{
+   public static void openEditor(Contract contract, KeYEnvironment<?> environment, IMethod method)throws PartInitException{
       Assert.isNotNull(contract);
       Assert.isNotNull(environment);
       ProofOblInput problem = contract.createProofObl(environment.getInitConfig(), contract);
