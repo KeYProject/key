@@ -61,7 +61,7 @@ import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -203,7 +203,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
     
     protected SymbolicExecutionEnvironment<?> instantiateProofWithoutUserInterface(String launchConfigurationName,
                                                                                    KeYLaunchSettings settings) throws Exception {
-       UserInterface ui = new CustomConsoleUserInterface(false);
+       UserInterface ui = new CustomUserInterface(false);
        return instantiateProof(ui, launchConfigurationName, settings);
     }
     

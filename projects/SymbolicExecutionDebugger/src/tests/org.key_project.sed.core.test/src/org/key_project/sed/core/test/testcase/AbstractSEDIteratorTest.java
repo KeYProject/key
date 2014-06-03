@@ -390,7 +390,7 @@ public abstract class AbstractSEDIteratorTest extends AbstractSetupTestCase {
     * @return The instantiated {@link SEDMemoryThread}.
     */
    protected static SEDMemoryThread appendThread(SEDMemoryDebugTarget target, String name) {
-      SEDMemoryThread thread = new SEDMemoryThread(target);
+      SEDMemoryThread thread = new SEDMemoryThread(target, false);
       thread.setName(name);
       target.addSymbolicThread(thread);
       return thread;

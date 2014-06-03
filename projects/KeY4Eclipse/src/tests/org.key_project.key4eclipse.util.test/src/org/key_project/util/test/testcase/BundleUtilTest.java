@@ -21,6 +21,7 @@ import java.io.InputStream;
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -28,6 +29,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -302,6 +304,16 @@ public class BundleUtilTest extends TestCase {
       catch (CoreException e) {
           assertEquals("No target is defined.", e.getMessage());
       }
+      // Test single file
+      IProject project4 = TestUtilsUtil.createProject("BundleUtilTest_testExtractFromBundleToWorkspace_4");
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/extractTest/File.txt", project4);
+      IFile singleFile = project4.getFile("File.txt");
+      assertTrue(singleFile.exists());
+      assertEquals(IOUtil.readFrom(BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/extractTest/File.txt")), ResourceUtil.readFrom(singleFile));
+      // Test not existing file
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/extractTest/NotExistingFile.txt", project4);
+      IFile notExistingFile = project4.getFile("NotExistingFile.txt");
+      assertTrue(notExistingFile == null || !notExistingFile.exists());
    }
 
    /**

@@ -58,7 +58,7 @@ import org.key_project.sed.ui.visualization.util.EmptyDiagramPersistencyBehavior
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.sed.ui.visualization.util.VisualizationPreferences;
-import org.key_project.util.eclipse.job.AbstractWorkbenchPartJob;
+import org.key_project.util.eclipse.job.AbstractDependingOnObjectJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
 
@@ -267,8 +267,8 @@ public class ExecutionTreeDiagramBehavior extends DiagramBehavior {
       boolean updateRequired = false;
       int i = 0;
       while (!updateRequired && i < events.length) {
-         if (DebugEvent.SUSPEND == events[i].getDetail() ||
-             DebugEvent.SUSPEND == events[i].getDetail()) {
+         if (DebugEvent.SUSPEND == events[i].getKind() ||
+             DebugEvent.SUSPEND == events[i].getKind()) {
             if (events[i].getSource() instanceof IDebugElement) {
                IDebugTarget target = ((IDebugElement)events[i].getSource()).getDebugTarget();
                if (target instanceof ISEDDebugTarget) {
@@ -281,8 +281,8 @@ public class ExecutionTreeDiagramBehavior extends DiagramBehavior {
       // Update diagram content if required.
       if (updateRequired) {
          // Do an asynchronous update in the UI thread (same behavior as DomainModelChangeListener which is responsible for changes in EMF objects)
-         AbstractWorkbenchPartJob.cancelJobs(diagramEditor);
-         new AbstractWorkbenchPartJob("Updating Symbolic Execution Tree", diagramEditor) {
+         AbstractDependingOnObjectJob.cancelJobs(this);
+         new AbstractDependingOnObjectJob("Updating Symbolic Execution Tree", this) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                return updateDiagramInJob(monitor);

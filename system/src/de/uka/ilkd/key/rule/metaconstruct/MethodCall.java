@@ -144,7 +144,7 @@ public class MethodCall extends ProgramTransformer {
                 (execContext.getTypeReference().getKeYJavaType());
 	    return st; 	
 	} else {
-	    throw new de.uka.ilkd.key.util.NotSupported
+	    throw new IllegalArgumentException
 		("Unsupported method invocation mode\n"+
 		 refPrefix.getClass());
 	}			    

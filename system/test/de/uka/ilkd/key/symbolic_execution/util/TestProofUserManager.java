@@ -17,7 +17,7 @@ import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Tests for {@link ProofUserManager}.
@@ -39,9 +39,9 @@ public class TestProofUserManager extends TestCase {
       Object firstUser = new Object();
       Object secondUser = new Object();
       Object thirdUser = new Object();
-      CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
-      KeYEnvironment<?> firstEnv = new KeYEnvironment<CustomConsoleUserInterface>(ui, null);
-      KeYEnvironment<?> secondEnv = new KeYEnvironment<CustomConsoleUserInterface>(ui, null);
+      CustomUserInterface ui = new CustomUserInterface(false);
+      KeYEnvironment<?> firstEnv = new KeYEnvironment<CustomUserInterface>(ui, null);
+      KeYEnvironment<?> secondEnv = new KeYEnvironment<CustomUserInterface>(ui, null);
       // Add firstProof with firstEnv
       ProofUserManager.getInstance().addUser(firstProof, firstEnv, firstUser);
       assertProofsAndEnvironments(firstProof, secondProof, thirdProof, false, false, false, new Object[] {firstUser}, new Object[] {}, new Object[] {}, firstEnv, false, new Proof[] {firstProof}, secondEnv, false, new Proof[] {});

@@ -26,7 +26,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * <p>
@@ -50,7 +50,7 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
       IKeYEditorTestSteps steps = new IKeYEditorTestSteps() {
          @Override
          public void test(IJavaProject project, 
-                          KeYEnvironment<CustomConsoleUserInterface> environment, 
+                          KeYEnvironment<CustomUserInterface> environment, 
                           Proof proof, 
                           SWTWorkbenchBot bot, 
                           SWTBotEditor editor, 
@@ -100,7 +100,7 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
       IKeYEditorTestSteps steps = new IKeYEditorTestSteps() {
          @Override
          public void test(IJavaProject project, 
-                          KeYEnvironment<CustomConsoleUserInterface> environment, 
+                          KeYEnvironment<CustomUserInterface> environment, 
                           Proof proof, 
                           SWTWorkbenchBot bot, 
                           SWTBotEditor editor, 
@@ -149,7 +149,7 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
       IKeYEditorTestSteps steps = new IKeYEditorTestSteps() {
          @Override
          public void test(IJavaProject project, 
-                          KeYEnvironment<CustomConsoleUserInterface> environment, 
+                          KeYEnvironment<CustomUserInterface> environment, 
                           Proof proof, 
                           SWTWorkbenchBot bot, 
                           SWTBotEditor editor, 
@@ -216,7 +216,7 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
       IKeYEditorTestSteps steps = new IKeYEditorTestSteps() {
          @Override
          public void test(IJavaProject project, 
-                          KeYEnvironment<CustomConsoleUserInterface> environment, 
+                          KeYEnvironment<CustomUserInterface> environment, 
                           Proof proof, 
                           SWTWorkbenchBot bot, 
                           SWTBotEditor editor, 

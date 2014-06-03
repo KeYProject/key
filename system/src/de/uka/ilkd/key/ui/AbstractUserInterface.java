@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.ui;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.List;
 
@@ -32,13 +35,19 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 public abstract class AbstractUserInterface implements UserInterface {
+   private boolean autoMode;
 
-	public void loadProblem(File file, List<File> classPath,
+   /**
+    * The used {@link PropertyChangeSupport}.
+    */
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+
+	protected ProblemLoader getProblemLoader(File file, List<File> classPath,
 	        File bootClassPath, KeYMediator mediator) {
 		final ProblemLoader pl = new ProblemLoader(file, classPath,
 		        bootClassPath, AbstractProfile.getDefaultProfile(), mediator);
 		pl.addTaskListener(this);
-		pl.run();
+		return pl;
 	}
 
     @Override
@@ -129,5 +138,127 @@ public abstract class AbstractUserInterface implements UserInterface {
           catch (InterruptedException e) {
           }
        }
+    }
+
+    @Override
+    public boolean isAutoMode() {
+        return autoMode;
+    }
+
+    @Override
+    public void notifyAutoModeBeingStarted() {
+       boolean oldValue = isAutoMode();
+       autoMode = true;
+       firePropertyChange(PROP_AUTO_MODE, oldValue, isAutoMode());
+    }
+
+    @Override
+    public void notifyAutomodeStopped() {
+       boolean oldValue = isAutoMode();
+       autoMode = false;
+       firePropertyChange(PROP_AUTO_MODE, oldValue, isAutoMode());
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(propertyName, listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        pcs.removePropertyChangeListener(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        pcs.removePropertyChangeListener(propertyName, listener);
+    }
+
+    /**
+     * Fires the event to all available listeners.
+     * @param propertyName The property name.
+     * @param index The changed index.
+     * @param oldValue The old value.
+     * @param newValue The new value.
+     */
+    protected void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue, boolean newValue) {
+        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+    }
+
+    /**
+     * Fires the event to all available listeners.
+     * @param propertyName The property name.
+     * @param index The changed index.
+     * @param oldValue The old value.
+     * @param newValue The new value.
+     */
+    protected void fireIndexedPropertyChange(String propertyName, int index, int oldValue, int newValue) {
+        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+    }
+
+    /**
+     * Fires the event to all available listeners.
+     * @param propertyName The property name.
+     * @param index The changed index.
+     * @param oldValue The old value.
+     * @param newValue The new value.
+     */
+    protected void fireIndexedPropertyChange(String propertyName, int index, Object oldValue, Object newValue) {
+        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+    }
+
+    /**
+     * Fires the event to all listeners.
+     * @param evt The event to fire.
+     */
+    protected void firePropertyChange(PropertyChangeEvent evt) {
+        pcs.firePropertyChange(evt);
+    }
+
+    /**
+     * Fires the event to all listeners.
+     * @param propertyName The changed property.
+     * @param oldValue The old value.
+     * @param newValue The new value.
+     */
+    protected void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+        pcs.firePropertyChange(propertyName, oldValue, newValue);
+    }
+
+    /**
+     * Fires the event to all listeners.
+     * @param propertyName The changed property.
+     * @param oldValue The old value.
+     * @param newValue The new value.
+     */
+    protected void firePropertyChange(String propertyName, int oldValue, int newValue) {
+        pcs.firePropertyChange(propertyName, oldValue, newValue);
+    }
+
+    /**
+     * Fires the event to all listeners.
+     * @param propertyName The changed property.
+     * @param oldValue The old value.
+     * @param newValue The new value.
+     */
+    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+        pcs.firePropertyChange(propertyName, oldValue, newValue);
     }
 }

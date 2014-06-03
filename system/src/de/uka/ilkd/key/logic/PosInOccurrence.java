@@ -271,7 +271,7 @@ public final class PosInOccurrence {
     }
 
     
-    private class PIOPathIteratorImpl implements PIOPathIterator {	
+    private final class PIOPathIteratorImpl implements PIOPathIterator {	
 	int               child;
 	int               count             = 0;
 	IntIterator       currentPathIt;

@@ -66,7 +66,7 @@ import org.key_project.sed.ui.action.ISEDAnnotationLinkAction;
 import org.key_project.sed.ui.action.ISEDAnnotationLinkEditAction;
 import org.key_project.sed.ui.edit.ISEDAnnotationEditor;
 import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.eclipse.job.AbstractWorkbenchPartJob;
+import org.key_project.util.eclipse.job.AbstractDependingOnObjectJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -174,8 +174,8 @@ public final class SEDUIUtil {
       ISelection oldSelection = debugView.getViewer().getSelection();
       if (!selection.equals(SWTUtil.toList(oldSelection))) {
          // Change selection in debug view if new elements are selected in a Job because the debug view uses Jobs itself to expand the debug model and it is required to wait for them.
-         AbstractWorkbenchPartJob.cancelJobs(parentPart);
-         Job selectJob = new AbstractWorkbenchPartJob("Synchronizing selection", parentPart) {
+         AbstractDependingOnObjectJob.cancelJobs(parentPart);
+         Job selectJob = new AbstractDependingOnObjectJob("Synchronizing selection", parentPart) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                try {
@@ -227,8 +227,8 @@ public final class SEDUIUtil {
                                         final IDebugView debugView, 
                                         final List<?> toExpand) {
       // Change selection in debug view if new elements are selected in a Job because the debug view uses Jobs itself to expand the debug model and it is required to wait for them.
-      AbstractWorkbenchPartJob.cancelJobs(parentPart);
-      Job selectJob = new AbstractWorkbenchPartJob("Expanding elements", parentPart) {
+      AbstractDependingOnObjectJob.cancelJobs(parentPart);
+      Job selectJob = new AbstractDependingOnObjectJob("Expanding elements", parentPart) {
          @Override
          protected IStatus run(IProgressMonitor monitor) {
             try {
@@ -370,7 +370,7 @@ public final class SEDUIUtil {
     * @return The parent element if available or {@code null} otherwise.
     * @throws DebugException Occurred Exception.
     */
-   protected static Object getParent(Object element) throws DebugException {
+   public static Object getParent(Object element) throws DebugException {
       if (element instanceof ISEDDebugNode) {
          return SEDDebugNodeContentProvider.getDefaultInstance().getDebugNodeParent(element);
       }
@@ -389,7 +389,7 @@ public final class SEDUIUtil {
     * @return The available children.
     * @throws DebugException Occurred Exception.
     */
-   protected static Object[] getChildren(Object element) throws DebugException {
+   public static Object[] getChildren(Object element) throws DebugException {
       if (element instanceof ISEDDebugTarget) {
          return SEDDebugTargetContentProvider.getDefaultInstance().getAllChildren(element);
       }
@@ -432,35 +432,41 @@ public final class SEDUIUtil {
                // Compute index on parent
                Object parent = getParent(toInject);
                final int viewIndex = ArrayUtil.indexOf(getChildren(parent), toInject);
-               // Create tree path to current element
-               final TreePath tp = new TreePath(tpElements.toArray());
-               // Inject the element into the TreeViewer
-               runInViewerThread(treeViewer, lazyContentProvider, new AbstractRunnableWithException() {
-                  @Override
-                  public void run() {
-                     try {
-                        lazyContentProvider.updateChildCount(tp, 0);
+               if (viewIndex >= 0) {
+                  // Create tree path to current element
+                  final TreePath tp = new TreePath(tpElements.toArray());
+                  // Inject the element into the TreeViewer
+                  runInViewerThread(treeViewer, lazyContentProvider, new AbstractRunnableWithException() {
+                     @Override
+                     public void run() {
+                        try {
+                           lazyContentProvider.updateChildCount(tp, 0);
+                        }
+                        catch (Exception e) {
+                           setException(e);
+                        }
                      }
-                     catch (Exception e) {
-                        setException(e);
+                  });
+                  runInViewerThread(treeViewer, lazyContentProvider, new AbstractRunnableWithException() {
+                     @Override
+                     public void run() {
+                        try {
+                           lazyContentProvider.updateElement(tp, viewIndex);
+                        }
+                        catch (Exception e) {
+                           setException(e);
+                        }
                      }
-                  }
-               });
-               runInViewerThread(treeViewer, lazyContentProvider, new AbstractRunnableWithException() {
-                  @Override
-                  public void run() {
-                     try {
-                        lazyContentProvider.updateElement(tp, viewIndex);
-                     }
-                     catch (Exception e) {
-                        setException(e);
-                     }
-                  }
-               });
-               // Update tree path for next loop iteration
-               tpElements.add(toInject);
-               // Update monitor
-               monitor.worked(1);
+                  });
+                  // Update tree path for next loop iteration
+                  tpElements.add(toInject);
+                  // Update monitor
+                  monitor.worked(1);                
+               }
+               else {
+                  // Something has changed in between and injection is not possible.
+                  monitor.setCanceled(true);
+               }
             }
          }
       }

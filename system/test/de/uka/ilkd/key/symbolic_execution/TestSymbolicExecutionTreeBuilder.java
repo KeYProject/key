@@ -22,7 +22,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * <p>
@@ -1488,7 +1488,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     */
    public void testIdenticalTermsDuringProof() throws Exception {
       // Make sure that correct symbolic execution tree is created.
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = doSETTest(keyRepDirectory, 
+      SymbolicExecutionEnvironment<CustomUserInterface> env = doSETTest(keyRepDirectory, 
                                                                                "examples/_testcase/set/identicalTermsDuringProof/test/IdenticalTermsDuringProof.java", 
                                                                                "IdenticalTermsDuringProof", 
                                                                                "mid", 

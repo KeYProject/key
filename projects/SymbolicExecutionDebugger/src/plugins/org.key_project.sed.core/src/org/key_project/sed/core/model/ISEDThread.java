@@ -13,6 +13,7 @@
 
 package org.key_project.sed.core.model;
 
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.key_project.sed.core.model.impl.AbstractSEDThread;
@@ -36,4 +37,9 @@ import org.key_project.sed.core.model.memory.SEDMemoryThread;
  * @see ISEDDebugNode
  */
 public interface ISEDThread extends ISEDDebugNode, IThread {
+   /**
+    * Returns all leaf nodes to select.
+    * @return The leaf nodes to select.
+    */
+   public ISEDDebugNode[] getLeafsToSelect() throws DebugException;
 }
