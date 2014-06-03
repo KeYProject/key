@@ -116,13 +116,15 @@ public abstract class StrategyProofMacro implements ProofMacro {
         }
         
         if(applyStrategy.hasBeenInterrupted()) {
-            throw new InterruptedException();
+            synchronized(applyStrategy) { // wait for applyStrategy to finish it last rule application
+                throw new InterruptedException();
+            }
         }
 
     }
 
     @Override
-    public javax.swing.KeyStroke getKeyStroke () {
+    public final javax.swing.KeyStroke getKeyStroke () {
 	return KeyStrokeManager.get(this);
     }
 

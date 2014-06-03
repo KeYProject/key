@@ -9,25 +9,23 @@
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-//
-
+// 
 package de.uka.ilkd.key.gui.macros;
 
-import de.uka.ilkd.key.gui.ExceptionDialog;
-import de.uka.ilkd.key.gui.InterruptListener;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.SwingWorker3;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.util.Debug;
 
+import javax.swing.SwingWorker;
+
 /**
- * The Class ProofMacroWorker is a swing worker for the application of proof macros.
- * 
- * It decouples proof macros from the GUI event thread.
- * It registers with the mediator to receive Stop-Button events
+ * The Class ProofMacroWorker is a swing worker for the application of proof
+ * macros.
+ *
+ * It decouples proof macros from the GUI event thread. It registers with the
+ * mediator to receive Stop-Button events
  */
-public class ProofMacroWorker extends SwingWorker3 implements InterruptListener {
+public class ProofMacroWorker extends SwingWorker<Void, Void> implements InterruptListener {
 
     /**
      * The macro which is to be executed
@@ -46,13 +44,10 @@ public class ProofMacroWorker extends SwingWorker3 implements InterruptListener 
 
     /**
      * Instantiates a new proof macro worker.
-     * 
-     * @param macro
-     *            the macro, not null
-     * @param mediator
-     *            the mediator, not null
-     * @param posInOcc
-     *            the position, possibly null
+     *
+     * @param macro the macro, not null
+     * @param mediator the mediator, not null
+     * @param posInOcc the position, possibly null
      */
     public ProofMacroWorker(ProofMacro macro, KeYMediator mediator, PosInOccurrence posInOcc) {
         assert macro != null;
@@ -62,54 +57,33 @@ public class ProofMacroWorker extends SwingWorker3 implements InterruptListener 
         this.posInOcc = posInOcc;
     }
 
-    /* 
-     * actually execute the macro. InterruptionException are ignored. All other exceptions
-     * are reported in the GUI.
-     */
-    @Override 
-    public Object construct() {
+    @Override
+    protected Void doInBackground() throws Exception {
         try {
-            macro.applyTo(mediator, posInOcc, mediator.getUI());
-        } catch(InterruptedException ex) {
+            synchronized(macro) {
+                macro.applyTo(mediator, posInOcc, mediator.getUI());
+            }
+        } catch (final InterruptedException exception) {
             Debug.out("Proof macro has been interrupted:");
-            Debug.out(ex);
-        } catch (Exception e) {
+            Debug.out(exception);
+        } catch (final Exception exception) {
             // This should actually never happen.
-            ExceptionDialog.showDialog(MainWindow.getInstance(), e);
+            ExceptionDialog.showDialog(MainWindow.getInstance(), exception);
         }
-
-        // no result is being calculated
         return null;
     }
 
-    /* 
-     * initiate the GUI stuff and relay to superclass
-     */
-    @Override 
-    public void start() {
-        mediator.stopInterface(true);
-        mediator.setInteractive(false);
-        mediator.addInterruptedListener(this);
-        super.start();
-    }
-
-    /* 
-     * finalise the GUI stuff
-     */
-    @Override 
-    public void finished() {
-        mediator.setInteractive(true);
-        mediator.startInterface(true);
-        mediator.removeInterruptedListener(this);
-    }
-
-    /* 
-     * If an interruption occured, tell the Swingworker thread
-     */
-    @Override 
+    @Override
     public void interruptionPerformed() {
-        // just notify the thread that the button has been pressed
-        interrupt();
+        cancel(true);
     }
 
+    @Override
+    protected void done() {
+        synchronized(macro) {
+            mediator.setInteractive(true);
+            mediator.startInterface(true);
+            mediator.removeInterruptedListener(this);
+        }
+    }
 }

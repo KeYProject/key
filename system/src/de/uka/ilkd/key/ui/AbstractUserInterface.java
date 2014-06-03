@@ -42,12 +42,12 @@ public abstract class AbstractUserInterface implements UserInterface {
     */
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
-	public void loadProblem(File file, List<File> classPath,
+	protected ProblemLoader getProblemLoader(File file, List<File> classPath,
 	        File bootClassPath, KeYMediator mediator) {
 		final ProblemLoader pl = new ProblemLoader(file, classPath,
 		        bootClassPath, AbstractProfile.getDefaultProfile(), mediator);
 		pl.addTaskListener(this);
-		pl.run();
+		return pl;
 	}
 
     @Override
