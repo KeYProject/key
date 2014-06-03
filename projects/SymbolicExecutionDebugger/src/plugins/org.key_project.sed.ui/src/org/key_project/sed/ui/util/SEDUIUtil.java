@@ -416,53 +416,59 @@ public final class SEDUIUtil {
                // Compute index on parent
                Object parent = getParent(toInject);
                final int viewIndex = ArrayUtil.indexOf(getChildren(parent), toInject);
-               // Create tree path to current element
-               final TreePath tp = new TreePath(tpElements.toArray());
-               // Create job collector to collect update jobs started by the Debug API
-               IFilter<Job> jobFilter = new IFilter<Job>() {
-                  @Override
-                  public boolean select(Job element) {
-                     String className = element.getClass().getName();
-                     return className.startsWith("org.eclipse.debug") ||
-                            className.startsWith("org.eclipse.ui.internal.progress");
-                  }
-               };
-               ScheduledJobCollector collector = new ScheduledJobCollector(jobFilter);
-               try {
-                  // Start collecting update jobs started by the debug view
-                  collector.start();
-                  IRunnableWithException run = new AbstractRunnableWithException() {
+               if (viewIndex >= 0) {
+                  // Create tree path to current element
+                  final TreePath tp = new TreePath(tpElements.toArray());
+                  // Create job collector to collect update jobs started by the Debug API
+                  IFilter<Job> jobFilter = new IFilter<Job>() {
                      @Override
-                     public void run() {
-                        try {
-                           // Inject the element into the TreeViewer
-                           lazyContentProvider.updateChildCount(tp, 0);
-                           lazyContentProvider.updateElement(tp, viewIndex);
-                        }
-                        catch (Exception e) {
-                           setException(e);
-                        }
+                     public boolean select(Job element) {
+                        String className = element.getClass().getName();
+                        return className.startsWith("org.eclipse.debug") ||
+                               className.startsWith("org.eclipse.ui.internal.progress");
                      }
                   };
-                  treeViewer.getControl().getDisplay().syncExec(run);
-                  if (run.getException() != null) {
-                     throw new DebugException(LogUtil.getLogger().createErrorStatus(run.getException().getMessage(), run.getException()));
+                  ScheduledJobCollector collector = new ScheduledJobCollector(jobFilter);
+                  try {
+                     // Start collecting update jobs started by the debug view
+                     collector.start();
+                     IRunnableWithException run = new AbstractRunnableWithException() {
+                        @Override
+                        public void run() {
+                           try {
+                              // Inject the element into the TreeViewer
+                              lazyContentProvider.updateChildCount(tp, 0);
+                              lazyContentProvider.updateElement(tp, viewIndex);
+                           }
+                           catch (Exception e) {
+                              setException(e);
+                           }
+                        }
+                     };
+                     treeViewer.getControl().getDisplay().syncExec(run);
+                     if (run.getException() != null) {
+                        throw new DebugException(LogUtil.getLogger().createErrorStatus(run.getException().getMessage(), run.getException()));
+                     }
                   }
+                  finally {
+                     // Stop collecting update jobs
+                     collector.stop();
+                  }
+                  // Wait until all update jobs have finished before
+                  Job[] jobs = collector.getJobs();
+                  for (Job job : jobs) {
+                     SWTUtil.checkCanceled(monitor);
+                     JobUtil.waitFor(job, 10);
+                  }         
+                  // Update tree path for next loop iteration
+                  tpElements.add(toInject);
+                  // Update monitor
+                  monitor.worked(1);                  
                }
-               finally {
-                  // Stop collecting update jobs
-                  collector.stop();
+               else {
+                  // Something has changed in between and injection is not possible.
+                  monitor.setCanceled(true);
                }
-               // Wait until all update jobs have finished before
-               Job[] jobs = collector.getJobs();
-               for (Job job : jobs) {
-                  SWTUtil.checkCanceled(monitor);
-                  JobUtil.waitFor(job, 10);
-               }         
-               // Update tree path for next loop iteration
-               tpElements.add(toInject);
-               // Update monitor
-               monitor.worked(1);
             }
          }
       }
