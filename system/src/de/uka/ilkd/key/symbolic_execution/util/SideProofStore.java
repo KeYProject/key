@@ -10,7 +10,7 @@ import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * <p>
@@ -272,7 +272,7 @@ public final class SideProofStore {
       /**
        * The {@link KeYEnvironment}.
        */
-      private final KeYEnvironment<CustomConsoleUserInterface> environment;
+      private final KeYEnvironment<CustomUserInterface> environment;
 
       /**
        * Constructor.
@@ -282,8 +282,8 @@ public final class SideProofStore {
       public Entry(String description, Proof proof) {
          this.description = description;
          this.proof = proof;
-         CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
-         this.environment = new KeYEnvironment<CustomConsoleUserInterface>(ui, proof.env().getInitConfig(), proof);
+         CustomUserInterface ui = new CustomUserInterface(false);
+         this.environment = new KeYEnvironment<CustomUserInterface>(ui, proof.env().getInitConfig(), proof);
       }
 
       /**
@@ -306,7 +306,7 @@ public final class SideProofStore {
        * Returns the {@link KeYEnvironment}.
        * @return The {@link KeYEnvironment}.
        */
-      public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
+      public KeYEnvironment<CustomUserInterface> getEnvironment() {
          return environment;
       }
 

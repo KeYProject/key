@@ -18,19 +18,18 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.rule.TacletApp;
-
+import de.uka.ilkd.key.rule.BuiltInRule;
 
 /**
- * A customized {@link CommandContributionItem} which contains a {@link TacletApp}, a {@link KeYMediator} and a {@link PosInSequent}.
+ * A customized {@link CommandContributionItem} which contains a {@link BuiltInRule}, a {@link KeYMediator} and a {@link PosInSequent}.
  * 
- * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
+ * @author Martin Hentschel
  */
-public class TacletCommandContributionItem extends CommandContributionItem {
+public class BuiltInRuleCommandContributionItem extends CommandContributionItem {
    /***
-    * The {@link TacletApp} to apply.
+    * The {@link BuiltInRule} to apply.
     */
-   private final TacletApp app;
+   private final BuiltInRule rule;
    
    /**
     * The {@link KeYMediator} to use.
@@ -38,30 +37,30 @@ public class TacletCommandContributionItem extends CommandContributionItem {
    private final KeYMediator mediator;
    
    /**
-    * The {@link PosInSequent} to apply {@link TacletApp} on.
+    * The {@link PosInSequent} to apply {@link BuiltInRule} on.
     */
    private final PosInSequent pos;
    
    /**
     * The constructor with the additional parameters.
     * @param contributionParameters - the {@link CommandContributionItemParameter}.
-    * @param app - the {@link TacletApp}.
+    * @param rule - the {@link BuiltInRule}.
     * @param mediator - the {@link KeYMediator}.
     * @param pos - the {@link PosInSequent}.
     */
-   public TacletCommandContributionItem(CommandContributionItemParameter contributionParameters, TacletApp app, KeYMediator mediator, PosInSequent pos) {
+   public BuiltInRuleCommandContributionItem(CommandContributionItemParameter contributionParameters, BuiltInRule rule, KeYMediator mediator, PosInSequent pos) {
       super(contributionParameters);
-      this.app = app;
+      this.rule = rule;
       this.mediator = mediator;
       this.pos = pos;
    }
    
    /**
-    * Returns the {@link TacletApp} to apply.
-    * @return The {@link TacletApp} to apply.
+    * Returns the {@link BuiltInRule} to apply.
+    * @return The {@link BuiltInRule} to apply.
     */
-   public TacletApp getTacletApp() {
-      return app;
+   public BuiltInRule getRule() {
+      return rule;
    }
    
    /**
@@ -73,8 +72,8 @@ public class TacletCommandContributionItem extends CommandContributionItem {
    }
    
    /**
-    * Returns the {@link PosInSequent} to apply {@link TacletApp} on.
-    * @return The {@link PosInSequent} to apply {@link TacletApp} on.
+    * Returns the {@link PosInSequent} to apply {@link BuiltInRule} on.
+    * @return The {@link PosInSequent} to apply {@link BuiltInRule} on.
     */
    public PosInSequent getPosInSequent() {
       return pos;

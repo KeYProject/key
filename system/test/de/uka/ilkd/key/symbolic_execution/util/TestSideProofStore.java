@@ -15,7 +15,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofStore.Entry;
 import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -105,9 +105,9 @@ public class TestSideProofStore extends TestCase {
          assertEquals(entries[i].getDescription(), expectedEntries[i].first);
          assertSame(entries[i].getProof(), expectedEntries[i].second);
          assertSame(entries[i], SideProofStore.DEFAULT_INSTANCE.getEntryAt(i));
-         KeYEnvironment<CustomConsoleUserInterface> ui = entries[i].getEnvironment();
+         KeYEnvironment<CustomUserInterface> ui = entries[i].getEnvironment();
          assertNotNull(ui);
-         KeYEnvironment<CustomConsoleUserInterface> uiAgain = entries[i].getEnvironment();
+         KeYEnvironment<CustomUserInterface> uiAgain = entries[i].getEnvironment();
          assertSame(ui, uiAgain);
          containedProofs.add(expectedEntries[i].second);
          assertFalse(entries[i].getProof().isDisposed());

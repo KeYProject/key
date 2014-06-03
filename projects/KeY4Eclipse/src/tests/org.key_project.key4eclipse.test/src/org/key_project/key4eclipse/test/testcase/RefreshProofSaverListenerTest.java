@@ -30,7 +30,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Tests for {@code org.key_project.key4eclipse.event.RefreshProofSaverListener}.
@@ -48,7 +48,7 @@ public class RefreshProofSaverListenerTest extends TestCase {
       IFile file = TestUtilsUtil.createFile(project, "Test.proof", "Replace me!");
       File location = ResourceUtil.getLocation(file);
       // Do proof
-      KeYEnvironment<CustomConsoleUserInterface> env = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null);
+      KeYEnvironment<CustomUserInterface> env = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null);
       try {
          Proof proof = env.getLoadedProof();
          assertNotNull(proof);
