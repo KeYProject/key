@@ -155,7 +155,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       oracleFile.getParentFile().mkdirs();
       // Create oracle file
       SEDXMLWriter writer = new SEDXMLWriter();
-      writer.write(target.getLaunch(), SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(oracleFile), saveVariables, saveCallStack);
+      writer.write(target.getLaunch(), SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(oracleFile), saveVariables, saveCallStack, null);
       // Print message to the user.
       printOracleDirectory();
    }
@@ -494,6 +494,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
     * @param usePrettyPrinting Use pretty printing?
+    * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -510,7 +511,8 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
                                        Boolean usePrettyPrinting,
-                                       int timeoutFactor,
+                                       Boolean showSignatureOnMethodReturnNodes,
+                                       int timeoutFactor, 
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       doKeYDebugTargetTest(projectName,
                            Activator.PLUGIN_ID, 
@@ -525,6 +527,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            showKeYMainWindow, 
                            mergeBranchConditions,
                            usePrettyPrinting,
+                           showSignatureOnMethodReturnNodes,
                            timeoutFactor, 
                            executor);
    }
@@ -546,6 +549,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
     * @param usePrettyPrinting Use pretty printing?
+    * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -563,6 +567,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
                                        Boolean usePrettyPrinting,
+                                       Boolean showSignatureOnMethodReturnNodes,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       doKeYDebugTargetTest(projectName, 
@@ -579,6 +584,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            showKeYMainWindow, 
                            mergeBranchConditions, 
                            usePrettyPrinting,
+                           showSignatureOnMethodReturnNodes,
                            timeoutFactor, 
                            executor);
    }
@@ -600,6 +606,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
     * @param usePrettyPrinting Use pretty printing?
+    * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -618,6 +625,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
                                        Boolean usePrettyPrinting,
+                                       Boolean showSignatureOnMethodReturnNodes,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       // Create test project
@@ -627,7 +635,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          projectConfigurator.configure(project);
       }
       // Do test steps
-      doKeYDebugTargetTest(project, closePropertiesView, closeExecutionTreeViews, selector, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, usePrettyPrinting, timeoutFactor, executor);
+      doKeYDebugTargetTest(project, closePropertiesView, closeExecutionTreeViews, selector, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, usePrettyPrinting, showSignatureOnMethodReturnNodes, timeoutFactor, executor);
    }
    
    /**
@@ -644,6 +652,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
     * @param usePrettyPrinting Use pretty printing?
+    * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -659,6 +668,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
                                        Boolean usePrettyPrinting,
+                                       Boolean showSignatureOnMethodReturnNodes,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       // Create bot
@@ -695,7 +705,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          assertEquals(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, usePrettyPrinting);
+         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, usePrettyPrinting, showSignatureOnMethodReturnNodes);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
@@ -821,11 +831,11 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
             // Evaluate created tree
             if (clearProofListInKeYBeforeResume) {
                assertTrue(launch.canTerminate());
-               assertFalse(launch.isTerminated());
-               assertTrue(target.canDisconnect());
+               assertTrue(launch.isTerminated()); // launch.isTerminated() returns true if terminated or disconnected.
+               assertFalse(target.canDisconnect());
                assertFalse(target.canSuspend());
                assertTrue(target.canTerminate());
-               assertFalse(target.isDisconnected());
+               assertTrue(target.isDisconnected());
                assertTrue(target.isSuspended());
                assertFalse(target.isTerminated());
                assertFalse(target.canResume());

@@ -17,6 +17,13 @@
                properties="stackFrameHasVariables"
                type="org.eclipse.debug.core.model.IStackFrame">
          </propertyTester>
+         <propertyTester
+               class="org.key_project.sed.core.propertyTester.HasSEDDebugTargetPropertyTester"
+               id="org.key_project.sed.core.hasSEDDebugTargetPropertyTester"
+               namespace="org.key_project.sed.core"
+               properties="hasSEDDebugTarget"
+               type="org.eclipse.debug.core.ILaunch">
+         </propertyTester>
       </extension>
       <extension
             point="org.key_project.sed.core.annotationTypes">

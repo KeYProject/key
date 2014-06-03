@@ -97,7 +97,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        target.setModelIdentifier(MODEL_IDENTIFIER);
        launch.addDebugTarget(target);
        
-       SEDMemoryThread thread = new SEDMemoryThread(target);
+       SEDMemoryThread thread = new SEDMemoryThread(target, false);
        thread.setName("Fixed Example Thread");
        thread.setPathCondition("pc1");
        target.addSymbolicThread(thread);

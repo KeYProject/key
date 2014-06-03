@@ -14,31 +14,29 @@
 package org.key_project.util.eclipse.job;
 
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ui.IWorkbenchPart;
 import org.key_project.util.eclipse.JobUtil;
-import org.key_project.util.eclipse.job.ObjectchedulingRule;
 import org.key_project.util.java.ObjectUtil;
 
 /**
- * Abstract super class for {@link Job}s executed in an {@link IWorkbenchPart}
- * which have to be executed in serial order. 
+ * Abstract super class for {@link Job}s depending on a single {@link Object}
+ * and thus have to be executed in serial order. 
  * @author Martin Hentschel
  */
-public abstract class AbstractWorkbenchPartJob extends Job {
+public abstract class AbstractDependingOnObjectJob extends Job {
    /**
-    * The {@link IWorkbenchPart} which has executed this {@link Job}.
+    * The {@link Object} on which this {@link Job} depends on.
     */
-   private IWorkbenchPart part;
+   private Object object;
    
    /**
     * Constructor.
     * @param name The name of this {@link Job}.
-    * @param part The {@link IWorkbenchPart} which has executed this {@link Job}.
+    * @param object The {@link Object} on which this {@link Job} depends on.
     */
-   public AbstractWorkbenchPartJob(String name, IWorkbenchPart part) {
+   public AbstractDependingOnObjectJob(String name, Object object) {
       super(name);
-      this.part = part;
-      setRule(new ObjectchedulingRule(part));
+      this.object = object;
+      setRule(new ObjectSchedulingRule(object));
    }
 
    /**
@@ -46,7 +44,7 @@ public abstract class AbstractWorkbenchPartJob extends Job {
     */
    @Override
    public boolean belongsTo(Object family) {
-      if (ObjectUtil.equals(part, family)) {
+      if (ObjectUtil.equals(object, family)) {
          return true;
       }
       else {
@@ -55,22 +53,22 @@ public abstract class AbstractWorkbenchPartJob extends Job {
    }
    
    /**
-    * Cancels all {@link Job}s which does something with the given {@link IWorkbenchPart}.
-    * @param part The {@link IWorkbenchPart} to cancel his {@link Job}s.
+    * Cancels all {@link Job}s which does something with the given {@link Object}.
+    * @param object The {@link Object} to cancel his {@link Job}s.
     * @return The canceled {@link Job}s.
     */
-   public static Job[] cancelJobs(IWorkbenchPart part) {
-      Job[] jobs = getJobs(part);
+   public static Job[] cancelJobs(Object object) {
+      Job[] jobs = getJobs(object);
       JobUtil.cancel(jobs);
       return jobs;
    }
    
    /**
-    * Returns all {@link Job}s that does something with the given {@link IWorkbenchPart}.
-    * @param part The {@link IWorkbenchPart} to search {@link Job}s for.
-    * @return The {@link Job}s that does something with the given {@link IWorkbenchPart}.
+    * Returns all {@link Job}s that does something with the given {@link Object}.
+    * @param part The {@link Object} to search {@link Job}s for.
+    * @return The {@link Job}s that does something with the given {@link Object}.
     */
-   public static Job[] getJobs(IWorkbenchPart part) {
+   public static Job[] getJobs(Object part) {
       return Job.getJobManager().find(part);
    }
 }

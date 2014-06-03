@@ -368,7 +368,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
                                              StrategyProperties.METHOD_CONTRACT,
                                              StrategyProperties.LOOP_INVARIANT,
                                              StrategyProperties.QUERY_ON,
-                                             StrategyProperties.SPLITTING_DELAYED);
+                                             StrategyProperties.SPLITTING_DELAYED,
+                                             false);
          return info.getProof().closed();
       }
       catch (ProofInputException e) {

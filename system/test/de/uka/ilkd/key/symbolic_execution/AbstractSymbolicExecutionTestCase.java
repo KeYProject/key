@@ -434,8 +434,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       else if (expected instanceof IExecutionMethodReturn) {
          assertTrue("Expected IExecutionMethodReturn but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionMethodReturn);
+         assertTrue(((IExecutionMethodReturn)expected).getSignature() + " does not match " + ((IExecutionMethodReturn)current).getSignature(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getSignature(), ((IExecutionMethodReturn)current).getSignature()));
          if (compareReturnValues) {
             assertTrue(((IExecutionMethodReturn)expected).getNameIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getNameIncludingReturnValue(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getNameIncludingReturnValue(), ((IExecutionMethodReturn)current).getNameIncludingReturnValue()));
+            assertTrue(((IExecutionMethodReturn)expected).getSignatureIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getSignatureIncludingReturnValue(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getSignatureIncludingReturnValue(), ((IExecutionMethodReturn)current).getSignatureIncludingReturnValue()));
          }
          assertEquals(((IExecutionMethodReturn)expected).isReturnValuesComputed(), ((IExecutionMethodReturn)current).isReturnValuesComputed());
          assertVariables((IExecutionMethodReturn)expected, (IExecutionMethodReturn)current, compareVariables);

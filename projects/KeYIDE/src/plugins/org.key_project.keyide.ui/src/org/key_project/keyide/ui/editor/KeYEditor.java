@@ -80,7 +80,6 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.ProofUserManager;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -132,7 +131,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    /**
     * The used {@link KeYEnvironment}
     */
-   private KeYEnvironment<CustomConsoleUserInterface> environment;
+   private KeYEnvironment<?> environment;
    
    /**
     * The current {@link Proof}.
@@ -664,7 +663,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * {@inheritDoc}
     */
    @Override
-   public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
+   public KeYEnvironment<?> getEnvironment() {
       return environment;
    }
 
@@ -672,8 +671,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * {@inheritDoc}
     */
    @Override
-   public CustomConsoleUserInterface getUI() {
-      KeYEnvironment<CustomConsoleUserInterface> environment = getEnvironment();
+   public UserInterface getUI() {
+      KeYEnvironment<?> environment = getEnvironment();
       return environment != null ? environment.getUi() : null;
    }
 
@@ -682,7 +681,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    @Override
    public KeYMediator getMediator() {
-      KeYEnvironment<CustomConsoleUserInterface> environment = getEnvironment();
+      KeYEnvironment<?> environment = getEnvironment();
       return environment != null ? environment.getMediator() : null;
    }
    

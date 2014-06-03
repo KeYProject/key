@@ -79,13 +79,14 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
                               Goal goal,
                               PosInOccurrence pos,
                               Services services,
-                              MatchConditions matchCond) {
+                              MatchConditions matchCond,
+                              PosInOccurrence applicationPosInOccurrence) {
         final ImmutableList<SequentFormula> replacements =
             instantiateSemisequent(semi, services, matchCond, pos);
         assert replacements.size() == 1 : "information flow taclets must have " +
                                   "exactly one add!";
         updateStrategyInfo(goal, replacements.iterator().next().formula());
-        super.addToAntec(semi, goal, pos, services, matchCond);
+        super.addToAntec(semi, goal, pos, services, matchCond, applicationPosInOccurrence);
     }
 
 

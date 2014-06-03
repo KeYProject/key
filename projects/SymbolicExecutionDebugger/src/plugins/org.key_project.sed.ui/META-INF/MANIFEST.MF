@@ -17,6 +17,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.sed.ui.action,
+ org.key_project.sed.ui.command,
  org.key_project.sed.ui.composite,
  org.key_project.sed.ui.edit,
  org.key_project.sed.ui.perspective,

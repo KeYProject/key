@@ -109,7 +109,7 @@ public abstract class SequentialProofMacro implements ExtendedProofMacro {
      */
     @Override 
     public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
-            ProverTaskListener listener) throws InterruptedException {
+                        ProverTaskListener listener) throws InterruptedException {
         final Node initNode = mediator.getSelectedNode();
         for (ExtendedProofMacro macro : getProofMacros()) {
             // reverse to original node

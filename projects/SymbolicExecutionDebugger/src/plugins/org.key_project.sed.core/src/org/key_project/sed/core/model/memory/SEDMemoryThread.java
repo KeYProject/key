@@ -51,9 +51,10 @@ public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryDebu
    /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this thread is contained.
-    */   
-   public SEDMemoryThread(ISEDDebugTarget target) {
-      super(target);
+    * @param executable {@code true} Support suspend, resume, etc.; {@code false} Do not support suspend, resume, etc.
+    */
+   public SEDMemoryThread(ISEDDebugTarget target, boolean executable) {
+      super(target, executable);
    }
 
    /**

@@ -15,6 +15,7 @@ package de.uka.ilkd.key.gui.macros;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.util.Debug;
+
 import javax.swing.SwingWorker;
 
 /**
@@ -59,7 +60,9 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
     @Override
     protected Void doInBackground() throws Exception {
         try {
-            macro.applyTo(mediator, posInOcc, mediator.getUI());
+            synchronized(macro) {
+                macro.applyTo(mediator, posInOcc, mediator.getUI());
+            }
         } catch (final InterruptedException exception) {
             Debug.out("Proof macro has been interrupted:");
             Debug.out(exception);
@@ -77,8 +80,10 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
 
     @Override
     protected void done() {
-        mediator.setInteractive(true);
-        mediator.startInterface(true);
-        mediator.removeInterruptedListener(this);
+        synchronized(macro) {
+            mediator.setInteractive(true);
+            mediator.startInterface(true);
+            mediator.removeInterruptedListener(this);
+        }
     }
 }

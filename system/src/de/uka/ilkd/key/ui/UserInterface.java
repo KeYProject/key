@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.ui;
 
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.List;
 
@@ -36,7 +37,41 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor {
+    public static final String PROP_AUTO_MODE = "autoMode";
+    
+    /**
+     * Checks if the auto mode is running which is the case between
+     * {@link #notifyAutoModeBeingStarted()} and {@link #notifyAutomodeStopped()}.
+     * @return {@code true} auto mode is running, {@code false} auto mode is not running.
+     */
+    public boolean isAutoMode();
+   
+    /**
+     * Adds the given listener.
+     * @param listener The listener to add.
+     */
+    public void addPropertyChangeListener(PropertyChangeListener listener);
 
+    /**
+     * Adds the given listener for the given property only.
+     * @param propertyName The property to observe.
+     * @param listener The listener to add.
+     */
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
+    
+    /**
+     * Removes the given listener.
+     * @param listener The listener to remove.
+     */
+    public void removePropertyChangeListener(PropertyChangeListener listener);
+    
+    /**
+     * Removes the given listener from the given property.
+     * @param propertyName The property to no longer observe.
+     * @param listener The listener to remove.
+     */
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
+    
     /**
      * these methods are called immediately before automode is started to ensure that
      * the GUI can respond in a reasonable way, e.g., change the cursor to a waiting cursor

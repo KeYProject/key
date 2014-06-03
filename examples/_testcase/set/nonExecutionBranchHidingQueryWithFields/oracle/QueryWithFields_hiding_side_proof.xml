@@ -8,7 +8,11 @@ post: result_0 = self.subMagic(x) &amp; self.&lt;inv&gt; &amp; exc_0 = null
 mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
-               <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+	Z(2(4(#))) {or(and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#))))),and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),not(equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#)))))))}, 
+	Z(6(6(1(1(2(4(#))))))) {and(not(equals(result_0,Z(2(4(#))))),geq(x,Z(0(#))))}, 
+	Z(neglit(1(1(7(4(#)))))) {lt(x,Z(0(#)))}
+as result of main&gt;" signatureIncludingReturnValue="&lt;return 
 	Z(2(4(#))) {or(and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#))))),and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),not(equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#)))))))}, 
 	Z(6(6(1(1(2(4(#))))))) {and(not(equals(result_0,Z(2(4(#))))),geq(x,Z(0(#))))}, 
 	Z(neglit(1(1(7(4(#)))))) {lt(x,Z(0(#)))}

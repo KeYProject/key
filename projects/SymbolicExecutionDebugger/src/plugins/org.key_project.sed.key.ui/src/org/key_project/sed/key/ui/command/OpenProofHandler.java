@@ -28,7 +28,6 @@ import org.key_project.sed.key.ui.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
@@ -40,7 +39,6 @@ public class OpenProofHandler extends AbstractHandler {
    /**
     * {@inheritDoc}
     */
-   @SuppressWarnings("unchecked")
    @Override
    public Object execute(ExecutionEvent event) throws ExecutionException {
       try {
@@ -58,7 +56,7 @@ public class OpenProofHandler extends AbstractHandler {
                   if (keyTarget.getEnvironment().getUi() instanceof CustomConsoleUserInterface) {
                      StarterUtil.openProofStarter(HandlerUtil.getActiveShell(event), 
                                                   keyTarget.getProof(), 
-                                                  (SymbolicExecutionEnvironment<CustomConsoleUserInterface>)keyTarget.getEnvironment(), 
+                                                  keyTarget.getEnvironment(), 
                                                   keyTarget.getMethod(),
                                                   false,
                                                   false,

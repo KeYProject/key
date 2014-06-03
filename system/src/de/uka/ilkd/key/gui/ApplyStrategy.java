@@ -559,7 +559,7 @@ public class ApplyStrategy {
     }
 
 
-    public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals) {
+    public synchronized ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals) {
 
         ProofSettings settings = proof.getSettings();
         StrategySettings stratSet = settings.getStrategySettings();

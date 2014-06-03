@@ -134,7 +134,12 @@ public abstract class AbstractExecutionNode extends AbstractExecutionElement imp
          }
       }
       // Check if a path condition was found.
-      return result != null ? result : getServices().getTermBuilder().tt().toString();
+      if (!isDisposed()) {
+         return result != null ? result : getServices().getTermBuilder().tt().toString();
+      }
+      else {
+         return result;
+      }
    }
 
    /**

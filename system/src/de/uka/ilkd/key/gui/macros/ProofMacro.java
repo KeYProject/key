@@ -125,7 +125,7 @@ public interface ProofMacro {
      */
     public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc, 
             ProverTaskListener listener) throws InterruptedException;
-
+    
     /**
      * Gets the keyboard shortcut to invoke the macro (optional).
      * 
