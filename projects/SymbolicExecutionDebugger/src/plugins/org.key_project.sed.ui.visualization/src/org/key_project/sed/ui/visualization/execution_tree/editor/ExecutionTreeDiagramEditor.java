@@ -69,7 +69,7 @@ import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.sed.ui.visualization.util.PaletteHideableDiagramEditor;
 import org.key_project.sed.ui.visualization.util.VisualizationPreferences;
-import org.key_project.util.eclipse.job.AbstractWorkbenchPartJob;
+import org.key_project.util.eclipse.job.AbstractDependingOnObjectJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
 
@@ -263,8 +263,8 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
       // Update diagram content if required.
       if (updateRequired) {
          // Do an asynchronous update in the UI thread (same behavior as DomainModelChangeListener which is responsible for changes in EMF objects)
-         AbstractWorkbenchPartJob.cancelJobs(this);
-         new AbstractWorkbenchPartJob("Updating Symbolic Execution Tree", this) {
+         AbstractDependingOnObjectJob.cancelJobs(this);
+         new AbstractDependingOnObjectJob("Updating Symbolic Execution Tree", this) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                return updateDiagramInJob(monitor);
