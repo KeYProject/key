@@ -51,8 +51,8 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
     * {@inheritDoc}
     */
    @Override
-   protected Feature setupApprovalF(Proof p_proof) {
-      Feature superFeature = super.setupApprovalF(p_proof);
+   protected Feature setupApprovalF() {
+      Feature superFeature = super.setupApprovalF();
       Feature labelFeature = new Feature() {
          @Override
          public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
