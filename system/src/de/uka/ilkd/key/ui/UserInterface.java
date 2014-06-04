@@ -1,18 +1,19 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.ui;
 
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.List;
 
@@ -35,7 +36,41 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor {
+    public static final String PROP_AUTO_MODE = "autoMode";
+    
+    /**
+     * Checks if the auto mode is running which is the case between
+     * {@link #notifyAutoModeBeingStarted()} and {@link #notifyAutomodeStopped()}.
+     * @return {@code true} auto mode is running, {@code false} auto mode is not running.
+     */
+    public boolean isAutoMode();
+   
+    /**
+     * Adds the given listener.
+     * @param listener The listener to add.
+     */
+    public void addPropertyChangeListener(PropertyChangeListener listener);
 
+    /**
+     * Adds the given listener for the given property only.
+     * @param propertyName The property to observe.
+     * @param listener The listener to add.
+     */
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
+    
+    /**
+     * Removes the given listener.
+     * @param listener The listener to remove.
+     */
+    public void removePropertyChangeListener(PropertyChangeListener listener);
+    
+    /**
+     * Removes the given listener from the given property.
+     * @param propertyName The property to no longer observe.
+     * @param listener The listener to remove.
+     */
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
+    
     /**
      * these methods are called immediately before automode is started to ensure that
      * the GUI can respond in a reasonable way, e.g., change the cursor to a waiting cursor
@@ -55,7 +90,7 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
 
     /**
      * called to complete and apply a taclet instantiations
-     * @param models the  partial models with all different possible instantiations found automatically
+     * @param models the partial models with all different possible instantiations found automatically
      * @param goal the Goal where to apply
      */
     void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal);

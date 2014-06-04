@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -76,7 +76,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          preferenceShell.bot().button("OK").click();
          assertEquals(usePrettyPrinting, KeYSEDPreferences.isUsePrettyPrinting());
          // Launch something
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Get debug target TreeItem
@@ -103,8 +103,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               null,
-                              8,
-                              executor);
+                              Boolean.TRUE,
+                              8, executor);
       }
       finally {
          // Restore original value
@@ -152,7 +152,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          preferenceShell.bot().button("OK").click();
          assertEquals(mergeBranchConditions, KeYSEDPreferences.isMergeBranchConditions());
          // Launch something
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Get debug target TreeItem
@@ -179,8 +179,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               null,
                               Boolean.FALSE,
-                              8,
-                              executor);
+                              Boolean.TRUE,
+                              8, executor);
       }
       finally {
          // Restore original value
@@ -228,7 +228,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          preferenceShell.bot().button("OK").click();
          assertEquals(showVariableValues, KeYSEDPreferences.isShowVariablesOfSelectedDebugNode());
          // Launch something
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Get debug target TreeItem
@@ -258,8 +258,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.FALSE,
-                              8,
-                              executor);
+                              Boolean.TRUE,
+                              8, executor);
       }
       finally {
          // Restore original value
@@ -311,7 +311,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          preferenceShell.bot().button("OK").click();
          assertEquals(showMainWindow, KeYSEDPreferences.isShowKeYMainWindow());
          // Launch something
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                if (showMainWindow) {
@@ -339,8 +339,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               null,
                               Boolean.FALSE,
                               Boolean.FALSE,
-                              8,
-                              executor);
+                              Boolean.TRUE,
+                              8, executor);
       }
       finally {
          // Restore original value
@@ -353,16 +353,32 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
     * Tests the launch where return values are shown in tree.
     */
    @Test
-   public void testShowMethodReturnValuesInDebugNodes() throws Exception {
-      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodes", true);
+   public void testShowMethodReturnValuesInDebugNodes_Signature() throws Exception {
+      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodesWithSignature", true, true);
    }
 
    /**
     * Tests the launch where return values are not shown in tree.
     */
    @Test
-   public void testDoNotShowMethodReturnValuesInDebugNodes() throws Exception {
-      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes", false);
+   public void testDoNotShowMethodReturnValuesInDebugNodes_Signature() throws Exception {
+      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodesWithSignature", false, true);
+   }
+   
+   /**
+    * Tests the launch where return values are shown in tree.
+    */
+   @Test
+   public void testShowMethodReturnValuesInDebugNodes_NameOnly() throws Exception {
+      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodes", true, false);
+   }
+
+   /**
+    * Tests the launch where return values are not shown in tree.
+    */
+   @Test
+   public void testDoNotShowMethodReturnValuesInDebugNodes_NameOnly() throws Exception {
+      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes", false, false);
    }
    
    /**
@@ -373,7 +389,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
     * @throws Exception Occurred Exception
     */
    protected void doTestShowMethodReturnValuesInDebugNodes(String projectName, 
-                                                           final boolean showMethodReturnValuesInDebugNodes) throws Exception {
+                                                           final boolean showMethodReturnValuesInDebugNodes,
+                                                           final boolean showSignature) throws Exception {
       boolean originalShowMethodReturnValuesInDebugNodes = KeYSEDPreferences.isShowMethodReturnValuesInDebugNode();
       try {
          // Set preference
@@ -385,16 +402,32 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          else {
             preferenceShell.bot().checkBox("Show method return values in debug nodes").deselect();
          }
+         if (showSignature) {
+            preferenceShell.bot().checkBox("Show signature instead of only the name on method return nodes").select();
+         }
+         else {
+            preferenceShell.bot().checkBox("Show signature instead of only the name on method return nodes").deselect();
+         }
          preferenceShell.bot().button("OK").click();
          assertEquals(showMethodReturnValuesInDebugNodes, KeYSEDPreferences.isShowMethodReturnValuesInDebugNode());
          // Launch something
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Get debug target TreeItem
                SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
                // Do resume and test created tree
-               String expectedModelPathInBundle = showMethodReturnValuesInDebugNodes ? "data/simpleIf/oracle/SimpleIf.xml" : "data/simpleIf/oracle_noMethodReturnValues/SimpleIf.xml";
+               String expectedModelPathInBundle;
+               if (showSignature) {
+                  expectedModelPathInBundle = showMethodReturnValuesInDebugNodes ? 
+                                              "data/simpleIf/oracle/SimpleIf.xml" : 
+                                              "data/simpleIf/oracle_noMethodReturnValues/SimpleIf.xml";
+               }
+               else {
+                  expectedModelPathInBundle = showMethodReturnValuesInDebugNodes ? 
+                                              "data/simpleIf/oracle/SimpleIf_NoSignature.xml" : 
+                                              "data/simpleIf/oracle_noMethodReturnValues/SimpleIf_NoSignature.xml";
+               }
                resume(bot, item, target);
                assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false);
             }
@@ -411,8 +444,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.FALSE,
-                              8,
-                              executor);
+                              null,
+                              8, executor);
       }
       finally {
          // Restore original value

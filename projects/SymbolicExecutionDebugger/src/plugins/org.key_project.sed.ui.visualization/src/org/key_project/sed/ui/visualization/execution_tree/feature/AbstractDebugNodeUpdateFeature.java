@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -33,19 +33,23 @@ import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.AreaContext;
 import org.eclipse.graphiti.features.context.impl.LayoutContext;
+import org.eclipse.graphiti.features.context.impl.UpdateContext;
 import org.eclipse.graphiti.features.impl.AbstractUpdateFeature;
 import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
+import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.SEDPreorderIterator;
+import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeStyleUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.java.ArrayUtil;
@@ -117,6 +121,19 @@ import org.key_project.util.java.StringUtil;
  */
 public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeature {
    /**
+    * Key used in {@link UpdateContext#getProperty(Object)} which specifies that the style has to be updated. 
+    * The value is an instance of {@link Boolean}.
+    */
+   public static final String KEY_UPDATE_STYLE = "updateStyle";
+   
+   /**
+    * Key used in {@link UpdateContext#getProperty(Object)} to specify the changed {@link ISEDDebugNode}
+    * for which the style of its {@link PictogramElement} has to be updated.
+    * The value is an instance of {@link ISEDDebugNode}.
+    */
+   public static final String KEY_SED_NODE = "sedNode";
+   
+   /**
     * The maximal x coordinate which is used by the previous
     * {@link ISEDDebugTarget} in {@link #updateChildren(PictogramElement, IProgressMonitor)}.
     */
@@ -135,8 +152,14 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     */
    @Override
    public boolean canUpdate(IUpdateContext context) {
-      Object bo = getBusinessObjectForPictogramElement(context.getPictogramElement());
-      return canUpdateBusinessObject(bo);
+      Object updateStyle = context.getProperty(KEY_UPDATE_STYLE);
+      if (updateStyle instanceof Boolean && ((Boolean)updateStyle).booleanValue()) {
+         return context.getPictogramElement() != null;
+      }
+      else {
+         Object bo = getBusinessObjectForPictogramElement(context.getPictogramElement());
+         return canUpdateBusinessObject(bo);
+      }
    }
    
    /**
@@ -151,23 +174,29 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     */
    @Override
    public IReason updateNeeded(IUpdateContext context) {
-      try {
-         PictogramElement pictogramElement = context.getPictogramElement();
-         if (isNameUpdateNeeded(pictogramElement)) {
-            return Reason.createTrueReason("Name is out of date.");
-         }
-         else {
-            if (isChildrenUpdateNeeded(pictogramElement)) {
-               return Reason.createTrueReason("New children available.");
+      Object updateStyle = context.getProperty(KEY_UPDATE_STYLE);
+      if (updateStyle instanceof Boolean && ((Boolean)updateStyle).booleanValue()) {
+         return Reason.createTrueReason("Style is out of date.");
+      }
+      else {
+         try {
+            PictogramElement pictogramElement = context.getPictogramElement();
+            if (isNameUpdateNeeded(pictogramElement)) {
+               return Reason.createTrueReason("Name is out of date.");
             }
             else {
-               return Reason.createFalseReason();
+               if (isChildrenUpdateNeeded(pictogramElement)) {
+                  return Reason.createTrueReason("New children available.");
+               }
+               else {
+                  return Reason.createFalseReason();
+               }
             }
          }
-      }
-      catch (DebugException e) {
-         LogUtil.getLogger().logError(e);
-         return Reason.createFalseReason(e.getMessage());
+         catch (DebugException e) {
+            LogUtil.getLogger().logError(e);
+            return Reason.createFalseReason(e.getMessage());
+         }
       }
    }
    
@@ -286,31 +315,42 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     */
    @Override
    public boolean update(IUpdateContext context) {
-      try {
-         // Define monitor to use
-         IProgressMonitor monitor = GraphitiUtil.getProgressMonitor(context);
-         // Update name
-         PictogramElement pictogramElement = context.getPictogramElement();
-         monitor.beginTask("Update element: " + pictogramElement, 3);
-         boolean success = updateName(pictogramElement, new SubProgressMonitor(monitor, 1));
-         monitor.worked(1);
-         // Update children, they have the correct layout after this step
-         final int OFFSET = getDiagram().getGridUnit() * 2;
-         if (success) {
-            success = updateChildren(pictogramElement, OFFSET, new SubProgressMonitor(monitor, 1));
+      Object updateStyle = context.getProperty(KEY_UPDATE_STYLE);
+      if (updateStyle instanceof Boolean && ((Boolean)updateStyle).booleanValue()) {
+         Object nodeProp = context.getProperty(KEY_SED_NODE);
+         ISEDDebugNode bo = nodeProp instanceof ISEDDebugNode ? (ISEDDebugNode)nodeProp : null;
+         if (bo == null) {
+            bo = (ISEDDebugNode)getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElement());
          }
-         monitor.worked(1);
-         // Update parents, because children maybe have now a bigger width and overlap with other branches
-         if (success) {
-            success = updateParents(pictogramElement, OFFSET, new SubProgressMonitor(monitor, 1));
-         }
-         monitor.worked(1);
-         monitor.done();
-         return success;
+         return updateStyle(context.getPictogramElement(), bo);
       }
-      catch (DebugException e) {
-         LogUtil.getLogger().logError(e);
-         return false;
+      else {
+         try {
+            // Define monitor to use
+            IProgressMonitor monitor = GraphitiUtil.getProgressMonitor(context);
+            // Update name
+            PictogramElement pictogramElement = context.getPictogramElement();
+            monitor.beginTask("Update element: " + pictogramElement, 3);
+            boolean success = updateName(pictogramElement, new SubProgressMonitor(monitor, 1));
+            monitor.worked(1);
+            // Update children, they have the correct layout after this step
+            final int OFFSET = getDiagram().getGridUnit() * 2;
+            if (success) {
+               success = updateChildren(pictogramElement, OFFSET, new SubProgressMonitor(monitor, 1));
+            }
+            monitor.worked(1);
+            // Update parents, because children maybe have now a bigger width and overlap with other branches
+            if (success) {
+               success = updateParents(pictogramElement, OFFSET, new SubProgressMonitor(monitor, 1));
+            }
+            monitor.worked(1);
+            monitor.done();
+            return success;
+         }
+         catch (DebugException e) {
+            LogUtil.getLogger().logError(e);
+            return false;
+         }
       }
    }
 
@@ -916,5 +956,44 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             pe.getGraphicsAlgorithm().setX(pe.getGraphicsAlgorithm().getX() + distance);
          }
       }
+   }
+
+   /**
+    * Updates the style of the given {@link PictogramElement}.
+    * @param pe The {@link PictogramElement} to update.
+    * @param node The {@link ISEDDebugNode} as business object of the given {@link PictogramElement}.
+    * @return {@code true} successful, {@code false} not succesful.
+    */
+   protected boolean updateStyle(PictogramElement pe, ISEDDebugNode node) {
+      if (pe instanceof Shape) {
+         Shape shape = (Shape)pe;
+         if (shape.getGraphicsAlgorithm() instanceof RoundedRectangle) {
+            RoundedRectangle rr = (RoundedRectangle)shape.getGraphicsAlgorithm();
+            ISEDAnnotation[] annotations = node.computeUsedAnnotations();
+            String newStyleId = ExecutionTreeStyleUtil.computeDebugNodeStyleId(annotations);
+            if (!newStyleId.equals(rr.getStyle().getId())) {
+               // Replace and update style
+               rr.setStyle(ExecutionTreeStyleUtil.getStyleForDebugNode(newStyleId, annotations, getDiagram()));
+            }
+            else {
+               // Update style
+               ExecutionTreeStyleUtil.getStyleForDebugNode(newStyleId, annotations, getDiagram());
+            }
+         }
+         else if (shape.getGraphicsAlgorithm() instanceof Text) {
+            Text text = (Text)shape.getGraphicsAlgorithm();
+            ISEDAnnotation[] annotations = node.computeUsedAnnotations();
+            String newStyleId = ExecutionTreeStyleUtil.computeDebugNodeTextStyleId(annotations);
+            if (!newStyleId.equals(text.getStyle().getId())) {
+               // Replace and update style
+               text.setStyle(ExecutionTreeStyleUtil.getStyleForDebugNodeText(newStyleId, annotations, getDiagram()));
+            }
+            else {
+               // Update style
+               ExecutionTreeStyleUtil.getStyleForDebugNodeText(newStyleId, annotations, getDiagram());
+            }
+         }
+      }
+      return true;
    }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -65,7 +65,11 @@ public class KeYLaunchSymbolicDebugPreferencePage extends FieldEditorPreferenceP
       edit = new BooleanFieldEditor(KeYSEDPreferences.USE_PRETTY_PRINTING, "Use &pretty printing", SWT.NONE, spacer);
       edit.fillIntoGrid(spacer, 2);
       addField(edit);
+      edit = new BooleanFieldEditor(KeYSEDPreferences.SHOW_SIGNATURE_ON_METHOD_RETURN_NODES, "Show signature instead of only the name on method &return nodes", SWT.NONE, spacer);
+      edit.fillIntoGrid(spacer, 2);
+      addField(edit);
 
+      
       group = SWTFactory.createGroup(getFieldEditorParent(), "KeY", 1, 1, GridData.FILL_HORIZONTAL);
       spacer = SWTFactory.createComposite(group, 1, 1, GridData.FILL_HORIZONTAL);
       edit = new BooleanFieldEditor(KeYSEDPreferences.SHOW_KEY_MAIN_WINDOW, "Show KeY's &main window (only for experienced user)", SWT.NONE, spacer);

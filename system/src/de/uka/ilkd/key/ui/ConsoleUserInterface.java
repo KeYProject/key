@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,61 +13,49 @@
 
 package de.uka.ilkd.key.ui;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import static de.uka.ilkd.key.gui.Main.Verbosity.DEBUG;
+import static de.uka.ilkd.key.gui.Main.Verbosity.HIGH;
+import static de.uka.ilkd.key.gui.Main.Verbosity.NORMAL;
+import static de.uka.ilkd.key.gui.Main.Verbosity.SILENT;
+
 import java.io.File;
 import java.util.List;
 
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.gui.KeYMediator;
-import static de.uka.ilkd.key.gui.Main.Verbosity.*;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ProofStarter;
 
 public class ConsoleUserInterface extends AbstractUserInterface {
     private static final int PROGRESS_BAR_STEPS = 50;
     private static final String PROGRESS_MARK = ">";
 
-    public static final String PROP_AUTO_MODE = "autoMode";
-
-   /**
-    * The used {@link PropertyChangeSupport}.
-    */
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-
     private final BatchMode batchMode;
     private final byte verbosity;
-	private ProofStarter ps;
 	private KeYMediator mediator;
-	private boolean autoMode;
 
 	// for a progress bar
 	private int progressMax = 0;
 
-    public boolean isAutoMode() {
-        return autoMode;
-    }
-
-   public ConsoleUserInterface(BatchMode batchMode, boolean useAutoSaver, byte verbosity) {
+   public ConsoleUserInterface(BatchMode batchMode, byte verbosity) {
     	this.batchMode = batchMode;
     	this.verbosity = verbosity;
-        this.mediator  = new KeYMediator(this, useAutoSaver);
+        this.mediator  = new KeYMediator(this);
    }
 
-   public ConsoleUserInterface(BatchMode batchMode, boolean useAutoSaver, boolean verbose) {
-       this(batchMode, useAutoSaver, verbose? DEBUG: NORMAL);
+   public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
+       this(batchMode, verbose? DEBUG: NORMAL);
    }
 
     public void taskFinished(TaskFinishedInfo info) {
@@ -91,6 +79,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                     System.out.println("Proof steps: "+stat.nodes);
                     System.out.println("Branches: "+stat.branches);
                     System.out.println("Automode Time: "+stat.autoModeTime+"ms");
+                    System.out.println("Time per step: "+stat.timePerStep+"ms");
                 }
                 System.out.println("Number of goals remaining open: " +
                         openGoals);
@@ -118,9 +107,9 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             // has to be notified that we work in auto mode (CS)
             mediator.setInteractive(false);
 
-            final Object result = ps.start();
-            if (verbosity >= HIGH) {
-            	System.out.println(result);
+            startAndWaitForAutoMode(proof);
+            if (verbosity >= HIGH) { // WARNING: Is never executed since application terminates via System.exit() before.
+            	System.out.println(proof.statistics());
             }
         }
     }
@@ -145,8 +134,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             ProofAggregate proofAggregate) {
         // TODO Implement ProblemInitializerListener.proofCreated
         // XXX WHY AT THE MAINWINDOW?!?!
-    	ps = new ProofStarter(this, mediator.getAutoSaver() != null);
-        ps.init(proofAggregate);
         mediator.setProof(proofAggregate.getFirstProof());
     }
 
@@ -221,20 +208,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     }
 
     @Override
-    public void notifyAutoModeBeingStarted() {
-       boolean oldValue = isAutoMode();
-       autoMode = true;
-       firePropertyChange(PROP_AUTO_MODE, oldValue, isAutoMode());
-    }
-
-    @Override
-    public void notifyAutomodeStopped() {
-       boolean oldValue = isAutoMode();
-       autoMode = false;
-       firePropertyChange(PROP_AUTO_MODE, oldValue, isAutoMode());
-    }
-
-    @Override
     public void notify(NotificationEvent event) {
         if(verbosity >= DEBUG) {
         	System.out.println(event);
@@ -255,12 +228,12 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
 	@Override
     public void loadProblem(File file) {
-		super.loadProblem(file, null, null, mediator);
+		super.getProblemLoader(file, null, null, mediator).runSynchronously();
 	}
 
    @Override
    public void loadProblem(File file, List<File> classPath, File bootClassPath) {
-      super.loadProblem(file, classPath, bootClassPath, mediator);
+      super.getProblemLoader(file, classPath, bootClassPath, mediator).runSynchronously();
    }
 
 	@Override
@@ -309,118 +282,4 @@ public class ConsoleUserInterface extends AbstractUserInterface {
          proof.dispose();
       }
    }
-
-   /**
-    * Returns the used {@link PropertyChangeSupport}.
-    * @return the used {@link PropertyChangeSupport}.
-    */
-   protected PropertyChangeSupport getPcs() {
-       return pcs;
-   }
-
-   /**
-    * Adds the given listener.
-    * @param listener The listener to add.
-    */
-   public void addPropertyChangeListener(PropertyChangeListener listener) {
-       pcs.addPropertyChangeListener(listener);
-   }
-
-   /**
-    * Adds the given listener for the given property only.
-    * @param propertyName The property to observe.
-    * @param listener The listener to add.
-    */
-   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-       pcs.addPropertyChangeListener(propertyName, listener);
-   }
-
-   /**
-    * Removes the given listener.
-    * @param listener The listener to remove.
-    */
-   public void removePropertyChangeListener(PropertyChangeListener listener) {
-       pcs.removePropertyChangeListener(listener);
-   }
-
-   /**
-    * Removes the given listener from the given property.
-    * @param propertyName The property to no longer observe.
-    * @param listener The listener to remove.
-    */
-   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-       pcs.removePropertyChangeListener(propertyName, listener);
-   }
-
-   /**
-    * Fires the event to all available listeners.
-    * @param propertyName The property name.
-    * @param index The changed index.
-    * @param oldValue The old value.
-    * @param newValue The new value.
-    */
-   protected void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue, boolean newValue) {
-       pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-   }
-
-   /**
-    * Fires the event to all available listeners.
-    * @param propertyName The property name.
-    * @param index The changed index.
-    * @param oldValue The old value.
-    * @param newValue The new value.
-    */
-   protected void fireIndexedPropertyChange(String propertyName, int index, int oldValue, int newValue) {
-       pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-   }
-
-   /**
-    * Fires the event to all available listeners.
-    * @param propertyName The property name.
-    * @param index The changed index.
-    * @param oldValue The old value.
-    * @param newValue The new value.
-    */
-   protected void fireIndexedPropertyChange(String propertyName, int index, Object oldValue, Object newValue) {
-       pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-   }
-
-   /**
-    * Fires the event to all listeners.
-    * @param evt The event to fire.
-    */
-   protected void firePropertyChange(PropertyChangeEvent evt) {
-       pcs.firePropertyChange(evt);
-   }
-
-   /**
-    * Fires the event to all listeners.
-    * @param propertyName The changed property.
-    * @param oldValue The old value.
-    * @param newValue The new value.
-    */
-   protected void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
-       pcs.firePropertyChange(propertyName, oldValue, newValue);
-   }
-
-   /**
-    * Fires the event to all listeners.
-    * @param propertyName The changed property.
-    * @param oldValue The old value.
-    * @param newValue The new value.
-    */
-   protected void firePropertyChange(String propertyName, int oldValue, int newValue) {
-       pcs.firePropertyChange(propertyName, oldValue, newValue);
-   }
-
-   /**
-    * Fires the event to all listeners.
-    * @param propertyName The changed property.
-    * @param oldValue The old value.
-    * @param newValue The new value.
-    */
-   protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-       pcs.firePropertyChange(propertyName, oldValue, newValue);
-   }
-
 }

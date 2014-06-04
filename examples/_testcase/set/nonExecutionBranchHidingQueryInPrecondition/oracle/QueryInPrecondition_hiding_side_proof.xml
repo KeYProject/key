@@ -14,7 +14,10 @@ mod: \if (true)  \then (empty)  \else (allLocs)
          \else (allLocs)
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
-               <methodReturn name="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+	Z(2(4(#))) {and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),leq(y,Z(neglit(1(#)))))}, 
+	Z(neglit(1(1(7(4(#)))))) {not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))}
+as result of main&gt;" signatureIncludingReturnValue="&lt;return 
 	Z(2(4(#))) {and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),leq(y,Z(neglit(1(#)))))}, 
 	Z(neglit(1(1(7(4(#)))))) {not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))}
 as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true">

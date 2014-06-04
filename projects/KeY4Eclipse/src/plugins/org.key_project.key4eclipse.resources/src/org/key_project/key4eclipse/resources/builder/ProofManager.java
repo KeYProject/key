@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -84,7 +84,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -96,7 +96,7 @@ import de.uka.ilkd.key.util.ProofStarter;
  */
 public class ProofManager {
 
-   private KeYEnvironment<CustomConsoleUserInterface> environment;
+   private KeYEnvironment<CustomUserInterface> environment;
    private MarkerManager markerManager;
    private IFolder mainProofFolder;
    private IProject project;
@@ -324,7 +324,7 @@ public class ProofManager {
     * Clones the global {@link KeYEnvironment}.
     * @return the cloned {@link KeYEnvironment}
     */
-   private KeYEnvironment<CustomConsoleUserInterface> cloneEnvironment(){
+   private KeYEnvironment<CustomUserInterface> cloneEnvironment(){
       InitConfig sourceInitConfig = environment.getInitConfig();
       // Create new profile which has separate OneStepSimplifier instance
       JavaProfile profile = new JavaProfile();
@@ -349,7 +349,7 @@ public class ProofManager {
          }
          env.getJustifInfo().addJustification(rule, origJusti);
       }
-      KeYEnvironment<CustomConsoleUserInterface> keyEnv = new KeYEnvironment<CustomConsoleUserInterface>(new CustomConsoleUserInterface(false), initConfig);
+      KeYEnvironment<CustomUserInterface> keyEnv = new KeYEnvironment<CustomUserInterface>(new CustomUserInterface(false), initConfig);
       return keyEnv;
    }
    
@@ -736,7 +736,7 @@ public class ProofManager {
       Proof proof = null;
       File file = pe.getProofFile().getLocation().toFile();
       Profile profile = pe.getKeYEnvironment().getInitConfig().getProfile();
-      KeYEnvironment<CustomConsoleUserInterface> loadEnv = null;
+      KeYEnvironment<CustomUserInterface> loadEnv = null;
       boolean error = false;
       try{
          loadEnv = KeYEnvironment.load(profile, file, null, null);
@@ -981,7 +981,7 @@ public class ProofManager {
     * @param type - the types full name
     * @return the {@link KeYJavaType}
     */
-   private KeYJavaType getkeYJavaType(KeYEnvironment<CustomConsoleUserInterface> env, String type){
+   private KeYJavaType getkeYJavaType(KeYEnvironment<CustomUserInterface> env, String type){
       Set<KeYJavaType> envKjts = env.getServices().getJavaInfo().getAllKeYJavaTypes();
       for(KeYJavaType kjt : envKjts){
          if(type.equals(kjt.getFullName())){
@@ -998,10 +998,10 @@ public class ProofManager {
     */
    private class ProofRunnable implements Runnable {
       
-      private final KeYEnvironment<CustomConsoleUserInterface> environment;
+      private final KeYEnvironment<CustomUserInterface> environment;
       private final IProgressMonitor monitor;
       
-      public ProofRunnable(KeYEnvironment<CustomConsoleUserInterface> environment, IProgressMonitor monitor){
+      public ProofRunnable(KeYEnvironment<CustomUserInterface> environment, IProgressMonitor monitor){
          this.environment = environment;
          this.monitor = monitor;
       }

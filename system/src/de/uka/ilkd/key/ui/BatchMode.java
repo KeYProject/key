@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -132,7 +132,7 @@ public class BatchMode {
                                      statistics.time + " | " +
                                      statistics.autoModeTime + " | " +
                                      (proofClosed ? 1 : 0) + " | " +
-                                     ((double)statistics.autoModeTime / (double)statistics.totalRuleApps) + " | " +
+                                     statistics.timePerStep + " | " +
                                      memory);
             statPrinter.close();
         } catch ( IOException e ) {

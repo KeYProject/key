@@ -13,6 +13,7 @@ import de.uka.ilkd.key.gui.testgen.TGInfoDialog;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 
+
 /**
  * Action which generates test cases for all open nodes. If the proof is closed,
  * test cases will be generated for nodes on which the emptyModality rule was

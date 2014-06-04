@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.gui;
 
@@ -27,6 +26,7 @@ import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagLayout;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -67,45 +67,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 
-import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
-import de.uka.ilkd.key.gui.actions.AboutAction;
-import de.uka.ilkd.key.gui.actions.AutoModeAction;
-import de.uka.ilkd.key.gui.actions.CounterExampleAction;
-import de.uka.ilkd.key.gui.actions.TestGenerationAction;
-import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
-import de.uka.ilkd.key.gui.actions.ExitMainAction;
-import de.uka.ilkd.key.gui.actions.FontSizeAction;
-import de.uka.ilkd.key.gui.actions.GoalBackAction;
-import de.uka.ilkd.key.gui.actions.HidePackagePrefixToggleAction;
-import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
-import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
-import de.uka.ilkd.key.gui.actions.LicenseAction;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
-import de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction;
-import de.uka.ilkd.key.gui.actions.OpenExampleAction;
-import de.uka.ilkd.key.gui.actions.OpenFileAction;
-import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
-import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
-import de.uka.ilkd.key.gui.actions.ProofManagementAction;
-import de.uka.ilkd.key.gui.actions.PruneProofAction;
-import de.uka.ilkd.key.gui.actions.QuickLoadAction;
-import de.uka.ilkd.key.gui.actions.QuickSaveAction;
-import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
-import de.uka.ilkd.key.gui.actions.ToggleConfirmExitAction;
-import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
-import de.uka.ilkd.key.gui.actions.SaveFileAction;
-import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
-import de.uka.ilkd.key.gui.actions.SearchInSequentAction;
-import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
-import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
-import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
-import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
-import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
-import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
-import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
-import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
-import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
+import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
@@ -292,6 +254,7 @@ public final class MainWindow extends JFrame  {
      */
     private MainWindow() {
         setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
+        applyGnomeWorkaround();
         setLaF();
         setIconImage(IconFactory.keyLogo());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -338,6 +301,24 @@ public final class MainWindow extends JFrame  {
     public static boolean hasInstance() {
        return instance != null;
     }
+    
+    /**
+     * Workaround to an issue with the Gnome window manager.
+     * This sets the application title in the app menu (in the top bar)
+     * to "KeY" instead of the full class name ("de-uka-ilkd....").
+     * This should not have a negative effect on other window managers.
+     * See <a href="http://elliotth.blogspot.de/2007/02/fixing-wmclass-for-your-java.html">
+     * here</a> for details.
+     */
+    private void applyGnomeWorkaround() {
+        Toolkit xToolkit = Toolkit.getDefaultToolkit();
+        java.lang.reflect.Field awtAppClassNameField;
+        try {
+            awtAppClassNameField = xToolkit.getClass().getDeclaredField("awtAppClassName");
+            awtAppClassNameField.setAccessible(true);
+            awtAppClassNameField.set(xToolkit, "KeY");
+        } catch (Exception e) {}
+    }
 
     /**
      * Tries to set the system look and feel if this option is activated.
@@ -369,7 +350,7 @@ public final class MainWindow extends JFrame  {
      * @param userInterface The UserInterface.
      */
     private KeYMediator getMainWindowMediator(UserInterface userInterface) {
-        KeYMediator result = new KeYMediator(userInterface, true);
+        KeYMediator result = new KeYMediator(userInterface);
         result.addKeYSelectionListener(proofListener);
         result.addAutoModeListener(proofListener);
         result.addGUIListener(guiListener);
@@ -454,8 +435,6 @@ public final class MainWindow extends JFrame  {
         toolBarPanel.add(controlToolBar);
         toolBarPanel.add(fileOpToolBar);
 
-        // FIXME double entry?
-        getContentPane().add(GuiUtilities.getClipBoardArea(), BorderLayout.PAGE_START);
         getContentPane().add(toolBarPanel, BorderLayout.PAGE_START);
 
         // create tabbed pane
@@ -535,7 +514,6 @@ public final class MainWindow extends JFrame  {
         toolBar.add(comp.getSelectionComponent());
         toolBar.addSeparator();        
         toolBar.add(new CounterExampleAction(this));
-        toolBar.addSeparator();        
         toolBar.add(new TestGenerationAction(this));
         toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
@@ -808,9 +786,9 @@ public final class MainWindow extends JFrame  {
         proof.add(new SearchInProofTreeAction(this));
         proof.add(new SearchInSequentAction(this));
         proof.addSeparator();
-	proof.add(new ShowUsedContractsAction(this));
+        proof.add(new ShowUsedContractsAction(this));
         proof.add(new ShowActiveTactletOptionsAction(this));
-	proof.add(showActiveSettingsAction);
+        proof.add(showActiveSettingsAction);
         proof.add(new ShowProofStatistics(this));
         proof.add(new ShowKnownTypesAction(this));
         proof.addSeparator();
@@ -843,6 +821,7 @@ public final class MainWindow extends JFrame  {
         help.setMnemonic(KeyEvent.VK_A);
 
         help.add(new AboutAction(this));
+        help.add(new SystemInfoAction(this));
         help.add(new LicenseAction(this));
         return help;
     }
@@ -947,6 +926,13 @@ public final class MainWindow extends JFrame  {
 
     public ProofTreeView getProofView() {
         return proofTreeView;
+    }
+    
+    /**
+     * Returns the current goal view.
+     */
+    public CurrentGoalView getGoalView() {
+        return currentGoalView;
     }
 
     /** saves a proof */

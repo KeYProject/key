@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -43,6 +43,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
@@ -137,6 +139,11 @@ public class Proof implements Named {
     /** list of rule app listeners */
     private List<RuleAppListener> ruleAppListenerList = Collections.synchronizedList(new ArrayList<RuleAppListener>(10));
 
+    /**
+     * Contains all registered {@link ProofDisposedListener}.
+     */
+    private final List<ProofDisposedListener> proofDisposedListener = new LinkedList<ProofDisposedListener>();
+    
     /** constructs a new empty proof with name */
     private Proof(Name name, Services services, ProofSettings settings) {
         this.name = name;
@@ -272,6 +279,7 @@ public class Proof implements Named {
         disposed = true;
         ruleAppListenerList = null;
         listenerList = null;
+        fireProofDisposed(new ProofDisposedEvent(this));
     }
 
 
@@ -1006,6 +1014,12 @@ public class Proof implements Named {
 	return result.toString();
     }
 
+    /**
+     * Instances of this class encapsulate statistical information about proofs,
+     * such as the number of nodes, or the number of interactions.
+     * @author bruns
+     *
+     */
     public final static class Statistics {
         public final int nodes;
         public final int branches;
@@ -1019,6 +1033,7 @@ public class Proof implements Named {
         public final int loopInvApps;
         public final long autoModeTime;
         public final long time;
+        public final float timePerStep;
 
         private List<Pair<String, String>> summaryList =
                 new ArrayList<Pair<String, String>>(14);
@@ -1027,16 +1042,16 @@ public class Proof implements Named {
         private Statistics(Proof proof) {
             final Iterator<Node> it = proof.root().subtreeIterator();
 
-            int tmpNodes = 0;
-            int tmpBranches = 1;
-            int tmpInteractive = 0;
-            int tmpQuant = 0;
-            int tmpOss = 0;
-            int tmpOssCaptured = 0;
-            int tmpSmt = 0;
-            int tmpDep = 0;
-            int tmpContr = 0;
-            int tmpInv = 0;
+            int tmpNodes = 0; // proof nodes
+            int tmpBranches = 1; // proof branches
+            int tmpInteractive = 0; // interactive steps
+            int tmpQuant = 0; // quantifier instantiations
+            int tmpOss = 0; // OSS applications
+            int tmpOssCaptured = 0; // rules apps in OSS protocol
+            int tmpSmt = 0; // SMT rule apps
+            int tmpDep = 0; // dependency contract apps
+            int tmpContr = 0; // functional contract apps
+            int tmpInv = 0; // loop invariants
 
             while (it.hasNext()) {
                 tmpNodes++;
@@ -1071,7 +1086,7 @@ public class Proof implements Named {
                     } else if (ruleApp instanceof TacletApp) {
                         final de.uka.ilkd.key.rule.Taclet t = ((TacletApp)ruleApp).taclet();
                         final String tName = t.name().toString();
-                        if (tName.startsWith("allLeft") || tName.startsWith("exRight")) {
+                        if (tName.startsWith("allLeft") || tName.startsWith("exRight") || tName.startsWith("inst")) {
                             tmpQuant++;
                         }
                     }
@@ -1090,29 +1105,19 @@ public class Proof implements Named {
             this.loopInvApps = tmpInv;
             this.autoModeTime = proof.getAutoModeTime();
             this.time = System.currentTimeMillis() - Main.getStartTime();
+            timePerStep = autoModeTime/(float)nodes;
 
-            generateSummary(proof, tmpNodes, tmpBranches, tmpInteractive, tmpQuant, tmpOss, tmpSmt, tmpDep, tmpContr, tmpInv, tmpOssCaptured);
+            generateSummary(proof);
         }
 
-
-        private void generateSummary(Proof proof,
-                                     int tmpNodes,
-                                     int tmpBranches,
-                                     int tmpInteractive,
-                                     int quant,
-                                     int tmpOss,
-                                     int tmpSmt,
-                                     int tmpDep,
-                                     int tmpContr,
-                                     int tmpInv,
-                                     int tmpOssCaptured) {
+        private void generateSummary(Proof proof) {
             final String nodeString =
-                    EnhancedStringBuffer.format(tmpNodes).toString();
+                    EnhancedStringBuffer.format(nodes).toString();
             summaryList.add(new Pair<String, String>("Nodes", nodeString));
             summaryList.add(new Pair<String, String>("Branches",
-                                                     EnhancedStringBuffer.format(tmpBranches).toString()));
+                                                     EnhancedStringBuffer.format(branches).toString()));
             summaryList.add(new Pair<String, String>("Interactive steps", "" +
-                                                                          tmpInteractive));
+                                                                          interactiveSteps));
             final long time = proof.getAutoModeTime();
             summaryList.add(new Pair<String, String>("Automode time",
                                                      EnhancedStringBuffer.formatTime(time).toString()));
@@ -1121,31 +1126,31 @@ public class Proof implements Named {
                                                                           time +
                                                                           "ms"));
             }
-            if (tmpNodes > 0) { // TODO: real rounding
-                final String avgTime = "" + (time / tmpNodes) + "." + ((time *
-                                                                        10 /
-                                                                        tmpNodes) %
-                                                                       10);
+            if (nodes > 0) {
+                String avgTime = "" + timePerStep;
+                // round to 3 digits after point
+                int i = avgTime.indexOf('.')+4;
+                if (i > avgTime.length()) i = avgTime.length();
+                avgTime = avgTime.substring(0,i);
                 summaryList.add(new Pair<String, String>("Avg. time per step", "" +
                                                                                avgTime +
                                                                                "ms"));
             }
 
             summaryList.add(new Pair<String, String>("Rule applications", ""));
-            summaryList.add(new Pair<String, String>("Quantifier instantiations", ""+quant));
+            summaryList.add(new Pair<String, String>("Quantifier instantiations", ""+quantifierInstantiations));
             summaryList.add(new Pair<String, String>("One-step Simplifier apps", "" +
-                                                                                 tmpOss));
+                                                                                 ossApps));
             summaryList.add(new Pair<String, String>("SMT solver apps", "" +
-                                                                        tmpSmt));
+                                                                        smtSolverApps));
             summaryList.add(new Pair<String, String>("Dependency Contract apps", "" +
-                                                                                 tmpDep));
+                                                                                 dependencyContractApps));
             summaryList.add(new Pair<String, String>("Operation Contract apps", "" +
-                                                                                tmpContr));
+                                                                                operationContractApps));
             summaryList.add(new Pair<String, String>("Loop invariant apps", "" +
-                                                                            tmpInv));
+                                                                            loopInvApps));
             summaryList.add(new Pair<String, String>("Total rule apps",
-                                                     EnhancedStringBuffer.format(tmpNodes +
-                                                                                 tmpOssCaptured).toString()));
+                                                     EnhancedStringBuffer.format(totalRuleApps).toString()));
         }
 
 
@@ -1189,6 +1194,45 @@ public class Proof implements Named {
    public void removeRuleAppListener(RuleAppListener p) {
       synchronized (ruleAppListenerList) {
          ruleAppListenerList.remove(p);
+      }
+   }
+   
+   /**
+    * Registers the given {@link ProofDisposedListener}.
+    * @param l The {@link ProofDisposedListener} to register.
+    */
+   public void addProofDisposedListener(ProofDisposedListener l) {
+      if (l != null) {
+         proofDisposedListener.add(l);
+      }
+   }
+   
+   /**
+    * Unregisters the given {@link ProofDisposedListener}.
+    * @param l The {@link ProofDisposedListener} to unregister.
+    */
+   public void removeProofDisposedListener(ProofDisposedListener l) {
+      if (l != null) {
+         proofDisposedListener.remove(l);
+      }
+   }
+   
+   /**
+    * Returns all registered {@link ProofDisposedListener}.
+    * @return All registered {@link ProofDisposedListener}.
+    */
+   public ProofDisposedListener[] getProofDisposedListeners() {
+      return proofDisposedListener.toArray(new ProofDisposedListener[proofDisposedListener.size()]);
+   }
+   
+   /**
+    * Fires the event {@link ProofDisposedListener#proofDisposed(ProofDisposedEvent)} to all listener.
+    * @param e The event to fire.
+    */
+   protected void fireProofDisposed(ProofDisposedEvent e) {
+      ProofDisposedListener[] listener = getProofDisposedListeners();
+      for (ProofDisposedListener l : listener) {
+         l.proofDisposed(e);
       }
    }
 }

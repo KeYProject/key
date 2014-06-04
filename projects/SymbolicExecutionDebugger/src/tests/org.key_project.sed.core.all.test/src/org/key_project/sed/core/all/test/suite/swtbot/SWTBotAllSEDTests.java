@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -42,12 +42,12 @@ import org.key_project.util.test.suite.swtbot.SWTBotAllUtilTests;
 @Suite.SuiteClasses({
    SWTBotAllKeY4EclipseTests.class,
    SWTBotAllUtilTests.class,
-   SWTBotAllSEDUITests.class,
    SWTBotAllStarterCoreTests.class,
    SWTBotAllSEDCoreTests.class,
+   SWTBotAllSEDUITests.class,
+   SWTBotAllSEDUIVisualizationTests.class,
    SWTBotAllSEDKeYTests.class,
    SWTBotAllSEDKeYUITests.class,
-   SWTBotAllSEDUIVisualizationTests.class,
    SWTBotAllSEDExampleUITests.class
 })
 public class SWTBotAllSEDTests {

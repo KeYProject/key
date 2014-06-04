@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,17 +11,12 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-
-
-
-
 /*
 
 Uses code by Hans Muller and Kathy Walrath from
 http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html
 
  */
-
 
 package de.uka.ilkd.key.gui;
 
@@ -552,7 +547,7 @@ public class ApplyStrategy {
     }
 
 
-    public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals) {
+    public synchronized ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals) {
 
         ProofSettings settings = proof.getSettings();
         StrategySettings stratSet = settings.getStrategySettings();
@@ -578,7 +573,7 @@ public class ApplyStrategy {
      *             beforehand if needed
      */
     @Deprecated
-    public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, int maxSteps,
+    public synchronized ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, int maxSteps,
             long timeout, boolean stopAtFirstNonCloseableGoal) {
         assert proof != null;
 

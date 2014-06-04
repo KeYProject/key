@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -19,7 +19,6 @@ import org.eclipse.jdt.core.IMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * This class is used to define an input to display in the editor
@@ -39,7 +38,7 @@ public class ProofOblInputEditorInput extends AbstractProofEditorInput {
     * @param method An optional {@link IMethod} from which the {@link Proof} was started.
     */
    public ProofOblInputEditorInput(ProofOblInput problem, 
-                                   KeYEnvironment<CustomConsoleUserInterface> environment, 
+                                   KeYEnvironment<?> environment, 
                                    IMethod method) {
       super(environment, method, problem.name());
       Assert.isNotNull(problem);

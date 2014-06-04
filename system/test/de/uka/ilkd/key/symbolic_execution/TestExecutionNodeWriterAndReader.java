@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -184,7 +184,7 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       KeYlessMethodCall mc = new KeYlessMethodCall(ln, "mc", "pc8", false);
       mc.addCallStackEntry(mc);
       ln.addChild(mc);
-      KeYlessMethodReturn mr = new KeYlessMethodReturn(mc, "mr", "pc9", true, "mc with return value", true);
+      KeYlessMethodReturn mr = new KeYlessMethodReturn(mc, "mr", "pc9", true, "mc with return value", "mc(arg)", "mc(arg) with return value", true);
       mr.addReturnValue(new KeYlessMethodReturnValue("rv1", "rv1String", false, null));
       mr.addReturnValue(new KeYlessMethodReturnValue("rv2", "rv2String", true, "c2String"));
       mc.addCallStackEntry(mc);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -97,7 +97,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        target.setModelIdentifier(MODEL_IDENTIFIER);
        launch.addDebugTarget(target);
        
-       SEDMemoryThread thread = new SEDMemoryThread(target);
+       SEDMemoryThread thread = new SEDMemoryThread(target, false);
        thread.setName("Fixed Example Thread");
        thread.setPathCondition("pc1");
        target.addSymbolicThread(thread);

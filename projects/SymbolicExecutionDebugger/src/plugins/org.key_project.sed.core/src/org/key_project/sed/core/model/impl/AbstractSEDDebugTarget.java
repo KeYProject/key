@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,7 +13,14 @@
 
 package org.key_project.sed.core.model.impl;
 
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.core.resources.IMarkerDelta;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
@@ -24,8 +31,24 @@ import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentProvider;
+import org.key_project.sed.core.annotation.ISEDAnnotation;
+import org.key_project.sed.core.annotation.ISEDAnnotationLink;
+import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.model.ISEDDebugElement;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDTermination;
+import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.event.ISEDAnnotationListener;
+import org.key_project.sed.core.model.event.SEDAnnotationEvent;
 import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
+import org.key_project.sed.core.util.ISEDIterator;
+import org.key_project.sed.core.util.LogUtil;
+import org.key_project.sed.core.util.SEDPreorderIterator;
+import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * Provides a basic implementation of {@link ISEDDebugTarget}.
@@ -49,11 +72,6 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     * Indicates that the connection to the process is disconnected or not.
     */
    private boolean disconnected = false;
-   
-   /**
-    * Indicates that the process is currently suspended or not.
-    */
-   private boolean suspended = true;
 
    /**
     * Indicates that the process is termianted or not.
@@ -69,6 +87,16 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     * The name of this debug target.
     */
    private String name;
+   
+   /**
+    * All registered annotations.
+    */
+   private final List<ISEDAnnotation> registeredAnnotations = new LinkedList<ISEDAnnotation>();
+   
+   /**
+    * All registered {@link ISEDAnnotationListener}.
+    */
+   private final List<ISEDAnnotationListener> annotationListener = new LinkedList<ISEDAnnotationListener>();
    
    /**
     * Constructor.
@@ -208,7 +236,38 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public boolean isSuspended() {
-      return suspended;
+      try {
+         return ArrayUtil.search(getSymbolicThreads(), new IFilter<ISEDThread>() {
+            @Override
+            public boolean select(ISEDThread element) {
+               return !element.isSuspended();
+            }
+         }) == null;
+      }
+      catch (DebugException e) {
+         LogUtil.getLogger().logError(e);
+         return false;
+      }
+   }
+   
+   /**
+    * This method should be called after an {@link ISEDThread} is resumed.
+    * @param thread The resumed {@link ISEDThread}.
+    */
+   public void threadResumed(ISEDThread thread) {
+      if (!isSuspended()) {
+         fireResumeEvent(DebugEvent.CLIENT_REQUEST);
+      }
+   }
+   
+   /**
+    * This method should be called after an {@link ISEDThread} is suspended.
+    * @param thread The suspended {@link ISEDThread}.
+    */
+   public void threadSuspended(ISEDThread thread) {
+      if (isSuspended()) {
+         fireSuspendEvent(DebugEvent.CLIENT_REQUEST);
+      }
    }
 
    /**
@@ -216,8 +275,11 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public void resume() throws DebugException {
-      suspended = false;
-      fireResumeEvent(DebugEvent.RESUME);
+      ISEDThread[] threads = getSymbolicThreads();
+      for (ISEDThread thread : threads) {
+         thread.resume();
+      }
+      fireResumeEvent(DebugEvent.CLIENT_REQUEST);
    }
 
    /**
@@ -225,8 +287,11 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public void suspend() throws DebugException {
-      suspended = true;
-      fireSuspendEvent(DebugEvent.SUSPEND);
+      ISEDThread[] threads = getSymbolicThreads();
+      for (ISEDThread thread : threads) {
+         thread.suspend();
+      }
+      fireSuspendEvent(DebugEvent.CLIENT_REQUEST);
    }
 
    /**
@@ -305,6 +370,198 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    protected void setName(String name) {
       this.name = name;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void registerAnnotation(ISEDAnnotation annotation) {
+      if (annotation != null && !registeredAnnotations.contains(annotation)) {
+         if (registeredAnnotations.add(annotation)) {
+            fireAnnotationRegistered(new SEDAnnotationEvent(this, annotation));
+         }
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void unregisterAnnotation(ISEDAnnotation annotation) {
+      if (annotation != null) {
+         if (registeredAnnotations.remove(annotation)) {
+            ISEDAnnotationLink[] links = annotation.getLinks();
+            for (ISEDAnnotationLink link : links) {
+               link.getTarget().removeAnnotationLink(link);
+            }
+            fireAnnotationUnregistered(new SEDAnnotationEvent(this, annotation));
+         }
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDAnnotation[] getRegisteredAnnotations() {
+      return registeredAnnotations.toArray(new ISEDAnnotation[registeredAnnotations.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDAnnotation[] getRegisteredAnnotations(ISEDAnnotationType type) {
+      List<ISEDAnnotation> result = new LinkedList<ISEDAnnotation>();
+      for (ISEDAnnotation annotation : registeredAnnotations) {
+         if (ObjectUtil.equals(type, annotation.getType())) {
+            result.add(annotation);
+         }
+      }
+      return result.toArray(new ISEDAnnotation[result.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isRegistered(ISEDAnnotation annotation) {
+      return annotation != null && registeredAnnotations.contains(annotation);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void moveRegisteredAnnotation(ISEDAnnotation annotation, int newIndex) {
+      if (annotation != null && newIndex >= 0 && newIndex < registeredAnnotations.size()) {
+         if (registeredAnnotations.remove(annotation)) {
+            registeredAnnotations.add(newIndex, annotation);
+            fireAnnotationMoved(new SEDAnnotationEvent(this, annotation));
+         }
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int indexOfRegisteredAnnotation(ISEDAnnotation annotation) {
+      if (annotation != null) {
+         return registeredAnnotations.indexOf(annotation);
+      }
+      else {
+         return -1;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int countRegisteredAnnotations() {
+      return registeredAnnotations.size();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addAnnotationListener(ISEDAnnotationListener l) {
+      if (l != null) {
+         annotationListener.add(l);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeAnnotationListener(ISEDAnnotationListener l) {
+      if (l != null) {
+         annotationListener.remove(l);
+      }
+   }
+   
+   /**
+    * Fires the event {@link ISEDAnnotationListener#annotationRegistered(SEDAnnotationEvent)}.
+    * @param e The {@link SEDAnnotationEvent}.
+    */
+   protected void fireAnnotationRegistered(SEDAnnotationEvent e) {
+      ISEDAnnotationListener[] listener = annotationListener.toArray(new ISEDAnnotationListener[annotationListener.size()]);
+      for (ISEDAnnotationListener l : listener) {
+         l.annotationRegistered(e);
+      }
+   }
+   
+   /**
+    * Fires the event {@link ISEDAnnotationListener#annotationUnregistered(SEDAnnotationEvent)}.
+    * @param e The {@link SEDAnnotationEvent}.
+    */
+   protected void fireAnnotationUnregistered(SEDAnnotationEvent e) {
+      ISEDAnnotationListener[] listener = annotationListener.toArray(new ISEDAnnotationListener[annotationListener.size()]);
+      for (ISEDAnnotationListener l : listener) {
+         l.annotationUnregistered(e);
+      }
+   }
+   
+   /**
+    * Fires the event {@link ISEDAnnotationListener#annotationMoved(SEDAnnotationEvent)}.
+    * @param e The {@link SEDAnnotationEvent}.
+    */
+   protected void fireAnnotationMoved(SEDAnnotationEvent e) {
+      ISEDAnnotationListener[] listener = annotationListener.toArray(new ISEDAnnotationListener[annotationListener.size()]);
+      for (ISEDAnnotationListener l : listener) {
+         l.annotationMoved(e);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Map<String, String> computeStatistics(IProgressMonitor monitor) throws DebugException {
+      // Compute statistics
+      if (monitor == null) {
+         monitor = new NullProgressMonitor();
+      }
+      monitor.beginTask("Computing statistics", IProgressMonitor.UNKNOWN);
+      SWTUtil.checkCanceled(monitor);
+      int nodeCount = 0;
+      int splitCount = 0;
+      int terminatedBranchesCount = 0;
+      int notTerminatedBranchesCount = 0;
+      ISEDIterator iter = new SEDPreorderIterator(this);
+      while (iter.hasNext()) {
+         SWTUtil.checkCanceled(monitor);
+         ISEDDebugElement next = iter.next();
+         if (next instanceof ISEDDebugNode) {
+            ISEDDebugNode node = (ISEDDebugNode)next;
+            nodeCount++;
+            ISEDDebugNode[] children = node.getChildren();
+            if (children.length == 0) {
+               if (node instanceof ISEDTermination) {
+                  terminatedBranchesCount++;
+               }
+               else {
+                  notTerminatedBranchesCount++;
+               }
+            }
+            else if (children.length >= 2) {
+               splitCount++;
+            }
+         }
+         monitor.worked(1);
+      }
+      // Create result
+      Map<String, String> statistics = new LinkedHashMap<String, String>();
+      statistics.put("Number of nodes", nodeCount + "");
+      statistics.put("Number of splits", splitCount + "");
+      statistics.put("Number of completed paths", terminatedBranchesCount + "");
+      statistics.put("Number of not completed paths", notTerminatedBranchesCount + "");
+      monitor.done();
+      return statistics;
    }
 
    /**

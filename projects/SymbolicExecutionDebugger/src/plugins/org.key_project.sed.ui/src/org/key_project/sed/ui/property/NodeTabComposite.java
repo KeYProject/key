@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -16,7 +16,6 @@ package org.key_project.sed.ui.property;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
@@ -35,7 +34,7 @@ import org.key_project.util.java.StringUtil;
  * and in {@code GraphitiDebugNodePropertySection}.
  * @author Martin Hentschel
  */
-public class NodeTabComposite extends AbstractSEDDebugNodeTabComposite {
+public class NodeTabComposite implements ISEDDebugNodeTabContent {
    /**
     * Shows the value of {@link ISEDDebugNode#getName()}.
     */
@@ -53,15 +52,16 @@ public class NodeTabComposite extends AbstractSEDDebugNodeTabComposite {
 
    /**
     * Constructor.
-    * @param parent The parent {@link Composite}.
-    * @param style The style to use.
-    * @param factory The {@link TabbedPropertySheetWidgetFactory} to use.
     */
-   public NodeTabComposite(Composite parent, int style, TabbedPropertySheetWidgetFactory factory) {
-      super(parent, style);
-      setLayout(new FillLayout());
-      
-      Composite composite = factory.createFlatFormComposite(this);
+   public NodeTabComposite() {
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void createComposite(Composite parent, TabbedPropertySheetWidgetFactory factory) {
+      Composite composite = factory.createFlatFormComposite(parent);
 
       nameText = factory.createText(composite, StringUtil.EMPTY_STRING);
       nameText.setEditable(false);
@@ -133,5 +133,12 @@ public class NodeTabComposite extends AbstractSEDDebugNodeTabComposite {
       typeCLabel.setText(type);
       typeCLabel.setImage(SEDImages.getNodeImage(node));
       SWTUtil.setText(pathText, path);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
    }
 }

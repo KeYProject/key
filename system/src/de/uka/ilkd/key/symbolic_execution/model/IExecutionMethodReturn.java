@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -39,11 +39,25 @@ public interface IExecutionMethodReturn extends IExecutionStateNode<SourceElemen
    public IExecutionMethodCall getMethodCall();
    
    /**
+    * Returns a human readable signature which describes this element.
+    * @return The human readable signature which describes this element.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public String getSignature() throws ProofInputException;
+   
+   /**
     * Returns the human readable node name including the return value ({@link #getReturnValues()}).
     * @return The human readable node name including the return value.
     * @throws ProofInputException Occurred Exception.
     */
    public String getNameIncludingReturnValue() throws ProofInputException;
+   
+   /**
+    * Returns the human readable signature including the return value ({@link #getReturnValues()}).
+    * @return The human readable signature including the return value.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public String getSignatureIncludingReturnValue() throws ProofInputException;
 
    /**
     * Checks if the values of {@link #getReturnValues()} are already computed.

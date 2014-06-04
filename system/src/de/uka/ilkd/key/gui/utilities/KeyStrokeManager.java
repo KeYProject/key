@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.Toolkit;
@@ -58,6 +71,7 @@ public final class KeyStrokeManager {
             mapping.put(de.uka.ilkd.key.gui.macros.FinishSymbolicExecutionMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F6,0));
             mapping.put(de.uka.ilkd.key.gui.macros.OneStepProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F7,0));
             mapping.put(de.uka.ilkd.key.gui.macros.TestGenMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F8,0));
+            mapping.put(de.uka.ilkd.key.gui.macros.HeapSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F9,0));
             
             mapping.put(de.uka.ilkd.key.gui.actions.QuickSaveAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_S,MULTI_KEY_MASK));
             mapping.put(de.uka.ilkd.key.gui.actions.QuickLoadAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_O,MULTI_KEY_MASK));
@@ -71,6 +85,7 @@ public final class KeyStrokeManager {
             mapping.put(de.uka.ilkd.key.gui.macros.FinishSymbolicExecutionMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_X,MULTI_KEY_MASK));
             mapping.put(de.uka.ilkd.key.gui.macros.OneStepProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,MULTI_KEY_MASK));
             mapping.put(de.uka.ilkd.key.gui.macros.TestGenMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_T,MULTI_KEY_MASK));
+            mapping.put(de.uka.ilkd.key.gui.macros.HeapSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_H,MULTI_KEY_MASK));
             
             mapping.put(de.uka.ilkd.key.gui.actions.QuickSaveAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_F5,0));
             mapping.put(de.uka.ilkd.key.gui.actions.QuickLoadAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_F6,0));
@@ -82,8 +97,6 @@ public final class KeyStrokeManager {
         mapping.put(de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_T,MULTI_KEY_MASK));
         mapping.put(de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_P,MULTI_KEY_MASK));
         mapping.put(de.uka.ilkd.key.gui.actions.UnicodeToggleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_U,MULTI_KEY_MASK));
-        mapping.put(de.uka.ilkd.key.gui.actions.TestGenerationAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_K,SHORTCUT_KEY_MASK));
-        mapping.put(de.uka.ilkd.key.gui.actions.CounterExampleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_L,SHORTCUT_KEY_MASK));
     }
     
     public static KeyStroke get (ProofMacro macro) {

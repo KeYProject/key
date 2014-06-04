@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -58,7 +58,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 
 	public WindowUserInterface(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
-	        completions.add(new FunctionalOperationContractCompletion());
+	   completions.add(new FunctionalOperationContractCompletion());
 		completions.add(new DependencyContractCompletion());
 		completions.add(new LoopInvariantRuleCompletion());
 		completions.add(new BlockContractCompletion(mainWindow));
@@ -67,8 +67,8 @@ public class WindowUserInterface extends AbstractUserInterface {
 	public void loadProblem(File file, List<File> classPath,
 	        File bootClassPath) {
 		mainWindow.addRecentFile(file.getAbsolutePath());
-		super.loadProblem(
-		        file, classPath, bootClassPath, mainWindow.getMediator());
+		super.getProblemLoader(
+		        file, classPath, bootClassPath, mainWindow.getMediator()).runAsynchronously();
 	}
 
 	@Override
@@ -198,13 +198,14 @@ public class WindowUserInterface extends AbstractUserInterface {
 
 	@Override
 	public void notifyAutoModeBeingStarted() {
+	   super.notifyAutoModeBeingStarted();
 		mainWindow.setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
 	}
 
 	@Override
 	public void notifyAutomodeStopped() {
-		mainWindow
-		        .setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+	   super.notifyAutomodeStopped();
+		mainWindow.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 	}
 
 	@Override

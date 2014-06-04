@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -14,7 +14,6 @@
 package org.key_project.keyide.ui.editor.input;
 
 import org.eclipse.core.resources.IStorage;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jdt.core.IMethod;
@@ -29,7 +28,6 @@ import org.key_project.util.java.StringUtil;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * Defines the basic functionality for {@link IEditorInput}s used for the {@link KeYEditor}.
@@ -39,7 +37,7 @@ public abstract class AbstractProofEditorInput extends PlatformObject implements
    /**
     * The {@link KeYEnvironment} in which the {@link Proof} lives.
     */
-   private KeYEnvironment<CustomConsoleUserInterface> environment;
+   private KeYEnvironment<?> environment;
    
    /**
     * The optional {@link IMethod} from which the proof was started.
@@ -59,10 +57,9 @@ public abstract class AbstractProofEditorInput extends PlatformObject implements
     * @param method An optional {@link IMethod} from which the {@link Proof} was started.
     * @param name The name of this editor input.
     */
-   public AbstractProofEditorInput(KeYEnvironment<CustomConsoleUserInterface> environment, 
+   public AbstractProofEditorInput(KeYEnvironment<?> environment, 
                                    IMethod method,
                                    String name) {
-      Assert.isNotNull(environment);
       this.environment = environment;
       this.method = method;
       this.storage = new TextStorage(StringUtil.EMPTY_STRING, name);
@@ -128,7 +125,7 @@ public abstract class AbstractProofEditorInput extends PlatformObject implements
     * Gives the {@link KeYEnvironment} of this {@link ProofOblInputEditorInput}.
     * @return The {@link KeYEnvironment} of this {@link ProofOblInputEditorInput}.
     */
-   public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
+   public KeYEnvironment<?> getEnvironment() {
       return environment;
    }
 }

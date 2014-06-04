@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -29,7 +29,6 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * A class to provide the proofTree transformed to the KeY-Internal representation.
@@ -38,7 +37,7 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  */
 public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
 
-   private KeYEnvironment<CustomConsoleUserInterface> environment;
+   private KeYEnvironment<?> environment;
    private Proof proof;
    private Map<Node, BranchFolder> branchFolders = new HashMap<Node, BranchFolder>();
 
@@ -144,7 +143,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
     * @param environment - the {@link KeYEnvironment}
     * @param proof - the {@link Proof}
     */
-   public LazyProofTreeContentProvider(TreeViewer viewer, KeYEnvironment<CustomConsoleUserInterface> environment, Proof proof){
+   public LazyProofTreeContentProvider(TreeViewer viewer, KeYEnvironment<?> environment, Proof proof){
       this.viewer=viewer;
       this.proof = proof;
       this.environment = environment;

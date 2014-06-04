@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -74,8 +74,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.Terminatio
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 
 /**
  * Allows to read XML files which contains an symbolic execution tree
@@ -427,7 +427,7 @@ public class ExecutionNodeReader {
          return new KeYlessMethodCall(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else if (ExecutionNodeWriter.TAG_METHOD_RETURN.equals(qName)) {
-         return new KeYlessMethodReturn(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getNameIncludingReturnValue(attributes), isReturnValueComputed(attributes));
+         return new KeYlessMethodReturn(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getNameIncludingReturnValue(attributes), getSignature(attributes), getSignatureIncludingReturnValue(attributes), isReturnValueComputed(attributes));
       }
       else if (ExecutionNodeWriter.TAG_START.equals(qName)) {
          return new KeYlessStart(getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
@@ -483,6 +483,24 @@ public class ExecutionNodeReader {
     */
    protected String getNameIncludingReturnValue(Attributes attributes) {
       return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_NAME_INCLUDING_RETURN_VALUE);
+   }
+   
+   /**
+    * Returns the signature value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getSignature(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_SIGNATURE);
+   }
+   
+   /**
+    * Returns the signature value including return value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getSignatureIncludingReturnValue(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_SIGNATURE_INCLUDING_RETURN_VALUE);
    }
    
    /**
@@ -1378,9 +1396,19 @@ public class ExecutionNodeReader {
       private String nameIncludingReturnValue;
       
       /**
+       * The signature including the return value.
+       */
+      private String signatureIncludingReturnValue;
+      
+      /**
        * Defines if the return value is computed or not.
        */
       private boolean returnValueComputed;
+      
+      /**
+       * The signature.
+       */
+      private String signature;
 
       /**
        * The possible return values.
@@ -1394,6 +1422,8 @@ public class ExecutionNodeReader {
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
        * @param nameIncludingReturnValue The name including the return value.
+       * @param signature The signature.
+       * @param signatureIncludingReturnValue The signature including return value.
        * @param returnValueComputed Is the return value computed?
        */
       public KeYlessMethodReturn(IExecutionNode parent, 
@@ -1401,10 +1431,14 @@ public class ExecutionNodeReader {
                                  String formatedPathCondition, 
                                  boolean pathConditionChanged,
                                  String nameIncludingReturnValue,
+                                 String signature,
+                                 String signatureIncludingReturnValue,
                                  boolean returnValueComputed) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
          this.nameIncludingReturnValue = nameIncludingReturnValue;
+         this.signatureIncludingReturnValue = signatureIncludingReturnValue;
          this.returnValueComputed = returnValueComputed;
+         this.signature = signature;
       }
 
       /**
@@ -1421,6 +1455,22 @@ public class ExecutionNodeReader {
       @Override
       public String getNameIncludingReturnValue() throws ProofInputException {
          return nameIncludingReturnValue;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getSignature() throws ProofInputException {
+         return signature;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getSignatureIncludingReturnValue() throws ProofInputException {
+         return signatureIncludingReturnValue;
       }
       
       /**

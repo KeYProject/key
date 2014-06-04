@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -17,7 +17,7 @@ import org.eclipse.core.expressions.PropertyTester;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
-import de.uka.ilkd.key.ui.ConsoleUserInterface;
+import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * A class to test for properties of the {@link KeYEditor} to set the correct GUI states.
@@ -50,7 +50,7 @@ public class AutoModePropertyTester extends PropertyTester {
                        final Object expectedValue) {
       if (receiver instanceof KeYEditor) {
          KeYEditor editor = (KeYEditor) receiver;
-         ConsoleUserInterface userInterface = editor.getUI();
+         UserInterface userInterface = editor.getUI();
          if (userInterface != null) {
             if (PROPERTY_IS_NOT_AUTO_MODE.equals(property)) {
                return !userInterface.isAutoMode();

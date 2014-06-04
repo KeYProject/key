@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -53,7 +53,7 @@ import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTre
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
-import org.key_project.util.eclipse.job.AbstractWorkbenchPartJob;
+import org.key_project.util.eclipse.job.AbstractDependingOnObjectJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
@@ -227,7 +227,6 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
       }
    }
    
-   
    /**
     * Updates the {@link Diagram} in a way that only {@link ISEDDebugTarget}
     * contained in the given {@link ISelection} are visible.
@@ -285,7 +284,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                         setEditorEnabled(true);
                      }
                   });
-                  AbstractWorkbenchPartJob.cancelJobs(editor);
+                  AbstractDependingOnObjectJob.cancelJobs(editor);
                   editor.executeFeatureInJob("Changing Symbolic Execution Tree", feature, context);
                   // Unset message
                   setMessage(null);
