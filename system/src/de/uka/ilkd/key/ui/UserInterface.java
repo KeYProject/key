@@ -91,7 +91,7 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
 
     /**
      * called to complete and apply a taclet instantiations
-     * @param models the  partial models with all different possible instantiations found automatically
+     * @param models the partial models with all different possible instantiations found automatically
      * @param goal the Goal where to apply
      */
     void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal);

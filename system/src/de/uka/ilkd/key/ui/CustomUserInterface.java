@@ -15,11 +15,13 @@ package de.uka.ilkd.key.ui;
 
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 /**
  * <p>
@@ -30,7 +32,7 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
  * The basic usage is like:
  * <code><pre>
  * // Create user interface
- * CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
+ * CustomUserInterface ui = new CustomUserInterface(false);
  * // Load java file
  * InitConfig initConfig = ui.load(javaFile, null, null);
  * // Find operation contract to proof in services
@@ -45,13 +47,28 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
  * </p>
  * @author Martin Hentschel
  */
-public class CustomConsoleUserInterface extends ConsoleUserInterface {
+public class CustomUserInterface extends ConsoleUserInterface {
+   /**
+    * An optional {@link IUserInterfaceCustomization}.
+    */
+   private final IUserInterfaceCustomization customiaztion;
+   
    /**
     * Constructor.
     * @param verbose Verbose?
     */
-   public CustomConsoleUserInterface(boolean verbose) {
+   public CustomUserInterface(boolean verbose) {
+      this(verbose, null);
+   }
+   
+   /**
+    * Constructor.
+    * @param verbose Verbose?
+    * @param customiaztion An optional {@link IUserInterfaceCustomization}.
+    */
+   public CustomUserInterface(boolean verbose, IUserInterfaceCustomization customiaztion) {
       super(null, verbose);
+      this.customiaztion = customiaztion;
    }
 
    /**
@@ -94,5 +111,58 @@ public class CustomConsoleUserInterface extends ConsoleUserInterface {
             getMediator().goalChosen(g);
          }
       }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */   
+   @Override
+   public void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal) {
+      if (customiaztion != null) {
+         customiaztion.completeAndApplyTacletMatch(models, goal);
+      }
+      else {
+         super.completeAndApplyTacletMatch(models, goal);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
+      if (customiaztion == null || isAutoMode()) {
+         return super.completeBuiltInRuleApp(app, goal, forced);
+      }
+      else {
+         IBuiltInRuleApp result = customiaztion.completeBuiltInRuleApp(app, goal, forced);
+         if (result != null) {
+            if (result.complete()) {
+               return result;
+            }
+            else {
+               return super.completeBuiltInRuleApp(result, goal, forced);
+            }
+         }
+         else {
+            return super.completeBuiltInRuleApp(app, goal, forced);
+         }
+      }
+   }
+
+   /**
+    * Instances of this class can be used to customize the behavior of a {@link CustomUserInterface}.
+    * @author Martin Hentschel
+    */
+   public static interface IUserInterfaceCustomization {
+      /**
+       * This method will be called to treat {@link UserInterface#completeAndApplyTacletMatch(ApplyTacletDialogModel[], Goal)}.
+       */
+      public void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal);
+
+      /**
+       * This method will be called to treat {@link UserInterface#completeBuiltInRuleApp(IBuiltInRuleApp, Goal, boolean)}.
+       */
+      public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced);
    }
 }

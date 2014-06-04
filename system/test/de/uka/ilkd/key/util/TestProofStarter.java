@@ -6,7 +6,7 @@ import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Tests for {@link ProofStarter}.
@@ -37,7 +37,7 @@ public class TestProofStarter extends AbstractSymbolicExecutionTestCase {
     * @param oneStepSimplification
     */
    protected void doProofStarter(boolean oneStepSimplification) {
-      KeYEnvironment<CustomConsoleUserInterface> env = null;
+      KeYEnvironment<CustomUserInterface> env = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
          File file = new File(keyRepDirectory, "examples/_testcase/proofStarter/CC/project.key");

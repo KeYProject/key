@@ -49,6 +49,8 @@ import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
+import org.key_project.key4eclipse.common.ui.util.EclipseUserInterfaceCustomization;
+import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
@@ -343,9 +345,12 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             }
             else if (input instanceof FileEditorInput) {
                FileEditorInput fileInput = (FileEditorInput) input;
-               File file = ResourceUtil.getLocation(fileInput.getFile());
+               IFile eclipseFile = fileInput.getFile();
+               File file = ResourceUtil.getLocation(eclipseFile);
                Assert.isTrue(file != null, "File \"" + fileInput.getFile() + "\" is not local.");
-               this.environment = KeYEnvironment.load(file, null, null);
+               File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(eclipseFile.getProject());
+               List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(eclipseFile.getProject());
+               this.environment = KeYEnvironment.load(file, classPaths, bootClassPath, EclipseUserInterfaceCustomization.getInstance());
                Assert.isTrue(getEnvironment().getLoadedProof() != null, "No proof loaded.");
                this.currentProof = getEnvironment().getLoadedProof();
             }

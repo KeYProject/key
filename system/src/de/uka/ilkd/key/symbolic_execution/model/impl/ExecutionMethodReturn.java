@@ -310,7 +310,9 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                            conditions.add(condition);
                         }
                         Term condition = getServices().getTermBuilder().or(conditions);
-                        condition = SymbolicExecutionUtil.simplify(info.getProof(), condition);
+                        if (conditions.size() >= 2) {
+                           condition = SymbolicExecutionUtil.simplify(info.getProof(), condition);
+                        }
                         condition = SymbolicExecutionUtil.improveReadability(condition, info.getProof().getServices());
                         result[i] = new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), entry.getKey(), condition);
                         i++;

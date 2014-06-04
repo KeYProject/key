@@ -75,6 +75,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -181,6 +182,41 @@ public final class SymbolicExecutionUtil {
       finally {
          SideProofUtil.disposeOrStore("Simplification of " + ProofSaver.printAnything(term, parentProof.getServices()), info);
       }
+   }
+
+   /**
+    * Converts the given {@link Sequent} into an implication.
+    * @param sequent The {@link Sequent} to convert.
+    * @param services The {@link Services} to use.
+    * @return The created implication.
+    */
+   public static Term sequentToImplication(Sequent sequent, Services services) {
+      if (sequent != null) {
+         ImmutableList<Term> antecedents = listSemisequentTerms(sequent.antecedent());
+         ImmutableList<Term> succedents = listSemisequentTerms(sequent.succedent());
+         // Construct branch condition from created antecedent and succedent terms as new implication 
+         Term left = services.getTermBuilder().and(antecedents);
+         Term right = services.getTermBuilder().or(succedents);
+         return services.getTermBuilder().imp(left, right);
+      }
+      else {
+         return services.getTermBuilder().tt();
+      }
+   }
+   
+   /**
+    * Lists the {@link Term}s contained in the given {@link Semisequent}.
+    * @param semisequent The {@link Semisequent} to list terms of.
+    * @return The list with all contained {@link Term}s.
+    */
+   public static ImmutableList<Term> listSemisequentTerms(Semisequent semisequent) {
+      ImmutableList<Term> terms = ImmutableSLList.nil();
+      if (semisequent != null) {
+         for (SequentFormula sf : semisequent) {
+            terms = terms.append(sf.formula());
+         }
+      }
+      return terms;
    }
    
    /**
@@ -354,41 +390,6 @@ public final class SymbolicExecutionUtil {
          }
       }
       return false;
-   }
-
-   /**
-    * Converts the given {@link Sequent} into an implication.
-    * @param sequent The {@link Sequent} to convert.
-    * @param services The {@link Services} to use.
-    * @return The created implication.
-    */
-   public static Term sequentToImplication(Sequent sequent, Services services) {
-      if (sequent != null) {
-         ImmutableList<Term> antecedents = listSemisequentTerms(sequent.antecedent());
-         ImmutableList<Term> succedents = listSemisequentTerms(sequent.succedent());
-         // Construct branch condition from created antecedent and succedent terms as new implication 
-         Term left = services.getTermBuilder().and(antecedents);
-         Term right = services.getTermBuilder().or(succedents);
-         return services.getTermBuilder().imp(left, right);
-      }
-      else {
-         return services.getTermBuilder().tt();
-      }
-   }
-   
-   /**
-    * Lists the {@link Term}s contained in the given {@link Semisequent}.
-    * @param semisequent The {@link Semisequent} to list terms of.
-    * @return The list with all contained {@link Term}s.
-    */
-   public static ImmutableList<Term> listSemisequentTerms(Semisequent semisequent) {
-      ImmutableList<Term> terms = ImmutableSLList.nil();
-      if (semisequent != null) {
-         for (SequentFormula sf : semisequent) {
-            terms = terms.append(sf.formula());
-         }
-      }
-      return terms;
    }
    
    /**
@@ -1673,13 +1674,12 @@ public final class SymbolicExecutionUtil {
          }
          // Create formula which contains the value interested in.
          Sequent newSequent = createSequentToProveWithNewSuccedent(parent, (Term)null, result, true);
-         Term condition = SideProofUtil.evaluateInSideProof(services, 
-                                                            parent.proof(), 
-                                                            node.sequent(),
-                                                            newSequent, 
-                                                            ParameterlessTermLabel.RESULT_LABEL, 
-                                                            "Operation contract branch condition computation on node " + parent.serialNr() + " for branch " + node.serialNr() + ".",
-                                                            StrategyProperties.SPLITTING_OFF);
+         Term condition = evaluateInSideProof(services, 
+                                              parent.proof(), 
+                                              newSequent, 
+                                              ParameterlessTermLabel.RESULT_LABEL, 
+                                              "Operation contract branch condition computation on node " + parent.serialNr() + " for branch " + node.serialNr() + ".",
+                                              StrategyProperties.SPLITTING_OFF);
          if (improveReadability) {
             condition = improveReadability(condition, services);
          }
@@ -1901,13 +1901,12 @@ public final class SymbolicExecutionUtil {
                              services.getTermBuilder().box(loopConditionModalityTerm.javaBlock(), newTerm) :
                              services.getTermBuilder().dia(loopConditionModalityTerm.javaBlock(), newTerm);
          Sequent newSequent = createSequentToProveWithNewSuccedent(parent, (Term)null, modalityTerm, pair.first, true);
-         Term condition = SideProofUtil.evaluateInSideProof(services, 
-                                                            parent.proof(), 
-                                                            node.sequent(),
-                                                            newSequent, 
-                                                            ParameterlessTermLabel.RESULT_LABEL, 
-                                                            "Loop invariant branch condition computation on node " + parent.serialNr() + " for branch " + node.serialNr() + ".",
-                                                            StrategyProperties.SPLITTING_OFF);
+         Term condition = evaluateInSideProof(services, 
+                                              parent.proof(), 
+                                              newSequent, 
+                                              ParameterlessTermLabel.RESULT_LABEL, 
+                                              "Loop invariant branch condition computation on node " + parent.serialNr() + " for branch " + node.serialNr() + ".",
+                                              StrategyProperties.SPLITTING_OFF);
          if (improveReadability) {
             condition = improveReadability(condition, services);
          }
@@ -2084,17 +2083,53 @@ public final class SymbolicExecutionUtil {
       Term leftAndRight = services.getTermBuilder().and(left, services.getTermBuilder().not(right));
       // Create formula which contains the value interested in.
       Sequent newSequent = createSequentToProveWithNewSuccedent(parent, (Term)null, leftAndRight, true);
-      Term condition = SideProofUtil.evaluateInSideProof(services, 
-                                                         parent.proof(), 
-                                                         node.sequent(),
-                                                         newSequent, 
-                                                         ParameterlessTermLabel.RESULT_LABEL, 
-                                                         "Taclet branch condition computation on node " + parent.serialNr() + " for branch " + node.serialNr() + ".",
-                                                         StrategyProperties.SPLITTING_OFF);
+      Term condition = evaluateInSideProof(services, 
+                                           parent.proof(), 
+                                           newSequent, 
+                                           ParameterlessTermLabel.RESULT_LABEL, 
+                                           "Taclet branch condition computation on node " + parent.serialNr() + " for branch " + node.serialNr() + ".",
+                                           StrategyProperties.SPLITTING_OFF);
       if (improveReadability) {
          condition = improveReadability(condition, services);
       }
       return condition;
+   }
+   
+   /**
+    * Starts the side proof and evaluates the {@link Sequent} to prove into a single {@link Term}.
+    * @param services The {@link Services} to use.
+    * @param proof The {@link Proof} from on which the side proof si performed.
+    * @param sequentToProve The {@link Sequent} to prove in a side proof.
+    * @param label The {@link TermLabel} which is used to compute the result.
+    * @param description The side proof description.
+    * @param splittingOption The splitting options to use.
+    * @return The result {@link Term}.
+    * @throws ProofInputException Occurred Exception.
+    */
+   private static Term evaluateInSideProof(Services services, 
+                                           Proof proof, 
+                                           Sequent sequentToProve, 
+                                           TermLabel label, 
+                                           String description, 
+                                           String splittingOption) throws ProofInputException {
+      List<Pair<Term, Node>> resultValuesAndConditions = SideProofUtil.computeResults(services, 
+                                                                                      proof, 
+                                                                                      sequentToProve, 
+                                                                                      label, 
+                                                                                      description, 
+                                                                                      StrategyProperties.METHOD_NONE, // Stop at methods to avoid endless executions and scenarios in which a precondition or null pointer check can't be shown
+                                                                                      StrategyProperties.LOOP_NONE, // Stop at loops to avoid endless executions and scenarios in which the invariant can't be shown to be initially valid or preserved.
+                                                                                      StrategyProperties.QUERY_OFF, // Stop at queries to to avoid endless executions and scenarios in which a precondition or null pointer check can't be shown
+                                                                                      splittingOption, 
+                                                                                      false);
+      ImmutableList<Term> goalCondtions = ImmutableSLList.<Term>nil();
+      for (Pair<Term, Node> pair : resultValuesAndConditions) {
+         Term goalCondition = pair.first;
+         goalCondition = SymbolicExecutionUtil.replaceSkolemConstants(pair.second.sequent(), goalCondition, services);
+         goalCondition = removeLabelRecursive(services.getTermFactory(), goalCondition, label);
+         goalCondtions = goalCondtions.append(goalCondition);
+      }
+      return services.getTermBuilder().and(goalCondtions);
    }
 
    /**
@@ -2125,8 +2160,7 @@ public final class SymbolicExecutionUtil {
     * @return The choice value.
     */
    public static String getChoiceSetting(String key) {
-      Map<String, String> settings =
-              ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+      Map<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
       return settings.get(key);
    }
    
@@ -2139,8 +2173,7 @@ public final class SymbolicExecutionUtil {
     * @param value The new choice value to set.
     */
    public static void setChoiceSetting(String key, String value) {
-      HashMap<String, String> settings =
-              ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+      HashMap<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
       HashMap<String, String> clone = new LinkedHashMap<String, String>();
       clone.putAll(settings);
       clone.put(key, value);
@@ -2310,19 +2343,114 @@ public final class SymbolicExecutionUtil {
       else {
          newSuccedentToProve = newSuccedent;
       }
-      if (addResultLabel) {
-         newSuccedentToProve = SideProofUtil.addLabelRecursive(node.proof().getServices().getTermFactory(), newSuccedentToProve, ParameterlessTermLabel.RESULT_LABEL);
-      }
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       PosInOccurrence pio = ruleApp.posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = SideProofUtil.computeGeneralSequentToProve(node.sequent(), pio != null ? pio.constrainedFormula() : null);
       Set<Term> skolemTerms = collectSkolemConstants(originalSequentWithoutMethodFrame, newSuccedentToProve);
       originalSequentWithoutMethodFrame = removeAllUnusedSkolemEqualities(originalSequentWithoutMethodFrame, skolemTerms);
+      if (addResultLabel) {
+         TermFactory factory = node.proof().getServices().getTermFactory();
+         Set<Term> skolemInNewTerm = collectSkolemConstantsNonRecursive(newSuccedentToProve);
+         originalSequentWithoutMethodFrame = labelSkolemConstants(originalSequentWithoutMethodFrame, skolemInNewTerm, factory);
+         newSuccedentToProve = addLabelRecursiveToNonSkolem(factory, newSuccedentToProve, ParameterlessTermLabel.RESULT_LABEL);
+      }
       Sequent sequentToProve = originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent();
       if (additionalAntecedent != null) {
          sequentToProve = sequentToProve.addFormula(new SequentFormula(additionalAntecedent), true, false).sequent();
       }
       return sequentToProve;
+   }
+
+   /**
+    * Labels all specified skolem equalities with the {@link ParameterlessTermLabel#RESULT_LABEL}.
+    * @param sequent The {@link Sequent} to modify.
+    * @param constantsToLabel The skolem constants to label.
+    * @param factory The {@link TermFactory} to use.
+    * @return The modified {@link Sequent}.
+    */
+   protected static Sequent labelSkolemConstants(Sequent sequent, 
+                                                 Set<Term> constantsToLabel, 
+                                                 TermFactory factory) {
+      for (SequentFormula sf : sequent.antecedent()) {
+         int skolemEquality = checkSkolemEquality(sf);
+         if (skolemEquality == -1) {
+            Term equality = sf.formula();
+            if (constantsToLabel.contains(equality.sub(0))) {
+               Term definition = addLabelRecursiveToNonSkolem(factory, equality.sub(1), ParameterlessTermLabel.RESULT_LABEL);
+               Term skolem = addLabelRecursiveToNonSkolem(factory, equality.sub(0), ParameterlessTermLabel.RESULT_LABEL);
+               List<Term> newSubs = new LinkedList<Term>();
+               newSubs.add(definition);
+               newSubs.add(skolem);
+               Term newEquality = factory.createTerm(equality.op(), new ImmutableArray<Term>(newSubs), equality.boundVars(), equality.javaBlock(), equality.getLabels());
+               sequent = sequent.changeFormula(new SequentFormula(newEquality), new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
+            }
+         }
+         else if (skolemEquality == 1) {
+            Term equality = sf.formula();
+            if (constantsToLabel.contains(equality.sub(1))) {
+               Term definition = addLabelRecursiveToNonSkolem(factory, equality.sub(0), ParameterlessTermLabel.RESULT_LABEL);
+               Term skolem = addLabelRecursiveToNonSkolem(factory, equality.sub(1), ParameterlessTermLabel.RESULT_LABEL);
+               List<Term> newSubs = new LinkedList<Term>();
+               newSubs.add(definition);
+               newSubs.add(skolem);
+               Term newEquality = factory.createTerm(equality.op(), new ImmutableArray<Term>(newSubs), equality.boundVars(), equality.javaBlock(), equality.getLabels());
+               sequent = sequent.changeFormula(new SequentFormula(newEquality), new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
+            }
+         }
+      }
+      return sequent;
+   }
+
+   /**
+    * Adds the given {@link TermLabel} to the given {@link Term} and to all of its children.
+    * @param tf The {@link TermFactory} to use.
+    * @param term The {@link Term} to add label to.
+    * @param label The {@link TermLabel} to add.
+    * @return A new {@link Term} with the given {@link TermLabel}.
+    */
+   private static Term addLabelRecursiveToNonSkolem(TermFactory tf, Term term, TermLabel label) {
+      List<Term> newSubs = new LinkedList<Term>();
+      for (Term oldSub : term.subs()) {
+         newSubs.add(addLabelRecursiveToNonSkolem(tf, oldSub, label));
+      }
+      if (checkSkolemEquality(term) != 0 || isSkolemConstant(term)) {
+         // Do not label skolem equality and skolem terms
+         return tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), term.getLabels());
+      }
+      else {
+         /// Label term which is not a skolem equality and not a skolem term
+         List<TermLabel> newLabels = new LinkedList<TermLabel>();
+         for (TermLabel oldLabel : term.getLabels()) {
+            newLabels.add(oldLabel);
+         }
+         newLabels.add(label);
+         return tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), new ImmutableArray<TermLabel>(newLabels));
+      }
+   }
+   
+   /**
+    * Removes the given {@link TermLabel} from the given {@link Term} and from all of its children.
+    * @param tf The {@link TermFactory} to use.
+    * @param term The {@link Term} to remove label from.
+    * @param label The {@link TermLabel} to remove.
+    * @return A new {@link Term} without the given {@link TermLabel}.
+    */
+   public static Term removeLabelRecursive(TermFactory tf, Term term, TermLabel label) {
+      // Update children
+      List<Term> newSubs = new LinkedList<Term>();
+      ImmutableArray<Term> oldSubs = term.subs();
+      for (Term oldSub : oldSubs) {
+         newSubs.add(removeLabelRecursive(tf, oldSub, label));
+      }
+      // Update label
+      List<TermLabel> newLabels = new LinkedList<TermLabel>();
+      ImmutableArray<TermLabel> oldLabels = term.getLabels();
+      for (TermLabel oldLabel : oldLabels) {
+         if (oldLabel != label) {
+            newLabels.add(oldLabel);
+         }
+      }
+      return tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), new ImmutableArray<TermLabel>(newLabels));
    }
 
    /**
@@ -2340,11 +2468,13 @@ public final class SymbolicExecutionUtil {
       List<Term> toCheck = new LinkedList<Term>(result);
       while (!toCheck.isEmpty()) {
          Term skolemConstant = toCheck.remove(0);
-         Term replacement = findSkolemReplacement(sequent, skolemConstant);
-         Set<Term> checkResult = collectSkolemConstantsNonRecursive(replacement);
-         for (Term checkConstant : checkResult) {
-            if (result.add(checkConstant)) {
-               toCheck.add(checkConstant);
+         List<Term> replacements = findSkolemReplacements(sequent, skolemConstant);
+         for (Term replacement : replacements) {
+            Set<Term> checkResult = collectSkolemConstantsNonRecursive(replacement);
+            for (Term checkConstant : checkResult) {
+               if (result.add(checkConstant)) {
+                  toCheck.add(checkConstant);
+               }
             }
          }
       }
@@ -2434,20 +2564,27 @@ public final class SymbolicExecutionUtil {
    /**
     * Checks if the given {@link SequentFormula} is a skolem equality.
     * @param sf The {@link SequentFormula} to check.
-    * @return {@code true} is skolem equality, {@code false} is not a skolem equality.
+    * @return {@code -1} left side of skolem equality, {@code 0} no skolem equality, {@code 1} right side of skolem equality.
     */
-   public static boolean isSkolemEquality(SequentFormula sf) {
-      boolean skolemEquality = false;
-      Term term = sf.formula();
+   public static int checkSkolemEquality(SequentFormula sf) {
+      return checkSkolemEquality(sf.formula());
+   }
+
+   /**
+    * Checks if the given {@link Term} is a skolem equality.
+    * @param sf The {@link Term} to check.
+    * @return {@code -1} left side of skolem equality, {@code 0} no skolem equality, {@code 1} right side of skolem equality.
+    */
+   public static int checkSkolemEquality(Term term) {
       if (term.op() == Equality.EQUALS) {
          if (isSkolemConstant(term.sub(0))) {
-            skolemEquality = true;
+            return -1;
          }
          if (isSkolemConstant(term.sub(1))) {
-            skolemEquality = true;
+            return 1;
          }
       }
-      return skolemEquality;
+      return 0;
    }
 
    /**
@@ -2458,8 +2595,30 @@ public final class SymbolicExecutionUtil {
     * @return The skolem constant free {@link Term}.
     */
    public static Term replaceSkolemConstants(Sequent sequent, Term term, Services services) {
-      if (isSkolemConstant(term)) {
-         return findSkolemReplacement(sequent, term);
+      int skolemCheck = checkSkolemEquality(term);
+      if (skolemCheck == -1) {
+         TermBuilder tb = services.getTermBuilder();
+         List<Term> replacements = findSkolemReplacements(sequent, term);
+         assert !replacements.isEmpty();
+         Term other = term.sub(1);
+         List<Term> newTerms = new LinkedList<Term>();
+         for (Term replacement : replacements) {
+            newTerms.add(tb.equals(replacement, other));
+         }
+         term = tb.and(newTerms);
+         return replaceSkolemConstants(sequent, term, services);
+      }
+      else if (skolemCheck == 1) {
+         TermBuilder tb = services.getTermBuilder();
+         List<Term> replacements = findSkolemReplacements(sequent, term);
+         assert !replacements.isEmpty();
+         Term other = term.sub(0);
+         List<Term> newTerms = new LinkedList<Term>();
+         for (Term replacement : replacements) {
+            newTerms.add(tb.equals(other, replacement));
+         }
+         term = tb.and(newTerms);
+         return replaceSkolemConstants(sequent, term, services);
       }
       else {
          List<Term> newChildren = new LinkedList<Term>();
@@ -2483,27 +2642,26 @@ public final class SymbolicExecutionUtil {
 
    /**
     * Utility method of {@link #replaceSkolemConstants(Sequent, Term, Services)} to
-    * find the equality part of the given skolem constant.
+    * find all equality parts of the given skolem constant.
     * @param sequent The {@link Sequent} which provides the skolem equalities.
-    * @param skolemConstant The skolem constant to solve.
-    * @return The equality part of the given skolem constant or the skolem constant itself it was not possible to find it.
+    * @param skolemEquality The skolem equality to solve.
+    * @return The equality parts of the given skolem equality.
     */
-   private static Term findSkolemReplacement(Sequent sequent, Term skolemConstant) {
-      Term result = null;
-      Iterator<SequentFormula> iter = sequent.iterator();
-      while (result == null && iter.hasNext()) {
-         SequentFormula sf = iter.next();
+   private static List<Term> findSkolemReplacements(Sequent sequent, Term skolemEquality) {
+      List<Term> result = new LinkedList<Term>();
+      for (SequentFormula sf : sequent) {
          Term term = sf.formula();
-         if (term.op() == Equality.EQUALS) {
-            if (term.sub(0).equals(skolemConstant)) {
-               result = term.sub(1);
+         if (term != skolemEquality) {
+            int skolemCheck = checkSkolemEquality(term);
+            if (skolemCheck == -1) {
+               result.add(term.sub(1));
             }
-            if (term.sub(1).equals(skolemConstant)) {
-               result = term.sub(0);
+            else if (skolemCheck == 1) {
+               result.add(term.sub(0));
             }
          }
       }
-      return result != null ? result : skolemConstant;
+      return result;
    }
 
    /**
