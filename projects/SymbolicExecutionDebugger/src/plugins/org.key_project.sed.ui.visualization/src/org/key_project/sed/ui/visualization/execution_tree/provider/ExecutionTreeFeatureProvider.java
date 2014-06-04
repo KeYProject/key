@@ -95,6 +95,7 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.LoopStatement
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopStatementLayoutFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopStatementUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.MethodCallAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.MethodCallCollapseFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.MethodCallCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.MethodCallLayoutFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.MethodCallUpdateFeature;
@@ -387,7 +388,10 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
          return super.getCustomFeatures(context);
       }
       else {
-         return new ICustomFeature[0];
+         return new ICustomFeature[] {
+               new MethodCallCollapseFeature(this)
+         };
+         //return new ICustomFeature[0];
       }
    }
 

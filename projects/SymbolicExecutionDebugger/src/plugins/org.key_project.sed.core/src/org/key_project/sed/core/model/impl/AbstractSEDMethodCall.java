@@ -25,6 +25,11 @@ import org.key_project.sed.core.model.ISEDThread;
  */
 public abstract class AbstractSEDMethodCall extends AbstractSEDStackFrameCompatibleDebugNode implements ISEDMethodCall {
    /**
+    * The current state of the Method (collapsed or expanded)
+    */
+   private boolean isCollapsed = false;
+   
+   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this method call is contained.
     * @param parent The parent in that this node is contained as child.
@@ -42,5 +47,19 @@ public abstract class AbstractSEDMethodCall extends AbstractSEDStackFrameCompati
    @Override
    public String getNodeType() {
       return "Method Call";
+   }
+   
+   /**
+    * Returns the current state of the Method (collapsed or expanded)
+    */
+   public boolean isCollapsed() {
+      return isCollapsed;
+   }
+   
+   /**
+    * Sets the current state to either collapsed or expanded
+    */
+   public void setIsCollapsed(boolean b) {
+      isCollapsed = b;
    }
 }

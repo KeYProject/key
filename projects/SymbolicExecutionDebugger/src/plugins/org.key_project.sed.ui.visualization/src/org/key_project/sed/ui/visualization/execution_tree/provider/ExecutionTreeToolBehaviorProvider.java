@@ -29,6 +29,7 @@ import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.palette.IPaletteCompartmentEntry;
+import org.eclipse.graphiti.platform.IPlatformImageConstants;
 import org.eclipse.graphiti.tb.ContextButtonEntry;
 import org.eclipse.graphiti.tb.ContextMenuEntry;
 import org.eclipse.graphiti.tb.DefaultToolBehaviorProvider;
@@ -46,6 +47,7 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeStep
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeSuspendFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeTerminateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeVisualizeStateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.MethodCallCollapseFeature;
 import org.key_project.sed.ui.visualization.util.ICustomFeatureFactory;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -94,6 +96,10 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
          data.getGenericContextButtons().clear();
          List<IContextButtonEntry> epEntries = collectContextButtonEntriesFromExtensionPoint(isReadOnly(), context);
          data.getGenericContextButtons().addAll(epEntries);
+         
+         // collapse
+         data.getGenericContextButtons().add(createCustomContextButtonEntry(new MethodCallCollapseFeature(getFeatureProvider()), context, "Collapse", null, IPlatformImageConstants.IMG_EDIT_COLLAPSE));
+
          data.getGenericContextButtons().add(createCustomContextButtonEntry(new DebugNodeVisualizeStateFeature(getFeatureProvider()), context, "Visualize State", null, IExecutionTreeImageConstants.IMG_VISUALIZE_STATE));
 
          data.getGenericContextButtons().add(createCustomContextButtonEntry(new DebugNodeStepReturnFeature(getFeatureProvider()), context, "Step Return", null, IExecutionTreeImageConstants.IMG_STEP_RETURN));
