@@ -15,9 +15,6 @@
 #
 
 # # Test for information flow
-provable: ./information_flow/collection/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).JML normal_behavior operation contract.1.key
-provable: ./information_flow/collection/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).JML normal_behavior operation contract.0.key
-provable: ./information_flow/collection/simple_evoting.Voter(java.lang.Object___inv_()).JML accessible clause.0.key
 provable: ./information_flow/collection/Voter(Voter__insecure_voting()).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/Voter(Voter__publishVoterParticipation()).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/Voter(Voter__isValid(int)).JML normal_behavior operation contract.0.key
