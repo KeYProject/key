@@ -109,6 +109,8 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                        openGoals);
                System.out.flush();
            }
+           // this seems to be a good place to free some memory
+           Runtime.getRuntime().gc();
            batchMode.finishedBatchMode ( result2, info.getProof() );
            Debug.fail ( "Control flow should not reach this point." );
        } else if (info.getSource() instanceof ProblemLoader) {
@@ -302,6 +304,9 @@ public class ConsoleUserInterface extends AbstractUserInterface {
            getMediator().setProof(proofStack.head());
            proof.dispose();
        }
+       // Run the garbage collector.
+       Runtime r = Runtime.getRuntime();
+       r.gc();
    }
 
    @Override

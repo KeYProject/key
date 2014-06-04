@@ -96,8 +96,11 @@ public abstract class AbstractUserInterface implements UserInterface {
                 getMediator().stopInterface(true);
                 getMediator().setInteractive(false);
                 getMacro().applyTo(getMediator(), null, this);
-                getMediator().setInteractive(true);
-                getMediator().startInterface(true);
+                synchronized(getMacro()) {
+                    // wait for macro to terminate
+                    getMediator().setInteractive(true);
+                    getMediator().startInterface(true);
+                }
             } catch(InterruptedException ex) {
                 Debug.out("Proof macro has been interrupted:");
                 Debug.out(ex);
@@ -153,7 +156,7 @@ public abstract class AbstractUserInterface implements UserInterface {
        ProblemInitializer init = createProblemInitializer(initConfig.getProfile());
        return init.startProver(initConfig, input, 0);
     }
-    
+
     /**
      * {@inheritDoc}
      */
