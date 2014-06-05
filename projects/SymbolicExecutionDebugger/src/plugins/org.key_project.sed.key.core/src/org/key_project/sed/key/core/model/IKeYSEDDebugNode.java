@@ -40,6 +40,12 @@ public interface IKeYSEDDebugNode<E extends IExecutionNode> extends ISEDDebugNod
     * {@inheritDoc}
     */
    @Override
+   public KeYThread getThread();
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public IKeYSEDDebugNode<?> getParent() throws DebugException;
    
    /**

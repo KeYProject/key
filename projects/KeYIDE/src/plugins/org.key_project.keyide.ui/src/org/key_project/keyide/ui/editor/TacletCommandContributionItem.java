@@ -30,17 +30,17 @@ public class TacletCommandContributionItem extends CommandContributionItem {
    /***
     * The {@link TacletApp} to apply.
     */
-   private TacletApp app;
+   private final TacletApp app;
    
    /**
     * The {@link KeYMediator} to use.
     */
-   private KeYMediator mediator;
+   private final KeYMediator mediator;
    
    /**
     * The {@link PosInSequent} to apply {@link TacletApp} on.
     */
-   private PosInSequent pos;
+   private final PosInSequent pos;
    
    /**
     * The constructor with the additional parameters.

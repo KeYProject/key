@@ -13,12 +13,10 @@
 
 package de.uka.ilkd.key.macros;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
@@ -95,20 +93,5 @@ public class OneStepProofMacro extends StrategyProofMacro {
             delegate.instantiateApp(app, pio, goal, collector);
         }
 
-    }
-
-    @Override
-    public boolean canApplyTo(KeYMediator mediator, Node node, PosInOccurrence posInOcc) {
-        return true;
-    }
-
-    @Override
-    public boolean canApplyTo(KeYMediator mediator, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
-        return true;
-    }
-
-    @Override
-    public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        return true;
     }
 }

@@ -40,6 +40,7 @@ import org.key_project.sed.core.model.event.ISEDAnnotationLinkListener;
 import org.key_project.sed.core.model.event.SEDAnnotationLinkEvent;
 import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
 import org.key_project.sed.core.util.SEDAnnotationUtil;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.ObjectUtil;
 
 /**
@@ -305,6 +306,15 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
       for (ISEDAnnotationLinkListener l : listener) {
          l.annotationLinkRemoved(e);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasChildren() throws DebugException {
+      ISEDDebugNode[] children = getChildren();
+      return !ArrayUtil.isEmpty(children);
    }
    
    /**

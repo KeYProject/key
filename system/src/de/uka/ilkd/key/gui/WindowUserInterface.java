@@ -69,10 +69,10 @@ public class WindowUserInterface extends AbstractUserInterface {
     }
 
     public void loadProblem(File file, List<File> classPath,
-            File bootClassPath) {
+                            File bootClassPath) {
         mainWindow.addRecentFile(file.getAbsolutePath());
-        super.getProblemLoader(
-                file, classPath, bootClassPath, mainWindow.getMediator()).runAsynchronously();
+        super.getProblemLoader(file, classPath, bootClassPath,
+                               mainWindow.getMediator()).runAsynchronously();
     }
 
     @Override
@@ -82,19 +82,17 @@ public class WindowUserInterface extends AbstractUserInterface {
 
     @Override
     public void progressStarted(Object sender) {
-        mainWindow.getMediator().stopInterface(
-                true);
+        mainWindow.getMediator().stopInterface(true);
     }
 
     @Override
     public void progressStopped(Object sender) {
-        mainWindow.getMediator().startInterface(
-                true);
+        mainWindow.getMediator().startInterface(true);
     }
 
     @Override
     public void proofCreated(ProblemInitializer sender,
-            ProofAggregate proofAggregate) {
+                             ProofAggregate proofAggregate) {
         mainWindow.addProblem(proofAggregate);
         mainWindow.setStandardStatusLine();
     }
@@ -129,8 +127,8 @@ public class WindowUserInterface extends AbstractUserInterface {
     public void taskFinished(TaskFinishedInfo info) {
         if (info.getSource() instanceof ApplyStrategy) {
             resetStatus(this);
-            ApplyStrategy.ApplyStrategyInfo result = (ApplyStrategyInfo) info
-                    .getResult();
+            ApplyStrategy.ApplyStrategyInfo result =
+                    (ApplyStrategyInfo) info.getResult();
 
             Proof proof = info.getProof();
             if (!proof.closed()) {
@@ -181,27 +179,23 @@ public class WindowUserInterface extends AbstractUserInterface {
 
     @Override
     public void taskProgress(int position) {
-        mainWindow.getStatusLine().setProgress(
-                position);
+        mainWindow.getStatusLine().setProgress(position);
 
     }
 
     @Override
     public void taskStarted(String message, int size) {
-        mainWindow.setStatusLine(
-                message, size);
+        mainWindow.setStatusLine(message, size);
     }
 
     @Override
     public void setMaximum(int maximum) {
-        mainWindow.getStatusLine().setProgressBarMaximum(
-                maximum);
+        mainWindow.getStatusLine().setProgressBarMaximum(maximum);
     }
 
     @Override
     public void setProgress(int progress) {
-        mainWindow.getStatusLine().setProgress(
-                progress);
+        mainWindow.getStatusLine().setProgress(progress);
     }
 
     @Override
@@ -223,8 +217,7 @@ public class WindowUserInterface extends AbstractUserInterface {
     @Override
     public void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models,
             Goal goal) {
-        new TacletMatchCompletionDialog(mainWindow, models, goal,
-                mainWindow.getMediator());
+        new TacletMatchCompletionDialog(mainWindow, models, goal, mainWindow.getMediator());
     }
 
     @Override

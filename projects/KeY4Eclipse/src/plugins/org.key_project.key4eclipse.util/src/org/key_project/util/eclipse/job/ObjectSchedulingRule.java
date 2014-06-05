@@ -17,13 +17,14 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * This {@link ISchedulingRule} can be used to let {@link Job}s waiting
  * if they use the same given {@link Object}.
  * @author Martin Hentschel
  */
-public class ObjectchedulingRule implements ISchedulingRule {
+public class ObjectSchedulingRule implements ISchedulingRule {
    /**
     * The object which causes conflicts.
     */
@@ -45,7 +46,7 @@ public class ObjectchedulingRule implements ISchedulingRule {
     * @param conflictsWith The object which causes conflicts.
     * @param conflictingResources Contains all {@link IResource}s which also conflicts with this {@link ISchedulingRule}.
     */
-   public ObjectchedulingRule(Object conflictsWith, 
+   public ObjectSchedulingRule(Object conflictsWith, 
                               IResource... conflictingResources) {
       super();
       this.conflictsWith = conflictsWith;
@@ -57,9 +58,9 @@ public class ObjectchedulingRule implements ISchedulingRule {
     */
    @Override
    public boolean contains(ISchedulingRule rule) {
-      if (conflictsWith != null && rule instanceof ObjectchedulingRule) {
-         ObjectchedulingRule otherRule = (ObjectchedulingRule)rule;
-         return conflictsWith.equals(otherRule.getConflictsWith());
+      if (rule instanceof ObjectSchedulingRule) {
+         ObjectSchedulingRule otherRule = (ObjectSchedulingRule)rule;
+         return ObjectUtil.equals(conflictsWith, otherRule.getConflictsWith());
       }
       else {
          if (rule instanceof IResource) {

@@ -102,7 +102,7 @@ public class KeYValue extends AbstractSEDValue {
    public KeYVariable[] getVariables() throws DebugException {
       synchronized (this) {
          try {
-            if (variables == null) {
+            if (variables == null && !executionValue.isDisposed()) {
                IExecutionVariable[] executionVariables = executionValue.getChildVariables();
                if (executionVariables != null) {
                   variables = new KeYVariable[executionVariables.length];

@@ -103,4 +103,12 @@ public class SEDMemoryVariable extends AbstractSEDVariable {
    public void setReferenceTypeName(String referenceTypeName) {
       this.referenceTypeName = referenceTypeName;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setId(String id) {
+      super.setId(id);
+   }
 }

@@ -29,7 +29,7 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.impl.TreeSettings;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -158,7 +158,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     */
    public void testEmptyRoot() throws ProofInputException {
       // Create tree to test
-      UserInterface ui = new CustomConsoleUserInterface(false);
+      UserInterface ui = new CustomUserInterface(false);
       KeYMediator mediator = new KeYMediator(ui);
       Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
       Node root = appendRoot(proof);
