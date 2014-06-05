@@ -66,16 +66,20 @@ public class SEDThreadEventHandler extends DebugEventHandler {
     * @param thread The observed {@link ISEDThread} which has changed.
     */
    protected void fireDelta(ISEDThread thread) {
-      ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-      ModelDelta delta = new ModelDelta(manager, IModelDelta.CONTENT);
-      try {
-         List<ISEDDebugNode> leafsToSelect = new LinkedList<ISEDDebugNode>();
-         CollectionUtil.addAll(leafsToSelect, thread.getLeafsToSelect());
-         getModelProxy().fillModelDeltaToSelectLeafs(manager, delta, IModelDelta.NO_CHANGE, leafsToSelect);
+      SEDDebugTargetProxy modelProxy = getModelProxy();
+      if (modelProxy != null) {
+         ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+         ModelDelta delta = new ModelDelta(manager, IModelDelta.CONTENT);
+         try {
+            List<ISEDDebugNode> leafsToSelect = new LinkedList<ISEDDebugNode>();
+            CollectionUtil.addAll(leafsToSelect, thread.getLeafsToSelect());
+            modelProxy.fillModelDeltaToUpdateTarget(manager, delta, IModelDelta.NO_CHANGE);
+            modelProxy.fireModelChangedWithMultiSelect(delta, leafsToSelect);
+         }
+         catch (DebugException e) {
+            LogUtil.getLogger().logError(e);
+            modelProxy.fireModelChanged(delta);
+         }
       }
-      catch (DebugException e) {
-         LogUtil.getLogger().logError(e);
-      }
-      fireDelta(delta);
    }
 }
