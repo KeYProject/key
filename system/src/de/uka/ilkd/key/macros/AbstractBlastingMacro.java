@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui.macros;
+package de.uka.ilkd.key.macros;
 
 import java.util.LinkedList;
 import java.util.List;

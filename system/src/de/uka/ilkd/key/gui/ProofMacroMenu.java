@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 // 
-package de.uka.ilkd.key.gui.macros;
+package de.uka.ilkd.key.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,6 +18,7 @@ import java.util.ServiceLoader;
 import javax.swing.*;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.macros.ProofMacro;
 
 /**
  * This class provides the user interface to the macro extensions.
@@ -45,8 +46,12 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
  *
  * @author mattias ulbrich
  */
-@SuppressWarnings("serial")
 public class ProofMacroMenu extends JMenu {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = -5436200313524574310L;
 
     /**
      * The loader used to access the providers for macros.

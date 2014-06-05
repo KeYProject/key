@@ -21,7 +21,7 @@ import java.util.LinkedHashMap;
 import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ProofMacro;
 
 /**
  * Manages keyboard shortcuts for proof macros and GUI actions.
@@ -63,29 +63,29 @@ public final class KeyStrokeManager {
     static {
         if (FKEY_MACRO_SCHEME) {
             // use F keys for macros, CTRL+SHIFT+letter for other actions
-            mapping.put(de.uka.ilkd.key.gui.macros.FullAutoPilotProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F1,0));
-            mapping.put(de.uka.ilkd.key.gui.macros.AutoPilotPrepareProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F2,0));
-            mapping.put(de.uka.ilkd.key.gui.macros.PropositionalExpansionMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F3,0));
-            mapping.put(de.uka.ilkd.key.gui.macros.FullPropositionalExpansionMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F4,0));
-            mapping.put(de.uka.ilkd.key.gui.macros.TryCloseMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F5,0));
-            mapping.put(de.uka.ilkd.key.gui.macros.FinishSymbolicExecutionMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F6,0));
-            mapping.put(de.uka.ilkd.key.gui.macros.OneStepProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F7,0));
-            mapping.put(de.uka.ilkd.key.gui.macros.TestGenMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F8,0));
-            mapping.put(de.uka.ilkd.key.gui.macros.HeapSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F9,0));
+            mapping.put(de.uka.ilkd.key.macros.FullAutoPilotProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F1,0));
+            mapping.put(de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F2,0));
+            mapping.put(de.uka.ilkd.key.macros.PropositionalExpansionMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F3,0));
+            mapping.put(de.uka.ilkd.key.macros.FullPropositionalExpansionMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F4,0));
+            mapping.put(de.uka.ilkd.key.macros.TryCloseMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F5,0));
+            mapping.put(de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F6,0));
+            mapping.put(de.uka.ilkd.key.macros.OneStepProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F7,0));
+            mapping.put(de.uka.ilkd.key.macros.TestGenMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F8,0));
+            mapping.put(de.uka.ilkd.key.macros.HeapSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F9,0));
             
             mapping.put(de.uka.ilkd.key.gui.actions.QuickSaveAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_S,MULTI_KEY_MASK));
             mapping.put(de.uka.ilkd.key.gui.actions.QuickLoadAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_O,MULTI_KEY_MASK));
         } else {
             // use CTRL+SHIFT+letter for macros, F keys for other actions
-            mapping.put(de.uka.ilkd.key.gui.macros.FullAutoPilotProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_V,MULTI_KEY_MASK));
-            mapping.put(de.uka.ilkd.key.gui.macros.AutoPilotPrepareProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_D,MULTI_KEY_MASK));
-            mapping.put(de.uka.ilkd.key.gui.macros.PropositionalExpansionMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_A,MULTI_KEY_MASK));
-            mapping.put(de.uka.ilkd.key.gui.macros.FullPropositionalExpansionMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_S,MULTI_KEY_MASK));
-            mapping.put(de.uka.ilkd.key.gui.macros.TryCloseMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_C,MULTI_KEY_MASK));
-            mapping.put(de.uka.ilkd.key.gui.macros.FinishSymbolicExecutionMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_X,MULTI_KEY_MASK));
-            mapping.put(de.uka.ilkd.key.gui.macros.OneStepProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,MULTI_KEY_MASK));
-            mapping.put(de.uka.ilkd.key.gui.macros.TestGenMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_T,MULTI_KEY_MASK));
-            mapping.put(de.uka.ilkd.key.gui.macros.HeapSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_H,MULTI_KEY_MASK));
+            mapping.put(de.uka.ilkd.key.macros.FullAutoPilotProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_V,MULTI_KEY_MASK));
+            mapping.put(de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_D,MULTI_KEY_MASK));
+            mapping.put(de.uka.ilkd.key.macros.PropositionalExpansionMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_A,MULTI_KEY_MASK));
+            mapping.put(de.uka.ilkd.key.macros.FullPropositionalExpansionMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_S,MULTI_KEY_MASK));
+            mapping.put(de.uka.ilkd.key.macros.TryCloseMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_C,MULTI_KEY_MASK));
+            mapping.put(de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_X,MULTI_KEY_MASK));
+            mapping.put(de.uka.ilkd.key.macros.OneStepProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,MULTI_KEY_MASK));
+            mapping.put(de.uka.ilkd.key.macros.TestGenMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_T,MULTI_KEY_MASK));
+            mapping.put(de.uka.ilkd.key.macros.HeapSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_H,MULTI_KEY_MASK));
             
             mapping.put(de.uka.ilkd.key.gui.actions.QuickSaveAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_F5,0));
             mapping.put(de.uka.ilkd.key.gui.actions.QuickLoadAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_F6,0));
