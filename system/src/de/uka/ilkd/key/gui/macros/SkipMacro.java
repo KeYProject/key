@@ -9,7 +9,6 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 
 import javax.swing.KeyStroke;
 
@@ -18,7 +17,7 @@ import javax.swing.KeyStroke;
  *
  * @author christoph
  */
-public class SkipMacro implements ProofMacro {
+public class SkipMacro extends AbstractProofMacro {
 
     @Override
     public String getName() {
@@ -32,17 +31,6 @@ public class SkipMacro implements ProofMacro {
     }
 
     @Override
-    public boolean finishAfterMacro() {
-        return true;
-    }
-
-    @Override
-    public boolean canApplyTo(KeYMediator mediator,
-                              PosInOccurrence posInOcc) {
-        return false;
-    }
-
-    @Override
     public boolean canApplyTo(KeYMediator mediator,
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
@@ -50,30 +38,8 @@ public class SkipMacro implements ProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(KeYMediator mediator,
-                              Node node,
-                              PosInOccurrence posInOcc) {
-        return false;
-    }
-
-    @Override
-    public void applyTo(KeYMediator mediator,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
-        // do nothing
-    }
-
-    @Override
     public void applyTo(KeYMediator mediator,
                         ImmutableList<Goal> goals,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
-        // do nothing
-    }
-
-    @Override
-    public void applyTo(KeYMediator mediator,
-                        Node node,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
         // do nothing

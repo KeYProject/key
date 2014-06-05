@@ -24,9 +24,8 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 
-public abstract class AlternativeMacro implements ProofMacro {
+public abstract class AlternativeMacro extends AbstractProofMacro {
 
     /**
      * The proof macro alternatives in their order according to their priority.
@@ -44,29 +43,6 @@ public abstract class AlternativeMacro implements ProofMacro {
      * @return a non-null array which should not be altered afterwards.
      */
     protected abstract ProofMacro[] createProofMacroArray();
-
-    @Override
-    public boolean finishAfterMacro() {
-		return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * <p>
-     * This compound macro is applicable if and only if any one of the macros is applicable.
-     * If there is no first macro, this is not applicable.
-     */
-    @Override
-    public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        List<ProofMacro> macros = getProofMacros();
-        for (int i = 0; i < macros.size(); i++) {
-            if (macros.get(i).canApplyTo(mediator, posInOcc)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
      * {@inheritDoc}
@@ -88,38 +64,6 @@ public abstract class AlternativeMacro implements ProofMacro {
         return false;
     }
 
-    @Override
-    public boolean canApplyTo(KeYMediator mediator, Node node, PosInOccurrence posInOcc) {
-        List<ProofMacro> macros = getProofMacros();
-        for (int i = 0; i < macros.size(); i++) {
-            if (macros.get(i).canApplyTo(mediator, node, posInOcc)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * <p>
-     * This launches the first applicable macro of {@link #getProofMacros()}.
-     *
-     * @throws InterruptedException
-     *             if the macro is interrupted.
-     */
-    @Override
-    public void applyTo(KeYMediator mediator,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
-        for (ProofMacro macro : getProofMacros()) {
-            if(macro.canApplyTo(mediator, posInOcc)) {
-                macro.applyTo(mediator, posInOcc, listener);
-                return;
-            }
-        }
-    }
-
     /**
      * {@inheritDoc}
      *
@@ -137,19 +81,6 @@ public abstract class AlternativeMacro implements ProofMacro {
         for (ProofMacro macro : getProofMacros()) {
             if(macro.canApplyTo(mediator, goals, posInOcc)) {
                 macro.applyTo(mediator, goals, posInOcc, listener);
-                return;
-            }
-        }
-    }
-
-    @Override
-    public void applyTo(KeYMediator mediator,
-                        Node node,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
-        for (ProofMacro macro : getProofMacros()) {
-            if(macro.canApplyTo(mediator, node, posInOcc)) {
-                macro.applyTo(mediator, node, posInOcc, listener);
                 return;
             }
         }

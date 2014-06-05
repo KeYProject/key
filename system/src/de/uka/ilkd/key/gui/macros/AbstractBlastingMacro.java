@@ -198,7 +198,6 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
         @Override
         public Name name() {
-            // TODO Auto-generated method stub
             return new Name("Semantics Blasting");
         }
 

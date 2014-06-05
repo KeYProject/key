@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.gui.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
@@ -22,7 +21,6 @@ import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
@@ -43,27 +41,9 @@ import de.uka.ilkd.key.strategy.Strategy;
  * @see ProverTaskListener
  * @see Strategy
  */
-public abstract class StrategyProofMacro implements ProofMacro {
+public abstract class StrategyProofMacro extends AbstractProofMacro {
 
     protected abstract Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc);
-
-    @Override
-    public boolean finishAfterMacro() {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * This macro can always be applied (does not change anything perhaps)
-     *
-     * TODO make this only applicable if it has an impact.
-     *
-     */
-    @Override
-    public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        return true;
-    }
 
     /**
      * {@inheritDoc}
@@ -81,50 +61,11 @@ public abstract class StrategyProofMacro implements ProofMacro {
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * This macro can always be applied (does not change anything perhaps)
-     *
-     * TODO make this only applicable if it has an impact.
-     *
-     */
-    @Override
-    public boolean canApplyTo(KeYMediator mediator,
-                              Node node,
-                              PosInOccurrence posInOcc) {
-        return true;
-    }
-
-    /**
      * Subclasses can use this method to do some postprocessing on the
      * proof-object after the strategy has finished.
      * @param proof     The proof object.
      */
     protected void doPostProcessing(Proof proof) {}
-
-    /*
-     * Set a new rule app manager similar to the focussed mode.
-     * Set a new strategy which only allows for the named admitted rules.
-     * Then run automation mode and in the end reset the managers.
-     * and the strategy.
-     * 
-     * If the automation is interrupted, report the interruption as an exception.
-     */
-    @Override 
-    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
-            ProverTaskListener listener) throws InterruptedException {
-        applyTo(mediator, ImmutableSLList.<Goal>nil().prepend(mediator.getSelectedGoal()), posInOcc, listener);
-    }
-
-    @Override 
-    public void applyTo(KeYMediator mediator, Node node, PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
-        // find the relevant goals
-        // and start
-        ImmutableList<Goal> goals =
-                mediator.getSelectedProof().getSubtreeEnabledGoals(node);
-        applyTo(mediator, goals, posInOcc, listener);
-    }
 
     /*
      * Set a new rule app manager similar to the focussed mode.

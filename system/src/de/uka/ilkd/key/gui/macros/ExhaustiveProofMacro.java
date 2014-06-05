@@ -24,21 +24,15 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class ExhaustiveProofMacro implements ProofMacro {
+public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
 
     /** Cache for nodes which have already been checked for an applicable
         position. */
     private static Map<Node, PosInOccurrence> applicableOnNodeAtPos =
             new HashMap<Node, PosInOccurrence>();
-
-    @Override
-    public boolean finishAfterMacro() {
-        return true;
-    }
 
     private PosInOccurrence getApplicablePosInOcc(KeYMediator mediator,
                                                   Goal goal,
@@ -56,25 +50,6 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
             }
             return res;
         }
-    }
-
-    @Override
-    public boolean canApplyTo(KeYMediator mediator,
-                              PosInOccurrence posInOcc) {
-        final ProofMacro macro = getProofMacro();
-
-        assert macro != null;
-        assert mediator != null;
-        assert mediator.getSelectionModel() != null;
-
-        if (mediator.getSelectedProof() == null) {
-            // can happen during initialisation
-            return false;
-        }
-
-        // check whether macro can be applied
-        final Proof proof = mediator.getSelectedProof();
-        return canApplyTo(mediator, proof.openGoals(), posInOcc);
     }
 
     @Override
@@ -103,69 +78,11 @@ public abstract class ExhaustiveProofMacro implements ProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(KeYMediator mediator,
-                              Node node,
-                              PosInOccurrence posInOcc) {
-        return canApplyTo(mediator, mediator.getSelectedProof().getSubtreeEnabledGoals(node), posInOcc);
-    }
-
-    @Override
-    public void applyTo(KeYMediator mediator,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
-        final Proof proof = mediator.getSelectedProof();
-
-        for (Goal goal : proof.openGoals()) {
-            final ProofMacro macro = getProofMacro();
-            if (!applicableOnNodeAtPos.containsKey(goal.node())) {
-                // node has not been checked before, so do it
-                boolean canBeApplied = canApplyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc);
-                if (!canBeApplied) {
-                    // canApplyTo checks all open goals. thus, if it returns
-                    // false, then this macro is not applicable at all and
-                    // we can return
-                    return;
-                }
-            }
-            PosInOccurrence applicableAt =
-                    applicableOnNodeAtPos.get(goal.node());
-            if (applicableAt != null) {
-                macro.applyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal), applicableAt, listener);
-            }
-        }
-    }
-
-    @Override
     public void applyTo(KeYMediator mediator,
                         ImmutableList<Goal> goals,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
         for (Goal goal : goals) {
-            final ProofMacro macro = getProofMacro();
-            if (!applicableOnNodeAtPos.containsKey(goal.node())) {
-                // node has not been checked before, so do it
-                boolean canBeApplied = canApplyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc);
-                if (!canBeApplied) {
-                    // canApplyTo checks all open goals. thus, if it returns
-                    // false, then this macro is not applicable at all and
-                    // we can return
-                    return;
-                }
-            }
-            PosInOccurrence applicableAt =
-                    applicableOnNodeAtPos.get(goal.node());
-            if (applicableAt != null) {
-                macro.applyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal), applicableAt, listener);
-            }
-        }
-    }
-
-    @Override
-    public void applyTo(KeYMediator mediator,
-                        Node node,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
-        for (Goal goal : mediator.getSelectedProof().getSubtreeEnabledGoals(node)) {
             final ProofMacro macro = getProofMacro();
             if (!applicableOnNodeAtPos.containsKey(goal.node())) {
                 // node has not been checked before, so do it

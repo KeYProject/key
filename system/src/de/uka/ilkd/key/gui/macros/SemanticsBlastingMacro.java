@@ -76,7 +76,6 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "Semantics Blasting";
 	}
 

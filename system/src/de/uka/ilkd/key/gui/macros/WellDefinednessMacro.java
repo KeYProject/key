@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO;
@@ -60,24 +61,19 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         return new WellDefinednessStrategy();
     }
 
-    private boolean preCheckPO(KeYMediator mediator) {
-        final ContractPO po =
-                mediator.getServices().getSpecificationRepository()
-                        .getPOForProof(mediator.getSelectedProof());
-        // applicable for all well-definedness checks
-        return WellDefinednessCheck.isOn()
-                && (po instanceof WellDefinednessPO
-                        || po instanceof FunctionalOperationContractPO);
-    }
-
     @Override
     public boolean canApplyTo(KeYMediator mediator, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
-        if (mediator.getSelectedProof() == null
+        final Proof proof = mediator.getSelectedProof();
+        if (proof == null
                 || mediator.getServices() == null
-                || mediator.getServices().getSpecificationRepository() == null) {
+                || mediator.getServices().getSpecificationRepository() == null
+                || !WellDefinednessCheck.isOn()) {
             return false;
         }
-        if (!preCheckPO(mediator)) {
+        final ContractPO po = mediator.getServices().getSpecificationRepository().getPOForProof(proof);
+        if (!(po instanceof WellDefinednessPO
+                        || po instanceof FunctionalOperationContractPO)) {
+            // applicable for all well-definedness checks
             return false;
         }
         for (Goal goal: goals) {
@@ -91,49 +87,6 @@ public class WellDefinednessMacro extends StrategyProofMacro {
                 n = n.parent();
             }
         }        
-        return false;
-    }
-
-    @Override
-    public boolean canApplyTo(KeYMediator mediator, Node node, PosInOccurrence posInOcc) {
-        if (mediator.getSelectedProof() == null
-                || mediator.getServices() == null
-                || mediator.getServices().getSpecificationRepository() == null) {
-            return false;
-        }
-        if (!preCheckPO(mediator)) {
-            return false;
-        }
-        while (node != null) {
-            // Applicable in a well-definedness branch (e.g. of a loop statement or a block contract)
-            if (node.getNodeInfo().getBranchLabel() != null
-                    && node.getNodeInfo().getBranchLabel().equals(WD_BRANCH)) {
-                return true;
-            }
-            node = node.parent();
-        }
-        return false;
-    }
-
-    @Override
-    public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        if (mediator.getSelectedProof() == null
-                || mediator.getServices() == null
-                || mediator.getServices().getSpecificationRepository() == null) {
-            return false;
-        }
-        if (!preCheckPO(mediator)) {
-            return false;
-        }
-        Node n = mediator.getSelectedNode();
-        while (n != null) {
-            // Applicable in a well-definedness branch (e.g. of a loop statement or a block contract)
-            if (n.getNodeInfo().getBranchLabel() != null
-                    && n.getNodeInfo().getBranchLabel().equals(WD_BRANCH)) {
-                return true;
-            }
-            n = n.parent();
-        }
         return false;
     }
 
