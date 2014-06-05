@@ -39,7 +39,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
  * <p>
  * The {@link ServiceLoader} mechanism is used to instantiate the registered
  * proof macros. To register a macro, add its class name to the file
- * <tt>resources/META-INF/services/de.uka.ilkd.key.gui.macros.ProofMacro</tt>.
+ * <tt>resources/META-INF/services/de.uka.ilkd.key.macros.ProofMacro</tt>.
  *
  * @see ProofMacro
  * @see ServiceLoader
