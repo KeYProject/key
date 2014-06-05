@@ -40,6 +40,11 @@ import java.util.LinkedList;
  */
 public class CurrentGoalView extends SequentView implements Autoscroll {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 8494000234215913553L;
+
     public static final Color DEFAULT_HIGHLIGHT_COLOR = new Color(70, 100, 170, 76);
 
     public static final Color ADDITIONAL_HIGHLIGHT_COLOR = new Color(0, 0, 0, 38);

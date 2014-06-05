@@ -101,7 +101,8 @@ public final class ProblemLoader extends DefaultProblemLoader {
     }
 
     public void runAsynchronously() {
-        final SwingWorker worker = new SwingWorker<Throwable, Void>() {
+        final SwingWorker<Throwable, Void> worker =
+                new SwingWorker<Throwable, Void>() {
 
             private long runTime;
 
