@@ -24,11 +24,11 @@ import de.uka.ilkd.key.proof.Node;
 public abstract class AbstractProofMacro implements ProofMacro {
 
     private static ImmutableList<Goal> getGoals(KeYMediator mediator, Node node) {
-        if (mediator.getSelectedProof() == null) {
+        if (node == null) {
             // can happen during initialisation
             return ImmutableSLList.<Goal>nil();
         } else {
-            return mediator.getSelectedProof().getSubtreeEnabledGoals(node);
+            return node.proof().getSubtreeEnabledGoals(node);
         }
     }
 

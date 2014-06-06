@@ -25,6 +25,7 @@ import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import java.util.ArrayList;
 
 /**
  * The abstract class SequentialProofMacro can be used to create compound macros
@@ -91,11 +92,15 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
                         ImmutableList<Goal> goals,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
-        final Node initNode = mediator.getSelectedNode();
+        final List<Node> initNodes = new ArrayList<Node>(goals.size());
+        for (Goal goal : goals) {
+            initNodes.add(goal.node());
+        }
         for (ProofMacro macro : getProofMacros()) {
-            // reverse to original node
-            mediator.getSelectionModel().setSelectedNode(initNode);
-            macro.applyTo(mediator, goals, posInOcc, listener);
+            // reverse to original nodes
+            for (Node initNode : initNodes) {
+                macro.applyTo(mediator, initNode, posInOcc, listener);
+            }
         }
     }
 
