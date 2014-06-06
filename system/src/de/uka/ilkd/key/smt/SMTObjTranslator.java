@@ -1041,8 +1041,6 @@ public class SMTObjTranslator implements SMTTranslator {
 	private void findSorts(Set<Sort> sorts, Term term) {
 		Sort s = term.sort();
 		
-		
-		
 		JavaInfo javaInfo = services.getJavaInfo();
 		Sort object = javaInfo.getJavaLangObject().getSort();
 		Sort nullSort = services.getTypeConverter().getHeapLDT().getNull()

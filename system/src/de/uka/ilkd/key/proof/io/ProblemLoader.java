@@ -63,6 +63,7 @@ public final class ProblemLoader extends DefaultProblemLoader {
             getMediator().getUI().reportStatus(this, errorMessage);
             return exception;
         } catch (final Throwable throwable) {
+        	throwable.printStackTrace();
             reportException(throwable);
             return throwable;
         }

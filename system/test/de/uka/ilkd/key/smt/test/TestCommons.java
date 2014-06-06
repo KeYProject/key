@@ -92,12 +92,21 @@ public abstract class TestCommons extends TestCase {
 		}
 		// System.gc();
 		// unknown is always allowed. But wrong answers are not allowed
-		if (isValid && result != null) {
+		return correctResult(isValid, result);
+	}
+	
+	protected boolean correctResult(Goal g, boolean isValid){
+		return correctResult(isValid, checkGoal(g));
+	}
+
+	private boolean correctResult(boolean isValid, SMTSolverResult result) {
+		//System.out.println(Boolean.toString(isValid)+" "+result);
+	    if (isValid && result != null) {
 			return result.isValid() != SMTSolverResult.ThreeValuedTruth.FALSIFIABLE;
 		} else {
 			return result.isValid() != SMTSolverResult.ThreeValuedTruth.VALID;
 		}
-	}
+    }
 
 	/**
 	 * check a problem file
@@ -112,11 +121,17 @@ public abstract class TestCommons extends TestCase {
 		Proof proof = p.getProofs()[0];
 		Assert.assertTrue(proof.openGoals().size() == 1);
 		Goal g = proof.openGoals().iterator().next();
-		SolverLauncher launcher = new SolverLauncher(new SMTTestSettings());
-		SMTProblem problem = new SMTProblem(g);
-		launcher.launch(problem, proof.getServices(), getSolverType());
-		return problem.getFinalResult();
+		return checkGoal(g);
 	}
+
+	private SMTSolverResult checkGoal(Goal g) {
+	    SolverLauncher launcher = new SolverLauncher(new SMTTestSettings());
+		SMTProblem problem = new SMTProblem(g);
+		launcher.launch(problem, g.proof().getServices(), getSolverType());
+		return problem.getFinalResult();
+    }
+	
+	
 
 	protected ProofAggregate loadProof(String filepath) {
 	    ProofAggregate p;
