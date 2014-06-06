@@ -9,24 +9,16 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 
-public class DoWhileFinallyMacro extends AbstractProofMacro {
-
-    private final ProofMacro macro;
-    private final ProofMacro elseMacro;
-    private final boolean condition;
-    private final int steps;
-
-    public DoWhileFinallyMacro(ProofMacro macro, int steps) {
-        this(macro, new SkipMacro(), steps, true);
-    }
-
-    public DoWhileFinallyMacro(ProofMacro macro, ProofMacro elseMacro,
-                            int steps, boolean condition) {
-        this.macro = macro;
-        this.elseMacro = elseMacro;
-        this.condition = condition;
-        this.steps = steps;
-    }
+/**
+ * The abstract class DoWhileFinallyMacro can be used to create compound macros
+ * which apply the macro given by {@link getProofMacro()} as long the given bound
+ * of steps is not reached yet, the condition given by {@link getCondition()}
+ * holds, and the macro is applicable. When this becomes false and the step bound
+ * is not reached yet, the macro given by {@link getAltProofMacro()} is applied.
+ *
+ * @author Michael Kirsten
+ */
+public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
 
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.gui.macros.ProofMacro#getName()
@@ -48,7 +40,9 @@ public class DoWhileFinallyMacro extends AbstractProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(KeYMediator mediator, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
+	public boolean canApplyTo(KeYMediator mediator,
+							  ImmutableList<Goal> goals,
+							  PosInOccurrence posInOcc) {
         if (getCondition()) {
             return getProofMacro().canApplyTo(mediator, goals, posInOcc);
         } else {
@@ -78,40 +72,31 @@ public class DoWhileFinallyMacro extends AbstractProofMacro {
      *
      * @return the proofMacro.
      */
-    ProofMacro getProofMacro() {
-        return this.macro;
-    }
+    abstract ProofMacro getProofMacro();
 
     /**
      * Gets the alternative proof macro for the else-branch.
      *
      * @return the proofMacro.
      */
-    ProofMacro getAltProofMacro() {
-        return this.elseMacro;
-    }
+    abstract ProofMacro getAltProofMacro();
 
-    boolean getCondition() {
-        return this.condition;
-    }
+    abstract boolean getCondition();
 
-    /** returns the maximum number of rule applications allowed for
+    /**
+     * Returns the maximum number of rule applications allowed for
      * this macro. The default implementation is the maximum amount
      * of proof steps for automatic mode.
      * @return the maximum number of rule applications allowed for
      * this macro
      */
-    int getMaxSteps(KeYMediator mediator) {
-        if (this.steps <= 0) {
-            if (mediator.getSelectedProof() != null) {
-                return mediator.getSelectedProof().getSettings().getStrategySettings().getMaxSteps();
-            } else {
-                return ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getMaxSteps();
-            }
-        } else {
-            return steps;
-        }
-    }
+    static int getMaxSteps(KeYMediator mediator) {
+		if (mediator.getSelectedProof() != null) {
+			return mediator.getSelectedProof().getSettings().getStrategySettings().getMaxSteps();
+		} else {
+			return ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getMaxSteps();
+		}
+	}
 
     @Override
     public KeyStroke getKeyStroke() {

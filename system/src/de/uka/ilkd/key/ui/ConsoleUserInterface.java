@@ -296,7 +296,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                 assert p.name().equals(proof.name());
                 getMediator().setProof(proofStack.head());
             } else {
-                // proofStack might be empty though proof != null. This can
+                // proofStack might be empty, though proof != null. This can
                 // happen for symbolic execution tests, if proofCreated was not
                 // called by the test setup.
             }

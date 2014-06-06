@@ -21,9 +21,21 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 
+/**
+ * Takes care of providing the whole ProofMacro interface by only making it
+ * necessary to implement to most general application methods for a given
+ * list of goals and translating the less general versions (firstly for a
+ * given node and secondly having neither any goals nor a node. Although all
+ * these methods can be redefined by inheritance, this is usually not
+ * necessary, unless you know <tt>exactly</tt> what you are doing.
+ * The exception is {@link #finishAfterMacro()} for compound macros
+ * (see description in {@link ProofMacro#finishAfterMacro()}).
+ *
+ * @author Michael Kirsten
+ */
 public abstract class AbstractProofMacro implements ProofMacro {
 
-    private static ImmutableList<Goal> getGoals(KeYMediator mediator, Node node) {
+    private static ImmutableList<Goal> getGoals(Node node) {
         if (node == null) {
             // can happen during initialisation
             return ImmutableSLList.<Goal>nil();
@@ -39,20 +51,20 @@ public abstract class AbstractProofMacro implements ProofMacro {
 
     @Override
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        return canApplyTo(mediator, getGoals(mediator, mediator.getSelectedNode()), posInOcc);
+        return canApplyTo(mediator, getGoals(mediator.getSelectedNode()), posInOcc);
     }
 
     @Override
     public boolean canApplyTo(KeYMediator mediator,
                               Node node,
                               PosInOccurrence posInOcc) {
-        return canApplyTo(mediator, getGoals(mediator, node), posInOcc);
+        return canApplyTo(mediator, getGoals(node), posInOcc);
     }
 
     @Override
     public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
-        applyTo(mediator, getGoals(mediator, mediator.getSelectedNode()), posInOcc, listener);
+        applyTo(mediator, getGoals(mediator.getSelectedNode()), posInOcc, listener);
     }
 
     @Override
@@ -60,6 +72,6 @@ public abstract class AbstractProofMacro implements ProofMacro {
                         Node node,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) throws InterruptedException {
-        applyTo(mediator, getGoals(mediator, node), posInOcc, listener);
+        applyTo(mediator, getGoals(node), posInOcc, listener);
     }
 }

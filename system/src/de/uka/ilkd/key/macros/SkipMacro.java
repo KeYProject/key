@@ -12,8 +12,9 @@ import de.uka.ilkd.key.proof.Goal;
 
 import javax.swing.KeyStroke;
 
-
 /**
+ * This macro does nothing and is not applicable. It can be used to create
+ * compound macros, e.g. as an alternative macro for {@link DoWhileFinallyMacro}.
  *
  * @author christoph
  */
@@ -21,7 +22,7 @@ public class SkipMacro extends AbstractProofMacro {
 
     @Override
     public String getName() {
-        return "DummyProofMacro";
+        return "SkipMacro";
     }
 
 

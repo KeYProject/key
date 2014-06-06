@@ -27,6 +27,15 @@ import de.uka.ilkd.key.proof.Node;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The abstract class ExhaustiveProofMacro can be used to create compound macros
+ * which either apply the macro given by {@link getProofMacro()} directly, or
+ * --if not directly applicable-- search on the sequent for any applicable
+ * posInOcc and apply it on the first applicable one or --if not applicable
+ * anywhere on the sequent-- do not apply it.
+ *
+ * @author Michael Kirsten
+ */
 public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
 
     /** Cache for nodes which have already been checked for an applicable
@@ -50,6 +59,24 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
             }
             return res;
         }
+    }
+
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.gui.macros.ProofMacro#getName()
+     */
+    @Override
+    public String getName() {
+        return "Apply macro on first applicable position in the sequent.";
+    }
+
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.gui.macros.ProofMacro#getDescription()
+     */
+    @Override
+	public String getDescription() {
+		return "Applies specificed macro --if it is applicable anywhere on" +
+				"the sequent-- either directly or on the first applicable" +
+				"position found.";
     }
 
     @Override
@@ -78,28 +105,29 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
     }
 
     @Override
-    public void applyTo(KeYMediator mediator,
-                        ImmutableList<Goal> goals,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
-        for (Goal goal : goals) {
-            final ProofMacro macro = getProofMacro();
-            if (!applicableOnNodeAtPos.containsKey(goal.node())) {
-                // node has not been checked before, so do it
-                boolean canBeApplied = canApplyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc);
-                if (!canBeApplied) {
-                    // canApplyTo checks all open goals. thus, if it returns
-                    // false, then this macro is not applicable at all and
-                    // we can return
-                    return;
-                }
-            }
-            PosInOccurrence applicableAt =
-                    applicableOnNodeAtPos.get(goal.node());
-            if (applicableAt != null) {
-                macro.applyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal), applicableAt, listener);
-            }
-        }
+	public void applyTo(KeYMediator mediator,
+						ImmutableList<Goal> goals,
+						PosInOccurrence posInOcc,
+						ProverTaskListener listener) throws InterruptedException {
+		for (Goal goal : goals) {
+			final ProofMacro macro = getProofMacro();
+			if (!applicableOnNodeAtPos.containsKey(goal.node())) {
+				// node has not been checked before, so do it
+				boolean canBeApplied =
+						canApplyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc);
+				if (!canBeApplied) {
+					// canApplyTo checks all open goals. thus, if it returns
+					// false, then this macro is not applicable at all and
+					// we can return
+					return;
+				}
+			}
+			PosInOccurrence applicableAt =
+					applicableOnNodeAtPos.get(goal.node());
+			if (applicableAt != null) {
+				macro.applyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal), applicableAt, listener);
+			}
+		}
     }
 
     /**

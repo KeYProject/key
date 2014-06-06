@@ -25,6 +25,13 @@ import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 
+/**
+ * The abstract class AlternativeMacro can be used to create compound macros
+ * which apply the first applicable macro (similar to a shortcut disjunction)
+ * and then it returns.
+ *
+ * @author Michael Kirsten
+ */
 public abstract class AlternativeMacro extends AbstractProofMacro {
 
     /**
