@@ -317,7 +317,17 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                menuItem.click();
             }
          });
+         waitUntilDeselected(bot, launchTreeItem);
       }
+   }
+   
+   /**
+    * Waits until the given {@link SWTBotTreeItem} is no longer selected.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @param item The {@link SWTBotTreeItem} to wait for.
+    */
+   protected static void waitUntilDeselected(SWTWorkbenchBot bot, SWTBotTreeItem item) {
+      TestUtilsUtil.waitUntilDeselected(bot, item);
    }
    
    /**
@@ -370,6 +380,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                menuItem.click();
             }
          });
+         waitUntilDeselected(bot, launchTreeItem);
       }
    }
    
@@ -423,6 +434,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                menuItem.click();
             }
          });
+         waitUntilDeselected(bot, launchTreeItem);
       }
    }
    

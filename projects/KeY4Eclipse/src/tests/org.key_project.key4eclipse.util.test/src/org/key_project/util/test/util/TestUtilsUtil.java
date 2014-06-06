@@ -70,6 +70,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.results.ArrayResult;
 import org.eclipse.swtbot.swt.finder.results.BoolResult;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.results.WidgetResult;
@@ -1795,6 +1796,63 @@ public class TestUtilsUtil {
       @Override
       public String getFailureMessage() {
          return "Item " + item + " is not expanded.";
+      }
+   }
+
+   /**
+    * Waits until the item is deselected.
+    * @param bot The {@link SWTBot} to use.
+    * @param item The {@link SWTBotTreeItem} to wait for a selection change. 
+    */
+   public static void waitUntilDeselected(SWTBot bot, SWTBotTreeItem item) {
+      bot.waitUntil(new DeslectedCondition(item));
+   }
+   
+   /**
+    * {@link ICondition} used by {@link TestUtilsUtil#waitUntilDeselected(SWTBot, SWTBotTreeItem)}.
+    * @author Martin Hentschel
+    */
+   private static class DeslectedCondition implements ICondition {
+      /**
+       * The {@link SWTBotTreeItem} to wait for.
+       */
+      private final SWTBotTreeItem item;
+      
+      /**
+       * Constructor.
+       * @param item The {@link SWTBotTreeItem} to wait for.
+       */
+      public DeslectedCondition(SWTBotTreeItem item) {
+         this.item = item;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean test() throws Exception {
+         TreeItem[] selection = syncExec(new ArrayResult<TreeItem>() {
+            @Override
+            public TreeItem[] run() {
+               return item.widget.getParent().getSelection();
+            }
+         });
+         return !ArrayUtil.contains(selection, item.widget);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void init(SWTBot bot) {
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFailureMessage() {
+         return "Item " + item + " is still selected.";
       }
    }
 }

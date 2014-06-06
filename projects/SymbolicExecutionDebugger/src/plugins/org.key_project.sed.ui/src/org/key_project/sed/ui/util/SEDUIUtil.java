@@ -38,6 +38,7 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.internal.ui.viewers.model.TreeModelContentProvider;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
+import org.eclipse.jface.viewers.ContentViewer;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.ILazyTreePathContentProvider;
@@ -959,6 +960,25 @@ public final class SEDUIUtil {
       }
       else {
          LogUtil.getLogger().logError("Extension point registry is not loaded.");
+      }
+      return result;
+   }
+   
+   /**
+    * Returns the {@link TreeModelContentProvider} used in the given {@link IDebugView}.
+    * @param debugView The {@link IDebugView} to get its {@link TreeModelContentProvider}.
+    * @return The {@link TreeModelContentProvider} or {@code null} if not available.
+    */
+   public static TreeModelContentProvider getContentProvider(IDebugView debugView) {
+      TreeModelContentProvider result = null;
+      if (debugView != null) {
+         Viewer viewer = debugView.getViewer();
+         if (viewer instanceof ContentViewer) {
+            IContentProvider cp = ((ContentViewer)viewer).getContentProvider();
+            if (cp instanceof TreeModelContentProvider) {
+               result = (TreeModelContentProvider)cp;
+            }
+         }
       }
       return result;
    }
