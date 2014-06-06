@@ -1171,7 +1171,7 @@ public class SymbolicLayoutExtractor {
                                                  Set<Term> objectsToIgnore) throws ProofInputException {
       Set<Term> result = new LinkedHashSet<Term>();
       for (SequentFormula sf : sequent) {
-         if (!SymbolicExecutionUtil.isSkolemEquality(sf)) {
+         if (SymbolicExecutionUtil.checkSkolemEquality(sf) == 0) {
             result.addAll(collectSymbolicObjectsFromTerm(sf.formula(), objectsToIgnore));
          }
       }

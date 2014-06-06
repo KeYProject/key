@@ -31,6 +31,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -44,6 +45,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
@@ -52,6 +54,8 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 
 /**
  * Provides utility methods for SWT.
@@ -656,5 +660,22 @@ public final class SWTUtil {
             }
          });
       }
+   }
+
+   /**
+    * Invokes {@link StructuredViewer#testFindItem(Object)} thread save.
+    * @param viewer The {@link StructuredViewer} to invoke method on.
+    * @param element The element to test.
+    * @return The found {@link Item} or {@code null} if not available.
+    */
+   public static Object testFindItem(final StructuredViewer viewer, final Object element) {
+      IRunnableWithResult<Object> run = new AbstractRunnableWithResult<Object>() {
+         @Override
+         public void run() {
+            setResult(viewer.testFindItem(element));
+         }
+      };
+      viewer.getControl().getDisplay().syncExec(run);
+      return run.getResult();
    }
 }

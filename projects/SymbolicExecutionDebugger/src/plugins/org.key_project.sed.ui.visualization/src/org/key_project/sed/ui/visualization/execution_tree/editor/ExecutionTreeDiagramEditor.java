@@ -82,7 +82,7 @@ import org.key_project.util.java.ArrayUtil;
 @SuppressWarnings("restriction")
 public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
    /**
-    * Indicates that this editor is read-onl or editable otherwise.
+    * Indicates that this editor is read-only or editable otherwise.
     */
    private boolean readOnly;
 
