@@ -284,21 +284,23 @@ public class ConsoleUserInterface extends AbstractUserInterface {
       return true; // All proofs are supported.
    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void removeProof(Proof proof) {
-       if (proof != null && !proofStack.isEmpty()) {
-           Proof p = proofStack.head();
-           proofStack = proofStack.removeAll(p);
-           assert p.name().equals(proof.name());
-           getMediator().setProof(proofStack.head());
-           proof.dispose();
-       } else {
-           // proofStack might be empty though proof != null. This can happen
-           // for symbolic execution tests, if proofCreated was not called by
-           // the test setup.
-       }
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeProof(Proof proof) {
+        if (proof != null) {
+            if (!proofStack.isEmpty()) {
+                Proof p = proofStack.head();
+                proofStack = proofStack.removeAll(p);
+                assert p.name().equals(proof.name());
+                getMediator().setProof(proofStack.head());
+            } else {
+                // proofStack might be empty though proof != null. This can
+                // happen for symbolic execution tests, if proofCreated was not
+                // called by the test setup.
+            }
+            proof.dispose();
+        }
+    }
 }
