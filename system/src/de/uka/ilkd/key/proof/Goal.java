@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.proof;
 
@@ -29,16 +29,14 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
-import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -273,7 +271,7 @@ public final class Goal  {
     }
 
     /** adds a formula to the sequent before the given position
-     * and informs the rule appliccation index about this change
+     * and informs the rule application index about this change
      * @param cf the SequentFormula to be added
      * @param p PosInOccurrence encodes the position
      */
@@ -294,7 +292,7 @@ public final class Goal  {
 
     /** adds a list of formulas to the antecedent or succedent of a
      * sequent. Either at its front or back.
-     * and informs the rule appliccation index about this change
+     * and informs the rule application index about this change
      * @param insertions the IList<SequentFormula> to be added
      * @param inAntec boolean true(false) if SequentFormula has to be
      * added to antecedent (succedent)
@@ -311,7 +309,7 @@ public final class Goal  {
 
     /** adds a formula to the antecedent or succedent of a
      * sequent. Either at its front or back
-     * and informs the rule appliccation index about this change
+     * and informs the rule application index about this change
      * @param cf the SequentFormula to be added
      * @param inAntec boolean true(false) if SequentFormula has to be
      * added to antecedent (succedent)
@@ -637,10 +635,13 @@ public final class Goal  {
         return goalList;
     }
 
-
     public String toString() {
-	String result = node.sequent().prettyprint(proof().getServices()).toString();
-	return result;
+        de.uka.ilkd.key.pp.LogicPrinter lp = (new de.uka.ilkd.key.pp.LogicPrinter
+                (new de.uka.ilkd.key.pp.ProgramPrinter(null),
+                        new NotationInfo(),
+                        proof().getServices()));
+        lp.printSequent(node.sequent());
+	return lp.toString();
     }
 
     private <T extends Named> ImmutableSet<Name> names(ImmutableSet<T> set) {

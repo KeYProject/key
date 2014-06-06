@@ -1,26 +1,21 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 // 
-
 package de.uka.ilkd.key.gui.macros;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ServiceLoader;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-
+import javax.swing.*;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 
@@ -37,7 +32,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
  * tooltip is set to {@link ProofMacro#getDescription()}.
  *
  * <p>
- * There are applicable macros iff {@link #isEmpty()} returns <code>false</code>.
+ * There are applicable macros iff {@link #isEmpty()} returns
+ * <code>false</code>.
  *
  * <p>
  * The {@link ServiceLoader} mechanism is used to instantiate the registered
@@ -49,7 +45,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
  *
  * @author mattias ulbrich
  */
-
 @SuppressWarnings("serial")
 public class ProofMacroMenu extends JMenu {
 
@@ -68,21 +63,19 @@ public class ProofMacroMenu extends JMenu {
      *
      * Only applicable macros are added as menu items.
      *
-     * @param mediator
-     *            the mediator of the current proof.
-     * @param posInOcc
-     *            the pos in occurrence, can be <code>null</code> if not
-     *            available.
+     * @param mediator the mediator of the current proof.
+     * @param posInOcc the pos in occurrence, can be <code>null</code> if not
+     * available.
      */
     public ProofMacroMenu(KeYMediator mediator, PosInOccurrence posInOcc) {
         super("Strategy macros");
 
         int count = 0;
         for (ProofMacro macro : loader) {
-            if(macro.canApplyTo(mediator, posInOcc)) {
+            if (macro.canApplyTo(mediator, posInOcc)) {
                 JMenuItem menuItem = createMenuItem(macro, mediator, posInOcc);
                 add(menuItem);
-                count ++;
+                count++;
             }
         }
 
@@ -102,14 +95,16 @@ public class ProofMacroMenu extends JMenu {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ProofMacroWorker worker = new ProofMacroWorker(macro, mediator, posInOcc);
-                worker.start();
+                final ProofMacroWorker worker = new ProofMacroWorker(macro, mediator, posInOcc);
+                mediator.stopInterface(true);
+                mediator.setInteractive(false);
+                mediator.addInterruptedListener(worker);
+                worker.execute();
             }
         });
 
         return menuItem;
     }
-
 
     /**
      * Checks if the menu is empty.
@@ -119,5 +114,4 @@ public class ProofMacroMenu extends JMenu {
     public boolean isEmpty() {
         return numberOfMacros == 0;
     }
-
 }

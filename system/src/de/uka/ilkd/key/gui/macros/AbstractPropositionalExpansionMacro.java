@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.gui.macros;
 
@@ -22,8 +22,9 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -56,10 +57,15 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
      * @return a constant non-<code>null</code> set
      */
     protected abstract Set<String> getAdmittedRuleNames();
+    
+    /**
+     * Whether this macro includes One Step Simplification.
+     */
+    protected abstract boolean allowOSS();
 
     @Override
     protected PropExpansionStrategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
-        return new PropExpansionStrategy(getAdmittedRuleNames());
+        return new PropExpansionStrategy(getAdmittedRuleNames(), allowOSS());
     }
 
     /**
@@ -71,9 +77,11 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         private static final Name NAME = new Name(PropExpansionStrategy.class.getSimpleName());
 
         private final Set<String> admittedRuleNames;
+        private final boolean allowOSS;
 
-        public PropExpansionStrategy(Set<String> admittedRuleNames) {
+        public PropExpansionStrategy(Set<String> admittedRuleNames, boolean allowOSS) {
             this.admittedRuleNames = admittedRuleNames;
+            this.allowOSS = allowOSS;
         }
 
         @Override
@@ -84,8 +92,10 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         @Override
         public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
-            if(admittedRuleNames.contains(name)) {
-                return LongRuleAppCost.ZERO_COST;
+            if (ruleApp instanceof OneStepSimplifierRuleApp && allowOSS) {
+                return NumberRuleAppCost.create(-5000);
+            } else if(admittedRuleNames.contains(name)) {
+                return NumberRuleAppCost.getZeroCost();
             } else {
                 return TopRuleAppCost.INSTANCE;
             }

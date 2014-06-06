@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.gui;
 
@@ -30,12 +29,13 @@ public class MaxRuleAppSlider extends JSlider {
      */
     private static final long serialVersionUID = 5810499328583797609L;
     private static final int MAX_RULE_APPS_LOG10 = 6;
-    private final static String TEXT = "Max. Rule Applications: ";
+    private final String text;
     private KeYMediator mediator;
     private static LinkedList<MaxRuleAppSlider> allInstances = new LinkedList<MaxRuleAppSlider>();
 
-    public MaxRuleAppSlider(KeYMediator mediator) {
+    public MaxRuleAppSlider(KeYMediator mediator, String text) {
         super(SwingConstants.HORIZONTAL, 0, MAX_RULE_APPS_LOG10*9, 0);
+        this.text = text;
 
         this.mediator = mediator;
         
@@ -92,7 +92,7 @@ public class MaxRuleAppSlider extends JSlider {
     }
     
     private void setTitle(int maxRuleApps) {
-        setBorder(BorderFactory.createTitledBorder(TEXT+maxRuleApps));
+       setBorder(BorderFactory.createTitledBorder(text + ": " + maxRuleApps));
     }
     
     public void refresh() {

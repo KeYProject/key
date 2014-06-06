@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -19,15 +19,12 @@ import junit.framework.TestCase;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.waits.Conditions;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
@@ -149,12 +146,7 @@ public final class TestGenerationUIUtil {
     * Opens the Visual DbC perspective.
     */
    public static void openVisualDbCPerspective() {
-      Display.getDefault().syncExec(new Runnable() {
-         @Override
-         public void run() {
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().setPerspective(getVisualDbCPerspective());
-         }
-      });
+      TestUtilsUtil.openPerspective(getVisualDbCPerspective());
    }
    
    /**
@@ -162,24 +154,6 @@ public final class TestGenerationUIUtil {
     * @return The Visual DbC perspective.
     */
    public static IPerspectiveDescriptor getVisualDbCPerspective() {
-      return getPerspective("de.hentschel.visualdbc.perspective");
-   }
-   
-   /**
-    * Returns the perspective with the given ID.
-    * @param id The ID to search.
-    * @return The foudn perspective or {@code null} if no perspective was found.
-    */
-   public static IPerspectiveDescriptor getPerspective(String id) {
-      IPerspectiveDescriptor result = null;
-      IPerspectiveDescriptor[] perspectives = PlatformUI.getWorkbench().getPerspectiveRegistry().getPerspectives();
-      int i = 0;
-      while (result == null && i < perspectives.length) {
-         if (ObjectUtil.equals(perspectives[i].getId(), id)) {
-            result = perspectives[i];
-         }
-         i++;
-      }
-      return result;
+      return TestUtilsUtil.getPerspective("de.hentschel.visualdbc.perspective");
    }
 }

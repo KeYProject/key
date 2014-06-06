@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.parser;
 
@@ -44,7 +43,9 @@ import de.uka.ilkd.key.util.DefaultExceptionHandler;
 
 public class TestTermParser extends TestCase {
     
-    private static final TermFactory tf = TermFactory.DEFAULT;
+    private static TermFactory tf;
+
+    private static TermBuilder tb;
 
     private static NamespaceSet nss;
 
@@ -65,12 +66,14 @@ public class TestTermParser extends TestCase {
 	super(name);
     }
 
-
+    @Override
     public void setUp() {
 	if(serv != null) {
 	    return;
 	}
 	serv = TacletForTests.services ();
+	tb = serv.getTermBuilder();
+	tf = tb.tf();
 	nss = serv.getNamespaces();
 	r2k = new Recoder2KeY(serv, nss);
 	r2k.parseSpecialClasses();	
@@ -154,9 +157,11 @@ public class TestTermParser extends TestCase {
     private KeYParserF stringDeclParser(String s) {
         // fills namespaces 
         new Recoder2KeY(TacletForTests.services (), nss).parseSpecialClasses();
-	return new KeYParserF(ParserMode.DECLARATION,new KeYLexerF(s,null),
-			      "No file. Call of parser from parser/TestTermParser.java",
-			      serv, nss);
+	return new KeYParserF(ParserMode.DECLARATION,
+		new KeYLexerF(s,
+			"No file. Call of parser from parser/TestTermParser.java",
+			null),
+		serv, nss);
     }
 
     public void parseDecls(String s) {
@@ -175,13 +180,14 @@ public class TestTermParser extends TestCase {
 	try {	  
 	    new Recoder2KeY(TacletForTests.services (), 
 	                    nss).parseSpecialClasses();	   
-	    return new KeYParserF
-		(ParserMode.PROBLEM, 
-	         new KeYLexerF(s,null),
-		 "No file. Call of parser from parser/TestTermParser.java",
-		 new ParserConfig(serv, nss),
-		 new ParserConfig(serv, nss),
-		 null, DefaultImmutableSet.<Taclet>nil()).problem();	    
+	    return new KeYParserF(ParserMode.PROBLEM,
+		    new KeYLexerF(s,
+			    "No file. Call of parser from parser/TestTermParser.java",
+			    null),
+		    new ParserConfig(serv, nss),
+		    new ParserConfig(serv, nss),
+		    null,
+		    DefaultImmutableSet.<Taclet> nil()).problem();
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
 	    PrintWriter pw = new PrintWriter(sw);
@@ -191,14 +197,14 @@ public class TestTermParser extends TestCase {
     }
 
     private KeYParserF stringTermParser(String s) {
-	return new KeYParserF
-	    (ParserMode.TERM, 
-	     new KeYLexerF(s, new DefaultExceptionHandler()),
-	     "No file. Call of parser from parser/TestTermParser.java",
-	     r2k,
-	     serv, 
-	     nss, 
-	     new AbbrevMap());
+	return new KeYParserF(ParserMode.TERM,
+		new KeYLexerF(s,
+			"No file. Call of parser from parser/TestTermParser.java",
+			new DefaultExceptionHandler()),
+		r2k,
+		serv,
+		nss,
+		new AbbrevMap());
 
     }
 
@@ -307,8 +313,8 @@ public class TestTermParser extends TestCase {
 	LogicVariable l1 = (LogicVariable) t.sub(0).varsBoundHere(0)
 	    .get(0);
 
-	Term t1 = TermBuilder.DF.all(thisx,
-	     TermBuilder.DF.all(l1,
+	Term t1 = tb.all(thisx,
+	     tb.all(l1,
 	      tf.createTerm
 	      (Junctor.NOT,
 	       tf.createTerm(Equality.EQUALS,
@@ -354,7 +360,7 @@ public class TestTermParser extends TestCase {
 	LogicVariable thisx = (LogicVariable) t.varsBoundHere(0)
 	    .get(0);
 
-	Term t1 = TermBuilder.DF.ex(thisx,
+	Term t1 = tb.ex(thisx,
 	     tf.createTerm
 	     (Junctor.NOT,
 	      tf.createTerm(isempty,new Term[]{tf.createTerm(thisx)}, null, null)));

@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.logic.sort;
 
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 
@@ -103,7 +103,7 @@ public final class NullSort implements Sort  {
     
     
     @Override
-    public final SortDependingFunction getCastSymbol(Services services) {
+    public final SortDependingFunction getCastSymbol(TermServices services) {
         SortDependingFunction result
             = SortDependingFunction.getFirstInstance(CAST_NAME, services)
         			   .getInstanceFor(this, services);
@@ -113,7 +113,7 @@ public final class NullSort implements Sort  {
     
     
     @Override    
-    public final SortDependingFunction getInstanceofSymbol(Services services) {
+    public final SortDependingFunction getInstanceofSymbol(TermServices services) {
 	SortDependingFunction result
 	    = SortDependingFunction.getFirstInstance(INSTANCE_NAME, services)
                                    .getInstanceFor(this, services);
@@ -123,7 +123,7 @@ public final class NullSort implements Sort  {
     
     
     @Override
-    public final SortDependingFunction getExactInstanceofSymbol(Services services) {
+    public final SortDependingFunction getExactInstanceofSymbol(TermServices services) {
 	SortDependingFunction result
             = SortDependingFunction.getFirstInstance(EXACT_INSTANCE_NAME, services)
                                    .getInstanceFor(this, services);

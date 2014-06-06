@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -15,6 +15,7 @@ package org.key_project.sed.ui.visualization.test.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.key_project.sed.ui.visualization.test.testcase.AbsoluteFileSystemPathSourceContainerTest;
 import org.key_project.sed.ui.visualization.test.testcase.AbstractDebugViewBasedEditorInViewViewTest;
 import org.key_project.sed.ui.visualization.test.testcase.EditableMultiDeleteInfoTest;
 import org.key_project.sed.ui.visualization.test.testcase.ExecutionTreeUtilTest;
@@ -27,6 +28,7 @@ import org.key_project.sed.ui.visualization.test.testcase.LogUtilTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+   AbsoluteFileSystemPathSourceContainerTest.class,
    AbstractDebugViewBasedEditorInViewViewTest.class,
    EditableMultiDeleteInfoTest.class,
    ExecutionTreeUtilTest.class,

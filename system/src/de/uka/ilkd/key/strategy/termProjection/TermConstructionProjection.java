@@ -1,23 +1,21 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.strategy.termProjection;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
@@ -53,8 +51,7 @@ public class TermConstructionProjection implements ProjectionToTerm {
         for ( int i = 0; i != subTerms.length; ++i ) {
             subs[i] = subTerms[i].toTerm ( app, pos, goal );           
         }
-        return TermFactory.DEFAULT.createTerm ( op, subs, null,
-                                                null );
+        return goal.proof().getServices().getTermFactory().createTerm ( op, subs, null, null );
     }
     
 }

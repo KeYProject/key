@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -183,7 +183,7 @@ public class AutoDeleteTests extends AbstractResourceTest {
             project.getFullPath().append("src").append("SingleJavaFileTest.java"));
       IFile proofFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("SingleJavaFileTest.java").append("SingleJavaFileTest[SingleJavaFileTest__add(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().addFileExtension("meta"));
+      IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile.exists());
       assertTrue(!proofFolder.exists());
@@ -219,8 +219,8 @@ public class AutoDeleteTests extends AbstractResourceTest {
             project.getFullPath().append("proofs").append("File.java").append("File[File__add(int,int)]_JML_operation_contract_0.proof"));
       IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("File.java").append("File[File__sub(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().addFileExtension("meta"));
-      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().addFileExtension("meta"));
+      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile.exists());
       assertTrue(!proofFolder.exists());
@@ -258,8 +258,8 @@ public class AutoDeleteTests extends AbstractResourceTest {
             project.getFullPath().append("proofs").append("File.java").append("File[File__add(int,int)]_JML_operation_contract_0.proof"));
       IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("File.java").append("File[File__sub(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().addFileExtension("meta"));
-      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().addFileExtension("meta"));
+      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile.exists());
       assertTrue(!proofFolder.exists());
@@ -299,8 +299,8 @@ public class AutoDeleteTests extends AbstractResourceTest {
             project.getFullPath().append("proofs").append("File0.java").append("File0[File0__add(int,int)]_JML_operation_contract_0.proof"));
       IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("File1.java").append("File1[File1__add(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().addFileExtension("meta"));
-      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().addFileExtension("meta"));
+      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile0.exists() && !javaFile1.exists());
       assertTrue(!proofFolder.exists());
@@ -338,8 +338,8 @@ public class AutoDeleteTests extends AbstractResourceTest {
             project.getFullPath().append("proofs").append("package0").append("File.java").append("package0_File[package0_File__add(int,int)]_JML_operation_contract_0.proof"));
       IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("package1").append("File.java").append("package1_File[package1_File__add(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().addFileExtension("meta"));
-      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().addFileExtension("meta"));
+      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       IFolder package0Folder = KeY4EclipseResourcesTestUtil.getFolder(
             project.getFullPath().append("proofs").append("package0"));
       IFolder package1Folder = KeY4EclipseResourcesTestUtil.getFolder(

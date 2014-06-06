@@ -1,17 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.rule.metaconstruct.arith;
 
@@ -24,8 +22,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -199,16 +195,16 @@ public class Polynomial {
         if ( it.hasNext () ) {
             res = it.next ().toTerm ( services );
             while ( it.hasNext () )
-                res = TermFactory.DEFAULT.createTerm
+                res = services.getTermFactory().createTerm
                               ( add, res, it.next ().toTerm ( services ) );
         }
         
-        final Term cTerm = TermBuilder.DF.zTerm(services, constantPart.toString());
+        final Term cTerm = services.getTermBuilder().zTerm(constantPart.toString());
         
         if ( res == null )
             res = cTerm;
         else if ( !BigInteger.ZERO.equals ( constantPart ) )
-            res = TermFactory.DEFAULT.createTerm ( add, cTerm, res );
+            res = services.getTermFactory().createTerm ( add, cTerm, res );
         
         return res;        
     }

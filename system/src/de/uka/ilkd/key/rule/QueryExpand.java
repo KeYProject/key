@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.rule;
 
@@ -45,7 +45,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -84,7 +84,6 @@ public class QueryExpand implements BuiltInRule {
 
     private static Name QUERY_DEF_NAME = new Name("Evaluate Query");
 
-    private static final TermBuilder tb = TermBuilder.DF;
 
     /** Stores a number that indicates the time when term occurred for the first time where
      * this rule was applicable. The time is the number of rules applied on this branch.*/
@@ -145,12 +144,13 @@ public class QueryExpand implements BuiltInRule {
 
            final ImmutableArray<ProgramVariable> args = getRegisteredArgumentVariables(method.getParameters(), services);
 
+           final TermBuilder tb = services.getTermBuilder();
 
            //Names for additional symbols
 
-           final String calleeName     = tb.newName(services, "callee");
-           final String progResultName = tb.newName(services, "queryResult");
-           final String logicResultName= tb.newName(services, "res_"+method.getName());
+           final String calleeName     = tb.newName("callee");
+           final String progResultName = tb.newName("queryResult");
+           final String logicResultName= tb.newName("res_"+method.getName());
            //For declaring the symbol that stores the result in a logical term a trick is done.
            //The new symbolc is introduced as a logical variable that is later skolemized by the ex_left rule.
            //  LogicVariable logicResultQV = new LogicVariable(new Name("res_"+method.getName()),query.sort());
@@ -228,14 +228,14 @@ public class QueryExpand implements BuiltInRule {
            final Term methodCall = tb.dia(jb, tb.not(tb.equals(tb.var(result),placeHolderResultTrm)));  //Not sure if box or diamond should be used.
            //final Term methodCall = tb.box(jb, tb.equals(tb.var(result), query));
 
-           Term update = tb.elementary(services, services.getTypeConverter().getHeapLDT().getHeap(), query.sub(0));
+           Term update = tb.elementary(services.getTypeConverter().getHeapLDT().getHeap(), query.sub(0));
            if (callee != null) {
-               update = tb.parallel(tb.elementary(services, tb.var(callee), query.sub(1)), update);
+               update = tb.parallel(tb.elementary(tb.var(callee), query.sub(1)), update);
            }
 
            final Term[] argUpdates = new Term[args.size()];
            for (int i = 0; i<args.size(); i++) {
-               argUpdates[i] = tb.elementary(services, tb.var(args.get(i)), query.sub(offset+1+i));
+               argUpdates[i] = tb.elementary(tb.var(args.get(i)), query.sub(offset+1+i));
            }
 
            update = tb.parallel(update, tb.parallel(argUpdates));
@@ -257,14 +257,14 @@ public class QueryExpand implements BuiltInRule {
 
 
     private ImmutableArray<ProgramVariable> getRegisteredArgumentVariables(
-            ImmutableArray<ParameterDeclaration> paramDecls, Services services) {
+            ImmutableArray<ParameterDeclaration> paramDecls, TermServices services) {
 
         final Namespace progvarsNS = services.getNamespaces().programVariables();
         final ProgramVariable[] args = new ProgramVariable[paramDecls.size()];
         int i = 0;
         for (final ParameterDeclaration pdecl : paramDecls) {
         	final String baseName = pdecl.getVariableSpecification().getName();
-        	final String newName = tb.newName(services,baseName);
+        	final String newName = services.getTermBuilder().newName(baseName);
             final ProgramElementName argVarName = new ProgramElementName(newName);
             args[i] = new LocationVariable(argVarName,
                     pdecl.getVariableSpecification().getProgramVariable().getKeYJavaType());
@@ -303,6 +303,7 @@ public class QueryExpand implements BuiltInRule {
     	removeRedundant(qeps);
     	//sorting is important in order to ensure that the original term is modified in a depth-first order.
     	Collections.sort(qeps);
+      final TermBuilder tb = services.getTermBuilder();
 
     	for(QueryEvalPos qep: qeps){
     	    //System.out.println("\nInserting: "+qep+"\n");
@@ -318,7 +319,7 @@ public class QueryExpand implements BuiltInRule {
         	}
         	//System.out.println("----------- Calling replace. Insert term: ----------------\n"+termToInsert+"\n-----------------------\n");
         	//Attention, when the term is modified, then the paths in the term have changed. Perform the changes in a depth-first order.
-        	term = replace(term, termToInsert, it);
+        	term = replace(term, termToInsert, it, services);
     	}
         	//TermBuilder TB = TermBuilder.DF;
         	//result = TB.and( queryExp, term);
@@ -543,10 +544,11 @@ public class QueryExpand implements BuiltInRule {
      * @param term
      * @param with
      * @param it iterator with argument positions. This is the path in the syntax tree of term.
+     * @param services TODO
      * @return Resulting term after replacement.
      * @note Was originally implemented in QueryExpand.java.
      */
-    protected Term replace(Term term, Term with, Iterator<Integer> it) {
+    protected Term replace(Term term, Term with, Iterator<Integer> it, TermServices services) {
         if ( !it.hasNext() ) {
             return with;
         }
@@ -559,7 +561,7 @@ public class QueryExpand implements BuiltInRule {
         for(int i = 0; i < arity; i++) {
             Term subTerm = term.sub(i);
             if (i == next) {
-                newSubTerms[i] = replace(subTerm, with, it);
+                newSubTerms[i] = replace(subTerm, with, it, services);
                 if(newSubTerms[i] != subTerm) {
                     changedSubTerm = true;
                 }
@@ -573,7 +575,7 @@ public class QueryExpand implements BuiltInRule {
 
         final Term result;
         if(changedSubTerm) {
-            result = TermFactory.DEFAULT.createTerm(term.op(),
+            result = services.getTermFactory().createTerm(term.op(),
                     newSubTerms,
                     newBoundVars,
                     term.javaBlock());
@@ -660,7 +662,7 @@ public class QueryExpand implements BuiltInRule {
     }
 
 	@Override
-    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos) {
+    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
 	    return new DefaultBuiltInRuleApp(this, pos);
     }
 

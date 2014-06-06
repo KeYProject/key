@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -99,6 +100,7 @@ public interface BlockContract extends SpecificationElement {
     public OriginalVariables getOrigVars();
 
     public static class Variables {
+        private final TermServices services;
 
         public static Variables create(final StatementBlock block, final List<Label> labels,
                                        final IProgramMethod method, final Services services)
@@ -122,8 +124,10 @@ public interface BlockContract extends SpecificationElement {
                          final ProgramVariable result,
                          final ProgramVariable exception,
                          final Map<LocationVariable, LocationVariable> remembranceHeaps,
-                         final Map<LocationVariable, LocationVariable> remembranceLocalVariables)
+                         final Map<LocationVariable, LocationVariable> remembranceLocalVariables,
+                         final TermServices services)
         {
+            this.services = services;
             this.self = self;
             this.breakFlags = breakFlags;
             this.continueFlags = continueFlags;
@@ -183,7 +187,7 @@ public interface BlockContract extends SpecificationElement {
         private Term termifyVariable(final ProgramVariable variable)
         {
             if (variable != null) {
-                return TermBuilder.DF.var(variable);
+                return services.getTermBuilder().var(variable);
             }
             else {
                 return null;
@@ -192,7 +196,7 @@ public interface BlockContract extends SpecificationElement {
 
     }
 
-    public static class VariablesCreator extends TermBuilder.Serviced {
+    public static class VariablesCreator extends TermBuilder {
 
         private static final String BREAK_FLAG_BASE_NAME = "broke";
         private static final String CONTINUE_FLAG_BASE_NAME = "continued";
@@ -210,7 +214,7 @@ public interface BlockContract extends SpecificationElement {
         public VariablesCreator(final StatementBlock block, final List<Label> labels,
                                 final IProgramMethod method, final Services services)
         {
-            super(services);
+            super(services.getTermFactory(), services);
             this.block = block;
             this.labels = labels;
             this.method = method;
@@ -220,14 +224,15 @@ public interface BlockContract extends SpecificationElement {
         {
             createAndStoreFlags();
             return new Variables(
-                selfVar(method, method.getContainerType(), false),
+                selfVar(method.getContainerType(), false),
                 breakFlags,
                 continueFlags,
                 returnFlag,
                 resultVar(method, false),
                 excVar(method, false),
                 createRemembranceHeaps(),
-                createRemembranceLocalVariables()
+                createRemembranceLocalVariables(),
+                services
             );
         }
 

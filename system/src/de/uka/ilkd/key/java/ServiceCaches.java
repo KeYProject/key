@@ -1,10 +1,25 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.java;
 
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TermTacletAppIndex;
@@ -89,6 +104,16 @@ public class ServiceCaches {
     * Map from  <code>Term</code>(allTerm) to <code>ClausesGraph</code> 
     */
    private final Map<Term, ClausesGraph> graphCache = new LRUCache<Term, ClausesGraph> (1000);
+
+   /**
+    * Cache used by the TermFactory to avoid unnecessary creation of terms
+    */
+   private final Map<Term, Term> termCache = new LRUCache<Term, Term>(20000);
+
+   /**
+    * Cache used by TypeComparisonCondition
+    */
+   private final Map<Sort,Map<Sort,Boolean>> disjointnessCache = new WeakHashMap<Sort,Map<Sort,Boolean>>();
    
    /**
     * Returns the cache used by {@link TermTacletAppIndexCacheSet} instances.
@@ -124,5 +149,13 @@ public class ServiceCaches {
 
    public Map<Term, ClausesGraph> getGraphCache() {
       return graphCache;
+   }
+
+   public Map<Term, Term> getTermFactoryCache() {
+       return termCache;
+   }
+
+   public Map<Sort, Map<Sort, Boolean>> getDisjointnessCache() {
+       return disjointnessCache;
    }
 }

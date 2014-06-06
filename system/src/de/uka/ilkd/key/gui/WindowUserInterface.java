@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -22,7 +22,6 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -68,8 +67,8 @@ public class WindowUserInterface extends AbstractUserInterface {
 	public void loadProblem(File file, List<File> classPath,
 	        File bootClassPath) {
 		mainWindow.addRecentFile(file.getAbsolutePath());
-		super.loadProblem(
-		        file, classPath, bootClassPath, mainWindow.getMediator());
+		super.getProblemLoader(
+		        file, classPath, bootClassPath, mainWindow.getMediator()).runAsynchronously();
 	}
 
 	@Override
@@ -161,6 +160,8 @@ public class WindowUserInterface extends AbstractUserInterface {
 				mainWindow.displayResults(info.toString());
 			}
 		}
+	    // this seems to be a good place to free some memory
+	    Runtime.getRuntime().gc();
 	}
 
 	protected boolean inStopAtFirstUncloseableGoalMode(Proof proof) {

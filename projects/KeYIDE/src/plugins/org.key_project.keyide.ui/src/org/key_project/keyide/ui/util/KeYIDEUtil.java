@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -96,7 +96,6 @@ public final class KeYIDEUtil {
                           SWTUtil.checkCanceled(monitor);
                           monitor.beginTask("Loading Proof Environment", IProgressMonitor.UNKNOWN);
                           final KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
-
                           if (environment.getInitConfig() != null) {
                              // Get method to proof in KeY
                              final IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getJavaInfo());

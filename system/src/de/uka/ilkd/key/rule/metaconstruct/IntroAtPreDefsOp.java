@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -30,10 +30,12 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.util.Triple;
 
 public final class IntroAtPreDefsOp extends AbstractTermTransformer {
@@ -47,6 +49,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
     public Term transform(Term term,
                   SVInstantiations svInst,
                   Services services) {
+        final TermBuilder TB = services.getTermBuilder();
         final Term target = term.sub(0);
 
         //the target term should have a Java block
@@ -98,12 +101,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
         Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
         for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-          final LocationVariable l = TB.heapAtPreVar(services, heap.name()+"Before_" + methodName, heap.sort(), true);
+          final LocationVariable l = TB.heapAtPreVar(heap.name()+"Before_" + methodName, heap.sort(), true);
           // buf fix. see #1197
           services.getNamespaces().programVariables().addSafely(l);
-          final Term u = TB.elementary(services,
-            l,
-            TB.var(heap));
+          final Term u = TB.elementary(l, TB.var(heap));
           if(atPreUpdate == null) {
              atPreUpdate =u;
           }else{

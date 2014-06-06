@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
@@ -28,7 +27,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -62,7 +61,7 @@ public class TriggersSet {
 
     private TriggersSet(Term allTerm, Services services) {
         this.allTerm = allTerm;
-        replacementWithMVs = ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars(allTerm);
+        replacementWithMVs = ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars(allTerm, services);
         uniQuantifiedVariables = getAllUQS(allTerm);
         initTriggers(services);
     }
@@ -193,7 +192,7 @@ public class TriggersSet {
                     TriggerUtils.iteratorByOperator(clause, Junctor.OR);
             while (it.hasNext()) {
                 final Term oriTerm = it.next();
-                for (Term term : expandIfThenElse(oriTerm)) {
+                for (Term term : expandIfThenElse(oriTerm, services)) {
                     Term t = term;
                     if (t.op() == Junctor.NOT) {
                         t = t.sub(0);
@@ -235,12 +234,12 @@ public class TriggersSet {
             return foundSubtriggers;
         }
 
-        private Set<Term> expandIfThenElse(Term t) {
+        private Set<Term> expandIfThenElse(Term t, TermServices services) {
             final Set<Term>[] possibleSubs = new Set[t.arity()];
             boolean changed = false;
             for (int i = 0; i != t.arity(); ++i) {
                 final Term oriSub = t.sub(i);
-                possibleSubs[i] = expandIfThenElse(oriSub);
+                possibleSubs[i] = expandIfThenElse(oriSub, services);
                 changed = changed || possibleSubs[i].size() != 1 || possibleSubs[i].iterator().next() != oriSub;
             }
 
@@ -257,7 +256,7 @@ public class TriggersSet {
 
             final Term[] chosenSubs = new Term[t.arity()];
             res.addAll(combineSubterms(t, possibleSubs, chosenSubs,
-                    t.boundVars(), 0));
+                    t.boundVars(), 0, services));
             return res;
         }
 
@@ -265,11 +264,11 @@ public class TriggersSet {
                 Set<Term>[] possibleSubs,
                 Term[] chosenSubs,
                 ImmutableArray<QuantifiableVariable> boundVars,
-                int i) {
+                int i, TermServices services) {
             final HashSet<Term> set = new LinkedHashSet<Term>();
             if (i >= possibleSubs.length) {
                 final Term res =
-                        TermFactory.DEFAULT.createTerm(oriTerm.op(),
+                        services.getTermFactory().createTerm(oriTerm.op(),
                         chosenSubs,
                         boundVars,
                         oriTerm.javaBlock());
@@ -284,7 +283,7 @@ public class TriggersSet {
                 chosenSubs[i] = term;
                 set.addAll(combineSubterms(oriTerm, possibleSubs,
                         chosenSubs, boundVars,
-                        i + 1));
+                        i + 1, services));
             }
             return set;
         }

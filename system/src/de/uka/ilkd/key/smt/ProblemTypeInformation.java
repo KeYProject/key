@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.smt;
 
 import java.util.HashMap;
@@ -10,6 +23,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.lang.SMTTermNumber;
@@ -21,6 +35,7 @@ public class ProblemTypeInformation {
 
 	Map<String,SMTSort> fieldTypes;
 	Map<String,SMTSort> constantsTypes;
+	Map<String,Sort> originalConstantType;
 
 	Set<Sort> javaSorts;
 
@@ -30,11 +45,20 @@ public class ProblemTypeInformation {
 
 	private Map<String, SMTSort> sorts;
 
-	public ProblemTypeInformation(Services services) {
+	public ProblemTypeInformation(TermServices services) {
 		super();
 		fieldTypes = new HashMap<String, SMTSort>();
 		constantsTypes = new HashMap<String, SMTSort>();
 		javaSorts = new HashSet<Sort>();
+		originalConstantType = new HashMap<String,Sort>();
+	}
+	
+	public void putOriginalConstantType(String c,Sort s){
+		originalConstantType.put(c, s);
+	}
+	
+	public Sort getOriginalConstantType(String c){
+		return originalConstantType.get(c);
 	}
 
 	/**
@@ -130,7 +154,7 @@ public class ProblemTypeInformation {
 		return result;
 	}
 
-	public Services getServices() {
+	public TermServices getServices() {
 		return services;
 	}
 

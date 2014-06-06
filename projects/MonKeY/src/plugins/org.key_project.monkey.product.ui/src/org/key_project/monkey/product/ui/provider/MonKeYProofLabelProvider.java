@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -24,6 +24,8 @@ import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.monkey.product.ui.model.MonKeYProof;
+import org.key_project.monkey.product.ui.model.MonKeYProofResult;
+import org.key_project.monkey.product.ui.util.MonKeYUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -73,6 +75,8 @@ public class MonKeYProofLabelProvider extends LabelProvider implements ITableLab
                 case 5 : return proof.hasResult() ? proof.getNodes() + StringUtil.EMPTY_STRING : StringUtil.EMPTY_STRING;
                 case 6 : return proof.hasResult() ? proof.getBranches() + StringUtil.EMPTY_STRING : StringUtil.EMPTY_STRING;
                 case 7 : return proof.hasResult() ? proof.getTime() + StringUtil.EMPTY_STRING : StringUtil.EMPTY_STRING;
+                case 8 : return proof.hasResult() & !MonKeYProofResult.CLOSED.equals(proof.getResult()) ? MonKeYUtil.toString(proof.isHasGoalWithApplicableRules()) : StringUtil.EMPTY_STRING;
+                case 9 : return proof.hasResult() & !MonKeYProofResult.CLOSED.equals(proof.getResult()) ? MonKeYUtil.toString(proof.isHasGoalWithoutApplicableRules()) : StringUtil.EMPTY_STRING;
                 default : return getText(element);
             }
         }
@@ -81,7 +85,7 @@ public class MonKeYProofLabelProvider extends LabelProvider implements ITableLab
         }
     }
 
-    /**
+   /**
      * Adds the listener to the given {@link Proof} if required.
      * @param proof The {@link Proof} to observe.
      */

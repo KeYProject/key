@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -43,6 +43,11 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
  * @author Martin Hentschel
  */
 public final class MonKeYUtil {
+   /**
+    * The default value of maximal rule applications used by MonKeY.
+    */
+   public static final int DEFAULT_MAX_RULE_APPLICATIONS = 10000;
+   
    /**
     * Forbid instances.
     */
@@ -272,5 +277,14 @@ public final class MonKeYUtil {
       public int getReusedProofsCount() {
          return reusedProofsCount;
       }
+   }
+
+   /**
+    * Converts the given value into a human readable {@link String}.
+    * @param value The value to convert.
+    * @return The human readable representation of the value.
+    */
+   public static String toString(boolean value) {
+     return value ? "Yes" : "No";
    }
 }

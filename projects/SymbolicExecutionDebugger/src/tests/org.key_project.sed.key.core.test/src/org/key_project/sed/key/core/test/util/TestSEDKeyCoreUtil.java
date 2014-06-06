@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -216,15 +216,16 @@ public final class TestSEDKeyCoreUtil {
 
    /**
     * Creates an expected {@link ISEDDebugTarget} defined by the given bundle file.
+    * @param bundleId The plug-in ID which contains the expected model path.
     * @param expectedModelPathInBundle The path to the oracle file in the bundle.
     * @return The expected {@link ISEDDebugTarget}.
     * @throws IOException Occurred Exception.
     * @throws SAXException Occurred Exception.
     * @throws ParserConfigurationException Occurred Exception.
     */   
-   public static ISEDDebugTarget createExpectedModel(String expectedModelPathInBundle) throws ParserConfigurationException, SAXException, IOException {
+   public static ISEDDebugTarget createExpectedModel(String bundleId, String expectedModelPathInBundle) throws ParserConfigurationException, SAXException, IOException {
       SEDXMLReader reader = new SEDXMLReader();
-      List<ISEDDebugTarget> targets = reader.read(BundleUtil.openInputStream(Activator.PLUGIN_ID, expectedModelPathInBundle));
+      List<ISEDDebugTarget> targets = reader.read(BundleUtil.openInputStream(bundleId, expectedModelPathInBundle));
       TestCase.assertNotNull(targets);
       TestCase.assertEquals(1, targets.size());
       return targets.get(0);
@@ -238,7 +239,7 @@ public final class TestSEDKeyCoreUtil {
     */
    public static ISEDDebugTarget createExpectedInitialModel(String targetName) {
       // Create debug target
-      SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null);
+      SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null, false);
       target.setModelIdentifier(KeYDebugTarget.MODEL_IDENTIFIER);
       target.setName(targetName);
       // Add thread
@@ -269,7 +270,7 @@ public final class TestSEDKeyCoreUtil {
     * @throws ParserConfigurationException Occurred Exception.
     */
    public static void assertFlatStepsExample(ISEDDebugTarget target) throws DebugException, ParserConfigurationException, SAXException, IOException {
-      TestSedCoreUtil.compareDebugTarget(createExpectedModel("data/statements/oracle/FlatSteps.xml"), target, false, false, false);
+      TestSedCoreUtil.compareDebugTarget(createExpectedModel(Activator.PLUGIN_ID, "data/statements/oracle/FlatSteps.xml"), target, false, false, false);
    }
    
    /**

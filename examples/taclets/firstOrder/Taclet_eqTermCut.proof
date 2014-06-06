@@ -1,0 +1,60 @@
+\profile "Java Profile";
+
+\settings {
+"#Proof-Settings-Config-File
+#Tue May 13 13:43:11 CEST 2014
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=\\#begboolean_equal_2\\#end,\\#begboolean_not_equal_1\\#end,\\#begboolean_not_equal_2\\#end,\\#begtrue_to_not_false\\#end,\\#begfalse_to_not_true\\#end,\\#begboolean_true_commute\\#end,\\#begboolean_false_commute\\#end,\\#begapply_eq_boolean\\#end,\\#begapply_eq_boolean_2\\#end,\\#begapply_eq_boolean_rigid\\#end,\\#begapply_eq_boolean_rigid_2\\#end,\\#begexpand_inByte\\#end,\\#begexpand_inChar\\#end,\\#begexpand_inShort\\#end,\\#begexpand_inInt\\#end,\\#begexpand_inLong\\#end,\\#begreplace_byte_MAX\\#end,\\#begreplace_byte_MIN\\#end,\\#begreplace_char_MAX\\#end,\\#begreplace_char_MIN\\#end,\\#begreplace_short_MAX\\#end,\\#begreplace_short_MIN\\#end,\\#begreplace_int_MAX\\#end,\\#begreplace_int_MIN\\#end,\\#begreplace_long_MAX\\#end,\\#begreplace_long_MIN\\#end,\\#begreplace_byte_RANGE\\#end,\\#begreplace_byte_HALFRANGE\\#end,\\#begreplace_short_RANGE\\#end,\\#begreplace_short_HALFRANGE\\#end,\\#begreplace_char_RANGE\\#end,\\#begreplace_int_RANGE\\#end,\\#begreplace_int_HALFRANGE\\#end,\\#begreplace_long_RANGE\\#end,\\#begreplace_long_HALFRANGE\\#end,\\#begtranslateJavaUnaryMinusInt\\#end,\\#begtranslateJavaUnaryMinusLong\\#end,\\#begtranslateJavaBitwiseNegation\\#end,\\#begtranslateJavaAddInt\\#end,\\#begtranslateJavaAddLong\\#end,\\#begtranslateJavaSubInt\\#end,\\#begtranslateJavaSubLong\\#end,\\#begtranslateJavaMulInt\\#end,\\#begtranslateJavaMulLong\\#end,\\#begtranslateJavaMod\\#end,\\#begtranslateJavaDivInt\\#end,\\#begtranslateJavaDivLong\\#end,\\#begtranslateJavaCastByte\\#end,\\#begtranslateJavaCastShort\\#end,\\#begtranslateJavaCastInt\\#end,\\#begtranslateJavaCastLong\\#end,\\#begtranslateJavaCastChar\\#end,\\#begtranslateJavaShiftRightInt\\#end,\\#begtranslateJavaShiftRightLong\\#end,\\#begtranslateJavaShiftLeftInt\\#end,\\#begtranslateJavaShiftLeftLong\\#end,\\#begtranslateJavaUnsignedShiftRightInt\\#end,\\#begtranslateJavaUnsignedShiftRightLong\\#end,\\#begtranslateJavaBitwiseOrInt\\#end,\\#begtranslateJavaBitwiseOrLong\\#end,\\#begtranslateJavaBitwiseAndInt\\#end,\\#begtranslateJavaBitwiseAndLong\\#end,\\#begtranslateJavaBitwiseXOrInt\\#end,\\#begtranslateJavaBitwiseXOrLong\\#end,\\#begcastDel\\#end,\\#begtypeEq\\#end,\\#begtypeEqDerived\\#end,\\#begtypeEqDerived2\\#end,\\#begtypeStatic\\#end,\\#begcloseType\\#end,\\#begcloseTypeSwitched\\#end,\\#begexact_instance_definition_int\\#end,\\#begexact_instance_definition_boolean\\#end,\\#begexact_instance_definition_null\\#end,\\#begexact_instance_for_interfaces_or_abstract_classes\\#end,\\#begclass_being_initialized_is_prepared\\#end,\\#beginitialized_class_is_prepared\\#end,\\#beginitialized_class_is_not_erroneous\\#end,\\#begclass_initialized_excludes_class_init_in_progress\\#end,\\#begclass_erroneous_excludes_class_in_init\\#end,\\#begerroneous_class_has_no_initialized_sub_class\\#end,\\#begsuperclasses_of_initialized_classes_are_prepared\\#end,\\#begelementOfEmpty\\#end,\\#begelementOfAllLocs\\#end,\\#begelementOfSingleton\\#end,\\#begelementOfUnion\\#end,\\#begelementOfIntersect\\#end,\\#begelementOfSetMinus\\#end,\\#begelementOfAllFields\\#end,\\#begelementOfAllObjects\\#end,\\#begelementOfArrayRange\\#end,\\#begelementOfFreshLocs\\#end,\\#begequalityToElementOf\\#end,\\#begsubsetToElementOf\\#end,\\#begdisjointToElementOf\\#end,\\#begcreatedInHeapToElementOf\\#end,\\#begelementOfEmptyEQ\\#end,\\#begelementOfAllLocsEQ\\#end,\\#begelementOfSingletonEQ\\#end,\\#begelementOfUnionEQ\\#end,\\#begelementOfIntersectEQ\\#end,\\#begelementOfSetMinusEQ\\#end,\\#begelementOfAllFieldsEQ\\#end,\\#begelementOfAllObjectsEQ\\#end,\\#begelementOfArrayRangeEQ\\#end,\\#begelementOfFreshLocsEQ\\#end,\\#begunionWithEmpty1\\#end,\\#begunionWithEmpty2\\#end,\\#begunionWithAllLocs1\\#end,\\#begunionWithAllLocs2\\#end,\\#begintersectWithEmpty1\\#end,\\#begintersectWithEmpty2\\#end,\\#begintersectWithAllLocs1\\#end,\\#begintersectWithAllLocs2\\#end,\\#begsetMinusWithEmpty1\\#end,\\#begsetMinusWithEmpty2\\#end,\\#begsetMinusWithAllLocs\\#end,\\#begsubsetWithEmpty\\#end,\\#begsubsetWithAllLocs\\#end,\\#begdisjointWithEmpty1\\#end,\\#begdisjointWithEmpty2\\#end,\\#begcreatedInHeapWithEmpty\\#end,\\#begcreatedInHeapWithSingleton\\#end,\\#begcreatedInHeapWithUnion\\#end,\\#begcreatedInHeapWithSetMinusFreshLocs\\#end,\\#begcreatedInHeapWithAllFields\\#end,\\#begcreatedInHeapWithArrayRange\\#end,\\#begreferencedObjectIsCreatedRight\\#end,\\#begreferencedObjectIsCreatedRightEQ\\#end,\\#begunionWithItself\\#end,\\#begintersectWithItself\\#end,\\#begsetMinusItself\\#end,\\#begsubsetOfItself\\#end,\\#begselectOfStore\\#end,\\#begselectOfCreate\\#end,\\#begselectOfAnon\\#end,\\#begselectOfMemset\\#end,\\#begonlyCreatedObjectsAreReferenced\\#end,\\#begonlyCreatedObjectsAreInLocSets\\#end,\\#begonlyCreatedObjectsAreInLocSetsEQ\\#end,\\#begarrayLengthNotNegative\\#end,\\#begwellFormedStoreObject\\#end,\\#begwellFormedStoreLocSet\\#end,\\#begwellFormedStorePrimitive\\#end,\\#begwellFormedCreate\\#end,\\#begwellFormedAnon\\#end,\\#begwellFormedMemsetObject\\#end,\\#begwellFormedMemsetLocSet\\#end,\\#begwellFormedMemsetPrimitive\\#end,\\#begselectOfStoreEQ\\#end,\\#begselectOfCreateEQ\\#end,\\#begselectOfAnonEQ\\#end,\\#begselectOfMemsetEQ\\#end,\\#begmemsetEmpty\\#end,\\#begselectCreatedOfAnonEQ\\#end,\\#begwellFormedStoreObjectEQ\\#end,\\#begwellFormedStoreLocSetEQ\\#end,\\#begwellFormedStorePrimitiveEQ\\#end,\\#begwellFormedAnonEQ\\#end,\\#begwellFormedMemsetObjectEQ\\#end,\\#begwellFormedMemsetPrimitiveEQ\\#end,\\#begaccDefinition\\#end,\\#begreachDefinition\\#end,\\#begreachZero\\#end,\\#begreachOne\\#end,\\#begreachNull\\#end,\\#begreachNull2\\#end,\\#begreachAddOne\\#end,\\#begreachAddOne2\\#end,\\#begreachUniquePathSameObject\\#end,\\#begreachDependenciesStoreSimple\\#end,\\#begreachDoesNotDependOnCreatedness\\#end,\\#begreachDependenciesStore\\#end,\\#begreachDependenciesAnon\\#end,\\#begreachDependenciesAnonCoarse\\#end,\\#begonly_created_objects_are_reachable\\#end,\\#begreach_does_not_depend_on_fresh_locs\\#end,\\#begreach_does_not_depend_on_fresh_locs_EQ\\#end
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT
+[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_RESTRICTED
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=10000
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , assertions-assertions\\:safe , initialisation-initialisation\\:disableStaticInitialisation , runtimeExceptions-runtimeExceptions\\:ban , JavaCard-JavaCard\\:on , Strings-Strings\\:on , modelFields-modelFields\\:showSatisfiability , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , optimisedSelectRules-optimisedSelectRules\\:on , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]invariantForall=false
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+\proofObligation "#Proof Obligation Settings
+#Tue May 13 13:43:11 CEST 2014
+name=eqTermCut
+class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
+";
+
+\proof {
+(keyLog "0" (keyUser "bubel" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+
+(autoModeTime "89")
+
+(branch "dummy ID"
+(builtin "One Step Simplification" (formula "1"))
+(rule "notRight" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "notLeft" (formula "2"))
+(rule "close" (formula "2") (ifseqformula "1"))
+)
+
+}

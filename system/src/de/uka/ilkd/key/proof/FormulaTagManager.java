@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof;
 
@@ -114,7 +113,7 @@ public class FormulaTagManager {
     private void addTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
         for (SequentFormula constrainedFormula : sci.addedFormulas(p_antec)) {
             final PosInOccurrence pio = new PosInOccurrence
-                    (constrainedFormula, PosInTerm.TOP_LEVEL, p_antec);
+                    (constrainedFormula, PosInTerm.getTopLevel(), p_antec);
             createNewTag(pio, p_goal);
         }
     }
@@ -122,11 +121,12 @@ public class FormulaTagManager {
     private void removeTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
         for (SequentFormula constrainedFormula : sci.removedFormulas(p_antec)) {
             final PosInOccurrence pio = new PosInOccurrence
-                    (constrainedFormula, PosInTerm.TOP_LEVEL, p_antec);
+                    (constrainedFormula, PosInTerm.getTopLevel(), p_antec);
             removeTag(pio);
         }	
     }
 
+    @SuppressWarnings("unchecked")
     public Object clone () {
     	return new FormulaTagManager
     	    ( (HashMap<FormulaTag, FormulaInfo>)tagToFormulaInfo.clone(), 
@@ -158,7 +158,7 @@ public class FormulaTagManager {
 
         for (Object s : ss) {
             final PosInOccurrence pio = new PosInOccurrence((SequentFormula) s,
-                    PosInTerm.TOP_LEVEL,
+                    PosInTerm.getTopLevel(),
                     p_antec);
             createNewTag(pio, p_goal);
         }
@@ -263,7 +263,7 @@ public class FormulaTagManager {
                                              long              p_age) {
 	    final PosInOccurrence newPIO =
 		new PosInOccurrence ( p_info.getNewFormula(),
-				      PosInTerm.TOP_LEVEL,
+				      PosInTerm.getTopLevel(),
 				      pio.isInAntec() );
 	    
 	    return new FormulaInfo ( newPIO,

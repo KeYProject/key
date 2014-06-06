@@ -1,28 +1,27 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.speclang;
-
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.java.Services;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 
 
 /** Heap contexts are various scenarios of what happens to heap variables
@@ -43,10 +42,10 @@ public class HeapContext {
       return result;
   }
 
-  public static Map<LocationVariable,LocationVariable> getBeforeAtPreVars(List<LocationVariable> heaps, Services services, String contextName) {
+  public static Map<LocationVariable,LocationVariable> getBeforeAtPreVars(List<LocationVariable> heaps, TermServices services, String contextName) {
     Map<LocationVariable,LocationVariable> result = new LinkedHashMap<LocationVariable,LocationVariable>();
     for(LocationVariable heap : heaps) {
-       final LocationVariable atPreVar = TermBuilder.DF.heapAtPreVar(services, heap.name()+contextName, heap.sort(), true);
+       final LocationVariable atPreVar = services.getTermBuilder().heapAtPreVar(heap.name()+contextName, heap.sort(), true);
        result.put(heap, atPreVar);
     }
     return result;
@@ -56,11 +55,10 @@ public class HeapContext {
     final Map<LocationVariable,Term> result = new LinkedHashMap<LocationVariable,Term>();
     for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
        final LocationVariable lv = atPreVars.get(heap);
-       final Term t = lv == null ? null : TermBuilder.DF.var(lv);
+       final Term t = lv == null ? null : services.getTermBuilder().var(lv);
        result.put(heap, t);
     }
     return result;
   }
 
 }
-

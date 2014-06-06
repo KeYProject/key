@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,15 +11,16 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.gui.actions.TermLabelMenu;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
@@ -58,7 +59,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
@@ -67,50 +67,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 
-import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
-import de.uka.ilkd.key.gui.actions.AboutAction;
-import de.uka.ilkd.key.gui.actions.AutoModeAction;
-import de.uka.ilkd.key.gui.actions.CounterExampleAction;
-import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
-import de.uka.ilkd.key.gui.actions.ExitMainAction;
-import de.uka.ilkd.key.gui.actions.FontSizeAction;
-import de.uka.ilkd.key.gui.actions.GoalBackAction;
-import de.uka.ilkd.key.gui.actions.HidePackagePrefixToggleAction;
-import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
-import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
-import de.uka.ilkd.key.gui.actions.LicenseAction;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
-import de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction;
-import de.uka.ilkd.key.gui.actions.OpenExampleAction;
-import de.uka.ilkd.key.gui.actions.OpenFileAction;
-import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
-import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
-import de.uka.ilkd.key.gui.actions.ProofManagementAction;
-import de.uka.ilkd.key.gui.actions.PruneProofAction;
-import de.uka.ilkd.key.gui.actions.QuickLoadAction;
-import de.uka.ilkd.key.gui.actions.QuickSaveAction;
-import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
-import de.uka.ilkd.key.gui.actions.ToggleConfirmExitAction;
-import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
-import de.uka.ilkd.key.gui.actions.SaveFileAction;
-import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
-import de.uka.ilkd.key.gui.actions.SearchInSequentAction;
-import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
-import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
-import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
-import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
-import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
-import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
-import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
-import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
-import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
+import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
-import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.gui.nodeviews.EmptySequent;
 import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
@@ -292,6 +254,7 @@ public final class MainWindow extends JFrame  {
      */
     private MainWindow() {
         setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
+        applyGnomeWorkaround();
         setLaF();
         setIconImage(IconFactory.keyLogo());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -338,6 +301,24 @@ public final class MainWindow extends JFrame  {
     public static boolean hasInstance() {
        return instance != null;
     }
+    
+    /**
+     * Workaround to an issue with the Gnome window manager.
+     * This sets the application title in the app menu (in the top bar)
+     * to "KeY" instead of the full class name ("de-uka-ilkd....").
+     * This should not have a negative effect on other window managers.
+     * See <a href="http://elliotth.blogspot.de/2007/02/fixing-wmclass-for-your-java.html">
+     * here</a> for details.
+     */
+    private void applyGnomeWorkaround() {
+        Toolkit xToolkit = Toolkit.getDefaultToolkit();
+        java.lang.reflect.Field awtAppClassNameField;
+        try {
+            awtAppClassNameField = xToolkit.getClass().getDeclaredField("awtAppClassName");
+            awtAppClassNameField.setAccessible(true);
+            awtAppClassNameField.set(xToolkit, "KeY");
+        } catch (Exception e) {}
+    }
 
     /**
      * Tries to set the system look and feel if this option is activated.
@@ -369,7 +350,7 @@ public final class MainWindow extends JFrame  {
      * @param userInterface The UserInterface.
      */
     private KeYMediator getMainWindowMediator(UserInterface userInterface) {
-        KeYMediator result = new KeYMediator(userInterface, true);
+        KeYMediator result = new KeYMediator(userInterface);
         result.addKeYSelectionListener(proofListener);
         result.addAutoModeListener(proofListener);
         result.addGUIListener(guiListener);
@@ -399,7 +380,7 @@ public final class MainWindow extends JFrame  {
         getContentPane().setLayout(new BorderLayout());
 
         // default size
-        setSize(1000, 750);
+        setPreferredSize(new Dimension(1000, 750));
 
         // FIXME FIXME
         recentFiles = new RecentFileMenu(new ActionListener() {
@@ -415,7 +396,6 @@ public final class MainWindow extends JFrame  {
         // minimize interaction
         final boolean stupidMode =
         		  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
-//            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().tacletFilter();
         mediator.setMinimizeInteraction(stupidMode);
 
         // set up actions
@@ -455,8 +435,6 @@ public final class MainWindow extends JFrame  {
         toolBarPanel.add(controlToolBar);
         toolBarPanel.add(fileOpToolBar);
 
-        // FIXME double entry?
-        getContentPane().add(GuiUtilities.getClipBoardArea(), BorderLayout.PAGE_START);
         getContentPane().add(toolBarPanel, BorderLayout.PAGE_START);
 
         // create tabbed pane
@@ -505,14 +483,6 @@ public final class MainWindow extends JFrame  {
         pane.setSelectedIndex(0);
         pane.setPreferredSize(new java.awt.Dimension(250, 440));
 
-        // change some key mappings which collide with font settings.
-	pane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-	        .getParent().remove(
-	                KeyStroke.getKeyStroke(KeyEvent.VK_UP, Toolkit
-	                        .getDefaultToolkit().getMenuShortcutKeyMask()));
-	pane.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(
-	        KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit
-	                .getDefaultToolkit().getMenuShortcutKeyMask()));
 	pane.setName("leftTabbed");
 
 	return pane;
@@ -544,6 +514,7 @@ public final class MainWindow extends JFrame  {
         toolBar.add(comp.getSelectionComponent());
         toolBar.addSeparator();        
         toolBar.add(new CounterExampleAction(this));
+        toolBar.add(new TestGenerationAction(this));
         toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this, false));
@@ -578,7 +549,7 @@ public final class MainWindow extends JFrame  {
 	smtComponent= new ComplexButton(TOOLBAR_ICON_SIZE);
 	smtComponent.setEmptyItem("No solver available","<html>No SMT solver is applicable for KeY.<br><br>If a solver is installed on your system," +
 		"<br>please configure the KeY-System accordingly:\n" +
-		"<br>Options|SMT Solvers</html>");
+		"<br>Options | SMT Solvers</html>");
 
 	smtComponent.setPrefix("Run ");
 
@@ -699,15 +670,6 @@ public final class MainWindow extends JFrame  {
     }
 
     /**
-     * Return a list of aspects compiled into the system, one by line. The idea is that the aspects
-     * will advise this method to add themselves to the list.
-     */
-    public String compiledAspects() {
-        return "";
-    }
-
-
-    /**
      * create the goal list, proof tree, proof list. Add to their respective
      * containers.
      */
@@ -741,8 +703,6 @@ public final class MainWindow extends JFrame  {
         menuBar.add(createOptionsMenu());
         menuBar.add(Box.createHorizontalGlue());
         menuBar.add(createHelpMenu());
-        if (Debug.ENABLE_DEBUG)
-            menuBar.add(createDebugMenu());
         return menuBar;
     }
 
@@ -781,7 +741,6 @@ public final class MainWindow extends JFrame  {
 
         JMenuItem laf = new JCheckBoxMenuItem("Use system look and feel (experimental)");
         laf.setToolTipText("If checked KeY tries to appear in the look and feel of your window manager, if not in the default Java LaF (aka Metal).");
-//        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofSettings.DEFAULT_SETTINGS.getViewSettings();
         final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         laf.setSelected(vs.useSystemLaF());
         laf.addActionListener(new ActionListener() {
@@ -827,11 +786,14 @@ public final class MainWindow extends JFrame  {
         proof.add(new SearchInProofTreeAction(this));
         proof.add(new SearchInSequentAction(this));
         proof.addSeparator();
-	proof.add(new ShowUsedContractsAction(this));
+        proof.add(new ShowUsedContractsAction(this));
         proof.add(new ShowActiveTactletOptionsAction(this));
-	proof.add(showActiveSettingsAction);
+        proof.add(showActiveSettingsAction);
         proof.add(new ShowProofStatistics(this));
         proof.add(new ShowKnownTypesAction(this));
+        proof.addSeparator();
+        proof.add(new CounterExampleAction(this));
+        proof.add(new TestGenerationAction(this));
 
         return proof;
     }
@@ -854,19 +816,12 @@ public final class MainWindow extends JFrame  {
     }
 
 
-    private JMenu createDebugMenu() {
-        JMenu debug = new JMenu("Debug");
-        debug.setMnemonic(KeyEvent.VK_D);
-        // please note: this is doubled in proof menu
-        debug.add(showActiveSettingsAction);
-        return debug;
-    }
-
     private JMenu createHelpMenu() {
         JMenu help = new JMenu("About");
         help.setMnemonic(KeyEvent.VK_A);
 
         help.add(new AboutAction(this));
+        help.add(new SystemInfoAction(this));
         help.add(new LicenseAction(this));
         return help;
     }
@@ -940,7 +895,6 @@ public final class MainWindow extends JFrame  {
         ButtonGroup group = new ButtonGroup();
         GeneralSettings gs
         =ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
 
         JRadioButtonMenuItem jmlButton
             = new JRadioButtonMenuItem("Source File Comments Are JML", gs.useJML());
@@ -950,26 +904,20 @@ public final class MainWindow extends JFrame  {
         jmlButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                GeneralSettings gs
-                =ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-//                    = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+                GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
                 gs.setUseJML(true);
-                gs.setUseOCL(false);
             }
         });
 
         JRadioButtonMenuItem noneButton
-        	= new JRadioButtonMenuItem("Source File Comments Are Ignored", !gs.useJML() && !gs.useOCL());
+        	= new JRadioButtonMenuItem("Source File Comments Are Ignored", !gs.useJML());
         result.add(noneButton);
         group.add(noneButton);
         noneButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-        	GeneralSettings gs
-        	=ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-    //    	= ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+        	GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
         	gs.setUseJML(false);
-        	gs.setUseOCL(false);
             }
     });
 
@@ -978,6 +926,13 @@ public final class MainWindow extends JFrame  {
 
     public ProofTreeView getProofView() {
         return proofTreeView;
+    }
+    
+    /**
+     * Returns the current goal view.
+     */
+    public CurrentGoalView getGoalView() {
+        return currentGoalView;
     }
 
     /** saves a proof */
@@ -1034,7 +989,6 @@ public final class MainWindow extends JFrame  {
 
 	private void setToolBarDisabled() {
 	    assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
-	    //assert doNotReenable == null : "toolbar disabled w/o prior enable";
 	    doNotReenable = new LinkedHashSet<Component>();
 	    Component[] cs = controlToolBar.getComponents();
 	    for (int i = 0; i < cs.length; i++) {
@@ -1054,7 +1008,6 @@ public final class MainWindow extends JFrame  {
 
         private void setToolBarEnabled() {
             assert EventQueue.isDispatchThread() : "toolbar enabled from wrong thread";
-            //assert doNotReenable != null : "toolbar enabled w/o prior disable";
             if (doNotReenable == null) return; // XXX ignore this problem for the moment XXX
 
             Component[] cs = controlToolBar.getComponents();
@@ -1491,7 +1444,6 @@ public final class MainWindow extends JFrame  {
             if (!(message instanceof Component)) {
                 throw new InternalError("only messages of type " + Component.class + " supported, yet");
             }
-            // JFrame dlg = new JDialog(mainFrame(),title, modal);
             JFrame dlg = new JFrame(title);
             dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             dlg.getContentPane().add((Component) message);

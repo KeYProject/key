@@ -4,17 +4,17 @@
       <statement name="int magicValue = magic(x,y);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = magic(x, y) catch(exc_0)
 pre: xPre(x) = TRUE &amp; y &lt; 0 | !(xPre(x) = TRUE &amp; y &lt; 0)
-post: (   heapBefore_magic_0[xPre(x)] = TRUE &amp; y &lt; 0
+post: (   xPre(x)@heapBefore_magic_0 = TRUE &amp; y &lt; 0
    -&gt; result_0 = subFirst(x, y) &amp; exc_0 = null)
-&amp; (   !(heapBefore_magic_0[xPre(x)] = TRUE &amp; y &lt; 0)
+&amp; (   !(xPre(x)@heapBefore_magic_0 = TRUE &amp; y &lt; 0)
    -&gt; result_0 = subSecond(x, y) &amp; exc_0 = null)
 mod: \if (true)  \then (empty)  \else (allLocs)
 \cap \if (!(xPre(x) = TRUE &amp; y &lt; 0))
          \then (empty)
          \else (allLocs)
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-            <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <branchCondition name="lt(y,Z(0(#)))" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="lt(y,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchCondition name="geq(x,Z(0(#)))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="geq(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <branchCondition name="leq(y,Z(neglit(1(#))))" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="leq(y,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return magicValue;" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="false">
                      <methodReturn name="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
                         <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
@@ -24,7 +24,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                      </methodReturn>
                   </statement>
                </branchCondition>
-               <branchCondition name="gt(y,Z(neglit(1(#))))" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="true" branchCondition="gt(y,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <branchCondition name="geq(y,Z(0(#)))" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="true" branchCondition="geq(y,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return magicValue;" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="false">
                      <methodReturn name="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
                         <methodReturnValue name="Z(neglit(1(1(7(4(#))))))" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="false">
@@ -35,7 +35,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                   </statement>
                </branchCondition>
             </branchCondition>
-            <branchCondition name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchCondition name="leq(x,Z(neglit(1(#))))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="leq(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="return magicValue;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
                   <methodReturn name="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
                      <methodReturnValue name="Z(neglit(1(1(7(4(#))))))" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="false">

@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -46,6 +46,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -58,6 +59,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.proof.TermProgramVariableCollectorKeepUpdatesForBreakpointconditions;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -89,6 +92,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepReturnSymbolicExecutionTreeNodesStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -698,6 +702,43 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       CompoundStopCondition stopCondition = new CompoundStopCondition();
       stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
       stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
+      proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
+      // Run proof
+      ui.startAndWaitForAutoMode(proof);
+      // Update symbolic execution tree 
+      builder.analyse();
+      // Test result
+      assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex, oracleFileExtension, baseDir);
+   }
+   
+   
+   
+   /**
+    * Executes an "step return" global on all goals on the given {@link SymbolicExecutionTreeBuilder}.
+    * @param ui The {@link CustomConsoleUserInterface} to use.
+    * @param builder The {@link SymbolicExecutionGoalChooser} to do step on.
+    * @param oraclePathInBaseDirFile The oracle path.
+    * @param oracleIndex The index of the current step.
+    * @param oracleFileExtension The oracle file extension
+    * @param baseDir The base directory for oracles.
+    * @throws IOException Occurred Exception
+    * @throws ProofInputException Occurred Exception
+    * @throws ParserConfigurationException Occurred Exception
+    * @throws SAXException Occurred Exception
+    */
+   protected static void stepReturnWithBreakpoints(CustomConsoleUserInterface ui, 
+                                    SymbolicExecutionTreeBuilder builder, 
+                                    String oraclePathInBaseDirFile, 
+                                    int oracleIndex, 
+                                    String oracleFileExtension, 
+                                    File baseDir,
+                                    CompoundStopCondition lineBreakpoints) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+      // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
+      Proof proof = builder.getProof();
+      CompoundStopCondition stopCondition = new CompoundStopCondition();
+      stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
+      stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
+      stopCondition.addChildren(lineBreakpoints);
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
       ui.startAndWaitForAutoMode(proof);
@@ -1630,6 +1671,20 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    }
 
    /**
+    * creates a new factory that should be used by others afterwards
+    * @return 
+    */
+   protected ITermProgramVariableCollectorFactory createNewProgramVariableCollectorFactory(final SymbolicExecutionBreakpointStopCondition breakpointParentStopCondition) {
+      ITermProgramVariableCollectorFactory programVariableCollectorFactory = new ITermProgramVariableCollectorFactory() {
+         @Override
+         public TermProgramVariableCollector create(Services services) {
+            return new TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(services, breakpointParentStopCondition);
+         }
+      };
+      return programVariableCollectorFactory;
+   }
+
+      /**
     * Makes sure that two {@link Term}s are equal.
     * @param expected The expected {@link Term}.
     * @param actual The actual {@link Term}.
@@ -1664,14 +1719,14 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    }
 
    /**
-    *
-    * @param proof
-    * @param enabled
+    * Defines if one step simplification is enabled in general and within the {@link Proof}.
+    * @param proof The optional {@link Proof}.
+    * @param enabled {@code true} use one step simplification, {@code false} do not use one step simplification.
     */
    public static void setOneStepSimplificationEnabled(Proof proof, boolean enabled) {
       ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(enabled);
       if (proof != null && !proof.isDisposed()) {
-         proof.getProofIndependentSettings().getGeneralSettings().setOneStepSimplification(true);
+         proof.getProofIndependentSettings().getGeneralSettings().setOneStepSimplification(enabled);
          OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof.env().getInitConfig().getProfile());
          if (simplifier != null) {
             simplifier.refresh(proof);

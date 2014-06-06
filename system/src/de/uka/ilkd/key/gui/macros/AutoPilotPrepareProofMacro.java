@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.gui.macros;
 
@@ -35,7 +35,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -122,13 +122,9 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static class AutoPilotStrategy implements Strategy {
 
         private static final Name NAME = new Name("Autopilot filter strategy");
-        private final KeYMediator mediator;
-        private final PosInOccurrence posInOcc;
         private final Strategy delegate;
 
         public AutoPilotStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
-            this.mediator = mediator;
-            this.posInOcc = posInOcc;
             this.delegate = mediator.getInteractiveProver().getProof().getActiveStrategy();
         }
 
@@ -167,7 +163,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
             String name = rule.name().toString();
             if(ADMITTED_RULES_SET.contains(name)) {
-                return LongRuleAppCost.ZERO_COST;
+                return NumberRuleAppCost.getZeroCost();
             }
             
             // apply OSS to <inv>() calls.
@@ -176,7 +172,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
                 if(target.op() instanceof UpdateApplication) {
                     Operator updatedOp = target.sub(1).op();
                     if(updatedOp instanceof ObserverFunction) {
-                        return LongRuleAppCost.ZERO_COST;
+                        return NumberRuleAppCost.getZeroCost();
                     }
                 }
             }

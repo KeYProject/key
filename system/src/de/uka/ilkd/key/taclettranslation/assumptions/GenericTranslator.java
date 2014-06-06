@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
@@ -28,7 +27,6 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -79,7 +77,7 @@ class GenericTranslator {
 
                 if (list.size() > 0) {
                         for (Term gt : list) {
-                                result.add(AssumptionGenerator.quantifyTerm(gt));
+                                result.add(AssumptionGenerator.quantifyTerm(gt, services));
 
                         }
                 }
@@ -131,13 +129,13 @@ class GenericTranslator {
                 if (term.sort().equals(generic)) {
 
                         if (term.op() instanceof LogicVariable) {
-                                TermBuilder tb = TermBuilder.DF;
+                                TermBuilder tb = services.getTermBuilder();
                                 term = tb.var(pool.getInstantiationOfLogicVar(
                                                 instantiation,
                                                 (LogicVariable) term.op()));
                         } else if (term.op() instanceof SchemaVariable) {
                                 if (((SchemaVariable) term.op()) instanceof TermSV) {
-                                        term = TermBuilder.DF
+                                        term = services.getTermBuilder()
                                                         .var(pool.getInstantiationOfLogicVar(
                                                                         instantiation,
                                                                         pool.getLogicVariable(
@@ -187,7 +185,7 @@ class GenericTranslator {
                                                 }
                                         }
 
-                                        term = TermFactory.DEFAULT.createTerm(
+                                        term = services.getTermFactory().createTerm(
                                                         func, subTerms);
 
                                 }
@@ -223,15 +221,15 @@ class GenericTranslator {
                                 i++;
                         }
                         if ((term.op()).equals(Quantifier.ALL)) {
-                                term = TermBuilder.DF.all(copy[0], subTerms[0]);
+                                term = services.getTermBuilder().all(copy[0], subTerms[0]);
                         }
                         if ((term.op()).equals(Quantifier.EX)) {
-                                term = TermBuilder.DF.ex(copy[0], subTerms[0]);
+                                term = services.getTermBuilder().ex(copy[0], subTerms[0]);
                         }
 
                 } else {
 
-                        term = TermFactory.DEFAULT.createTerm(term.op(),
+                        term = services.getTermFactory().createTerm(term.op(),
                                         subTerms, variables,
                                         JavaBlock.EMPTY_JAVABLOCK);
 

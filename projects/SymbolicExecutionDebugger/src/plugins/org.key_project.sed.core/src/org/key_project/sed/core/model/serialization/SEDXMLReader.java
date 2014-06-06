@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -30,9 +30,15 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.jface.resource.StringConverter;
+import org.eclipse.swt.graphics.RGB;
+import org.key_project.sed.core.annotation.ISEDAnnotation;
+import org.key_project.sed.core.annotation.ISEDAnnotationLink;
+import org.key_project.sed.core.annotation.ISEDAnnotationType;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
@@ -45,16 +51,18 @@ import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopBodyTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
+import org.key_project.sed.core.model.memory.SEDMemoryLoopInvariant;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
+import org.key_project.sed.core.model.memory.SEDMemoryMethodContract;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
-import org.key_project.sed.core.model.memory.SEDMemoryLoopInvariant;
-import org.key_project.sed.core.model.memory.SEDMemoryMethodContract;
 import org.key_project.sed.core.model.memory.SEDMemoryValue;
 import org.key_project.sed.core.model.memory.SEDMemoryVariable;
+import org.key_project.sed.core.util.SEDAnnotationUtil;
+import org.key_project.util.java.ObjectUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -77,6 +85,34 @@ import org.xml.sax.helpers.DefaultHandler;
  * @see SEDXMLWriter
  */
 public class SEDXMLReader {
+   /**
+    * The {@link ILaunch} to use.
+    */
+   private final ILaunch launch;
+   
+   /**
+    * Is this {@link ISEDDebugTarget} executable meaning that
+    * suspend, resume, step operations and disconnect are supported?;
+    */
+   private final boolean executable;   
+   
+   /**
+    * Constructor.
+    */
+   public SEDXMLReader() {
+      this(null, false);
+   }
+   
+   /**
+    * Constructor.
+    * @param launch The {@link ILaunch} to use.
+    * @param executable {@code true} Support suspend, resume, etc.; {@code false} Do not support suspend, resume, etc.
+    */
+   public SEDXMLReader(ILaunch launch, boolean executable) {
+      this.launch = launch;
+      this.executable = executable;
+   }
+
    /**
     * Parses the given XML content.
     * @param xml The XML content to parse.
@@ -191,6 +227,11 @@ public class SEDXMLReader {
       private Map<String, ISEDDebugElement> elementIdMapping = new HashMap<String, ISEDDebugElement>();
       
       /**
+       * Maps the annotation ID ({@link ISEDAnnotation#getId()}) to the its {@link ISEDAnnotation} instance.
+       */
+      private Map<String, ISEDAnnotation> annotationIdMapping = new HashMap<String, ISEDAnnotation>();
+      
+      /**
        * {@inheritDoc}
        */
       @Override
@@ -205,7 +246,7 @@ public class SEDXMLReader {
             callStack.add(getNodeIdRef(attributes));
          }
          else {
-            Object obj = createElement(target, parent != null ? parent : thread, thread, uri, localName, qName, attributes);
+            Object obj = createElement(target, parent != null ? parent : thread, thread, uri, localName, qName, attributes, annotationIdMapping);
             if (obj instanceof ISEDDebugElement) {
                ISEDDebugElement element = (ISEDDebugElement)obj;
                elementIdMapping.put(element.getId(), element);
@@ -268,6 +309,15 @@ public class SEDXMLReader {
                   throw new SAXException("Model is in inconsistent state.");
                }
             }
+            else if (obj instanceof ISEDAnnotation) {
+               ISEDAnnotation annotation = (ISEDAnnotation)obj;
+               annotationIdMapping.put(annotation.getId(), annotation);
+               target.registerAnnotation(annotation);
+            }
+            else if (obj instanceof ISEDAnnotationLink) {
+               ISEDAnnotationLink link = (ISEDAnnotationLink)obj;
+               link.getSource().addLink(link);
+            }
          }
       }
 
@@ -280,6 +330,12 @@ public class SEDXMLReader {
             variablesValueStack.removeFirst();
          }
          else if (isCallStackEntry(uri, localName, qName)) {
+            // Nothing to do
+         }
+         else if (isAnnotation(uri, localName, qName)) {
+            // Nothing to do
+         }
+         else if (isAnnotationLink(uri, localName, qName)) {
             // Nothing to do
          }
          else {
@@ -339,6 +395,28 @@ public class SEDXMLReader {
    }
    
    /**
+    * Checks if the given tag name represents an {@link ISEDAnnotation}.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @return {@code true} represents an {@link ISEDAnnotation}, {@code false} represents something else.
+    */
+   protected boolean isAnnotation(String uri, String localName, String qName) {
+      return SEDXMLWriter.TAG_ANNOTATION.equals(qName);
+   }
+   
+   /**
+    * Checks if the given tag name represents an {@link ISEDAnnotationLink}.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @return {@code true} represents an {@link ISEDAnnotationLink}, {@code false} represents something else.
+    */
+   protected boolean isAnnotationLink(String uri, String localName, String qName) {
+      return SEDXMLWriter.TAG_ANNOTATION_LINK.equals(qName);
+   }
+   
+   /**
     * Checks if the given tag name represents an {@link IVariable}.
     * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
     * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
@@ -372,7 +450,7 @@ public class SEDXMLReader {
     * @return The created {@link Object}.
     * @throws SAXException Occurred Exception.
     */
-   protected Object createElement(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+   protected Object createElement(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes, Map<String, ISEDAnnotation> annotationIdMapping) throws SAXException {
       if (SEDXMLWriter.TAG_LAUNCH.equals(qName)) {
          return null; // Nothing to do
       }
@@ -424,11 +502,68 @@ public class SEDXMLReader {
       else if (SEDXMLWriter.TAG_LOOP_INVARIANT.equals(qName)) {
          return createLoopInvariant(target, parent, thread, uri, localName, qName, attributes);
       }
+      else if (SEDXMLWriter.TAG_ANNOTATION.equals(qName)) {
+         return createAnnotation(target, parent, thread, uri, localName, qName, attributes);
+      }
+      else if (SEDXMLWriter.TAG_ANNOTATION_LINK.equals(qName)) {
+         return createAnnotationLink(target, parent, thread, uri, localName, qName, attributes, annotationIdMapping);
+      }
       else {
          throw new SAXException("Unknown tag \"" + qName + "\".");
       }
    }
    
+   protected ISEDAnnotationLink createAnnotationLink(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes, Map<String, ISEDAnnotation> annotationIdMapping) throws SAXException {
+      String sourceId = getAnnotationLinkSource(attributes);
+      String targetId = getAnnotationLinkTarget(attributes);
+      if (!ObjectUtil.equals(targetId, parent.getId())) {
+         throw new SAXException("Annotation link is contained in wrong node.");
+      }
+      ISEDAnnotation annotation = annotationIdMapping.get(sourceId);
+      if (annotation == null) {
+         throw new SAXException("Annotation with ID \"" + sourceId + "\" is not available.");
+      }
+      ISEDAnnotationLink link = annotation.getType().createLink(annotation, parent);
+      link.setId(getId(attributes));
+      String content = getAnnotationContent(attributes);
+      if (content != null) {
+         annotation.getType().restoreAnnotationLink(link, content);
+      }
+      return link;
+   }
+   
+   protected ISEDAnnotation createAnnotation(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      String typeId = getTypeId(attributes);
+      ISEDAnnotationType type = SEDAnnotationUtil.getAnnotationtype(typeId);
+      if (type == null) {
+         throw new SAXException("Annotation type with type ID \"" + typeId + "\" does not exit.");
+      }
+      ISEDAnnotation annotation = type.createAnnotation();
+      annotation.setId(getId(attributes));
+      annotation.setEnabled(isEnabled(attributes));
+      boolean highlightBackground = isHighlightBackground(attributes);
+      RGB backgroundColor = getBackgroundColor(attributes);
+      boolean highlightForeground = isHighlightForeground(attributes);
+      RGB foregroundColor = getForegroundColor(attributes);
+      if (annotation.isHighlightBackground() != highlightBackground) {
+         annotation.setCustomHighlightBackground(highlightBackground);
+      }
+      if (!ObjectUtil.equals(annotation.getBackgroundColor(), backgroundColor)) {
+         annotation.setCustomBackgroundColor(backgroundColor);
+      }
+      if (annotation.isHighlightForeground() != highlightForeground) {
+         annotation.setCustomHighlightForeground(highlightForeground);
+      }
+      if (!ObjectUtil.equals(annotation.getForegroundColor(), foregroundColor)) {
+         annotation.setCustomForegroundColor(foregroundColor);
+      }
+      String content = getAnnotationContent(attributes);
+      if (content != null) {
+         type.restoreAnnotation(annotation, content);
+      }
+      return annotation;
+   }
+
    protected SEDMemoryValue createValue(ISEDDebugTarget target, String uri, String localName, String qName, Attributes attributes) {
       SEDMemoryValue value = new SEDMemoryValue(target);
       value.setAllocated(isAllocated(attributes));
@@ -471,7 +606,7 @@ public class SEDXMLReader {
     * @return The created {@link SEDMemoryDebugTarget}.
     */
    protected SEDMemoryDebugTarget createDebugTarget(String uri, String localName, String qName, Attributes attributes) {
-      SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null);
+      SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(launch, executable);
       target.setId(getId(attributes));
       target.setName(getName(attributes));
       target.setModelIdentifier(getModelIdentifier(attributes));
@@ -492,11 +627,12 @@ public class SEDXMLReader {
     */   
    protected SEDMemoryBranchStatement createBranchStatement(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryBranchStatement branchStatement = new SEDMemoryBranchStatement(target, parent, thread);
+      branchStatement.setSourcePath(getSourcePath(attributes));
       fillDebugNode(branchStatement, attributes);
       fillStackFrame(branchStatement, attributes);
       return branchStatement;
    }
-   
+
    /**
     * Creates a {@link SEDMemoryExceptionalTermination} instance for the content in the given tag.
     * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
@@ -545,6 +681,7 @@ public class SEDXMLReader {
     */   
    protected SEDMemoryLoopCondition createLoopCondition(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryLoopCondition loopCondition = new SEDMemoryLoopCondition(target, parent, thread);
+      loopCondition.setSourcePath(getSourcePath(attributes));
       fillDebugNode(loopCondition, attributes);
       fillStackFrame(loopCondition, attributes);
       return loopCondition;
@@ -564,6 +701,7 @@ public class SEDXMLReader {
     */   
    protected SEDMemoryLoopStatement createLoopStatement(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryLoopStatement loopStatement = new SEDMemoryLoopStatement(target, parent, thread);
+      loopStatement.setSourcePath(getSourcePath(attributes));
       fillDebugNode(loopStatement, attributes);
       fillStackFrame(loopStatement, attributes);
       return loopStatement;
@@ -583,6 +721,7 @@ public class SEDXMLReader {
     */   
    protected SEDMemoryMethodCall createMethodCall(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryMethodCall methodCall = new SEDMemoryMethodCall(target, parent, thread);
+      methodCall.setSourcePath(getSourcePath(attributes));
       fillDebugNode(methodCall, attributes);
       fillStackFrame(methodCall, attributes);
       return methodCall;
@@ -602,6 +741,7 @@ public class SEDXMLReader {
     */   
    protected SEDMemoryMethodReturn createMethodReturn(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryMethodReturn methodReturn = new SEDMemoryMethodReturn(target, parent, thread);
+      methodReturn.setSourcePath(getSourcePath(attributes));
       fillDebugNode(methodReturn, attributes);
       fillStackFrame(methodReturn, attributes);
       return methodReturn;
@@ -621,6 +761,7 @@ public class SEDXMLReader {
     */   
    protected SEDMemoryStatement createStatement(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryStatement statement = new SEDMemoryStatement(target, parent, thread);
+      statement.setSourcePath(getSourcePath(attributes));
       fillDebugNode(statement, attributes);
       fillStackFrame(statement, attributes);
       return statement;
@@ -640,6 +781,7 @@ public class SEDXMLReader {
     */   
    protected SEDMemoryMethodContract createMethodContract(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryMethodContract methodContract = new SEDMemoryMethodContract(target, parent, thread);
+      methodContract.setSourcePath(getSourcePath(attributes));
       fillDebugNode(methodContract, attributes);
       fillStackFrame(methodContract, attributes);
       methodContract.setPreconditionComplied(isPreconditionComplied(attributes));
@@ -662,6 +804,7 @@ public class SEDXMLReader {
     */   
    protected SEDMemoryLoopInvariant createLoopInvariant(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryLoopInvariant loopInvariant = new SEDMemoryLoopInvariant(target, parent, thread);
+      loopInvariant.setSourcePath(getSourcePath(attributes));
       fillDebugNode(loopInvariant, attributes);
       fillStackFrame(loopInvariant, attributes);
       loopInvariant.setInitiallyValid(isInitiallyValid(attributes));
@@ -757,6 +900,15 @@ public class SEDXMLReader {
     */
    protected String getPathCondition(Attributes attributes) {
       return attributes.getValue(SEDXMLWriter.ATTRIBUTE_PATH_CONDITION);
+   }
+   
+   /**
+    * Returns the source path value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getSourcePath(Attributes attributes) {
+      return attributes.getValue(SEDXMLWriter.ATTRIBUTE_SOURCE_PATH);
    }
    
    /**
@@ -892,5 +1044,86 @@ public class SEDXMLReader {
     */
    protected String getReferenceTypeName(Attributes attributes) {
       return attributes.getValue(SEDXMLWriter.ATTRIBUTE_REFERENCE_TYPE_NAME);
+   }
+   
+   /**
+    * Returns the type ID value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getTypeId(Attributes attributes) {
+      return attributes.getValue(SEDXMLWriter.ATTRIBUTE_TYPE_ID);
+   }
+   
+   /**
+    * Returns the annotation content value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getAnnotationContent(Attributes attributes) {
+      return attributes.getValue(SEDXMLWriter.ATTRIBUTE_CONTENT);
+   }
+   
+   /**
+    * Returns the enabled value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isEnabled(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(SEDXMLWriter.ATTRIBUTE_ENABLED));
+   }
+   
+   /**
+    * Returns the highlight background value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isHighlightBackground(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(SEDXMLWriter.ATTRIBUTE_HIGHLIGHT_BACKGROUND));
+   }
+   
+   /**
+    * Returns the highlight foreground value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isHighlightForeground(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(SEDXMLWriter.ATTRIBUTE_HIGHLIGHT_FOREGROUND));
+   }
+   
+   /**
+    * Returns the background color value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected RGB getBackgroundColor(Attributes attributes) {
+      return StringConverter.asRGB(attributes.getValue(SEDXMLWriter.ATTRIBUTE_BACKGROUND_COLOR));
+   }
+   
+   /**
+    * Returns the foreground color value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected RGB getForegroundColor(Attributes attributes) {
+      return StringConverter.asRGB(attributes.getValue(SEDXMLWriter.ATTRIBUTE_FOREGROUND_COLOR));
+   }
+   
+   /**
+    * Returns the annotation link source value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getAnnotationLinkSource(Attributes attributes) {
+      return attributes.getValue(SEDXMLWriter.ATTRIBUTE_ANNOTATION_LINK_SOURCE);
+   }
+   
+   /**
+    * Returns the annotation link target value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getAnnotationLinkTarget(Attributes attributes) {
+      return attributes.getValue(SEDXMLWriter.ATTRIBUTE_ANNOTATION_LINK_TARGET);
    }
 }

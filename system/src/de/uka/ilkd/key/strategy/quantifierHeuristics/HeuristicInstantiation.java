@@ -1,25 +1,23 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -31,9 +29,7 @@ import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 public class HeuristicInstantiation implements TermGenerator {
 	
     public final static TermGenerator INSTANCE = new HeuristicInstantiation ();
-    
-    private final TermBuilder tb = TermBuilder.DF;
-    
+        
     private HeuristicInstantiation() {}
     
     public Iterator<Term> generate(RuleApp app,
@@ -59,12 +55,14 @@ public class HeuristicInstantiation implements TermGenerator {
         private final Function             quantifiedVarSortCast;
 
         private Term                       nextInst = null;
+        private final TermServices services;
 
         private HIIterator(Iterator<Term> it, 
 					 QuantifiableVariable var, 
-        	         Services services) {
+        	         TermServices services) {
             this.instances = it;
             this.quantifiedVar = var;
+            this.services = services;
             quantifiedVarSort = quantifiedVar.sort ();
             quantifiedVarSortCast = quantifiedVarSort.getCastSymbol (services);
             findNextInst ();
@@ -78,7 +76,7 @@ public class HeuristicInstantiation implements TermGenerator {
                         nextInst = null;
                         continue;
                     }
-                    nextInst = tb.func ( quantifiedVarSortCast, nextInst );
+                    nextInst = services.getTermBuilder().func ( quantifiedVarSortCast, nextInst );
                 }
             }
         }

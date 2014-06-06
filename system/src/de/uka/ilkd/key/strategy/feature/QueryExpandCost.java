@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -28,7 +28,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
@@ -39,7 +39,7 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 public class QueryExpandCost implements Feature {
 	
 	/** Constant that represents the boolean value true */
-    public static final RuleAppCost ZERO_COST = LongRuleAppCost.ZERO_COST;
+    public static final RuleAppCost ZERO_COST = NumberRuleAppCost.getZeroCost();
     /** Constant that represents the boolean value false */
     public static final RuleAppCost TOP_COST  = TopRuleAppCost.INSTANCE;
     
@@ -117,7 +117,7 @@ public class QueryExpandCost implements Feature {
 		//String tStr = t.toString(); int maxLen = tStr.length()>50?50:tStr.length();
 		//System.out.println("  cost="+cost + "    query:.."+tStr.substring(15, maxLen-1)+"..");
 
-		return LongRuleAppCost.create(cost);
+		return NumberRuleAppCost.create(cost);
 	}
 
 	/**

@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.rule;
 
@@ -18,8 +17,22 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.IntIterator;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PIOPathIterator;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IfThenElse;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.ModalOperatorSV;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.Transformer;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.util.TermHelper;
 import de.uka.ilkd.key.proof.Goal;
@@ -159,8 +172,7 @@ public final class RewriteTaclet extends FindTaclet {
      * <code>p_pos</code>
      */
     public MatchConditions checkPrefix(PosInOccurrence p_pos,
-                                       MatchConditions p_mc,
-                                       Services        p_services) {
+                                       MatchConditions p_mc) {
 	int polarity = p_pos.isInAntec() ? -1 : 1;  // init polarity
 	SVInstantiations svi = p_mc.getInstantiations ();
 	// this is assumed to hold
@@ -186,8 +198,12 @@ public final class RewriteTaclet extends FindTaclet {
 	            (op instanceof Modality || op instanceof ModalOperatorSV)) {
 	        return null;
 	    }
-	    polarity = polarity(op, it, polarity);
+	    
+	    if (polarity != 0) {
+	        polarity = polarity(op, it, polarity);
+	    }
 	}
+	
 	if (getApplicationRestriction() == NONE)
             return p_mc;
 	if (((getApplicationRestriction() & ANTECEDENT_POLARITY) != 0 && polarity != -1) ||
@@ -252,7 +268,7 @@ public final class RewriteTaclet extends FindTaclet {
 		}
 	    }
 
-	    return TermFactory.DEFAULT.createTerm(term.op(),
+	    return services.getTermFactory().createTerm(term.op(),
                                                   subs,
                                                   term.boundVars(),
                                                   term.javaBlock(),
@@ -264,7 +280,7 @@ public final class RewriteTaclet extends FindTaclet {
 	// FIXME: Labeling should be done by somehow using {@link label.ITermLabelWorker}
 
 	if(!with.sort().extendsTrans(maxSort)) {
-	    with = TermBuilder.DF.cast(services, maxSort, with);
+	    with = services.getTermBuilder().cast(services, maxSort, with);
 	}
 
 	return with;

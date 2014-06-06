@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -54,14 +54,17 @@ public class JoinIsApplicable {
     private ProspectivePartner areProspectivePartners(Goal g1, PosInOccurrence pio ,Goal g2){
         Term referenceFormula = pio.subTerm();
      
-        Term update1 = referenceFormula.op() instanceof UpdateApplication ? referenceFormula.sub(0) : TermBuilder.DF.skip();
+        assert g1.proof().getServices() == g2.proof().getServices();
+        TermBuilder tb = g1.proof().getServices().getTermBuilder();
+      
+        Term update1 = referenceFormula.op() instanceof UpdateApplication ? referenceFormula.sub(0) : tb.skip();
 
         referenceFormula = referenceFormula.op() instanceof UpdateApplication ? referenceFormula.sub(1) : referenceFormula;
         
         
         for(SequentFormula sf : g2.sequent().succedent()){
             Term formula = sf.formula();
-            Term update2 = TermBuilder.DF.skip();
+            Term update2 = tb.skip();
             if(formula.op() instanceof UpdateApplication 
                && !formula.equals(referenceFormula)){
                     update2 = formula.sub(0);// don't change the order of this and the following line.

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
+import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -75,7 +76,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          preferenceShell.bot().button("OK").click();
          assertEquals(usePrettyPrinting, KeYSEDPreferences.isUsePrettyPrinting());
          // Launch something
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Get debug target TreeItem
@@ -83,10 +84,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Do run
                resume(bot, item, target);
                if (usePrettyPrinting) {
-                  assertDebugTargetViaOracle(target, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/PrettyPrintSimpleTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/PrettyPrintSimpleTest.xml", false, false);
                }
                else {
-                  assertDebugTargetViaOracle(target, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/NotPrettyPrintedPrettyPrintSimpleTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/NotPrettyPrintedPrettyPrintSimpleTest.xml", false, false);
                }
             }
          };
@@ -151,7 +152,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          preferenceShell.bot().button("OK").click();
          assertEquals(mergeBranchConditions, KeYSEDPreferences.isMergeBranchConditions());
          // Launch something
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Get debug target TreeItem
@@ -159,10 +160,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Do run
                resume(bot, item, target);
                if (mergeBranchConditions) {
-                  assertDebugTargetViaOracle(target, "data/switchCaseTest/oracleMergeBranchConditions/MergedSwitchCaseTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/switchCaseTest/oracleMergeBranchConditions/MergedSwitchCaseTest.xml", false, false);
                }
                else {
-                  assertDebugTargetViaOracle(target, "data/switchCaseTest/oracleMergeBranchConditions/NotMergedSwitchCaseTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/switchCaseTest/oracleMergeBranchConditions/NotMergedSwitchCaseTest.xml", false, false);
                }
             }
          };
@@ -227,7 +228,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          preferenceShell.bot().button("OK").click();
          assertEquals(showVariableValues, KeYSEDPreferences.isShowVariablesOfSelectedDebugNode());
          // Launch something
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Get debug target TreeItem
@@ -310,7 +311,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          preferenceShell.bot().button("OK").click();
          assertEquals(showMainWindow, KeYSEDPreferences.isShowKeYMainWindow());
          // Launch something
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                if (showMainWindow) {
@@ -387,7 +388,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          preferenceShell.bot().button("OK").click();
          assertEquals(showMethodReturnValuesInDebugNodes, KeYSEDPreferences.isShowMethodReturnValuesInDebugNode());
          // Launch something
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Get debug target TreeItem
@@ -395,7 +396,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Do resume and test created tree
                String expectedModelPathInBundle = showMethodReturnValuesInDebugNodes ? "data/simpleIf/oracle/SimpleIf.xml" : "data/simpleIf/oracle_noMethodReturnValues/SimpleIf.xml";
                resume(bot, item, target);
-               assertDebugTargetViaOracle(target, expectedModelPathInBundle, false, false);
+               assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false);
             }
          };
          doKeYDebugTargetTest(projectName,

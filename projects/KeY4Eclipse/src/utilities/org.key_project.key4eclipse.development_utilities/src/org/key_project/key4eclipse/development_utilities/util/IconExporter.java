@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.key4eclipse.development_utilities.util;
 
 import java.awt.Color;
@@ -54,10 +67,16 @@ public class IconExporter extends TestCase {
       
       Image infoImage = new Image(Display.getDefault(), BundleUtil.openInputStream(Activator.PLUGIN_ID, "icons/DEC_FIELD_INFO.png"));
       
-      decorateImages(new IconToDecorate(baseImage, infoImage, 12, 14, -3, -2, "projects/KeY4Eclipse/src/plugins/org.key_project.key4eclipse.resources/icons/keyinfo12x14.png"),
+      Image empty16Image = new Image(Display.getDefault(), BundleUtil.openInputStream(Activator.PLUGIN_ID, "icons/empty16.png"));
+
+      decorateImages(//new IconToDecorate(hole17Image, empty16Image, 16, 16, 0, 0, "projects/KeY4Eclipse/src/plugins/org.key_project.key4eclipse.resources/icons/projectIcon.png"), // This icon requires to fill the hole manually in white
+                     new IconToDecorate(baseImage, infoImage, 12, 14, -3, -2, "projects/KeY4Eclipse/src/plugins/org.key_project.key4eclipse.resources/icons/keyinfo12x14.png"),
                      new IconToDecorate(baseImage, PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEC_FIELD_WARNING), 12, 14, -3, -2, "projects/KeY4Eclipse/src/plugins/org.key_project.key4eclipse.resources/icons/keywarning12x14.png"),
                      new IconToDecorate(baseImage, PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEC_FIELD_ERROR), 12, 14, -3, -2, "projects/KeY4Eclipse/src/plugins/org.key_project.key4eclipse.resources/icons/keyerror12x14.png"));
 
+      
+      
+      
       // KeY Resources UI
       Image decProofMetaFileImage = new Image(Display.getDefault(), BundleUtil.openInputStream(Activator.PLUGIN_ID, "icons/DEC_PROOF_META_FILE.png"));
       decorateImages(new IconToDecorate(hole17Image, decProofMetaFileImage, 16, 16, 0, 0, "projects/KeY4Eclipse/src/plugins/org.key_project.key4eclipse.resources.ui/icons/proofmetafile16.png"));
@@ -83,7 +102,13 @@ public class IconExporter extends TestCase {
          
          GC gc = new GC(result);
          gc.drawImage(baseImage, task.getBaseX(), task.getBaseY());
-         gc.drawImage(decorationImage, result.getBounds().width - decorationImage.getBounds().width, result.getBounds().height - decorationImage.getBounds().height);
+         int decX = task.getDecX() != null ?
+                    task.getDecX() :
+                    result.getBounds().width - decorationImage.getBounds().width;
+         int decY = task.getDecY() != null ?
+                    task.getDecY() :
+                       result.getBounds().height - decorationImage.getBounds().height;
+         gc.drawImage(decorationImage, decX, decY);
          gc.dispose();
     
          ImageData resultData = result.getImageData();
@@ -110,15 +135,25 @@ public class IconExporter extends TestCase {
       
       private final int baseY;
       
+      private final Integer decX;
+      
+      private final Integer decY;
+      
       private final String target;
 
       public IconToDecorate(ImageData baseImage, Image decoration, int width, int height, int baseX, int baseY, String target) {
+         this(baseImage, decoration, width, height, baseX, baseY, null, null, target);
+      }
+
+      public IconToDecorate(ImageData baseImage, Image decoration, int width, int height, int baseX, int baseY, Integer decX, Integer decY, String target) {
          this.baseImage = baseImage;
          this.decoration = decoration;
          this.width = width;
          this.height = height;
          this.baseX = baseX;
          this.baseY = baseY;
+         this.decX = decX;
+         this.decY = decY;
          this.target = target;
       }
 
@@ -132,6 +167,14 @@ public class IconExporter extends TestCase {
 
       public int getBaseY() {
          return baseY;
+      }
+
+      public Integer getDecX() {
+         return decX;
+      }
+
+      public Integer getDecY() {
+         return decY;
       }
 
       public int getWidth() {

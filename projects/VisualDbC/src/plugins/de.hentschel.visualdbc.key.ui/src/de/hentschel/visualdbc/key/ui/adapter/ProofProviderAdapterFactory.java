@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -50,7 +50,6 @@ import de.hentschel.visualdbc.interactive.proving.ui.util.event.IInteractiveConn
 import de.hentschel.visualdbc.interactive.proving.ui.util.event.InteractiveConnectionUtilEvent;
 import de.hentschel.visualdbc.key.ui.util.LogUtil;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -211,10 +210,7 @@ public class ProofProviderAdapterFactory implements IAdapterFactory {
             if (dbcModel != null) {
                IDSConnection connection = InteractiveConnectionUtil.getConnection(dbcModel);
                if (connection instanceof KeyConnection) {
-                  MainWindow main = ((KeyConnection) connection).getMain();
-                  if (main != null) {
-                     result = main.getUserInterface();
-                  }
+                  result = ((KeyConnection) connection).getUserInterface();
                }
             }
          }

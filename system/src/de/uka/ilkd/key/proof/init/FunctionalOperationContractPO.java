@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -190,10 +190,10 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
 */
             final Term mby = contract.getMby(selfVar, paramVars, services);
 //            mbyAtPreDef = TB.equals(mbyAtPre, mby);
-            mbyAtPreDef = TB.measuredBy(mby, services);
+            mbyAtPreDef = tb.measuredBy(mby);
         } else {
 //            mbyAtPreDef = TB.tt();
-            mbyAtPreDef = TB.measuredByEmpty(services);
+            mbyAtPreDef = tb.measuredByEmpty();
         }
         return mbyAtPreDef;
     }
@@ -241,16 +241,16 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
           final Term ft;
           if(!getContract().hasModifiesClause(heap)) {
             // strictly pure have a different contract.
-            ft = TB.frameStrictlyEmpty(services, TB.var(heap), heapToAtPre.get(heap));
+            ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre.get(heap));
           }else{
-            ft = TB.frame(services, TB.var(heap),
-                 heapToAtPre.get(heap), getContract().getMod(heap, selfVar,
+            ft = tb.frame(tb.var(heap), heapToAtPre.get(heap),
+                 getContract().getMod(heap, selfVar,
                          paramVars, services));
           }
           if(frameTerm == null) {
             frameTerm = ft;
           }else{
-            frameTerm = TB.and(frameTerm, ft);
+            frameTerm = tb.and(frameTerm, ft);
           }
        }
        return frameTerm;
@@ -274,21 +274,19 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
        Term update = null;
        for(Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
           final LocationVariable heap = atPreEntry.getKey();
-          final Term u = TB.elementary(services, atPreEntry.getValue(), heap == getSavedHeap() ?
-                  TB.getBaseHeap(services) : TB.var(heap));
+          final Term u = tb.elementary(atPreEntry.getValue(), heap == getSavedHeap() ?
+                  tb.getBaseHeap() : tb.var(heap));
           if(update == null) {
              update = u;
           }else{
-             update = TB.parallel(update, u);
+             update = tb.parallel(update, u);
           }
         }
         Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
         Iterator<ProgramVariable> paramIt = paramVars.iterator();
         while (formalParamIt.hasNext()) {
-            Term paramUpdate = TB.elementary(services,
-                                             formalParamIt.next(),
-                                             TB.var(paramIt.next()));
-            update = TB.parallel(update, paramUpdate);
+            Term paramUpdate = tb.elementary(formalParamIt.next(), tb.var(paramIt.next()));
+            update = tb.parallel(update, paramUpdate);
         }
         return update;
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -35,7 +35,7 @@ public class KeYConditionalValueVariable extends AbstractSEDVariable {
    /**
     * The conditional {@link IExecutionValue} to represent in debug model.
     */
-   private IExecutionValue executionValue;
+   private final IExecutionValue executionValue;
    
    /**
     * The contained {@link IValue}.

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -33,7 +33,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    /**
     * The {@link IExecutionStart} to represent by this debug node.
     */
-   private IExecutionStart executionNode;
+   private final IExecutionStart executionNode;
 
    /**
     * The contained children.
@@ -50,10 +50,11 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param executionNode The {@link IExecutionStart} to represent by this debug node.
     */
-   public KeYThread(KeYDebugTarget target, IExecutionStart executionNode) {
+   public KeYThread(KeYDebugTarget target, IExecutionStart executionNode) throws DebugException {
       super(target);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
 
    /**

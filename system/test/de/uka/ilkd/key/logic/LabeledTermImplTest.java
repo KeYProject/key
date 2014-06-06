@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -19,22 +19,33 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.rule.TacletForTests;
 
 public class LabeledTermImplTest extends TestCase {
 
+        private TermServices services;
+        private TermFactory tf;
+
+        @Override
+        public void setUp() {
+            services = TacletForTests.services();
+            tf = services.getTermFactory();
+
+        }
+    
 	public void testEqualsLabelOnTop() {
-		Term unlabeledTerm = 
-				TermFactory.DEFAULT.createTerm(Junctor.AND, 
-						TermFactory.DEFAULT.createTerm(Junctor.TRUE), 
-						TermFactory.DEFAULT.createTerm(Junctor.FALSE));
+                Term unlabeledTerm = 
+				tf.createTerm(Junctor.AND, 
+						tf.createTerm(Junctor.TRUE), 
+						tf.createTerm(Junctor.FALSE));
 		
 		ImmutableArray<TermLabel> labels = new ImmutableArray<TermLabel>(
 		      ParameterlessTermLabel.LOOP_BODY_LABEL);
 		
 		Term labeledTerm = 
-				TermFactory.DEFAULT.createTerm(Junctor.AND, 
-						TermFactory.DEFAULT.createTerm(Junctor.TRUE), 
-						TermFactory.DEFAULT.createTerm(Junctor.FALSE), labels);
+				tf.createTerm(Junctor.AND, 
+						tf.createTerm(Junctor.TRUE), 
+						tf.createTerm(Junctor.FALSE), labels);
 				
 		assertFalse("Labeled and unlabeled terms must not be equal", labeledTerm.equals(unlabeledTerm));
 		assertFalse("Labeled and unlabeled terms must not be equal", unlabeledTerm.equals(labeledTerm));
@@ -46,12 +57,12 @@ public class LabeledTermImplTest extends TestCase {
 	 */
 	public void testGetHasAndContainsLabels() {
 	   // Create terms
-	   Term unlabled = TermBuilder.DF.tt();
+	   Term unlabled = services.getTermBuilder().tt();
 	   SymbolicExecutionTermLabel sedLabel = new SymbolicExecutionTermLabel(1);
-      SymbolicExecutionTermLabel anotherSedLabel = new SymbolicExecutionTermLabel(2);
-	   Term oneLabel = TermBuilder.DF.label(unlabled, sedLabel);
-	   Term oneLabelChanged = TermBuilder.DF.label(oneLabel, ParameterlessTermLabel.LOOP_BODY_LABEL);
-	   Term twoLabels = TermBuilder.DF.label(unlabled, new ImmutableArray<TermLabel>(ParameterlessTermLabel.LOOP_BODY_LABEL, sedLabel));
+	   SymbolicExecutionTermLabel anotherSedLabel = new SymbolicExecutionTermLabel(2);
+	   Term oneLabel = services.getTermBuilder().label(unlabled, sedLabel);
+	   Term oneLabelChanged = services.getTermBuilder().label(oneLabel, ParameterlessTermLabel.LOOP_BODY_LABEL);
+	   Term twoLabels = services.getTermBuilder().label(unlabled, new ImmutableArray<TermLabel>(ParameterlessTermLabel.LOOP_BODY_LABEL, sedLabel));
 	   // Test unlabled
 	   assertFalse(unlabled.hasLabels());
 	   assertNotNull(unlabled.getLabels());

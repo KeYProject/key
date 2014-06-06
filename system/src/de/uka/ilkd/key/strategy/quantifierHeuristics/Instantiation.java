@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
@@ -25,19 +24,18 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 class Instantiation {
 
-    private final static TermBuilder tb = TermBuilder.DF;
 
     /** universally quantifiable variable bound in<code>allTerm</code> */
     private final QuantifiableVariable firstVar;
@@ -62,7 +60,7 @@ class Instantiation {
 	matrix = TriggerUtils.discardQuantifiers(allterm);
 	/* Terms bound in every formula on <code>goal</code> */
 	triggersSet = TriggersSet.create(allterm, services);
-	assumedLiterals = initAssertLiterals(seq);
+	assumedLiterals = initAssertLiterals(seq, services);
 	addInstances(sequentToTerms(seq), services);
     }
 
@@ -127,9 +125,9 @@ class Instantiation {
     }
 
     private Term createArbitraryInstantiation(QuantifiableVariable var,
-	    Services services) {
-        return tb.func (var.sort().getCastSymbol (services),
-	        tb.zero(services));
+	    TermServices services) {
+        return services.getTermBuilder().func (var.sort().getCastSymbol (services),
+              services.getTermBuilder().zero());
     }
 
     private void addInstance(Substitution sub, Services services) {
@@ -156,10 +154,11 @@ class Instantiation {
 
     /**
      * @param seq
+    * @param services TODO
      * @return all literals in antesequent, and all negation of literal in
      *         succedent
      */
-    private ImmutableSet<Term> initAssertLiterals(Sequent seq) {
+    private ImmutableSet<Term> initAssertLiterals(Sequent seq, TermServices services) {
 	ImmutableSet<Term> assertLits = DefaultImmutableSet.<Term> nil();
 	for (final SequentFormula cf : seq.antecedent()) {
 	    final Term atom = cf.formula();
@@ -171,7 +170,7 @@ class Instantiation {
 	    final Term atom = cf.formula();
 	    final Operator op = atom.op();
             if ( !( op == Quantifier.ALL || op == Quantifier.EX ) )
-		assertLits = assertLits.add(tb.not(atom));
+		assertLits = assertLits.add(services.getTermBuilder().not(atom));
 	}
 	return assertLits;
     }
@@ -198,7 +197,7 @@ class Instantiation {
 	if (cost.longValue() == -1)
 	    return TopRuleAppCost.INSTANCE;
 
-	return LongRuleAppCost.create(cost.longValue());
+	return NumberRuleAppCost.create(cost.longValue());
     }
 
     /** get all instances from instancesCostCache subsCache */

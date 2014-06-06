@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.gui.nodeviews;
 
@@ -99,6 +98,13 @@ class TacletMenu extends JMenu {
         CLUTTER_RULES.add(new Name("typeStatic"));
         CLUTTER_RULES.add(new Name("less_is_total"));
         CLUTTER_RULES.add(new Name("less_zero_is_total"));
+        CLUTTER_RULES.add(new Name("applyEqReverse"));
+        
+        
+        // the following are used for drag'n'drop interactions
+        CLUTTER_RULES.add(new Name("eqTermCut"));
+        CLUTTER_RULES.add(new Name("instAll"));
+        CLUTTER_RULES.add(new Name("instEx"));
     }
 
     private TacletAppComparator comp = new TacletAppComparator();
@@ -408,7 +414,7 @@ class TacletMenu extends JMenu {
                 !insSystemInvItem.isResponsible(taclet)) {
                 final DefaultTacletMenuItem item =
                     new DefaultTacletMenuItem(this, app,
-                        mediator.getNotationInfo());
+                        mediator.getNotationInfo(), mediator.getServices());
                 item.addActionListener(control);
                 boolean rareRule = false;
                 for (RuleSet rs : taclet.getRuleSets()) {
@@ -512,9 +518,12 @@ class TacletMenu extends JMenu {
 			 startsWith(CREATE_ABBREVIATION)){
 		    PosInOccurrence occ = pos.getPosInOccurrence();
 		    if (occ != null && occ.posInTerm() != null) {
+		        // trim string, otherwise window gets too large (bug #1430)
+		        final String oldTerm = occ.subTerm().toString();
+		        final String term = oldTerm.length()>200? oldTerm.substring(0, 200): oldTerm;
 			String abbreviation = (String)JOptionPane.showInputDialog
 			    (new JFrame(),
-			     "Enter abbreviation for term: \n"+occ.subTerm().toString(),
+			     "Enter abbreviation for term: \n"+term,
 			     "New Abbreviation",
 			     JOptionPane.QUESTION_MESSAGE,
 			     null,

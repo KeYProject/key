@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.java.visitor;
 
@@ -29,9 +29,13 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramConstant;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
@@ -173,7 +177,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         if(t.op() instanceof ProgramVariable) {
             if(replaceMap.containsKey(t.op())) {
                 ProgramVariable replacement = replaceMap.get(t.op());
-                return TermFactory.DEFAULT.createTerm(replacement);
+                return services.getTermFactory().createTerm(replacement);
             } else {
                 return t;
             }
@@ -191,7 +195,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     op = ElementaryUpdate.getInstance(replacedLhs);
                 }
             }
-            return TermFactory.DEFAULT.createTerm(op,
+            return services.getTermFactory().createTerm(op,
                                                   subTerms,
                                                   t.boundVars(),
                                                   t.javaBlock(),
@@ -259,7 +263,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             replaceVariable(variables.result),
             replaceVariable(variables.exception),
             replaceRemembranceHeaps(variables.remembranceHeaps),
-            replaceRemembranceLocalVariables(variables.remembranceLocalVariables)
+            replaceRemembranceLocalVariables(variables.remembranceLocalVariables),
+            services
         );
     }
 

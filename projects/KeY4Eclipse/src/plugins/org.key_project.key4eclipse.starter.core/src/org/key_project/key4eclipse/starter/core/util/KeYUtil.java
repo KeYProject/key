@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -22,6 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -1048,6 +1049,78 @@ public final class KeYUtil {
       else {
          return -1;
       }
+   }
+   
+   /**
+    * Collects all {@link IMethod}s in the given {@link IResource}.
+    * @param res - the given {@link IResource}
+    * @return - the {@link LinkedList<IMethod>} with all {@link IMethod}s
+    * @throws JavaModelException
+    */
+   public static LinkedList<IMethod> getResourceMethods(IResource res) throws JavaModelException{
+      ICompilationUnit unit = (ICompilationUnit) JavaCore.create(res);
+      LinkedList<IMethod> methods = new LinkedList<IMethod>();
+      IType[] types = unit.getAllTypes();
+      for(IType type : types){
+         IMethod[] tmp = type.getMethods();
+         for(IMethod method : tmp){
+            methods.add(method);
+         }
+      }
+      return methods;
+   }
+   
+   /**
+    * Collects all {@link IMethod}s in the given {@link IResource}.
+    * @param res - the given {@link IResource}
+    * @return - the {@link LinkedList<IMethod>} with all {@link IMethod}s
+    * @throws JavaModelException
+    */
+   public static IType getType(IResource res) throws JavaModelException{
+      ICompilationUnit unit = (ICompilationUnit) JavaCore.create(res);
+      IType[] types = unit.getAllTypes();
+      return types[0];
+   }
+   
+   /**
+    * Returns the lineNumber of the given {@link IMethod}.
+    * @param method - the {@link IMethod} to use
+    * @return the lineNumber of the {@link IMethod}
+    * @throws CoreException
+    */
+   public static int getLineNumberOfMethod(IMethod method, int offset) throws CoreException {
+      Position pos = KeYUtil.getCursorPositionForOffset(method, offset);
+      return pos.getLine();
+   }
+
+   public static IMethod getContainingMethodForMethodStart(int charStart, IResource resource) throws CoreException {
+      ICompilationUnit unit = (ICompilationUnit) JavaCore.create(resource);
+      IJavaElement javaElement = unit.getElementAt(charStart);
+      if(javaElement instanceof IMethod){
+         return (IMethod) javaElement;
+      }
+      return null;
+   } 
+   
+   public static LinkedList<IProgramMethod> getProgramMethods(LinkedList<IMethod> methods, JavaInfo javaInfo) throws ProofInputException{
+      LinkedList<IProgramMethod> programMethods = new LinkedList<IProgramMethod>();
+      for(IMethod method : methods){
+         programMethods.add(getProgramMethod(method, javaInfo));
+      }
+      return programMethods;
+   }
+   
+
+   public static IMethod getContainingMethod(int lineNumber, IResource resource) throws CoreException {
+      LinkedList<IMethod>methods = getResourceMethods(resource);
+      for(IMethod method : methods){
+         int start = getLineNumberOfMethod(method, method.getSourceRange().getOffset());
+         int end = getLineNumberOfMethod(method, method.getSourceRange().getOffset()+method.getSourceRange().getLength());
+         if(lineNumber>start&&lineNumber<end){
+            return method;
+         }
+      }
+      return null;
    }
    
    /**

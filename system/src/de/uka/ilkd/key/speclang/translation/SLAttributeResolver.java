@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.speclang.translation;
 
@@ -95,7 +94,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
         
         //<inv> is special case (because it's really a predicate, not a boolean attribute)
         if(name.equals("<inv>") && receiver.isTerm()) {
-            return new SLExpression(TB.inv(services, receiver.getTerm()));
+            return new SLExpression(services.getTermBuilder().inv(receiver.getTerm()));
         }
         
         ProgramVariable attribute = null;
@@ -122,7 +121,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                     if(recTerm != null){
                 	final Function thisFieldSymbol 
                 		= heapLDT.getFieldSymbolForPV(et, services);
-                        recTerm = TB.dot(services, et.sort(), recTerm, thisFieldSymbol);
+                        recTerm = services.getTermBuilder().dot(et.sort(), recTerm, thisFieldSymbol);
                     }
                 } else {
                     break;
@@ -136,10 +135,10 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                         "Reference to non-static field without receiver: " +
                         attribute.name());
             } else if(attribute instanceof ProgramConstant) {
-        	return new SLExpression(TB.var(attribute), 
+        	return new SLExpression(services.getTermBuilder().var(attribute), 
         				attribute.getKeYJavaType());
             } else if(attribute == javaInfo.getArrayLength()) {
-        	return new SLExpression(TB.dotLength(services, recTerm), 
+        	return new SLExpression(services.getTermBuilder().dotLength(recTerm), 
         		                attribute.getKeYJavaType());
             } else {
         	try {
@@ -149,12 +148,10 @@ public final class SLAttributeResolver extends SLExpressionResolver {
         	    		                       services);
         	    Term attributeTerm;
         	    if(attribute.isStatic()) {
-        		attributeTerm = TB.staticDot(services, 
-        					     attribute.sort(), 
+        		attributeTerm = services.getTermBuilder().staticDot(attribute.sort(), 
         					     fieldSymbol);
         	    } else {
-        		attributeTerm = TB.dot(services, 
-        				       attribute.sort(), 
+        		attributeTerm = services.getTermBuilder().dot(attribute.sort(), 
         				       recTerm, 
         				       fieldSymbol);
         	    }

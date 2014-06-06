@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -40,7 +40,7 @@ public class KeYLoopInvariant extends AbstractSEDLoopInvariant implements IKeYSE
    /**
     * The {@link IExecutionLoopInvariant} to represent by this debug node.
     */
-   private IExecutionLoopInvariant executionNode;
+   private final IExecutionLoopInvariant executionNode;
 
    /**
     * The contained children.
@@ -77,10 +77,11 @@ public class KeYLoopInvariant extends AbstractSEDLoopInvariant implements IKeYSE
    public KeYLoopInvariant(KeYDebugTarget target, 
                            IKeYSEDDebugNode<?> parent, 
                            ISEDThread thread, 
-                           IExecutionLoopInvariant executionNode) {
+                           IExecutionLoopInvariant executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
    
    /**
@@ -228,7 +229,7 @@ public class KeYLoopInvariant extends AbstractSEDLoopInvariant implements IKeYSE
    public boolean hasVariables() throws DebugException {
       try {
          return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
-                SymbolicExecutionUtil.canComputeVariables(executionNode) &&
+                SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
                 super.hasVariables();
       }
       catch (ProofInputException e) {

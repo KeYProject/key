@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,6 +13,7 @@
 
 package org.key_project.sed.ui.test.testcase.swtbot;
 
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -56,6 +57,7 @@ public class AbstractSWTBotPropertyTabTest extends AbstractSetupTestCase {
          TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Get properties view
          SWTBotView propertiesView = TestUtilsUtil.getPropertiesView(bot);
+         steps.initializeLaunch(TestSedCoreUtil.getFirstLaunch(debugTree));
          // Make sure that all nodes to test are loaded and that the automatic selection set to the debug target by the Debug API is done.
          selectDebugTarget(debugTree);
          selectThread(debugTree);
@@ -63,20 +65,20 @@ public class AbstractSWTBotPropertyTabTest extends AbstractSetupTestCase {
          selectMethodReturn(debugTree);
          Thread.sleep(1000); // Some extra time for the Debug API to set the selection
          // Select and test debug target in once because otherwise the selection can be changed by Eclipse itself.
-         selectDebugTarget(debugTree);
-         steps.assertDebugTarget(debugTree, propertiesView, getPropertiesTabs(propertiesView));
+         ISEDDebugTarget target = selectDebugTarget(debugTree);
+         steps.assertDebugTarget(debugTree, propertiesView, getPropertiesTabs(propertiesView), target);
          // Select first thread
-         selectThread(debugTree);
-         steps.assertThread(debugTree, propertiesView, getPropertiesTabs(propertiesView));
+         ISEDThread thread = selectThread(debugTree);
+         steps.assertThread(debugTree, propertiesView, getPropertiesTabs(propertiesView), thread);
          // Select first statement
-         selectStatement(debugTree);
-         steps.assertStatement(debugTree, propertiesView, getPropertiesTabs(propertiesView));
+         ISEDStatement statement = selectStatement(debugTree);
+         steps.assertStatement(debugTree, propertiesView, getPropertiesTabs(propertiesView), statement);
          // Select debug target
-         selectDebugTarget(debugTree);
-         steps.assertDebugTarget(debugTree, propertiesView, getPropertiesTabs(propertiesView));
+         target = selectDebugTarget(debugTree);
+         steps.assertDebugTarget(debugTree, propertiesView, getPropertiesTabs(propertiesView), target);
          // Select method return
-         selectMethodReturn(debugTree);
-         steps.assertMethodReturn(debugTree, propertiesView, getPropertiesTabs(propertiesView));
+         ISEDMethodReturn methodReturn = selectMethodReturn(debugTree);
+         steps.assertMethodReturn(debugTree, propertiesView, getPropertiesTabs(propertiesView), methodReturn);
       }
       finally {
          // Terminate and remove all launches
@@ -161,13 +163,20 @@ public class AbstractSWTBotPropertyTabTest extends AbstractSetupTestCase {
     */
    protected static interface ITestSteps {
       /**
+       * Initializes the given {@link ILaunch}.
+       * @param firstLaunch The {@link ILaunch} to initialize.
+       * @throws Exception Occurred Exception
+       */
+      public void initializeLaunch(ILaunch launch) throws Exception;
+
+      /**
        * Do some assertions on an {@link ISEDThread}.
        * @param debugTree The debug tree.
        * @param propertiesView The properties view.
        * @param tabs The properties view tabs.
        * @throws Exception Occurred Exception
        */
-      public void assertThread(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception;
+      public void assertThread(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDThread thread) throws Exception;
 
       /**
        * Do some assertions on an {@link ISEDStatement}.
@@ -176,7 +185,7 @@ public class AbstractSWTBotPropertyTabTest extends AbstractSetupTestCase {
        * @param tabs The properties view tabs.
        * @throws Exception Occurred Exception
        */
-      public void assertStatement(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception;
+      public void assertStatement(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDStatement statement) throws Exception;
 
       /**
        * Do some assertions on an {@link ISEDDebugTarget}.
@@ -185,7 +194,7 @@ public class AbstractSWTBotPropertyTabTest extends AbstractSetupTestCase {
        * @param tabs The properties view tabs.
        * @throws Exception Occurred Exception
        */
-      public void assertDebugTarget(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception;
+      public void assertDebugTarget(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDDebugTarget target) throws Exception;
 
       /**
        * Do some assertions on an {@link ISEDMethodReturn}.
@@ -194,6 +203,19 @@ public class AbstractSWTBotPropertyTabTest extends AbstractSetupTestCase {
        * @param tabs The properties view tabs.
        * @throws Exception Occurred Exception
        */
-      public void assertMethodReturn(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception;
+      public void assertMethodReturn(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDMethodReturn methodReturn) throws Exception;
+   }
+   
+   /**
+    * Provides some basic implementations of {@link ITestSteps}.
+    * @author Martin Hentschel
+    */
+   protected static abstract class AbstractTestSteps implements ITestSteps {
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void initializeLaunch(ILaunch launch) throws Exception {
+      }
    }
 }

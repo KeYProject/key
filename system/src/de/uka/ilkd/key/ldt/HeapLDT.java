@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.ldt;
 
@@ -33,6 +32,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
@@ -101,7 +101,7 @@ public final class HeapLDT extends LDT {
     //constructors
     //------------------------------------------------------------------------- 
     
-    public HeapLDT(Services services) {
+    public HeapLDT(TermServices services) {
 	super(NAME, services);
 	final Namespace sorts    = services.getNamespaces().sorts();
 	final Namespace progVars = services.getNamespaces().programVariables();
@@ -200,7 +200,7 @@ public final class HeapLDT extends LDT {
     /**
      * Returns the select function for the given sort.
      */
-    public Function getSelect(Sort instanceSort, Services services) {
+    public Function getSelect(Sort instanceSort, TermServices services) {
 	return select.getInstanceFor(instanceSort, services);
     }
     
@@ -211,15 +211,19 @@ public final class HeapLDT extends LDT {
      * returns null.
      */
     public Sort getSortOfSelect(Operator op) {
-	if(op instanceof SortDependingFunction 
-           && ((SortDependingFunction)op).isSimilar(select)) {
-	   return ((SortDependingFunction)op).getSortDependingOn(); 
-	} else {
-	    return null;
-	}
+        if(isSelectOp(op)) {
+            return ((SortDependingFunction)op).getSortDependingOn();
+        } else {
+            return null;
+        }
     }
-    
-    
+
+    public boolean isSelectOp(Operator op) {
+        return op instanceof SortDependingFunction
+                && ((SortDependingFunction)op).isSimilar(select);
+    }
+
+
     public Function getStore() {
 	return store;
     }
@@ -255,24 +259,24 @@ public final class HeapLDT extends LDT {
     }
     
         
-    public Function getClassPrepared(Sort instanceSort, Services services) {
+    public Function getClassPrepared(Sort instanceSort, TermServices services) {
 	return classPrepared.getInstanceFor(instanceSort, services);
     }
     
     
-    public Function getClassInitialized(Sort instanceSort, Services services) {
+    public Function getClassInitialized(Sort instanceSort, TermServices services) {
 	return classInitialized.getInstanceFor(instanceSort, services);
     }
     
     
     public Function getClassInitializationInProgress(Sort instanceSort, 
-	    					     Services services) {
+	    					     TermServices services) {
 	return classInitializationInProgress.getInstanceFor(instanceSort, 
 							    services);
     }
     
     
-    public Function getClassErroneous(Sort instanceSort, Services services) {
+    public Function getClassErroneous(Sort instanceSort, TermServices services) {
 	return classErroneous.getInstanceFor(instanceSort, services);
     }
     
@@ -431,7 +435,7 @@ public final class HeapLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
 	    			 Term sub, 
-	    			 Services services, 
+	    			 TermServices services, 
 	    			 ExecutionContext ec) {
 	return false;
     }

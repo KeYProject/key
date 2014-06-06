@@ -23,7 +23,7 @@
    <extension
          point="org.eclipse.ui.ide.projectNatureImages">
       <image
-            icon="icons/projectIcon.gif"
+            icon="icons/projectIcon.png"
             id="org.key_project.key4eclipse.resources.KeYProjectNatureImage"
             natureId="org.key_project.key4eclipse.resources.KeYProjectNature">
       </image>
@@ -138,7 +138,20 @@
          point="org.eclipse.core.contenttype.contentTypes">
        <file-association
              content-type="org.eclipse.core.runtime.xml"
-             file-extensions="meta">
+             file-extensions="proofmeta">
        </file-association>
+   </extension>
+   <extension
+         point="org.eclipse.ui.decorators">
+      <decorator
+            adaptable="true"
+            class="org.key_project.key4eclipse.resources.decorator.ProofFolderLightweightLabelDecorator"
+            icon="icons/projectIcon.png"
+            id="org.key_project.key4eclipse.resources.proofFolderDecorator"
+            label="Proof Folders"
+            lightweight="true"
+            objectClass="org.eclipse.core.resources.IFolder"
+            state="true">
+      </decorator>
    </extension>
 </plugin>

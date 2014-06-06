@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -84,7 +84,8 @@ public class FileHeaderModifier {
             protected boolean isEclipseProjectDataFolder(File file) {
                if (!file.isFile()) {
                   if (isEclipseProject(file.getParentFile())) {
-                     return "data".equals(file.getName());
+                     return "data".equals(file.getName()) ||
+                            "additionalUndeployedData".equals(file.getName());
                   }
                   else {
                      return false;
@@ -111,7 +112,10 @@ public class FileHeaderModifier {
             }
          };
          // Write settings into console
-         System.out.println("Working Directories: " + workingDirs);
+         System.out.println("Working Directories: ");
+         for (File workingDir : workingDirs) {
+            System.out.println("   - " + workingDir);
+         }
          System.out.println("Output Directory: " + outputDir);
          System.out.println("Old Header: File" + oldHeaderFile);
          System.out.println("New Header File: " + newHeaderFile);

@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -30,6 +30,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Taclet;
 
 public interface SkeletonGenerator{
@@ -40,9 +41,10 @@ public interface SkeletonGenerator{
      * Override this method to introduce a translating mechanism for taclets.
      * @param t
      *            taclet to be translated.
+    * @param services TODO
      * @return returns the translation of the taclet.
      */
-    public Term translate(Taclet t)
+    public Term translate(Taclet t, TermServices services)
 	    throws IllegalTacletException;
 }
 
@@ -60,11 +62,12 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
       * 
       * @param s
       *            The sequent to be translated.
+    * @param services TODO
       * @return the resulting term of the translation or <code>null</code> if
       *         both antecedent and succendent are empty.
       */
-     protected Term translate(Sequent s) {
- 	TermBuilder builder = TermBuilder.DF;
+     protected Term translate(Sequent s, TermServices services) {
+ 	TermBuilder builder = services.getTermBuilder();
 
  	ImmutableList<Term> ante = getFormulaeOfSemisequent(s.antecedent());
  	ImmutableList<Term> succ = getFormulaeOfSemisequent(s.succedent());

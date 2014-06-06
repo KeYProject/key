@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -279,6 +279,9 @@ public class CreateOperation {
                   dbcInterface.getExtends().add((DbcInterface)dbcExtend);
                }
             }
+            for (String fullName : dsInterface.getExtendsFullnames()) {
+               dbcInterface.getExtendsFullNames().add(fullName);
+            }
          }
          else if (dsType instanceof IDSClass) {
             IDSClass dsClass = (IDSClass)dsType;
@@ -292,12 +295,18 @@ public class CreateOperation {
                   dbcClass.getExtends().add((DbcClass)dbcExtend);
                }
             }
+            for (String fullName : dsClass.getExtendsFullnames()) {
+               dbcClass.getExtendsFullNames().add(fullName);
+            }
             for (IDSInterface dsImplements : dsClass.getImplements()) {
                AbstractDbcType dbcImplements = mapping.get(dsImplements);
                if (dbcImplements != null) {
                   Assert.isTrue(dbcImplements instanceof DbcInterface);
                   dbcClass.getImplements().add((DbcInterface)dbcImplements);
                }
+            }
+            for (String fullName : dsClass.getImplementsFullnames()) {
+               dbcClass.getImplementsFullNames().add(fullName);
             }
          }
          else if (dsType instanceof IDSEnum) {
@@ -311,6 +320,9 @@ public class CreateOperation {
                   Assert.isTrue(dbcImplements instanceof DbcInterface);
                   dbcEnum.getImplements().add((DbcInterface)dbcImplements);
                }
+            }
+            for (String fullName : dsEnum.getImplementsFullnames()) {
+               dbcEnum.getImplementsFullNames().add(fullName);
             }
          }
       }

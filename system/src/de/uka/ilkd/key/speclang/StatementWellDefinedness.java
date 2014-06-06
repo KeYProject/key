@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -22,6 +22,8 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -53,9 +55,9 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     StatementWellDefinedness(String name, int id, Type type, IObserverFunction target,
                              LocationVariable heap, OriginalVariables origVars,
                              Condition requires, Term assignable, Term accessible,
-                             Condition ensures, Term mby, Term rep) {
+                             Condition ensures, Term mby, Term rep, TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires,
-              assignable, accessible, ensures, mby, rep);
+              assignable, accessible, ensures, mby, rep, tb);
     }
 
     /**
@@ -65,7 +67,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return
      */
-    abstract SequentFormula generateSequent(SequentTerms seqTerms, Services services);
+    abstract SequentFormula generateSequent(SequentTerms seqTerms, TermServices services);
 
     public abstract SpecificationElement getStatement();
 
@@ -105,9 +107,9 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
                                       Term leadingUpdate, Services services) {
         final Term pre = getPre(po.pre, vars.self, vars.heap, vars.params, false, services).term;
         final Term post = getPost(po.post, vars.result, services);
-        final ImmutableList<Term> wdRest = TB.wd(po.rest, services);
+        final ImmutableList<Term> wdRest = TB.wd(po.rest);
         final Term updates = getUpdates(po.mod, vars.heap, vars.heap, vars.anonHeap, services);
-        final Term uPost = TB.apply(updates, TB.and(TB.wd(post, services), TB.and(wdRest)));
+        final Term uPost = TB.apply(updates, TB.and(TB.wd(post), TB.and(wdRest)));
         return new SequentTerms(leadingUpdate, pre, vars.anonHeap, po.mod, po.rest, uPost, services);
     }
 
@@ -198,12 +200,12 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         final Term anonWdPost;
 
         private SequentTerms(Term context, Term pre, Term anonHeap, Term mod,
-                             ImmutableList<Term> rest, Term anonWdPost, Services services) {
+                             ImmutableList<Term> rest, Term anonWdPost, TermServices services) {
             this.context = context;
             this.pre = pre;
-            this.wfAnon = anonHeap != null ? TB.wellFormed(anonHeap, services) : TB.tt();
-            this.wdMod = TB.wd(mod, services);
-            this.wdRest = TB.and(TB.wd(rest, services));
+            this.wfAnon = anonHeap != null ? TB.wellFormed(anonHeap) : TB.tt();
+            this.wdMod = TB.wd(mod);
+            this.wdRest = TB.and(TB.wd(rest));
             this.anonWdPost = anonWdPost;
         }
     }

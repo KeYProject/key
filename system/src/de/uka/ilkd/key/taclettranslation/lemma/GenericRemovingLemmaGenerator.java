@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.HashMap;
@@ -5,7 +18,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -35,7 +48,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
      * if their sort argument is a generic sort.
      */
     @Override
-    protected Operator replaceOp(Operator op, Services services) {
+    protected Operator replaceOp(Operator op, TermServices services) {
 
         if (op instanceof SortDependingFunction) {
             SortDependingFunction sdf = (SortDependingFunction) op;
@@ -57,7 +70,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
      * named proxy sorts.
      */
     @Override
-    protected Sort replaceSort(Sort sort, Services services) {
+    protected Sort replaceSort(Sort sort, TermServices services) {
         if(sort instanceof GenericSort) {
 
             Sort cached = sortMap.get(sort);
@@ -84,7 +97,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
      *            the services
      * @return the immutable set
      */
-    private ImmutableSet<Sort> replaceSorts(ImmutableSet<Sort> extendsSorts, Services services) {
+    private ImmutableSet<Sort> replaceSorts(ImmutableSet<Sort> extendsSorts, TermServices services) {
         ImmutableSet<Sort> result = DefaultImmutableSet.nil();
         for (Sort sort : extendsSorts) {
             result = result.add(replaceSort(sort, services));

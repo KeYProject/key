@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -92,7 +92,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
                        String mode, 
                        ILaunch launch, 
                        IProgressMonitor monitor) throws CoreException {
-       SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(launch);
+       SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(launch, false);
        target.setName("Fixed Example Target");
        target.setModelIdentifier(MODEL_IDENTIFIER);
        launch.addDebugTarget(target);

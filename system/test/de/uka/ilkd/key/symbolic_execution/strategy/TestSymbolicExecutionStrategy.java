@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -20,6 +20,49 @@ import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
  * @author Martin Hentschel
  */
 public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTestCase {
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingArraysIndexOf
+    */
+   public void testNonExecutionBranchHidingArraysIndexOf_hiding_side_proof() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingArraysIndexOf/test/Arrays.java", 
+                          "Arrays", 
+                          "indexOf", 
+                          "array != null && filter != null && \\invariant_for(filter)",
+                          "examples/_testcase/set/nonExecutionBranchHidingArraysIndexOf/oracle/Arrays_hiding_side_proof.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          true,
+                          false,
+                          false);
+   }
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingArraysIndexOf
+    */
+   public void testNonExecutionBranchHidingArraysIndexOf_hiding_off() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingArraysIndexOf/test/Arrays.java", 
+                          "Arrays", 
+                          "indexOf", 
+                          "array != null && filter != null && \\invariant_for(filter)",
+                          "examples/_testcase/set/nonExecutionBranchHidingArraysIndexOf/oracle/Arrays_hiding_off.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false);
+   }
+   
    /**
     * Tests example: examples/_testcase/set/nonExecutionBranchHidingLoopInvariantWithSplittingQuery
     */

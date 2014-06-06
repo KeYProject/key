@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_a0568af0-aba5-4193-bc0f-2700fd16cd4c" name="equals(example1.Number)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_4c549ca6-0aac-4938-8cf3-4e4214b6597b" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_74ecf5e8-6f08-4b22-8f05-3c1c96d7bbc3" name="self.equals(n);" pathCondition="true" lineNumber="-1" charStart="1360" charEnd="1366">
+            <sedBranchStatement xml:id="_4e7d423d-059d-4598-81de-ccbaa874f7ce" name="if (this.content==n.content)" pathCondition="true" lineNumber="-1" charStart="1381" charEnd="1458">
+               <sedBranchCondition xml:id="_1733a17e-8964-4fe6-a760-1ee0479cb683" name="not(equals(n,null))" pathCondition="not(equals(n,null))">
+                  <sedBranchCondition xml:id="_fe12ae5b-3f7f-4484-befb-c9353c1b3a50" name="equals(int::select(heap,self,example1.Number::$content),int::select(heap,n,example1.Number::$content))" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,example1.Number::$content),int::select(heap,n,example1.Number::$content)))">
+                     <sedStatement xml:id="_5b68ce7b-b88a-4ffd-bc79-a014d430924e" name="return true;" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,example1.Number::$content),int::select(heap,n,example1.Number::$content)))" lineNumber="-1" charStart="1412" charEnd="1424">
+                        <sedMethodReturn xml:id="_7f193ea0-e749-47b2-a09e-bbad7d81eed7" name="&lt;return of self.equals(n);&gt;" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,example1.Number::$content),int::select(heap,n,example1.Number::$content)))" lineNumber="-1" charStart="1360" charEnd="1366">
+                           <sedTermination xml:id="_152c4d58-933b-4e3d-b3d6-8109cffd93ef" name="&lt;end&gt;" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,example1.Number::$content),int::select(heap,n,example1.Number::$content)))" verified="true">
+                           </sedTermination>
+                        </sedMethodReturn>
+                     </sedStatement>
+                  </sedBranchCondition>
+                  <sedBranchCondition xml:id="_ecc1ce49-eeba-4872-a570-cad4201d42f0" name="not(equals(int::select(heap,self,example1.Number::$content),int::select(heap,n,example1.Number::$content)))" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,example1.Number::$content),int::select(heap,n,example1.Number::$content))))">
+                     <sedStatement xml:id="_bb1e5d7b-93c7-43aa-9c0d-06431c1b8398" name="return false;" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,example1.Number::$content),int::select(heap,n,example1.Number::$content))))" lineNumber="-1" charStart="1441" charEnd="1454">
+                        <sedMethodReturn xml:id="_5245a882-e3f6-4238-9c66-a3634844d0a1" name="&lt;return of self.equals(n);&gt;" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,example1.Number::$content),int::select(heap,n,example1.Number::$content))))" lineNumber="-1" charStart="1360" charEnd="1366">
+                           <sedTermination xml:id="_5567f247-cecb-4208-8da5-2c2a83860d53" name="&lt;end&gt;" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,example1.Number::$content),int::select(heap,n,example1.Number::$content))))" verified="true">
+                           </sedTermination>
+                        </sedMethodReturn>
+                     </sedStatement>
+                  </sedBranchCondition>
+               </sedBranchCondition>
+               <sedBranchCondition xml:id="_adbd742d-a14c-4bdd-b5bf-16e5cd4d936f" name="equals(n,null)" pathCondition="equals(n,null)">
+                  <sedExceptionalTermination xml:id="_ecbb903e-babb-418a-8c83-b24ee3b3ffc9" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(n,null)" verified="true">
+                  </sedExceptionalTermination>
+               </sedBranchCondition>
+            </sedBranchStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

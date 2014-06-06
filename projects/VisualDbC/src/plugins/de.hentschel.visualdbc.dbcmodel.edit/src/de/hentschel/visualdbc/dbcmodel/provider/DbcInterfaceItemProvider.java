@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -33,6 +33,8 @@ import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 
+import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
+import org.eclipse.emf.edit.provider.ViewerNotification;
 import de.hentschel.visualdbc.dbcmodel.DbcInterface;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 
@@ -72,6 +74,7 @@ public class DbcInterfaceItemProvider
          super.getPropertyDescriptors(object);
 
          addExtendsPropertyDescriptor(object);
+         addExtendsFullNamesPropertyDescriptor(object);
       }
       return itemPropertyDescriptors;
    }
@@ -94,6 +97,28 @@ public class DbcInterfaceItemProvider
              false,
              true,
              null,
+             null,
+             null));
+   }
+
+   /**
+    * This adds a property descriptor for the Extends Full Names feature.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   protected void addExtendsFullNamesPropertyDescriptor(Object object) {
+      itemPropertyDescriptors.add
+         (createItemPropertyDescriptor
+            (((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+             getResourceLocator(),
+             getString("_UI_DbcInterface_extendsFullNames_feature"),
+             getString("_UI_PropertyDescriptor_description", "_UI_DbcInterface_extendsFullNames_feature", "_UI_DbcInterface_type"),
+             DbcmodelPackage.Literals.DBC_INTERFACE__EXTENDS_FULL_NAMES,
+             true,
+             false,
+             false,
+             ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
              null,
              null));
    }
@@ -149,6 +174,12 @@ public class DbcInterfaceItemProvider
    @Override
    public void notifyChanged(Notification notification) {
       updateChildren(notification);
+
+      switch (notification.getFeatureID(DbcInterface.class)) {
+         case DbcmodelPackage.DBC_INTERFACE__EXTENDS_FULL_NAMES:
+            fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
+            return;
+      }
       super.notifyChanged(notification);
    }
 

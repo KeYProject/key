@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -43,7 +43,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
    /**
     * The {@link IExecutionMethodCall} to represent by this debug node.
     */
-   private IExecutionMethodCall executionNode;
+   private final IExecutionMethodCall executionNode;
 
    /**
     * The contained children.
@@ -80,10 +80,11 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
    public KeYMethodCall(KeYDebugTarget target, 
                         IKeYSEDDebugNode<?> parent, 
                         ISEDThread thread, 
-                        IExecutionMethodCall executionNode) {
+                        IExecutionMethodCall executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeAnnotations();
    }
    
    /**
@@ -234,7 +235,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
    public boolean hasVariables() throws DebugException {
       try {
          return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
-                SymbolicExecutionUtil.canComputeVariables(executionNode) &&
+                SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
                 super.hasVariables();
       }
       catch (ProofInputException e) {

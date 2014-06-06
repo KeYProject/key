@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.speclang;
 
@@ -170,7 +169,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
             		     Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap);
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalInvariants.get(heap));
     }
     
@@ -181,7 +180,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap);
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalModifies.get(heap));
     }
     
@@ -193,7 +192,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap);
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalVariant);
     }
     
@@ -249,7 +248,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> inverseReplaceMap 
             = getInverseReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(inverseReplaceMap);
+        OpReplacer or = new OpReplacer(inverseReplaceMap, services.getTermFactory());
         Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable heap : invariants.keySet()) {
            newInvariants.put(heap, or.replace(invariants.get(heap)));

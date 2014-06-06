@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -759,7 +759,7 @@ public class SymbolicExecutionTreeBuilder {
    
    protected boolean isNotInImpliciteMethod(Node node) {
       Term term = node.getAppliedRuleApp().posInOccurrence().subTerm();
-      term = TermBuilder.DF.goBelowUpdates(term);
+      term = TermBuilder.goBelowUpdates(term);
       Services services = proof.getServices();
       IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), services);
       IProgramMethod pm = ec.getMethodContext();
@@ -782,7 +782,7 @@ public class SymbolicExecutionTreeBuilder {
       MethodFrameCounterJavaASTVisitor newCounter = new MethodFrameCounterJavaASTVisitor(jb.program(), proof.getServices());
       int newCount = newCounter.run();
       Term oldModality = node.getAppliedRuleApp().posInOccurrence().subTerm();
-      oldModality = TermBuilder.DF.goBelowUpdates(oldModality);
+      oldModality = TermBuilder.goBelowUpdates(oldModality);
       MethodFrameCounterJavaASTVisitor oldCounter = new MethodFrameCounterJavaASTVisitor(oldModality.javaBlock().program(), proof.getServices());
       int oldCount = oldCounter.run();
       LinkedList<Node> currentMethodCallStack = getMethodCallStack(node.getAppliedRuleApp());
@@ -860,7 +860,8 @@ public class SymbolicExecutionTreeBuilder {
             Node stackEntry = stackIter.next();
             if (stackEntry != proof.root()) { // Ignore call stack entries provided by the initial sequent
                IExecutionNode executionNode = getExecutionNode(stackEntry);
-               assert executionNode != null : "Can't find execution node for KeY's proof node " + stackEntry.serialNr() + ": " + ProofSaver.printAnything(stackEntry, proof.getServices()) + ".";
+               assert executionNode != null :
+                   "Can't find execution node for KeY's proof node " + stackEntry.serialNr() + ": " + ProofSaver.printAnything(stackEntry, proof.getServices()) + ".";
                callStack.add(executionNode);
             }
          }

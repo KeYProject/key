@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
@@ -22,8 +21,8 @@ import java.util.Map;
 
 import antlr.Token;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
@@ -34,7 +33,15 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermCreationException;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -46,6 +53,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -63,9 +71,9 @@ import de.uka.ilkd.key.util.Triple;
  */
 final class JMLTranslator {
 
-    private final static TermBuilder TB = TermBuilder.DF;
+    private final TermBuilder tb; 
     private final String fileName;
-    private Services services;                          // to be used in future
+    private TermServices services;                          // to be used in future
     private SLTranslationExceptionManager excManager;
     private List<PositionedString> warnings = new ArrayList<PositionedString>();
 
@@ -168,15 +176,16 @@ final class JMLTranslator {
         }
     }
 
-    public JMLTranslator(SLTranslationExceptionManager excManager, Services services) {
+    public JMLTranslator(SLTranslationExceptionManager excManager, TermServices services) {
         this(excManager,null,services);
     }
 
     public JMLTranslator(SLTranslationExceptionManager excManager,
-                            String fileName,
-                         Services services) {
+                         String fileName,
+                         TermServices services) {
         this.excManager = excManager;
         this.services = services;
+        this.tb = services.getTermBuilder();
         this.fileName = fileName;
 
         translationMethods =
@@ -209,7 +218,7 @@ final class JMLTranslator {
                 BooleanLDT booleanLDT =
                         services.getTypeConverter().getBooleanLDT();
                 if (ensuresTerm.sort() == booleanLDT.targetSort()) {
-                    return TB.convertToFormula(ensuresTerm, services);
+                    return tb.convertToFormula(ensuresTerm);
                 } else {
                     return ensuresTerm;
                 }
@@ -229,7 +238,7 @@ final class JMLTranslator {
                 BooleanLDT booleanLDT =
                         services.getTypeConverter().getBooleanLDT();
                 if (ensuresTerm.sort() == booleanLDT.targetSort()) {
-                    return TB.convertToFormula(ensuresTerm, services);
+                    return tb.convertToFormula(ensuresTerm);
                 } else {
                     return ensuresTerm;
                 }
@@ -271,8 +280,8 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Term.class, Services.class);
                 Term ensuresTerm = (Term) params[0];
-                Services services = (Services) params[1];
-                return TB.convertToFormula(ensuresTerm, services);
+                TermServices services = (TermServices) params[1];
+                return tb.convertToFormula(ensuresTerm);
             }
         });
         translationMethods.put(JMLKeyWord.MODEL_METHOD_AXIOM, new JMLTranslationMethod() {
@@ -282,8 +291,8 @@ final class JMLTranslator {
         	              throws SLTranslationException {
         	    checkParameters(params, Term.class, Services.class);
         	    Term axiomsTerm = (Term) params[0];
-        	    Services services = (Services) params[1];
-        	    return TB.convertToFormula(axiomsTerm, services);
+        	    TermServices services = (TermServices) params[1];
+        	    return tb.convertToFormula(axiomsTerm);
         	}
        });
        translationMethods.put(JMLKeyWord.REPRESENTS,
@@ -311,8 +320,8 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Term.class, Services.class);
                 Term requiresTerm = (Term) params[0];
-                Services services = (Services) params[1];
-                return TB.convertToFormula(requiresTerm, services);
+                TermServices services = (TermServices) params[1];
+                return tb.convertToFormula(requiresTerm);
             }
         });
         translationMethods.put(JMLKeyWord.SIGNALS, new JMLTranslationMethod() {
@@ -328,24 +337,22 @@ final class JMLTranslator {
                 LogicVariable eVar = (LogicVariable) params[1];
                 ProgramVariable excVar = (ProgramVariable) params[2];
                 KeYJavaType excType = (KeYJavaType) params[3];
-                Services services = (Services) params[4];
+                TermServices services = (TermServices) params[4];
 
                 if (result == null) {
-                    result = TB.tt();
+                    result = tb.tt();
                 } else {
                     Map /* Operator -> Operator */ replaceMap =
                             new LinkedHashMap();
                     replaceMap.put(eVar, excVar);
-                    OpReplacer excVarReplacer = new OpReplacer(replaceMap);
+                    OpReplacer excVarReplacer = new OpReplacer(replaceMap, services.getTermFactory());
 
                     Sort os = excType.getSort();
                     Function instance = os.getInstanceofSymbol(services);
 
-                    result = TB.imp(
-                            TB.equals(TB.func(instance, TB.var(excVar)), TB.TRUE(
-                            services)),
-                            TB.convertToFormula(excVarReplacer.replace(result),
-                                                services));
+                    result = tb.imp(
+                            tb.equals(tb.func(instance, tb.var(excVar)), tb.TRUE()),
+                            tb.convertToFormula(excVarReplacer.replace(result)));
                 }
                 return result;
             }
@@ -363,21 +370,21 @@ final class JMLTranslator {
                 ImmutableList<KeYJavaType> signalsonly =
                         (ImmutableList<KeYJavaType>) params[0];
                 ProgramVariable excVar = (ProgramVariable) params[1];
-                Services services = (Services) params[2];
+                TermServices services = (TermServices) params[2];
                 // Build appropriate term out of the parsed list of types
                 // i.e. disjunction of "excVar instanceof ExcType"
                 // for every ExcType in the list
-                Term result = TB.ff();
+                Term result = tb.ff();
 
                 Iterator<KeYJavaType> it = signalsonly.iterator();
                 while (it.hasNext()) {
                     KeYJavaType kjt = it.next();
                     Function instance = kjt.getSort().getInstanceofSymbol(
                             services);
-                    result = TB.or(result,
-                                   TB.equals(
-                            TB.func(instance, TB.var(excVar)),
-                            TB.TRUE(services)));
+                    result = tb.or(result,
+                                   tb.equals(
+                            tb.func(instance, tb.var(excVar)),
+                            tb.TRUE()));
                 }
 
                 return result;
@@ -390,8 +397,8 @@ final class JMLTranslator {
                 checkParameters(params, Term.class, String.class, Services.class);
                 Term term = (Term) params[0];
                 String label = (String) params[1];
-                Services services = (Services) params[2];
-                Term formula = term == null ? TB.tt() : TB.convertToFormula(term, services);
+                TermServices services = (TermServices) params[2];
+                Term formula = term == null ? tb.tt() : tb.convertToFormula(term);
                 return new Pair<Label, Term>(label == null ? null : new ProgramElementName(label), formula);
             }
         });
@@ -404,8 +411,8 @@ final class JMLTranslator {
                 checkParameters(params, Term.class, String.class, Services.class);
                 Term term = (Term) params[0];
                 String label = (String) params[1];
-                Services services = (Services) params[2];
-                Term formula = term == null ? TB.tt() : TB.convertToFormula(term, services);
+                TermServices services = (TermServices) params[2];
+                Term formula = term == null ? tb.tt() : tb.convertToFormula(term);
                 return new Pair<Label, Term>(label == null ? null : new ProgramElementName(label), formula);
             }
         });
@@ -417,8 +424,8 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Term.class, Services.class);
                 Term term = (Term) params[0];
-                Services services = (Services) params[1];
-                return term == null ? TB.tt() : TB.convertToFormula(term, services);
+                TermServices services = (TermServices) params[1];
+                return term == null ? tb.tt() : tb.convertToFormula(term);
             }
         });
 
@@ -430,7 +437,7 @@ final class JMLTranslator {
             public Term translateQuantifier(QuantifiableVariable qv,
                                             Term t)
                     throws SLTranslationException {
-                return TB.all(qv, t);
+                return tb.all(qv, t);
             }
 
 
@@ -438,7 +445,7 @@ final class JMLTranslator {
             public Term combineQuantifiedTerms(Term t1,
                                                Term t2)
                     throws SLTranslationException {
-                return TB.imp(t1, t2);
+                return tb.imp(t1, t2);
             }
 
 
@@ -454,7 +461,7 @@ final class JMLTranslator {
             public Term translateQuantifier(QuantifiableVariable qv,
                                             Term t)
                     throws SLTranslationException {
-                return TB.ex(qv, t);
+                return tb.ex(qv, t);
             }
 
 
@@ -462,7 +469,7 @@ final class JMLTranslator {
             public Term combineQuantifiedTerms(Term t1,
                                                Term t2)
                     throws SLTranslationException {
-                return TB.andSC(t1, t2);
+                return tb.andSC(t1, t2);
             }
 
 
@@ -502,7 +509,7 @@ final class JMLTranslator {
                             "bounded sum must declare exactly one variable");
                 }
                 LogicVariable qv = declVars.head();
-                Term resultTerm = TB.bsum(qv, a.getTerm(), b.getTerm(), t.getTerm(), services);
+                Term resultTerm = tb.bsum(qv, a.getTerm(), b.getTerm(), t.getTerm(), services);
                 warnings.add(new PositionedString("The keyword \\bsum is deprecated and will be removed in the future.\n" +
                 		"Please use the standard \\sum syntax."));
                 final SLExpression bsumExpr = new SLExpression(resultTerm, promo);
@@ -520,7 +527,7 @@ final class JMLTranslator {
                     Term lo,
                     Term hi,
                     Term body) {
-                return TB.bsum(qv, lo, hi, body, services);
+                return tb.bsum(qv, lo, hi, body, services);
             }
 
             @Override
@@ -529,7 +536,7 @@ final class JMLTranslator {
                     ImmutableList<QuantifiableVariable> qvs, Term range,
                     Term body) {
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
-                return TB.sum(qvs, TB.andSC(tr,range), body, services);
+                return tb.sum(qvs, tb.andSC(tr,range), body, services);
             }
 
         });
@@ -543,7 +550,7 @@ final class JMLTranslator {
                     Term lo,
                     Term hi,
                     Term body) {
-                return TB.bprod(qv, lo, hi, body, services);
+                return tb.bprod(qv, lo, hi, body, services);
             }
 
             @Override
@@ -552,7 +559,7 @@ final class JMLTranslator {
                     ImmutableList<QuantifiableVariable> qvs, Term range,
                     Term body) {
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
-                return TB.prod(qvs, TB.andSC(tr,range), body, services);
+                return tb.prod(qvs, tb.andSC(tr,range), body, services);
             }
 
         });
@@ -564,20 +571,25 @@ final class JMLTranslator {
             // TODO: make subtype of JMLBoundedNumericalQuantifierTranslationMethod and remove this
             private Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
                 final Type type = kjt.getJavaType();
-                Term res = TB.tt();
+                final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
+                Term res = tb.tt();
                 for (QuantifiableVariable qv: qvs) {
                     if (type instanceof PrimitiveType) {
-                        if (type == PrimitiveType.JAVA_BYTE) res = TB.and(res,TB.inByte(TB.var(qv),services));
-                        if (type == PrimitiveType.JAVA_SHORT) res = TB.and(res,TB.inShort(TB.var(qv),services));
-                        if (type == PrimitiveType.JAVA_CHAR) res = TB.and(res,TB.inChar(TB.var(qv),services));
-                        if (type == PrimitiveType.JAVA_INT) res = TB.and(res,TB.inInt(TB.var(qv),services));
-                        if (type == PrimitiveType.JAVA_LONG) res = TB.and(res,TB.inLong(TB.var(qv),services));
+                        if (type == PrimitiveType.JAVA_BYTE) res = tb.and(res,tb.inByte(tb.var(qv)));
+                        if (type == PrimitiveType.JAVA_SHORT) res = tb.and(res,tb.inShort(tb.var(qv)));
+                        if (type == PrimitiveType.JAVA_CHAR) res = tb.and(res,tb.inChar(tb.var(qv)));
+                        if (type == PrimitiveType.JAVA_INT) res = tb.and(res,tb.inInt(tb.var(qv)));
+                        if (type == PrimitiveType.JAVA_LONG) res = tb.and(res,tb.inLong(tb.var(qv)));
                     } else {
                         // assume reference type
                         if (nullable) {
-                            res = TB.and(res,TB.created(services, TB.var(qv)));
+                            res = tb.and(res,tb.created(tb.var(qv)));
                         } else {
-                            res = TB.and(res,TB.createdAndNotNull(services, TB.var(qv)));
+                            final Term nonNull = arrayDepth > 0 ?
+                                    tb.deepNonNull(tb.var(qv), tb.zTerm(arrayDepth))
+                                    : tb.not(tb.equals(tb.var(qv), tb.NULL()));
+                            res = tb.and(res, tb.and(
+                                    tb.created(tb.var(qv)), nonNull));
                         }
                     }
                 }
@@ -592,7 +604,7 @@ final class JMLTranslator {
                             throws SLTranslationException {
                 checkParameters(params, Term.class, Term.class, KeYJavaType.class, ImmutableList.class, Boolean.class, KeYJavaType.class, Services.class);
                 final Services services = (Services) params[6];
-                Term guard = TB.convertToFormula((Term) params[0],services);
+                Term guard = tb.convertToFormula((Term) params[0]);
                 assert guard.sort() == Sort.FORMULA;
                 final Term body = (Term) params[1];
                 final KeYJavaType declsType = (KeYJavaType) params[2];
@@ -603,7 +615,7 @@ final class JMLTranslator {
                 if (body.sort() != intSort)
                     throw excManager.createException("body of \\min expression must be integer type");
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
-                final Term min = TB.min(qvs, TB.andSC(tr, guard), body, services);
+                final Term min = tb.min(qvs, tb.andSC(tr, guard), body, services);
                 final KeYJavaType type = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 
                 final SLExpression result = new SLExpression(min,type);
@@ -619,20 +631,25 @@ final class JMLTranslator {
             // TODO: make subtype of JMLBoundedNumericalQuantifierTranslationMethod and remove this
             private Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
                 final Type type = kjt.getJavaType();
-                Term res = TB.tt();
+                final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
+                Term res = tb.tt();
                 for (QuantifiableVariable qv: qvs) {
                     if (type instanceof PrimitiveType) {
-                        if (type == PrimitiveType.JAVA_BYTE) res = TB.and(res,TB.inByte(TB.var(qv),services));
-                        if (type == PrimitiveType.JAVA_SHORT) res = TB.and(res,TB.inShort(TB.var(qv),services));
-                        if (type == PrimitiveType.JAVA_CHAR) res = TB.and(res,TB.inChar(TB.var(qv),services));
-                        if (type == PrimitiveType.JAVA_INT) res = TB.and(res,TB.inInt(TB.var(qv),services));
-                        if (type == PrimitiveType.JAVA_LONG) res = TB.and(res,TB.inLong(TB.var(qv),services));
+                        if (type == PrimitiveType.JAVA_BYTE) res = tb.and(res,tb.inByte(tb.var(qv)));
+                        if (type == PrimitiveType.JAVA_SHORT) res = tb.and(res,tb.inShort(tb.var(qv)));
+                        if (type == PrimitiveType.JAVA_CHAR) res = tb.and(res,tb.inChar(tb.var(qv)));
+                        if (type == PrimitiveType.JAVA_INT) res = tb.and(res,tb.inInt(tb.var(qv)));
+                        if (type == PrimitiveType.JAVA_LONG) res = tb.and(res,tb.inLong(tb.var(qv)));
                     } else {
                         // assume reference type
                         if (nullable) {
-                            res = TB.and(res,TB.created(services, TB.var(qv)));
+                            res = tb.and(res,tb.created(tb.var(qv)));
                         } else {
-                            res = TB.and(res,TB.createdAndNotNull(services, TB.var(qv)));
+                            final Term nonNull = arrayDepth > 0 ?
+                                    tb.deepNonNull(tb.var(qv), tb.zTerm(arrayDepth))
+                                    : tb.not(tb.equals(tb.var(qv), tb.NULL()));
+                            res = tb.and(res, tb.and(
+                                    tb.created(tb.var(qv)), nonNull));
                         }
                     }
                 }
@@ -646,7 +663,7 @@ final class JMLTranslator {
                             throws SLTranslationException {
                 checkParameters(params, Term.class, Term.class, KeYJavaType.class, ImmutableList.class, Boolean.class, KeYJavaType.class, Services.class);
                 final Services services = (Services) params[6];
-                Term guard = TB.convertToFormula((Term) params[0],services);
+                Term guard = tb.convertToFormula((Term) params[0]);
                 final Term body = (Term) params[1];
                 final KeYJavaType declsType = (KeYJavaType) params[2];
                 final boolean nullable = (Boolean) params[4];
@@ -656,7 +673,7 @@ final class JMLTranslator {
                 if (body.sort() != intSort)
                     throw excManager.createException("body of \\max expression must be integer type");
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
-                final Term max = TB.max(qvs, TB.andSC(tr, guard), body, services);
+                final Term max = tb.max(qvs, tb.andSC(tr, guard), body, services);
                 final KeYJavaType type = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 
                 final SLExpression result = new SLExpression(max,type);
@@ -700,9 +717,9 @@ final class JMLTranslator {
                     // boolean term; obviously the original boolean terms are
                     // converted to formulas somewhere else; however, we need
                     // boolean terms instead of formulas here
-                    tt = TB.convertToBoolean(t.getTerm(), services);
+                    tt = tb.convertToBoolean(t.getTerm());
                 }
-                Term resultTerm = TB.seqDef(qv, a.getTerm(), b.getTerm(), tt, services);
+                Term resultTerm = tb.seqDef(qv, a.getTerm(), b.getTerm(), tt);
                 final KeYJavaType seqtype =
                         services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
                 return new SLExpression(resultTerm, seqtype);
@@ -718,9 +735,9 @@ final class JMLTranslator {
                     Term lo,
                     Term hi,
                     Term body) {
-                final Term cond = TB.ife(TB.convertToFormula(body, services),
-                                         TB.one(services), TB.zero(services));
-                return TB.bsum(qv, lo, hi, cond, services);
+                final Term cond = tb.ife(tb.convertToFormula(body),
+                                         tb.one(), tb.zero());
+                return tb.bsum(qv, lo, hi, cond, services);
             }
 
             @Override
@@ -729,9 +746,9 @@ final class JMLTranslator {
                     ImmutableList<QuantifiableVariable> qvs, Term range,
                     Term body) {
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
-                final Term cond = TB.ife(TB.convertToFormula(body, services),
-                        TB.one(services), TB.zero(services));
-                return TB.sum(qvs, TB.andSC(tr,range), cond, services);
+                final Term cond = tb.ife(tb.convertToFormula(body),
+                        tb.one(), tb.zero());
+                return tb.sum(qvs, tb.andSC(tr,range), cond, services);
             }
 
         });
@@ -747,12 +764,12 @@ final class JMLTranslator {
             public Object translate(SLTranslationExceptionManager excManager,
                     Object... params) throws SLTranslationException {
                 checkParameters(params, Services.class, Term.class, KeYJavaType.class);
-                final Services services = (Services)params[0];
+                final TermServices services = (TermServices)params[0];
                 final Term selfVar = (Term)params[1];
                 final KeYJavaType targetType = (KeYJavaType)params[2];
                 final boolean isStatic = selfVar == null;
                 assert targetType != null || !isStatic;
-                final Term result = isStatic? TB.staticInv(services, targetType): TB.inv(services, selfVar);
+                final Term result = isStatic? tb.staticInv(targetType): tb.inv(selfVar);
                 return new SLExpression(result);
             }});
 
@@ -768,7 +785,7 @@ final class JMLTranslator {
                 final Services services = (Services)params[0];
                 IObserverFunction inv = services.getJavaInfo().getInv();
                 Term obj = ((SLExpression) params[1]).getTerm();
-                return new SLExpression(TB.func(inv, TB.getBaseHeap(services), obj));
+                return new SLExpression(tb.func(inv, tb.getBaseHeap(), obj));
             }
         });
 
@@ -839,7 +856,7 @@ final class JMLTranslator {
                 final Term seq = ((SLExpression)params[1]).getTerm();
                 final Term elem = ((SLExpression)params[2]).getTerm();
                 final KeYJavaType inttype = services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT);
-                return new SLExpression(TB.indexOf(services,seq,elem),inttype);
+                return new SLExpression(tb.indexOf(seq,elem),inttype);
             }
         });
 
@@ -851,10 +868,10 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class,
                                 SLExpression.class);
-                final Services services = (Services) params[0];
+                final TermServices services = (TermServices) params[0];
                 final Term seq = ((SLExpression) params[1]).getTerm();
                 final Term idx = ((SLExpression) params[2]).getTerm();
-                return new SLExpression(TB.seqGet(services, Sort.ANY, seq, idx));
+                return new SLExpression(tb.seqGet(Sort.ANY, seq, idx));
             }
         });
 
@@ -872,7 +889,7 @@ final class JMLTranslator {
                 final Term seq2 = ((SLExpression) params[2]).getTerm();
                 final KeYJavaType seqtype =
                         services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
-                return new SLExpression(TB.seqConcat(services, seq1, seq2),
+                return new SLExpression(tb.seqConcat(seq1, seq2),
                                         seqtype);
             }
         });
@@ -896,14 +913,14 @@ final class JMLTranslator {
                                               ? new LogicVariable(new Name("n"),
                                                                   services.getTypeConverter().getIntegerLDT().targetSort())
                         : null;
-                final Term h = TB.getBaseHeap(services);
+                final Term h = tb.getBaseHeap();
                 final Term s = getFields(excManager, t, services);
                 final Term o = e1.getTerm();
                 final Term o2 = e2.getTerm();
-                final Term n = e3 == null ? TB.var(stepsLV) : e3.getTerm();
-                Term reach = TB.reach(services, h, s, o, o2, n);
+                final Term n = e3 == null ? tb.var(stepsLV) : e3.getTerm();
+                Term reach = tb.reach(h, s, o, o2, n);
                 if (e3 == null) {
-                    reach = TB.ex(stepsLV, reach);
+                    reach = tb.ex(stepsLV, reach);
                 }
                 return new SLExpression(reach);
             }
@@ -929,24 +946,23 @@ final class JMLTranslator {
                                               ? new LogicVariable(new Name("n"),
                                                                   services.getTypeConverter().getIntegerLDT().targetSort())
                         : null;
-                final Term h = TB.getBaseHeap(services);
+                final Term h = tb.getBaseHeap();
                 final Term s = getFields(excManager, t, services);
                 final Term o = e1.getTerm();
-                final Term o2 = TB.var(objLV);
-                final Term n = e3 == null ? TB.var(stepsLV) : e3.getTerm();
-                Term reach = TB.reach(services, h, s, o, o2, n);
+                final Term o2 = tb.var(objLV);
+                final Term n = e3 == null ? tb.var(stepsLV) : e3.getTerm();
+                Term reach = tb.reach(h, s, o, o2, n);
                 if (e3 == null) {
-                    reach = TB.ex(stepsLV, reach);
+                    reach = tb.ex(stepsLV, reach);
                 }
 
                 final LogicVariable fieldLV
                 = new LogicVariable(new Name("f"), services.getTypeConverter().getHeapLDT().getFieldSort());
                 final Term locSet
-                = TB.guardedSetComprehension(services,
-                        new LogicVariable[]{objLV, fieldLV},
+                = tb.guardedSetComprehension(new LogicVariable[]{objLV, fieldLV},
                         reach,
                         o2,
-                        TB.var(fieldLV));
+                        tb.var(fieldLV));
 
                 return new SLExpression(locSet, services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
             }
@@ -973,26 +989,24 @@ final class JMLTranslator {
 	            throw excManager.createException("\\fresh not allowed in this context");
 	        }
 
-	        Term t = TB.tt();
+	        Term t = tb.tt();
 	        final Sort objectSort = services.getJavaInfo().objectSort();
                 final TypeConverter tc = services.getTypeConverter();
 	        for(SLExpression expr: list) {
     	            if(!expr.isTerm()) {
 	                throw excManager.createException("Expected a term, but found: " + expr);
 	            } else if(expr.getTerm().sort().extendsTrans(objectSort)) {
-	                t = TB.and(t,
-	                           TB.equals(TB.select(services,
-	                                           tc.getBooleanLDT().targetSort(),
+	                t = tb.and(t,
+	                           tb.equals(tb.select(tc.getBooleanLDT().targetSort(),
 	                                           atPres.get(baseHeap),
 	                                           expr.getTerm(),
-	                                           TB.func(tc.getHeapLDT().getCreated())),
-	                                 TB.FALSE(services)));
+	                                           tb.func(tc.getHeapLDT().getCreated())),
+	                                 tb.FALSE()));
                         // add non-nullness (bug #1364)
-                        t = TB.and(t, TB.not(TB.equals(expr.getTerm(),TB.NULL(services))));
+                        t = tb.and(t, tb.not(tb.equals(expr.getTerm(),tb.NULL())));
     	            } else if(expr.getTerm().sort().extendsTrans(tc.getLocSetLDT().targetSort())) {
-	            t = TB.and(t, TB.subset(services,
-	                                    expr.getTerm(),
-	                                    TB.freshLocs(services, atPres.get(baseHeap))));
+	            t = tb.and(t, tb.subset(expr.getTerm(),
+	                                    tb.freshLocs(atPres.get(baseHeap))));
 	            } else {
 	                throw excManager.createException("Wrong type: " + expr);
 	            }
@@ -1039,7 +1053,7 @@ final class JMLTranslator {
                 checkSLExpressions(expr1, expr2, excManager, "<=!=>");
                 SLExpression eq =
                         buildEqualityTerm(expr1, expr2, excManager, services);
-                return new SLExpression(TB.not(eq.getTerm()));
+                return new SLExpression(tb.not(eq.getTerm()));
             }
         });
         translationMethods.put(JMLKeyWord.EQ,
@@ -1080,9 +1094,9 @@ final class JMLTranslator {
                 SLExpression eq =
                         buildEqualityTerm(expr1, expr2, excManager, services);
                 if (eq.getType() != null) {
-                    return new SLExpression(TB.not(eq.getTerm()), eq.getType());
+                    return new SLExpression(tb.not(eq.getTerm()), eq.getType());
                 } else {
-                    return new SLExpression(TB.not(eq.getTerm()));
+                    return new SLExpression(tb.not(eq.getTerm()));
                 }
             }
         });
@@ -1198,7 +1212,7 @@ final class JMLTranslator {
                     } else if(intHelper.isIntegerTerm(result)) {
                         result = intHelper.buildCastExpression(type, result);
                     } else {result = new SLExpression(
-                            TB.cast(services, type.getSort(), result.getTerm()),
+                            tb.cast(services, type.getSort(), result.getTerm()),
                             type);
                     }
                 } else {
@@ -1220,10 +1234,10 @@ final class JMLTranslator {
 
                 // handle cases where a and b are of sort FORMULA and boolean respectively (which are incompatible, unfortunately)
                 final KeYJavaType bool = services.getTypeConverter().getBooleanType();
-                Term aTerm = a.getType() == bool ? TB.convertToFormula(a.getTerm(), services) : a.getTerm();
-                Term bTerm = b.getType() == bool ? TB.convertToFormula(b.getTerm(), services) : b.getTerm();
+                Term aTerm = a.getType() == bool ? tb.convertToFormula(a.getTerm()) : a.getTerm();
+                Term bTerm = b.getType() == bool ? tb.convertToFormula(b.getTerm()) : b.getTerm();
 
-                Term ife = TB.ife(TB.convertToFormula(result.getTerm(), services), aTerm, bTerm);
+                Term ife = tb.ife(tb.convertToFormula(result.getTerm()), aTerm, bTerm);
                 if(a.getType() != null && a.getType().equals(b.getType())) {
                     result = new SLExpression(ife, a.getType());
                 } else {
@@ -1244,7 +1258,7 @@ final class JMLTranslator {
                         LocationVariable.class, LocationVariable.class,
                         ImmutableList.class, Term.class);
 
-                Services services = (Services) params[0];
+                TermServices services = (TermServices) params[0];
                 Token desc = (Token) params[1];
                 LocationVariable selfVar = (LocationVariable) params[2];
                 LocationVariable resultVar = (LocationVariable) params[3];
@@ -1281,8 +1295,7 @@ final class JMLTranslator {
 
                 SLExpression result;
                 try {
-                    result = new SLExpression(TB.parseTerm(text, services,
-                                                           namespaces));
+                    result = new SLExpression(services.getTermBuilder().parseTerm(text, namespaces));
                     return result;
                 } catch (ParserException ex) {
                     throw excManager.createException("Cannot parse embedded JavaDL: "
@@ -1321,7 +1334,7 @@ final class JMLTranslator {
                         args = new Term[0];
                     } else {
 
-                        Term heap = TB.getBaseHeap(services);
+                        Term heap = tb.getBaseHeap();
 
                         // special casing "implicit heap" arguments:
                         // omitting one argument means first argument is "heap"
@@ -1344,7 +1357,7 @@ final class JMLTranslator {
                     }
 
                     try {
-                        Term resultTerm = TB.func(function, args, null);
+                        Term resultTerm = tb.func(function, args, null);
                         final KeYJavaType type =
                                 services.getTypeConverter().getIntegerLDT().targetSort() == resultTerm.sort() ?
                                         services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT) :
@@ -1371,7 +1384,7 @@ final class JMLTranslator {
                 assert symbol instanceof ProgramVariable : "Expecting a program variable";
                 ProgramVariable pv = (ProgramVariable) symbol;
                 try {
-                    Term resultTerm = TB.var(pv);
+                    Term resultTerm = tb.var(pv);
                     SLExpression result = new SLExpression(resultTerm);
                     return result;
                 } catch (TermCreationException ex) {
@@ -1390,7 +1403,7 @@ final class JMLTranslator {
 			public SLExpression translate(SLTranslationExceptionManager excManager,
 					Object... params) throws SLTranslationException {
 				checkParameters(params,Services.class,JavaInfo.class);
-				return new SLExpression(TB.empty((Services)params[0]),
+				return new SLExpression(tb.empty(),
                         ((JavaInfo)params[1]).getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
 			}});
 
@@ -1426,7 +1439,7 @@ final class JMLTranslator {
                 checkParameters(params, Services.class, SLExpression.class,
                                 String.class, Token.class, SLExpression.class,
                                 SLExpression.class);
-                Services services = (Services) params[0];
+                TermServices services = (TermServices) params[0];
                 SLExpression receiver = (SLExpression) params[1];
                 String fullyQualifiedName = (String) params[2];
                 Token lbrack = (Token) params[3];
@@ -1476,7 +1489,7 @@ final class JMLTranslator {
                 }
             }
 
-            private SLExpression translateArrayReference(Services services,
+            private SLExpression translateArrayReference(TermServices services,
                                                          SLExpression receiver,
                                                          SLExpression rangeFrom,
                                                          SLExpression rangeTo) {
@@ -1484,19 +1497,17 @@ final class JMLTranslator {
                 if (rangeFrom == null) {
                     // We have a star. A star includes all components of an array even
                     // those out of bounds. This makes proving easier.
-                    Term t = TB.allFields(services, receiver.getTerm());
+                    Term t = tb.allFields(receiver.getTerm());
                     result = new SLExpression(t);
                 } else if (rangeTo != null) {
                     // We have "rangeFrom .. rangeTo"
-                    Term t = TB.arrayRange(services,
-                            receiver.getTerm(),
+                    Term t = tb.arrayRange(receiver.getTerm(),
                             rangeFrom.getTerm(),
                             rangeTo.getTerm());
                     result = new SLExpression(t);
                 } else {
                     // We have a regular array access
-                    Term t = TB.dotArr(services,
-                            receiver.getTerm(),
+                    Term t = tb.dotArr(receiver.getTerm(),
                             rangeFrom.getTerm());
                     ArrayType arrayType =
                             (ArrayType) receiver.getType().getJavaType();
@@ -1508,24 +1519,21 @@ final class JMLTranslator {
             }
 
 
-            private SLExpression translateSequenceReference(Services services,
+            private SLExpression translateSequenceReference(TermServices services,
                                                             SLExpression receiver,
                                                             SLExpression rangeFrom,
                                                             SLExpression rangeTo)
                     throws SLTranslationException {
                 if (rangeFrom == null) {
                     // a star
-                    return new SLExpression(TB.allFields(services,
-                                                         receiver.getTerm()));
+                    return new SLExpression(tb.allFields(receiver.getTerm()));
                 } else if (rangeTo != null) {
-                        Term t = TB.seqSub(services,
-                                receiver.getTerm(),
+                        Term t = tb.seqSub(receiver.getTerm(),
                                 rangeFrom.getTerm(),
                                 rangeTo.getTerm());
                         return new SLExpression(t);
                     } else {
-                        Term t = TB.seqGet(services,
-                                Sort.ANY,
+                        Term t = tb.seqGet(Sort.ANY,
                                 receiver.getTerm(),
                                 rangeFrom.getTerm());
                         return new SLExpression(t);
@@ -1590,7 +1598,7 @@ final class JMLTranslator {
                             if (heapLDT.getSortOfSelect(t.op()) != null) {
                                 final Term objTerm = t.sub(1);
                                 final Term fieldTerm = t.sub(2);
-                                t = TB.singleton(services, objTerm, fieldTerm);
+                                t = tb.singleton(objTerm, fieldTerm);
                                 singletons = singletons.append(t);
                             } else if (t.op() instanceof ProgramVariable) {
                                 // this case may happen with local variables
@@ -1608,7 +1616,7 @@ final class JMLTranslator {
                         throw excManager.createException("Not a term: " + expr);
                     }
                 }
-                return TB.union(services, singletons);
+                return tb.union(singletons);
             }
         });
         translationMethods.put(JMLKeyWord.PAIRWISE_DISJOINT,
@@ -1622,18 +1630,18 @@ final class JMLTranslator {
                 checkParameters(params, ImmutableList.class, Services.class);
                 ImmutableList<Term> list =
                         (ImmutableList<Term>) params[0];
-                Services services = (Services) params[1];
+                TermServices services = (TermServices) params[1];
 
                 ImmutableList<Term> disTerms = ImmutableSLList.<Term>nil();
                 while (!list.isEmpty()) {
                     Term t1 = list.head();
                     list = list.tail();
                     for (Term t2 : list) {
-                        Term dis = TB.disjoint(services, t1, t2);
+                        Term dis = tb.disjoint(t1, t2);
                         disTerms = disTerms.append(dis);
                     }
                 }
-                return new SLExpression(TB.and(disTerms));
+                return new SLExpression(tb.and(disTerms));
             }
         });
 
@@ -1648,7 +1656,7 @@ final class JMLTranslator {
 				checkParameters(params, Services.class);
 				final KeYJavaType t = ((Services)params[0]).getJavaInfo()
 			               .getKeYJavaType(PrimitiveType.JAVA_INT);
-				return new SLExpression(TB.index((Services)params[0]),t);
+				return new SLExpression(tb.index(),t);
 			}});
 
         translationMethods.put(JMLKeyWord.VALUES, new JMLTranslationMethod(){
@@ -1659,7 +1667,7 @@ final class JMLTranslator {
 				checkParameters(params, Services.class);
 				final KeYJavaType t = ((Services)params[0]).getJavaInfo()
 			               .getKeYJavaType(PrimitiveType.JAVA_SEQ);
-				return new SLExpression(TB.values((Services)params[0]),t);
+				return new SLExpression(tb.values(),t);
 			}});
     }
 
@@ -1694,7 +1702,7 @@ final class JMLTranslator {
                 T o = castToReturnType(result, resultClass);
                 assert o instanceof Term;
                 Term t = (Term)o;
-                t = TB.label((Term)castToReturnType(result, resultClass), expr.getLabels());
+                t = services.getTermBuilder().label((Term)castToReturnType(result, resultClass), expr.getLabels());
                 return castToReturnType(t, resultClass);
             }
         }
@@ -1789,7 +1797,7 @@ final class JMLTranslator {
         while (fns.lookup(name)!=null);
         final Function sk = new Function(name,Sort.FORMULA);
         fns.add(sk);
-        final Term t = TB.func(sk);
+        final Term t = tb.func(sk);
         return new SLExpression(t);
     }
 
@@ -1861,7 +1869,7 @@ final class JMLTranslator {
         return skolemExprHelper(jmlKeyWord,kjt,services);
     }
 
-    private SLExpression skolemExprHelper(Token jmlKeyWord, KeYJavaType type, Services services) {
+    private SLExpression skolemExprHelper(Token jmlKeyWord, KeYJavaType type, TermServices services) {
         addUnderspecifiedWarning(jmlKeyWord);
         assert services != null;
         final Namespace fns = services.getNamespaces().functions();
@@ -1873,7 +1881,7 @@ final class JMLTranslator {
         while (fns.lookup(name)!= null);
         final Function sk = new Function(name,sort);
         fns.add(sk);
-        final Term t = TB.func(sk);
+        final Term t = tb.func(sk);
         return new SLExpression(t,type);
     }
 
@@ -1954,26 +1962,28 @@ final class JMLTranslator {
             Term preTerm = (Term) params[0];
             Term bodyTerm = (Term) params[1];
             KeYJavaType declsType = (KeYJavaType) params[2];
+            final Type type = declsType.getJavaType();
+            services = (Services) params[6];
+            assert services != null;
+            final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
             ImmutableList<LogicVariable> declVars =
                     (ImmutableList<LogicVariable>) params[3];
             boolean nullable = (Boolean) params[4];
             KeYJavaType resultType = (KeYJavaType) params[5];
-            services = (Services) params[6];
-            assert services != null;
             if (resultType == null) {
                 // quick fix. may happen with \num_of
                 resultType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
             }
 
-            Term nullTerm = TB.NULL(services);
             for (LogicVariable lv : declVars) {
-                preTerm = TB.and(preTerm,
-                                 TB.reachableValue(services, TB.var(lv),
-                                                   declsType));
+                preTerm = tb.and(preTerm,
+                                 tb.reachableValue(tb.var(lv), declsType));
                 if (lv.sort().extendsTrans(services.getJavaInfo().objectSort())
                     && !nullable) {
-                    preTerm = TB.and(preTerm, TB.not(TB.equals(TB.var(lv),
-                                                               nullTerm)));
+                    final Term nonNull = arrayDepth > 0 ?
+                            tb.deepNonNull(tb.var(lv), tb.zTerm(arrayDepth))
+                            : tb.not(tb.equals(tb.var(lv), tb.NULL()));
+                    preTerm = tb.and(preTerm, nonNull);
                 }
             }
 
@@ -1987,7 +1997,7 @@ final class JMLTranslator {
                                          Term t1,
                                          Term t2)
                 throws SLTranslationException {
-            t2 = TB.convertToFormula(t2, services);
+            t2 = tb.convertToFormula(t2);
             Term result = combineQuantifiedTerms(t1, t2);
             for (LogicVariable qv : qvs) {
                 result = translateQuantifier(qv, result);
@@ -2003,27 +2013,32 @@ final class JMLTranslator {
             if (it.hasNext()) {
                 throw new SLTranslationException("Only one quantified variable is allowed in this context.");
             }
-            Term cond = TB.convertToBoolean(TB.and(t1, t2),services);
+            Term cond = tb.convertToBoolean(tb.and(t1, t2));
             return new SLExpression(translateQuantifier(qv, cond),resultType);
         }
         
         /** Provide restriction terms for the declared KeYJavaType */
         protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
             final Type type = kjt.getJavaType();
-            Term res = TB.tt();
+            final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
+            Term res = tb.tt();
             for (QuantifiableVariable qv: qvs) {
                 if (type instanceof PrimitiveType) {
-                    if (type == PrimitiveType.JAVA_BYTE) res = TB.and(res,TB.inByte(TB.var(qv),services));
-                    if (type == PrimitiveType.JAVA_SHORT) res = TB.and(res,TB.inShort(TB.var(qv),services));
-                    if (type == PrimitiveType.JAVA_CHAR) res = TB.and(res,TB.inChar(TB.var(qv),services));
-                    if (type == PrimitiveType.JAVA_INT) res = TB.and(res,TB.inInt(TB.var(qv),services));
-                    if (type == PrimitiveType.JAVA_LONG) res = TB.and(res,TB.inLong(TB.var(qv),services));
+                    if (type == PrimitiveType.JAVA_BYTE) res = tb.and(res,tb.inByte(tb.var(qv)));
+                    if (type == PrimitiveType.JAVA_SHORT) res = tb.and(res,tb.inShort(tb.var(qv)));
+                    if (type == PrimitiveType.JAVA_CHAR) res = tb.and(res,tb.inChar(tb.var(qv)));
+                    if (type == PrimitiveType.JAVA_INT) res = tb.and(res,tb.inInt(tb.var(qv)));
+                    if (type == PrimitiveType.JAVA_LONG) res = tb.and(res,tb.inLong(tb.var(qv)));
                 } else {
                     // assume reference type
                     if (nullable) {
-                        res = TB.and(res,TB.created(services, TB.var(qv)));
+                        res = tb.and(res,tb.created(tb.var(qv)));
                     } else {
-                        res = TB.and(res,TB.createdAndNotNull(services, TB.var(qv)));
+                        final Term nonNull = arrayDepth > 0 ?
+                                tb.deepNonNull(tb.var(qv), tb.zTerm(arrayDepth))
+                                : tb.not(tb.equals(tb.var(qv), tb.NULL()));
+                        res = tb.and(res,tb.and(
+                                tb.created(tb.var(qv)), nonNull));
                     }
                 }
             }
@@ -2061,9 +2076,9 @@ final class JMLTranslator {
             if(t.op().equals(locSetLDT.getUnion())) {
                 final Term sub0 = getFields(excManager, t.sub(0),services);
                 final Term sub1 = getFields(excManager, t.sub(1),services);
-                return TB.union(services, sub0, sub1);
+                return tb.union(sub0, sub1);
             } else if(t.op().equals(locSetLDT.getSingleton())) {
-            return TB.allObjects(services, t.sub(1));
+            return tb.allObjects(t.sub(1));
             } else {
                 throw excManager.createException("Inacceptable field expression: " + t);
             }
@@ -2199,52 +2214,7 @@ final class JMLTranslator {
             return null;
         }
     }
-
-    /**
-     * Translation method for expressions only allowed to appear in a postcondition.
-     * @author bruns
-     *
-     */
-    private abstract static class JMLPostExpressionTranslationMethod implements JMLTranslationMethod {
-
-        protected void assertPost (Term heapAtPre) throws SLTranslationException{
-            if (heapAtPre == null){
-                throw new SLTranslationException("JML construct "+name()+" not allowed in this context.");
-            }
-        }
-
-
-        /**
-         * Converts a term so that all of its non-rigid operators refer to the pre-state.
-         */
-        protected Term convertToOld(Services services, Term heapAtPre, Term term) {
-            assert heapAtPre != null;
-            Map<Term,Term> map = new LinkedHashMap<Term, Term>();
-            map.put(TB.getBaseHeap(services), heapAtPre);
-            OpReplacer or = new OpReplacer(map);
-            return or.replace(term);
-        }
-
-        /**
-         * Name of this translation method;
-         */
-        protected abstract String name();
-
-        protected abstract Term translate (Services services, Term heapAtPre, Object[] params) throws SLTranslationException;
-
-        public Term translate (Object ... params) throws SLTranslationException{
-            if (!(params[0] instanceof Services && params[1] instanceof Term))
-                throw new SLTranslationException(
-                        "Parameter 2 does not match the expected type.\n"
-                        + "Parameter type was: " + params[1].getClass().getName()
-                        + "\nExpected type was:  Term");
-            Term heapAtPre = (Term) params[1];
-            assertPost(heapAtPre);
-            return translate((Services)params[0], heapAtPre, Arrays.copyOfRange(params, 1, params.length-1));
-        }
-    }
-
-
+    
     private abstract class JMLEqualityTranslationMethod implements
             JMLTranslationMethod {
 
@@ -2295,9 +2265,9 @@ final class JMLTranslator {
                 Sort os = typeExpr.getType().getSort();
                 Function ioFunc = os.getExactInstanceofSymbol(services);
 
-                return new SLExpression(TB.equals(
-                        TB.func(ioFunc, typeofExpr.getTerm()),
-                        TB.TRUE(services)));
+                return new SLExpression(tb.equals(
+                        tb.func(ioFunc, typeofExpr.getTerm()),
+                        tb.TRUE()));
             }
 
             // this should not be reached
@@ -2315,13 +2285,13 @@ final class JMLTranslator {
             Term result = null;
             try {
                 if (a.sort() != Sort.FORMULA && b.sort() != Sort.FORMULA) {
-                    result = TB.equals(a, b);
+                    result = tb.equals(a, b);
                 // Special case so that model methods are handled better
                 } else if(a.sort() == services.getTypeConverter().getBooleanLDT().targetSort() && b.sort() == Sort.FORMULA) {
-                    result = TB.equals(a, TB.ife(b, TB.TRUE(services), TB.FALSE(services)));
+                    result = tb.equals(a, tb.ife(b, tb.TRUE(), tb.FALSE()));
                 } else {
-                    result = TB.equals(TB.convertToFormula(a, services),
-                                       TB.convertToFormula(b, services));
+                    result = tb.equals(tb.convertToFormula(a),
+                                       tb.convertToFormula(b));
                 }
                 return result;
             } catch (IllegalArgumentException e) {
@@ -2390,9 +2360,3 @@ final class JMLTranslator {
         protected abstract SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression left, SLExpression right) throws SLTranslationException;
     }
 }
-
-//if(symbol == null) {
-//  // no function -> look for predicates
-//  Namespace preds = services.getNamespaces().functions();
-//  Named symbol = funcs.lookup(new Name(functName));
-//}

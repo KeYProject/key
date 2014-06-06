@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -24,6 +24,7 @@ import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.definition.IDefaultStrategyPropertiesFactory;
 import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
@@ -48,6 +49,16 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     * The {@link Name} of the symbolic execution {@link Strategy}.
     */
    public static final Name name = new Name("Symbolic Execution Strategy");
+   
+   /**
+    * The default factory.
+    */
+   public static IDefaultStrategyPropertiesFactory DEFAULT_FACTORY = new IDefaultStrategyPropertiesFactory() {
+      @Override
+      public StrategyProperties createDefaultStrategyProperties() {
+          return SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false, false, false, false);
+      }
+   };
    
    /**
     * Constructor.
@@ -93,11 +104,11 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     * {@inheritDoc}
     */
    @Override
-   protected Feature setupApprovalF(Proof p_proof) {
-      Feature result = super.setupApprovalF(p_proof);
+   protected Feature setupApprovalF() {
+      Feature result = super.setupApprovalF();
       // Make sure that cuts are only applied if the cut term is not already part of the sequent. This check is performed exactly before the rule is applied because the sequent might has changed in the time after the schema variable instantiation was instantiated.
       SetRuleFilter depFilter = new SetRuleFilter();
-      depFilter.addRuleToSet(p_proof.env().getInitConfig().lookupActiveTaclet(new Name("cut")));
+      depFilter.addRuleToSet(getProof().env().getInitConfig().lookupActiveTaclet(new Name("cut")));
       result = add(result, ConditionalFeature.createConditional(depFilter, new CutHeapObjectsFeature()));
       return result;
    }
@@ -106,8 +117,8 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     * {@inheritDoc}
     */
    @Override
-   protected Feature setupGlobalF(Feature dispatcher, Proof p_proof) {
-       Feature globalF = super.setupGlobalF(dispatcher, p_proof);
+   protected Feature setupGlobalF(Feature dispatcher) {
+       Feature globalF = super.setupGlobalF(dispatcher);
        // Make sure that modalities without symbolic execution label are executed first because they might forbid rule application on modalities with symbolic execution label (see loop body branches)
        globalF = add(globalF, ifZero(not(new BinaryFeature() {
           @Override
@@ -300,12 +311,14 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
                new StrategyPropertyValueDefinition(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY, ALIAS_CHECK_IMMEDIATELY, null));
          // Model
          return new StrategySettingsDefinition(false, 
-                                          null, 
-                                          "Symbolic Execution Options",
-                                          methodTreatment,
-                                          loopTreatment,
-                                          branchHiding,
-                                          aliasChecks);
+                                               null, 
+                                               1000,
+                                               "Symbolic Execution Options",
+                                               SymbolicExecutionStrategy.DEFAULT_FACTORY,
+                                               methodTreatment,
+                                               loopTreatment,
+                                               branchHiding,
+                                               aliasChecks);
       }
    }
 }

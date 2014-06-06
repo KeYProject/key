@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
@@ -119,7 +119,7 @@ public final class WhileInvariantTransformer {
         post = initialPost.sub(0);
 
         javaInfo = services.getJavaInfo();
-        tf = TermFactory.DEFAULT ;
+        tf = services.getTermFactory() ;
         typeConv = services.getTypeConverter();
         
         returnType = removeWhile.returnType();
@@ -195,7 +195,7 @@ public final class WhileInvariantTransformer {
         // normal case and continue
         if (w.continueOccurred()) {
             stmnt.add(contFlagDecl(contFlag));
-            contFlagTerm = TermBuilder.DF.equals(typeConv.convertToLogicElement(contFlag), 
+            contFlagTerm =  services.getTermBuilder().equals(typeConv.convertToLogicElement(contFlag), 
         	    	             typeConv.getBooleanLDT().getTrueTerm());
         }
         
@@ -270,7 +270,7 @@ public final class WhileInvariantTransformer {
         JavaBlock mainJavaBlock = JavaBlock.createJavaBlock(transaction ? 
                                                             new StatementBlock(resSta, new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH)) :
                                                             new StatementBlock(resSta));
-        return TermBuilder.DF.prog(loopBodyModality, 
+        return services.getTermBuilder().prog(loopBodyModality, 
                                    mainJavaBlock, 
                                    result,
                                    computeLoopBodyModalityLabels(services, applicationPos, rule, goal, loopBodyModality, result, mainJavaBlock, applicationSequent)); 
@@ -290,7 +290,7 @@ public final class WhileInvariantTransformer {
        if (problem instanceof AbstractOperationPO) {
           AbstractOperationPO operationPO = (AbstractOperationPO)problem;
           if (operationPO.isAddUninterpretedPredicate()) {
-             term = TermBuilder.DF.and(term, operationPO.getUninterpretedPredicate());
+             term = services.getTermBuilder().and(term, operationPO.getUninterpretedPredicate());
           }
        }
        return term;
@@ -416,12 +416,12 @@ public final class WhileInvariantTransformer {
                             PosInOccurrence applicationPos, 
                             Services services) {
         JavaBlock returnJavaBlock = addContext(root, new StatementBlock(KeYJavaASTFactory.returnClause(returnExpression)));
-        Term executeReturn = TermBuilder.DF.prog(modality, 
+        Term executeReturn = services.getTermBuilder().prog(modality, 
                                                  returnJavaBlock, 
                                                  post,
                                                  TermLabelManager.instantiateLabels(services, applicationPos, rule, goal, "ReturnCaseModality", null, modality, new ImmutableArray<Term>(post), null, returnJavaBlock));
         
-        return TermBuilder.DF.imp(TermBuilder.DF.equals(typeConv.convertToLogicElement(returnFlag), typeConv.getBooleanLDT().getTrueTerm()),
+        return services.getTermBuilder().imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(returnFlag), typeConv.getBooleanLDT().getTrueTerm()),
                                   executeReturn);
     }
 
@@ -446,11 +446,11 @@ public final class WhileInvariantTransformer {
                            PosInOccurrence applicationPos, 
                            Services services) {
         JavaBlock executeJavaBlock = addContext(root, new StatementBlock(breakIfCascade.toArray(new Statement[breakIfCascade.size()])));
-        Term executeBreak = TermBuilder.DF.prog(modality, 
+        Term executeBreak = services.getTermBuilder().prog(modality, 
                                                 executeJavaBlock, 
                                                 post,
                                                 TermLabelManager.instantiateLabels(services, applicationPos, rule, goal, "BreakCaseModality", null, modality, new ImmutableArray<Term>(post), null, executeJavaBlock));
-        return TermBuilder.DF.imp(TermBuilder.DF.equals(typeConv.convertToLogicElement(breakFlag), 
+        return services.getTermBuilder().imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(breakFlag), 
                                 typeConv.getBooleanLDT().getTrueTerm()), 
                                 executeBreak); 
     }
@@ -467,33 +467,34 @@ public final class WhileInvariantTransformer {
                                         Term excFlagTerm,
                                         Term inv) {
 
+        final TermBuilder TB = services.getTermBuilder();
         final Term TRUE_TERM = typeConv.getBooleanLDT().getTrueTerm();
 
         ArrayList<Term> al = new ArrayList<Term>();
 
         if (returnFlagTerm != null)
-            al.add(TermBuilder.DF.equals(returnFlagTerm, TRUE_TERM));
+            al.add(TB.equals(returnFlagTerm, TRUE_TERM));
         if (breakFlagTerm != null)
-            al.add(TermBuilder.DF.equals(breakFlagTerm, TRUE_TERM));
+            al.add(TB.equals(breakFlagTerm, TRUE_TERM));
         if (excFlagTerm != null)
-            al.add(TermBuilder.DF.equals(excFlagTerm, TRUE_TERM));
+            al.add(TB.equals(excFlagTerm, TRUE_TERM));
 
         if (al.size() == 0) {
             if (contFlagTerm == null) {
                 ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(services, applicationPos, rule, goal, inv.op(), inv.subs(), applicationSequent);
-                return TermBuilder.DF.label(inv, labels);
+                return TB.label(inv, labels);
             }
             else {
                 ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(services, applicationPos, rule, goal, Junctor.IMP, new ImmutableArray<Term>(contFlagTerm, inv), applicationSequent);
-                return TermBuilder.DF.imp(contFlagTerm, inv, labels);
+                return TB.imp(contFlagTerm, inv, labels);
             }
         } else {
-            Term premiss = TermBuilder.DF.not(createLongJunctorTerm(Junctor.OR, al));
+            Term premiss = TB.not(createLongJunctorTerm(Junctor.OR, al));
             if (contFlagTerm != null)
-                premiss = TermBuilder.DF.imp(contFlagTerm, premiss);            
+                premiss = TB.imp(contFlagTerm, premiss);            
             
             ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(services, applicationPos, rule, goal, Junctor.IMP, new ImmutableArray<Term>(premiss, inv), applicationSequent);
-            return TermBuilder.DF.imp(premiss, inv, labels);
+            return TB.imp(premiss, inv, labels);
         }       
     }
     
@@ -527,13 +528,14 @@ public final class WhileInvariantTransformer {
                            Goal goal,
                            PosInOccurrence applicationPos, 
                            Services services) {
+        final TermBuilder TB = services.getTermBuilder();
         JavaBlock throwJavaBlock = addContext(root, new StatementBlock(KeYJavaASTFactory.throwClause(thrownException)));
-        Term throwException = TermBuilder.DF.prog(modality, 
+        Term throwException = TB.prog(modality, 
                                                   throwJavaBlock, 
                                                   post,
                                                   TermLabelManager.instantiateLabels(services, applicationPos, rule, goal, "ThrowCaseModality", null, modality, new ImmutableArray<Term>(post), null, throwJavaBlock));
-        return TermBuilder.DF.imp( 
-              TermBuilder.DF.equals(typeConv.convertToLogicElement(excFlag), 
+        return TB.imp( 
+              TB.equals(typeConv.convertToLogicElement(excFlag), 
         	       typeConv.getBooleanLDT().getTrueTerm()), 
              throwException);
     }

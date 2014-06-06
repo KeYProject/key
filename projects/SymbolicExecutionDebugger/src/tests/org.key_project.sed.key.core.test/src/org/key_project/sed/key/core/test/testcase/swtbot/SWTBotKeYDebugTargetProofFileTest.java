@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -40,7 +40,7 @@ public class SWTBotKeYDebugTargetProofFileTest extends AbstractKeYDebugTargetTes
       IKeYDebugTargetProofFileTestExecutor executor = new IKeYDebugTargetProofFileTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IFile file, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
-            assertDebugTargetViaOracle(target, "data/magic42/oracle/Magic42ProofFile.xml", true, false);
+            assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/magic42/oracle/Magic42ProofFile.xml", true, false);
          }
       };
       doKeYDebugTargetTest("SWTBotKeYDebugTargetProofFileTest_testMagic42", 

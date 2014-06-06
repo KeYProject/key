@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -14,27 +14,27 @@
 package de.hentschel.visualdbc.datasource.key.test.testCase;
 
 import org.junit.Test;
-import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
-import de.hentschel.visualdbc.datasource.key.test.util.TestKeyUtil;
+import de.hentschel.visualdbc.datasource.key.test.Activator;
 import de.hentschel.visualdbc.datasource.model.DSPackageManagement;
 
 /**
  * Tests the handling of packages in a {@link KeyConnection}.
  * @author Martin Hentschel
  */
-public class PackageTest extends AbstractSetupTestCase {
+public class PackageTest extends AbstractKeYTest {
    /**
     * Tests packages with management {@link DSPackageManagement#NO_PACKAGES}
     */
    @Test
    public void testPackageManagement_noPackages() throws Exception {
-      TestKeyUtil.testKeyConnection("testPackageManagement_noPackages",
-                                    "data/packageTest",
-                                    null,
-                                    DSPackageManagement.NO_PACKAGES,
-                                    TestKeyUtil.createExpectedPackageTestModel_NoPackages());
+      testKeyConnection("testPackageManagement_noPackages",
+                        "data/packageTest/test",
+                        null,
+                        DSPackageManagement.NO_PACKAGES,
+                        Activator.PLUGIN_ID,
+                        "data/packageTest/oracle/packageManagement_noPackages.dbc");
    }
 
    /**
@@ -42,11 +42,12 @@ public class PackageTest extends AbstractSetupTestCase {
     */
    @Test
    public void testPackageManagement_flatList() throws Exception {
-      TestKeyUtil.testKeyConnection("testPackageManagement_flatList",
-                                    "data/packageTest",
-                                    null,
-                                    DSPackageManagement.FLAT_LIST,
-                                    TestKeyUtil.createExpectedPackageTestModel_FlatList());
+      testKeyConnection("testPackageManagement_flatList",
+                        "data/packageTest/test",
+                        null,
+                        DSPackageManagement.FLAT_LIST,
+                        Activator.PLUGIN_ID,
+                        "data/packageTest/oracle/packageManagement_flatList.dbc");
    }
 
    /**
@@ -54,10 +55,11 @@ public class PackageTest extends AbstractSetupTestCase {
     */
    @Test
    public void testPackageManagement_hierarchy() throws Exception {
-      TestKeyUtil.testKeyConnection("testPackageManagement_hierarchy",
-                                    "data/packageTest",
-                                    null,
-                                    DSPackageManagement.HIERARCHY,
-                                    TestKeyUtil.createExpectedPackageTestModel_Hierarchy());
+      testKeyConnection("testPackageManagement_hierarchy",
+                        "data/packageTest/test",
+                        null,
+                        DSPackageManagement.HIERARCHY,
+                        Activator.PLUGIN_ID,
+                        "data/packageTest/oracle/packageManagement_hierarchy.dbc");
    }
 }

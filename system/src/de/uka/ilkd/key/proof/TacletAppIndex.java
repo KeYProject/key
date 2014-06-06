@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof;
 
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.rulefilter.AndRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
@@ -297,7 +297,7 @@ public class TacletAppIndex  {
      */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence pos, 
                                                  TacletFilter    filter,
-                                                 Services        services) { 
+                                                 TermServices        services) { 
 
         final Iterator<NoPosTacletApp> it =
             getFindTaclet ( pos, filter, services ).iterator();
@@ -309,7 +309,7 @@ public class TacletAppIndex  {
             final Taclet t = tacletApp.taclet();
             if (t instanceof RewriteTaclet
                     && ((RewriteTaclet)t).checkPrefix(
-                            pos, MatchConditions.EMPTY_MATCHCONDITIONS, services)
+                            pos, MatchConditions.EMPTY_MATCHCONDITIONS)
                             != null)
                 result = result.prepend ( tacletApp );
         }
@@ -326,7 +326,7 @@ public class TacletAppIndex  {
      */
     public ImmutableList<NoPosTacletApp> getFindTaclet(PosInOccurrence pos,
                                               TacletFilter    filter,
-                                              Services        services) { 
+                                              TermServices        services) { 
         return getIndex ( pos ).getTacletAppAt ( pos, filter );
     }
 

@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.gui;
 
@@ -161,7 +160,11 @@ class ContractSelectionPanel extends JPanel {
 
 
     public void setContracts(Contract[] contracts, String title) {
-        if (contracts == null || contracts.length == 0) return;
+        if (contracts == null || contracts.length == 0) {
+            contractList.setListData(new Contract[0]);
+            updateUI();
+            return;
+        }
 
         //sort contracts by id (for the user's convenience)
         Arrays.sort(contracts, new Comparator<Contract> () {

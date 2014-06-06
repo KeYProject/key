@@ -51,6 +51,12 @@ lexer grammar KeYLexer;
         public int marker;
     }
 
+    /*
+        Not sure what this is intended for. A rule description is pushed on
+        this for each entered lexer rule and removed when the rule is left.
+        I think this can be removed.
+        (Kai Wallisch May 2014)
+    */
     Stack<String> paraphrase = new Stack<String>();
 
     protected KeYExceptionHandler keh = new KeYRecoderExcHandler();
@@ -58,41 +64,20 @@ lexer grammar KeYLexer;
 
     // why is keh sometimes null?
 
-    public KeYLexer(InputStream in, KeYExceptionHandler keh) throws IOException {
-        this(new ANTLRInputStream(in));
-	if(keh != null)
-            this.keh = keh;
-	this.selector = new Stack<SaveStruct>();
-	//selector.select(this);
-    }
-
-    public KeYLexer(InputStream in, KeYExceptionHandler keh,
-                    Stack<SaveStruct> selector) throws IOException {
-        this(new ANTLRInputStream(in));
-	if(keh != null)
-          this.keh = keh;
-	this.selector = selector;
-    }
-
-    public KeYLexer(Reader in, KeYExceptionHandler keh) throws IOException {
-        this(new ANTLRReaderStream(in));
-	if(keh != null)
-          this.keh = keh;
-	this.selector = new Stack<SaveStruct>();
-	//selector.select(this);
-    }
-
     public KeYLexer(CharStream in, KeYExceptionHandler keh) {
 	this(in);
 	if(keh != null) { this.keh = keh; }
 	this.selector = new Stack<SaveStruct>();
     }
-
-    public KeYLexer(String in, KeYExceptionHandler keh) {
-	this(new ANTLRStringStream(in), keh);
-    }
-
-    public void reportError(RecognitionException ex){
+    
+    @Override
+    public void reportError(RecognitionException ex) {
+        /*
+         TODO: Don't pass along RecognitionException instances, they don't have useful messages.
+         See http://www.antlr3.org/api/ActionScript/org/antlr/runtime/RecognitionException.html for further information.
+         
+         (Kai Wallisch May 2014)
+        */
         keh.reportException(ex);
     }
 
@@ -153,6 +138,9 @@ lexer grammar KeYLexer;
       modPairs.put("\\throughout_transaction","\\endmodality");
    }
 
+    /*
+     TODO: Remove this method. (Kai Wallisch May 2014)
+    */
    private void newline() {
      Debug.out("newline() was called but ANTLRv3 does not implement it anymore.");
    }
@@ -591,10 +579,9 @@ RGUILLEMETS
 @after { paraphrase.pop(); }
       :   '>' '>'
       ;
-
-
+      
 WS
-@init { paraphrase.push("white space"); }
+@init { paraphrase.push("whitespace"); }
 @after { paraphrase.pop(); }
 :       (' '
       |       '\t'
@@ -719,33 +706,43 @@ QUOTED_STRING_LITERAL
 
 SL_COMMENT
 @init { paraphrase.push("a comment"); }
-
-	@after { paraphrase.pop(); }
+@after { paraphrase.pop(); }
 :
 	'//'
 	(~('\n' | '\uFFFF'))* ('\n' | '\uFFFF' | EOF)
-	{ $channel = HIDDEN; newline(); }
+	{ $channel = HIDDEN; }
 	;
 
 ML_COMMENT
 @init { paraphrase.push("a comment"); }
-	@after { paraphrase.pop(); }
+@after { paraphrase.pop(); }
 :
 	'/*' {
+	  
+	  final int startAtLine = input.getLine();
+	  final int startAtColumn = input.getCharPositionInLine() - 2;
+	  
 	  while(true) {
-	    if((input.LA(1) == '\r' && input.LA(2) != '\n') ||
-		input.LA(1) == '\n') newline();
 	    if(input.LA(1) == '*' && input.LA(2) == '/') {
 	      match("*/");
 	      break;
 	    }
 	    if (input.LA(1) == EOF) {
-		throw new NoViableAltException("Matched EOF", -1, -1, input);
+            throw new RecognitionException(input){
+                @Override
+                public String getMessage() {
+                    return "Unclosed comment in " + input.getSourceName() + "\n\n"
+                        + "Started a comment with '/*' at line " + startAtLine
+                        + " column " + startAtColumn
+                        + "  but reached end of file without encountering '*/'.";
+                }
+            };
 	    } else {
-		input.consume();
+		    input.consume();
 	    }
 	  }
 	  $channel = HIDDEN;
+
 	}
 	;
 

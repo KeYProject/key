@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.logic;
 
@@ -22,6 +21,7 @@ import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -33,11 +33,13 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.rule.TacletForTests;
 
 public class TestClashFreeSubst extends TestCase {
  
-    TermFactory tf=TermFactory.DEFAULT;
+    TermFactory tf;
 
     Services services;
     NamespaceSet nss;
@@ -59,11 +61,14 @@ public class TestClashFreeSubst extends TestCase {
     public void setUp() {
 	services = new Services(AbstractProfile.getDefaultProfile());
 	nss = services.getNamespaces();
+	tf = services.getTermFactory();
 	
 	String sorts = "\\sorts{boolean;int;LocSet;}";
-	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(sorts,null),
-			      "No file. Call of parser from logic/TestClashFreeSubst.java",
-			      services, nss);
+	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION,
+		new KeYLexerF(sorts,
+			"No file. Call of parser from logic/TestClashFreeSubst.java",
+			null),
+		services, nss);
 	try {
 	    basicSortsParser.parseSorts();
 	} catch(Exception e) {
@@ -127,9 +132,11 @@ public class TestClashFreeSubst extends TestCase {
 
     private KeYParserF stringDeclParser(String s) {
 
-	return new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s,null),
-			      "No file. Call of parser from logic/TestClashFreeSubst.java",
-			      services, nss);
+	return new KeYParserF(ParserMode.DECLARATION,
+		new KeYLexerF(s,
+			"No file. Call of parser from logic/TestClashFreeSubst.java",
+			null),
+		services, nss);
     }
 
     public void parseDecls(String s) {
@@ -146,9 +153,17 @@ public class TestClashFreeSubst extends TestCase {
 
     private KeYParserF stringTermParser(String s) {
 	return new KeYParserF(ParserMode.GLOBALDECL,
-			     new KeYLexerF(s,null),
-			     services, 
-			     nss);
+		new KeYLexerF(s,
+			"No file. Call of parser from logic/TestClashFreeSubst.java",
+			null),
+		new Recoder2KeY(services,
+			new KeYCrossReferenceServiceConfiguration(services.getExceptionHandler()),
+			services.getJavaInfo().rec2key(),
+			new NamespaceSet(),
+			services.getTypeConverter()),
+		services,
+		nss,
+		new AbbrevMap());
     }
 
     public Term parseTerm(String s) {
@@ -211,7 +226,7 @@ public class TestClashFreeSubst extends TestCase {
 			    top.varsBoundHere(0).get(i);
 		    }
 		    subStack.pop();
-		    subStack.push(TermBuilder.DF.all(ImmutableSLList.<QuantifiableVariable>nil().append(bv), top.sub(0)));
+		    subStack.push(TacletForTests.services().getTermBuilder().all(ImmutableSLList.<QuantifiableVariable>nil().append(bv), top.sub(0)));
 		    return;
 		}
 	    }
@@ -232,7 +247,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testSubst() {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("g(v,x)");
-	ClashFreeSubst cfs = new ClashFreeSubst(v,s);
+	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
 	assertEquals("substitution",
 		     parseTerm("g(f(x),x)"),
 		     cfs.apply(t));
@@ -241,7 +256,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testSubstWary() {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("q(v,x)");
-	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s);
+	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
 	assertEquals("substitution",
 		     parseTerm("q(f(x),x)"),
 		     cfs.apply(t));
@@ -250,7 +265,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testShare() {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("g(v,f(x))");
-	ClashFreeSubst cfs = new ClashFreeSubst(v,s);
+	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
 	assertSame("share unchanged subterms", 
 		   t.sub(1), cfs.apply(t).sub(1));
     }
@@ -258,7 +273,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testShareWary() {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("q(v,f(x))");
-	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s);
+	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
 	assertSame("share unchanged subterms", 
 		   t.sub(1), cfs.apply(t).sub(1));
     }
@@ -284,7 +299,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testClash() {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("\\exists x; q(x,v)");
-	ClashFreeSubst cfs = new ClashFreeSubst(v,s);
+	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 = 
 	    res.varsBoundHere(0).get(0);
@@ -298,7 +313,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testSubstInSubstTerm() {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("{\\subst y; f(v)}g(y,v)");
-	ClashFreeSubst cfs = new ClashFreeSubst(v,s);
+	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
 	assertEquals("substitute into substitution term",
 		     parseTerm("{\\subst y; f(f(x))}g(y,f(x))"),
 		     cfs.apply(t));
@@ -307,7 +322,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testClashInSubstTerm() {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("{\\subst x; f(v)}g(x,v)");
-	ClashFreeSubst cfs = new ClashFreeSubst(v,s);
+	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 = 
 	    res.varsBoundHere(1).get(0);
@@ -322,7 +337,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testMultiSubst() {
 	Term s = parseTerm("f(x)");
 	Term t = toMulti(parseFma("\\forall y; \\forall z; q(y,g(v,z))"));
-	ClashFreeSubst cfs = new ClashFreeSubst(v,s);
+	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
 	assertEquals("substitution on multi",
 		     toMulti(parseFma("\\forall y; \\forall z; q(y,g(f(x),z))")),
 		     cfs.apply(t));
@@ -331,7 +346,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testMultiShareBound() {
 	Term s = parseTerm("f(x)");
 	Term t = toMulti(parseFma("\\forall y; \\forall v; \\forall z; q(y,g(v,z))"));
-	ClashFreeSubst cfs = new ClashFreeSubst(v,s);
+	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
 	assertSame("sharing on multi",
 		   cfs.apply(t), t);
     }
@@ -341,7 +356,7 @@ public class TestClashFreeSubst extends TestCase {
     public void xtestMultiClash() {
 	Term s = parseTerm("f(x)");
 	Term t = toMulti(parseFma("\\forall y; \\forall x; \\forall z; q(g(x,y),g(v,z))"));
-	ClashFreeSubst cfs = new ClashFreeSubst(v,s);
+	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 = 
 	    res.varsBoundHere(0).get(1);
@@ -358,7 +373,7 @@ public class TestClashFreeSubst extends TestCase {
     public void xtestMultiClash1() {
 	Term s = parseTerm("f(x)");
 	Term t = toMulti(parseFma("\\forall y; \\forall x;\\forall z; q(g(x,y),g(v,z))"));
-	ClashFreeSubst cfs = new ClashFreeSubst(v,s);
+	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 = 
 	    res.varsBoundHere(0).get(2);
@@ -374,7 +389,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testWary0() {
 	Term s = parseTerm("f(pv0)");
 	Term t = parseTerm("q(v,x)");
-	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s);
+	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
 	assertEquals("substitution",
 		     parseTerm("q(f(pv0),x)"),
 		     cfs.apply(t));
@@ -383,7 +398,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testWary1() {
 	Term s = parseTerm("f(pv0)");
 	Term t = parseTerm("q(v,x) & {pv0:=v}q(x,x)");
-	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s);
+	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
 	assertEquals("substitution",
 		     parseTerm("q(f(pv0),x) & {pv0:=f(pv0)}q(x,x)"),
 		     cfs.apply(t));
@@ -392,7 +407,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testWary2() {
 	Term s = parseTerm("f(pv0)");
 	Term t = parseTerm("q(v,x) & {pv0:=v}q(x,v)");
-	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s);
+	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 = 
 	    res.varsBoundHere(1).get(0);

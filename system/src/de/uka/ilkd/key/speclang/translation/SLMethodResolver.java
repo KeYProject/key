@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.speclang.translation;
 
@@ -81,7 +80,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
                     	= services.getTypeConverter()
                     	          .getHeapLDT()
                     	          .getFieldSymbolForPV(et, services);
-                    recTerm = TB.dot(services, et.sort(), recTerm, fieldSymbol);
+                    recTerm = services.getTermBuilder().dot(et.sort(), recTerm, fieldSymbol);
                 }
             }else{
                 break;
@@ -105,7 +104,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
         Term[] subs = new Term[params.size() - pm.getHeapCount(services) + pm.getStateCount()*pm.getHeapCount(services) + (pm.isStatic() ? 0 : 1) ];
         for(LocationVariable heap : heaps ) {
           if(pm.getStateCount() >= 1) {
-            subs[i++] = TB.var(heap);
+            subs[i++] = services.getTermBuilder().var(heap);
             if(pm.getStateCount() == 2) {
               subs[i++] = params.head().getTerm();
             }
@@ -132,7 +131,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
             		"method \"" + methodName + "\" in specification expression.");
         }
         
-        return new SLExpression(TB.tf().createTerm(pm, subs), 
+        return new SLExpression(services.getTermBuilder().tf().createTerm(pm, subs), 
         	                pm.getReturnType());
     }
 

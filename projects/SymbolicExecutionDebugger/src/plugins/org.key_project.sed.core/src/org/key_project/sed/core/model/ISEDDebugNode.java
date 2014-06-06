@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -15,6 +15,10 @@ package org.key_project.sed.core.model;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.key_project.sed.core.annotation.ISEDAnnotation;
+import org.key_project.sed.core.annotation.ISEDAnnotationLink;
+import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.model.event.ISEDAnnotationLinkListener;
 import org.key_project.sed.core.model.impl.AbstractSEDDebugNode;
 import org.key_project.sed.core.model.impl.AbstractSEDStackFrameCompatibleDebugNode;
 
@@ -115,4 +119,55 @@ public interface ISEDDebugNode extends ISEDDebugElement {
     * the failure.</li>
     */
    public ISEDDebugNode[] getCallStack() throws DebugException;
+   
+   /**
+    * Adds the given {@link ISEDAnnotationLink} to this node.
+    * @param link The {@link ISEDAnnotationLink} to add.
+    */
+   public void addAnnotationLink(ISEDAnnotationLink link);
+   
+   /**
+    * Removes the given {@link ISEDAnnotationLink} from this node.
+    * @param link The {@link ISEDAnnotationLink} to remove.
+    */
+   public void removeAnnotationLink(ISEDAnnotationLink link);
+   
+   /**
+    * Returns all contained {@link ISEDAnnotationLink}s.
+    * @return All contained {@link ISEDAnnotationLink}s.
+    */
+   public ISEDAnnotationLink[] getAnnotationLinks();
+   
+   /**
+    * Returns all contained {@link ISEDAnnotationLink}s of the given {@link ISEDAnnotationType}.
+    * @param type The {@link ISEDAnnotationType}.
+    * @return All contained {@link ISEDAnnotationLink}s of the given {@link ISEDAnnotationType}
+    */
+   public ISEDAnnotationLink[] getAnnotationLinks(ISEDAnnotationType type);
+   
+   /**
+    * Returns all {@link ISEDAnnotation} referenced by {@link ISEDAnnotationLink}s
+    * in the order they are defined in the {@link ISEDDebugTarget}.
+    * @return The used {@link ISEDAnnotation}s.
+    */
+   public ISEDAnnotation[] computeUsedAnnotations();
+   
+   /**
+    * Checks if the given {@link ISEDAnnotationLink} is contained in this node.
+    * @param link The {@link ISEDAnnotationLink} to check.
+    * @return {@code true} the {@link ISEDAnnotationLink} is contained in this node, {@code false} the {@link ISEDAnnotationLink} is not contained.
+    */
+   public boolean containsAnnotationLink(ISEDAnnotationLink link);
+   
+   /**
+    * Adds the given {@link ISEDAnnotationLinkListener}.
+    * @param l The {@link ISEDAnnotationLinkListener} to add.
+    */
+   public void addAnnotationLinkListener(ISEDAnnotationLinkListener l);
+   
+   /**
+    * Removes the given {@link ISEDAnnotationLinkListener}.
+    * @param l The {@link ISEDAnnotationLinkListener} to remove.
+    */
+   public void removeAnnotationLinkListener(ISEDAnnotationLinkListener l);
 }

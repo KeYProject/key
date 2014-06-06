@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -25,6 +25,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
+import org.key_project.sed.key.core.test.Activator;
 
 /**
  * Tests the step return functionality of an {@link IDebugTarget} and
@@ -37,7 +38,7 @@ public class SWTBotStepReturnTest extends AbstractKeYDebugTargetTestCase {
     */
    @Test
    public void testStepReturn() throws Exception {
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+      IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Get debug target TreeItem
@@ -46,21 +47,21 @@ public class SWTBotStepReturnTest extends AbstractKeYDebugTargetTestCase {
             String expectedModelPathInBundle = "data/stepReturnTest/oracle/StepReturnTest";
             String expectedModelFileExtension = ".xml";
             int modelIndex = 0;
-            assertStep(target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension);
+            assertStep(target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension);
             // Step into
-            assertStepInto(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // call main
-            assertStepInto(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // first level
-            assertStepInto(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // call first level
-            assertStepInto(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // second level
-            assertStepInto(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // call second level
-            assertStepInto(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // third level
-            assertStepInto(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // call third level
-            assertStepInto(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // fourth level
-            assertStepInto(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // call fourth level
-            assertStepReturn(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // a = a * 2
-            assertStepReturn(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // second level
-            assertStepReturn(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // first level
-            assertStepReturn(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // end
+            assertStepInto(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // call main
+            assertStepInto(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // first level
+            assertStepInto(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // call first level
+            assertStepInto(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // second level
+            assertStepInto(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // call second level
+            assertStepInto(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // third level
+            assertStepInto(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // call third level
+            assertStepInto(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // fourth level
+            assertStepInto(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // call fourth level
+            assertStepReturn(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // a = a * 2
+            assertStepReturn(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // second level
+            assertStepReturn(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // first level
+            assertStepReturn(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // end
          }
       };
       doKeYDebugTargetTest("SWTBotStepReturnTest_testStepReturn", 

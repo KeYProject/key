@@ -1,21 +1,20 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.logic.util;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -43,7 +42,7 @@ public class TermHelper {
      * @param services the Services object
      * @return the maximal sort allowed at the i-th position
      */
-    public static Sort getMaxSort(Term term, int i, Services services) {     
+    public static Sort getMaxSort(Term term, int i, TermServices services) {     
         if (term.sub(i).sort() == Sort.FORMULA) return Sort.FORMULA;
         
         if (term.op() instanceof IfThenElse && i > 0) {
@@ -62,7 +61,7 @@ public class TermHelper {
     private static Sort getMaxSortHelper(final Operator op, 
 	    				 int i, 
 	    				 Sort maxSortDefault,
-	    				 Services services) {
+	    				 TermServices services) {
         final Sort newMaxSort;
         if (op instanceof SortedOperator) {
             newMaxSort = ((SortedOperator)op).argSort(i);

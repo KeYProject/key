@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.proof.init;
 
@@ -28,7 +28,6 @@ import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -55,8 +54,7 @@ import de.uka.ilkd.key.util.Pair;
  */
 public abstract class AbstractPO implements IPersistablePO {
 
-    protected static final TermFactory TF = TermFactory.DEFAULT;
-    protected static final TermBuilder TB = TermBuilder.DF;
+    protected final TermBuilder tb; 
     protected final InitConfig initConfig;
     protected final Services services;
     protected final JavaInfo javaInfo;
@@ -77,6 +75,7 @@ public abstract class AbstractPO implements IPersistablePO {
                       String name) {
         this.initConfig = initConfig;
         this.services = initConfig.getServices();
+        this.tb = services.getTermBuilder();
         this.javaInfo = initConfig.getServices().getJavaInfo();
         this.heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
         this.specRepos = initConfig.getServices().getSpecificationRepository();

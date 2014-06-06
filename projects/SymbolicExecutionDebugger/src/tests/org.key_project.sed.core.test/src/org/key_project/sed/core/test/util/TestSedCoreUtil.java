@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -15,6 +15,7 @@ package org.key_project.sed.core.test.util;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,6 +37,7 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
 import org.eclipse.debug.internal.ui.DebugUIPlugin;
 import org.eclipse.debug.internal.ui.DelegatingModelPresentation;
 import org.eclipse.debug.internal.ui.InstructionPointerManager;
@@ -69,6 +71,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.resources.ProjectExplorer;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.key_project.sed.core.annotation.ISEDAnnotation;
+import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchStatement;
 import org.key_project.sed.core.model.ISEDDebugElement;
@@ -80,8 +84,8 @@ import org.key_project.sed.core.model.ISEDLoopCondition;
 import org.key_project.sed.core.model.ISEDLoopInvariant;
 import org.key_project.sed.core.model.ISEDLoopStatement;
 import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDMethodContract;
+import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
@@ -196,10 +200,11 @@ public final class TestSedCoreUtil {
 
    /**
     * Opens the "Symbolic Debug" perspective.
+    * @return The {@link IPerspectiveDescriptor} of "Symbolic Debug" perspective.
     * @throws Exception Occurred Exception.
     */
-   public static void openSymbolicDebugPerspective() throws Exception {
-      IRunnableWithException run = new AbstractRunnableWithException() {
+   public static IPerspectiveDescriptor openSymbolicDebugPerspective() throws Exception {
+      IRunnableWithResult<IPerspectiveDescriptor> run = new AbstractRunnableWithResult<IPerspectiveDescriptor>() {
          @Override
          public void run() {
             try {
@@ -243,6 +248,7 @@ public final class TestSedCoreUtil {
       if (run.getException() != null) {
          throw run.getException();
       }
+      return run.getResult();
    }
 
    /**
@@ -470,8 +476,11 @@ public final class TestSedCoreUtil {
          for (SWTBotTreeItem item : launchItems) {
             item.select();
             item.contextMenu("Terminate and Remove").click();
-            SWTBotShell dialog = bot.shell("Terminate and Remove");
-            dialog.bot().button("Yes").click();
+            try{
+               SWTBotShell dialog = bot.shell("Terminate and Remove");
+               dialog.bot().button("Yes").click();
+            }catch(Exception e){
+            }
          }
          // Wait until all items are removed
          bot.waitWhile(Conditions.treeHasRows(debugTree, 1));
@@ -730,6 +739,29 @@ public final class TestSedCoreUtil {
       TestCase.assertEquals(expectedId, currentEditorPart.getEditorSite().getId());
       TestCase.assertEquals(expectedResource, currentEditorPart.getEditorInput().getAdapter(IResource.class));
    }
+
+   /**
+    * Makes sure that the correct {@link IEditorPart} was opened by the 
+    * Eclipse Debug API.
+    * @param currentEditorPart The current {@link IEditorPart} to test.
+    * @param expectedFile The expected {@link File}.
+    * @param target The {@link IDebugTarget} to use.
+    * @param frame The {@link IStackFrame} to test.
+    * @throws PartInitException Occurred Exception.
+    */
+   public static void assertDebugEditor(IEditorPart currentEditorPart, 
+                                        File expectedFile,
+                                        IDebugTarget target, 
+                                        IStackFrame frame) {
+      IDebugModelPresentation presentation = ((DelegatingModelPresentation)DebugUIPlugin.getModelPresentation()).getPresentation(target.getModelIdentifier());
+      Object sourceElement = target.getLaunch().getSourceLocator().getSourceElement(frame);
+      TestCase.assertTrue(sourceElement instanceof LocalFileStorage);
+      TestCase.assertEquals(expectedFile, ((LocalFileStorage)sourceElement).getFile());
+      IEditorInput expectedInput = presentation.getEditorInput(sourceElement);
+      TestCase.assertEquals(expectedInput, currentEditorPart.getEditorInput());
+      String expectedId = presentation.getEditorId(expectedInput, frame);
+      TestCase.assertEquals(expectedId, currentEditorPart.getEditorSite().getId());
+   }
    
    /**
     * Makes sure that the given {@link IEditorPart} is an {@link ITextEditor}
@@ -811,6 +843,14 @@ public final class TestSedCoreUtil {
                                          boolean compareId, 
                                          boolean compareVariables,
                                          boolean compareCallStack) throws DebugException {
+      // Compare annotations
+      ISEDAnnotation[] expectedAnnotations = expected.getRegisteredAnnotations();
+      ISEDAnnotation[] currentAnnotations = current.getRegisteredAnnotations();
+      assertEquals(expectedAnnotations.length, currentAnnotations.length);
+      for (int i = 0; i < expectedAnnotations.length; i++) {
+         compareAnnotation(expectedAnnotations[i], currentAnnotations[i]);
+      }
+      // Compare nodes
       ISEDIterator expectedIter = new SEDPreorderIterator(expected);
       ISEDIterator currentIter = new SEDPreorderIterator(current);
       while (expectedIter.hasNext()) {
@@ -879,6 +919,38 @@ public final class TestSedCoreUtil {
    }
    
    /**
+    * Compares the given {@link ISEDAnnotation}s with each other.
+    * @param expected The expected {@link ISEDAnnotation}.
+    * @param current The current {@link ISEDAnnotation}.
+    */
+   protected static void compareAnnotation(ISEDAnnotation expected, ISEDAnnotation current) {
+      TestCase.assertNotNull(expected);
+      TestCase.assertNotNull(current);
+      TestCase.assertEquals(expected.getId(), current.getId());
+      TestCase.assertSame(expected.getType(), current.getType());
+      TestCase.assertEquals(expected.isEnabled(), current.isEnabled());
+      TestCase.assertEquals(expected.isHighlightBackground(), current.isHighlightBackground());
+      TestCase.assertEquals(expected.isHighlightForeground(), current.isHighlightForeground());
+      TestCase.assertEquals(expected.getBackgroundColor(), current.getBackgroundColor());
+      TestCase.assertEquals(expected.getForegroundColor(), current.getForegroundColor());
+      TestCase.assertEquals(expected.getType().saveAnnotation(expected), current.getType().saveAnnotation(current));
+   }
+   
+   /**
+    * Compares the given {@link ISEDAnnotationLink}s with each other.
+    * @param expected The expected {@link ISEDAnnotationLink}.
+    * @param current The current {@link ISEDAnnotationLink}.
+    */
+   protected static void compareAnnotationLink(ISEDAnnotationLink expected, ISEDAnnotationLink current) {
+      TestCase.assertNotNull(expected);
+      TestCase.assertNotNull(current);
+      TestCase.assertEquals(expected.getId(), current.getId());
+      TestCase.assertEquals(expected.getSource().getId(), current.getSource().getId());
+      TestCase.assertEquals(expected.getTarget().getId(), current.getTarget().getId());
+      TestCase.assertEquals(expected.getSource().getType().saveAnnotationLink(expected), current.getSource().getType().saveAnnotationLink(current));
+   }
+
+   /**
     * Compares the given {@link IDebugTarget}s with each other.
     * @param expected The expected {@link IDebugTarget}.
     * @param current The current {@link IDebugTarget}.
@@ -930,6 +1002,13 @@ public final class TestSedCoreUtil {
          TestCase.assertTrue(expected.getPathCondition() + " does not match " + current.getPathCondition(), StringUtil.equalIgnoreWhiteSpace(expected.getPathCondition(), current.getPathCondition()));
          TestCase.assertEquals(expected.getNodeType(), current.getNodeType());
          compareDebugElement(expected, current, compareReferences, compareVariables);
+         // Compare annotation links
+         ISEDAnnotationLink[] expectedAnnotationLinks = expected.getAnnotationLinks();
+         ISEDAnnotationLink[] currentAnnotationLinks = current.getAnnotationLinks();
+         assertEquals(expectedAnnotationLinks.length, currentAnnotationLinks.length);
+         for (int i = 0; i < expectedAnnotationLinks.length; i++) {
+            compareAnnotationLink(expectedAnnotationLinks[i], currentAnnotationLinks[i]);
+         }
          // Compare call stack
          if (compareCallStack) {
             compareCallStack(expected.getCallStack(), current.getCallStack());

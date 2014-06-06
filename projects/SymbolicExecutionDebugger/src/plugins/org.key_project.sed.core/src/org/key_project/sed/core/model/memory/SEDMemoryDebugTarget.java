@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -32,14 +32,15 @@ public class SEDMemoryDebugTarget extends AbstractSEDDebugTarget implements ISED
    /**
     * The contained {@link ISEDThread}s.
     */
-   private List<ISEDThread> threads = new LinkedList<ISEDThread>();
+   private final List<ISEDThread> threads = new LinkedList<ISEDThread>();
    
    /**
     * Constructor.
     * @param launch The {@link ILaunch} in that this {@link IDebugTarget} is used.
+    * @param executable {@code true} Support suspend, resume, etc.; {@code false} Do not support suspend, resume, etc.
     */
-   public SEDMemoryDebugTarget(ILaunch launch) {
-      super(launch);
+   public SEDMemoryDebugTarget(ILaunch launch, boolean executable) {
+      super(launch, executable);
    }
 
    /**

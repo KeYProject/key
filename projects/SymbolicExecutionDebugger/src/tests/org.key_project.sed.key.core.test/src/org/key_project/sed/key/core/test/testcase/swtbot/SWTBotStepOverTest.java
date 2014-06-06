@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -25,6 +25,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
+import org.key_project.sed.key.core.test.Activator;
 
 /**
  * Tests the step over functionality of an {@link IDebugTarget} and
@@ -37,7 +38,7 @@ public class SWTBotStepOverTest extends AbstractKeYDebugTargetTestCase {
     */
    @Test
    public void testStepOverOnOneBranchOnly() throws Exception {
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+      IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Get debug target TreeItem
@@ -46,25 +47,25 @@ public class SWTBotStepOverTest extends AbstractKeYDebugTargetTestCase {
             String expectedModelPathInBundle = "data/stepOverOnTwoBranches/oracleOnBranchOnly/StepOverOnTwoBranches";
             String expectedModelFileExtension = ".xml";
             int modelIndex = 0;
-            assertStep(target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension);
+            assertStep(target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension);
             // Step into
-            assertStepInto(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // main method
-            assertStepInto(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // if
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // i = 2
+            assertStepInto(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // main method
+            assertStepInto(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // if
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // i = 2
             item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 0, 0); // Select first i = 2 statement
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // j = 3 on first branch
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // x = valueLonger(i) on first branch
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // y = value(j) on first branch
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // j = 3 on first branch
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // x = valueLonger(i) on first branch
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // y = value(j) on first branch
             item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 1, 0); // Select second i = 2 statement
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // j = 3 on second branch
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // x = valueLonger(i) on second branch
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // y = value(j) on second branch
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // j = 3 on second branch
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // x = valueLonger(i) on second branch
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // y = value(j) on second branch
             item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // z
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // zz
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // return statement
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // method return -2
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // end
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // z
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // zz
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // return statement
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // method return -2
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // end
          }
       };
       doKeYDebugTargetTest("SWTBotStepOverTest_testStepOverOnOneBranchOnly", 
@@ -88,7 +89,7 @@ public class SWTBotStepOverTest extends AbstractKeYDebugTargetTestCase {
     */
    @Test
    public void testStepOverOnTwoBranches() throws Exception {
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+      IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Get debug target TreeItem
@@ -97,19 +98,19 @@ public class SWTBotStepOverTest extends AbstractKeYDebugTargetTestCase {
             String expectedModelPathInBundle = "data/stepOverOnTwoBranches/oracleTwoBranches/StepOverOnTwoBranches";
             String expectedModelFileExtension = ".xml";
             int modelIndex = 0;
-            assertStep(target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension);
+            assertStep(target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension);
             // Step into
-            assertStepInto(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // main method
-            assertStepInto(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // if
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // i = 2
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // j = 3
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // x = valueLonger(i)
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // y = value(j)
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // z
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // zz
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // return statement
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // method return -2
-            assertStepOver(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // end
+            assertStepInto(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // main method
+            assertStepInto(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // if
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // i = 2
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // j = 3
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // x = valueLonger(i)
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // y = value(j)
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // z
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // zz
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // return statement
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // method return -2
+            assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // end
          }
       };
       doKeYDebugTargetTest("SWTBotStepOverTest_testStepOverOnTwoBranches", 

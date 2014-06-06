@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -16,10 +16,10 @@ package org.key_project.monkey.product.ui.model;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
 
 import org.eclipse.core.runtime.Assert;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.key4eclipse.starter.core.util.ProofUserManager;
 import org.key_project.monkey.product.ui.util.MonKeYUtil;
 import org.key_project.util.bean.Bean;
 import org.key_project.util.java.StringUtil;
@@ -30,6 +30,7 @@ import org.key_project.util.java.thread.IRunnableWithResult;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
@@ -40,6 +41,8 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.ProofUserManager;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -72,6 +75,16 @@ public class MonKeYProof extends Bean {
      * Bean property {@link #getReuseStatus()}.
      */
     public static final String PROP_REUSE_STATUS = "reuseStatus";
+
+    /**
+     * Bean property {@link #isHasGoalWithApplicableRules()}.
+     */
+    public static final String PROP_HAS_GOAL_WITH_APPLICABLE_RULES = "hasGoalWithApplicableRules";
+
+    /**
+     * Bean property {@link #isHasGoalWithoutApplicableRules()}.
+     */
+    public static final String PROP_HAS_GOAL_WITHOUT_APPLICABLE_RULES = "hasGoalWithoutApplicableRules";
     
     /**
      * The {@link KeYEnvironment} to use.
@@ -132,6 +145,16 @@ public class MonKeYProof extends Bean {
      * The reuse status.
      */
     private String reuseStatus;
+    
+    /**
+     * If true at least one {@link Goal} has applicable rules left.
+     */
+    private boolean hasGoalWithApplicableRules;
+    
+    /**
+     * If true at least one {@link Goal} has no applicable rules.
+     */
+    private boolean hasGoalWithoutApplicableRules;
 
    /**
      * Constructor.
@@ -191,10 +214,12 @@ public class MonKeYProof extends Bean {
      * Starts the proof in KeY and tries to fulfill it automatically.
      * @throws Exception Occurred Exception.
      */
-    public void startProof(final boolean expandMethods,
+    public void startProof(final int maxRuleApplications,
+                           final boolean expandMethods,
                            final boolean useDependencyContracts,
                            final boolean useQuery,
-                           final boolean useDefOps) throws Exception {
+                           final boolean useDefOps,
+                           final boolean stopAtUnclosable) throws Exception {
        // Start auto mode only if proof is not already closed.
        if (!MonKeYProofResult.CLOSED.equals(getResult())) {
           // Check if the proof is still valid
@@ -247,9 +272,12 @@ public class MonKeYProof extends Bean {
                    sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, useDependencyContracts ? StrategyProperties.DEP_ON : StrategyProperties.DEP_OFF);
                    sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, useQuery ? StrategyProperties.QUERY_ON : StrategyProperties.QUERY_OFF);
                    sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, useDefOps ? StrategyProperties.NON_LIN_ARITH_DEF_OPS : StrategyProperties.NON_LIN_ARITH_NONE);
+                   sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, stopAtUnclosable ? StrategyProperties.STOPMODE_NONCLOSE : StrategyProperties.STOPMODE_DEFAULT);
                    proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
                    // Make sure that the new options are used
+                   ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(maxRuleApplications);
                    ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);
+                   proof.getSettings().getStrategySettings().setMaxSteps(maxRuleApplications);
                    proof.setActiveStrategy(environment.getMediator().getProfile().getDefaultStrategyFactory().create(proof, sp));
                 }
              });
@@ -283,6 +311,20 @@ public class MonKeYProof extends Bean {
         setTime((proof != null && !proof.isDisposed()) ? getTime() + (System.currentTimeMillis() - proofStartTime) : 0l);
         setNodes((proof != null && !proof.isDisposed()) ? proof.countNodes() : 0);
         setBranches((proof != null && !proof.isDisposed()) ? proof.countBranches() : 0);
+        boolean hasGoalWithApplicableRules = false;
+        boolean hasGoalWithoutApplicableRules = false;
+        Iterator<Goal> iter = proof.openGoals().iterator();
+        while ((!hasGoalWithApplicableRules || !hasGoalWithoutApplicableRules) && iter.hasNext()) {
+           Goal next = iter.next();
+           if (SymbolicExecutionUtil.hasApplicableRules(next)) {
+              hasGoalWithApplicableRules = true;
+           }
+           else {
+              hasGoalWithoutApplicableRules = true;
+           }
+        }
+        setHasGoalWithApplicableRules(hasGoalWithApplicableRules);
+        setHasGoalWithoutApplicableRules(hasGoalWithoutApplicableRules);
     }
 
     /**
@@ -307,7 +349,7 @@ public class MonKeYProof extends Bean {
      * Sets the number of proof nodes.
      * @param nodes The number of proof nodes to set.
      */
-    public void setNodes(int nodes) {
+    protected void setNodes(int nodes) {
         int oldValue = getNodes();
         this.nodes = nodes;
         firePropertyChange(PROP_NODES, oldValue, getNodes());
@@ -325,7 +367,7 @@ public class MonKeYProof extends Bean {
      * Sets the reuse status.
      * @param reuseStatus The reuse status to set.
      */
-    public void setReuseStatus(String reuseStatus) {
+    protected void setReuseStatus(String reuseStatus) {
         String oldValue = getReuseStatus();
         this.reuseStatus = reuseStatus;
         firePropertyChange(PROP_REUSE_STATUS, oldValue, getReuseStatus());
@@ -343,7 +385,7 @@ public class MonKeYProof extends Bean {
      * Sets the number of branches.
      * @param branches The number of branches to set.
      */
-    public void setBranches(int branches) {
+    protected void setBranches(int branches) {
         int oldValue = getBranches();
         this.branches = branches;
         firePropertyChange(PROP_BRANCHES, oldValue, getBranches());
@@ -361,13 +403,49 @@ public class MonKeYProof extends Bean {
      * Sets the elapsed time.
      * @param time The elapsed time to set.
      */
-    public void setTime(long time) {
+    protected void setTime(long time) {
         long oldValue = getTime();
         this.time = time;
         firePropertyChange(PROP_TIME, oldValue, getTime());
     }
 
-    /**
+   /**
+    * Checks if at least one goal with applicable rules is available.
+    * @return {@code true} available, {@code false} not available.
+    */
+   public boolean isHasGoalWithApplicableRules() {
+      return hasGoalWithApplicableRules;
+   }
+
+   /**
+    * Defines if at least one goal with applicable rules is available.
+    * @param hasGoalWithApplicableRules {@code true} available, {@code false} not available.
+    */
+   protected void setHasGoalWithApplicableRules(boolean hasGoalWithApplicableRules) {
+      boolean oldValue = isHasGoalWithApplicableRules();
+      this.hasGoalWithApplicableRules = hasGoalWithApplicableRules;
+      firePropertyChange(PROP_HAS_GOAL_WITH_APPLICABLE_RULES, oldValue, isHasGoalWithApplicableRules());
+   }
+
+   /**
+    * Checks if at least one goal without applicable rules is available.
+    * @return {@code true} available, {@code false} not available.
+    */
+   public boolean isHasGoalWithoutApplicableRules() {
+      return hasGoalWithoutApplicableRules;
+   }
+
+   /**
+    * Defines if at least one goal without applicable rules is available.
+    * @param hasGoalWithoutApplicableRules {@code true} available, {@code false} not available.
+    */
+   protected void setHasGoalWithoutApplicableRules(boolean hasGoalWithoutApplicableRules) {
+      boolean oldValue = isHasGoalWithoutApplicableRules();
+      this.hasGoalWithoutApplicableRules = hasGoalWithoutApplicableRules;
+      firePropertyChange(PROP_HAS_GOAL_WITHOUT_APPLICABLE_RULES, oldValue, isHasGoalWithoutApplicableRules());
+   }
+
+   /**
      * Checks if a proof result is available.
      * @return {@code true} proof result is available, {@code false} no proof result available.
      */

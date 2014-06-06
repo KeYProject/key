@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.speclang;
 
@@ -98,17 +97,11 @@ public final class SLEnvInput extends AbstractEnvInput {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private static String getLanguage() {
-//        GeneralSettings gs 
-//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();        
+    private static String getLanguage() {      
     	GeneralSettings gs 
         = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-        if(gs.useJML() && gs.useOCL()) {
-            return "JML/OCL";
-        } else if(gs.useJML()) {
+        if(gs.useJML()) {
             return "JML";
-        } else if(gs.useOCL()) {
-            return "OCL";
         } else {
             return "no";
         }
@@ -376,7 +369,6 @@ public final class SLEnvInput extends AbstractEnvInput {
         final GeneralSettings gs
         = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
-//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
         if(gs.useJML()) {
             createSpecs(new JMLSpecExtractor(initConfig.getServices()));
         }

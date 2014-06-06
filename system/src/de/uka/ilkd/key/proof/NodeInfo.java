@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -134,7 +134,7 @@ public class NodeInfo {
        if (ruleApp instanceof PosTacletApp) {
            PosTacletApp pta = (PosTacletApp) ruleApp;
            if (!isSymbolicExecution(pta.taclet())) return null;
-           Term t = TermBuilder.DF.goBelowUpdates(pta.posInOccurrence().subTerm());
+           Term t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
            final ProgramElement pe = t.javaBlock().program();
            if (pe != null) {
                firstStatement = pe.getFirstElement();

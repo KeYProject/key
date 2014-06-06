@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -110,7 +110,7 @@ public class SWTBotProofProviderAdapterFactoryTest extends AbstractProofReferenc
          assertNull(dependenciesViewPart.getCurrentModel());
          TestInteractiveProvingUtil.openProof(startProofListener, tree, pathToFirstProof);
          waitForModel(dependenciesViewPart);
-         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), "data/TwoClassesWithDiagram/oracle/FirstProof.xml");
+         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), Activator.PLUGIN_ID, "data/TwoClassesWithDiagram/oracle/FirstProof.xml");
          // Start second proof
          TestUtilsUtil.selectInTree(tree, pathToSecondProof);
          waitForNoModel(dependenciesViewPart);
@@ -118,13 +118,13 @@ public class SWTBotProofProviderAdapterFactoryTest extends AbstractProofReferenc
          assertEquals("The active editor provides no supported proof.", dependenciesView.bot().label(0).getText());
          TestInteractiveProvingUtil.openProof(startProofListener, tree, 1);
          waitForModel(dependenciesViewPart);
-         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), "data/TwoClassesWithDiagram/oracle/SecondProof.xml");
+         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), Activator.PLUGIN_ID, "data/TwoClassesWithDiagram/oracle/SecondProof.xml");
          // Select first proof again
          DbcModel oldModel = dependenciesViewPart.getCurrentModel();
          TestUtilsUtil.selectInTree(tree, pathToFirstProof);
          waitForModelChange(oldModel, dependenciesViewPart);
          assertNotNull(dependenciesViewPart.getCurrentModel());
-         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), "data/TwoClassesWithDiagram/oracle/FirstProof.xml");
+         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), Activator.PLUGIN_ID, "data/TwoClassesWithDiagram/oracle/FirstProof.xml");
          // Close data source connection
          IDSConnection connection = InteractiveConnectionUtil.getConnection(model);
          if (connection != null && connection.isConnected()) {
@@ -193,7 +193,7 @@ public class SWTBotProofProviderAdapterFactoryTest extends AbstractProofReferenc
          assertNull(dependenciesViewPart.getCurrentModel());
          TestInteractiveProvingUtil.openProof(startProofListener, editor, proofEditParts.get(0));
          waitForModel(dependenciesViewPart);
-         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), "data/TwoClassesWithDiagram/oracle/FirstProof.xml");
+         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), Activator.PLUGIN_ID, "data/TwoClassesWithDiagram/oracle/FirstProof.xml");
          // Start second proof
          editor.select(proofEditParts.get(2));
          waitForNoModel(dependenciesViewPart);
@@ -201,13 +201,13 @@ public class SWTBotProofProviderAdapterFactoryTest extends AbstractProofReferenc
          assertEquals("The active editor provides no supported proof.", dependenciesView.bot().label(0).getText());
          TestInteractiveProvingUtil.openProof(startProofListener, editor, proofEditParts.get(2));
          waitForModel(dependenciesViewPart);
-         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), "data/TwoClassesWithDiagram/oracle/SecondProof.xml");
+         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), Activator.PLUGIN_ID, "data/TwoClassesWithDiagram/oracle/SecondProof.xml");
          // Select first proof again
          DbcModel oldModel = dependenciesViewPart.getCurrentModel();
          editor.select(proofEditParts.get(0));
          waitForModelChange(oldModel, dependenciesViewPart);
          assertNotNull(dependenciesViewPart.getCurrentModel());
-         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), "data/TwoClassesWithDiagram/oracle/FirstProof.xml");
+         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), Activator.PLUGIN_ID, "data/TwoClassesWithDiagram/oracle/FirstProof.xml");
          // Close data source connection
          DbcProof proof = (DbcProof)proofEditParts.get(0).part().getAdapter(DbcProof.class);
          DbcModel editorModel = DbcModelUtil.getModelRoot(proof);

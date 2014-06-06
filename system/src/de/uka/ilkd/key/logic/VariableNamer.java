@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.logic;
 
@@ -674,7 +673,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 	            if (v.hasInitializer()) {
 			ProgramElement rhs = instantiateExpression(
 			    v.getInitializer(), app.instantiations(), services);
-			name = ProofSaver.printProgramElement(rhs);
+			name = ProofSaver.printProgramElement(rhs).toString();
 			break;
 		    } else if (c.getStatementAt(1) instanceof CopyAssignment) {
 	        	CopyAssignment p2 = (CopyAssignment) c.getStatementAt(1);
@@ -729,7 +728,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * ProgramElementName carrying an additional index
      */
-    private abstract static class IndProgramElementName
+    public abstract static class IndProgramElementName
     			    extends ProgramElementName {
 	private final String basename;
         private final int index;
@@ -953,5 +952,12 @@ public abstract class VariableNamer implements InstantiationProposer {
     protected static class BasenameAndIndex {
     	public String basename;
 	public int index;
+    }
+    
+    public static Name getBasename(Name name){
+       if(name instanceof IndProgramElementName){
+          return new Name(((IndProgramElementName) name).getBaseName());
+       }
+       return name;
     }
 }

@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.parser;
 
@@ -53,9 +52,11 @@ public class TestDeclParser extends TestCase {
 	nss = serv.getNamespaces();
 	
 	String sorts = "\\sorts{boolean;int;LocSet;}";
-	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(sorts,null),
-			      "No file. Call of parser from logic/TestClashFreeSubst.java",
-			      serv, nss);
+	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION,
+		new KeYLexerF(sorts,
+			"No file. Call of parser from logic/TestClashFreeSubst.java",
+			null),
+		serv, nss);
 	try {
 	    basicSortsParser.parseSorts();
 	} catch(Exception e) {
@@ -67,9 +68,11 @@ public class TestDeclParser extends TestCase {
     }
 
     private KeYParserF stringParser(String s) {
-	return new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s,null),
-			      "No file. Call of parser from parser/TestDeclParser.java",
-			      serv, nss);
+	return new KeYParserF(ParserMode.DECLARATION,
+		new KeYLexerF(s,
+			"No file. Call of parser from parser/TestDeclParser.java",
+			null),
+		serv, nss);
     }
 
     public void parseDecls(String s) {
@@ -478,4 +481,3 @@ public class TestDeclParser extends TestCase {
     
 
 }
-    

@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.rule.label;
 
 import java.util.Iterator;
@@ -5,10 +18,10 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
@@ -53,7 +66,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     * {@inheritDoc}
     */
    @Override
-   public RefactoringScope defineRefactoringScope(Services services,
+   public RefactoringScope defineRefactoringScope(TermServices services,
                                                   PosInOccurrence applicationPosInOccurrence,
                                                   Term applicationTerm,
                                                   Rule rule,
@@ -82,7 +95,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     * {@inheritDoc}
     */
    @Override
-   public void refactoreLabels(Services services,
+   public void refactoreLabels(TermServices services,
                                PosInOccurrence applicationPosInOccurrence,
                                Term applicationTerm,
                                Rule rule,Goal goal,

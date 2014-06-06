@@ -1,16 +1,19 @@
 This is the KeY project - Integrated Deductive Software Design 
-Copyright (C) 2001-2010 Karlsruhe Institute of Technology, Germany
-                        Universitaet Koblenz-Landau, Germany
+Copyright (C) 2001-2011 Universität Karlsruhe, Germany
+                        Universität Koblenz-Landau, Germany
                         and Chalmers University of Technology, Sweden          
+Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+                        Technical University Darmstadt, Germany
+                        Chalmers University of Technology, Sweden
 
 The KeY system is protected by the GNU General 
 Public License. See LICENSE.TXT for details.
 
-system 		contains sources of all software.
+system 		  contains sources of all software.
 
-examples 	contains some programming examples 
-		to illustrate use of various packages.
+examples 	  contains some programming examples 
+		  to illustrate use of various packages.
 
-LICENSE.TXT     information on how KeY is protected
+LICENSE.TXT       information on how KeY is protected
 
-README.install  installation information
+README.install.*  installation information

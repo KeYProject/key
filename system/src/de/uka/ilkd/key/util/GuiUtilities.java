@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -18,7 +18,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Point;
-import java.awt.TextArea;
+import java.awt.Toolkit;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JComponent;
@@ -32,8 +32,6 @@ import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 import de.uka.ilkd.key.pp.PosInSequent;
 
 public final class GuiUtilities {
-
-    private static TextArea clipBoardTextArea;
     
     /**
      * The shared instance of the key file chooser.
@@ -71,8 +69,9 @@ public final class GuiUtilities {
             try{
                SwingUtilities.invokeAndWait(runner);
             } catch(InterruptedException e) {
-                System.err.println(e);
-                e.printStackTrace();
+            	Debug.out(e);
+//                System.err.println(e);
+//                e.printStackTrace();
             } catch(InvocationTargetException ite) {
                Throwable targetExc = ite.getTargetException();
                System.err.println(targetExc);
@@ -98,36 +97,15 @@ public final class GuiUtilities {
         }
     }
 
-    // is this still needed?
     public static void copyHighlightToClipboard(CurrentGoalView view, PosInSequent pos) {
         String s = view.getHighlightedText(pos);
         // now CLIPBOARD
         java.awt.datatransfer.StringSelection ss = 
             new java.awt.datatransfer.StringSelection(s);
-        final TextArea clipBoard = getClipBoardArea();
-        clipBoard.getToolkit().getSystemClipboard().setContents(ss,ss);
-        // now PRIMARY
-        clipBoard.setText(s);
-        clipBoard.selectAll();
+        java.awt.Toolkit toolkit = Toolkit.getDefaultToolkit();
+        toolkit.getSystemClipboard().setContents(ss, ss);
     }
 
-    // is this still needed?
-    public static TextArea getClipBoardArea() {
-        if (clipBoardTextArea == null) {
-            clipBoardTextArea = new java.awt.TextArea(
-        	    "",10,10,java.awt.TextArea.SCROLLBARS_NONE) {
-        	/**
-                     * 
-                     */
-                    private static final long serialVersionUID = 7729624612190406520L;
-
-            public java.awt.Dimension getMaximumSize() {
-        	    return new java.awt.Dimension(0,0);
-        	}
-            };
-        }
-        return clipBoardTextArea;
-    }
 
     /**
      * Gets <b>the</b> file chooser for the prover.

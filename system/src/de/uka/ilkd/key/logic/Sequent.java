@@ -1,30 +1,26 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.logic;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
-import java.util.HashSet;
-import java.util.Set;
 
 
 /** This class represents a sequent. A sequent consists of an
@@ -334,23 +330,6 @@ public class Sequent implements Iterable<SequentFormula> {
        return formulaNumber <= antecedent.size();
     }
 
-    public void prettyprint(de.uka.ilkd.key.pp.LogicPrinter printer) {
-	printer.printSequent(this);
-    }
-
-    public void prettyprint(de.uka.ilkd.key.pp.LogicPrinter printer, SequentPrintFilter filter) {
-	printer.printSequent(this, true);
-    }
-
-
-    public StringBuffer prettyprint(Services services) {
-	de.uka.ilkd.key.pp.LogicPrinter lp = (new de.uka.ilkd.key.pp.LogicPrinter
-					       (new de.uka.ilkd.key.pp.ProgramPrinter(null),
-						new NotationInfo(),
-						services));
-	lp.printSequent(this);
-	return lp.result();
-    }
 
     /** removes the formula at position p (NOTICE:Sequent determines
      * index using identity (==) not equality.)
@@ -452,7 +431,7 @@ public class Sequent implements Iterable<SequentFormula> {
      * Returns names of TermLabels, that occur in term or one of its subterms.
      */
     private static Set<Name> getLabelsForTermRecursively(Term term) {
-        Set<Name> result = new HashSet();
+        Set<Name> result = new HashSet<Name>();
 
         if (term.hasLabels()) {
             for (TermLabel label : term.getLabels()) {
@@ -460,7 +439,7 @@ public class Sequent implements Iterable<SequentFormula> {
             }
         }
 
-        for (Term subTerm : term.subs()) {
+        for (final Term subTerm : term.subs()) {
             result.addAll(getLabelsForTermRecursively(subTerm));
         }
 
@@ -471,10 +450,9 @@ public class Sequent implements Iterable<SequentFormula> {
      * Returns names of TermLabels, that occur in this sequent.
      */
     public Set<Name> getOccuringTermLabels() {
-        Set<Name> result = new HashSet();
-        Iterator<SequentFormula> iterator = iterator();
-        while (iterator.hasNext()) {
-            result.addAll(getLabelsForTermRecursively(iterator.next().formula()));
+        final Set<Name> result = new HashSet<Name>();
+        for (final SequentFormula sf : this) {
+            result.addAll(getLabelsForTermRecursively(sf.formula()));
         }
         return result;
     }

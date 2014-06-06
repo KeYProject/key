@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.rule.conditions;
 
@@ -18,17 +17,18 @@ package de.uka.ilkd.key.rule.conditions;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.ProxySort;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -166,36 +166,31 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
         return false;
     }
 
-    private static Map<Sort,Map<Sort,Boolean>> disjointnessCache
-    	= new WeakHashMap<Sort,Map<Sort,Boolean>>();
-
-
-    private static Boolean lookupInCache(Sort s1, Sort s2) {
+    private static Boolean lookupInCache(Sort s1, Sort s2, ServiceCaches caches) {
 	Boolean result = null;
 
-	Map<Sort,Boolean> map = disjointnessCache.get(s1);
+	Map<Sort,Boolean> map = caches.getDisjointnessCache().get(s1);
 	if(map != null) {
 	    result = map.get(s2);
 	}
 
 	if(result == null) {
-	    map = disjointnessCache.get(s2);
+	    map = caches.getDisjointnessCache().get(s2);
 	    if(map != null) {
 		result = map.get(s1);
 	    }
 	}
-
 	return result;
     }
 
 
-    private static void putIntoCache(Sort s1, Sort s2, boolean b) {
-	Map<Sort,Boolean> map = disjointnessCache.get(s1);
+    private static void putIntoCache(Sort s1, Sort s2, boolean b, ServiceCaches caches) {
+	Map<Sort,Boolean> map = caches.getDisjointnessCache().get(s1);
 	if(map == null) {
 	    map = new WeakHashMap<Sort,Boolean>();
 	}
 	map.put(s2, b);
-	disjointnessCache.put(s1, map);
+	caches.getDisjointnessCache().put(s1, map);
     }
     
     
@@ -211,7 +206,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 	}
 	
 	//result cached?
-	Boolean result = lookupInCache(fstSort, sndSort);
+	Boolean result = lookupInCache(fstSort, sndSort, services.getCaches());
 	
 	//if not, compute it 
 	if(result == null) {
@@ -262,7 +257,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 		}
 	    }
 	    
-    	    putIntoCache(fstSort, sndSort, result);
+    	    putIntoCache(fstSort, sndSort, result, services.getCaches());
     	}
 	
 	return result;

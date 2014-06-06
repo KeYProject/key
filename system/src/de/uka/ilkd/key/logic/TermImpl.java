@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.logic;
 
@@ -37,7 +36,7 @@ class TermImpl implements Term {
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST
         = new ImmutableArray<TermLabel>();
     
-	private static int serialNumberCounter =0;
+    private static int serialNumberCounter =0;
 
     //content
     private final Operator op;
@@ -160,8 +159,8 @@ class TermImpl implements Term {
     @Override
     public Term subAt(PosInTerm pos) {
         Term sub = this;
-        for(final IntIterator it = pos.iterator(); it.hasNext(); ) {	
-            sub = sub.sub(it.next());
+        for(int i = 0; i<pos.depth(); i++) {	
+            sub = sub.sub(pos.getIndexAt(i));
         }
         return sub;
     }

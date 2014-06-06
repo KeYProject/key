@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.rule;
 
@@ -19,6 +18,7 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -48,11 +48,6 @@ public class ContractRuleApp extends AbstractContractRuleApp {
     	super(rule, pio, instantiation);
     }
     
-    public ContractRuleApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableList<PosInOccurrence> ifInsts, Contract instantiation) {
-        super(rule, pio, ifInsts, instantiation);
-    }
-
     public ContractRuleApp replacePos(PosInOccurrence newPos) {
 	    return new ContractRuleApp(rule(), newPos, instantiation);
     }
@@ -119,9 +114,15 @@ public class ContractRuleApp extends AbstractContractRuleApp {
 
     public Term programTerm() {
         if (posInOccurrence() != null) {
-            return TermBuilder.DF.goBelowUpdates(posInOccurrence().subTerm());
+            return TermBuilder.goBelowUpdates(posInOccurrence().subTerm());
         }
         return null;
+    }
+    
+    @Override
+    public IObserverFunction getObserverFunction(Services services) {
+        return UseOperationContractRule.computeInstantiation(
+                    posInOccurrence().subTerm(), services).pm;
     }
 
 }

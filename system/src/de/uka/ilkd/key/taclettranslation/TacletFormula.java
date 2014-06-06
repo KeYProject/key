@@ -1,22 +1,22 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.taclettranslation;
 
 import java.util.Collection;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Taclet;
 
 /**
@@ -36,13 +36,14 @@ public interface TacletFormula {
 
     /**
      * 
-     * @return the formula of the instance if the taclet is translatable
+     * @param services TODO
+    * @return the formula of the instance if the taclet is translatable
      *         otherwise <code>null</code>. If the translation of the taclet
      *         consists of several instantiations (e.g. the taclet has some
      *         generic sorts) the returned term is a conjunction of these 
      *         instantiations.
      */
-    Term getFormula();
+    Term getFormula(TermServices services);
 
     /**
      * @return if the taclet can not be translated the reason why. Otherwise a

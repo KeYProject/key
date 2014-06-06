@@ -1,19 +1,20 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -38,6 +39,9 @@ public class TestStepOverSymbolicExecutionTreeNodesStopCondition extends Abstrac
     * stop conditions works correctly in combination with the goal chooser.
     */
    public void testStepOverOnTwoBranches() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+      HashMap<String, String> originalTacletOptions = null;
+      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = null;
+      boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       // Define test settings
       String javaPathInkeyRepDirectory = "examples/_testcase/set/stepOverOnTwoBranches/test/StepOverOnTwoBranches.java";
       String containerTypeName = "StepOverOnTwoBranches";
@@ -45,8 +49,11 @@ public class TestStepOverSymbolicExecutionTreeNodesStopCondition extends Abstrac
       String oraclePathInkeyRepDirectoryFile = "examples/_testcase/set/stepOverOnTwoBranches/oracle/StepOverOnTwoBranches";
       String oracleFileExtension = ".xml";
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false);
       try {
+         originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
+         setOneStepSimplificationEnabled(null, true);
+         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false);
+         // Create proof environment for symbolic execution
          // Make sure that initial tree is valid
          int oracleIndex = 0;
          assertSetTreeAfterStep(env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory);
@@ -64,7 +71,11 @@ public class TestStepOverSymbolicExecutionTreeNodesStopCondition extends Abstrac
          stepOver(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory); // end
       }
       finally {
-         env.dispose();
+         setOneStepSimplificationEnabled(null, originalOneStepSimplification);
+         restoreTacletOptions(originalTacletOptions);
+         if (env != null) {
+            env.dispose();
+         }
       }
    }
 }

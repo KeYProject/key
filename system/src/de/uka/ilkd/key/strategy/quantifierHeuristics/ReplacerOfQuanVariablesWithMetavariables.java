@@ -1,25 +1,27 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.DefaultImmutableMap;
+import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -31,11 +33,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 @Deprecated
 class ReplacerOfQuanVariablesWithMetavariables {
 
-    final private static TermBuilder tb = TermBuilder.DF;
-
     private ReplacerOfQuanVariablesWithMetavariables () {}
     
-    public static Substitution createSubstitutionForVars(Term allTerm) {
+    public static Substitution createSubstitutionForVars(Term allTerm, TermServices services) {
         ImmutableMap<QuantifiableVariable,Term> res =
             DefaultImmutableMap.<QuantifiableVariable,Term>nilMap();
         Term t = allTerm;
@@ -46,11 +46,11 @@ class ReplacerOfQuanVariablesWithMetavariables {
             Term m;
             if ( op == Quantifier.ALL ) {
                 Metavariable mv = new Metavariable ( ARBITRARY_NAME, q.sort () );
-                m = tb.var ( mv );
+                m = services.getTermBuilder().var ( mv );
             } else {
                 Function f = new Function ( ARBITRARY_NAME, q.sort (),
                                             new Sort [0] );
-                m = tb.func ( f );
+                m = services.getTermBuilder().func ( f );
             }
             res = res.put ( q, m );
             t = t.sub ( 0 );

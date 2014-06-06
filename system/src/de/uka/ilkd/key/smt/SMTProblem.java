@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.smt;
 
@@ -38,7 +37,7 @@ public class SMTProblem {
 
         private Term term;
         private Collection<SMTSolver> solvers = new LinkedList<SMTSolver>();
-        private Goal goal;
+        private final Goal goal;
         private Sequent sequent;
         private String name = "";
 
@@ -70,15 +69,9 @@ public class SMTProblem {
         }
 
         public SMTProblem(Goal goal) {
+                this.goal = goal;
                 name = "Goal " + goal.node().serialNr();
                 term = goalToTerm(goal);
-                this.goal = goal;
-        }
-
-        public SMTProblem(Sequent sequent) {
-                term = sequentToTerm(sequent);
-                this.sequent = sequent;
-
         }
 
         public Goal getGoal() {
@@ -143,19 +136,19 @@ public class SMTProblem {
 
                 ImmutableList<Term> ante = ImmutableSLList.nil();
 
-                ante = ante.append(TermBuilder.DF.tt());
+                final TermBuilder tb = goal.proof().getServices().getTermBuilder();
+                ante = ante.append(tb.tt());
                 for (SequentFormula f : s.antecedent()) {
                         ante = ante.append(f.formula());
                 }
 
                 ImmutableList<Term> succ = ImmutableSLList.nil();
-                succ = succ.append(TermBuilder.DF.ff());
+                succ = succ.append(tb.ff());
                 for (SequentFormula f : s.succedent()) {
                         succ = succ.append(f.formula());
                 }
 
-                return TermBuilder.DF.imp(TermBuilder.DF.and(ante),
-                                TermBuilder.DF.or(succ));
+                return tb.imp(tb.and(ante), tb.or(succ));
 
         }
 

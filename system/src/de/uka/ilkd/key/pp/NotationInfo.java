@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.pp;
 
@@ -272,9 +271,9 @@ public final class NotationInfo {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
 	tbl.put(heapLDT.getStore(), new Notation.StoreNotation());
-	tbl.put(heapLDT.getAnon(), new Notation.AnonNotation());
-	tbl.put(heapLDT.getCreate(), new Notation.CreateNotation());
-	tbl.put(heapLDT.getMemset(), new Notation.MemsetNotation());
+        tbl.put(heapLDT.getAnon(), new Notation.HeapConstructorNotation());
+        tbl.put(heapLDT.getCreate(), new Notation.HeapConstructorNotation());
+        tbl.put(heapLDT.getMemset(), new Notation.HeapConstructorNotation());
 	tbl.put(IObserverFunction.class, new Notation.ObserverNotation());
 	tbl.put(IProgramMethod.class, new Notation.ObserverNotation());
 	tbl.put(heapLDT.getLength(), new Notation.Postfix(".length"));
@@ -372,7 +371,7 @@ public final class NotationInfo {
     /** Get the Notation for a given Operator.  
      * If no notation is registered, a Function notation is returned.
      */
-    Notation getNotation(Operator op, Services services) {
+    Notation getNotation(Operator op) {
         Notation result = notationTable.get(op);
         if(result != null) {
             return result;

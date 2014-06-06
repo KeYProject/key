@@ -5,17 +5,28 @@
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <loopInvariant name="
-invariant: i &gt;= 0 &amp; (i &lt;= array.length &amp; result_1 = i);
+            <loopInvariant name="invariant: i &gt;= 0 &amp; (i &lt;= array.length &amp; result_1 = i);
 variant: javaSubInt(array.length, i)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
-               <branchCondition name="not(or(or(and(and(geq(i_0,Z(1(#))),geq(length(array),Z(0(#)))),lt(length(array),i_0)),and(and(leq(i_0,Z(neglit(1(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0))),not(imp(and(and(geq(i_0,Z(0(#))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),equals(result_1_0,i_0)))))" pathCondition="not(and(geq(length(array),Z(0(#))),or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))))" pathConditionChanged="true" branchCondition="not(or(or(and(and(geq(i_0,Z(1(#))),geq(length(array),Z(0(#)))),lt(length(array),i_0)),and(and(leq(i_0,Z(neglit(1(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0))),not(imp(and(and(geq(i_0,Z(0(#))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),equals(result_1_0,i_0)))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+               <branchCondition name="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <callStackEntry path="/0"/>
-                  <branchCondition name="and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))))" pathConditionChanged="true" branchCondition="and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (goOnNice)">
+                  <branchCondition name="and(and(java.lang.Object::&lt;inv&gt;(heap,x),not(equals(array,null))),not(equals(x,null)))" pathCondition="not(or(or(or(not(or(or(equals(x,null),equals(array,null)),java.lang.Object::&lt;inv&gt;(heap,x))),not(imp(java.lang.Object::&lt;inv&gt;(heap,x),or(or(equals(x,null),equals(array,null)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))))),not(imp(equals(array,null),equals(x,null)))),equals(x,null)))" pathConditionChanged="true" branchCondition="and(and(java.lang.Object::&lt;inv&gt;(heap,x),not(equals(array,null))),not(equals(x,null)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (goOnNice)">
                      <operationContract name="result_5 = x.goOnNice(array, i) catch(exc_8)
 pre: i &lt; 0 &amp; x.&lt;inv&gt; | !array = null &amp; i &gt;= 0 &amp; x.&lt;inv&gt;
-post: (   i &lt; 0 &amp; heapBefore_goOnNice_5[x.&lt;inv&gt;]
+post: (   i &lt; 0 &amp; x.&lt;inv&gt;@heapBefore_goOnNice_5
    -&gt;   !exc_8 = null
       &amp; (  (     java.lang.Throwable::instance(exc_8)
                = TRUE
@@ -27,7 +38,7 @@ post: (   i &lt; 0 &amp; heapBefore_goOnNice_5[x.&lt;inv&gt;]
               = TRUE)))
 &amp; (     !array = null
       &amp; i &gt;= 0
-      &amp; heapBefore_goOnNice_5[x.&lt;inv&gt;]
+      &amp; x.&lt;inv&gt;@heapBefore_goOnNice_5
    -&gt;     result_5
         = \if (i &lt; array.length)
               \then (TRUE)
@@ -82,38 +93,62 @@ mod: \if (true)
 \cap \if (!array = null &amp; i &gt;= 0 &amp; x.&lt;inv&gt;)
          \then (allLocs)
          \else (allLocs)
-termination: diamond" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))))" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
+termination: diamond" pathCondition="not(or(or(or(not(or(or(equals(x,null),equals(array,null)),java.lang.Object::&lt;inv&gt;(heap,x))),not(imp(java.lang.Object::&lt;inv&gt;(heap,x),or(or(equals(x,null),equals(array,null)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))))),not(imp(equals(array,null),equals(x,null)))),equals(x,null)))" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
                         <callStackEntry path="/0"/>
-                        <branchCondition name="and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))))" pathConditionChanged="true" branchCondition="and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (goOnNice)">
+                        <branchCondition name="and(and(java.lang.Object::&lt;inv&gt;(heap,x),not(equals(array,null))),not(equals(x,null)))" pathCondition="not(or(or(or(not(or(or(equals(x,null),equals(array,null)),java.lang.Object::&lt;inv&gt;(heap,x))),not(imp(java.lang.Object::&lt;inv&gt;(heap,x),or(or(equals(x,null),equals(array,null)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))))),not(imp(equals(array,null),equals(x,null)))),equals(x,null)))" pathConditionChanged="true" branchCondition="and(and(java.lang.Object::&lt;inv&gt;(heap,x),not(equals(array,null))),not(equals(x,null)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (goOnNice)">
                            <callStackEntry path="/0"/>
-                           <branchCondition name="equals(result_5,TRUE)" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))),equals(result_5,TRUE)))" pathConditionChanged="true" branchCondition="equals(result_5,TRUE)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <branchCondition name="equals(result_5,TRUE)" pathCondition="not(or(or(or(or(not(or(or(equals(x,null),equals(array,null)),equals(result_5,TRUE))),not(imp(equals(result_5,TRUE),or(or(java.lang.Object::&lt;inv&gt;(heap,x),equals(x,null)),equals(array,null))))),not(imp(and(java.lang.Object::&lt;inv&gt;(heap,x),equals(result_5,TRUE)),or(or(update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))),equals(x,null)),equals(array,null))))),not(imp(equals(array,null),equals(x,null)))),equals(x,null)))" pathConditionChanged="true" branchCondition="equals(result_5,TRUE)" mergedBranchCondition="false" isBranchConditionComputed="true">
                               <callStackEntry path="/0"/>
-                              <statement name="result_1++;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))),equals(result_5,TRUE)))" pathConditionChanged="false">
+                              <statement name="result_1++;" pathCondition="not(or(or(or(or(not(or(or(equals(x,null),equals(array,null)),equals(result_5,TRUE))),not(imp(equals(result_5,TRUE),or(or(java.lang.Object::&lt;inv&gt;(heap,x),equals(x,null)),equals(array,null))))),not(imp(and(java.lang.Object::&lt;inv&gt;(heap,x),equals(result_5,TRUE)),or(or(update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))),equals(x,null)),equals(array,null))))),not(imp(equals(array,null),equals(x,null)))),equals(x,null)))" pathConditionChanged="false">
                                  <callStackEntry path="/0"/>
-                                 <statement name="i++;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))),equals(result_5,TRUE)))" pathConditionChanged="false">
+                                 <statement name="i++;" pathCondition="not(or(or(or(or(not(or(or(equals(x,null),equals(array,null)),equals(result_5,TRUE))),not(imp(equals(result_5,TRUE),or(or(java.lang.Object::&lt;inv&gt;(heap,x),equals(x,null)),equals(array,null))))),not(imp(and(java.lang.Object::&lt;inv&gt;(heap,x),equals(result_5,TRUE)),or(or(update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))),equals(x,null)),equals(array,null))))),not(imp(equals(array,null),equals(x,null)))),equals(x,null)))" pathConditionChanged="false">
                                     <callStackEntry path="/0"/>
-                                    <termination name="&lt;loop body end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))),equals(result_5,TRUE)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+                                    <termination name="&lt;loop body end&gt;" pathCondition="not(or(or(or(or(not(or(or(equals(x,null),equals(array,null)),equals(result_5,TRUE))),not(imp(equals(result_5,TRUE),or(or(java.lang.Object::&lt;inv&gt;(heap,x),equals(x,null)),equals(array,null))))),not(imp(and(java.lang.Object::&lt;inv&gt;(heap,x),equals(result_5,TRUE)),or(or(update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))),equals(x,null)),equals(array,null))))),not(imp(equals(array,null),equals(x,null)))),equals(x,null)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                                     </termination>
                                  </statement>
                               </statement>
                            </branchCondition>
-                           <branchCondition name="not(equals(result_5,TRUE))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))),not(equals(result_5,TRUE))))" pathConditionChanged="true" branchCondition="not(equals(result_5,TRUE))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <branchCondition name="not(equals(result_5,TRUE))" pathCondition="not(or(or(or(or(not(or(or(or(java.lang.Object::&lt;inv&gt;(heap,x),equals(x,null)),equals(array,null)),equals(result_5,TRUE))),not(imp(java.lang.Object::&lt;inv&gt;(heap,x),or(or(or(update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))),equals(x,null)),equals(array,null)),equals(result_5,TRUE))))),not(imp(equals(result_5,TRUE),or(equals(x,null),equals(array,null))))),not(imp(equals(array,null),equals(x,null)))),equals(x,null)))" pathConditionChanged="true" branchCondition="not(equals(result_5,TRUE))" mergedBranchCondition="false" isBranchConditionComputed="true">
                               <callStackEntry path="/0"/>
-                              <termination name="&lt;loop body end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))),not(equals(result_5,TRUE))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+                              <termination name="&lt;loop body end&gt;" pathCondition="not(or(or(or(or(not(or(or(or(java.lang.Object::&lt;inv&gt;(heap,x),equals(x,null)),equals(array,null)),equals(result_5,TRUE))),not(imp(java.lang.Object::&lt;inv&gt;(heap,x),or(or(or(update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))),equals(x,null)),equals(array,null)),equals(result_5,TRUE))))),not(imp(equals(result_5,TRUE),or(equals(x,null),equals(array,null))))),not(imp(equals(array,null),equals(x,null)))),equals(x,null)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                               </termination>
                            </branchCondition>
                         </branchCondition>
-                        <branchCondition name="and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))))" pathConditionChanged="true" branchCondition="and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (goOnNice)">
+                        <branchCondition name="false" pathCondition="false" pathConditionChanged="true" branchCondition="false" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (goOnNice)">
                            <callStackEntry path="/0"/>
-                           <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                           <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="false" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                            </termination>
                         </branchCondition>
                      </operationContract>
                   </branchCondition>
-                  <branchCondition name="and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))))" pathConditionChanged="true" branchCondition="and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (goOnNice)">
+                  <branchCondition name="false" pathCondition="false" pathConditionChanged="true" branchCondition="false" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (goOnNice)">
                      <operationContract name="result_6 = x.goOnNice(array, i) catch(exc_9)
 pre: i &lt; 0 &amp; x.&lt;inv&gt; | !array = null &amp; i &gt;= 0 &amp; x.&lt;inv&gt;
-post: (   i &lt; 0 &amp; heapBefore_goOnNice_5[x.&lt;inv&gt;]
+post: (   i &lt; 0 &amp; x.&lt;inv&gt;@heapBefore_goOnNice_5
    -&gt;   !exc_9 = null
       &amp; (  (     java.lang.Throwable::instance(exc_9)
                = TRUE
@@ -125,7 +160,7 @@ post: (   i &lt; 0 &amp; heapBefore_goOnNice_5[x.&lt;inv&gt;]
               = TRUE)))
 &amp; (     !array = null
       &amp; i &gt;= 0
-      &amp; heapBefore_goOnNice_5[x.&lt;inv&gt;]
+      &amp; x.&lt;inv&gt;@heapBefore_goOnNice_5
    -&gt;     result_6
         = \if (i &lt; array.length)
               \then (TRUE)
@@ -180,43 +215,64 @@ mod: \if (true)
 \cap \if (!array = null &amp; i &gt;= 0 &amp; x.&lt;inv&gt;)
          \then (allLocs)
          \else (allLocs)
-termination: diamond" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))))" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
+termination: diamond" pathCondition="false" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
                         <callStackEntry path="/0"/>
-                        <branchCondition name="and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))))" pathConditionChanged="true" branchCondition="and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (goOnNice)">
+                        <branchCondition name="false" pathCondition="false" pathConditionChanged="true" branchCondition="false" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (goOnNice)">
                            <callStackEntry path="/0"/>
-                           <branchCondition name="equals(result_6,TRUE)" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))),equals(result_6,TRUE)))" pathConditionChanged="true" branchCondition="equals(result_6,TRUE)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <branchCondition name="equals(result_6,TRUE)" pathCondition="false" pathConditionChanged="true" branchCondition="equals(result_6,TRUE)" mergedBranchCondition="false" isBranchConditionComputed="true">
                               <callStackEntry path="/0"/>
-                              <statement name="result_1++;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))),equals(result_6,TRUE)))" pathConditionChanged="false">
+                              <statement name="result_1++;" pathCondition="false" pathConditionChanged="false">
                                  <callStackEntry path="/0"/>
-                                 <statement name="i++;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))),equals(result_6,TRUE)))" pathConditionChanged="false">
+                                 <statement name="i++;" pathCondition="false" pathConditionChanged="false">
                                     <callStackEntry path="/0"/>
-                                    <termination name="&lt;loop body end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))),equals(result_6,TRUE)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+                                    <termination name="&lt;loop body end&gt;" pathCondition="false" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                                     </termination>
                                  </statement>
                               </statement>
                            </branchCondition>
-                           <branchCondition name="not(equals(result_6,TRUE))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))),not(equals(result_6,TRUE))))" pathConditionChanged="true" branchCondition="not(equals(result_6,TRUE))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <branchCondition name="not(equals(result_6,TRUE))" pathCondition="false" pathConditionChanged="true" branchCondition="not(equals(result_6,TRUE))" mergedBranchCondition="false" isBranchConditionComputed="true">
                               <callStackEntry path="/0"/>
-                              <termination name="&lt;loop body end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))),not(equals(result_6,TRUE))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+                              <termination name="&lt;loop body end&gt;" pathCondition="false" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                               </termination>
                            </branchCondition>
                         </branchCondition>
-                        <branchCondition name="and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))))" pathConditionChanged="true" branchCondition="and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (goOnNice)">
+                        <branchCondition name="false" pathCondition="false" pathConditionChanged="true" branchCondition="false" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (goOnNice)">
                            <callStackEntry path="/0"/>
-                           <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(java.lang.Object::&lt;inv&gt;(heap,x),leq(i_0,Z(neglit(1(#))))),not(equals(x,null)))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                           <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="false" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                            </termination>
                         </branchCondition>
                      </operationContract>
                   </branchCondition>
                </branchCondition>
-               <branchCondition name="not(or(or(and(and(geq(i_0,Z(1(#))),geq(length(array),Z(0(#)))),lt(length(array),i_0)),and(and(leq(i_0,Z(neglit(1(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0))),not(imp(and(and(geq(i_0,Z(0(#))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),equals(result_1_0,i_0)))))" pathCondition="not(and(geq(length(array),Z(0(#))),or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))))" pathConditionChanged="true" branchCondition="not(or(or(and(and(geq(i_0,Z(1(#))),geq(length(array),Z(0(#)))),lt(length(array),i_0)),and(and(leq(i_0,Z(neglit(1(#)))),geq(length(array),Z(0(#)))),geq(length(array),i_0))),not(imp(and(and(geq(i_0,Z(0(#))),geq(length(array),Z(0(#)))),geq(length(array),i_0)),equals(result_1_0,i_0)))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+               <branchCondition name="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                   <callStackEntry path="/0"/>
-                  <statement name="return result_1;" pathCondition="not(and(geq(length(array),Z(0(#))),or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))))" pathConditionChanged="false">
+                  <statement name="return result_1;" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
-                     <branchCondition name="and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))))" pathConditionChanged="true" branchCondition="and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (goOnNice)">
-                        <methodReturn name="&lt;return of self.size(x,array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))))" pathConditionChanged="false" isReturnValueComputed="false">
+                     <branchCondition name="and(and(java.lang.Object::&lt;inv&gt;(heap,x),not(equals(array,null))),not(equals(x,null)))" pathCondition="not(or(or(or(not(or(or(equals(x,null),equals(array,null)),java.lang.Object::&lt;inv&gt;(heap,x))),not(imp(java.lang.Object::&lt;inv&gt;(heap,x),or(or(equals(x,null),equals(array,null)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))))),not(imp(equals(array,null),equals(x,null)))),equals(x,null)))" pathConditionChanged="true" branchCondition="and(and(java.lang.Object::&lt;inv&gt;(heap,x),not(equals(array,null))),not(equals(x,null)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (goOnNice)">
+                        <methodReturn name="&lt;return of self.size(x,array);&gt;" pathCondition="not(or(or(or(not(or(or(equals(x,null),equals(array,null)),java.lang.Object::&lt;inv&gt;(heap,x))),not(imp(java.lang.Object::&lt;inv&gt;(heap,x),or(or(equals(x,null),equals(array,null)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))))),not(imp(equals(array,null),equals(x,null)))),equals(x,null)))" pathConditionChanged="false" isReturnValueComputed="false">
                            <callStackEntry path="/0"/>
-                           <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(or(and(and(not(equals(i_0,Z(0(#)))),or(geq(i_0,Z(1(#))),geq(length(array),i_0))),or(leq(i_0,Z(neglit(1(#)))),lt(length(array),i_0))),not(imp(and(geq(i_0,Z(0(#))),geq(length(array),i_0)),equals(result_1_0,i_0))))),and(and(and(java.lang.Object::&lt;inv&gt;(heap,x),geq(i_0,Z(0(#)))),not(equals(array,null))),not(equals(x,null)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           <termination name="&lt;end&gt;" pathCondition="not(or(or(or(not(or(or(equals(x,null),equals(array,null)),java.lang.Object::&lt;inv&gt;(heap,x))),not(imp(java.lang.Object::&lt;inv&gt;(heap,x),or(or(equals(x,null),equals(array,null)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
+    b_3=x.goOnNice(array,i);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))))),not(imp(equals(array,null),equals(x,null)))),equals(x,null)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </branchCondition>

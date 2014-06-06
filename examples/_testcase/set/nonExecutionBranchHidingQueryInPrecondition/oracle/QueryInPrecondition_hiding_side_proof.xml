@@ -4,9 +4,9 @@
       <statement name="int magicValue = magic(x,y);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = magic(x, y) catch(exc_0)
 pre: xPre(x) = TRUE &amp; y &lt; 0 | !(xPre(x) = TRUE &amp; y &lt; 0)
-post: (   heapBefore_magic_0[xPre(x)] = TRUE &amp; y &lt; 0
+post: (   xPre(x)@heapBefore_magic_0 = TRUE &amp; y &lt; 0
    -&gt; result_0 = subFirst(x, y) &amp; exc_0 = null)
-&amp; (   !(heapBefore_magic_0[xPre(x)] = TRUE &amp; y &lt; 0)
+&amp; (   !(xPre(x)@heapBefore_magic_0 = TRUE &amp; y &lt; 0)
    -&gt; result_0 = subSecond(x, y) &amp; exc_0 = null)
 mod: \if (true)  \then (empty)  \else (allLocs)
 \cap \if (!(xPre(x) = TRUE &amp; y &lt; 0))

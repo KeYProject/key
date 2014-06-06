@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,7 +13,11 @@
 
 package org.key_project.sed.ui.visualization;
 
+import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
+import org.key_project.sed.ui.visualization.util.SETFileLaunchUtil;
+import org.key_project.sed.ui.visualization.util.VisualizationImages;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -40,6 +44,8 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+      // Make sure that the symbolic debug perspective is opened instead of the regular debug perspective when a KeY launch type is launched
+      DebugUITools.setLaunchPerspective(SETFileLaunchUtil.getConfigurationType(), SETFileLaunchUtil.MODE, SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID);
 	}
 
 	/*
@@ -47,6 +53,7 @@ public class Activator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
+	   VisualizationImages.disposeImages();
 		plugin = null;
 		super.stop(context);
 	}

@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -43,13 +43,10 @@ public class AboutAction extends MainWindowAction {
     }
 
     public void showAbout() {
-	String aspects = mainWindow.compiledAspects();
 	JOptionPane pane = new JOptionPane(
 	        Main.COPYRIGHT.replace("and", "\n"+UnicodeHelper.emSpaces(8)+"and")
 	        + "\n\nWWW: http://key-project.org/"
 	        + "\n\nVersion " + Main.VERSION
-	        + ((aspects.length() == 0) ? "" : "\nCompiled with Aspects:\n"
-	                + aspects)
 	                , JOptionPane.INFORMATION_MESSAGE,
 	        JOptionPane.DEFAULT_OPTION, IconFactory.key22Logo(108, 68));
 	JDialog dialog = pane.createDialog(mainWindow, "The KeY Project");

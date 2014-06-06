@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.logic;
 
@@ -26,22 +25,29 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.TacletForTests;
 
 
 public class TestPosInOcc extends TestCase {
     
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static TermBuilder TB;
 
     public TestPosInOcc(String name) {
 	super(name);
     }
 
+    @Override
+    public void setUp () {
+       TB = TacletForTests.services().getTermBuilder();
+    }
+    
     public void testIterator () {
 	Sort sort1=new SortImpl(new Name("S1"));
 	LogicVariable x=new LogicVariable(new Name("x"),sort1);  
 	Function f=new Function(new Name("f"),sort1,new Sort[]{sort1});
 	Function p=new Function(new Name("p"),Sort.FORMULA,new Sort[]{sort1});
 
+	
 	Term terms[] = new Term [ 3 ];
 	terms[0]     = TB.var ( x );
 	terms[1]     = TB.func ( f, new Term[] { terms[0] } );
@@ -49,7 +55,7 @@ public class TestPosInOcc extends TestCase {
 
 	PosInOccurrence pio = new PosInOccurrence
 	    ( new SequentFormula ( terms[2] ),
-	      PosInTerm.TOP_LEVEL,
+	      PosInTerm.getTopLevel(),
 	    true);
 
 	PIOPathIterator it = pio.iterator ();
@@ -114,7 +120,7 @@ public class TestPosInOcc extends TestCase {
         SequentFormula cfma2 = new SequentFormula ( terms2[3] );
 
         final PosInOccurrence topPIO = new PosInOccurrence ( cfma,
-                                                             PosInTerm.TOP_LEVEL,
+                                                             PosInTerm.getTopLevel(),
                                                              true );
 
 

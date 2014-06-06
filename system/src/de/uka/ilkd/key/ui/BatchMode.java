@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -48,6 +48,8 @@ public class BatchMode {
 
         if (result instanceof Throwable) {
             // Error in batchMode. Terminate with status -1.
+            System.err.println("An error occurred during batch mode:");
+            System.err.println(""+result);
             System.exit ( -1 );
         }
 
@@ -80,11 +82,6 @@ public class BatchMode {
 
         if (proof.openGoals ().size () == 0) {
             // Says that all Proofs have succeeded
-            if (proof.getBasicTask() != null &&
-            		proof.getBasicTask().getStatus().getProofClosedButLemmasLeft()) {
-                // Says that the proof is closed by depends on (unproved) lemmas
-                System.exit ( 0 ); //XXX, was: 2
-            }
             System.exit ( 0 );
         } else {
             // Says that there is at least one open Proof
@@ -104,6 +101,11 @@ public class BatchMode {
     private void printStatistics(String file, Object result,
                                  Proof.Statistics statistics,
                                  boolean proofClosed) {
+        
+        // get current memory consumption (after GC) in kB
+        Runtime.getRuntime().gc();
+        final long memory = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024;
+        
         try {
             final boolean fileExists = (new File(file)).exists();
             final FileWriter statisticsFW = new FileWriter ( file, true );
@@ -112,7 +114,7 @@ public class BatchMode {
             if (!fileExists) {
                 statPrinter.println("Name | Total rule apps | Nodes | " +
                         "Branches | Overall time | Automode time | " +
-                        "Closed | Time per step");
+                        "Closed | Time per step | Memory");
             }
 
             String name = fileName;
@@ -122,7 +124,7 @@ public class BatchMode {
 
             statPrinter.print ( name + " | " );
             if ("Error".equals ( result ) )
-                statPrinter.println ( "-1 | -1 | -1 | -1 | -1 | -1 | -1" );
+                statPrinter.println ( "-1 | -1 | -1 | -1 | -1 | -1 | -1 | -1" );
             else
                 statPrinter.println (statistics.totalRuleApps + " | " +
                                      statistics.nodes + " | " +
@@ -130,7 +132,8 @@ public class BatchMode {
                                      statistics.time + " | " +
                                      statistics.autoModeTime + " | " +
                                      (proofClosed ? 1 : 0) + " | " +
-                                     ((double)statistics.autoModeTime / (double)statistics.totalRuleApps));
+                                     statistics.timePerStep + " | " +
+                                     memory);
             statPrinter.close();
         } catch ( IOException e ) {
             e.printStackTrace();

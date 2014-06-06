@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.speclang;
 
@@ -37,6 +36,7 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -106,6 +106,7 @@ public final class QueryAxiom extends ClassAxiom {
 	    		ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, 
 	    		Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final TermBuilder TB = services.getTermBuilder();
 	
 	//create schema variables
 	final List<SchemaVariable> heapSVs = new ArrayList<SchemaVariable>();
@@ -166,7 +167,7 @@ public final class QueryAxiom extends ClassAxiom {
 		if(hc >= target.getHeapCount(services)) {
 			break;
 		}
-		Term u = TB.elementary(services, heap, TB.var(heapSVs.get(hc++)));
+		Term u = TB.elementary(heap, TB.var(heapSVs.get(hc++)));
 		if(update == null) {
 			update = u;
 		}else{
@@ -176,17 +177,12 @@ public final class QueryAxiom extends ClassAxiom {
 	update = target.isStatic() 
 	         ? update 
                  : TB.parallel(update, 
-                	       TB.elementary(services, 
-                		       	     selfProgSV, 
-                		       	     TB.var(selfSV)));
+                	       TB.elementary(selfProgSV, TB.var(selfSV)));
 	for(int i = 0; i < paramSVs.length; i++) {
 	    update = TB.parallel(update, 
-		                 TB.elementary(services, 
-		                	       paramProgSVs[i], 
-		                	       TB.var(paramSVs[i])));
+		                 TB.elementary(paramProgSVs[i], TB.var(paramSVs[i])));
 	}
-	final Term post = TB.imp(TB.reachableValue(services, 
-						   TB.var(resultProgSV), 
+	final Term post = TB.imp(TB.reachableValue(TB.var(resultProgSV), 
 						   target.getReturnType()),
 	                  	 TB.equals(TB.var(skolemSV), TB.var(resultProgSV)));
 	
@@ -215,7 +211,7 @@ public final class QueryAxiom extends ClassAxiom {
 	    ifSeq = null;
 	} else {
 	    final Term ifFormula 
-	    	= TB.exactInstance(services, kjt.getSort(), TB.var(selfSV));
+	    	= TB.exactInstance(kjt.getSort(), TB.var(selfSV));
 	    final SequentFormula ifCf = new SequentFormula(ifFormula);
 	    final Semisequent ifSemiSeq 
 	    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
@@ -292,4 +288,3 @@ public final class QueryAxiom extends ClassAxiom {
     }
     
 }
- 

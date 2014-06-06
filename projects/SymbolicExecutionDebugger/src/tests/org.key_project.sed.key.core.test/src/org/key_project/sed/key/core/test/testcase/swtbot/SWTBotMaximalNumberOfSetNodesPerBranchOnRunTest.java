@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -24,6 +24,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
+import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -37,7 +38,7 @@ public class SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest extends AbstractKeY
     */
    @Test
    public void testDifferentValues() throws Exception {
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+      IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             int originalMaximalNumberOfSetNodesPerBranchOnRun = KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun();
@@ -48,19 +49,19 @@ public class SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest extends AbstractKeY
                String expectedModelPathInBundle = "data/manyStatements/oracle/ManyStatements";
                String expectedModelFileExtension = ".xml";
                int modelIndex = 0;
-               assertStep(target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension);
+               assertStep(target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension);
                // Set maximal step value to 1
                setMaximalNumberOfSetNodesPerBranchOnRun(bot, 1);
-               assertResume(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension);
+               assertResume(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension);
                // Set maximal step value to 2
                setMaximalNumberOfSetNodesPerBranchOnRun(bot, 2);
-               assertResume(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension);
+               assertResume(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension);
                // Set maximal step value to 3
                setMaximalNumberOfSetNodesPerBranchOnRun(bot, 3);
-               assertResume(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension);
+               assertResume(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension);
                // Set maximal step value to 100
                setMaximalNumberOfSetNodesPerBranchOnRun(bot, 100);
-               assertResume(bot, item, target, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension);
+               assertResume(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension);
             }
             finally {
                // Restore original value

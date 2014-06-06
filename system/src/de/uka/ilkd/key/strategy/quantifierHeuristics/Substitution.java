@@ -1,17 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
@@ -19,11 +17,10 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -34,9 +31,6 @@ import de.uka.ilkd.key.util.Debug;
  * variable to a term(instance).
  */
 public class Substitution {
-
-    private final TermBuilder tb = TermBuilder.DF;
-    
     private final ImmutableMap<QuantifiableVariable,Term> varMap;
     
     public Substitution(ImmutableMap<QuantifiableVariable,Term> map){
@@ -75,7 +69,7 @@ public class Substitution {
     }   
   
     
-    public Term apply(Term t, Services services) {
+    public Term apply(Term t, TermServices services) {
         assert isGround() :
             "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
@@ -86,14 +80,14 @@ public class Substitution {
                 quantifiedVarSort.getCastSymbol (services);
             Term instance = getSubstitutedTerm( var );
             if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) )
-            	instance = tb.func ( quantifiedVarSortCast, instance );
-            t = applySubst ( var, instance, t );
+            	instance = services.getTermBuilder().func ( quantifiedVarSortCast, instance );
+            t = applySubst ( var, instance, t, services );
         }
         return t;
     }
 
-    private Term applySubst(QuantifiableVariable var, Term instance, Term t) {
-        final ClashFreeSubst subst = new ClashFreeSubst ( var,  instance);
+    private Term applySubst(QuantifiableVariable var, Term instance, Term t, TermServices services) {
+        final ClashFreeSubst subst = new ClashFreeSubst ( var,  instance, services);
         return subst.apply ( t );
     }
     
@@ -101,7 +95,7 @@ public class Substitution {
      * Try to apply the substitution to a term, introducing casts if
      * necessary (may never be the case any more, XXX)
      */
-    public Term applyWithoutCasts(Term t, Services services) {
+    public Term applyWithoutCasts(Term t, TermServices services) {
         assert isGround() :
             "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
@@ -110,14 +104,14 @@ public class Substitution {
             Term instance = getSubstitutedTerm( var );
             
             try {
-                t = applySubst ( var, instance, t );
+                t = applySubst ( var, instance, t, services );
             } catch (TermCreationException e) {
                 final Sort quantifiedVarSort = var.sort ();                
                 if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) ) {
                     final Function quantifiedVarSortCast =
                         quantifiedVarSort.getCastSymbol (services);
-                    instance = tb.func ( quantifiedVarSortCast, instance );
-                    t = applySubst ( var, instance, t );
+                    instance = services.getTermBuilder().func ( quantifiedVarSortCast, instance );
+                    t = applySubst ( var, instance, t, services );
                 } else {
                     throw e;
                 }

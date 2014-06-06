@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -27,6 +27,34 @@ import junit.framework.TestCase;
  * @author Martin Hentschel
  */
 public class TestJavaUtil extends TestCase {
+   /**
+    * Tests {@link JavaUtil#contains(Object[], Object)}
+    */
+   public void testContains() {
+      String[] array = {"A", "B", "C"};
+      assertFalse(JavaUtil.contains(array, null));
+      assertFalse(JavaUtil.contains(null, "A"));
+      assertTrue(JavaUtil.contains(array, "A"));
+      assertTrue(JavaUtil.contains(array, "B"));
+      assertTrue(JavaUtil.contains(array, "C"));
+      assertFalse(JavaUtil.contains(array, "D"));
+      String[] arrayWithNull = {"A", "B", null, "D"};
+      assertTrue(JavaUtil.contains(arrayWithNull, null));
+      assertFalse(JavaUtil.contains(null, "A"));
+      assertTrue(JavaUtil.contains(arrayWithNull, "A"));
+      assertTrue(JavaUtil.contains(arrayWithNull, "B"));
+      assertFalse(JavaUtil.contains(arrayWithNull, "C"));
+      assertTrue(JavaUtil.contains(arrayWithNull, "D"));
+      assertFalse(JavaUtil.contains(arrayWithNull, "E"));
+      String[] arrayWithDoubleElements = {"B", "A", "C", "B", "C"};
+      assertFalse(JavaUtil.contains(arrayWithDoubleElements, null));
+      assertFalse(JavaUtil.contains(null, "A"));
+      assertTrue(JavaUtil.contains(arrayWithDoubleElements, "A"));
+      assertTrue(JavaUtil.contains(arrayWithDoubleElements, "B"));
+      assertTrue(JavaUtil.contains(arrayWithDoubleElements, "C"));
+      assertFalse(JavaUtil.contains(arrayWithDoubleElements, "D"));
+   }
+   
    /**
     * Tests for {@link JavaUtil#toSortedString(java.util.Map)}
     */

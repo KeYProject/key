@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.speclang.jml;
 
@@ -68,7 +67,6 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     private static final String THROWABLE = "java.lang.Throwable";
     private static final String ERROR = "java.lang.Error";
-    private static final String EXCEPTION = "java.lang.Exception";
     private static final String RUNTIME_EXCEPTION = "java.lang.RuntimeException";
     private static final String DEFAULT_SIGNALS_ONLY = "signals_only "+ERROR+", "+RUNTIME_EXCEPTION+";";
     private final Services services;
@@ -190,22 +188,35 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         final TypeConverter typeConverter = services.getTypeConverter();
         if (typeConverter.isReferenceType(varType) && !isImplicitVar) {
-            if (varType instanceof ArrayType &&
-                    typeConverter.
-                    isReferenceType(((ArrayType)varType).getBaseType().getKeYJavaType())) {
-                final PositionedString arrayElementsNonNull
-                = new PositionedString("(\\forall int i; 0 <= i && i < " + varName + ".length;"
-                                              + varName + "[i]" + " != null)",
-                                              fileName,
-                                              pos).label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
-                result = result.add(arrayElementsNonNull);
-            }
-            PositionedString ps
-            = new PositionedString(varName + " != null", fileName, pos)
-                                .label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
+            final int arrayDepth = arrayDepth(varType, services);
+
+            // use special "deep" non null predicate (see bug #1392)
+            // ... looks a bit like a hack with those DL escapes ...
+            final String nonNullString = arrayDepth > 0 ?
+                    "\\dl_nonNull(\\dl_heap(),"+varName+","+arrayDepth+")" : varName+" != null";
+            PositionedString ps = new PositionedString(nonNullString, fileName, pos)
+                    .label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
             result = result.add(ps);
         }
         return result;
+    }
+    
+    /**
+     * Get the depth for the nonNull predicate.
+     * The depth is 0 for non array types,
+     * its dimension for reference array types,
+     * and its dimension -1 for array types with primitive base type.
+     */
+    public static int arrayDepth (Type type, Services services) {
+        assert services != null;
+        final TypeConverter tc = services.getTypeConverter();
+        if (type instanceof ArrayType) {
+            final int d = ((ArrayType)type).getDimension();
+            while (type instanceof ArrayType) {
+                type = ((ArrayType)type).getBaseType().getKeYJavaType().getJavaType();
+            }
+            return tc.isReferenceType(type)? d: d-1;
+        } else return 0;
     }
 
 

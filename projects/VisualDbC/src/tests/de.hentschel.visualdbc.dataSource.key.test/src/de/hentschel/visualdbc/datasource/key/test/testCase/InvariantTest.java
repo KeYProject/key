@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -14,26 +14,26 @@
 package de.hentschel.visualdbc.datasource.key.test.testCase;
 
 import org.junit.Test;
-import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
-import de.hentschel.visualdbc.datasource.key.test.util.TestKeyUtil;
+import de.hentschel.visualdbc.datasource.key.test.Activator;
 import de.hentschel.visualdbc.datasource.model.DSPackageManagement;
 
 /**
  * Tests the handling of invariants in a {@link KeyConnection}.
  * @author Martin Hentschel
  */
-public class InvariantTest extends AbstractSetupTestCase {
+public class InvariantTest extends AbstractKeYTest {
    /**
     * Tests attributes.
     */
    @Test
    public void testClassAndInterfaceInvariants() throws Exception {
-      TestKeyUtil.testKeyConnection("InvariantTest_testClassAndInterfaceInvariants",
-                                    "data/typeInvariantTest",
-                                    null,
-                                    DSPackageManagement.FLAT_LIST,
-                                    TestKeyUtil.createExpectedTypeInvariantTestModel());
+      testKeyConnection("InvariantTest_testClassAndInterfaceInvariants",
+                        "data/typeInvariantTest/test",
+                        null,
+                        DSPackageManagement.FLAT_LIST,
+                        Activator.PLUGIN_ID,
+                        "data/typeInvariantTest/oracle/typeInvariantTest.dbc");
    }
 }

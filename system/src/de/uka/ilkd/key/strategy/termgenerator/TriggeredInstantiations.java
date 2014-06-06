@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.util.HashSet;
@@ -17,7 +30,7 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -115,7 +128,7 @@ public class TriggeredInstantiations implements TermGenerator {
 
                     final Term trigger = instantiateTerm(
                             taclet.getTrigger().getTerm(), services,
-                            svInst.replace(sv, TermBuilder.DF.var(mv), services));
+                            svInst.replace(sv, services.getTermBuilder().var(mv), services));
 
                     final Set<Term> instances = computeInstances(services,
                             comprehension, mv, trigger, terms, axioms, tapp);
@@ -148,19 +161,19 @@ public class TriggeredInstantiations implements TermGenerator {
     private void computeAxiomAndCandidateSets(final Sequent seq,
             final Set<Term> terms, final Set<Term> axioms, Services services) {        
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        collectAxiomsAndCandidateTerms(terms, axioms, integerLDT, seq.antecedent(), true);
-        collectAxiomsAndCandidateTerms(terms, axioms, integerLDT, seq.succedent(), false);
+        collectAxiomsAndCandidateTerms(terms, axioms, integerLDT, seq.antecedent(), true, services);
+        collectAxiomsAndCandidateTerms(terms, axioms, integerLDT, seq.succedent(), false, services);
     }
 
     private void collectAxiomsAndCandidateTerms(final Set<Term> terms,
             final Set<Term> axioms, final IntegerLDT integerLDT,
-            Semisequent antecedent, boolean inAntecedent) {
+            Semisequent antecedent, boolean inAntecedent, TermServices services) {
         
         for (SequentFormula sf : antecedent) {
             collectTerms(sf.formula(), terms, integerLDT);
             if (sf.formula().op() instanceof Function || 
                     sf.formula().op() == Equality.EQUALS) {
-                axioms.add(inAntecedent ? sf.formula() : TermBuilder.DF.not(sf.formula()));
+                axioms.add(inAntecedent ? sf.formula() : services.getTermBuilder().not(sf.formula()));
             }
         }
     }
@@ -185,7 +198,7 @@ public class TriggeredInstantiations implements TermGenerator {
             boolean addToInstances = true;
             Constraint c = EqualityConstraint.BOTTOM.unify(trigger, t, services);
             if (c.isSatisfiable()) {
-                final Term middle = c.getInstantiation(mv);
+                final Term middle = c.getInstantiation(mv, services);
                 if (middle != null && !alreadyChecked.contains(middle)) {
                     alreadyChecked.add(middle);
                     if (!checkConditions && app.taclet().getTrigger().hasAvoidConditions()) {

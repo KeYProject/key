@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof;
 
@@ -161,12 +160,12 @@ public final class ProgVarReplacer {
     public SVInstantiations replace(SVInstantiations insts) {
    	SVInstantiations result = insts;
 
-    	Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it;
+    Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it;
 	it = insts.pairIterator();
 	while(it.hasNext()) {
-	    ImmutableMapEntry<SchemaVariable,InstantiationEntry> e = it.next();
+	    ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> e = it.next();
 	    SchemaVariable sv     = e.key();
-	    InstantiationEntry ie = e.value();
+	    InstantiationEntry<?> ie = e.value();
 	    Object inst = ie.getInstantiation();
 
 	    if(ie instanceof ContextInstantiationEntry) {
@@ -214,7 +213,7 @@ public final class ProgVarReplacer {
 		    result = result.replace(sv, newT, services);
 		}
 	    } else {
-		assert false : "unexpected subtype of InstantiationEntry";
+		assert false : "unexpected subtype of InstantiationEntry<?>";
 	    }
 	}
 
@@ -286,7 +285,7 @@ public final class ProgVarReplacer {
         final ProgramVariable pv = (ProgramVariable) t.op();
         Object o = map.get(pv);
         if (o instanceof ProgramVariable) {
-            return TermFactory.DEFAULT.createTerm((ProgramVariable)o, t.getLabels());
+            return services.getTermFactory().createTerm((ProgramVariable)o, t.getLabels());
         } else if (o instanceof Term) {
             return (Term) o;
         }
@@ -320,7 +319,7 @@ public final class ProgVarReplacer {
         }
 
         if(changedSubTerm || newJb != jb) {                               
-            result = TermFactory.DEFAULT.createTerm(t.op(),
+            result = services.getTermFactory().createTerm(t.op(),
                     newSubTerms,
                     t.boundVars(),
                     newJb, t.getLabels());

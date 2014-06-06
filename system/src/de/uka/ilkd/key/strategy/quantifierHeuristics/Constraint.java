@@ -1,24 +1,21 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 
 /**
  * Abstract constraint interface for constraints offering unification of terms
@@ -58,13 +55,14 @@ public interface Constraint {
     boolean isSatisfiable();
 
     /**
-     * @return Find a term the given metavariable can be instantiated with which
+     * @param services TODO
+    * @return Find a term the given metavariable can be instantiated with which
      *         is consistent with every instantiation that satisfies this
      *         constraint (that means, the term such an instantiation
      *         substitutes the metavariable with can always be unified with the
      *         returned term).
      */
-    Term getInstantiation(Metavariable p_mv);
+    Term getInstantiation(Metavariable p_mv, TermServices services);
 
     /**
      * tries to unify the terms t1 and t2
@@ -82,7 +80,7 @@ public interface Constraint {
      * @return TOP if not possible, else a new constraint with after unification
      *         of t1 and t2
      */
-    Constraint unify(Term t1, Term t2, Services services);
+    Constraint unify(Term t1, Term t2, TermServices services);
 
     /**
      * tries to unify terms t1 and t2.
@@ -98,7 +96,7 @@ public interface Constraint {
      * @return TOP if not possible, else a new constraint with after unification
      *         of t1 and t2
      */
-    Constraint unify(Term t1, Term t2, Services services,
+    Constraint unify(Term t1, Term t2, TermServices services,
 	    BooleanContainer unchanged);
 
     /**
@@ -129,7 +127,7 @@ public interface Constraint {
      *            the Services providing access to the type model
      * @return the joined constraint
      */
-    Constraint join(Constraint co, Services services);
+    Constraint join(Constraint co, TermServices services);
 
     /**
      * joins constraint co with this constraint and returns the joint new
@@ -147,15 +145,7 @@ public interface Constraint {
      *            strong as co
      * @return the joined constraint
      */
-    Constraint join(Constraint co, Services services, BooleanContainer unchanged);
-
-    /**
-     * @return a constraint derived from this one by removing all constraints on
-     *         the given variable, which may therefore have any value according
-     *         to the new constraint (the possible values of other variables are
-     *         not modified)
-     */
-    Constraint removeVariables ( ImmutableSet<Metavariable> mvs );
+    Constraint join(Constraint co, TermServices services, BooleanContainer unchanged);
 
     /** @return String representation of the constraint */
     String toString();
@@ -177,10 +167,10 @@ public interface Constraint {
 	    return false;
 	}
 
-	public Term getInstantiation(Metavariable p_mv) {
+	public Term getInstantiation(Metavariable p_mv, TermServices services) {
 	    // As there is in fact no instantiation satisfying this
 	    // constraint, we could return everything
-	    return TermBuilder.DF.var(p_mv);
+	    return services.getTermBuilder().var(p_mv);
 	}
 
 	/**
@@ -189,11 +179,11 @@ public interface Constraint {
 	 * 
 	 * @return always this
 	 */
-	public Constraint unify(Term t1, Term t2, Services services) {
+	public Constraint unify(Term t1, Term t2, TermServices services) {
 	    return this;
 	}
 
-	public Constraint unify(Term t1, Term t2, Services services,
+	public Constraint unify(Term t1, Term t2, TermServices services,
 		BooleanContainer unchanged) {
 	    unchanged.setVal(true);
 	    return this;
@@ -219,7 +209,7 @@ public interface Constraint {
 	 * 
 	 * @return this
 	 */
-	public Constraint join(Constraint co, Services services) {
+	public Constraint join(Constraint co, TermServices services) {
 	    return this;
 	}
 
@@ -228,7 +218,7 @@ public interface Constraint {
 	 * 
 	 * @return this
 	 */
-	public Constraint join(Constraint co, Services services,
+	public Constraint join(Constraint co, TermServices services,
 		BooleanContainer c) {
 	    c.setVal(true);
 	    return this;
@@ -241,19 +231,6 @@ public interface Constraint {
 	 */
 	public boolean isBottom() {
 	    return false;
-	}
-
-	/**
-	 * @return a constraint derived from this one by removing all
-	 *         constraints on the given variable, which may therefore have
-	 *         any value according to the new constraint (the possible
-	 *         values of other variables are not modified)
-	 */
-	@Override
-	public Constraint removeVariables ( ImmutableSet<Metavariable> mvs ) {
-	    // the constraint will still be unsatisfiable, as the
-	    // other variables have no valid instantiations
-	    return this;
 	}
 
 	/**

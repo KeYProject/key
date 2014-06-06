@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -20,15 +20,16 @@ import java.io.File;
 import java.util.List;
 
 import de.uka.ilkd.key.gui.ApplyStrategy;
+import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.gui.KeYMediator;
 import static de.uka.ilkd.key.gui.Main.Verbosity.*;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -49,7 +50,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
     private final BatchMode batchMode;
     private final byte verbosity;
-	private ProofStarter ps;
 	private KeYMediator mediator;
 	private boolean autoMode;
 
@@ -60,14 +60,14 @@ public class ConsoleUserInterface extends AbstractUserInterface {
         return autoMode;
     }
 
-   public ConsoleUserInterface(BatchMode batchMode, boolean useAutoSaver, byte verbosity) {
+   public ConsoleUserInterface(BatchMode batchMode, byte verbosity) {
     	this.batchMode = batchMode;
     	this.verbosity = verbosity;
-        this.mediator  = new KeYMediator(this, useAutoSaver);
+        this.mediator  = new KeYMediator(this);
    }
 
-   public ConsoleUserInterface(BatchMode batchMode, boolean useAutoSaver, boolean verbose) {
-       this(batchMode, useAutoSaver, verbose? DEBUG: NORMAL);
+   public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
+       this(batchMode, verbose? DEBUG: NORMAL);
    }
 
     public void taskFinished(TaskFinishedInfo info) {
@@ -91,6 +91,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                     System.out.println("Proof steps: "+stat.nodes);
                     System.out.println("Branches: "+stat.branches);
                     System.out.println("Automode Time: "+stat.autoModeTime+"ms");
+                    System.out.println("Time per step: "+stat.timePerStep+"ms");
                 }
                 System.out.println("Number of goals remaining open: " +
                         openGoals);
@@ -118,9 +119,9 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             // has to be notified that we work in auto mode (CS)
             mediator.setInteractive(false);
 
-            final Object result = ps.start();
-            if (verbosity >= HIGH) {
-            	System.out.println(result);
+            startAndWaitForAutoMode(proof);
+            if (verbosity >= HIGH) { // WARNING: Is never executed since application terminates via System.exit() before.
+            	System.out.println(proof.statistics());
             }
         }
     }
@@ -145,8 +146,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             ProofAggregate proofAggregate) {
         // TODO Implement ProblemInitializerListener.proofCreated
         // XXX WHY AT THE MAINWINDOW?!?!
-    	ps = new ProofStarter(this, mediator.getAutoSaver() != null);
-        ps.init(proofAggregate);
         mediator.setProof(proofAggregate.getFirstProof());
     }
 
@@ -255,12 +254,12 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
 	@Override
     public void loadProblem(File file) {
-		super.loadProblem(file, null, null, mediator);
+		super.getProblemLoader(file, null, null, mediator).runSynchronously();
 	}
 
    @Override
    public void loadProblem(File file, List<File> classPath, File bootClassPath) {
-      super.loadProblem(file, classPath, bootClassPath, mediator);
+      super.getProblemLoader(file, classPath, bootClassPath, mediator).runSynchronously();
    }
 
 	@Override

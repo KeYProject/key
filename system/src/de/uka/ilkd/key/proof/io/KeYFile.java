@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof.io;
 
@@ -117,8 +116,8 @@ public class KeYFile implements EnvInput {
     private KeYParserF createDeclParser(InputStream is) throws FileNotFoundException {
         return new KeYParserF(ParserMode.DECLARATION,
                              new KeYLexerF(is,
+                                          file.toString(),
                                           initConfig.getServices().getExceptionHandler()),
-                             file.toString(), 
                              initConfig.getServices(),
                              initConfig.namespaces());
     }
@@ -142,8 +141,7 @@ public class KeYFile implements EnvInput {
             try {
                KeYParserF problemParser
                     = new KeYParserF(ParserMode.PROBLEM,
-                                    new KeYLexerF(getNewStream(), null),
-                                    file.toString());
+                                    new KeYLexerF(getNewStream(), file.toString(), null));
                problemParser.profile();
                ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
                 settings.loadSettingsFromString(problemParser.preferences());
@@ -198,8 +196,8 @@ public class KeYFile implements EnvInput {
                 // numbers. Somebody please fix that. /Woj
                 KeYParserF problemParser = new KeYParserF(ParserMode.PROBLEM,
                         new KeYLexerF(getNewStream(),
-                                null), 
-                                file.toString(), 
+                                file.toString(),
+                                null),
                                 pc, 
                                 pc, 
                                 null, 
@@ -264,8 +262,8 @@ public class KeYFile implements EnvInput {
         try {
             KeYParserF problemParser = new KeYParserF(ParserMode.PROBLEM,
                                                     new KeYLexerF(getNewStream(),
-                                                                 null), 
-                                                    file.toString());
+                                                                 file.toString(),
+                                                                 null));
             
             problemParser.profile(); // skip profile
             problemParser.preferences(); // skip preferences
@@ -325,9 +323,9 @@ public class KeYFile implements EnvInput {
                 KeYParserF problemParser
                 = new KeYParserF(ParserMode.PROBLEM,
                         new KeYLexerF(cinp,
+                                file.toString(),
                                 initConfig.getServices()
                                 .getExceptionHandler()), 
-                                file.toString(), 
                                 schemaConfig, 
                                 normalConfig, 
                                 initConfig.getTaclet2Builder(), 
@@ -422,9 +420,9 @@ public class KeYFile implements EnvInput {
                 KeYParserF problemParser
                 = new KeYParserF(ParserMode.PROBLEM,
                         new KeYLexerF(cinp,
+                                file.toString(),
                                 initConfig.getServices()
                                 .getExceptionHandler()), 
-                                file.toString(),
                                 schemaConfig,
                                 normalConfig,
                                 initConfig.getTaclet2Builder(),

@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -23,7 +23,6 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -33,10 +32,11 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 
@@ -163,17 +163,22 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
       if (getParentValue() != null || SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
          siteProofSelectTerm = createSelectTerm();
          if (getParentValue() != null) { // Is null at static variables
-            siteProofCondition = TermBuilder.DF.and(siteProofCondition, getParentValue().getCondition());
+            siteProofCondition = getServices().getTermBuilder().and(siteProofCondition, getParentValue().getCondition());
          }
          if (lengthValue != null) {
-            siteProofCondition = TermBuilder.DF.and(siteProofCondition, lengthValue.getCondition());
+            siteProofCondition = getServices().getTermBuilder().and(siteProofCondition, lengthValue.getCondition());
          }
          sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(getServices(), getProofNode(), siteProofCondition, siteProofSelectTerm, true); 
       }
       else {
          sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(getServices(), getProofNode(), siteProofCondition, getProgramVariable());
       }
-      ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequentToProve.getSequentToProve(), StrategyProperties.SPLITTING_DELAYED);
+      ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
+                                                                          sequentToProve.getSequentToProve(), 
+                                                                          StrategyProperties.METHOD_NONE,
+                                                                          StrategyProperties.LOOP_NONE,
+                                                                          StrategyProperties.QUERY_OFF,
+                                                                          StrategyProperties.SPLITTING_DELAYED);
       try {
          List<ExecutionValue> result = new ArrayList<ExecutionValue>(info.getProof().openGoals().size());
          // Group values of the branches
@@ -227,7 +232,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          return result.toArray(new ExecutionValue[result.size()]);
       }
       finally {
-         info.getProof().dispose();
+         SideProofUtil.disposeOrStore("Value computation on node " + getProofNode().serialNr(), info);
       }
    }
 
@@ -244,9 +249,9 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
                                     List<Goal> unknownValues) throws ProofInputException {
       for (Goal goal : goals) {
          // Extract value
-         Term value = SymbolicExecutionUtil.extractOperatorValue(goal, operator);
+         Term value = SideProofUtil.extractOperatorValue(goal, operator);
          assert value != null;
-         value = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), value);
+         value = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), value, getServices());
          // Compute unknown flag if required
          boolean unknownValue = false;
          if (siteProofSelectTerm != null) {
@@ -284,16 +289,16 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          List<Term> pathConditions = new LinkedList<Term>();
          Proof proof = null;
          for (Goal valueGoal : valueGoals) {
-            pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(), false, false));
+            pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(), false));
             proof = valueGoal.node().proof();
          }
-         Term comboundPathCondition = TermBuilder.DF.or(pathConditions);
+         Term comboundPathCondition = getServices().getTermBuilder().or(pathConditions);
          comboundPathCondition = SymbolicExecutionUtil.simplify(proof, comboundPathCondition);
          comboundPathCondition = SymbolicExecutionUtil.improveReadability(comboundPathCondition, proof.getServices());
          return comboundPathCondition;
       }
       else {
-         return TermBuilder.DF.tt();
+         return getServices().getTermBuilder().tt();
       }
    }
    
@@ -306,12 +311,12 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
       if (SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
          // Static field access
          Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), getServices());
-         return TermBuilder.DF.staticDot(getServices(), getProgramVariable().sort(), function);
+         return getServices().getTermBuilder().staticDot(getProgramVariable().sort(), function);
       }
       else {
          if (getParentValue() == null) {
             // Direct access to a variable, so return it as term
-            return TermBuilder.DF.var((ProgramVariable)getProgramVariable());
+            return getServices().getTermBuilder().var((ProgramVariable)getProgramVariable());
          }
          else {
             Term parentTerm = getParentValue().getVariable().createSelectTerm();
@@ -319,18 +324,18 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
                if (getServices().getJavaInfo().getArrayLength() == getProgramVariable()) {
                   // Special handling for length attribute of arrays
                   Function function = getServices().getTypeConverter().getHeapLDT().getLength();
-                  return TermBuilder.DF.func(function, parentTerm);
+                  return getServices().getTermBuilder().func(function, parentTerm);
                }
                else {
                   // Field access on the parent variable
                   Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), getServices());
-                  return TermBuilder.DF.dot(getServices(), getProgramVariable().sort(), parentTerm, function);
+                  return getServices().getTermBuilder().dot(getProgramVariable().sort(), parentTerm, function);
                }
             }
             else {
                // Special handling for array indices.
-               Term idx = TermBuilder.DF.zTerm(getServices(), "" + arrayIndex);
-               return TermBuilder.DF.dotArr(getServices(), parentTerm, idx);
+               Term idx = getServices().getTermBuilder().zTerm("" + arrayIndex);
+               return getServices().getTermBuilder().dotArr(parentTerm, idx);
             }
          }
       }

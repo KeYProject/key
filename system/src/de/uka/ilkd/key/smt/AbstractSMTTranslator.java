@@ -1,29 +1,52 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.smt;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Vector;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IfThenElse;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
@@ -87,7 +110,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         }
 
-        private static final TermBuilder TB = TermBuilder.DF;
+        private final TermBuilder tb; // TODO: Rename
         
         private int nameCounter =0;
 
@@ -242,6 +265,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 this.config = config;
                 integerSort = services.getTypeConverter().getIntegerLDT()
                                 .targetSort();
+                this.tb = services.getTermBuilder();
 
         }
 
@@ -298,8 +322,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                         .getIntegerLDT().getMul();
 
                         multiplicationFunction = new Function(new Name(
-                                        TermBuilder.DF.newName(services,
-                                                        "unin_mult")),
+                                        tb.newName("unin_mult")),
                                         reference.sort(), reference.argSorts());
                 }
                 return multiplicationFunction;
@@ -739,7 +762,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * 
          * @return structured List of declaration.
          */
-        private ArrayList<ArrayList<StringBuffer>> buildTranslatedFuncDecls(Services services) {
+        private ArrayList<ArrayList<StringBuffer>> buildTranslatedFuncDecls(TermServices services) {
                 ArrayList<ArrayList<StringBuffer>> toReturn = new ArrayList<ArrayList<StringBuffer>>();
                 // add the function declarations for each used function
                 for (Operator op : this.functionDecls.keySet()) {
@@ -967,10 +990,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         
      
 
-        private Term createLogicalVar(Services services, String baseName,
+        private Term createLogicalVar(TermServices services, String baseName,
                         Sort sort) {
-                return TermBuilder.DF.var(new LogicVariable(new Name(
-                                TermBuilder.DF.newName(services, baseName)),
+                return tb.var(new LogicVariable(new Name(
+                                tb.newName(baseName)),
                                 sort));
         }
 
@@ -980,9 +1003,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 Sort sort = services.getTypeConverter().getIntegerLDT()
                                 .getMul().sort();
                 Function mult = getMultiplicationFunction(services);
-                TermBuilder tb = TermBuilder.DF;
-                Term zero = tb.zero(services);
-                Term one = tb.one(services);
+                Term zero = tb.zero();
+                Term one = tb.one();
                 LinkedList<Term> multAssumptions = new LinkedList<Term>();
 
                 Term x = createLogicalVar(services, "x", sort);
@@ -1039,7 +1061,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return result;
         }
         
-        private ArrayList<StringBuffer> buildAssumptionsForSorts(Services services){
+        private ArrayList<StringBuffer> buildAssumptionsForSorts(TermServices services){
         	ArrayList<StringBuffer> result = new ArrayList<StringBuffer>();
         	if(this.isMultiSorted()){
          		for(Sort sort : usedRealSort.keySet()){
@@ -1064,25 +1086,25 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 : constantsForBigIntegers;
         }
 
-        private Term getRightBorderAsTerm(long integer, Services services) {
-                return TermBuilder.DF.zTerm(services, Long
+        private Term getRightBorderAsTerm(long integer, TermServices services) {
+                return tb.zTerm(Long
                                 .toString(getRightBorderAsInteger(integer,
                                                 services)));
         }
 
-        private Long getRightBorderAsInteger(long integer, Services services) {
+        private Long getRightBorderAsInteger(long integer, TermServices services) {
                 return integer < 0 ? getMinNumber() : getMaxNumber();
         }
 
-        private StringBuffer getNameForIntegerConstant(Services services,
+        private StringBuffer getNameForIntegerConstant(TermServices services,
                         long integer) {
                 String val = integer < 0 ? "negative_value" : "positive_value";
-                return new StringBuffer(TermBuilder.DF.newName(services, "i")
+                return new StringBuffer(tb.newName("i")
                                 + "_" + val);
 
         }
 
-        private StringBuffer buildUniqueConstant(long integer, Services services)
+        private StringBuffer buildUniqueConstant(long integer, TermServices services)
                         throws IllegalFormulaException {
                 HashMap<Long, StringBuffer> map = getRightConstantContainer(integer);
                 StringBuffer buf = map.get(integer);
@@ -2612,7 +2634,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         QuantifiableVariable qv = args[i];
                         if (qv instanceof LogicVariable) {
                                 LogicVariable lv = (LogicVariable) qv;
-                                subs[i] = TB.var(lv);
+                                subs[i] = tb.var(lv);
                                 argsorts[i] = lv.sort();
                         } else {
                                 Debug.log4jError(
@@ -2626,7 +2648,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 argsorts);
 
                 // Build the final predicate
-                Term temp = TB.func(fun, subs);
+                Term temp = tb.func(fun, subs);
 
                 // translate the predicate
                 StringBuffer cstr = this.translateTerm(temp, quantifiedVars,

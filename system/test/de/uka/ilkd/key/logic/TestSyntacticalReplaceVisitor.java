@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.logic;
 
@@ -30,7 +29,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class TestSyntacticalReplaceVisitor extends TestCase {
     
-    private static final TermBuilder TB = TermBuilder.DF;
+    private TermBuilder TB;
        
     SVInstantiations insts=null;
 
@@ -47,6 +46,8 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
 	TacletForTests.setStandardFile(TacletForTests.testRules);
 	TacletForTests.parse();
 	index=TacletForTests.getRules();
+	TB = TacletForTests.services().getTermBuilder();
+	
 	RewriteTaclet taclet
 	    = (RewriteTaclet)index.lookup("testSyntacticalReplaceVisitor_0")
 	    .taclet();
@@ -88,7 +89,7 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
     }
 
     public void test1() {
-	SyntacticalReplaceVisitor srv=new SyntacticalReplaceVisitor(null, insts, null, null);
+	SyntacticalReplaceVisitor srv=new SyntacticalReplaceVisitor(TacletForTests.services(), insts, null, null);
 	rw.execPostOrder(srv);
 	assertEquals(srv.getTerm(), t_allxpxpx);
     }
@@ -99,7 +100,7 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
 	Term result=TacletForTests.parseTerm("(\\forall s y; p(f(const)))");
 	SyntacticalReplaceVisitor v = new
 	    SyntacticalReplaceVisitor
-	    (null, SVInstantiations.EMPTY_SVINSTANTIATIONS, null, null);
+	    (TacletForTests.services(), SVInstantiations.EMPTY_SVINSTANTIATIONS, null, null);
 	orig.execPostOrder(v);
 	assertEquals("Substitution Term not resolved correctly.",
 		     v.getTerm().sub(0), result.sub(0));

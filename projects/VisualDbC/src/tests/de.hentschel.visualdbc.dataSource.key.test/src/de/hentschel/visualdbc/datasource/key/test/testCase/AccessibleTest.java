@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -14,26 +14,26 @@
 package de.hentschel.visualdbc.datasource.key.test.testCase;
 
 import org.junit.Test;
-import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
-import de.hentschel.visualdbc.datasource.key.test.util.TestKeyUtil;
+import de.hentschel.visualdbc.datasource.key.test.Activator;
 import de.hentschel.visualdbc.datasource.model.DSPackageManagement;
 
 /**
  * Tests the handling of accessible clauses in a {@link KeyConnection}.
  * @author Martin Hentschel
  */
-public class AccessibleTest extends AbstractSetupTestCase {
+public class AccessibleTest extends AbstractKeYTest {
    /**
     * Tests accessible clause.
     */
    @Test
    public void testAccessible() throws Exception {
-      TestKeyUtil.testKeyConnection("AccessibleTest_testAccessible",
-                                    "data/accessibleTest",
-                                    null,
-                                    DSPackageManagement.FLAT_LIST,
-                                    TestKeyUtil.createExpectedAccessibleTestModel());
+      testKeyConnection("AccessibleTest_testAccessible",
+                        "data/accessibleTest/test",
+                        null,
+                        DSPackageManagement.FLAT_LIST,
+                        Activator.PLUGIN_ID,
+                        "data/accessibleTest/oracle/accessibleTest.dbc");
    }
 }

@@ -1,26 +1,24 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.proof.join;
 
-import java.io.StringReader;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -46,7 +44,7 @@ public interface PredicateEstimator {
 class StdPredicateEstimator implements PredicateEstimator{
     
     @Override
-    public Result estimate(ProspectivePartner partner, Proof proof){
+    public Result estimate(ProspectivePartner partner, final Proof proof){
            final Node node = getFirstDifferentNode(partner);
            String branchLabel = node.getNodeInfo().getBranchLabel();
            if(branchLabel != null && (branchLabel.endsWith("TRUE") || branchLabel.endsWith("FALSE") )){
@@ -69,7 +67,7 @@ class StdPredicateEstimator implements PredicateEstimator{
                     @Override
                     public Term getPredicate() {
                         if(!positive){
-                            return TermBuilder.DF.not(term);
+                            return proof.getServices().getTermBuilder().not(term);
                         }
                         return term;
                     }
@@ -147,8 +145,8 @@ class StdPredicateEstimator implements PredicateEstimator{
     private Term translate(String estimation, Services services){
             try {
             KeYParserF parser =
-                    new KeYParserF (ParserMode.TERM, new KeYLexerF ( estimation,
-                                     services.getExceptionHandler() ), "",
+                    new KeYParserF (ParserMode.TERM, new KeYLexerF ( estimation, "",
+                                     services.getExceptionHandler() ),
                                      services,   // should not be needed
                                      services.getNamespaces() );
                 return parser.term();

@@ -1,17 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 /** these tests are used to control if the collision mechanisms work
  * correct. Collisions may be: collisions between variablesv, with the
@@ -20,6 +18,7 @@
 package de.uka.ilkd.key.rule;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.gui.TacletInstantiationsTableModel;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -42,7 +41,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.SVInstantiationException;
 import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.TacletInstantiationsTableModel;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -57,6 +55,7 @@ public class TestCollisionResolving extends TestCase {
 	super(name);
     }
 
+    @Override
     public void setUp() {
 	TacletForTests.setStandardFile(TacletForTests.testRules);
 	TacletForTests.parse();
@@ -77,6 +76,7 @@ public class TestCollisionResolving extends TestCase {
 	goal = new Goal(node, ruleAppIndex);
     }
 
+    @Override
     public void tearDown() {
         s = null;
         goal = null;
@@ -90,16 +90,16 @@ public class TestCollisionResolving extends TestCase {
 	Function p = new Function(new Name("p"), Sort.FORMULA, new Sort[]{s});
 	Function q = new Function(new Name("q"), Sort.FORMULA, new Sort[]{s});
 
-	Term t_x = TermFactory.DEFAULT.createTerm(x);	
-	Term t_p_x = TermFactory.DEFAULT.createTerm(p, new Term[]{t_x}, null, null);
-	Term t_q_x = TermFactory.DEFAULT.createTerm(q, new Term[]{t_x}, null, null);
-	
+	Term t_x = services.getTermFactory().createTerm(x);	
+	Term t_p_x = services.getTermFactory().createTerm(p, new Term[]{t_x}, null, null);
+	Term t_q_x = services.getTermFactory().createTerm(q, new Term[]{t_x}, null, null);
+   TermBuilder tb = services.getTermBuilder();
 	Term t_all_p_x =
-	    TermBuilder.DF.all(x, t_p_x);
+	    tb.all(x, t_p_x);
 	Term t_ex_q_x =
-	    TermBuilder.DF.ex(x, t_q_x);
+	    tb.ex(x, t_q_x);
 	Term term = 
-	    TermFactory.DEFAULT.createTerm(Junctor.AND, t_all_p_x,
+	        services.getTermFactory().createTerm(Junctor.AND, t_all_p_x,
 						  t_ex_q_x);
 	FindTaclet coll_varSV = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_coll_varSV").taclet();
@@ -109,7 +109,7 @@ public class TestCollisionResolving extends TestCase {
 	     (term, 
 	      coll_varSV.find(),
 	      MatchConditions.EMPTY_MATCHCONDITIONS,
-	      null),
+	      services),
 	      services);
 
 	SchemaVariable b 
@@ -138,24 +138,29 @@ public class TestCollisionResolving extends TestCase {
 	Function p = new Function(new Name("p"), Sort.FORMULA, new Sort[]{s});
 	Function q = new Function(new Name("q"), Sort.FORMULA, new Sort[]{s});
 
-	Term t_x = TermFactory.DEFAULT.createTerm(x);	
-	Term t_p_x = TermFactory.DEFAULT.createTerm(p, new Term[]{t_x}, null, null);
-	Term t_q_x = TermFactory.DEFAULT.createTerm(q, new Term[]{t_x}, null, null);
+	TermBuilder tb = services.getTermBuilder();
+
+	final TermFactory tf = services.getTermFactory();
+    
+	Term t_x = tf.createTerm(x);	
+	Term t_p_x = tf.createTerm(p, new Term[]{t_x}, null, null);
+	Term t_q_x = tf.createTerm(q, new Term[]{t_x}, null, null);
 	
+
 	Term t_ex_q_x =
-	    TermBuilder.DF.ex(x, t_q_x);
+	    tb.ex(x, t_q_x);
 
 	Term t_px_and_exxqx = 
-	    TermFactory.DEFAULT.createTerm(Junctor.AND, t_p_x,
+	    tf.createTerm(Junctor.AND, t_p_x,
 						  t_ex_q_x);
 	Term term =
-	    TermBuilder.DF.all(x, t_px_and_exxqx);
+	    tb.all(x, t_px_and_exxqx);
 
 	FindTaclet coll_varSV = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_coll_context").taclet();
 
 	PosInOccurrence pos=new PosInOccurrence(new SequentFormula(term),
-						PosInTerm.TOP_LEVEL.down(0),
+						PosInTerm.getTopLevel().down(0),
 						true);
 
 	TacletApp result 
@@ -163,7 +168,7 @@ public class TestCollisionResolving extends TestCase {
 					      (term.sub(0), 
 					       coll_varSV.find(),
 					       MatchConditions.EMPTY_MATCHCONDITIONS,
-					       null),pos, services);
+					       services),pos, services);
 
 	SchemaVariable b 
 	    = (SchemaVariable) TacletForTests.getVariables().lookup(new Name("b"));
@@ -186,7 +191,7 @@ public class TestCollisionResolving extends TestCase {
 	FindTaclet taclet = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_ns1").taclet();
 	PosInOccurrence pos=new PosInOccurrence(new SequentFormula(term),
-						PosInTerm.TOP_LEVEL.down(0),
+						PosInTerm.getTopLevel().down(0),
 						true);
 	TacletApp app 
 	    = PosTacletApp.createPosTacletApp(taclet, 
@@ -280,7 +285,7 @@ public class TestCollisionResolving extends TestCase {
 					      ("\\exists s x; p(x)"))).semisequent();
 	Sequent seq=Sequent.createSuccSequent(semiseq);
 	PosInOccurrence pos=new PosInOccurrence(semiseq.get(0),
-						PosInTerm.TOP_LEVEL, false);
+						PosInTerm.getTopLevel(), false);
 
 	NoPosTacletApp app0 = NoPosTacletApp.createNoPosTacletApp ( taclet );
 	app0 = app0.matchFind ( pos,
@@ -413,7 +418,7 @@ public class TestCollisionResolving extends TestCase {
 	    ("TestCollisionResolving_name_conflict_with_context2").taclet();
 	Term term=TacletForTests.parseTerm("\\forall s x; p(x)");
 	PosInOccurrence pos=new PosInOccurrence(new SequentFormula(term),
-						PosInTerm.TOP_LEVEL.down(0),
+						PosInTerm.getTopLevel().down(0),
 						true);
 	MatchConditions mc=taclet.match(term.sub(0), taclet.find(),
 					MatchConditions.EMPTY_MATCHCONDITIONS,

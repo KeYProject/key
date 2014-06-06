@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.logic;
 
 import java.io.File;
@@ -112,20 +125,21 @@ public class TestTermLabelManager extends TestCase {
                                            String... supportedRules) {
       LoggingTermLabelRefactoring refactoring = new LoggingTermLabelRefactoring(scope, supportedRules);
       Services services = createTestServices(null, null, null, null, null, refactoring);
+      TermBuilder TB = services.getTermBuilder();
       // Create sequent
       PosInOccurrence pos = createTestPosInOccurrence(services);
       IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
       Term one = integerLDT.translateLiteral(new IntLiteral(1), services);
       Term two = integerLDT.translateLiteral(new IntLiteral(2), services);
-      one = TermBuilder.DF.label(one, new ParameterlessTermLabel(new Name("APPLICATION")));
-      two = TermBuilder.DF.label(two, new ParameterlessTermLabel(new Name("APPLICATION")));
+      one = TB.label(one, new ParameterlessTermLabel(new Name("APPLICATION")));
+      two = TB.label(two, new ParameterlessTermLabel(new Name("APPLICATION")));
       Sequent sequent = Sequent.EMPTY_SEQUENT;
-      sequent = sequent.addFormula(new SequentFormula(TermBuilder.DF.inInt(one, services)), true, true).sequent();
+      sequent = sequent.addFormula(new SequentFormula(TB.inInt(one)), true, true).sequent();
       sequent = sequent.addFormula(pos.constrainedFormula(), true, false).sequent();
-      sequent = sequent.addFormula(new SequentFormula(TermBuilder.DF.inInt(two, services)), false, true).sequent();
+      sequent = sequent.addFormula(new SequentFormula(TB.inInt(two)), false, true).sequent();
       // Test supported rule
       Rule rule = new DummyRule("rule");
-      Term taclet = TermBuilder.DF.tt();
+      Term taclet = TB.tt();
       Goal goal = createGoal(services, sequent);
       TermLabelManager.refactorLabels(services, pos, rule, goal, taclet);
       compareSequents(sequent, goal.sequent(), ruleChanged, scope);
@@ -208,7 +222,7 @@ public class TestTermLabelManager extends TestCase {
       Services services = createTestServices(null, null, null, null, update, null);
       PosInOccurrence pos = createTestPosInOccurrence(services);
       Rule rule = new DummyRule("rule");
-      Term taclet = TermBuilder.DF.tt();
+      Term taclet = services.getTermBuilder().tt();
       // Create labels
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(services, pos, rule, null, null, taclet, null, null, null, null);
       assertNotNull(labels);
@@ -230,7 +244,7 @@ public class TestTermLabelManager extends TestCase {
       Services services = createTestServices(null, null, null, null, update, null);
       PosInOccurrence pos = createTestPosInOccurrence(services);
       Rule rule = new DummyRule("rule");
-      Term taclet = TermBuilder.DF.tt();
+      Term taclet = services.getTermBuilder().tt();
       // Create labels
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(services, pos, rule, null, null, taclet, null, null, null, null);
       assertNotNull(labels);
@@ -251,7 +265,7 @@ public class TestTermLabelManager extends TestCase {
       Services services = createTestServices(null, null, null, policy, null, null);
       PosInOccurrence pos = createTestPosInOccurrence(services);
       Rule rule = new DummyRule("rule");
-      Term taclet = TermBuilder.DF.tt();
+      Term taclet = services.getTermBuilder().tt();
       // Create labels
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(services, pos, rule, null, null, taclet, null, null, null, null);
       assertNotNull(labels);
@@ -295,7 +309,7 @@ public class TestTermLabelManager extends TestCase {
       Services services = createTestServices(null, null, null, policy, null, null);
       PosInOccurrence pos = createTestPosInOccurrence(services);
       Rule rule = new DummyRule("rule");
-      Term taclet = TermBuilder.DF.tt();
+      Term taclet = services.getTermBuilder().tt();
       // Create labels
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(services, pos, rule, null, null, taclet, null, null, null, null);
       assertNotNull(labels);
@@ -327,7 +341,7 @@ public class TestTermLabelManager extends TestCase {
       Services services = createTestServices(null, null, policy, null, null, null);
       PosInOccurrence pos = createTestPosInOccurrence(services);
       Rule rule = new DummyRule("rule");
-      Term taclet = TermBuilder.DF.tt();
+      Term taclet = services.getTermBuilder().tt();
       // Create labels
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(services, pos, rule, null, null, taclet, null, null, null, null);
       assertNotNull(labels);
@@ -361,7 +375,7 @@ public class TestTermLabelManager extends TestCase {
       Services services = createTestServices(null, null, policy, null, null, null);
       PosInOccurrence pos = createTestPosInOccurrence(services);
       Rule rule = new DummyRule("rule");
-      Term taclet = TermBuilder.DF.tt();
+      Term taclet = services.getTermBuilder().tt();
       // Create labels
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(services, pos, rule, null, null, taclet, null, null, null, null);
       assertNotNull(labels);
@@ -387,12 +401,13 @@ public class TestTermLabelManager extends TestCase {
    public void testInstantiateLabels_modalityTermPolicies() {
       LoggingTermLabelPolicy policy = new LoggingTermLabelPolicy();
       Services services = createTestServices(null, policy, null, null, null, null);
-      Term modality = TermBuilder.DF.label(TermBuilder.DF.box(JavaBlock.EMPTY_JAVABLOCK, TermBuilder.DF.label(TermBuilder.DF.tt(), new ParameterlessTermLabel(new Name("POST")))), new ParameterlessTermLabel(new Name("ONE")));
+      TermBuilder TB = services.getTermBuilder();
+      Term modality = TB.label(TB.box(JavaBlock.EMPTY_JAVABLOCK, TB.label(TB.tt(), new ParameterlessTermLabel(new Name("POST")))), new ParameterlessTermLabel(new Name("ONE")));
       LocationVariable heap = services.getTypeConverter().getHeapLDT().getSavedHeap();
-      Term update = TermBuilder.DF.label(TermBuilder.DF.elementary(services, TermBuilder.DF.var(heap), TermBuilder.DF.var(heap)), new ParameterlessTermLabel(new Name("UPDATE")));
-      Term updateApp = TermBuilder.DF.apply(update, modality, new ImmutableArray<TermLabel>(new ParameterlessTermLabel(new Name("UPDATE-APPLICATION"))));
-      PosInOccurrence pos = new PosInOccurrence(new SequentFormula(updateApp), PosInTerm.TOP_LEVEL, true);
-      Term taclet = TermBuilder.DF.tt();
+      Term update = TB.label(TB.elementary(TB.var(heap), TB.var(heap)), new ParameterlessTermLabel(new Name("UPDATE")));
+      Term updateApp = TB.apply(update, modality, new ImmutableArray<TermLabel>(new ParameterlessTermLabel(new Name("UPDATE-APPLICATION"))));
+      PosInOccurrence pos = new PosInOccurrence(new SequentFormula(updateApp), PosInTerm.getTopLevel(), true);
+      Term taclet = TB.tt();
       Rule rule = new DummyRule("rule");
       // Create labels
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(services, pos, rule, null, null, taclet, null, null, null, null);
@@ -411,7 +426,7 @@ public class TestTermLabelManager extends TestCase {
       LoggingTermLabelPolicy policy = new LoggingTermLabelPolicy();
       Services services = createTestServices(policy, null, null, null, null, null);
       PosInOccurrence pos = createTestPosInOccurrence(services);
-      Term taclet = TermBuilder.DF.tt();
+      Term taclet = services.getTermBuilder().tt();
       Rule rule = new DummyRule("rule");
       // Create labels
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(services, pos, rule, null, null, taclet, null, null, null, null);
@@ -430,7 +445,7 @@ public class TestTermLabelManager extends TestCase {
       Services services = createTestServices(null, null, null, null, null, null);
       PosInOccurrence pos = createTestPosInOccurrence(services);
       Rule rule = new DummyRule("rule");
-      Term taclet = TermBuilder.DF.label(TermBuilder.DF.tt(), new ImmutableArray<TermLabel>(new ParameterlessTermLabel(new Name("TACLET"))));
+      Term taclet = services.getTermBuilder().label(services.getTermBuilder().tt(), new ImmutableArray<TermLabel>(new ParameterlessTermLabel(new Name("TACLET"))));
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(services, pos, rule, null, null, taclet, null, null, null, null);
       assertNotNull(labels);
       assertEquals(1, labels.size());
@@ -448,7 +463,7 @@ public class TestTermLabelManager extends TestCase {
 
    protected PosInOccurrence createTestPosInOccurrence(Services services) {
       Term testTerm = createTestTerm(services);
-      Term inInt = TermBuilder.DF.inInt(testTerm, services);
+      Term inInt = services.getTermBuilder().inInt(testTerm);
       return new PosInOccurrence(new SequentFormula(inInt), PosInTerm.parseReverseString("0"), true);
    }
 
@@ -457,11 +472,12 @@ public class TestTermLabelManager extends TestCase {
       Term one = integerLDT.translateLiteral(new IntLiteral(1), services);
       Term two = integerLDT.translateLiteral(new IntLiteral(2), services);
       Term three = integerLDT.translateLiteral(new IntLiteral(3), services);
-      one = TermBuilder.DF.label(one, new ParameterlessTermLabel(new Name("ONE")));
-      two = TermBuilder.DF.label(one, new ParameterlessTermLabel(new Name("TWO")));
-      three = TermBuilder.DF.label(one, new ParameterlessTermLabel(new Name("THREE")));
-      Term innerAdd = TermBuilder.DF.label(TermBuilder.DF.add(services, two, three), new ParameterlessTermLabel(new Name("ADD")));
-      return TermBuilder.DF.label(TermBuilder.DF.add(services, one, innerAdd), new ParameterlessTermLabel(new Name("APPLICATION")));
+      TermBuilder TB = services.getTermBuilder();
+      one = TB.label(one, new ParameterlessTermLabel(new Name("ONE")));
+      two = TB.label(one, new ParameterlessTermLabel(new Name("TWO")));
+      three = TB.label(one, new ParameterlessTermLabel(new Name("THREE")));
+      Term innerAdd = TB.label(TB.add(two, three), new ParameterlessTermLabel(new Name("ADD")));
+      return TB.label(TB.add(one, innerAdd), new ParameterlessTermLabel(new Name("APPLICATION")));
    }
 
    /**
@@ -601,12 +617,12 @@ public class TestTermLabelManager extends TestCase {
       }
 
       @Override
-      public RefactoringScope defineRefactoringScope(Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Term tacletTerm) {
+      public RefactoringScope defineRefactoringScope(TermServices services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Term tacletTerm) {
          return scope;
       }
 
       @Override
-      public void refactoreLabels(Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Term tacletTerm, Term term, List<TermLabel> labels) {
+      public void refactoreLabels(TermServices services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Term tacletTerm, Term term, List<TermLabel> labels) {
          List<TermLabel> changedLabels = new LinkedList<TermLabel>();
          for (TermLabel label : labels) {
             if (label.name().toString().endsWith("-CHANGED")) {
@@ -664,12 +680,12 @@ public class TestTermLabelManager extends TestCase {
       }
 
       @Override
-      public boolean isRuleApplicationSupported(Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock) {
+      public boolean isRuleApplicationSupported(TermServices services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock) {
          return true;
       }
 
       @Override
-      public boolean addLabel(Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock, Term childTerm, TermLabel label) {
+      public boolean addLabel(TermServices services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock, Term childTerm, TermLabel label) {
          log.add(label);
          return true;
       }
@@ -683,7 +699,7 @@ public class TestTermLabelManager extends TestCase {
       private List<TermLabel> log = new LinkedList<TermLabel>();
 
       @Override
-      public boolean keepLabel(Services services,
+      public boolean keepLabel(TermServices services,
                                PosInOccurrence applicationPosInOccurrence,
                                Term applicationTerm,
                                Rule rule,

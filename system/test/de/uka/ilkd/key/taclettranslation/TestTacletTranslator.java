@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -60,17 +60,20 @@ public class TestTacletTranslator extends TestCase {
     // Utility Methods for test cases.
     //
     private KeYParserF stringTacletParser(String s) {
-        return new KeYParserF(ParserMode.TACLET, new KeYLexerF(s, null),
-                "No file. parser/TestTacletParser.stringTacletParser(" + s + ")",
-                services, nss);
+	return new KeYParserF(ParserMode.TACLET,
+		new KeYLexerF(s,
+			"No file. parser/TestTacletParser.stringTacletParser(" + s + ")",
+			null),
+		services, nss);
     }
 
     private void parseDecls(String s) {
         try {
-            KeYParserF p = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s,
-                    null),
-                    "No file. parser/TestTacletParser.stringDeclParser(" + s + ")",
-                    services, nss);
+	    KeYParserF p = new KeYParserF(ParserMode.DECLARATION,
+		    new KeYLexerF(s,
+			    "No file. parser/TestTacletParser.stringDeclParser(" + s + ")",
+			    null),
+		   services, nss);
             p.decls();
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
@@ -122,7 +125,7 @@ public class TestTacletTranslator extends TestCase {
 
         Taclet taclet = parseTaclet(tacletString);
         Term expected = parseTerm(termString);
-        Term translation = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(taclet);
+        Term translation = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(taclet, services);
 
         assertEquals("Taclet " + taclet.name() + " not translated as expected", expected,
                 translation);

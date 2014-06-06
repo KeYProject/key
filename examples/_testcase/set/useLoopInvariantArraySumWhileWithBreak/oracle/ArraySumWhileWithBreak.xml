@@ -5,8 +5,7 @@
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <loopInvariant name="
-invariant: i &gt;= 0
+            <loopInvariant name="invariant: i &gt;= 0
 &amp; (  i &lt;= array.length
    &amp;   result_1
      = javaCastInt(bsum{int j;}(0, i, array[j])));
@@ -33,7 +32,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                      <callStackEntry path="/0"/>
                      <branchStatement name="if (i==array.length)" pathCondition="not(equals(array,null))" pathConditionChanged="false">
                         <callStackEntry path="/0"/>
-                        <branchCondition name="imp(geq(length(array),Z(0(#))),equals(length(array),i_0))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))" pathConditionChanged="true" branchCondition="imp(geq(length(array),Z(0(#))),equals(length(array),i_0))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <branchCondition name="equals(length(array),i_0)" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))" pathConditionChanged="true" branchCondition="equals(length(array),i_0)" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <callStackEntry path="/0"/>
                            <statement name="break_1=true;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))" pathConditionChanged="false">
                               <callStackEntry path="/0"/>
@@ -47,13 +46,13 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                               </statement>
                            </statement>
                         </branchCondition>
-                        <branchCondition name="not(and(geq(i_0,Z(0(#))),equals(length(array),i_0)))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(and(geq(i_0,Z(0(#))),equals(length(array),i_0)))))" pathConditionChanged="true" branchCondition="not(and(geq(i_0,Z(0(#))),equals(length(array),i_0)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <branchCondition name="not(equals(length(array),i_0))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),i_0))))" pathConditionChanged="true" branchCondition="not(equals(length(array),i_0))" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <callStackEntry path="/0"/>
-                           <statement name="result_1+=array[i];" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(and(geq(i_0,Z(0(#))),equals(length(array),i_0)))))" pathConditionChanged="false">
+                           <statement name="result_1+=array[i];" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),i_0))))" pathConditionChanged="false">
                               <callStackEntry path="/0"/>
-                              <statement name="i++;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(and(geq(i_0,Z(0(#))),equals(length(array),i_0)))))" pathConditionChanged="false">
+                              <statement name="i++;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),i_0))))" pathConditionChanged="false">
                                  <callStackEntry path="/0"/>
-                                 <termination name="&lt;loop body end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(and(geq(i_0,Z(0(#))),equals(length(array),i_0)))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
+                                 <termination name="&lt;loop body end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),i_0))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
                                  </termination>
                               </statement>
                            </statement>

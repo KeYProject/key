@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -19,6 +19,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -35,9 +37,10 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     private LoopWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                 LocationVariable heap, OriginalVariables origVars,
                                 Condition requires, Term assignable, Term accessible,
-                                Condition ensures, Term mby, Term rep, LoopInvariant inv) {
+                                Condition ensures, Term mby, Term rep, LoopInvariant inv,
+                                TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires,
-              assignable, accessible, ensures, mby, rep);
+              assignable, accessible, ensures, mby, rep, tb);
         this.inv = inv;
     }
 
@@ -55,11 +58,11 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
-    SequentFormula generateSequent(SequentTerms seq, Services services) {
+    SequentFormula generateSequent(SequentTerms seq, TermServices services) {
         // wd(phi) & (phi & wf(anon) -> wd(mod) & wd(variant) & {anon^mod}(wd(phi) & wd(variant)))
         final Term imp = TB.imp(TB.and(seq.pre, seq.wfAnon),
                                 TB.and(seq.wdMod, seq.wdRest, seq.anonWdPost));
-        final Term wdPre = TB.wd(seq.pre, services);
+        final Term wdPre = TB.wd(seq.pre);
         return new SequentFormula(TB.apply(seq.context,
                                            TB.and(wdPre, imp)));
     }
@@ -78,7 +81,7 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
         return new LoopWellDefinedness(getName(), newId, type(), getTarget(), getHeap(),
                                        getOrigVars(), getRequires(), getAssignable(),
                                        getAccessible(), getEnsures(), getMby(),
-                                       getRepresents(), getStatement());
+                                       getRepresents(), getStatement(), TB);
     }
 
     @Override
@@ -86,7 +89,8 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
         return new LoopWellDefinedness(getName(), id(), type(), newPM, getHeap(),
                                        getOrigVars(), getRequires(), getAssignable(),
                                        getAccessible(), getEnsures(), getMby(),
-                                       getRepresents(), getStatement().setTarget(newKJT, newPM));
+                                       getRepresents(),
+                                       getStatement().setTarget(newKJT, newPM), TB);
     }
 
     @Override
@@ -105,7 +109,7 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
-    public LoopWellDefinedness combine(WellDefinednessCheck wdc, Services services) {
+    public LoopWellDefinedness combine(WellDefinednessCheck wdc, TermServices services) {
         assert wdc instanceof LoopWellDefinedness;
         final LoopWellDefinedness lwd = (LoopWellDefinedness)wdc;
         assert this.getStatement().getName().equals(lwd.getStatement().getName());

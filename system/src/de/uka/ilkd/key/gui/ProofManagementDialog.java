@@ -3,13 +3,14 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
+
 package de.uka.ilkd.key.gui;
 
 import java.awt.Component;
@@ -53,6 +54,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -344,19 +346,8 @@ public final class ProofManagementDialog extends JDialog {
             }
         }
 
-        validateNotNull(selectedKJT);
-        validateNotNull(selectedTarget);
-        select(selectedKJT, selectedTarget);
-    }
-
-    /*
-     * Check for Nullpointers.
-     */
-    public static void validateNotNull(Object o) {
-        if (o == null) {
-            System.err.println("Unexpected null value.");
-            Thread.dumpStack();
-        }
+        if (selectedKJT != null && selectedTarget != null)
+            select(selectedKJT, selectedTarget);
     }
 
     /**
@@ -426,7 +417,8 @@ public final class ProofManagementDialog extends JDialog {
 
     private void select(KeYJavaType kjt, IObserverFunction target) {
         tabbedPane.setSelectedIndex(0);
-        classTree.select(kjt, target);
+        if (classTree != null)
+            classTree.select(kjt, target);
     }
 
     private void select(Proof p) {
@@ -511,18 +503,25 @@ public final class ProofManagementDialog extends JDialog {
             startButton.setEnabled(true);
         }
     }
-
+        
+    
+    private boolean isInstanceMethodOfAbstractClass(KeYJavaType p_class, IObserverFunction obs) {
+        return p_class.getJavaType() instanceof InterfaceDeclaration
+            || (p_class.getSort().isAbstract() && !obs.isStatic());
+    }
+    
     private void updateContractPanel() {
         ContractSelectionPanel pan = getActiveContractPanel();
 	if (pan == contractPanelByMethod) {
 	    final ClassTree.Entry entry = classTree.getSelectedEntry();
-	    if(entry != null && entry.target != null) {
-		final ImmutableSet<Contract> contracts
-			= specRepos.getContracts(entry.kjt, entry.target);
-		pan.setContracts(contracts, "Contracts");
+	    if(entry != null && entry.target != null && 
+	            !isInstanceMethodOfAbstractClass(entry.kjt, entry.target)) {
+	        final ImmutableSet<Contract> contracts 
+	        = specRepos.getContracts(entry.kjt, entry.target);
+	        pan.setContracts(contracts, "Contracts");
 	    } else {
-		pan.setContracts(DefaultImmutableSet.<Contract>nil(), "Contracts");
-	    }
+	        pan.setContracts(DefaultImmutableSet.<Contract>nil(), "Contracts");	        
+	    }	    	    
 	} else if (pan == contractPanelByProof) {
 	    if(proofList.getSelectedValue() != null) {
 		final Proof p 
@@ -544,6 +543,7 @@ public final class ProofManagementDialog extends JDialog {
         for (KeYJavaType kjt : kjts) {
             ImmutableSet<IObserverFunction> targets = specRepos.getContractTargets(kjt);
             for (IObserverFunction target : targets) {
+	          if (!isInstanceMethodOfAbstractClass(kjt, target)) {                
                 ImmutableSet<Contract> contracts = specRepos.getContracts(kjt, target);
                 boolean startedProving = false;
                 boolean allClosed = true;
@@ -571,7 +571,8 @@ public final class ProofManagementDialog extends JDialog {
                         : keyClosedIcon)
                         : keyIcon)
                         : null);
-            }
+              }
+		    }
         }
         classTree.updateUI();
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -205,14 +205,14 @@ public class ProofReferenceModelCreatorTest extends AbstractProofReferenceModelC
          // Compare initial model
          ProofReferenceModelCreator creator = new ProofReferenceModelCreator(proof);
          creator.updateModel(ProofReferenceUtil.computeProofReferences(proof), new NullProgressMonitor());
-         compareWithOracle(oracleDirectory, creator.getModel(), initialOracleFileInBundle);
+         compareWithOracle(oracleDirectory, creator.getModel(), Activator.PLUGIN_ID, initialOracleFileInBundle);
          // Start auto mode
          StrategyProperties sp = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, useContracts, false, false, false);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
          environment.getUi().startAndWaitForAutoMode(proof);
          // Compare final model
          creator.updateModel(ProofReferenceUtil.computeProofReferences(proof), new NullProgressMonitor());
-         compareWithOracle(oracleDirectory, creator.getModel(), finalOracleFileInBundle);
+         compareWithOracle(oracleDirectory, creator.getModel(), Activator.PLUGIN_ID, finalOracleFileInBundle);
       }
       finally {
          // Dispose proof and environment

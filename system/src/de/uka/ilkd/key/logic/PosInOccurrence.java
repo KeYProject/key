@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.logic;
 
@@ -167,7 +166,7 @@ public final class PosInOccurrence {
     }
 
     public boolean isTopLevel () {
-	return posInTerm == PosInTerm.TOP_LEVEL;
+	return posInTerm == PosInTerm.getTopLevel();
     }
 
     /**
@@ -208,7 +207,7 @@ public final class PosInOccurrence {
         assert p_newFormula != null;
         final PIOPathIterator it = iterator ();
         Term newTerm = p_newFormula.formula ();
-        PosInTerm newPosInTerm = PosInTerm.TOP_LEVEL;
+        PosInTerm newPosInTerm = PosInTerm.getTopLevel();
 
         while ( true ) {
             final int subNr = it.next ();
@@ -244,7 +243,7 @@ public final class PosInOccurrence {
         if (isTopLevel()) {
             return this;
         }
-	return new PosInOccurrence(cfma, PosInTerm.TOP_LEVEL, 
+	return new PosInOccurrence(cfma, PosInTerm.getTopLevel(), 
 				   inAntec);    	
     }
 
@@ -272,7 +271,7 @@ public final class PosInOccurrence {
     }
 
     
-    private class PIOPathIteratorImpl implements PIOPathIterator {	
+    private final class PIOPathIteratorImpl implements PIOPathIterator {	
 	int               child;
 	int               count             = 0;
 	IntIterator       currentPathIt;
@@ -280,17 +279,6 @@ public final class PosInOccurrence {
 	
 	private PIOPathIteratorImpl               () {
 	    currentPathIt = posInTerm ().iterator ();
-	}
-
-	private PosInTerm firstN ( PosInTerm p_pit,
-				   int       p_n ) {
-	    IntIterator it  = p_pit.iterator ();
-	    PosInTerm         res = PosInTerm.TOP_LEVEL;
-
-	    while ( p_n-- != 0 )
-		res = res.down ( it.next () );
-
-	    return res;
 	}
 
 	/**
@@ -312,7 +300,7 @@ public final class PosInOccurrence {
 
 	    final PosInOccurrence pio;	   
 	    pio = new PosInOccurrence ( cfma,
-		    firstN ( posInTerm, count - 1 ),
+		    posInTerm.firstN(count - 1),
 		    inAntec );            
 
         

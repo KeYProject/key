@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -697,9 +697,7 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
          // Start proof
          startProofRunnable.startProof(projectName, bot, editorPart);
          // Switch to KeY perspective
-         SWTBotShell switchShell = bot.shell("Confirm Perspective Switch");
-         switchShell.bot().button("Yes").click();
-         assertEquals(KeYPerspective.PERSPECTIVE_ID, TestUtilsUtil.getActivePerspective().getId());
+         TestUtilsUtil.confirmPerspectiveSwitch(bot, KeYPerspective.PERSPECTIVE_ID);
          // Select first operation contract and start proof
          SWTBotShell contractShell = bot.shell("Select Contract for Proof in KeY");
          contractShell.bot().table().select(0);

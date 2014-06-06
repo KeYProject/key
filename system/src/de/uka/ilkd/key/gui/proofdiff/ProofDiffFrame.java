@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -22,7 +22,6 @@ import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
@@ -35,6 +34,7 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.proofdiff.diff_match_patch.Diff;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -54,17 +54,20 @@ import de.uka.ilkd.key.proof.Proof;
  * @author mattias ulbrich
  */
 
-@SuppressWarnings("serial")
 public class ProofDiffFrame extends JFrame {
+
+    private static final long serialVersionUID = -1593379776744771923L;
 
     /**
      * The action to show a new frame of this class. Is used in {@link MainWindow}.
      */
-    public static class Action extends AbstractAction {
+    public static class Action extends MainWindowAction {
 
+        private static final long serialVersionUID = -1745515272350810787L;
         private final MainWindow mainWindow;
 
         public Action(MainWindow mainWindow) {
+            super(mainWindow);
             this.mainWindow = mainWindow;
             putValue(NAME, "Visual node diff ...");
             // putValue(SMALL_ICON, ...);
@@ -343,7 +346,7 @@ public class ProofDiffFrame extends JFrame {
                         proof.getServices(),
                         true);
 
-        node.sequent().prettyprint(logicPrinter);
+        logicPrinter.printSequent(node.sequent());
 
         return logicPrinter.result().toString();
     }
