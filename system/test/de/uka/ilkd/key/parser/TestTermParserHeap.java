@@ -5,7 +5,7 @@ package de.uka.ilkd.key.parser;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class TestTermParserHeap extends TestTermParser {
+public class TestTermParserHeap extends AbstractTestTermParser {
 
     public TestTermParserHeap() {
         super(TestTermParserHeap.class.getSimpleName());
