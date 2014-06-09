@@ -13,7 +13,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     @Override
     public void setUpDeclarations() {
-        
+
     }
 
 }
