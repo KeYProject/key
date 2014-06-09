@@ -55,8 +55,14 @@ public class InfoTreeModel extends DefaultTreeModel {
 
     private class FunctionsNode extends InfoTreeNode {
 
+        private static final String COLLECTION = 
+                "This node stands for a category of symbols; expand it to browse the symbols " +
+                "in the category.";
+        private static final String DEFAULT_FUNCTIONS_LABEL =
+                "Display descriptions for documented interpreted function and predicate symbols.";
+
         FunctionsNode(MainWindow mainWindow, Properties functionExplanations) {
-            super("Function Symbols", "Display descriptions for documented function symbols.");
+            super("Function Symbols", DEFAULT_FUNCTIONS_LABEL);
 
             Map<String, InfoTreeNode> categoryMap = new HashMap<String, InfoTreeNode>();
 
@@ -72,7 +78,7 @@ public class InfoTreeModel extends DefaultTreeModel {
                     String category = parts[0];
                     InfoTreeNode categoryNode = categoryMap.get(category);
                     if (categoryNode == null) {
-                        categoryNode = new InfoTreeNode(category, "This collects a category of symbols.");
+                        categoryNode = new InfoTreeNode(category, COLLECTION);
                         categoryMap.put(category, categoryNode);
                         insertAsLast(categoryNode, this);
                     }
