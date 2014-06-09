@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+
 /**
  * Parser tests for heap terms.
  *
@@ -13,7 +15,12 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     @Override
     public void setUpDeclarations() {
+        parseDecls("\\javaSource \".\"");
+//        parseDecls("\\programVariables { A a; }");
+    }
 
+    public void testTest() {
+        assert (services.getJavaInfo().getKeYJavaType("testTermParserHeap.A") != null);
     }
 
 }

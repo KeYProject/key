@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -28,7 +29,7 @@ public class AbstractTestTermParser extends TestCase {
     protected static TermFactory tf;
     protected static TermBuilder tb;
     protected static NamespaceSet nss;
-    protected static Services serv;
+    protected static Services services;
     protected static Recoder2KeY r2k;
 
     AbstractTestTermParser(String name) {
@@ -37,12 +38,12 @@ public class AbstractTestTermParser extends TestCase {
 
     @Override
     public void setUp() {
-        if (serv == null) {
-            serv = TacletForTests.services();
-            tb = serv.getTermBuilder();
+        if (services == null) {
+            services = TacletForTests.services();
+            tb = services.getTermBuilder();
             tf = tb.tf();
-            nss = serv.getNamespaces();
-            r2k = new Recoder2KeY(serv, nss);
+            nss = services.getNamespaces();
+            r2k = new Recoder2KeY(services, nss);
             r2k.parseSpecialClasses();
         }
         setUpDeclarations();
@@ -75,7 +76,7 @@ public class AbstractTestTermParser extends TestCase {
                 new KeYLexerF(s,
                         "No file. Call of parser from parser/TestTermParser.java",
                         null),
-                serv, nss);
+                services, nss);
     }
 
     public void parseDecls(String s) {
@@ -97,8 +98,8 @@ public class AbstractTestTermParser extends TestCase {
                     new KeYLexerF(s,
                             "No file. Call of parser from parser/TestTermParser.java",
                             null),
-                    new ParserConfig(serv, nss),
-                    new ParserConfig(serv, nss),
+                    new ParserConfig(services, nss),
+                    new ParserConfig(services, nss),
                     null,
                     DefaultImmutableSet.<Taclet>nil()).problem();
         } catch (Exception e) {
@@ -115,7 +116,7 @@ public class AbstractTestTermParser extends TestCase {
                         "No file. Call of parser from parser/TestTermParser.java",
                         new DefaultExceptionHandler()),
                 r2k,
-                serv,
+                services,
                 nss,
                 new AbbrevMap());
 
