@@ -11,4 +11,9 @@ public class TestTermParserHeap extends TestTermParser {
         super(TestTermParserHeap.class.getSimpleName());
     }
 
+    @Override
+    public void setUpDeclarations() {
+        
+    }
+
 }

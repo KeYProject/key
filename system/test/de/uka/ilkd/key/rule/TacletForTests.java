@@ -113,7 +113,7 @@ public class TacletForTests {
     }
 
     public static void setStandardFile(String filename) {
-	standardFile=filename;
+        standardFile = filename;
     }
 
     public static ProofAggregate problems() {

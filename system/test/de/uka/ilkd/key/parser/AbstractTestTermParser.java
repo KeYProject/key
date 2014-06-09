@@ -1,0 +1,146 @@
+package de.uka.ilkd.key.parser;
+
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.util.DefaultExceptionHandler;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import junit.framework.TestCase;
+
+/**
+ *
+ * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ */
+public class AbstractTestTermParser extends TestCase {
+
+    protected static TermFactory tf;
+    protected static TermBuilder tb;
+    protected static NamespaceSet nss;
+    protected static Services serv;
+    protected static Recoder2KeY r2k;
+
+    AbstractTestTermParser(String name) {
+        super(name);
+    }
+
+    @Override
+    public void setUp() {
+        if (serv == null) {
+            serv = TacletForTests.services();
+            tb = serv.getTermBuilder();
+            tf = tb.tf();
+            nss = serv.getNamespaces();
+            r2k = new Recoder2KeY(serv, nss);
+            r2k.parseSpecialClasses();
+        }
+        setUpDeclarations();
+    }
+
+    /*
+     * Override this to parse declarations.
+     */
+    public void setUpDeclarations() {
+    }
+
+    Sort lookup_sort(String name) {
+        return (Sort) nss.sorts().lookup(new Name(name));
+    }
+
+    Function lookup_func(String name) {
+        return (Function) nss.functions().lookup(new Name(name));
+    }
+
+    LogicVariable declareVar(String name, Sort sort) {
+        LogicVariable v = new LogicVariable(new Name(name), sort);
+        nss.variables().add(v);
+        return v;
+    }
+
+    private KeYParserF stringDeclParser(String s) {
+        // fills namespaces 
+        new Recoder2KeY(TacletForTests.services(), nss).parseSpecialClasses();
+        return new KeYParserF(ParserMode.DECLARATION,
+                new KeYLexerF(s,
+                        "No file. Call of parser from parser/TestTermParser.java",
+                        null),
+                serv, nss);
+    }
+
+    public void parseDecls(String s) {
+        try {
+            stringDeclParser(s).decls();
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            throw (RuntimeException) new RuntimeException("Exc while Parsing:\n" + sw).initCause(e);
+        }
+    }
+
+    public Term parseProblem(String s) {
+        try {
+            new Recoder2KeY(TacletForTests.services(),
+                    nss).parseSpecialClasses();
+            return new KeYParserF(ParserMode.PROBLEM,
+                    new KeYLexerF(s,
+                            "No file. Call of parser from parser/TestTermParser.java",
+                            null),
+                    new ParserConfig(serv, nss),
+                    new ParserConfig(serv, nss),
+                    null,
+                    DefaultImmutableSet.<Taclet>nil()).problem();
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            throw new RuntimeException("Exc while Parsing:\n" + sw);
+        }
+    }
+
+    private KeYParserF stringTermParser(String s) {
+        return new KeYParserF(ParserMode.TERM,
+                new KeYLexerF(s,
+                        "No file. Call of parser from parser/TestTermParser.java",
+                        new DefaultExceptionHandler()),
+                r2k,
+                serv,
+                nss,
+                new AbbrevMap());
+
+    }
+
+    public Term parseTerm(String s) {
+        try {
+            return stringTermParser(s).term();
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            throw new RuntimeException("Exc while Parsing:\n" + sw);
+        }
+    }
+
+    public Term parseFma(String s) {
+        try {
+            return stringTermParser(s).formula();
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            throw new RuntimeException("Exc while Parsing:\n" + sw);
+        }
+    }
+
+}
