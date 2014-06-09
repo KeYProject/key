@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.rule.TacletForTests;
 
 /**
  * Parser tests for heap terms.
@@ -15,8 +15,9 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     @Override
     public void setUpDeclarations() {
-        parseDecls("\\javaSource \".\"");
-//        parseDecls("\\programVariables { A a; }");
+        String javaPath = System.getProperty("key.home") + "/system/proofExamples/_testcase/speclang/testTermParserHeap/A.java";
+        TacletForTests.parse(javaPath);
+        parseDecls("\\programVariables { A a; }");
     }
 
     public void testTest() {

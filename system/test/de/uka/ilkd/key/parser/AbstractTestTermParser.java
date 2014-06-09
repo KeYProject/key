@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -50,7 +49,7 @@ public class AbstractTestTermParser extends TestCase {
     }
 
     /*
-     * Override this to parse declarations.
+     * Override this to set up declarations.
      */
     public void setUpDeclarations() {
     }
