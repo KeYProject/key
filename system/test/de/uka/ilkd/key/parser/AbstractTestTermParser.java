@@ -70,7 +70,7 @@ public class AbstractTestTermParser extends TestCase {
 
     private KeYParserF stringDeclParser(String s) {
         // fills namespaces 
-        new Recoder2KeY(TacletForTests.services(), nss).parseSpecialClasses();
+        new Recoder2KeY(services, nss).parseSpecialClasses();
         return new KeYParserF(ParserMode.DECLARATION,
                 new KeYLexerF(s,
                         "No file. Call of parser from parser/TestTermParser.java",
@@ -80,7 +80,8 @@ public class AbstractTestTermParser extends TestCase {
 
     public void parseDecls(String s) {
         try {
-            stringDeclParser(s).decls();
+            KeYParserF stringDeclParser = stringDeclParser(s);
+            stringDeclParser.decls();
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
