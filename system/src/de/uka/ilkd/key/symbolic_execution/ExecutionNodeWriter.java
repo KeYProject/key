@@ -60,6 +60,16 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String ATTRIBUTE_NAME_INCLUDING_RETURN_VALUE = "nameIncludingReturnValue";
 
    /**
+    * Attribute name to store {@link IExecutionMethodReturn#getSignatureIncludingReturnValue()}.
+    */
+   public static final String ATTRIBUTE_SIGNATURE_INCLUDING_RETURN_VALUE = "signatureIncludingReturnValue";
+
+   /**
+    * Attribute name to store {@link IExecutionMethodReturn#getSignature()}.
+    */
+   public static final String ATTRIBUTE_SIGNATURE = "signature";
+
+   /**
     * Attribute exceptional termination to store {@link IExecutionTermination#getTerminationKind()}.
     */
    public static final String ATTRIBUTE_TERMINATION_KIND = "terminationKind";
@@ -560,10 +570,12 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                               StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
+      attributeValues.put(ATTRIBUTE_SIGNATURE, node.getSignature());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       if (saveReturnValues) {
          attributeValues.put(ATTRIBUTE_NAME_INCLUDING_RETURN_VALUE, node.getNameIncludingReturnValue());
+         attributeValues.put(ATTRIBUTE_SIGNATURE_INCLUDING_RETURN_VALUE, node.getSignatureIncludingReturnValue());
       }
       attributeValues.put(ATTRIBUTE_RETURN_VALUE_COMPUTED, node.isReturnValuesComputed() + "");
       appendStartTag(level, TAG_METHOD_RETURN, attributeValues, sb);

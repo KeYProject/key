@@ -68,7 +68,7 @@ public class ThreadCreateFeature extends AbstractDebugNodeCreateFeature {
                                               ISEDDebugNode parent,
                                               ISEDThread thread,
                                               String name) throws DebugException {
-      SEDMemoryThread result = new SEDMemoryThread(target);
+      SEDMemoryThread result = new SEDMemoryThread(target, false);
       result.setName(name);
       return result;
    }

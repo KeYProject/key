@@ -20,6 +20,7 @@ import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiA
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiCallStackTabTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiNodeTabTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiSourceTabTest;
+import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSaveSetAsTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSetFileLaunchTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSetFileSourceLookupTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSymbolicExecutionTreeLayoutTest;
@@ -36,6 +37,7 @@ import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSymbolicE
    SWTBotGraphitiCallStackTabTest.class,
    SWTBotGraphitiNodeTabTest.class,
    SWTBotGraphitiSourceTabTest.class,
+   SWTBotSaveSetAsTest.class,
    SWTBotSetFileLaunchTest.class,
    SWTBotSetFileSourceLookupTest.class,
    SWTBotSymbolicExecutionTreeLayoutTest.class,

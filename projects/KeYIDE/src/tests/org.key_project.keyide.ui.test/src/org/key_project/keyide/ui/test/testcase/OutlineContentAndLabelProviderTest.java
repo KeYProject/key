@@ -39,7 +39,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 
 //TODO Document class OutlineContentAndLabelProviderTest
@@ -60,7 +60,7 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
       // Get local file in operating system of folder src 
       File location = ResourceUtil.getLocation(src);
       // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
-      KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(location, null, null);
+      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(location, null, null);
       IProgramMethod pm = TestUtilsUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
       ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
       FunctionalOperationContract foc = CollectionUtil.getFirst(operationContracts);

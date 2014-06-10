@@ -19,7 +19,6 @@ import org.eclipse.jdt.core.IMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * This class is used to define an input to display in the editor
@@ -39,7 +38,7 @@ public class ProofOblInputEditorInput extends AbstractProofEditorInput {
     * @param method An optional {@link IMethod} from which the {@link Proof} was started.
     */
    public ProofOblInputEditorInput(ProofOblInput problem, 
-                                   KeYEnvironment<CustomConsoleUserInterface> environment, 
+                                   KeYEnvironment<?> environment, 
                                    IMethod method) {
       super(environment, method, problem.name());
       Assert.isNotNull(problem);

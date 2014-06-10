@@ -971,6 +971,7 @@ public abstract class Taclet implements Rule, Named {
      * antecedent(succedent) (only looked at if pos == null)
      * @param services the Services encapsulating all java information
      * @param matchCond the MatchConditions containing in particular
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is rewritten
      * the instantiations of the schemavariables
      */
     private void addToPos ( Semisequent semi,
@@ -978,9 +979,10 @@ public abstract class Taclet implements Rule, Named {
 			    PosInOccurrence pos,
 			    boolean antec,
 			    Services services, 
-			    MatchConditions matchCond ) {
+			    MatchConditions matchCond,
+			    PosInOccurrence applicationPosInOccurrence) {
 	final ImmutableList<SequentFormula> replacements = 
-            instantiateSemisequent(semi, services, matchCond, pos);
+            instantiateSemisequent(semi, services, matchCond, applicationPosInOccurrence);
 	
 	if (pos != null) {
 	    goal.addFormula(replacements, pos);
@@ -1002,13 +1004,15 @@ public abstract class Taclet implements Rule, Named {
      * @param services the Services encapsulating all java information
      * @param matchCond the MatchConditions containing in particular
      * the instantiations of the schemavariables
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is rewritten
      */
     protected void addToAntec(Semisequent semi,
 			      Goal goal,
 			      PosInOccurrence pos,
 			      Services services, 
-			      MatchConditions matchCond) { 
-	addToPos(semi, goal, pos, true, services, matchCond);
+			      MatchConditions matchCond,
+			      PosInOccurrence applicationPosInOccurrence) { 
+	addToPos(semi, goal, pos, true, services, matchCond, applicationPosInOccurrence);
     }
 
     /**
@@ -1024,13 +1028,15 @@ public abstract class Taclet implements Rule, Named {
      * @param services the Services encapsulating all java information
      * @param matchCond the MatchConditions containing in particular
      * the instantiations of the schemavariables
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is rewritten
      */
     protected void addToSucc(Semisequent semi,
 			     Goal goal,
 			     PosInOccurrence pos,
 			     Services services, 
-			     MatchConditions matchCond) {
-	addToPos(semi, goal, pos, false, services, matchCond);
+			     MatchConditions matchCond,
+			     PosInOccurrence applicationPosInOccurrence) {
+	addToPos(semi, goal, pos, false, services, matchCond, applicationPosInOccurrence);
     }
 
     protected abstract Taclet setName(String s);

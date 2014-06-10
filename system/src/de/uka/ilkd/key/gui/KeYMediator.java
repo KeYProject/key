@@ -272,18 +272,17 @@ public class KeYMediator {
 
 
     private void finishSetBack(final Proof proof){
-        this.ui.taskFinished(
-                        new DefaultTaskFinishedInfo(this, null,
-                                        proof, 0,
-                                        0, getNrGoalsClosedByAutoMode()){
-                                @Override
-                                public String toString() {
-
-                                        return "Proof has been pruned: "+(proof.openGoals().size() == 1?
-                                                        "one open goal remains." :
-                                                        (proof.openGoals().size()+" open goals remain."));
-                                }
-                        });
+        TaskFinishedInfo info =
+                new DefaultTaskFinishedInfo(this, null, proof, 0, 0,
+                                            getNrGoalsClosedByAutoMode()) {
+            @Override
+            public String toString() {
+                return "Proof has been pruned: "+(proof.openGoals().size() == 1 ?
+                        "one open goal remains." :
+                            (proof.openGoals().size()+" open goals remain."));
+            }
+        };
+        this.ui.taskFinished(info);
         if (!proof.isDisposed()) {
            ServiceCaches caches = proof.getServices().getCaches();
            caches.getTermTacletAppIndexCache().clear();
@@ -310,33 +309,33 @@ public class KeYMediator {
 
 
     private void setProofHelper(Proof newProof) {
-      Proof oldProof = getSelectedProof();
-      if (oldProof != null) {
-         oldProof.removeProofTreeListener(proofTreeListener);
-         oldProof.removeRuleAppListener(proofListener);
-      }
-      if (newProof != null) {
-         notationInfo.setAbbrevMap(newProof.abbreviations());
-      }
-      if (newProof != null) {
-         newProof.addProofTreeListener(proofTreeListener);
-         newProof.addRuleAppListener(proofListener);
-      }
-      
-      // moved from layout main here; but does not actually belong here at all;
-      // we should get that rule to behave like a normal built-in rule
-      OneStepSimplifier newSimplifier = MiscTools.findOneStepSimplifier(newProof);
-      if (currentOneStepSimplifier != newSimplifier) {
-         if (currentOneStepSimplifier != null) {
-            removeKeYSelectionListener(currentOneStepSimplifier);
-         }
-         currentOneStepSimplifier = newSimplifier;
-         if (currentOneStepSimplifier != null) {
-            addKeYSelectionListener(currentOneStepSimplifier);
-         }
-      }
-      
-      keySelectionModel.setSelectedProof(newProof);
+        Proof oldProof = getSelectedProof();
+        if (oldProof != null) {
+            oldProof.removeProofTreeListener(proofTreeListener);
+            oldProof.removeRuleAppListener(proofListener);
+        }
+        if (newProof != null) {
+            notationInfo.setAbbrevMap(newProof.abbreviations());
+        }
+        if (newProof != null) {
+            newProof.addProofTreeListener(proofTreeListener);
+            newProof.addRuleAppListener(proofListener);
+        }
+
+        // moved from layout main here; but does not actually belong here at all;
+        // we should get that rule to behave like a normal built-in rule
+        OneStepSimplifier newSimplifier = MiscTools.findOneStepSimplifier(newProof);
+        if (currentOneStepSimplifier != newSimplifier) {
+            if (currentOneStepSimplifier != null) {
+                removeKeYSelectionListener(currentOneStepSimplifier);
+            }
+            currentOneStepSimplifier = newSimplifier;
+            if (currentOneStepSimplifier != null) {
+                addKeYSelectionListener(currentOneStepSimplifier);
+            }
+        }
+
+        keySelectionModel.setSelectedProof(newProof);
     }
 
 

@@ -1674,4 +1674,55 @@ public class TestUtilsUtil {
       }
       return run.getResult();
    }
+
+   /**
+    * Waits until the {@link SWTBotTreeItem} is expanded.
+    * @param bot The {@link SWTWorkbenchBot} to use. 
+    * @param item The {@link SWTBotTreeItem} to wait for.
+    */
+   public static void waitUntilExpanded(SWTWorkbenchBot bot, SWTBotTreeItem item) {
+      bot.waitUntil(new ExpandedCondition(item));
+   }
+   
+   /**
+    * {@link ICondition} used by {@link TestUtilsUtil#waitUntilExpanded(SWTWorkbenchBot, SWTBotTreeItem)}.
+    * @author Martin Hentschel
+    */
+   private static class ExpandedCondition implements ICondition {
+      /**
+       * The {@link SWTBotTreeItem} to wait for.
+       */
+      private final SWTBotTreeItem item;
+      
+      /**
+       * Constructor.
+       * @param item The {@link SWTBotTreeItem} to wait for.
+       */
+      public ExpandedCondition(SWTBotTreeItem item) {
+         this.item = item;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean test() throws Exception {
+         return item.isExpanded();
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void init(SWTBot bot) {
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFailureMessage() {
+         return "Item " + item + " is not expanded.";
+      }
+   }
 }

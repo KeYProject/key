@@ -8,7 +8,10 @@ post: result_0 = subMagic(x) &amp; exc_0 = null
 mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
-               <methodReturn name="&lt;return of SimpleBooleanQuery.main(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleBooleanQuery.main(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+	Z(2(4(#))) {equals(x,TRUE)}, 
+	Z(neglit(1(1(7(4(#)))))) {not(equals(x,TRUE))}
+as result of main&gt;" signatureIncludingReturnValue="&lt;return 
 	Z(2(4(#))) {equals(x,TRUE)}, 
 	Z(neglit(1(1(7(4(#)))))) {not(equals(x,TRUE))}
 as result of SimpleBooleanQuery.main(x);&gt;" isReturnValueComputed="true">

@@ -14,7 +14,6 @@
 package org.key_project.keyide.ui.util;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -35,6 +34,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog;
 import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
+import org.key_project.key4eclipse.common.ui.util.EclipseUserInterfaceCustomization;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
@@ -49,21 +49,19 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.nodeviews.TacletMenu;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Provides utility method for the KeYIDE.
@@ -95,7 +93,7 @@ public final class KeYIDEUtil {
                        try {
                           SWTUtil.checkCanceled(monitor);
                           monitor.beginTask("Loading Proof Environment", IProgressMonitor.UNKNOWN);
-                          final KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
+                          final KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(location, classPaths, bootClassPath, EclipseUserInterfaceCustomization.getInstance());
                           if (environment.getInitConfig() != null) {
                              // Get method to proof in KeY
                              final IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getJavaInfo());
@@ -152,7 +150,7 @@ public final class KeYIDEUtil {
     * @param method An optional {@link IMethod} from which the {@link Proof} was started.
     * @throws PartInitException Occurred Exception.
     */
-   public static void openEditor(Contract contract, KeYEnvironment<CustomConsoleUserInterface> environment, IMethod method)throws PartInitException{
+   public static void openEditor(Contract contract, KeYEnvironment<?> environment, IMethod method)throws PartInitException{
       Assert.isNotNull(contract);
       Assert.isNotNull(environment);
       ProofOblInput problem = contract.createProofObl(environment.getInitConfig(), contract);
@@ -234,23 +232,30 @@ public final class KeYIDEUtil {
    }
 
    /**
+    * <p>
     * Collects all applicable {@link TacletApp}s for a given {@link PosInSequent} and {@link KeYMediator}.
+    * </p>
+    * <p>
+    * The code behaves like the {@link TacletMenu}.
+    * </p>
     * @param mediator - the {@link KeYMediator} of the current {@link Proof}.
     * @param pos - the {@link PosInSequent} to find the {@link TacletApp}s for.
     * @return {@link ImmutableList} - the {@link ImmutableList} with all applicable {@link TacletApp}s.
     */
-   // TODO: Where was this method copied from?
-   public static ImmutableList<TacletApp> findRules(KeYMediator mediator, PosInSequent pos) {
-      if(pos != null){
-         ImmutableList<TacletApp> findTacletList = mediator.getFindTaclet(pos);
-         ImmutableList<TacletApp> reWriteTacletList = mediator.getRewriteTaclet(pos);
-         ImmutableList<TacletApp> noFindTacletList = mediator.getNoFindTaclet();
+   public static ImmutableList<TacletApp> findTaclets(KeYMediator mediator, PosInSequent pos) {
+      if (pos != null) {
+         ImmutableList<TacletApp> findList = mediator.getFindTaclet(pos);
+         ImmutableList<TacletApp> rewriteList = mediator.getRewriteTaclet(pos);
+         ImmutableList<TacletApp> noFindList = mediator.getNoFindTaclet();
          
-         findTacletList = removeObsolete(findTacletList);
-         reWriteTacletList = removeObsolete(reWriteTacletList);
-         noFindTacletList = removeObsolete(noFindTacletList);
+         ImmutableList<TacletApp> find = TacletMenu.removeRewrites(findList).prepend(rewriteList);
          
-         ImmutableList<TacletApp> allTaclets = removeRewrites(findTacletList).prepend(reWriteTacletList);
+         TacletMenu.TacletAppComparator comp = new TacletMenu.TacletAppComparator();
+         ImmutableList<TacletApp> allTaclets = TacletMenu.sort(find, comp);
+         
+         if (pos != null && pos.isSequent()) {
+            allTaclets = allTaclets.prepend(noFindList);
+         }
          
          return allTaclets;
       }
@@ -258,43 +263,19 @@ public final class KeYIDEUtil {
          return null;
       }
    }
-      
    
-   /** Remove rules which belong to rule set "obsolete".
-    * Obsolete rules are sound, but are discouraged to use in
-    * both automated and interactive proofs, mostly because of proof complexity issues.
+   /**
+    * Collects all applicable {@link BuiltInRule}s.
+    * @param mediator The {@link KeYMediator} of the current {@link Proof}.
+    * @param pos The {@link PosInSequent} to find the {@link TacletApp}s for.
+    * @return The {@link ImmutableList} with all applicable {@link BuiltInRule}s.
     */
-   private static ImmutableList<TacletApp> removeObsolete(ImmutableList<TacletApp> list) {
-       ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
-       for (TacletApp ta: list) {
-           boolean isObsolete = false;
-           for (RuleSet rs: ta.taclet().getRuleSets()) {
-               if (rs.name().equals(new Name("obsolete"))) {
-                   isObsolete = true;
-                   break;
-               }
-           }
-           if (!isObsolete)
-               result = result.append(ta);
-       }
-       return result;
-   }
-   
-   
-   /** removes RewriteTaclet from list
-    * @param list the IList<Taclet> from where the RewriteTaclet are
-    * removed
-    * @return list without RewriteTaclets
-    */
-   private static ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
-      ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp> nil();
-      Iterator<TacletApp> it = list.iterator();
-
-      while (it.hasNext()) {
-         TacletApp tacletApp = it.next();
-         Taclet taclet = tacletApp.taclet();
-         result = (taclet instanceof RewriteTaclet ? result : result.prepend(tacletApp));
+   public static ImmutableList<BuiltInRule> findBuiltInRules(KeYMediator mediator, PosInSequent pos) {
+      if (pos != null) {
+         return mediator.getBuiltInRule(pos.getPosInOccurrence());
       }
-      return result;
+      else {
+         return ImmutableSLList.<BuiltInRule>nil();
+      }
    }
 }

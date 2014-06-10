@@ -62,6 +62,14 @@ public class BlockContractCompletion implements InteractiveRuleApplicationComple
 
     @Override
     public boolean canComplete(final IBuiltInRuleApp app) {
-        return app.rule() instanceof BlockContractRule;
+        return checkCanComplete(app);
     }
+    
+    /**
+     * Checks if the app is supported. 
+     * This functionality is also used by the Eclipse plug-ins like the KeYIDE.
+     */
+    public static boolean checkCanComplete(final IBuiltInRuleApp app) {
+       return app.rule() instanceof BlockContractRule;
+   }
 }

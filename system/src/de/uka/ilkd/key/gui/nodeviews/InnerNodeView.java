@@ -59,6 +59,10 @@ import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 
 public class InnerNodeView extends SequentView {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -6542881446084654358L;
     private InitialPositionTable posTable;
     public final JTextArea tacletInfo;
     Node node;

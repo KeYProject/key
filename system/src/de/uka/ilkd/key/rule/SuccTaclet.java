@@ -86,7 +86,7 @@ public class SuccTaclet extends FindTaclet{
 
 
 	    addToAntec(replWith.antecedent(), goal, 
-		       null, services, matchCond);	   	    	    
+		       null, services, matchCond, posOfFind);	   	    	    
 
 	    replaceAtPos ( replWith.succedent (),
 		    goal,
@@ -111,8 +111,8 @@ public class SuccTaclet extends FindTaclet{
 			    PosInOccurrence posOfFind,
 			    Services services,
 			    MatchConditions matchCond) {
-	addToAntec(add.antecedent(), goal, null, services, matchCond);
-	addToSucc(add.succedent(), goal, posOfFind, services, matchCond);
+	addToAntec(add.antecedent(), goal, null, services, matchCond, posOfFind);
+	addToSucc(add.succedent(), goal, posOfFind, services, matchCond, posOfFind);
     }
 
     /** toString for the find part */

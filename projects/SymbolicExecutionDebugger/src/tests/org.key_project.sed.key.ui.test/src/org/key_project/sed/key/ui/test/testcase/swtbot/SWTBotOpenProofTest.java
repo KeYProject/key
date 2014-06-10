@@ -85,6 +85,7 @@ public class SWTBotOpenProofTest extends AbstractKeYDebugTargetTestCase {
                               Boolean.FALSE, 
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.TRUE,
                               8, 
                               executor);
       }
@@ -136,6 +137,7 @@ public class SWTBotOpenProofTest extends AbstractKeYDebugTargetTestCase {
                               Boolean.TRUE, 
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.TRUE,
                               8, 
                               executor);
       }

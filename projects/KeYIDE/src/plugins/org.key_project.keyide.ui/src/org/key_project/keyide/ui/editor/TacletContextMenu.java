@@ -27,6 +27,7 @@ import org.key_project.util.eclipse.WorkbenchUtil;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -48,8 +49,8 @@ public class TacletContextMenu extends ExtensionContributionFactory {
          KeYMediator mediator = keyEditor.getMediator();
          if (mediator != null && mediator.getSelectedNode().getAppliedRuleApp() == null) {
             PosInSequent pos = keyEditor.getSelectedPosInSequent();
-            ImmutableList<TacletApp> appList = KeYIDEUtil.findRules(mediator, pos);
-            // TODO: What about build in rules, are they not supported?
+            // Add taclet rules
+            ImmutableList<TacletApp> appList = KeYIDEUtil.findTaclets(mediator, pos);
             if (appList != null) {
                Iterator<TacletApp> it = appList.iterator();
                while (it.hasNext()) {
@@ -60,6 +61,15 @@ public class TacletContextMenu extends ExtensionContributionFactory {
                   item.setVisible(true);
                   additions.addContributionItem(item, null);
                }
+            }
+            // Add built in rules
+            ImmutableList<BuiltInRule> builtInRules = KeYIDEUtil.findBuiltInRules(mediator, pos);
+            for (BuiltInRule rule : builtInRules) {
+               CommandContributionItemParameter p = new CommandContributionItemParameter(serviceLocator, "", "org.key_project.keyide.ui.commands.applyrule", SWT.PUSH);
+               p.label = rule.displayName();
+               BuiltInRuleCommandContributionItem item = new BuiltInRuleCommandContributionItem(p, rule, mediator, pos);
+               item.setVisible(true);
+               additions.addContributionItem(item, null);
             }
          }
       }

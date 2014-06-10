@@ -332,12 +332,22 @@
            id="org.key_project.sed.ui.visualization.visualizeStateCommand"
            name="Visualize State">
      </command>
+     <command
+           categoryId="org.eclipse.debug.ui.category.run"
+           description="Saves the currently selected symbolic exeution tree as *.set file."
+           id="org.key_project.sed.ui.visualization.saveSetAsCommand"
+           name="Save Symbolic Execution Tree as Set File">
+     </command>
   </extension>
   <extension
         point="org.eclipse.ui.commandImages">
      <image
            commandId="org.key_project.sed.ui.visualization.visualizeStateCommand"
            icon="icons/object_diagram.gif">
+     </image>
+     <image
+           commandId="org.key_project.sed.ui.visualization.saveSetAsCommand"
+           icon="icons/saveas_edit.gif">
      </image>
   </extension>
   <extension
@@ -366,6 +376,30 @@
            </iterate>
         </enabledWhen>
      </handler>
+     <handler
+           class="org.key_project.sed.ui.visualization.execution_tree.command.SaveSetAsCommand"
+           commandId="org.key_project.sed.ui.visualization.saveSetAsCommand">
+        <enabledWhen>
+           <iterate
+                 ifEmpty="false"
+                 operator="and">
+              <or>
+                 <instanceof
+                       value="org.key_project.sed.core.model.ISEDDebugTarget">
+                 </instanceof>
+                 <and>
+                    <instanceof
+                          value="org.eclipse.debug.core.ILaunch">
+                    </instanceof>
+                    <test
+                          forcePluginActivation="true"
+                          property="org.key_project.sed.core.hasSEDDebugTarget">
+                    </test>
+                 </and>
+              </or>
+           </iterate>
+        </enabledWhen>
+     </handler>
   </extension>
   <extension
         point="org.eclipse.ui.bindings">
@@ -381,6 +415,32 @@
      <menuContribution
            allPopups="true"
            locationURI="popup:org.eclipse.debug.ui.DebugView?after=additions">
+        <command
+              commandId="org.key_project.sed.ui.visualization.saveSetAsCommand"
+              icon="icons/saveas_edit.gif"
+              style="push">
+           <visibleWhen
+                 checkEnabled="false">
+              <iterate
+                    ifEmpty="false"
+                    operator="and">
+                 <or>
+                    <instanceof
+                          value="org.key_project.sed.core.model.ISEDDebugTarget">
+                    </instanceof>
+                    <and>
+                       <instanceof
+                             value="org.eclipse.debug.core.ILaunch">
+                       </instanceof>
+                       <test
+                             forcePluginActivation="true"
+                             property="org.key_project.sed.core.hasSEDDebugTarget">
+                       </test>
+                    </and>
+                 </or>
+              </iterate>
+           </visibleWhen>
+        </command>
         <command
               commandId="org.key_project.sed.ui.visualization.visualizeStateCommand"
               icon="icons/object_diagram.gif"
