@@ -169,7 +169,7 @@ public final class MainWindow extends JFrame  {
        "<p style=\"font-family: lucida;font-size: 12pt;font-weight: bold\">";
 
     /** action for starting and stopping automatic mode */
-    private MainWindowAction autoModeAction;
+    private final AutoModeAction autoModeAction;
 
     /** action for opening a KeY file */
     private MainWindowAction openFileAction;
@@ -198,7 +198,7 @@ public final class MainWindow extends JFrame  {
     private LemmaGenerationAction loadKeYTaclets;
     private LemmaGenerationBatchModeAction lemmaGenerationBatchModeAction;
 
-    private OneStepSimplificationToggleAction oneStepSimplAction =
+    private final OneStepSimplificationToggleAction oneStepSimplAction =
         new OneStepSimplificationToggleAction(this);
 
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
@@ -222,7 +222,7 @@ public final class MainWindow extends JFrame  {
     private ExitMainAction exitMainAction;
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
-    private HidePackagePrefixToggleAction hidePackagePrefixToggleAction =
+    private final HidePackagePrefixToggleAction hidePackagePrefixToggleAction =
         new HidePackagePrefixToggleAction(this);
     
     private final TermLabelMenu termLabelMenu;
@@ -248,7 +248,8 @@ public final class MainWindow extends JFrame  {
         sequentViewSearchBar = new SequentViewSearchBar(emptySequent);
         termLabelMenu = new TermLabelMenu(this);
         proofListView = new JScrollPane();
-        mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator);
+        autoModeAction = new AutoModeAction(this);
+        mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
         mainFrame = new MainFrame(this, emptySequent);
         proofList = new TaskTree(mediator);
         notificationManager = new NotificationManager(mediator, this);
@@ -370,7 +371,6 @@ public final class MainWindow extends JFrame  {
         mediator.setMinimizeInteraction(stupidMode);
 
         // set up actions
-        autoModeAction            = new AutoModeAction(this);
         openFileAction            = new OpenFileAction(this);
         openExampleAction         = new OpenExampleAction(this);
         openMostRecentFileAction  = new OpenMostRecentFileAction(this);
@@ -1367,13 +1367,6 @@ public final class MainWindow extends JFrame  {
 
     public UserInterface getUserInterface() {
         return userInterface;
-    }
-
-    /**
-     * @return the autoModeAction
-     */
-    public Action getAutoModeAction() {
-        return autoModeAction;
     }
 
     public Action getOpenMostRecentFileAction() {

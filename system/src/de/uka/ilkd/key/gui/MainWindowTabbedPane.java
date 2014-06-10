@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.util.GuiUtilities;
 import java.awt.Toolkit;
@@ -41,7 +42,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
      */
     private final InfoView infoView;
 
-    MainWindowTabbedPane(MainWindow mainWindow, KeYMediator mediator) {
+    MainWindowTabbedPane(MainWindow mainWindow, KeYMediator mediator, AutoModeAction autoModeAction) {
         assert mediator != null;
         assert mainWindow != null;
 
@@ -63,7 +64,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
                 "The currently open goals");
 
         // set strategySelectionView
-        strategySelectionView = new StrategySelectionView(mainWindow);
+        strategySelectionView = new StrategySelectionView(autoModeAction);
         strategySelectionView.setMediator(mediator);
         addTab("Proof Search Strategy", null, strategySelectionView,
                 "Select strategy for automated proof search");

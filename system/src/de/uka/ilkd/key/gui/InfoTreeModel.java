@@ -46,7 +46,7 @@ public class InfoTreeModel extends DefaultTreeModel {
         super(new InfoTreeNode());
         insertAsLast(new RulesNode(xmlResources.ruleExplanations, goal), (InfoTreeNode) root);
         insertAsLast(new TermLabelsNode(mainWindow, xmlResources.termLabelExplanations), (InfoTreeNode) root);
-        insertAsLast(new FunctionsNode(mainWindow, xmlResources.functionExplanations), (InfoTreeNode) root);
+        insertAsLast(new FunctionsNode(xmlResources.functionExplanations), (InfoTreeNode) root);
     }
 
     private void insertAsLast(InfoTreeNode ins, InfoTreeNode parent) {
@@ -61,7 +61,7 @@ public class InfoTreeModel extends DefaultTreeModel {
         private static final String DEFAULT_FUNCTIONS_LABEL =
                 "Display descriptions for documented interpreted function and predicate symbols.";
 
-        FunctionsNode(MainWindow mainWindow, Properties functionExplanations) {
+        FunctionsNode(Properties functionExplanations) {
             super("Function Symbols", DEFAULT_FUNCTIONS_LABEL);
 
             Map<String, InfoTreeNode> categoryMap = new HashMap<String, InfoTreeNode>();
