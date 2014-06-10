@@ -67,7 +67,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 public class KeYMediator {
 
-	/** The user interface */
+    /** The user interface */
     private UserInterface ui;
 
     private InteractiveProver interactiveProver;
@@ -890,7 +890,6 @@ public class KeYMediator {
         });
     }
 
-
     /**
      * takes a notification event and informs the notification
      * manager
@@ -936,8 +935,6 @@ public class KeYMediator {
        }
        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
     }
-
-
 
 //    /**
 //     * returns the prover task listener of the main frame
