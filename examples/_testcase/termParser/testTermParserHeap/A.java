@@ -1,9 +1,5 @@
 package testTermParserHeap;
 
-/*
- Used in class TestTermParserHeap.
- */
-
 class A {
 private int f;
 A next;

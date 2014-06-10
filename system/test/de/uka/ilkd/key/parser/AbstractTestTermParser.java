@@ -20,7 +20,8 @@ import java.io.StringWriter;
 import junit.framework.TestCase;
 
 /**
- *
+ * Common code of classes TestTermParser and TestTermParserHeap.
+ * 
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class AbstractTestTermParser extends TestCase {
