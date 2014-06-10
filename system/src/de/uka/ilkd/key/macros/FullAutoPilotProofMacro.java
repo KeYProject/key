@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui.macros;
+package de.uka.ilkd.key.macros;
 
 /**
  * This class captures a proof macro which is meant to fully automise KeY proof
@@ -54,7 +54,7 @@ public class FullAutoPilotProofMacro extends SequentialProofMacro {
     @Override
     protected ProofMacro[] createProofMacroArray() {
         return new ProofMacro[] {
-                new AutoPilotPrepareProofMacro(),
+                new AutoPilotPrepareProofMacro() {public boolean finishAfterMacro() {return false;}},
                 new TryCloseMacro(NUMBER_OF_TRY_STEPS)
         };
     }

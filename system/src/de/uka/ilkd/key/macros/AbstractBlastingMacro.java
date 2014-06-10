@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui.macros;
+package de.uka.ilkd.key.macros;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -198,7 +198,6 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
         @Override
         public Name name() {
-            // TODO Auto-generated method stub
             return new Name("Semantics Blasting");
         }
 

@@ -11,34 +11,37 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui.macros;
+package de.uka.ilkd.key.macros;
 
 import java.util.Set;
 
 /**
- * The macro PropositionalExpansionMacro apply rules to decompose propositional
- * toplevel formulas; but does not split the goal.
+ * The macro FullPropositionalExpansionMacro apply rules to decompose
+ * propositional toplevel formulas; it even splits the goal if necessary.
  *
  * The rules that are applied can be set in {@link #ADMITTED_RULES}.
  *
  * @author mattias ulbrich
  */
-public class PropositionalExpansionMacro extends AbstractPropositionalExpansionMacro {
+public class FullPropositionalExpansionMacro extends AbstractPropositionalExpansionMacro {
 
     @Override
     public String getName() {
-        return "Propositional expansion (w/o splits)";
+        return "Propositional expansion (w/ splits)";
     }
 
     @Override
     public String getDescription() {
         return "Apply rules to decompose propositional toplevel formulas; " +
-                "does not split the goal.";
+                "splits the goal if necessary";
     }
 
     private static final String[] ADMITTED_RULES = {
         "andLeft", "orRight", "impRight", "notLeft", "notRight", "close",
-        "closeTrue", "closeFalse", "true_left", "false_right"
+        "andRight", "orLeft", "impLeft",
+        "closeTrue", "closeFalse", "true_left", "false_right",
+//        "ifthenelse_split", "ifthenelse_split_for",
+        "equivLeft", "equivRight"
     };
 
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);

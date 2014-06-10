@@ -11,17 +11,20 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui.macros;
+package de.uka.ilkd.key.macros;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
@@ -59,29 +62,31 @@ public class WellDefinednessMacro extends StrategyProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        if (mediator.getSelectedProof() == null
+    public boolean canApplyTo(KeYMediator mediator, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
+        final Proof proof = mediator.getSelectedProof();
+        if (proof == null
                 || mediator.getServices() == null
-                || mediator.getServices().getSpecificationRepository() == null) {
+                || mediator.getServices().getSpecificationRepository() == null
+                || !WellDefinednessCheck.isOn()) {
             return false;
         }
-        final ContractPO po =
-                mediator.getServices().getSpecificationRepository()
-                        .getPOForProof(mediator.getSelectedProof());
-        if (po instanceof WellDefinednessPO) { // applicable for all well-definedness checks
-            return true;
-        } else if (!(po instanceof FunctionalOperationContractPO)) {
+        final ContractPO po = mediator.getServices().getSpecificationRepository().getPOForProof(proof);
+        if (!(po instanceof WellDefinednessPO
+                        || po instanceof FunctionalOperationContractPO)) {
+            // applicable for all well-definedness checks
             return false;
         }
-        Node n = mediator.getSelectedNode();
-        while (n != null) {
-            // Applicable in a well-definedness branch (e.g. of a loop statement or a block contract)
-            if (n.getNodeInfo().getBranchLabel() != null
-                    && n.getNodeInfo().getBranchLabel().equals(WD_BRANCH)) {
-                return true;
+        for (Goal goal: goals) {
+            Node n = goal.node();
+            while (n != null) {
+                // Applicable in a well-definedness branch (e.g. of a loop statement or a block contract)
+                if (n.getNodeInfo().getBranchLabel() != null
+                        && n.getNodeInfo().getBranchLabel().equals(WD_BRANCH)) {
+                    return true;
+                }
+                n = n.parent();
             }
-            n = n.parent();
-        }
+        }        
         return false;
     }
 

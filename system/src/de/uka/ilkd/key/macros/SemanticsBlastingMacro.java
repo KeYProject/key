@@ -14,7 +14,7 @@
 /**
  * 
  */
-package de.uka.ilkd.key.gui.macros;
+package de.uka.ilkd.key.macros;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -76,7 +76,6 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "Semantics Blasting";
 	}
 

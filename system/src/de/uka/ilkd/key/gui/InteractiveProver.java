@@ -78,7 +78,8 @@ public class InteractiveProver implements InterruptListener {
 
         mediator.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);//XXX
 
-        applyStrategy = new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
+        applyStrategy =
+                new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create(), true);
         applyStrategy.addProverTaskObserver(mediator().getUI());
 
         if (mediator.getAutoSaver() != null) {

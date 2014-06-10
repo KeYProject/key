@@ -22,6 +22,7 @@ import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -103,6 +104,8 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      */
     boolean confirmTaskRemoval(String message);
 
+    void finish(Proof proof);
+
     /**
      * loads the problem or proof from the given file
      * @param file the File with the problem description or the proof
@@ -116,6 +119,14 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @param bootClassPath the boot class path to use. 
      */
     void loadProblem(File file, List<File> classPath, File bootClassPath);
+
+    void setMacro(ProofMacro macro);
+
+    ProofMacro getMacro();
+
+    boolean macroChosen();
+
+    boolean applyMacro();
 
     /** 
      * called to open the build in examples 

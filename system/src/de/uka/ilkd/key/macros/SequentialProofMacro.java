@@ -11,18 +11,21 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui.macros;
+package de.uka.ilkd.key.macros;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import java.util.ArrayList;
 
 /**
  * The abstract class SequentialProofMacro can be used to create compound macros
@@ -35,7 +38,7 @@ import de.uka.ilkd.key.proof.Node;
  *
  * @author mattias ulbrich
  */
-public abstract class SequentialProofMacro implements ProofMacro {
+public abstract class SequentialProofMacro extends AbstractProofMacro {
 
     /**
      * The proof macros to be applied in their order.
@@ -62,34 +65,42 @@ public abstract class SequentialProofMacro implements ProofMacro {
      * If there is no first macro, this is not applicable.
      */
     @Override
-    public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(KeYMediator mediator,
+                              ImmutableList<Goal> goals,
+                              PosInOccurrence posInOcc) {
         List<ProofMacro> macros = getProofMacros();
         if(macros.isEmpty()) {
             return false;
         } else {
-            return macros.get(0).canApplyTo(mediator, posInOcc);
+            return macros.get(0).canApplyTo(mediator, goals, posInOcc);
         }
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * This launches the first macro and registers a new
      * {@link AutoModeListener} with the {@code mediator}. This listener
      * unregisters itself after the last macro.
-     * 
+     *
      * @throws InterruptedException
      *             if one of the wrapped macros is interrupted.
      */
-    @Override 
-    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
-            ProverTaskListener listener) throws InterruptedException {
-        final Node initNode = mediator.getSelectedNode();
+    @Override
+    public void applyTo(KeYMediator mediator,
+                        ImmutableList<Goal> goals,
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) throws InterruptedException {
+        final List<Node> initNodes = new ArrayList<Node>(goals.size());
+        for (Goal goal : goals) {
+            initNodes.add(goal.node());
+        }
         for (ProofMacro macro : getProofMacros()) {
-            // reverse to original node
-            mediator.getSelectionModel().setSelectedNode(initNode);
-            macro.applyTo(mediator, posInOcc, listener);
+            // reverse to original nodes
+            for (Node initNode : initNodes) {
+                macro.applyTo(mediator, initNode, posInOcc, listener);
+            }
         }
     }
 

@@ -20,7 +20,6 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -54,6 +53,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvariantTransformer;
@@ -435,7 +435,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final KeYJavaType booleanKJT = services.getTypeConverter().getBooleanType();
 
         //get instantiation
-        Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);	
+        Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);
 
         final Map<LocationVariable,Term> atPres = inst.inv.getInternalAtPres();
         final List<LocationVariable> heapContext = ((IBuiltInRuleApp)ruleApp).getHeapContext();
@@ -459,7 +459,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         for(ProgramVariable pv : localIns) {
             reachableIn = services.getTermBuilder().and(reachableIn, 
                     services.getTermBuilder().reachableValue(pv));
-        }	
+        }
         final ImmutableSet<ProgramVariable> localOuts 
             = MiscTools.getLocalOuts(inst.loop, services);
         Term reachableOut = services.getTermBuilder().tt();
@@ -540,19 +540,19 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term variantUpdate = variantPair.first;
         final Term variantPO = variantPair.second;
 
-	final ImmutableList<Goal> result;
-	Goal wdGoal;
-	if (WellDefinednessCheck.isOn()) {
-	    //split goal into four branches
-	    result = goal.split(4);
-	    wdGoal = result.tail().tail().tail().head();
-	    wdGoal.setBranchLabel(WellDefinednessMacro.WD_BRANCH);
-	} else {
-	    //split goal into three branches
-	    result = goal.split(3);
-	    wdGoal = null;
-	}
-	Goal initGoal = result.tail().tail().head();
+        final ImmutableList<Goal> result;
+        Goal wdGoal;
+        if (WellDefinednessCheck.isOn()) {
+            //split goal into four branches
+            result = goal.split(4);
+            wdGoal = result.tail().tail().tail().head();
+            wdGoal.setBranchLabel(WellDefinednessMacro.WD_BRANCH);
+        } else {
+            //split goal into three branches
+            result = goal.split(3);
+            wdGoal = null;
+        }
+        Goal initGoal = result.tail().tail().head();
         Goal bodyGoal = result.tail().head();
         Goal useGoal = result.head();
 
@@ -562,25 +562,25 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term guardTrueTerm = guardStuff.second;
         final Term guardFalseTerm = guardStuff.third;
 
-	//prepare common assumption
-	final Term[] uAnon 
-		= new Term[]{inst.u, anonUpdate};
-	final Term[] uBeforeLoopDefAnonVariant 
-		= new Term[]{inst.u, 
-		             beforeLoopUpdate, 
-		             anonUpdate, 
-		             variantUpdate};
-	final Term uAnonInv 
-		= services.getTermBuilder().applySequential(uAnon, services.getTermBuilder().and(invTerm, reachableOut));
+        //prepare common assumption
+        final Term[] uAnon
+                = new Term[]{inst.u, anonUpdate};
+        final Term[] uBeforeLoopDefAnonVariant
+                = new Term[]{inst.u,
+                             beforeLoopUpdate,
+                             anonUpdate,
+                             variantUpdate};
+        final Term uAnonInv
+                = services.getTermBuilder().applySequential(uAnon, services.getTermBuilder().and(invTerm, reachableOut));
 
-	//"Invariant Initially Valid":
-	// \replacewith (==> inv );
-	prepareInvInitiallyValidBranch(services, ruleApp, inst, invTerm, reachableState, initGoal);
+        //"Invariant Initially Valid":
+        // \replacewith (==> inv );
+        prepareInvInitiallyValidBranch(services, ruleApp, inst, invTerm, reachableState, initGoal);
 
-	setupWdGoal(wdGoal, inst.inv, inst.u, inst.selfTerm, heapContext.get(0),
-	            anonHeap, localIns, ruleApp.posInOccurrence(), services);
+        setupWdGoal(wdGoal, inst.inv, inst.u, inst.selfTerm, heapContext.get(0),
+                    anonHeap, localIns, ruleApp.posInOccurrence(), services);
 
-	//"Body Preserves Invariant":
+        //"Body Preserves Invariant":
         // \replacewith (==>  #atPreEqs(anon1) 
         //                       -> #introNewAnonUpdate(#modifies, #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv -> 
         //                         (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->

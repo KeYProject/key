@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui.macros;
+package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
@@ -94,11 +94,4 @@ public class OneStepProofMacro extends StrategyProofMacro {
         }
 
     }
-
-    @Override
-    public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        return true;
-    }
-
-
 }
