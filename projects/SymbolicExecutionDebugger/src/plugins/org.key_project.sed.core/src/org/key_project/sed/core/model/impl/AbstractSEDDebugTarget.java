@@ -440,7 +440,15 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
                ISEDDebugNode node = (ISEDDebugNode)next;
                boolean hit = breakpoint.isEnabled() && checkBreakpointHit(breakpoint, node);
                if (hit) {
-                  if (!breakpointType.hasLink(node, breakpoint)) {
+                  ISEDAnnotationLink[] links = node.getAnnotationLinks(breakpointType);
+                  boolean found = false;
+                  for (ISEDAnnotationLink link : links) {
+                     if (breakpointType.isBreakpointLink(link, breakpoint)) {
+                        found = true;
+                        ((BreakpointAnnotationLink)link).updateBreakpointName();
+                     }
+                  }
+                  if (!found) {
                      ISEDAnnotation[] annotations = getRegisteredAnnotations(breakpointType);
                      for (ISEDAnnotation annotation : annotations) {
                         breakpointType.addBreakpointLink(node, annotation, breakpoint);

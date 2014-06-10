@@ -57,6 +57,13 @@ public class BreakpointAnnotationLink extends AbstractSEDAnnotationLink {
       IBreakpoint oldValue = getBreakpoint();
       this.breakpoint = breakpoint;
       firePropertyChange(PROP_BREAKPOINT, oldValue, getBreakpoint());
+      updateBreakpointName();
+   }
+   
+   /**
+    * Updates {@link #getBreakpointName()} according to {@link #getBreakpoint()}.
+    */
+   public void updateBreakpointName() {
       setBreakpointName(computeBreakpointName());
    }
    
