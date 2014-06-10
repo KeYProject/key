@@ -1041,24 +1041,36 @@ public class SMTObjTranslator implements SMTTranslator {
 	private void findSorts(Set<Sort> sorts, Term term) {
 		Sort s = term.sort();
 		
-		JavaInfo javaInfo = services.getJavaInfo();
-		Sort object = javaInfo.getJavaLangObject().getSort();
-		Sort nullSort = services.getTypeConverter().getHeapLDT().getNull()
-		        .sort();
-		if (s.extendsTrans(object) && !s.equals(nullSort)) {
-			sorts.add(s);
-		}
+		
+		addSingleSort(sorts, s);
 		if(term.op() instanceof SortDependingFunction){
 			SortDependingFunction sdf = (SortDependingFunction) term.op();
-			Sort d = sdf.getSortDependingOn();
-			if (d.extendsTrans(object) && !d.equals(nullSort)) {
-				sorts.add(d);
-			}
+			Sort d = sdf.getSortDependingOn();			
+			addSingleSort(sorts, d);
 		}
+		
 		for (Term sub : term.subs()) {
 			findSorts(sorts, sub);
 		}
 	}
+
+	private void addSingleSort(Set<Sort> sorts, Sort s) {
+	    String name = s.name().toString();
+	    JavaInfo javaInfo = services.getJavaInfo();
+	    Sort object = javaInfo.getJavaLangObject().getSort();
+		Sort nullSort = services.getTypeConverter().getHeapLDT().getNull()
+		        .sort();
+		//if java reference type
+		if (s.extendsTrans(object) && !s.equals(nullSort)) {
+			sorts.add(s);			
+		}
+	    //if array type- add element type
+	    if(name.endsWith("[]")){
+	    	String single = name.substring(0, name.length() - 2);
+	    	Sort singleSort = services.getJavaInfo().getKeYJavaType(single).getSort();
+	    	addSingleSort(sorts, singleSort);
+	    }
+    }
 
 	/**
 	 * Translates a KeY problem into a SMTFile.
@@ -1517,9 +1529,9 @@ public class SMTObjTranslator implements SMTTranslator {
 	    boolean finalClass = kjt != null
 	            && kjt.getJavaType() instanceof ClassDeclaration
 	            && ((ClassDeclaration) kjt.getJavaType()).isFinal();
-	    if (kjt != null && kjt.getJavaType() instanceof ArrayDeclaration) {
-	    	finalClass = true;
-	    }
+//	    if (kjt != null && kjt.getJavaType() instanceof ArrayDeclaration) {
+//	    	finalClass = true;
+//	    }
 	    return finalClass;
     }
 
