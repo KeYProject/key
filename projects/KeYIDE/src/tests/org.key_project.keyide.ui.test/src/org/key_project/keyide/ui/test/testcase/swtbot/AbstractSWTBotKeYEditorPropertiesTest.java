@@ -29,7 +29,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Provides the basic functionality to test a properties tab of the {@link KeYEditor}.
@@ -53,7 +53,7 @@ public abstract class AbstractSWTBotKeYEditorPropertiesTest extends AbstractSWTB
       IKeYEditorTestSteps steps = new IKeYEditorTestSteps() {
          @Override
          public void test(IJavaProject project,
-                          KeYEnvironment<CustomConsoleUserInterface> environment, 
+                          KeYEnvironment<CustomUserInterface> environment, 
                           Proof proof, 
                           SWTWorkbenchBot bot, 
                           SWTBotEditor editor,

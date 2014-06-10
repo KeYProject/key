@@ -1181,8 +1181,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.FALSE,
-                           6, 
-                           executor);
+                           Boolean.TRUE, 
+                           6, executor);
    }
    
    /**
@@ -1344,8 +1344,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.valueOf(showKeYMainWindow),
                            Boolean.valueOf(mergeBranchConditions),
                            Boolean.FALSE,
-                           timeoutFactor, 
-                           executor);
+                           Boolean.TRUE, 
+                           timeoutFactor, executor);
    }
 
    /**
@@ -1421,15 +1421,17 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             assertFalse(target.isTerminated());
             // Make sure that the debug target is in the initial state.
             TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
-            // Clear proof list in KeY if required
             if (clearProofListInKeYBeforeDisconnect) {
+               // Clear proof list in KeY
                assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
                KeYUtil.clearProofList(MainWindow.getInstance());
                assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
             }
-            // Disconnect
-            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, pathToElementInDebugTreeWhichProvidesDisconnectMenuItem); // Select first debug target
-            item.contextMenu("Disconnect").click();
+            else {
+               // Disconnect
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, pathToElementInDebugTreeWhichProvidesDisconnectMenuItem); // Select first debug target
+               item.contextMenu("Disconnect").click();
+            }
             assertTrue(launch instanceof IDisconnect);
             TestSedCoreUtil.waitUntilLaunchIsDisconnected(bot, (IDisconnect)launch);
             assertTrue(launch.canTerminate());
@@ -1463,8 +1465,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.TRUE,
                            Boolean.FALSE,
                            Boolean.FALSE,
-                           8, 
-                           executor);
+                           Boolean.TRUE, 
+                           8, executor);
    }
 
    /**
@@ -1542,7 +1544,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             assertFalse(target.canResume());
             assertFalse(target.canSuspend());
             assertFalse(target.canTerminate());
-            assertFalse(target.isDisconnected());
+            assertEquals(clearProofListInKeYBeforeTermination, target.isDisconnected());
             assertTrue(target.isSuspended());
             assertTrue(target.isTerminated());
             // Remove terminated launch
@@ -1562,7 +1564,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.TRUE,
                            Boolean.FALSE,
                            Boolean.FALSE,
-                           8, 
-                           executor);
+                           Boolean.TRUE, 
+                           8, executor);
    }
 }

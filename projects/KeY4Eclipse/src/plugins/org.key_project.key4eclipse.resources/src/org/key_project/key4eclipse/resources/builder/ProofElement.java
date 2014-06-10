@@ -25,7 +25,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Object that represents a proof and provides all the required stuff for the build process.
@@ -42,7 +42,7 @@ public class ProofElement {
    private IFile proofFile;
    private IFile metaFile;
    
-   private KeYEnvironment<CustomConsoleUserInterface> environment;
+   private KeYEnvironment<CustomUserInterface> environment;
    
    private Contract contract;
    private ProofOblInput proofObl;
@@ -91,10 +91,10 @@ public class ProofElement {
       return metaFile;
    }
    
-   public KeYEnvironment<CustomConsoleUserInterface> getKeYEnvironment(){
+   public KeYEnvironment<CustomUserInterface> getKeYEnvironment(){
       return environment;
    }
-   public void setKeYEnvironment(KeYEnvironment<CustomConsoleUserInterface> environment){
+   public void setKeYEnvironment(KeYEnvironment<CustomUserInterface> environment){
       this.environment = environment;
    }
 
@@ -131,7 +131,7 @@ public class ProofElement {
       this.usedContracts = usedContracts;
    }
    
-   public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<CustomConsoleUserInterface> environment, IFolder proofFolder, IFile proofFile, IFile metaFile, LinkedHashSet<IMarker> marker, Contract contract){
+   public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<CustomUserInterface> environment, IFolder proofFolder, IFile proofFile, IFile metaFile, LinkedHashSet<IMarker> marker, Contract contract){
       this.javaFile = javaFile;
       this.scl = scl;
       this.marker = marker;

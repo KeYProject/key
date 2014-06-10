@@ -66,7 +66,7 @@ public class SWTBotChangeConditonWithErrorOKThenOKWithoutChange extends Abstract
             Boolean.FALSE,
             Boolean.FALSE,
             Boolean.FALSE,
-            8,
-            executor);   
+            Boolean.TRUE,
+            8, executor);   
    } 
 }

@@ -169,7 +169,7 @@ public final class MainWindow extends JFrame  {
        "<p style=\"font-family: lucida;font-size: 12pt;font-weight: bold\">";
 
     /** action for starting and stopping automatic mode */
-    private MainWindowAction autoModeAction;
+    private final AutoModeAction autoModeAction;
 
     /** action for opening a KeY file */
     private MainWindowAction openFileAction;
@@ -198,7 +198,7 @@ public final class MainWindow extends JFrame  {
     private LemmaGenerationAction loadKeYTaclets;
     private LemmaGenerationBatchModeAction lemmaGenerationBatchModeAction;
 
-    private OneStepSimplificationToggleAction oneStepSimplAction =
+    private final OneStepSimplificationToggleAction oneStepSimplAction =
         new OneStepSimplificationToggleAction(this);
 
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
@@ -222,7 +222,7 @@ public final class MainWindow extends JFrame  {
     private ExitMainAction exitMainAction;
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
-    private HidePackagePrefixToggleAction hidePackagePrefixToggleAction =
+    private final HidePackagePrefixToggleAction hidePackagePrefixToggleAction =
         new HidePackagePrefixToggleAction(this);
     
     private final TermLabelMenu termLabelMenu;
@@ -248,7 +248,8 @@ public final class MainWindow extends JFrame  {
         sequentViewSearchBar = new SequentViewSearchBar(emptySequent);
         termLabelMenu = new TermLabelMenu(this);
         proofListView = new JScrollPane();
-        mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator);
+        autoModeAction = new AutoModeAction(this);
+        mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
         mainFrame = new MainFrame(this, emptySequent);
         proofList = new TaskTree(mediator);
         notificationManager = new NotificationManager(mediator, this);
@@ -265,7 +266,12 @@ public final class MainWindow extends JFrame  {
             System.err.println("Error: KeY started in graphical mode, but no graphical environment present.");
             System.err.println("Please use the --auto option to start KeY in batch mode.");
             System.err.println("Use the --help option for more command line options.");
-            System.exit(-1);
+            //System.exit(-1);
+            try{
+            	throw new RuntimeException();
+            }catch(Exception e){
+            	e.printStackTrace();
+            }
         }
         if (instance == null) {
             instance = new MainWindow();
@@ -370,7 +376,6 @@ public final class MainWindow extends JFrame  {
         mediator.setMinimizeInteraction(stupidMode);
 
         // set up actions
-        autoModeAction            = new AutoModeAction(this);
         openFileAction            = new OpenFileAction(this);
         openExampleAction         = new OpenExampleAction(this);
         openMostRecentFileAction  = new OpenMostRecentFileAction(this);
@@ -685,7 +690,7 @@ public final class MainWindow extends JFrame  {
         proof.setMnemonic(KeyEvent.VK_P);
 
         proof.add(autoModeAction);
-        final JMenuItem macros = new de.uka.ilkd.key.gui.macros.ProofMacroMenu(mediator, null);
+        final JMenuItem macros = new ProofMacroMenu(mediator, null);
         proof.add(macros);
         proof.add(new UndoLastStepAction(this, true));
         proof.add(new AbandonTaskAction(this));
@@ -1367,13 +1372,6 @@ public final class MainWindow extends JFrame  {
 
     public UserInterface getUserInterface() {
         return userInterface;
-    }
-
-    /**
-     * @return the autoModeAction
-     */
-    public Action getAutoModeAction() {
-        return autoModeAction;
     }
 
     public Action getOpenMostRecentFileAction() {

@@ -634,6 +634,7 @@ public class Recoder2KeYConverter {
      *         there has been an exception
      */
     public ProgramElement convert(recoder.java.JavaProgramElement pe) {
+        ProgramElement result = null;
         ExtList parameter;
 
         if (pe instanceof recoder.java.JavaNonTerminalProgramElement) {
@@ -647,7 +648,8 @@ public class Recoder2KeYConverter {
         final Class<? extends recoder.java.JavaProgramElement> class_ = pe.getClass();
 
         try {
-            return (ProgramElement) getKeYClassConstructor(class_).newInstance(parameter);
+            result = (ProgramElement) getKeYClassConstructor(class_).newInstance(parameter);
+            return result;
         } catch (Exception e) {
             final String className = class_.toString().substring(6);
             final StringBuffer sb = new StringBuffer(className);
@@ -2200,6 +2202,45 @@ public class Recoder2KeYConverter {
 
     public NoState convert(de.uka.ilkd.key.java.recoderext.NoState m) {
         return new NoState(collectComments(m));
+    }
+
+    public EmptyStatement convert(recoder.java.statement.EmptyStatement m) {
+        return new EmptyStatement(collectChildrenAndComments(m));
+    }   
+    
+    //modifiers
+    
+    public Abstract convert(recoder.java.declaration.modifier.Abstract m) {
+        return new Abstract(collectChildrenAndComments(m));
+    }
+    
+    public Public convert(recoder.java.declaration.modifier.Public m) {
+        return new Public(collectChildrenAndComments(m));
+    }
+
+    public Protected convert(recoder.java.declaration.modifier.Protected m) {
+        return new Protected(collectChildrenAndComments(m));
+    }
+
+    public Private convert(recoder.java.declaration.modifier.Private m) {
+        return new Private(collectChildrenAndComments(m));
+    }
+
+    public Static convert(recoder.java.declaration.modifier.Static m) {
+        return new Static(collectChildrenAndComments(m));
+    }
+
+    public Final convert(recoder.java.declaration.modifier.Final m) {
+        return new Final(collectChildrenAndComments(m));
+    }
+    
+    public StrictFp convert(recoder.java.declaration.modifier.StrictFp m) {
+        return new StrictFp(collectChildrenAndComments(m));
+    }
+
+    // package reference
+    public PackageReference convert(recoder.java.reference.PackageReference m) {
+        return new PackageReference(collectChildrenAndComments(m));
     }
 
 }

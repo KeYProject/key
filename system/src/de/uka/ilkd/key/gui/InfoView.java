@@ -19,6 +19,11 @@ import javax.swing.event.TreeSelectionListener;
 import de.uka.ilkd.key.util.GuiUtilities;
 import javax.swing.event.TreeSelectionEvent;
 
+/**
+ * Class for info contents displayed in {@link MainWindow}.
+ *
+ * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ */
 public class InfoView extends JSplitPane {
 
     private final InfoTree infoTree;
@@ -33,7 +38,7 @@ public class InfoView extends JSplitPane {
         xmlResources = new XMLResources();
         this.mainWindow = mainWindow;
         this.mediator = mediator;
-        mediator.addKeYSelectionListener(new SelectionListener());
+        mediator.addKeYSelectionListener(new InfoViewSelectionLitsener());
 
         // initial placement of the divider
         setDividerLocation(300);
@@ -42,7 +47,7 @@ public class InfoView extends JSplitPane {
         setResizeWeight(1.0);
 
         // Setting a name for this causes PreferenceSaver to include this class.
-        setName("ruleViewPane");
+        setName("infoViewPane");
 
         infoTree = new InfoTree();
         infoTree.addTreeSelectionListener(new TreeSelectionListener() {
@@ -63,7 +68,7 @@ public class InfoView extends JSplitPane {
         setVisible(true);
     }
 
-    private class SelectionListener implements KeYSelectionListener {
+    private class InfoViewSelectionLitsener implements KeYSelectionListener {
 
         /**
          * focused node has changed

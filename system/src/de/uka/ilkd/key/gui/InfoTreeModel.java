@@ -32,6 +32,11 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.MiscTools;
 
+/**
+ * Extension of {@link DefaultTreeModel} used by {@link InfoTree}.
+ *
+ * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ */
 public class InfoTreeModel extends DefaultTreeModel {
 
     private static final String LEMMAS = "Lemmas";
@@ -41,7 +46,7 @@ public class InfoTreeModel extends DefaultTreeModel {
         super(new InfoTreeNode());
         insertAsLast(new RulesNode(xmlResources.ruleExplanations, goal), (InfoTreeNode) root);
         insertAsLast(new TermLabelsNode(mainWindow, xmlResources.termLabelExplanations), (InfoTreeNode) root);
-        insertAsLast(new FunctionsNode(mainWindow, xmlResources.functionExplanations), (InfoTreeNode) root);
+        insertAsLast(new FunctionsNode(xmlResources.functionExplanations), (InfoTreeNode) root);
     }
 
     private void insertAsLast(InfoTreeNode ins, InfoTreeNode parent) {
@@ -50,8 +55,14 @@ public class InfoTreeModel extends DefaultTreeModel {
 
     private class FunctionsNode extends InfoTreeNode {
 
-        FunctionsNode(MainWindow mainWindow, Properties functionExplanations) {
-            super("Function Symbols", "Display descriptions for documented function symbols.");
+        private static final String COLLECTION = 
+                "This node stands for a category of symbols; expand it to browse the symbols " +
+                "in the category.";
+        private static final String DEFAULT_FUNCTIONS_LABEL =
+                "Display descriptions for documented interpreted function and predicate symbols.";
+
+        FunctionsNode(Properties functionExplanations) {
+            super("Function Symbols", DEFAULT_FUNCTIONS_LABEL);
 
             Map<String, InfoTreeNode> categoryMap = new HashMap<String, InfoTreeNode>();
 
@@ -60,14 +71,14 @@ public class InfoTreeModel extends DefaultTreeModel {
 
             for (String key : sortedKeys) {
                 String[] parts = key.split("/", 2);
-                if(parts.length == 1) {
+                if (parts.length == 1) {
                     // no "/"
                     insertAsLast(new InfoTreeNode(key, functionExplanations), this);
                 } else {
                     String category = parts[0];
                     InfoTreeNode categoryNode = categoryMap.get(category);
-                    if(categoryNode == null) {
-                        categoryNode = new InfoTreeNode(category, "This collects a category of symbols.");
+                    if (categoryNode == null) {
+                        categoryNode = new InfoTreeNode(category, COLLECTION);
                         categoryMap.put(category, categoryNode);
                         insertAsLast(categoryNode, this);
                     }

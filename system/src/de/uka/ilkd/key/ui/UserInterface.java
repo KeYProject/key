@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.ui;
 
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.List;
 
@@ -21,6 +22,7 @@ import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -35,7 +37,41 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor {
+    public static final String PROP_AUTO_MODE = "autoMode";
+    
+    /**
+     * Checks if the auto mode is running which is the case between
+     * {@link #notifyAutoModeBeingStarted()} and {@link #notifyAutomodeStopped()}.
+     * @return {@code true} auto mode is running, {@code false} auto mode is not running.
+     */
+    public boolean isAutoMode();
+   
+    /**
+     * Adds the given listener.
+     * @param listener The listener to add.
+     */
+    public void addPropertyChangeListener(PropertyChangeListener listener);
 
+    /**
+     * Adds the given listener for the given property only.
+     * @param propertyName The property to observe.
+     * @param listener The listener to add.
+     */
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
+    
+    /**
+     * Removes the given listener.
+     * @param listener The listener to remove.
+     */
+    public void removePropertyChangeListener(PropertyChangeListener listener);
+    
+    /**
+     * Removes the given listener from the given property.
+     * @param propertyName The property to no longer observe.
+     * @param listener The listener to remove.
+     */
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
+    
     /**
      * these methods are called immediately before automode is started to ensure that
      * the GUI can respond in a reasonable way, e.g., change the cursor to a waiting cursor
@@ -55,7 +91,7 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
 
     /**
      * called to complete and apply a taclet instantiations
-     * @param models the  partial models with all different possible instantiations found automatically
+     * @param models the partial models with all different possible instantiations found automatically
      * @param goal the Goal where to apply
      */
     void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal);
@@ -67,6 +103,8 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @return true if removal has been granted
      */
     boolean confirmTaskRemoval(String message);
+
+    void finish(Proof proof);
 
     /**
      * loads the problem or proof from the given file
@@ -81,6 +119,14 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @param bootClassPath the boot class path to use. 
      */
     void loadProblem(File file, List<File> classPath, File bootClassPath);
+
+    void setMacro(ProofMacro macro);
+
+    ProofMacro getMacro();
+
+    boolean macroChosen();
+
+    boolean applyMacro();
 
     /** 
      * called to open the build in examples 

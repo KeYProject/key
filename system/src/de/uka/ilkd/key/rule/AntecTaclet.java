@@ -94,7 +94,7 @@ public class AntecTaclet extends FindTaclet{
 		    matchCond );
 
 	    addToSucc(replWith.succedent(), goal, 
-		      null, services, matchCond);	   	    	    
+		      null, services, matchCond, posOfFind);	   	    	    
 	    
 	
 	} else {
@@ -115,8 +115,8 @@ public class AntecTaclet extends FindTaclet{
 			    PosInOccurrence posOfFind,
 			    Services services,
 			    MatchConditions matchCond) {
-	addToAntec(add.antecedent(), goal, posOfFind, services, matchCond);
-	addToSucc(add.succedent(), goal, null, services, matchCond);
+	addToAntec(add.antecedent(), goal, posOfFind, services, matchCond, posOfFind);
+	addToSucc(add.succedent(), goal, null, services, matchCond, posOfFind);
     }
         
     /** toString for the find part */

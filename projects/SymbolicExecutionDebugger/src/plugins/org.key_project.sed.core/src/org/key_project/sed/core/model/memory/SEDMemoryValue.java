@@ -161,4 +161,12 @@ public class SEDMemoryValue extends AbstractSEDValue {
    public void setMultiValued(boolean multiValued) {
       this.multiValued = multiValued;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setId(String id) {
+      super.setId(id);
+   }
 }

@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.util.GuiUtilities;
 import java.awt.Toolkit;
@@ -10,7 +11,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 
 /**
- *
+ * {@link JTabbedPane} displayed in {@link MainWindow}, to the left of
+ * {@link de.uka.ilkd.key.gui.nodeviews.SequentView}.
+ * 
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class MainWindowTabbedPane extends JTabbedPane {
@@ -39,7 +42,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
      */
     private final InfoView infoView;
 
-    MainWindowTabbedPane(MainWindow mainWindow, KeYMediator mediator) {
+    MainWindowTabbedPane(MainWindow mainWindow, KeYMediator mediator, AutoModeAction autoModeAction) {
         assert mediator != null;
         assert mainWindow != null;
 
@@ -61,10 +64,8 @@ public class MainWindowTabbedPane extends JTabbedPane {
                 "The currently open goals");
 
         // set strategySelectionView
-        strategySelectionView = new StrategySelectionView(mainWindow);
-        if (mediator != null) {
-            strategySelectionView.setMediator(mediator);
-        }
+        strategySelectionView = new StrategySelectionView(autoModeAction);
+        strategySelectionView.setMediator(mediator);
         addTab("Proof Search Strategy", null, strategySelectionView,
                 "Select strategy for automated proof search");
 
