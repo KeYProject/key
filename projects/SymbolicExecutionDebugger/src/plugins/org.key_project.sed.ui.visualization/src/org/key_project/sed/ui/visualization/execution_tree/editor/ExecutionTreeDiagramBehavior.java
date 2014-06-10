@@ -281,8 +281,8 @@ public class ExecutionTreeDiagramBehavior extends DiagramBehavior {
       // Update diagram content if required.
       if (updateRequired) {
          // Do an asynchronous update in the UI thread (same behavior as DomainModelChangeListener which is responsible for changes in EMF objects)
-         AbstractDependingOnObjectJob.cancelJobs(this);
-         new AbstractDependingOnObjectJob("Updating Symbolic Execution Tree", this) {
+         AbstractDependingOnObjectJob.cancelJobs(diagramEditor);
+         new AbstractDependingOnObjectJob("Updating Symbolic Execution Tree", diagramEditor) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                return updateDiagramInJob(monitor);
