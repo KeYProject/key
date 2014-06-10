@@ -3,6 +3,7 @@ package de.uka.ilkd.key.parser;
 import java.io.File;
 
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 /**
@@ -24,12 +25,20 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     @Override
-    public void setUpDeclarations() {
+    public void setUp() {
+        parseDecls("\\schemaVar \\term Heap h;");
+        parseDecls("\\programVariables { testTermParserHeap.A a; }");
+    }
+
+    @Override
+    protected Services getServices() {
         JavaInfo javaInfo = new HelperClassForTests().parse(
                 new File(javaPath)).getFirstProof().getJavaInfo();
-        services = javaInfo.getServices();
-        nss = services.getNamespaces();
-        parseDecls("\\programVariables { testTermParserHeap.A a; }");
+        return javaInfo.getServices();
+    }
+
+    public void testX() {
+        System.out.println(parseTerm("a.f@(h)"));
     }
 
 }

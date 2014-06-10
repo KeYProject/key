@@ -21,38 +21,25 @@ import junit.framework.TestCase;
 
 /**
  * Common code of classes TestTermParser and TestTermParserHeap.
- * 
+ *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class AbstractTestTermParser extends TestCase {
+public abstract class AbstractTestTermParser extends TestCase {
 
-    protected static TermFactory tf;
-    protected static TermBuilder tb;
-    protected static NamespaceSet nss;
-    protected static Services services;
-    protected static Recoder2KeY r2k;
+    protected final TermFactory tf;
+    protected final TermBuilder tb;
+    protected final NamespaceSet nss;
+    protected final Services services;
+    protected final Recoder2KeY r2k;
 
     AbstractTestTermParser(String name) {
         super(name);
-    }
-
-    @Override
-    public void setUp() {
-        if (services == null) {
-            services = TacletForTests.services();
-            tb = services.getTermBuilder();
-            tf = tb.tf();
-            nss = services.getNamespaces();
-            r2k = new Recoder2KeY(services, nss);
-            r2k.parseSpecialClasses();
-        }
-        setUpDeclarations();
-    }
-
-    /*
-     * Override this to set up declarations.
-     */
-    public void setUpDeclarations() {
+        services = getServices();
+        tb = services.getTermBuilder();
+        tf = tb.tf();
+        nss = services.getNamespaces();
+        r2k = new Recoder2KeY(services, nss);
+        r2k.parseSpecialClasses();
     }
 
     Sort lookup_sort(String name) {
@@ -144,5 +131,7 @@ public class AbstractTestTermParser extends TestCase {
             throw new RuntimeException("Exc while Parsing:\n" + sw);
         }
     }
+
+    protected abstract Services getServices();
 
 }

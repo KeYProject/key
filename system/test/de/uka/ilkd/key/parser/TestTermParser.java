@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -40,9 +41,14 @@ public class TestTermParser extends AbstractTestTermParser {
     public TestTermParser(String name) {
 	super(name);
     }
+    
+    @Override
+    protected Services getServices() {
+        return TacletForTests.services();
+    }
 
     @Override
-    public void setUpDeclarations() {	
+    public void setUp() {	
         
         /*
          * Setting up only static variables here. It needs to be called only once.
