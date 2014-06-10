@@ -39,7 +39,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
-import de.uka.ilkd.key.gui.macros.ProofMacroMenu;
+import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;

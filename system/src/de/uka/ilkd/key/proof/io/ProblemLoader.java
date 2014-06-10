@@ -36,6 +36,7 @@ import javax.swing.SwingWorker;
  * @author Martin Hentschel
  */
 public final class ProblemLoader extends DefaultProblemLoader {
+
    private ProverTaskListener ptl;
 
    public ProblemLoader(File file, List<File> classPath, File bootClassPath,

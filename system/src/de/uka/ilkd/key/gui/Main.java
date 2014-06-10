@@ -24,8 +24,8 @@ import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
-import de.uka.ilkd.key.gui.macros.DummyProofMacro;
-import de.uka.ilkd.key.gui.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.ui.BatchMode;
@@ -55,12 +55,12 @@ public final class Main {
     private static final String AUTOSAVE = "--autosave";
     private static final String EXPERIMENTAL = "--experimental";
     private static final String DEBUG = "--debug";
+    private static final String MACRO = "--macro";
     private static final String NO_DEBUG = "--no_debug";
     private static final String ASSERTION = "--assertion";
     private static final String NO_ASSERTION = "--no-assertion";
     private static final String NO_JMLSPECS = "--no-jmlspecs";
     public static final String JUSTIFY_RULES ="--justify-rules";
-    private static final String MACRO = "--macro";
     private static final String PRINT_STATISTICS ="--print-statistics";
     private static final String SAVE_ALL_CONTRACTS = "--save-all";
     private static final String TIMEOUT ="--timeout";
@@ -151,9 +151,9 @@ public final class Main {
     private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES =
         {de.uka.ilkd.key.proof.delayedcut.DelayedCut.FEATURE};
 
-    private static ProofMacro autoMacro = new DummyProofMacro();
-
     private static boolean saveAllContracts = false;
+
+    private static ProofMacro autoMacro = new SkipMacro();
 
     /**
      * <p>
@@ -396,7 +396,7 @@ public final class Main {
                     break;
                 }
             }
-            if (macro.equals("") || autoMacro instanceof DummyProofMacro) {
+            if (macro.equals("") || autoMacro instanceof SkipMacro) {
                 System.err.println("No automatic proof macro specified.");
             }
         }

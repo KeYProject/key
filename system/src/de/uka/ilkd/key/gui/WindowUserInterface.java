@@ -74,9 +74,9 @@ public class WindowUserInterface extends AbstractUserInterface {
 
     public void loadProblem(File file, List<File> classPath,
                             File bootClassPath) {
-            mainWindow.addRecentFile(file.getAbsolutePath());
-            super.getProblemLoader(
-                    file, classPath, bootClassPath, mainWindow.getMediator()).runAsynchronously();
+        mainWindow.addRecentFile(file.getAbsolutePath());
+        super.getProblemLoader(file, classPath, bootClassPath,
+                               mainWindow.getMediator()).runAsynchronously();
     }
 
     @Override
@@ -121,7 +121,6 @@ public class WindowUserInterface extends AbstractUserInterface {
         mainWindow.setStandardStatusLine();
     }
 
-    @Override
     public void finish(Proof proof) {
         // do nothing
     }
@@ -130,7 +129,8 @@ public class WindowUserInterface extends AbstractUserInterface {
     public void taskFinished(TaskFinishedInfo info) {
         if (info.getSource() instanceof ApplyStrategy) {
             resetStatus(this);
-            ApplyStrategy.ApplyStrategyInfo result = (ApplyStrategyInfo) info.getResult();
+            ApplyStrategy.ApplyStrategyInfo result =
+                    (ApplyStrategyInfo) info.getResult();
 
             Proof proof = info.getProof();
             if (!proof.closed()) {
@@ -220,8 +220,7 @@ public class WindowUserInterface extends AbstractUserInterface {
     @Override
     public void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models,
                                             Goal goal) {
-        new TacletMatchCompletionDialog(mainWindow, models, goal,
-                mainWindow.getMediator());
+        new TacletMatchCompletionDialog(mainWindow, models, goal, mainWindow.getMediator());
     }
 
     @Override
@@ -271,7 +270,8 @@ public class WindowUserInterface extends AbstractUserInterface {
     * {@inheritDoc}
     */
    @Override
-   public DefaultProblemLoader load(Profile profile, File file, List<File> classPath, File bootClassPath) throws ProblemLoaderException {
+   public DefaultProblemLoader load(Profile profile, File file, List<File> classPath,
+                                    File bootClassPath) throws ProblemLoaderException {
       if (file != null) {
          mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
       }
@@ -286,12 +286,12 @@ public class WindowUserInterface extends AbstractUserInterface {
       return mainWindow.getProofList().containsProof(proof);
    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeProof(Proof proof) {
-        if (!proof.isDisposed()) {
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeProof(Proof proof) {
+       if (!proof.isDisposed()) {
            // The following was copied from AbandonTaskAction when I redirected
            // the abandon method there to this method.
            // The code seems to do more than the original code of this method...

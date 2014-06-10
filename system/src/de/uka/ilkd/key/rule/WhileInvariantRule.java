@@ -23,7 +23,6 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -59,6 +58,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
@@ -785,9 +785,10 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term reachableIn = tb.tt();
         for(ProgramVariable pv : localIns) {
             reachableIn = tb.and(reachableIn, 
-                    tb.reachableValue(pv));
+                                 tb.reachableValue(pv));
         }
         Term reachableOut = tb.tt();
+
         for(ProgramVariable pv : localOuts) {
             reachableOut = tb.and(reachableOut, 
                     tb.reachableValue(pv));
@@ -909,12 +910,16 @@ public final class WhileInvariantRule implements BuiltInRule {
         Goal bodyGoal = result.tail().head();
         Goal useGoal = result.head();
 
+        //"Invariant Initially Valid":
+        // \replacewith (==> inv );
+        prepareInvInitiallyValidBranch(services, ruleApp, inst, invTerm, reachableState, initGoal);
+
+        setupWdGoal(wdGoal, inst.inv, inst.u, inst.selfTerm, heapContext.get(0),
+                    anonHeap, localIns, ruleApp.posInOccurrence(), services);
+
         //"Body Preserves Invariant":
-        // \replacewith (==>  #atPreEqs(anon1)
-        //                       -> #introNewAnonUpdate(
-        //                                  #modifies,
-        //                                  #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post)
-        //                          & inv ->
+        // \replacewith (==>  #atPreEqs(anon1) 
+        //                       -> #introNewAnonUpdate(#modifies, #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv -> 
         //                         (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
         //                          #whileInvRule(\[{.. while (#e) #s ...}\]post,
         //                               #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post)

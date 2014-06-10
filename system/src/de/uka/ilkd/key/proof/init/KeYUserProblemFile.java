@@ -137,8 +137,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
                                     initConfig.getTaclet2Builder(),
                                     initConfig.getTaclets()); 
             problemTerm = problemParser.parseProblem();
-            String searchS = "\\problem";            
-
+            String searchS = "\\problem";
 	    if(problemTerm == null) {
 	       boolean chooseDLContract = problemParser.getChooseContract() != null;
           boolean proofObligation = problemParser.getProofObligation() != null;
@@ -152,6 +151,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 	         throw new ProofInputException(
 	                 "No \\problem or \\chooseContract or \\proofObligation in the input file!");
 	       }
+	       
 	    }
 
             problemHeader = lexer.getCapturedText();

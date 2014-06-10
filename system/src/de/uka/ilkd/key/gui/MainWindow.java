@@ -280,7 +280,12 @@ public final class MainWindow extends JFrame  {
             System.err.println("Error: KeY started in graphical mode, but no graphical environment present.");
             System.err.println("Please use the --auto option to start KeY in batch mode.");
             System.err.println("Use the --help option for more command line options.");
-            System.exit(-1);
+            //System.exit(-1);
+            try{
+            	throw new RuntimeException();
+            }catch(Exception e){
+            	e.printStackTrace();
+            }
         }
         if (instance == null) {
             instance = new MainWindow();
@@ -786,7 +791,7 @@ public final class MainWindow extends JFrame  {
         proof.setMnemonic(KeyEvent.VK_P);
 
         proof.add(autoModeAction);
-        final JMenuItem macros = new de.uka.ilkd.key.gui.macros.ProofMacroMenu(mediator, null);
+        final JMenuItem macros = new ProofMacroMenu(mediator, null);
         proof.add(macros);
         proof.add(new UndoLastStepAction(this, true));
         proof.add(new AbandonTaskAction(this));

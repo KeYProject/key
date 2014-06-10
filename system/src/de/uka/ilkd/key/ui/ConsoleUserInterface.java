@@ -30,9 +30,9 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.macros.ProofMacro;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -48,7 +48,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     private static final int PROGRESS_BAR_STEPS = 50;
     private static final String PROGRESS_MARK = ">";
 
-    // Substitute for TaskTree from graphical mode to facilitate side proofs
+    // Substitute for TaskTree (GUI) to facilitate side proofs in console mode
     private ImmutableList<Proof> proofStack = ImmutableSLList.<Proof>nil();
 
     private final BatchMode batchMode;
@@ -78,7 +78,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        mediator.setInteractive(false);
        startAndWaitForAutoMode(proof);
        if (verbosity >= HIGH) { // WARNING: Is never executed since application terminates via System.exit() before.
-        System.out.println(proof.statistics());
+           System.out.println(proof.statistics());
        }
    }
 
@@ -297,17 +297,20 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    @Override
    public void removeProof(Proof proof) {
        if (proof != null) {
-           Proof p = proofStack.head();
-           proofStack = proofStack.removeAll(p);
-           assert p.name().equals(proof.name());
-           assert !proofStack.isEmpty();
-           getMediator().setProof(proofStack.head());
+           if (!proofStack.isEmpty()) {
+               Proof p = proofStack.head();
+               proofStack = proofStack.removeAll(p);
+               assert p.name().equals(proof.name());
+               getMediator().setProof(proofStack.head());
+           } else {
+               // proofStack might be empty, though proof != null. This can
+               // happen for symbolic execution tests, if proofCreated was not
+               // called by the test setup.
+           }
            proof.dispose();
        }
-       // Run the garbage collector.
-       Runtime r = Runtime.getRuntime();
-       r.gc();
    }
+
 
    @Override
    public File saveProof(Proof proof, String fileExtension) {

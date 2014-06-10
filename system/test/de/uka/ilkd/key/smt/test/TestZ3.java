@@ -13,11 +13,13 @@
 
 package de.uka.ilkd.key.smt.test;
 
-import de.uka.ilkd.key.smt.SolverType;
 import junit.framework.Assert;
+import de.uka.ilkd.key.smt.SolverType;
 
 
 public class TestZ3 extends TestSMTSolver {
+
+
     private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
 
     private static boolean isInstalled = false;

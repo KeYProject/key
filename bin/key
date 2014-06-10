@@ -95,7 +95,7 @@ done
 
 list_help(){
   echo "Runscript for the KeY system\n"
-  echo "Usage: ./runProver [technical options] [options for KeY prover] [filename]\n"
+  echo "Usage: ./key [technical options] [options for KeY prover] [filename]\n"
   echo "\nOptions for using this script"
   echo "  --J-option: pass option to the JVM following the -J option convention of javac\n"
   echo "Debugging:\n"

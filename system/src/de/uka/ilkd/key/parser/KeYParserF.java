@@ -49,7 +49,6 @@ public class KeYParserF {
 		normalConfig, taclet2Builder, taclets);
     }
 
-    @SuppressWarnings("unchecked")
     public KeYParserF(ParserMode mode, TokenStream lexer,
 	    ParserConfig schemaConfig, ParserConfig normalConfig,
 	    HashMap taclet2Builder, ImmutableSet<Taclet> taclets) {

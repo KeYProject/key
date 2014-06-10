@@ -23,8 +23,8 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
-import de.uka.ilkd.key.gui.macros.DummyProofMacro;
-import de.uka.ilkd.key.gui.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -47,19 +47,20 @@ public abstract class AbstractUserInterface implements UserInterface {
     */
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
-    private ProofMacro autoMacro = new DummyProofMacro();
+    private ProofMacro autoMacro = new SkipMacro();
     protected boolean saveOnly = false;
 
-	protected ProblemLoader getProblemLoader(File file, List<File> classPath,
-	                                         File bootClassPath, KeYMediator mediator) {
-		final ProblemLoader pl = new ProblemLoader(file, classPath,
-		        bootClassPath, AbstractProfile.getDefaultProfile(), mediator);
-		pl.addTaskListener(this);
-		return pl;
-	}
+    protected ProblemLoader getProblemLoader(File file, List<File> classPath,
+                                             File bootClassPath, KeYMediator mediator) {
+        final ProblemLoader pl =
+                new ProblemLoader(file, classPath, bootClassPath,
+                                  AbstractProfile.getDefaultProfile(), mediator);
+        pl.addTaskListener(this);
+        return pl;
+    }
 
     @Override
-    public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
+    public  IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
         app = forced? app.forceInstantiate(goal): app.tryToInstantiate(goal);
         // cannot complete that app
         return app.complete() ? app : null;
@@ -85,7 +86,7 @@ public abstract class AbstractUserInterface implements UserInterface {
     protected abstract String getMacroConsoleOutput();
 
     public boolean macroChosen() {
-        return !(getMacro() instanceof DummyProofMacro);
+        return !(getMacro() instanceof SkipMacro);
     }
 
     public boolean applyMacro() {
@@ -108,7 +109,7 @@ public abstract class AbstractUserInterface implements UserInterface {
                 Proof proof = getMediator().getSelectedProof();
                 TaskFinishedInfo info =
                         new DefaultTaskFinishedInfo(getMacro(), null, proof, proof.getAutoModeTime(),
-                                proof.countNodes(), proof.openGoals().size());
+                                                    proof.countNodes(), proof.openGoals().size());
                 taskFinished(info);
             }
             return true;
