@@ -352,8 +352,6 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                businessObjects.add(element);
             }
             // Select in debug viewer
-            SEDUIUtil.selectInDebugView(getEditorPart(), getDebugView(), businessObjects);
-            // Select in debug viewer
             Runnable finishTask = new Runnable() {
                @Override
                public void run() {
