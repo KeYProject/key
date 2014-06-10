@@ -4,9 +4,9 @@ import java.io.File;
 
 import junit.framework.Assert;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.macros.FinishSymbolicExecutionMacro;
-import de.uka.ilkd.key.gui.macros.SemanticsBlastingMacro;
-import de.uka.ilkd.key.gui.macros.TryCloseMacro;
+import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
+import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
+import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.TestConsoleUserInterface;
