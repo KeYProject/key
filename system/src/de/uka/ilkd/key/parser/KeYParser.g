@@ -2298,18 +2298,15 @@ array_decls[Pair<Sort,Type> p, boolean checksort] returns [Sort s = null]
     ;
     
 
-attrid returns [String attr = "";]
+attrid[Sort prefixSort] returns [String attr = "";]
 @init{
-  classRef = "";
-  KeYJavaType kjt = null;
-  boolean brackets = false;
+  classRef = prefixSort.name().toString();
 } : 
         
     id = simple_ident 
-       (AT LPAREN classRef = simple_ident_dots (EMPTYBRACKETS {brackets = true;})? RPAREN {
-            if(brackets) classRef += "[]";
+       (AT LPAREN classRef = simple_ident_dots (EMPTYBRACKETS {classRef += "[]";})? RPAREN {
             if (!isDeclParser()) {
-	        kjt = getTypeByClassName(classRef);
+	        KeYJavaType kjt = getTypeByClassName(classRef);
 		if(kjt == null)
                   throw new NotDeclException
                     ("Class " + classRef + " is unknown.", 
@@ -2317,10 +2314,9 @@ attrid returns [String attr = "";]
                      getColumn());
 		classRef = kjt.getFullName();
             }
-         classRef+="::";
        })? 
     {
-	attr = classRef+id;
+        attr = classRef + "::" + id;
     }
     ;
 
@@ -2744,7 +2740,7 @@ attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix 
         ( 
            (IDENT (AT LPAREN simple_ident_dots RPAREN)? LPAREN)=>( result = query[prefix])
            | 
-           attributeName = attrid 
+           attributeName = attrid[prefix.sort()]
            {   
               v = getAttribute(prefix.sort(), attributeName);
               result = createAttributeTerm(prefix, v);
