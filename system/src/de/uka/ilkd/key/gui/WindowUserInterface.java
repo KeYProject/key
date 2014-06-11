@@ -304,7 +304,7 @@ public class WindowUserInterface extends AbstractUserInterface {
                p.dispose();
            }
            proof.dispose();
-           mainWindow.getProofView().removeProofs(rootTaskProofs);
+           mainWindow.getProofTreeView().removeProofs(rootTaskProofs);
 
            // The original code of this method. Necessary?
            mainWindow.getProofList().removeProof(proof);

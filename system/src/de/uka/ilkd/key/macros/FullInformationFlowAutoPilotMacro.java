@@ -40,11 +40,6 @@ public class FullInformationFlowAutoPilotMacro extends AbstractProofMacro {
                 "<li>Try to close as many goals as possible</ol>";
     }
 
-    @Override
-    public boolean finishAfterMacro() {
-        return true;
-    }
-
     private ProofMacro createProofMacro() {
         final SequentialProofMacro stateExpansionAndCloseMacro =
                 new SequentialProofMacro() {

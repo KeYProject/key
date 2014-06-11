@@ -85,11 +85,6 @@ public class TryCloseMacro extends AbstractProofMacro {
                 "Applies only to goals beneath the selected node.";
     }
 
-    @Override
-    public boolean finishAfterMacro() {
-        return true;
-    }
-
     /*
      * This macro is always applicable.
      */

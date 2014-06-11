@@ -33,18 +33,10 @@ abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractProofMacr
         return "Finish auxiliary computation";
     }
 
-
     @Override
     public String getDescription() {
         return "Finish auxiliary computation.";
     }
-
-
-    @Override
-    public boolean finishAfterMacro() {
-		return true;
-    }
-
 
     static Term calculateResultingTerm(Proof proof,
                                        IFProofObligationVars ifVars,
@@ -66,7 +58,6 @@ abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractProofMacr
         return composedStates;
     }
 
-
     private static Term[] buildExecution(ProofObligationVars c,
                                          Map<Term, Term> vsMap,
                                          ImmutableList<de.uka.ilkd.key.proof.Goal> symbExecGoals,
@@ -87,7 +78,6 @@ abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractProofMacr
         return result;
     }
 
-
     private static Term[] buildFormulasFromGoals(ImmutableList<Goal> symbExecGoals) {
         Term[] result = new Term[symbExecGoals.size()];
         int i = 0;
@@ -97,7 +87,6 @@ abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractProofMacr
         }
         return result;
     }
-
 
     private static Term buildFormulaFromGoal(Goal symbExecGoal) {
         final TermBuilder tb = symbExecGoal.proof().getServices().getTermBuilder();
@@ -110,7 +99,6 @@ abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractProofMacr
         }
         return result;
     }
-
 
     protected static void addContractApplicationTaclets(Goal initiatingGoal,
                                                         Proof symbExecProof) {

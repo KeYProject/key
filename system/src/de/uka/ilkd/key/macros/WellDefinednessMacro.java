@@ -71,9 +71,10 @@ public class WellDefinednessMacro extends StrategyProofMacro {
             return false;
         }
         final ContractPO po = mediator.getServices().getSpecificationRepository().getPOForProof(proof);
-        if (!(po instanceof WellDefinednessPO
-                        || po instanceof FunctionalOperationContractPO)) {
-            // applicable for all well-definedness checks
+        if (po instanceof WellDefinednessPO) { // applicable for all well-definedness checks
+            return true;
+        }
+        if (!(po instanceof FunctionalOperationContractPO)) {
             return false;
         }
         for (Goal goal: goals) {

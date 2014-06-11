@@ -47,11 +47,6 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      */
     private ProofMacro[] proofMacros = null;
 
-    @Override
-    public boolean finishAfterMacro() {
-        return true;
-    }
-
     /**
      * Creates the proof macro array.
      *

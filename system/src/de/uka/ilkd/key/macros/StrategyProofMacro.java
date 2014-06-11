@@ -45,11 +45,6 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
 
     protected abstract Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc);
 
-    @Override
-    public boolean finishAfterMacro() {
-        return true;
-    }
-
     /**
      * {@inheritDoc}
      *

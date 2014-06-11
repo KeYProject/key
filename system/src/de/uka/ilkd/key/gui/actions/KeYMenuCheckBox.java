@@ -30,7 +30,16 @@ public abstract class KeYMenuCheckBox extends JCheckBoxMenuItem {
     private static final long serialVersionUID = -4156054085757784178L;
     protected final MainWindowAction mainWindowAction;
 
+    /*
+     * If this constructor is used, default selected state for the CheckBox
+     * is false.
+     */
     KeYMenuCheckBox(MainWindow mainWindow, String label) {
+        this(mainWindow, label, false);
+    }
+
+    KeYMenuCheckBox(MainWindow mainWindow, String label, boolean selectedState) {
+        super("", selectedState);
         final KeYMenuCheckBox checkBox = this;
         mainWindowAction = new MainWindowAction(mainWindow) {
             /**

@@ -46,11 +46,6 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro {
     }
 
     @Override
-    public boolean finishAfterMacro() {
-        return true;
-    }
-
-    @Override
     public boolean canApplyTo(KeYMediator mediator,
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
