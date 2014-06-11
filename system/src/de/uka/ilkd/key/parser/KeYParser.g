@@ -953,13 +953,11 @@ options {
 
     private Term termForParsedVariable(ParsableVariable v) 
         throws RecognitionException/*SemanticException*/ {
-        if ( v instanceof LogicVariable || v instanceof ProgramVariable) {
+        if ( v instanceof LogicVariable || v instanceof ProgramVariable || isTermParser()) {
             return getTermFactory().createTerm(v);
         } else {
 	  if(isGlobalDeclTermParser())
-		semanticError(v + " is not a logic variable");          
-  	  if(isTermParser())
-               semanticError(v + " is an unknown kind of variable.");
+		semanticError(v + " is not a logic variable");
 	  if (inSchemaMode() && v instanceof SchemaVariable ) {
                return getTermFactory().createTerm(v);
           } else {

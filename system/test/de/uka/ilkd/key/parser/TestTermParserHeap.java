@@ -37,9 +37,11 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         return javaInfo.getServices();
     }
 
-    public void testAtHeapSyntax() {
+    public void testFieldAtHeapSyntax() {
+        // start with testing parsability of individual terms
         parseTerm("h");
         parseTerm("a.f");
+        // test new syntax
         parseTerm("a.f@h");
     }
 
