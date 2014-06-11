@@ -42,6 +42,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.RuleCollection;
 import de.uka.ilkd.key.proof.io.KeYFileForTests;
 import de.uka.ilkd.key.proof.io.RuleSource;
+import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
 public class TacletForTests {
 
@@ -56,9 +57,9 @@ public class TacletForTests {
     public static AbbrevMap scm = new AbbrevMap();
 
     public static NamespaceSet nss = new NamespaceSet();
-    public static TacletIndex rules= null;
+    public static TacletIndex rules = null;
     public static Services services;
-    public static File lastFile=null;
+    public static File lastFile = null;
 
     public static Namespace variables = null;
 
@@ -66,7 +67,7 @@ public class TacletForTests {
         @Override
         public RuleCollection getStandardRules() {
             return new RuleCollection(
-                    RuleSource.initRuleFile("ldt.key"),
+                    RuleSource.initRuleFile(ldtFile),
                     ImmutableSLList.<BuiltInRule>nil());
         }
     };

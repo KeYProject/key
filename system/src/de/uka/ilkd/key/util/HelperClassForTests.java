@@ -29,6 +29,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.RuleCollection;
 import de.uka.ilkd.key.proof.io.RuleSource;
+import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 import de.uka.ilkd.key.rule.BuiltInRule;
 
 /**
@@ -41,9 +42,10 @@ public class HelperClassForTests {
     
     private static final Profile profile = new JavaProfile() {
             //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
+            @Override
 	    public RuleCollection getStandardRules() {
                 return new RuleCollection(
-                                RuleSource.initRuleFile("ldt.key"), 
+                                RuleSource.initRuleFile(ldtFile), 
                                 ImmutableSLList.<BuiltInRule>nil());
             }
         };

@@ -26,6 +26,9 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 public class RuleSource {
 
     private static final String PATH_TO_RULES = "rules/";
+    
+    // key-file containing ldt declarations
+    public static final String ldtFile = "ldt.key";
 
     private URL url=null;
 
