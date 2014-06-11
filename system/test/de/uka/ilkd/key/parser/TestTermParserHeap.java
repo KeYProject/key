@@ -26,7 +26,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     @Override
     public void setUp() {
-        parseDecls("\\schemaVar \\term Heap h;");
+        parseDecls("\\schemaVariables {\\term Heap h;}");
         parseDecls("\\programVariables { testTermParserHeap.A a; }");
     }
 
@@ -37,8 +37,10 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         return javaInfo.getServices();
     }
 
-    public void testX() {
-        System.out.println(parseTerm("a.f@(h)"));
+    public void testAtHeapSyntax() {
+        parseTerm("h");
+        parseTerm("a.f");
+        parseTerm("a.f@h");
     }
 
 }

@@ -2749,7 +2749,7 @@ attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix 
            attributeName = attrid 
            {   
               v = getAttribute(prefix.sort(), attributeName);
-	      result = createAttributeTerm(prefix, v);
+              result = createAttributeTerm(prefix, v);
            }   
         )
  ;
