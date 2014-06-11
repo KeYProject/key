@@ -2296,29 +2296,6 @@ array_decls[Pair<Sort,Type> p, boolean checksort] returns [Sort s = null]
             }
         }     
     ;
-    
-
-attrid[Sort prefixSort] returns [String attr = "";]
-@init{
-  classRef = prefixSort.name().toString();
-} : 
-        
-    id = simple_ident 
-       (AT LPAREN classRef = simple_ident_dots (EMPTYBRACKETS {classRef += "[]";})? RPAREN {
-            if (!isDeclParser()) {
-	        KeYJavaType kjt = getTypeByClassName(classRef);
-		if(kjt == null)
-                  throw new NotDeclException
-                    ("Class " + classRef + " is unknown.", 
-                     classRef, getSourceName(), getLine(), 
-                     getColumn());
-		classRef = kjt.getFullName();
-            }
-       })? 
-    {
-        attr = classRef + "::" + id;
-    }
-    ;
 
 id_declaration returns [ IdDeclaration idd = null ]
     :
@@ -2740,46 +2717,66 @@ attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix 
         ( 
            (IDENT (AT LPAREN simple_ident_dots RPAREN)? LPAREN)=>( result = query[prefix])
            | 
-           attributeName = attrid[prefix.sort()]
+           attributeName = attrid[prefix]
            {   
               v = getAttribute(prefix.sort(), attributeName);
               result = createAttributeTerm(prefix, v);
            }   
         )
  ;
-        catch [TermCreationException ex] {
-              keh.reportException
-		(new KeYSemanticException(input, getSourceName(), ex));
+catch [TermCreationException ex] {
+        keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+    }
+
+attrid[Term prefix] returns [String attr = "";]
+@init{
+  classRef = prefix.sort().name().toString();
+} : 
+        
+    id = simple_ident 
+       (AT LPAREN classRef = simple_ident_dots
+            (EMPTYBRACKETS {classRef += "[]";})?
+        RPAREN {
+        if (!isDeclParser()) {
+	        KeYJavaType kjt = getTypeByClassName(classRef);
+            if(kjt == null)
+                throw new NotDeclException
+                    ("Class " + classRef + " is unknown.", 
+                     classRef, getSourceName(), getLine(), 
+                     getColumn());
+            classRef = kjt.getFullName();
         }
+    })? 
+    {
+        attr = classRef + "::" + id;
+    }
+    ;
 
 query [Term prefix] returns [Term result = null] 
 @init{
-    classRef = "";
-    boolean brackets = false;
+    classRef = prefix.sort().name().toString();
 }
     :
-    mid=IDENT (AT LPAREN classRef = simple_ident_dots (EMPTYBRACKETS {brackets = true;} )? RPAREN)? args = argument_list
-    { 
-       if("".equals(classRef)){
-          classRef = prefix.sort().name().toString();
-       }else{
-         if(brackets) classRef += "[]";
-         KeYJavaType kjt = getTypeByClassName(classRef);
-         if(kjt == null)
-           throw new NotDeclException
-             ("Class " + classRef + " is unknown.", 
-              classRef, getSourceName(), getLine(), 
-              getColumn());
-         classRef = kjt.getFullName();
-       }
-       result = getServices().getJavaInfo().getProgramMethodTerm
-                (prefix, mid.getText(), args, classRef);
+    mid=IDENT
+        (AT LPAREN classRef = simple_ident_dots
+            (EMPTYBRACKETS {classRef += "[]";} )?
+        RPAREN {
+            KeYJavaType kjt = getTypeByClassName(classRef);
+            if(kjt == null)
+                throw new NotDeclException
+                    ("Class " + classRef + " is unknown.", 
+                     classRef, getSourceName(), getLine(), 
+                     getColumn());
+            classRef = kjt.getFullName();
+        })?
+    args = argument_list
+    {
+        result = getServices().getJavaInfo().getProgramMethodTerm(prefix, mid.getText(), args, classRef);
     }        
- ;
-        catch [TermCreationException ex] {
-              keh.reportException
-		(new KeYSemanticException(input, getSourceName(), ex));
-        }
+    ;
+catch [TermCreationException ex] {
+        keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+    }
 
 static_query returns [Term result = null] 
 @init{
