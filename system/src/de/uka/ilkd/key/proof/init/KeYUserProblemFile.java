@@ -29,6 +29,7 @@ import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import org.antlr.runtime.RecognitionException;
 
 
 /** 
@@ -192,13 +193,13 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * Reads a saved proof of a .key file.
      */
     public void readProof(IProofFileParser prl) throws ProofInputException {
-	if(lastParser == null) {
-	    readProblem();
-	}
+        if (lastParser == null) {
+            readProblem();
+        }
         try {
             lastParser.proof(prl);
-        } catch(antlr.ANTLRException e) {
-            throw new ProofInputException(e);
+        } catch (RecognitionException ex) {
+            throw new ProofInputException(ex);
         }
     }
         

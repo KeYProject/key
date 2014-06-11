@@ -22,9 +22,12 @@ import org.antlr.runtime.ANTLRStringStream;
 
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
+/*
+ * Extends generated class {@link KeYLexer} with custom constructors.
+ */
 public class KeYLexerF extends KeYLexer {
 
-    public KeYLexerF(InputStream file, String fileName, KeYExceptionHandler keh) throws IOException{
+    public KeYLexerF(InputStream file, String fileName, KeYExceptionHandler keh) throws IOException {
         super(getStream(new ANTLRInputStream(file), fileName), keh);
     }
 
@@ -38,8 +41,8 @@ public class KeYLexerF extends KeYLexer {
     }
 
     /*
-    * Use this to set stream name before sending it to super constructor.
-    */
+     * Use this to set stream name before sending it to super constructor.
+     */
     static ANTLRStringStream getStream(ANTLRStringStream stream, String fileName) {
         stream.name = fileName;
         return stream;

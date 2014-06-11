@@ -30,6 +30,7 @@ import de.uka.ilkd.key.proof.SVInstantiationParserException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import org.antlr.runtime.RecognitionException;
 
 
 public class IfChoiceModel extends DefaultComboBoxModel {
@@ -42,13 +43,13 @@ public class IfChoiceModel extends DefaultComboBoxModel {
     private static final String manualText="Manual Input";
     private String manualInput;
     //    private RuleApp app;
-    private Term ifFma;
+    private final Term ifFma;
 
 
    /** namespaces (variables, functions, sorts, etc.) */
-    private NamespaceSet nss;
-    private AbbrevMap scm;
-    private Services services;
+    private final NamespaceSet nss;
+    private final AbbrevMap scm;
+    private final Services services;
 
 
     public IfChoiceModel ( Term                         p_ifFma,
@@ -108,8 +109,9 @@ public class IfChoiceModel extends DefaultComboBoxModel {
      * parses and returns the term encoded as string 's' 
      * @param s the String to parse 
      * @return the term encoded in 's' 
+     * @throws org.antlr.runtime.RecognitionException In case an exceptions occurs during parse.
      */
-    public Term parseFormula(String s) throws antlr.ANTLRException {
+    public Term parseFormula(String s) throws RecognitionException {
 	KeYParserF p = stringParser(s);
 	return p.formula();
     }
@@ -122,28 +124,23 @@ public class IfChoiceModel extends DefaultComboBoxModel {
      */
     public IfFormulaInstantiation getSelection(int pos) 
 	throws SVInstantiationParserException, MissingInstantiationException {
-	Object o = getSelectedItem();
-	if (o != manualText) {
-	    return (IfFormulaInstantiation)o;
-	}
-	try {
- 	    if (manualInput == null || "".equals(manualInput)) {
-		throw new MissingInstantiationException(
-		    "'\\assumes'-formula: " + 
-		    ProofSaver.printAnything(ifFma, services), pos, -1, true);
-	    }
+        Object o = getSelectedItem();
+        if (o != manualText) {
+            return (IfFormulaInstantiation) o;
+        }
+        try {
+            if (manualInput == null || "".equals(manualInput)) {
+                throw new MissingInstantiationException(
+                        "'\\assumes'-formula: "
+                        + ProofSaver.printAnything(ifFma, services), pos, -1, true);
+            }
 
-	    return new IfFormulaInstDirect ( new SequentFormula ( parseFormula(manualInput) ) );
-	} catch (antlr.RecognitionException are) {
- 	    throw new SVInstantiationParserException
- 		( manualInput, pos, are.getColumn(), 
-		  "Problem occured parsing a manual input"
- 		  + " of an '\\assumes'-sequent.\n" +  are.getMessage(), true);
-	} catch (antlr.ANTLRException e) {
- 	    throw new SVInstantiationParserException
- 		( manualInput, pos, -1, "Problem occured parsing a manual input"
- 		  +" of an '\\assumes'-sequent.\n" +  e.getMessage(), true);
- 	} 
+            return new IfFormulaInstDirect(new SequentFormula(parseFormula(manualInput)));
+        } catch (RecognitionException e) {
+            throw new SVInstantiationParserException(manualInput, pos, e.charPositionInLine,
+                    "Problem occured parsing a manual input"
+                    + " of an '\\assumes'-sequent.\n" + e.getMessage(), true);
+        }
     }
 
 }

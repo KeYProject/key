@@ -38,6 +38,7 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import org.antlr.runtime.RecognitionException;
 
 
 /** 
@@ -280,7 +281,7 @@ public class KeYFile implements EnvInput {
             javaPathAlreadyParsed = true;
             
             return javaPath;
-        } catch (antlr.ANTLRException e) {
+        } catch (RecognitionException e) {
             throw new ProofInputException(e);
         } catch (IOException ioe) {
             throw new ProofInputException(ioe);
@@ -337,7 +338,7 @@ public class KeYFile implements EnvInput {
             } finally {
                 cinp.close();
             }
-	} catch (antlr.ANTLRException e) {
+	} catch (RecognitionException e) {
 	    throw new ProofInputException(e);
 	} catch (FileNotFoundException fnfe) {
 	    throw new ProofInputException(fnfe);
@@ -361,7 +362,7 @@ public class KeYFile implements EnvInput {
             } finally {
                 is.close();
             }
-	} catch (antlr.ANTLRException e) {
+	} catch (RecognitionException e) {
 	    throw new ProofInputException(e);
 	} catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
@@ -384,7 +385,7 @@ public class KeYFile implements EnvInput {
             } finally {
                 is.close();
             }
-	} catch (antlr.ANTLRException e) {
+	} catch (RecognitionException e) {
 	    throw new ProofInputException(e);
 	} catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
@@ -423,7 +424,7 @@ public class KeYFile implements EnvInput {
             } finally {
                 cinp.close();
             }
-	} catch (antlr.ANTLRException e) {
+	} catch (RecognitionException e) {
 	    throw new ProofInputException(e);
 	} catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
