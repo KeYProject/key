@@ -80,6 +80,11 @@ Revision 2.0.0:
      ** possible to run multiple solvers in parallel
      ** support for integer division (Z3 only) 
   * > 150 bug fixes 
+  * Discontinued features
+     ** RTSJ support
+     ** Test case generation
+     ** OCL
+     ** Proof reuse
 
 Revision 1.6.5:
 ===============
