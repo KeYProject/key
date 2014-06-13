@@ -80,6 +80,14 @@ public class ObjectDiagramToolBehaviorProvider extends DefaultToolBehaviorProvid
    }
 
    /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isShowFlyoutPalette() {
+      return !isReadOnly();
+   }
+
+   /**
     * Made sure that always the correct contributor ID is returned
     * and that it is not computed by the active diagram which fails
     * for object diagrams opened from the symbolic execution tree view.
