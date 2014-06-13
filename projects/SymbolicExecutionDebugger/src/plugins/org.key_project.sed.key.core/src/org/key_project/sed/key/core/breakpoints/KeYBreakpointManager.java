@@ -15,6 +15,7 @@ package org.key_project.sed.key.core.breakpoints;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IResource;
@@ -28,19 +29,23 @@ import org.eclipse.jdt.internal.debug.core.breakpoints.JavaLineBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaMethodBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaWatchpoint;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.SymbolicExecutionExceptionBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.FieldWatchpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.LineBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.MethodBreakpoint;
+import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.SymbolicExecutionExceptionBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 
 // TODO: Document class
@@ -326,5 +331,32 @@ public class KeYBreakpointManager {
     */
    public Map<IBreakpoint, de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint> getBreakpointMap() {
       return breakpointMap;
+   }
+
+   /**
+    * Returns the available {@link IBreakpoint}s.
+    * @return The available {@link IBreakpoint}s.
+    */
+   public IBreakpoint[] getBreakpoints() {
+      Set<IBreakpoint> keys = breakpointMap.keySet();
+      return keys.toArray(new IBreakpoint[keys.size()]);
+   }
+
+   public boolean checkBreakpointHit(IBreakpoint breakpoint, IKeYSEDDebugNode<IExecutionNode> node) {
+      de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint keyBreakpoint = breakpointMap.get(breakpoint);
+      if (keyBreakpoint != null) {
+         IExecutionNode enode = node.getExecutionNode();
+         Node proofNode = enode.getProofNode();
+         if (enode instanceof IExecutionStateNode<?>) {
+            IExecutionStateNode<?> senode = (IExecutionStateNode<?>)enode;
+            return keyBreakpoint.isBreakpointHit(senode.getActiveStatement(), proofNode.getAppliedRuleApp(), enode.getProof(), proofNode);
+         }
+         else {
+            return keyBreakpoint.isBreakpointHit(null, proofNode.getAppliedRuleApp(), enode.getProof(), proofNode);
+         }
+      }
+      else {
+         return false;
+      }
    }
 }

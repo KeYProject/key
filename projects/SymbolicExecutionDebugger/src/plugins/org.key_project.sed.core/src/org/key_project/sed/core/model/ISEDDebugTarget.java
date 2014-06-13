@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ITerminate;
 import org.eclipse.debug.core.model.IThread;
@@ -153,4 +154,17 @@ public interface ISEDDebugTarget extends ISEDDebugElement, IDebugTarget {
     * @throws DebugException Occurred Exception.
     */
    public Map<String, String> computeStatistics(IProgressMonitor monitor) throws DebugException;
+   
+   /**
+    * Returns all currently used {@link IBreakpoint}s.
+    * @return The currently used {@link IBreakpoint}s.
+    */
+   public IBreakpoint[] getBreakpoints();
+   
+   /**
+    * Returns all {@link IBreakpoint}s which are fulfilled in the given {@link ISEDDebugNode}.
+    * @param node The {@link ISEDDebugNode} to check.
+    * @return The fulfilled {@link IBreakpoint}s in the given {@link ISEDDebugNode}.
+    */
+   public IBreakpoint[] computeHitBreakpoints(ISEDDebugNode node) throws DebugException;
 }
