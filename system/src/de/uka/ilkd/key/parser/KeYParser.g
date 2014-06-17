@@ -2712,17 +2712,16 @@ attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix 
     attributeName = "";    
 }    
 @after { _attribute_or_query_suffix = result; }
-    :   
-        DOT 
-        ( 
+    :   AT LPAREN t=term RPAREN {result = t;}
+		// commented out for testing
+        /* | ( DOT 
            (IDENT (AT LPAREN simple_ident_dots RPAREN)? LPAREN)=>( result = query[prefix])
-           | 
-           attributeName = attrid[prefix]
+           | attributeName = attrid[prefix]
            {   
               v = getAttribute(prefix.sort(), attributeName);
               result = createAttributeTerm(prefix, v);
-           }   
-        )
+           }
+		)*/
  ;
 catch [TermCreationException ex] {
         keh.reportException(new KeYSemanticException(input, getSourceName(), ex));

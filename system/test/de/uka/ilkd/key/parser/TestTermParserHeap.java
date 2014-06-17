@@ -4,6 +4,7 @@ import java.io.File;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 /**
@@ -42,7 +43,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         parseTerm("h");
         parseTerm("a.f");
         // test new syntax
-        parseTerm("a.f@h");
+        Term t = parseTerm("a.f@(h)");
     }
 
 }
