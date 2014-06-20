@@ -953,11 +953,13 @@ options {
 
     private Term termForParsedVariable(ParsableVariable v) 
         throws RecognitionException/*SemanticException*/ {
-        if ( v instanceof LogicVariable || v instanceof ProgramVariable || isTermParser()) {
+        if ( v instanceof LogicVariable || v instanceof ProgramVariable) {
             return getTermFactory().createTerm(v);
         } else {
 	  if(isGlobalDeclTermParser())
-		semanticError(v + " is not a logic variable");
+		semanticError(v + " is not a logic variable");          
+  	  if(isTermParser())
+               semanticError(v + " is an unknown kind of variable.");
 	  if (inSchemaMode() && v instanceof SchemaVariable ) {
                return getTermFactory().createTerm(v);
           } else {
@@ -2712,16 +2714,15 @@ attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix 
     attributeName = "";    
 }    
 @after { _attribute_or_query_suffix = result; }
-    :   AT LPAREN t=term RPAREN {result = t;}
-		// commented out for testing
-        /* | ( DOT 
+    :   DOT 
+        ( 
            (IDENT (AT LPAREN simple_ident_dots RPAREN)? LPAREN)=>( result = query[prefix])
            | attributeName = attrid[prefix]
            {   
               v = getAttribute(prefix.sort(), attributeName);
               result = createAttributeTerm(prefix, v);
            }
-		)*/
+        )
  ;
 catch [TermCreationException ex] {
         keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
