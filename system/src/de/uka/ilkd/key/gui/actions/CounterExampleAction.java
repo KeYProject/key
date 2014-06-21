@@ -12,9 +12,6 @@
 //
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.util.LinkedList;
-import java.util.List;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
@@ -24,7 +21,10 @@ import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.util.Debug;
-import javax.swing.SwingWorker;
+import java.awt.event.ActionEvent;
+import java.util.*;
+import javax.swing.*;
+import static javax.swing.Action.SMALL_ICON;
 
 @SuppressWarnings("serial")
 public class CounterExampleAction extends MainWindowAction {
@@ -36,6 +36,8 @@ public class CounterExampleAction extends MainWindowAction {
         super(mainWindow);
         setName(NAME);
         setTooltip(TOOLTIP);
+        Icon icon = IconFactory.counterExample(MainWindow.TOOLBAR_ICON_SIZE);
+        putValue(SMALL_ICON, icon);
         init();
     }
 
