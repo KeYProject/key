@@ -2778,32 +2778,6 @@ catch [TermCreationException ex] {
     keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
-query [Term prefix] returns [Term result = null] 
-@init{
-    classRef = prefix.sort().name().toString();
-}
-    :
-    mid=IDENT
-        (AT LPAREN classRef = simple_ident_dots
-            (EMPTYBRACKETS {classRef += "[]";} )?
-        RPAREN {
-            KeYJavaType kjt = getTypeByClassName(classRef);
-            if(kjt == null)
-                throw new NotDeclException
-                    ("Class " + classRef + " is unknown.", 
-                     classRef, getSourceName(), getLine(), 
-                     getColumn());
-            classRef = kjt.getFullName();
-        })?
-    args = argument_list
-    {
-        result = getServices().getJavaInfo().getProgramMethodTerm(prefix, mid.getText(), args, classRef);
-    }        
-    ;
-catch [TermCreationException ex] {
-        keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
-    }
-
 static_query returns [Term result = null] 
 @init{
     queryRef = "";
