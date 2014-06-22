@@ -2778,36 +2778,6 @@ catch [TermCreationException ex] {
     keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
-static_query returns [Term result = null] 
-@init{
-    queryRef = "";
-}
-    :
-    queryRef =  staticAttributeOrQueryReference args = argument_list
-    { 
-       int index = queryRef.indexOf(':');
-       String className = queryRef.substring(0, index); 
-       String qname = queryRef.substring(index+2); 
-       result = getServices().getJavaInfo().getProgramMethodTerm(null, qname, args, className);
-       if(result == null && isTermParser()) {
-	  final Sort sort = lookupSort(className);
-          if (sort == null) {
-		semanticError("Could not find matching sort for " + className);
-          }
-          KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
-          if (kjt == null) {
-		semanticError("Found logic sort for " + className + 
-		 " but no corresponding java type!");
-          }          
-       }
-	    
-    }        
- ;
-        catch [TermCreationException ex] {
-        keh.reportException
-		(new KeYSemanticException(input, getSourceName(), ex));
-        }
-
 //term120
 accessterm returns [Term _accessterm = null] 
 @after { _accessterm = result; }
@@ -2851,10 +2821,38 @@ accessterm returns [Term _accessterm = null]
          | result = heap_update_suffix[result]
          )*
  ;
-        catch [TermCreationException ex] {
-               keh.reportException
-                (new KeYSemanticException(input, getSourceName(), ex));
-        }
+catch [TermCreationException ex] {
+    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+}
+        
+static_query returns [Term result = null] 
+@init{
+    queryRef = "";
+}
+    :
+    queryRef =  staticAttributeOrQueryReference args = argument_list
+    { 
+       int index = queryRef.indexOf(':');
+       String className = queryRef.substring(0, index); 
+       String qname = queryRef.substring(index+2); 
+       result = getServices().getJavaInfo().getProgramMethodTerm(null, qname, args, className);
+       if(result == null && isTermParser()) {
+	  final Sort sort = lookupSort(className);
+          if (sort == null) {
+		semanticError("Could not find matching sort for " + className);
+          }
+          KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
+          if (kjt == null) {
+		semanticError("Found logic sort for " + className + 
+		 " but no corresponding java type!");
+          }          
+       }
+	    
+    }        
+ ;
+catch [TermCreationException ex] {
+    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+}
 
 heap_update_suffix [Term heap] returns [Term _heap_update_suffix = null]
 @init { result = heap; }
