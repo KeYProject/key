@@ -2706,27 +2706,21 @@ static_attribute_suffix returns [Term result = null]
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
-
 attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix = null]
-@init{
-    Operator v = null;
-    result = prefix;
-    attributeName = "";    
-}    
 @after { _attribute_or_query_suffix = result; }
-    :   DOT 
-        ( 
-           (IDENT (AT LPAREN simple_ident_dots RPAREN)? LPAREN)=>( result = query[prefix])
-           | attributeName = attrid[prefix]
-           {   
-              v = getAttribute(prefix.sort(), attributeName);
-              result = createAttributeTerm(prefix, v);
-           }
-        )
- ;
+    :
+    DOT memberName = attrid[prefix]
+    (
+        result = querySuffix[prefix, memberName]
+        | /* epsilon */ {
+            Operator v = getAttribute(prefix.sort(), memberName);
+            result = createAttributeTerm(prefix, v);
+        }
+    )
+    ;
 catch [TermCreationException ex] {
-        keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
-    }
+    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+}
 
 attrid[Term prefix] returns [String attr = "";]
 @init{
@@ -2751,6 +2745,38 @@ attrid[Term prefix] returns [String attr = "";]
         attr = classRef + "::" + id;
     }
     ;
+    
+querySuffix [Term prefix, String memberName] returns [Term result = null] 
+@init{
+    String classRef, name;
+    boolean brackets = false;
+}
+    :
+    args = argument_list
+    {
+       if(memberName.indexOf("::") == -1) {
+          classRef = prefix.sort().name().toString();
+          name = memberName;
+       } else {
+          String parts[] = memberName.split("::", 2);
+          classRef = parts[0];
+          name = parts[1];
+       }
+       KeYJavaType kjt = getTypeByClassName(classRef);
+       if(kjt == null)
+          throw new NotDeclException
+             ("Class " + classRef + " is unknown.", 
+              classRef, getSourceName(), getLine(), 
+              getColumn());
+       classRef = kjt.getFullName();
+
+       result = getServices().getJavaInfo().getProgramMethodTerm
+                (prefix, name, args, classRef);
+    }
+ ;
+catch [TermCreationException ex] {
+    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+}
 
 query [Term prefix] returns [Term result = null] 
 @init{
