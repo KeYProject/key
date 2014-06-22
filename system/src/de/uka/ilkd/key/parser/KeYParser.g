@@ -2710,13 +2710,13 @@ attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix 
 @after { _attribute_or_query_suffix = result; }
     :
     DOT memberName = attrid
-    (
-        result = querySuffix[prefix, memberName]
-        | /* epsilon */ {
+    (result = querySuffix[prefix, memberName] {assert result != null;})?
+    {
+        if(result == null){
             Operator v = getAttribute(prefix.sort(), memberName);
             result = createAttributeTerm(prefix, v);
         }
-    )
+    }
     ;
 catch [TermCreationException ex] {
     keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
