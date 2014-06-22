@@ -2709,7 +2709,7 @@ static_attribute_suffix returns [Term result = null]
 attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix = null]
 @after { _attribute_or_query_suffix = result; }
     :
-    DOT memberName = attrid[prefix]
+    DOT memberName = attrid
     (
         result = querySuffix[prefix, memberName]
         | /* epsilon */ {
@@ -2722,28 +2722,14 @@ catch [TermCreationException ex] {
     keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
-attrid[Term prefix] returns [String attr = "";]
-@init{
-  classRef = prefix.sort().name().toString();
-} : 
-        
-    id = simple_ident 
-       (AT LPAREN classRef = simple_ident_dots
-            (EMPTYBRACKETS {classRef += "[]";})?
-        RPAREN {
-        if (!isDeclParser()) {
-	        KeYJavaType kjt = getTypeByClassName(classRef);
-            if(kjt == null)
-                throw new NotDeclException
-                    ("Class " + classRef + " is unknown.", 
-                     classRef, getSourceName(), getLine(), 
-                     getColumn());
-            classRef = kjt.getFullName();
-        }
-    })? 
-    {
-        attr = classRef + "::" + id;
-    }
+attrid returns [String attr = "";]
+    :
+    // the o.f@(packagename.Classname) syntax has been dropped.
+    // instead, one can write o.(packagename.Classname::f) 
+      id = simple_ident
+        { attr = id; }
+    | LPAREN clss = sort_name DOUBLECOLON id2 = simple_ident RPAREN
+        { attr = clss + "::" + id2; }
     ;
     
 querySuffix [Term prefix, String memberName] returns [Term result = null] 
