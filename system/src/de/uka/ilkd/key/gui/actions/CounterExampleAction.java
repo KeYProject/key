@@ -24,12 +24,11 @@ import de.uka.ilkd.key.util.Debug;
 import java.awt.event.ActionEvent;
 import java.util.*;
 import javax.swing.*;
-import static javax.swing.Action.SMALL_ICON;
 
 @SuppressWarnings("serial")
 public class CounterExampleAction extends MainWindowAction {
 
-    private static final String NAME = "CE";
+    private static final String NAME = "Generate Counterexample";
     private static final String TOOLTIP = "Search for a counterexample for the selected goal";
 
     public CounterExampleAction(MainWindow mainWindow) {
