@@ -46,9 +46,13 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         // test new syntax
         Term t = parseTerm("a.f@h");
         assertEquals(t, parseTerm("int::select(heap, a, testTermParserHeap.A::$f)"));
-        
+
         t = parseTerm("a1.f@h");
         assertEquals(t, parseTerm("int::select(heap, a1, testTermParserHeap.A1::$f)"));
+
+        // a1.(A.f) = int::select(heap, a, A1::$f)
+        t = parseTerm("a1.(testTermParserHeap.A::f)");
+        assertEquals(t, parseTerm("int::select(heap, a1, testTermParserHeap.A::$f)"));
     }
 
 }
