@@ -44,7 +44,7 @@ public class SMTOptionsAction extends MainWindowAction {
 
 public SMTOptionsAction(MainWindow mainWindow) {
 	super(mainWindow);
-	setName("SMT Solvers Options...");
+	setName("SMT Solvers Options");
         setIcon(IconFactory.toolbox(16));
     }
 

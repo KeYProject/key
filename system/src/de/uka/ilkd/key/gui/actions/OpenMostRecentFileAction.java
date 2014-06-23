@@ -33,7 +33,7 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
 
     public OpenMostRecentFileAction(MainWindow mainWindow) {
 	super(mainWindow);
-        setName("Reload ");
+        setName("Reload");
         setIcon(IconFactory.openMostRecent(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Reload last opened file.");
         setAcceleratorLetter(KeyEvent.VK_R);

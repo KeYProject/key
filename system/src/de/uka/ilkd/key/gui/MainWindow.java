@@ -760,7 +760,7 @@ public final class MainWindow extends JFrame  {
 
 
         fileMenu.add(loadUserDefinedTacletsAction);
-        JMenu submenu = new JMenu("Prove...");
+        JMenu submenu = new JMenu("Prove");
         fileMenu.add(submenu);
 
         submenu.add(loadUserDefinedTacletsForProvingAction);
