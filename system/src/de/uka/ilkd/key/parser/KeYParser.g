@@ -911,6 +911,11 @@ options {
         } 
     }
     
+    private boolean isHeapTerm(Term term) {
+        return term != null && term.sort() == 
+            getServices().getTypeConverter().getHeapLDT().targetSort();
+    }
+    
     private void unbindVars(Namespace orig) {
         if(isGlobalDeclTermParser()) {
             Debug.fail("unbindVars was called in Global Declaration Term parser.");
@@ -2790,14 +2795,22 @@ accessterm returns [Term _accessterm = null]
       |
         result = atom
       )
-         ( result = array_access_suffix[result]
+         
+         ( result = accessterm_bracket_suffix[result]
          | result = attribute_or_query_suffix[result]
-         | result = heap_update_suffix[result]
          )*
  ;
 catch [TermCreationException ex] {
     keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
 }
+
+accessterm_bracket_suffix[Term reference] returns [Term resultAtAfter]
+@init{Term result;}
+@after{resultAtAfter = result;}
+    :
+    {isHeapTerm(reference)}? result = heap_update_suffix[reference]
+    | result = array_access_suffix[reference]
+    ;
         
 static_query returns [Term result = null] 
 @init{

@@ -54,5 +54,9 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         t = parseTerm("a1.(testTermParserHeap.A::f)");
         assertEquals(t, parseTerm("int::select(heap, a1, testTermParserHeap.A::$f)"));
     }
+    
+    public void testStoreSyntax(){
+//        parseTerm("heap[a.f := 4]");
+    }
 
 }
