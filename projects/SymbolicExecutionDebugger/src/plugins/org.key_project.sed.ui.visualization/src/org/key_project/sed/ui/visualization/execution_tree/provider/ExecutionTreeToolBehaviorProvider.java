@@ -40,6 +40,7 @@ import org.eclipse.graphiti.tb.IToolBehaviorProvider;
 import org.eclipse.graphiti.ui.internal.GraphitiUIPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
+import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeResumeFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeStepIntoFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeStepOverFeature;
@@ -94,12 +95,14 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
       IContextButtonPadData data = super.getContextButtonPad(context);
       if (isReadOnly()) {
          data.getGenericContextButtons().clear();
+         // collapse
+         if (getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElement()) instanceof ISEDMethodCall) {
+            data.getGenericContextButtons().add(createCustomContextButtonEntry(new MethodCallCollapseFeature(getFeatureProvider()), context, "Collapse", null, IPlatformImageConstants.IMG_EDIT_COLLAPSE));
+         }
+
          List<IContextButtonEntry> epEntries = collectContextButtonEntriesFromExtensionPoint(isReadOnly(), context);
          data.getGenericContextButtons().addAll(epEntries);
          
-         // collapse
-         data.getGenericContextButtons().add(createCustomContextButtonEntry(new MethodCallCollapseFeature(getFeatureProvider()), context, "Collapse", null, IPlatformImageConstants.IMG_EDIT_COLLAPSE));
-
          data.getGenericContextButtons().add(createCustomContextButtonEntry(new DebugNodeVisualizeStateFeature(getFeatureProvider()), context, "Visualize State", null, IExecutionTreeImageConstants.IMG_VISUALIZE_STATE));
 
          data.getGenericContextButtons().add(createCustomContextButtonEntry(new DebugNodeStepReturnFeature(getFeatureProvider()), context, "Step Return", null, IExecutionTreeImageConstants.IMG_STEP_RETURN));

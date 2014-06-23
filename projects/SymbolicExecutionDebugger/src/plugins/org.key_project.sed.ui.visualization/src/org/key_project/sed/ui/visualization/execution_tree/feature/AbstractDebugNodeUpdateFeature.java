@@ -294,6 +294,10 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          monitor.beginTask("Update element: " + pictogramElement, 3);
          boolean success = updateName(pictogramElement, new SubProgressMonitor(monitor, 1));
          monitor.worked(1);
+         
+         Object bo = getBusinessObjectForPictogramElement(pictogramElement);
+         System.out.println("Node: " + bo + ", Picto: " + pictogramElement.getGraphicsAlgorithm());
+         
          // Update children, they have the correct layout after this step
          final int OFFSET = getDiagram().getGridUnit() * 2;
          if (success) {

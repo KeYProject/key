@@ -19,6 +19,7 @@ import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddShapeFeature;
+import org.eclipse.graphiti.internal.ExternalPictogramLink;
 import org.eclipse.graphiti.mm.GraphicsAlgorithmContainer;
 import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
@@ -139,6 +140,9 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
       // create link and wire it
       link(textShape, addedNode);
 
+//      Graphiti.getPeService().setPropertyValue(pictogramElement, "", "");
+      
+      
       int width = context.getWidth() <= 0 ? computeInitialWidth(targetDiagram, text.getValue(), text.getFont()) : context.getWidth();
       int height = context.getHeight() <= 0 ? computeInitialHeight(targetDiagram, text.getValue(), text.getFont()) : context.getHeight();
       gaService.setLocationAndSize(roundedRectangle, context.getX(), context.getY(), width, height);

@@ -2,7 +2,6 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
@@ -10,10 +9,8 @@ import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
 import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.impl.AbstractSEDMethodCall;
-import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
 
 public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFeature {
    /**
