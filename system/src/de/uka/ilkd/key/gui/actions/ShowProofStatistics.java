@@ -31,12 +31,10 @@ public class ShowProofStatistics extends MainWindowAction {
     private static final long serialVersionUID = -8814798230037775905L;
 
     public ShowProofStatistics(MainWindow mainWindow) {
-	super(mainWindow);
-	setName("Show Proof Statistics...");
+	    super(mainWindow);
+	    setName("Show Proof Statistics");
         setIcon(IconFactory.statistics(16));
-	
-	getMediator().enableWhenProofLoaded(this);
-
+	    getMediator().enableWhenProofLoaded(this);
     }
 
     @Override
@@ -49,7 +47,9 @@ public class ShowProofStatistics extends MainWindowAction {
         } else {
 
             final int openGoals = proof.openGoals().size();
-            String stats = (openGoals > 0)? ""+openGoals+" open goals.": "Closed.";
+            String stats;
+            if (openGoals > 0) stats = openGoals+" open goal"+(openGoals > 1? "s.":".");
+            else stats = "Closed.";
             stats += "\n\n";
             for (Pair<String,String> x: proof.statistics().getSummary()) {
                 if ("".equals(x.second)) stats +="\n";
