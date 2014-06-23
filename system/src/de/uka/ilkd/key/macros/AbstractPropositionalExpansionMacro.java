@@ -65,7 +65,8 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
 
     @Override
     protected PropExpansionStrategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
-        return new PropExpansionStrategy(getAdmittedRuleNames(), allowOSS());
+        return new PropExpansionStrategy(mediator.getInteractiveProver().getProof().getActiveStrategy(),
+                        getAdmittedRuleNames(), allowOSS());
     }
 
     /**
@@ -77,9 +78,11 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         private static final Name NAME = new Name(PropExpansionStrategy.class.getSimpleName());
 
         private final Set<String> admittedRuleNames;
+        private final Strategy delegate;
         private final boolean allowOSS;
 
-        public PropExpansionStrategy(Set<String> admittedRuleNames, boolean allowOSS) {
+        public PropExpansionStrategy(Strategy delegate, Set<String> admittedRuleNames, boolean allowOSS) {
+            this.delegate = delegate;
             this.admittedRuleNames = admittedRuleNames;
             this.allowOSS = allowOSS;
         }
@@ -93,8 +96,13 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
             if (ruleApp instanceof OneStepSimplifierRuleApp && allowOSS) {
-                return NumberRuleAppCost.create(-5000);
+                return delegate.computeCost(ruleApp, pio, goal);
             } else if(admittedRuleNames.contains(name)) {
+                final RuleAppCost origCost = delegate.computeCost(ruleApp, pio, goal);
+                // pass through negative costs
+                if (origCost instanceof NumberRuleAppCost && ((NumberRuleAppCost) origCost).getValue() < 0)
+                    return origCost;
+                // cap costs at zero
                 return NumberRuleAppCost.getZeroCost();
             } else {
                 return TopRuleAppCost.INSTANCE;
@@ -103,7 +111,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            return true;
+            return delegate.isApprovedApp(app, pio, goal);
         }
 
         @Override
