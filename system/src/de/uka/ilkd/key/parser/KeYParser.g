@@ -811,27 +811,15 @@ options {
                 }
                 // WATCHOUT why not in DECLARATION MODE	   
                 if(!isDeclParser()) {			      	
-                    final ImmutableList<ProgramVariable> vars = 	
-                    javaInfo.getAllAttributes(attributeName, prefixKJT);
+                    ProgramVariable var = javaInfo.getFieldType(attributeName, prefixKJT);
 
-                    if (vars.size() == 0) {
+                    if (var == null) {
                         semanticError("There is no attribute '" + attributeName + 
                             "' declared in type '" + prefixSort + "'");
-                    }                    
-
-                    if (LogicPrinter.printInShortForm(attributeName, 
-                            prefixSort, getServices())) {       		   
-                        result = vars.head();
-                    } else {
-                        if (vars.size() > 1) {
-                            semanticError
-                            ("Cannot uniquely determine attribute " + attributeName + 
-                                "\n Please specify the exact type by attaching" +
-                                " @( declaredInType ) to the attribute name." + 
-                                "\n Found attributes of the same name in: " + getTypeList(vars));
-                        }
                     }
-                }              
+                            
+                    result = var;
+                }
             }
         }
 

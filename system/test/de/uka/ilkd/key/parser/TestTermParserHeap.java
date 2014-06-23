@@ -29,6 +29,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     public void setUp() {
         parseDecls("\\programVariables {Heap h;}");
         parseDecls("\\programVariables {testTermParserHeap.A a;}");
+        parseDecls("\\programVariables {testTermParserHeap.A1 a1;}");
     }
 
     @Override
@@ -43,7 +44,11 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         parseTerm("h");
         parseTerm("a.f");
         // test new syntax
-        Term t = parseTerm("a.f@(h)");
+        Term t = parseTerm("a.f@h");
+        assertEquals(t, parseTerm("int::select(heap, a, testTermParserHeap.A::$f)"));
+        
+        t = parseTerm("a1.f@h");
+        assertEquals(t, parseTerm("int::select(heap, a1, testTermParserHeap.A1::$f)"));
     }
 
 }

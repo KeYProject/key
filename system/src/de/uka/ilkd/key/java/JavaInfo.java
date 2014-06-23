@@ -995,6 +995,51 @@ public final class JavaInfo {
 	assert s.extendsTrans(objectSort());
         return getAttribute(attributeName, getKeYJavaType(s));
     }
+    
+    /*
+     Traverses type hierarchy to find the first {@link KeYJavaType} in which
+     a field of name programName is declared, starting from parameter type. And
+     then returns a {@link ProgramVariable} for that field/type combination.
+     */
+    public ProgramVariable getFieldType(String programName, KeYJavaType type) {
+
+        ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
+
+        if (!(type.getSort().extendsTrans(objectSort()))) {
+            return null;
+        }
+
+        if (type.getJavaType() instanceof ArrayType) {
+            ProgramVariable var = find(programName, getFields(((ArrayDeclaration) type.getJavaType())
+                    .getMembers()));
+            if (var != null) {
+                result = result.prepend(var);
+            }
+            var = getAttribute(programName, getJavaLangObject());
+            if (var != null) {
+                result = result.prepend(var);
+            }
+            return result.head();
+        }
+
+        // the assert statements below are not for fun, some methods rely
+        // on the correct order
+        ImmutableList<KeYJavaType> hierarchy = kpmi.getAllSupertypes(type);
+        assert hierarchy.head() == type;
+
+        final Iterator<KeYJavaType> it = hierarchy.iterator();
+        while (it.hasNext()) {
+            KeYJavaType st = it.next();
+            if (st != null) {
+                final ProgramVariable var = getAttribute(programName, st);
+                if (var != null) {
+                    return var;
+                }
+            }
+        }
+
+        return null;
+    }
 
     /**
      * returns a list of all attributes with the given program name
