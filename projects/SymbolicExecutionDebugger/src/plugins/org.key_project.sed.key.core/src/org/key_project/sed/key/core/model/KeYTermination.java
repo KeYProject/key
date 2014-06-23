@@ -16,7 +16,6 @@ package org.key_project.sed.key.core.model;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.model.ISEDTermination;
-import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDTermination;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
@@ -50,17 +49,25 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDeb
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param parent The parent in that this node is contained as child.
-    * @param thread The {@link ISEDThread} in that this node is contained.
+    * @param thread The {@link KeYThread} in that this node is contained.
     * @param executionNode The {@link IExecutionTermination} to represent by this debug node.
     */
    public KeYTermination(KeYDebugTarget target, 
                          IKeYSEDDebugNode<?> parent, 
-                         ISEDThread thread, 
+                         KeYThread thread, 
                          IExecutionTermination executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
       initializeAnnotations();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYThread getThread() {
+      return (KeYThread)super.getThread();
    }
    
    /**

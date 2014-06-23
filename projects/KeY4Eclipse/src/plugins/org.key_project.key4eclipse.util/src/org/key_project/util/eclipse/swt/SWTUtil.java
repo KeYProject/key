@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.viewers.AbstractTableViewer;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -31,6 +32,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
@@ -474,6 +476,25 @@ public final class SWTUtil {
              @Override
              public void run() {
                 viewer.setSelection(selection, reveal);
+             }
+          });
+       }
+    }
+    
+    /**
+     * Thread save execution of {@link TreeViewer#expandToLevel(Object, int)}.
+     * @param viewer The {@link TreeViewer} to expand element in.
+     * @param elementOrTreePaths The element to expand.
+     * @param level Non-negative level, or {@link AbstractTreeViewer#ALL_LEVELS} to expand all levels of the tree.
+     */
+    public static void expandToLevel(final TreeViewer viewer, 
+                                     final Object elementOrTreePath,
+                                     final int level) {
+       if (viewer != null && !viewer.getControl().isDisposed()) {
+          viewer.getControl().getDisplay().syncExec(new Runnable() {
+             @Override
+             public void run() {
+                viewer.expandToLevel(elementOrTreePath, level);
              }
           });
        }

@@ -60,6 +60,13 @@ public interface ISEDDebugNode extends ISEDDebugElement {
    public ISEDDebugNode[] getChildren() throws DebugException;
    
    /**
+    * Checks if children are available.
+    * @return {@code true} children are available, {@code false} children are not available.
+    * @throws DebugException Occurred Exception
+    */
+   public boolean hasChildren() throws DebugException;
+   
+   /**
     * Returns the {@link ISEDThread} in that this {@link ISEDDebugNode} is contained 
     * as child. An {@link ISEDThread} returns itself.
     * @return The {@link ISEDThread}.

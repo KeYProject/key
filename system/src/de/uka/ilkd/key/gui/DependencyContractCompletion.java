@@ -165,6 +165,14 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
 
     @Override
     public boolean canComplete(IBuiltInRuleApp app) {
-        return app.rule() instanceof UseDependencyContractRule;
+        return checkCanComplete(app);
     }
+    
+    /**
+     * Checks if the app is supported. 
+     * This functionality is also used by the Eclipse plug-ins like the KeYIDE.
+     */
+    public static boolean checkCanComplete(final IBuiltInRuleApp app) {
+       return app.rule() instanceof UseDependencyContractRule;
+   }
 }

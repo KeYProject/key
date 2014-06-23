@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    
+<comment>
+    These properties define the help comments which are to be displayed
+    in the view pane when selecting term label tree elements.
+</comment>
+
+<entry key="SC">
+The term label SC is used to indicate that a logical operator has originally been "shortcut" operator.
+
+For instance, both conjunction operators in JML (i.e., &amp;&amp; and &amp;) are translated to the same function in JavaDL. To differentiate between the two, the translation of &amp;&amp; adds the label SC. 
+
+This is relevant for welldefinedness checks.
+</entry>
+
+</properties>
+

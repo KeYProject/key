@@ -136,10 +136,13 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
       // Compute branch condition
       if (isMergedBranchCondition()) {
          // Add all merged branch conditions
-         branchCondition = getServices().getTermBuilder().and(getMergedBranchCondtions());
+         Term[] mergedConditions = getMergedBranchCondtions();
+         branchCondition = getServices().getTermBuilder().and(mergedBranchCondtions);
          // Simplify merged branch conditions
-         branchCondition = SymbolicExecutionUtil.simplify(getProof(), branchCondition);
-         branchCondition = SymbolicExecutionUtil.improveReadability(branchCondition, getServices());
+         if (mergedConditions.length >= 2) {
+            branchCondition = SymbolicExecutionUtil.simplify(getProof(), branchCondition);
+            branchCondition = SymbolicExecutionUtil.improveReadability(branchCondition, getServices());
+         }
       }
       else {
          branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true);

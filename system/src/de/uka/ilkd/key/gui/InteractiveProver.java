@@ -23,9 +23,11 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.util.Debug;
+
 import java.util.Iterator;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
@@ -76,7 +78,8 @@ public class InteractiveProver implements InterruptListener {
 
         mediator.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);//XXX
 
-        applyStrategy = new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
+        applyStrategy =
+                new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create(), true);
         applyStrategy.addProverTaskObserver(mediator().getUI());
 
         if (mediator.getAutoSaver() != null) {

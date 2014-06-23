@@ -25,7 +25,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Tests for {@link ProgramMethodPO}.
@@ -126,7 +126,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
                          String precondition,
                          String expectedTryContent) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       HashMap<String, String> originalTacletOptions = null;
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = null;
+      SymbolicExecutionEnvironment<CustomUserInterface> env = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
          // Make sure that the correct taclet options are defined.

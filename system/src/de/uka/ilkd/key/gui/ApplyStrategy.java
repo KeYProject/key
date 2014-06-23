@@ -38,6 +38,7 @@ import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -403,12 +404,15 @@ public class ApplyStrategy {
 
     IGoalChooser goalChooser;
 
+    private boolean finishAfterStrategy;
+
 
     // Please create this object beforehand and re-use it.
     // Otherwise the addition/removal of the InteractiveProofListener
     // can cause a ConcurrentModificationException during ongoing operation
-    public ApplyStrategy(IGoalChooser defaultGoalChooser) {
+    public ApplyStrategy(IGoalChooser defaultGoalChooser, boolean finishAfterStrategy) {
         this.defaultGoalChooser = defaultGoalChooser;
+        this.finishAfterStrategy = finishAfterStrategy;
     }
 
     /** applies rules that are chosen by the active strategy
@@ -524,8 +528,16 @@ public class ApplyStrategy {
     }
 
     private synchronized void fireTaskFinished (TaskFinishedInfo info) {
-        for (ProverTaskListener ptl : proverTaskObservers) {
-            ptl.taskFinished(info);
+        if (finishAfterStrategy) {
+            for (ProverTaskListener ptl : proverTaskObservers) {
+                ptl.taskFinished(info);
+            }
+        } else {
+            for (ProverTaskListener ptl : proverTaskObservers) {
+                if (ptl instanceof UserInterface && !((UserInterface)ptl).macroChosen()) {
+                    ((UserInterface)ptl).finish(info.getProof());
+                }
+            }
         }
     }
 
@@ -547,7 +559,7 @@ public class ApplyStrategy {
     }
 
 
-    public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals) {
+    public synchronized ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals) {
 
         ProofSettings settings = proof.getSettings();
         StrategySettings stratSet = settings.getStrategySettings();
@@ -573,8 +585,11 @@ public class ApplyStrategy {
      *             beforehand if needed
      */
     @Deprecated
-    public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, int maxSteps,
-            long timeout, boolean stopAtFirstNonCloseableGoal) {
+    public synchronized ApplyStrategyInfo start(Proof proof,
+                                   				ImmutableList<Goal> goals,
+                                   				int maxSteps,
+                                   				long timeout,
+                                   				boolean stopAtFirstNonCloseableGoal) {
         assert proof != null;
 
         this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal;
@@ -623,14 +638,11 @@ public class ApplyStrategy {
     }
 
     private void finishStrategy(ApplyStrategyInfo result) {
-//        if (result != null) {
         assert result != null; // CS
-            proof.addAutoModeTime(result.getTime());
-
-        fireTaskFinished (new DefaultTaskFinishedInfo(this, result,
-                proof, result.getTime(),
-                result.getAppliedRuleApps(), result.getClosedGoals()));
-//        }
+        proof.addAutoModeTime(result.getTime());
+        fireTaskFinished (new DefaultTaskFinishedInfo(this, result, proof, result.getTime(),
+                                                      result.getAppliedRuleApps(),
+                                                      result.getClosedGoals()));
     }
 
     // Used to combine multiple iteratively called proofs and integrate their results in final result

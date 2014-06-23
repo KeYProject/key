@@ -26,7 +26,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Tests the {@link FunctionalOperationContractPO} used for symbolic execution.
@@ -51,7 +51,7 @@ public class TestFunctionalOperationContractPO extends AbstractSymbolicExecution
                          String oraclePathInBaseDirFile,
                          String expectedTryContent) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       HashMap<String, String> originalTacletOptions = null;
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = null;
+      SymbolicExecutionEnvironment<CustomUserInterface> env = null;
       try {
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, baseContractName);

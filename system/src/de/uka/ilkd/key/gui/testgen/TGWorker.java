@@ -14,7 +14,6 @@ import de.uka.ilkd.key.gui.InterruptListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
@@ -24,6 +23,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -33,6 +33,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.testgen.ModelGenerator;
 import de.uka.ilkd.key.util.Debug;
 
 public class TGWorker extends SwingWorker<Void, Void> implements InterruptListener {
@@ -137,6 +138,8 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 			return null;
 		}
 		launcher.launch(solvers, problems, proof.getServices());
+//		ModelGenerator mg = new ModelGenerator(proofs.get(0).root().sequent(), 3, getMediator());
+//		mg.launch();
 		return null;
 	}
 
@@ -224,7 +227,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 					return null;
 				}
 			}
-		}
+		}		
 		final Proof proof = new Proof("Test Case for NodeNr: "
 				+ node.serialNr(), newSequent, "", oldProof.env()
 				.getInitConfig().createTacletIndex(), oldProof.env()

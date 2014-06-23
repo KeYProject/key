@@ -57,6 +57,11 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
    private TerminationKind terminationKind;
    
    /**
+    * Is the branch verified?
+    */
+   private Boolean branchVerified;
+   
+   /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
     * @param mediator The used {@link KeYMediator} during proof.
@@ -192,6 +197,17 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
     */
    @Override
    public boolean isBranchVerified() {
+      if (branchVerified == null) {
+         branchVerified = Boolean.valueOf(lazyComputeBranchVerified());
+      }
+      return branchVerified.booleanValue();
+   }
+   
+   /**
+    * Computes the value of {@link #isBranchVerified()} lazily.
+    * @return The branch verified state.
+    */
+   protected boolean lazyComputeBranchVerified() {
       if (!isDisposed()) {
          // Find uninterpreted predicate
          Term predicate = null;

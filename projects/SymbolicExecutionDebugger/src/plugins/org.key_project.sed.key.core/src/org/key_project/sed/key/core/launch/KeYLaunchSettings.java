@@ -127,6 +127,11 @@ public class KeYLaunchSettings {
    private final boolean usePrettyPrinting;
    
    /**
+    * Show signature on method return nodes?
+    */
+   private final boolean showSignatureOnMethodReturnNodes;
+   
+   /**
     * Constructor.
     * @param newDebugSession {@code true} new debug session, {@code false} continue existing *.proof file.
     * @param proofFileToContinue The path to the proof file to continue.
@@ -145,6 +150,7 @@ public class KeYLaunchSettings {
     * @param classPaths The used class path entries.
     * @param bootClassPath The used boot class path.
     * @param usePrettyPrinting Use pretty printing?
+    * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @throws JavaModelException Occurred Exception.
     */
    public KeYLaunchSettings(boolean newDebugSession,
@@ -163,7 +169,8 @@ public class KeYLaunchSettings {
                             File location,
                             List<File> classPaths,
                             File bootClassPath,
-                            boolean usePrettyPrinting) throws JavaModelException {
+                            boolean usePrettyPrinting,
+                            boolean showSignatureOnMethodReturnNodes) throws JavaModelException {
       this.newDebugSession = newDebugSession;
       this.proofFileToContinue = proofFileToContinue;
       this.method = method;
@@ -182,6 +189,7 @@ public class KeYLaunchSettings {
       this.classPaths = classPaths;
       this.bootClassPath = bootClassPath;
       this.usePrettyPrinting = usePrettyPrinting;
+      this.showSignatureOnMethodReturnNodes = showSignatureOnMethodReturnNodes;
    }
 
    /**
@@ -326,5 +334,13 @@ public class KeYLaunchSettings {
     */
    public boolean isUsePrettyPrinting() {
       return usePrettyPrinting;
+   }
+
+   /**
+    * Checks if signature is shown on method return nodes.
+    * @return Show signature on method return nodes?
+    */
+   public boolean isShowSignatureOnMethodReturnNodes() {
+      return showSignatureOnMethodReturnNodes;
    }
 }

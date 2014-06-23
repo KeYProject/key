@@ -162,7 +162,7 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
          if (ObjectUtil.equals(getDiagram(), diagram)) {
             OutputStream out = ExecutionTreeUtil.writeDomainFile(diagram);
             SEDXMLWriter writer = new SEDXMLWriter();
-            writer.write(getDebugTargets(), SEDXMLWriter.DEFAULT_ENCODING, out, true, true);
+            writer.write(getDebugTargets(), SEDXMLWriter.DEFAULT_ENCODING, out, true, true, null);
          }
       }
       catch (Exception e) {

@@ -61,6 +61,10 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
 
     /**
      * Rule sets to capture.
+     * Automated performance tests showed that including more rule sets
+     * here would not improve prover performance.
+     * I tested it for "simplify_literals", "cast_del", and "evaluate_instanceof";
+     * in any case there was a measurable slowdown. -- DB 03/06/14
      */
     private static final ImmutableList<String> ruleSets
     = ImmutableSLList.<String>nil().append("concrete")
@@ -85,6 +89,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
     //-------------------------------------------------------------------------
 
     public OneStepSimplifier() { // Visibility must be public because it is no longer a singleton in general. Side proofs use own OneStepSimplifier instances for parallelization. This is required thanks to the internal state of this rule.
+        assert bottomUp.length == ruleSets.size();
     }
 
 
