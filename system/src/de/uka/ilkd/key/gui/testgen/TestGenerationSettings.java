@@ -145,20 +145,21 @@ public class TestGenerationSettings implements Settings, Cloneable {
 
 	@Override
 	public void writeSettings(Object sender, Properties props) {
+		System.out.println("Saving: "+maxUnwinds);
 		SettingsConverter.store(props,
 		        TestGenerationSettings.propConcurrentProcesses,
-		        TestGenerationSettings.DEFAULT_CONCURRENTPROCESSES);
+		        concurrentProcesses);
 		SettingsConverter.store(props,
 		        TestGenerationSettings.propInvariantForAll,
-		        TestGenerationSettings.DEFAULT_INVARIANTFORALL);
+		        invariantForAll);
 		SettingsConverter.store(props, TestGenerationSettings.propMaxUwinds,
-		        TestGenerationSettings.DEFAULT_MAXUNWINDS);
+		        maxUnwinds);
 		SettingsConverter.store(props, TestGenerationSettings.propOutputPath,
-		        TestGenerationSettings.DEFAULT_OUTPUTPATH);
+		        outputPath);
 		SettingsConverter.store(props,
 		        TestGenerationSettings.propRemoveDuplicates,
-		        TestGenerationSettings.DEFAULT_REMOVEDUPLICATES);
+		        removeDuplicates);
 		SettingsConverter.store(props, TestGenerationSettings.propUseJUnit,
-		        TestGenerationSettings.DEFAULT_USEJUNIT);
+		        useJunit);
 	}
 }

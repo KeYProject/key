@@ -69,6 +69,7 @@ class TestGenOptionsPanel extends TablePanel{
 						value = settings.getNumberOfProcesses();
 					}
 					settings.setConcurrentProcesses(value);
+					settings.fireSettingsChanged();
 				}                                
 			});
 		}
@@ -90,6 +91,7 @@ class TestGenOptionsPanel extends TablePanel{
 						value = settings.getMaximalUnwinds();
 					}
 					settings.setMaxUnwinds(value);
+					settings.fireSettingsChanged();
 				}                                
 			});
 		}
@@ -105,6 +107,7 @@ class TestGenOptionsPanel extends TablePanel{
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					settings.setOutputPath(saveToFilePanel.getPath());
+					settings.fireSettingsChanged();
 
 				}
 			});
@@ -119,6 +122,7 @@ class TestGenOptionsPanel extends TablePanel{
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					settings.setUseJunit(useJUnit.isSelected());
+					settings.fireSettingsChanged();
 				}
 			});			
 		}		
@@ -131,6 +135,7 @@ class TestGenOptionsPanel extends TablePanel{
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					settings.setRemoveDuplicates(removeDuplicates.isSelected());
+					settings.fireSettingsChanged();
 				}
 			});
 		}
@@ -145,6 +150,7 @@ class TestGenOptionsPanel extends TablePanel{
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					settings.setInvariantForAll(invariantForAll.isSelected());
+					settings.fireSettingsChanged();
 				}
 			});
 			
