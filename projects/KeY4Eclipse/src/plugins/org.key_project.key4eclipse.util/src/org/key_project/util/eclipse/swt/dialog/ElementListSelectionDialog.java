@@ -15,7 +15,7 @@ package org.key_project.util.eclipse.swt.dialog;
 
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
-import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
@@ -24,21 +24,21 @@ import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 /**
  * <p>
  * A dialog to select elements in a list structure which is shown
- * via a {@link TableViewer}.
+ * via a {@link ListViewer}.
  * </p>
  * <p>
  * The usage and the implementation is oriented on {@link ElementTreeSelectionDialog}.
  * </p>
  * @author Martin Hentschel
  */
-public class ElementTableSelectionDialog extends AbstractElementSelectionDialog<TableViewer> {
+public class ElementListSelectionDialog extends AbstractElementSelectionDialog<ListViewer> {
    /**
     * Constructor.
     * @param parent The parent {@link Shell}.
     * @param contentProvider The content provider to use.
     * @param labelProvider The label provider to use.
     */
-   public ElementTableSelectionDialog(Shell parent, 
+   public ElementListSelectionDialog(Shell parent, 
                                       IContentProvider contentProvider, 
                                       IBaseLabelProvider labelProvider) {
       super(parent, contentProvider, labelProvider);
@@ -48,7 +48,7 @@ public class ElementTableSelectionDialog extends AbstractElementSelectionDialog<
     * {@inheritDoc}
     */
    @Override
-   protected TableViewer createViewerInstance(Composite parent) {
-      return new TableViewer(parent, SWT.BORDER | (isAllowMultiple() ? SWT.MULTI : SWT.SINGLE));
+   protected ListViewer createViewerInstance(Composite parent) {
+      return new ListViewer(parent, SWT.BORDER | (isAllowMultiple() ? SWT.MULTI : SWT.SINGLE));
    }
 }
