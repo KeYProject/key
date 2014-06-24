@@ -2805,7 +2805,6 @@ catch [TermCreationException ex] {
 }
 
 accessterm_bracket_suffix[Term reference] returns [Term resultAtAfter]
-@init{Term result;}
 @after{resultAtAfter = result;}
     :
     {isHeapTerm(reference)}? result = heap_update_suffix[reference]
