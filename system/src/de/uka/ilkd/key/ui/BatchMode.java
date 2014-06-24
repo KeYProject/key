@@ -40,7 +40,7 @@ public class BatchMode {
 
 
    public void finishedBatchMode (Object result,
-            Proof proof) {
+                                  Proof proof) {
 
         if ( Main.getStatisticsFile() != null )
             printStatistics ( Main.getStatisticsFile(), result.toString(),

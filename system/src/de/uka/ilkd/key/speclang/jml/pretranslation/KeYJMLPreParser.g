@@ -156,6 +156,16 @@ options {
       result = result.prepend(p);
       return result;
     }
+    
+  @Override
+  protected Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet follow) throws RecognitionException {
+    throw new MismatchedTokenException(ttype, input);
+  }
+
+  @Override
+  public Object recoverFromMismatchedSet(IntStream input, RecognitionException e, BitSet follow) throws RecognitionException {
+    throw e;
+  }
 
 }
 
@@ -1004,7 +1014,7 @@ method_declaration[ImmutableList<String> mods, PositionedString type, Token name
           }
           assert bodyString.charAt(0) == '{' && bodyString.charAt(bodyString.length()-1) == '}';
           bodyString = bodyString.substring(1, bodyString.length()-1).trim();
-          assert bodyString.startsWith("return ");
+          assert bodyString.startsWith("return ") : "return expected, instead: " + bodyString;
           bodyString = bodyString.substring(bodyString.indexOf(" ") + 1);
           // TODO Other heaps? There is only one return statement.....
           psDefinition = createPositionedString("<heap> "+name.getText() +
@@ -1054,11 +1064,17 @@ param_decl returns [String s = null]
         )?
         t=IDENT
         {
-            text.append(t.getText() + " ");
+            text.append(t.getText());
         }
+        (
+          ( AXIOM_NAME_BEGIN // That is "["
+            AXION_NAME_END // That is "]"
+          | EMPTYBRACKETS )
+                { text.append("[]"); }
+        )*
         t=IDENT
         {
-            text.append(t.getText());
+            text.append(" " + t.getText());
         }
     ;
 

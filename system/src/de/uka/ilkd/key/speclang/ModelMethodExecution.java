@@ -60,7 +60,7 @@ public final class ModelMethodExecution extends ClassAxiom {
     @Override
     public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, Services services) {
 
-		Name tacletName = MiscTools.toValidTacletName(name);
+        Name tacletName = MiscTools.toValidTacletName(name);
         TacletGenerator TG = TacletGenerator.getInstance();
         return null;
 //            return TG.generateModelMethodExecutionTaclets(tacletName,

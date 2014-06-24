@@ -624,7 +624,7 @@ public final class SideProofUtil {
       sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NON_SPLITTING);
       starter.setStrategy(sp);
       // Execute proof in the current thread
-      return starter.start();
+      return starter.start(false);
    }
 
    /**

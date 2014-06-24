@@ -20,10 +20,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
-import de.uka.ilkd.key.testgen.TestCaseGenerator;
 
 interface SolverListener {
         void processStarted(SMTSolver solver, SMTProblem problem);
