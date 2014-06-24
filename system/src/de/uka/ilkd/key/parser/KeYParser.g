@@ -2849,7 +2849,7 @@ heap_update_suffix [Term heap] returns [Term result=heap]
         {  // TODO at least make some check that it is a select term after all ...
            Term objectTerm = target.sub(1);
            Term fieldTerm  = target.sub(2);
-           result = TermBuilder.DF.store(getServices(), heap, objectTerm, fieldTerm, val);
+           result = getServices().getTermBuilder().store(heap, objectTerm, fieldTerm, val);
         }
     | id=simple_ident args=argument_list
         {
@@ -2860,7 +2860,7 @@ heap_update_suffix [Term heap] returns [Term result=heap]
            Term[] augmentedArgs = new Term[args.length+1];
            System.arraycopy(args, 0, augmentedArgs, 1, args.length);
            augmentedArgs[0] = heap;
-           result = tf.createTerm(f, augmentedArgs);
+           result = getTermFactory().createTerm(f, augmentedArgs);
            if(!result.sort().name().toString().equals("Heap")) {
               semanticError(id + " is not a heap constructor ");
            }
@@ -2868,10 +2868,9 @@ heap_update_suffix [Term heap] returns [Term result=heap]
     )
     RBRACKET
     ;
-        catch [TermCreationException ex] {
-               keh.reportException
-                (new KeYSemanticException(input, getSourceName(), ex));
-        }
+catch [TermCreationException ex] {
+    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+}
 
 array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = null] 
 @init{

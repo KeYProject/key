@@ -55,6 +55,12 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         assertEquals(t1, t2);
     }
 
+    public void testBracketHeapUpdate() {
+        Term t1 = parseTerm("heap[a.f := 4][create(a)][memset(empty, 1)][anon(allLocs, heap)]");
+        Term t2 = parseTerm("anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)");
+        assertEquals(t1, t2);
+    }
+
     public void DISABLEDtestFieldAtHeapSyntax() {
         Term t1, t2;
 
