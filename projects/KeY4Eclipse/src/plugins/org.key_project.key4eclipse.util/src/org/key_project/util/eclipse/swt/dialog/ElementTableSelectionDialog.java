@@ -16,8 +16,8 @@ package org.key_project.util.eclipse.swt.dialog;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
-import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -49,7 +49,7 @@ public class ElementTableSelectionDialog extends SelectionStatusDialog {
     /**
      * The label provider of {@link #viewer}.
      */
-    private ILabelProvider labelProvider;
+    private IBaseLabelProvider labelProvider;
 
     /**
      * The input in {@link #viewer}.
@@ -74,7 +74,7 @@ public class ElementTableSelectionDialog extends SelectionStatusDialog {
      */
     public ElementTableSelectionDialog(Shell parent, 
                                        IContentProvider contentProvider,
-                                       ILabelProvider labelProvider) {
+                                       IBaseLabelProvider labelProvider) {
         super(parent);
         this.contentProvider = contentProvider;
         this.labelProvider = labelProvider;
@@ -128,7 +128,7 @@ public class ElementTableSelectionDialog extends SelectionStatusDialog {
      * @param input The input to use.
      */
     protected void setViewerContent(IContentProvider contentProvider,
-                                    ILabelProvider labelProvider,
+                                    IBaseLabelProvider labelProvider,
                                     Object input) {
         viewer.setContentProvider(contentProvider);
         viewer.setLabelProvider(labelProvider);
@@ -203,10 +203,10 @@ public class ElementTableSelectionDialog extends SelectionStatusDialog {
     }
 
     /**
-     * Returns the defined {@link ILabelProvider}.
-     * @return The defined {@link ILabelProvider}.
+     * Returns the defined {@link IBaseLabelProvider}.
+     * @return The defined {@link IBaseLabelProvider}.
      */
-    protected ILabelProvider getLabelProvider() {
+    protected IBaseLabelProvider getLabelProvider() {
         return labelProvider;
     }
 }

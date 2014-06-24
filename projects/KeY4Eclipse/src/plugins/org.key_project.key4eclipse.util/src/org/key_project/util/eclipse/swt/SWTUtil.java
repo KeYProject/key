@@ -29,7 +29,6 @@ import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableViewer;
@@ -38,8 +37,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -83,104 +80,6 @@ public final class SWTUtil {
     public static void checkCanceled(IProgressMonitor monitor) throws OperationCanceledException {
         if (monitor != null && monitor.isCanceled()) {
             throw new OperationCanceledException();
-        }
-    }
-    
-    /**
-     * <p>
-     * Configures the given {@link Table} to show only the column {@link Image}s
-     * with their real size.
-     * </p>
-     * <p>
-     * It is recommend that not text is set on the {@link TableItem} 
-     * (e.g. used {@link LabelProvider} returns no texts) because otherwise
-     * it is possible that the cells are to big.
-     * </p>
-     * @param table The {@link Table} to configure.
-     */
-    public static void makeTableShowingFullTableItemImages(final Table table) {
-        if (table != null) {
-            table.addListener(SWT.MeasureItem, new Listener() {
-                @Override
-                public void handleEvent(Event event) {
-                    TableItem item = (TableItem)event.item;
-                    event.width = item.getImage().getImageData().width;
-                    event.height = item.getImage().getImageData().height;
-                }
-            });
-            table.addListener(SWT.EraseItem, new Listener() {
-                public void handleEvent(Event event) {
-                    event.detail &= ~SWT.FOREGROUND;
-                }
-            });
-            table.addListener(SWT.PaintItem, new Listener() {
-                public void handleEvent(Event event) {
-                    TableItem item = (TableItem)event.item;
-                    event.gc.drawImage(item.getImage(), event.x >= 0 ? event.x : 0, event.y); // On Linux event.x is negativ what is wrong
-                }
-            });
-        }
-    }
-    
-    /**
-     * <p>
-     * Configures the given {@link Table} to show multilined text in cells.
-     * </p>
-     * <p>
-     * Example usage
-     * <pre><code>
-     *   final int TEXT_MARGIN = 3;
-     *   Display display = new Display();
-     *   Shell shell = new Shell(display);
-     *   shell.setLayout(new FillLayout());
-     *   final Table table = new Table(shell, SWT.FULL_SELECTION);
-     *
-     *   TableItem item = new TableItem(table, SWT.NONE);
-     *   item.setText("Line1\nLine2");
-     *
-     *   TableItem item2 = new TableItem(table, SWT.NONE);
-     *   item2.setText("1\n2\n3\n4\n5\n6");
-     *   
-     *   SWTUtil.makeTableMultilined(table, TEXT_MARGIN);
-     *
-     *   shell.open();
-     *   while (!shell.isDisposed()) {
-     *           if (!display.readAndDispatch()) display.sleep();
-     *   }
-     *   display.dispose();
-     * </code></pre>
-     * </p>
-     * <p>
-     * The code was copied from SWT Snippet 231.
-     * See <a href="http://git.eclipse.org/c/platform/eclipse.platform.swt.git/tree/examples/org.eclipse.swt.snippets/src/org/eclipse/swt/snippets/Snippet231.java">http://git.eclipse.org/c/platform/eclipse.platform.swt.git/tree/examples/org.eclipse.swt.snippets/src/org/eclipse/swt/snippets/Snippet231.java</a>
-     * </p>
-     * @param table The {@link Table} to configure. If it is {@code null} nothing happens.
-     * @param textMargin The text margin to use.
-     */
-    public static void makeTableMultilined(final Table table, final int textMargin) {
-        if (table != null) {
-            table.addListener(SWT.MeasureItem, new Listener() {
-                public void handleEvent(Event event) {
-                    TableItem item = (TableItem)event.item;
-                    String text = item.getText(event.index);
-                    Point size = event.gc.textExtent(text);
-                    event.width = size.x + (2 * textMargin);
-                    event.height = Math.max(event.height, size.y + textMargin);
-                }
-            });
-            table.addListener(SWT.EraseItem, new Listener() {
-                public void handleEvent(Event event) {
-                    event.detail &= ~SWT.FOREGROUND;
-                }
-            });
-            table.addListener(SWT.PaintItem, new Listener() {
-                public void handleEvent(Event event) {
-                    TableItem item = (TableItem)event.item;
-                    String text = item.getText(event.index);
-                    int yOffset = 0;
-                    event.gc.drawText(text, event.x + textMargin, event.y + yOffset, true);
-                }
-            });
         }
     }
     
