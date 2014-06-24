@@ -39,23 +39,42 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         return javaInfo.getServices();
     }
 
-    public void testFieldAtHeapSyntax() {
-        // start with testing parsability of individual terms
-        parseTerm("h");
-        parseTerm("a.f");
-        // test new syntax
-        Term t = parseTerm("a.f@h");
-        assertEquals(t, parseTerm("int::select(heap, a, testTermParserHeap.A::$f)"));
+    public void testParsePrettyPrintedSelect() {
+        Term t1, t2;
 
-        t = parseTerm("a1.f@h");
-        assertEquals(t, parseTerm("int::select(heap, a1, testTermParserHeap.A1::$f)"));
+        t1 = parseTerm("a.f");
+        t2 = parseTerm("int::select(heap, a, A::$f)");
+        assertEquals(t1, t2);
 
-        // a1.(A.f) = int::select(heap, a, A1::$f)
-        t = parseTerm("a1.(testTermParserHeap.A::f)");
-        assertEquals(t, parseTerm("int::select(heap, a1, testTermParserHeap.A::$f)"));
+        t1 = parseTerm("a1.f");
+        t2 = parseTerm("int::select(heap, a1, A1::$f)");
+        assertEquals(t1, t2);
+
+        t1 = parseTerm("a1.(A.f)");
+        t2 = parseTerm("int::select(heap, a1, A::$f)");
+        assertEquals(t1, t2);
     }
-    
-    public void testStoreSyntax(){
+
+    public void DISABLEDtestFieldAtHeapSyntax() {
+        Term t1, t2;
+
+        parseTerm("h");
+
+        // test new syntax
+        t1 = parseTerm("a.f@h");
+        t2 = parseTerm("int::select(h, a, testTermParserHeap.A::$f)");
+        assertEquals(t1, t2);
+
+        t1 = parseTerm("a1.f@h");
+        t2 = parseTerm("int::select(h, a1, testTermParserHeap.A1::$f)");
+        assertEquals(t1, t2);
+
+        t1 = parseTerm("a1.(A.f)@h");
+        t2 = parseTerm("int::select(h, a1, A::$f)");
+        assertEquals(t1, t2);
+    }
+
+    public void testStoreSyntax() {
 //        parseTerm("heap[a.f := 4]");
     }
 
