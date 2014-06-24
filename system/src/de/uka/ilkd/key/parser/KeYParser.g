@@ -2840,24 +2840,16 @@ catch [TermCreationException ex] {
     keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
-heap_update_suffix [Term heap] returns [Term _heap_update_suffix = null]
-@init { result = heap; }
-@after { _heap_update_suffix = result; }
-    :
-    LBRACE
-    result=elementary_heap_update[result]
-    ( PARALLEL result=elementary_heap_update[result] )*
-    RBRACE
-    ;
-
-elementary_heap_update [Term heap] returns [Term result=heap]
-    : // TODO find the right kind of super non-terminal for "o.f" and "a[i]"
+heap_update_suffix [Term heap] returns [Term result=heap]
+    : // TODO find the right kind of non-terminal for "o.f" and "a[i]"
       // and do not resign to parsing an arbitrary term
-    ( (equivalence_term ASSIGN) => target=equivalence_term ASSIGN val=equivalence_term
-        {
+    LBRACKET
+    ( (equivalence_term ASSIGN) =>
+       target=equivalence_term ASSIGN val=equivalence_term
+        {  // TODO at least make some check that it is a select term after all ...
            Term objectTerm = target.sub(1);
            Term fieldTerm  = target.sub(2);
-           result = getServices().getTermBuilder().store(heap, objectTerm, fieldTerm, val);
+           result = TermBuilder.DF.store(getServices(), heap, objectTerm, fieldTerm, val);
         }
     | id=simple_ident args=argument_list
         {
@@ -2868,12 +2860,13 @@ elementary_heap_update [Term heap] returns [Term result=heap]
            Term[] augmentedArgs = new Term[args.length+1];
            System.arraycopy(args, 0, augmentedArgs, 1, args.length);
            augmentedArgs[0] = heap;
-           result = getTermFactory().createTerm(f, augmentedArgs);
+           result = tf.createTerm(f, augmentedArgs);
            if(!result.sort().name().toString().equals("Heap")) {
               semanticError(id + " is not a heap constructor ");
            }
         }
     )
+    RBRACKET
     ;
         catch [TermCreationException ex] {
                keh.reportException
