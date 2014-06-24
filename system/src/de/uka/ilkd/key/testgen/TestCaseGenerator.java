@@ -125,13 +125,22 @@ public class TestCaseGenerator {
 		}		
 		if(params.length() > 0){
 			params = params.substring(1);
-		}		
+		}
+		
+		String caller;
+		if(m.isStatic()){
+			caller = info.getTypeOfClassUnderTest().getName();
+		}
+		else{
+			caller = "self";
+		}
+		
 		if(m.getReturnType().equals(KeYJavaType.VOID_TYPE)){
-			return "self."+name+"("+params+");";
+			return caller+"."+name+"("+params+");";
 		}
 		else{
 			String returnType = m.getReturnType().getFullName();
-			return returnType +" result = self."+name+"("+params+");";
+			return returnType +" result = "+caller+"."+name+"("+params+");";
 		}		
 	}
 
