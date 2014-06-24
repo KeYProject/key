@@ -26,12 +26,18 @@ public class ProofInfo {
 	public IProgramMethod getMUT(){		
 		SpecificationRepository spec = services.getSpecificationRepository();	
 		IObserverFunction f = spec.getTargetOfProof(proof);
-		IProgramMethod m = (IProgramMethod) f;
-		return m;
-		
+		if(f instanceof IProgramMethod){
+			return (IProgramMethod) f;
+		}
+		else{
+			return null;
+		}		
 	}
 
 	public KeYJavaType getTypeOfClassUnderTest(){
+		if(getMUT()==null){
+			return null;
+		}		
 		return getMUT().getContainerType();
 	}
 
