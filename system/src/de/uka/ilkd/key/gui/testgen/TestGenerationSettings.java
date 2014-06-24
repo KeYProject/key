@@ -19,9 +19,11 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	private static final boolean DEFAULT_REMOVEDUPLICATES = true;
 	private static final boolean DEFAULT_USEJUNIT = false;
 	private static final boolean DEFAULT_INVARIANTFORALL = true;
+	private static final String DEFAULT_OPENJMLPATH = "openjml";
 	// Option fields
 	private int maxUnwinds;
 	private String outputPath;
+	private String openjmlPath;
 	private boolean removeDuplicates;
 	private boolean useJunit;
 	private int concurrentProcesses;
@@ -34,7 +36,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	private static final String propUseJUnit = "[TestGenSettings]UseJUnit";
 	private static final String propConcurrentProcesses = "[TestGenSettings]ConcurrentProcesses";
 	private static final String propInvariantForAll = "[TestGenSettings]InvariantForAll";
-
+	private static final String propOpenjmlPath = "[TestGenSettings]OpenJMLPath";
 	public TestGenerationSettings() {
 		listeners = new LinkedHashSet<SettingsListener>();
 		maxUnwinds = TestGenerationSettings.DEFAULT_MAXUNWINDS;
@@ -43,6 +45,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		useJunit = TestGenerationSettings.DEFAULT_USEJUNIT;
 		concurrentProcesses = TestGenerationSettings.DEFAULT_CONCURRENTPROCESSES;
 		invariantForAll = TestGenerationSettings.DEFAULT_INVARIANTFORALL;
+		openjmlPath = DEFAULT_OPENJMLPATH;
 	}
 
 	public TestGenerationSettings(TestGenerationSettings data) {
@@ -56,6 +59,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		useJunit = data.useJunit;
 		concurrentProcesses = data.concurrentProcesses;
 		invariantForAll = data.invariantForAll;
+		openjmlPath = data.openjmlPath;
 	}
 
 	@Override
@@ -109,6 +113,9 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		invariantForAll = SettingsConverter.read(props,
 		        TestGenerationSettings.propInvariantForAll,
 		        TestGenerationSettings.DEFAULT_INVARIANTFORALL);
+		openjmlPath = SettingsConverter.read(props,
+		        TestGenerationSettings.propOpenjmlPath,
+		        TestGenerationSettings.DEFAULT_OPENJMLPATH);
 	}
 
 	public boolean removeDuplicates() {
@@ -138,6 +145,16 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	public void setUseJunit(boolean useJunit) {
 		this.useJunit = useJunit;
 	}
+	
+	
+
+	public String getOpenjmlPath() {
+		return openjmlPath;
+	}
+
+	public void setOpenjmlPath(String openjmlPath) {
+		this.openjmlPath = openjmlPath;
+	}
 
 	public boolean useJunit() {
 		return useJunit;
@@ -161,5 +178,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		        removeDuplicates);
 		SettingsConverter.store(props, TestGenerationSettings.propUseJUnit,
 		        useJunit);
+		SettingsConverter.store(props, TestGenerationSettings.propOpenjmlPath,
+		        openjmlPath);
 	}
 }
