@@ -19,7 +19,6 @@ import java.util.Set;
  * This macro performs simplification of Heap and LocSet terms.
  * It applies simplification rules (including the "unoptimized" select rules),
  * One Step Simplification, alpha, and delta rules.
- * Currently all rules (except OSS) have zero costs.
  * @author bruns
  *
  */
@@ -37,6 +36,7 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
                     +"One Step Simplification, alpha, and delta rules.";
     }
     
+    // note that rules in the 'concrete' rule set are usually not included here
     private static final Set<String> ADMITTED_RULES_SET = asSet(new String[]{
         "selectOfStore",
         "selectOfCreate",
@@ -108,8 +108,12 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "elementOfInfiniteUnion2Vars",
         
         "allFieldsEq",
+        "subsetSingletonLeft",
+        "subsetSingletonLeftEQ",
         "subsetSingletonRight",
         "subsetSingletonRightEQ",
+        "subsetUnionLeft",
+        "subsetUnionLeftEQ",
         "subsetOfIntersectWithItSelfEQ1",
         "subsetOfIntersectWithItSelfEQ2",
         "allFieldsSubsetOf",
@@ -118,6 +122,8 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "disjointInfiniteUnion",
         "disjointInfiniteUnion_2",
         "intersectAllFieldsFreshLocs",
+        "disjointWithSingleton1",
+        "disjointWithSingleton2",
         
         "createdInHeapWithSingleton",
         "createdInHeapWithAllFields",
@@ -129,8 +135,6 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "createdInHeapWithArrayRangeEQ",
         "createdInHeapWithSelectEQ",
         "createdInHeapWithObserverEQ",
-        
-        // TODO: the "other lemma" locset rules are not yet here
         
         "elementOfEmptyEQ",
         "elementOfAllLocsEQ",
@@ -144,10 +148,26 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "elementOfFreshLocsEQ",
         "elementOfInfiniteUnion2VarsEQ",
         
+        // rules listed under "other lemma"
+        "unionEqualsEmpty",
+        "unionEqualsEmptyEQ",
+        "intersectWithSingleton",
+        "setMinusSingleton",
+        "unionIntersectItself",
+        "unionIntersectItself_2",
+        "unionIntersectItself_3",
+        "unionIntersectItself_4",
+        "unionIntersectItself_5",
+        "unionIntersectItself_6",
+        
+        // normalization rules are currently not included
+        
         // semantics blasting rules
-        "equalityToElementOfRight",
-        "subsetToElementOfRight",
+//        "equalityToElementOfRight",
+//        "subsetToElementOfRight",
         "disjointDefinition", // TODO: may have own rules in future
+        "definitionAllElementsOfArray",
+        "definitionAllElementsOfArrayLocsets",
         
         // alpha rules
         "impRight",
@@ -156,14 +176,17 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "close",
         "closeTrue",
         "closeFalse",
+        "ifthenelse_negated",
         // TODO: those must be more expensive
 //        "replace_known_left",
 //        "replace_known_right",
         
         // others
+        "castDel",
         "nonNull",
         "nonNullZero",
         "allRight",
+        "exLeft",
     });
 
 

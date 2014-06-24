@@ -12,9 +12,6 @@
 //
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.util.LinkedList;
-import java.util.List;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
@@ -24,18 +21,22 @@ import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.util.Debug;
-import javax.swing.SwingWorker;
+import java.awt.event.ActionEvent;
+import java.util.*;
+import javax.swing.*;
 
 @SuppressWarnings("serial")
 public class CounterExampleAction extends MainWindowAction {
 
-    private static final String NAME = "CE";
+    private static final String NAME = "Generate Counterexample";
     private static final String TOOLTIP = "Search for a counterexample for the selected goal";
 
     public CounterExampleAction(MainWindow mainWindow) {
         super(mainWindow);
         setName(NAME);
         setTooltip(TOOLTIP);
+        Icon icon = IconFactory.counterExample(MainWindow.TOOLBAR_ICON_SIZE);
+        putValue(SMALL_ICON, icon);
         init();
     }
 
