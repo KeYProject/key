@@ -83,7 +83,7 @@ public class KeYBreakpointManager {
          String containerTypeName = KeYUtil.getType(resource).getFullyQualifiedName();
          containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
          KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
-         if(containerKJT!=null){
+         if (containerKJT != null) {
             de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.KeYWatchpoint stopCondition = new de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.KeYWatchpoint(
                   watchpoint.getHitCount(), environment
                   .getBuilder().getProof(),
@@ -107,24 +107,26 @@ public class KeYBreakpointManager {
       IResource resource = methodBreakpoint.getMarker().getResource();
       if (JDTUtil.isJavaFile(resource)) {
          IMethod method = KeYUtil.getContainingMethodForMethodStart(methodBreakpoint.getCharStart(), resource);
-         // Determine container type
-         IType containerType = method.getDeclaringType();
-         String containerTypeName = containerType.getFullyQualifiedName();
-         containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
-         KeYJavaType containerKJT = environment.getBuilder().getProof().getJavaInfo().getTypeByClassName(containerTypeName);
-         if(containerKJT!=null){
-            IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getProof().getJavaInfo());
-            int start = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset());
-            int end = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset() + method.getSourceRange().getLength());
-            MethodBreakpoint stopCondition = new MethodBreakpoint(
-                  methodBreakpoint.getMarker().getResource().getLocation().toOSString(),
-                  methodBreakpoint.getLineNumber(),
-                  methodBreakpoint.getHitCount(), pm, environment
-                        .getBuilder().getProof(),
-                        methodBreakpoint.getCondition(), methodBreakpoint.isEnabled(),
-                        methodBreakpoint.isConditionEnabled(), start, end, methodBreakpoint.isEntry(), methodBreakpoint.isExit());
-            breakpointStopCondition.addBreakpoint(stopCondition);
-            breakpointMap.put(methodBreakpoint, stopCondition);
+         if (method != null) {
+            // Determine container type
+            IType containerType = method.getDeclaringType();
+            String containerTypeName = containerType.getFullyQualifiedName();
+            containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
+            KeYJavaType containerKJT = environment.getBuilder().getProof().getJavaInfo().getTypeByClassName(containerTypeName);
+            if(containerKJT!=null){
+               IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getProof().getJavaInfo());
+               int start = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset());
+               int end = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset() + method.getSourceRange().getLength());
+               MethodBreakpoint stopCondition = new MethodBreakpoint(
+                     methodBreakpoint.getMarker().getResource().getLocation().toOSString(),
+                     methodBreakpoint.getLineNumber(),
+                     methodBreakpoint.getHitCount(), pm, environment
+                           .getBuilder().getProof(),
+                           methodBreakpoint.getCondition(), methodBreakpoint.isEnabled(),
+                           methodBreakpoint.isConditionEnabled(), start, end, methodBreakpoint.isEntry(), methodBreakpoint.isExit());
+               breakpointStopCondition.addBreakpoint(stopCondition);
+               breakpointMap.put(methodBreakpoint, stopCondition);
+            }
          }
       }
    }
@@ -183,27 +185,28 @@ public class KeYBreakpointManager {
       IResource resource = lineBreakpoint.getMarker().getResource();
       if (JDTUtil.isJavaFile(resource)) {
          IMethod method = KeYUtil.getContainingMethod(lineBreakpoint.getLineNumber(), resource);
-         // Determine container type
-         IType containerType = method.getDeclaringType();
-         String containerTypeName = containerType.getFullyQualifiedName();
-         containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
-         KeYJavaType containerKJT = environment.getBuilder().getProof().getJavaInfo().getTypeByClassName(containerTypeName);
-         if(containerKJT!=null){
-            IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getProof().getJavaInfo());
-            int start = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset());
-            int end = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset() + method.getSourceRange().getLength());
-            LineBreakpoint stopCondition = new LineBreakpoint(
-                  resource.getLocation().toOSString(),
-                  lineBreakpoint.getLineNumber(),
-                  lineBreakpoint.getHitCount(), pm, environment
-                        .getBuilder().getProof(),
-                  lineBreakpoint.getCondition(), lineBreakpoint.isEnabled(),
-                  lineBreakpoint.isConditionEnabled(), start, end);
-            breakpointStopCondition.addBreakpoint(stopCondition);
-            breakpointMap.put(lineBreakpoint, stopCondition);
+         if (method != null) {
+            // Determine container type
+            IType containerType = method.getDeclaringType();
+            String containerTypeName = containerType.getFullyQualifiedName();
+            containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
+            KeYJavaType containerKJT = environment.getBuilder().getProof().getJavaInfo().getTypeByClassName(containerTypeName);
+            if(containerKJT!=null){
+               IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getProof().getJavaInfo());
+               int start = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset());
+               int end = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset() + method.getSourceRange().getLength());
+               LineBreakpoint stopCondition = new LineBreakpoint(
+                     resource.getLocation().toOSString(),
+                     lineBreakpoint.getLineNumber(),
+                     lineBreakpoint.getHitCount(), pm, environment
+                           .getBuilder().getProof(),
+                     lineBreakpoint.getCondition(), lineBreakpoint.isEnabled(),
+                     lineBreakpoint.isConditionEnabled(), start, end);
+               breakpointStopCondition.addBreakpoint(stopCondition);
+               breakpointMap.put(lineBreakpoint, stopCondition);
+            }
          }
       }
-      
    }
 
    /**
@@ -249,11 +252,13 @@ public class KeYBreakpointManager {
     */
    public void keyWatchpointChanged(KeYWatchpoint watchpoint) throws SLTranslationException, CoreException {
       KeYWatchpoint stopCondition = (KeYWatchpoint) breakpointMap.get(watchpoint);
-      stopCondition.setEnabled(watchpoint.isEnabled());
-      stopCondition.setHitCount(watchpoint.getHitCount());
-      stopCondition.setConditionEnabled(watchpoint.isConditionEnabled());
-      stopCondition.setCondition(watchpoint.getCondition());
-      stopCondition.setSuspendOnTrue(watchpoint.isSuspendOnTrue());
+      if (stopCondition != null) {
+         stopCondition.setEnabled(watchpoint.isEnabled());
+         stopCondition.setHitCount(watchpoint.getHitCount());
+         stopCondition.setConditionEnabled(watchpoint.isConditionEnabled());
+         stopCondition.setCondition(watchpoint.getCondition());
+         stopCondition.setSuspendOnTrue(watchpoint.isSuspendOnTrue());
+      }
    }
 
    /**
@@ -265,11 +270,13 @@ public class KeYBreakpointManager {
     */
    public void exceptionBreakpointChanged(JavaExceptionBreakpoint exceptionBreakpoint) throws CoreException {
       SymbolicExecutionExceptionBreakpoint stopCondition = (SymbolicExecutionExceptionBreakpoint) breakpointMap.get(exceptionBreakpoint);
-      stopCondition.setEnabled(exceptionBreakpoint.isEnabled());
-      stopCondition.setCaught(exceptionBreakpoint.isCaught());
-      stopCondition.setUncaught(exceptionBreakpoint.isUncaught());
-      stopCondition.setSuspendOnSubclasses(exceptionBreakpoint.isSuspendOnSubclasses());
-      stopCondition.setHitCount(exceptionBreakpoint.getHitCount());
+      if (stopCondition != null) {
+         stopCondition.setEnabled(exceptionBreakpoint.isEnabled());
+         stopCondition.setCaught(exceptionBreakpoint.isCaught());
+         stopCondition.setUncaught(exceptionBreakpoint.isUncaught());
+         stopCondition.setSuspendOnSubclasses(exceptionBreakpoint.isSuspendOnSubclasses());
+         stopCondition.setHitCount(exceptionBreakpoint.getHitCount());
+      }
    }
 
    /**
@@ -281,10 +288,12 @@ public class KeYBreakpointManager {
     */
    public void javaLineBreakpointAdded(JavaLineBreakpoint lineBreakpoint) throws CoreException, SLTranslationException {
       LineBreakpoint stopCondition = (LineBreakpoint) breakpointMap.get(lineBreakpoint);
-      stopCondition.setHitCount(lineBreakpoint.getHitCount());
-      stopCondition.setEnabled(lineBreakpoint.isEnabled());
-      stopCondition.setConditionEnabled(lineBreakpoint.isConditionEnabled());
-      stopCondition.setCondition(lineBreakpoint.getCondition());
+      if (stopCondition != null) {
+         stopCondition.setHitCount(lineBreakpoint.getHitCount());
+         stopCondition.setEnabled(lineBreakpoint.isEnabled());
+         stopCondition.setConditionEnabled(lineBreakpoint.isConditionEnabled());
+         stopCondition.setCondition(lineBreakpoint.getCondition());
+      }
    }
 
    /**
@@ -296,10 +305,12 @@ public class KeYBreakpointManager {
     */
    public void javaWatchpointChanged(JavaWatchpoint javaWatchpoint) throws CoreException {
       FieldWatchpoint stopCondition = (FieldWatchpoint) breakpointMap.get(javaWatchpoint);
-      stopCondition.setHitCount(javaWatchpoint.getHitCount());
-      stopCondition.setEnabled(javaWatchpoint.isEnabled());
-      stopCondition.setAccess(javaWatchpoint.isAccess());
-      stopCondition.setModification(javaWatchpoint.isModification());
+      if (stopCondition != null) {
+         stopCondition.setHitCount(javaWatchpoint.getHitCount());
+         stopCondition.setEnabled(javaWatchpoint.isEnabled());
+         stopCondition.setAccess(javaWatchpoint.isAccess());
+         stopCondition.setModification(javaWatchpoint.isModification());
+      }
    }
 
    /**
@@ -311,12 +322,14 @@ public class KeYBreakpointManager {
     */
    public void methodBreakpointChanged(JavaMethodBreakpoint methodBreakpoint) throws CoreException, SLTranslationException {
       MethodBreakpoint stopCondition = (MethodBreakpoint) breakpointMap.get(methodBreakpoint);
-      stopCondition.setHitCount(methodBreakpoint.getHitCount());
-      stopCondition.setEnabled(methodBreakpoint.isEnabled());
-      stopCondition.setConditionEnabled(methodBreakpoint.isConditionEnabled());
-      stopCondition.setCondition(methodBreakpoint.getCondition());
-      stopCondition.setEntry(methodBreakpoint.isEntry());
-      stopCondition.setExit(methodBreakpoint.isExit());
+      if (stopCondition != null) {
+         stopCondition.setHitCount(methodBreakpoint.getHitCount());
+         stopCondition.setEnabled(methodBreakpoint.isEnabled());
+         stopCondition.setConditionEnabled(methodBreakpoint.isConditionEnabled());
+         stopCondition.setCondition(methodBreakpoint.getCondition());
+         stopCondition.setEntry(methodBreakpoint.isEntry());
+         stopCondition.setExit(methodBreakpoint.isExit());
+      }
    }
 
    /**
