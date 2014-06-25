@@ -103,7 +103,7 @@ public class TaskTree extends JPanel {
 		tn.allProofs()[i].removeProofTreeListener(proofTreeListener);
                 tn.allProofs()[i].mgt().removeProofListener();
 	    }
-            MainWindow.getInstance().getProofView().
+            MainWindow.getInstance().getProofTreeView().
                 removeProofs(tn.allProofs());
 	    //go to some other node, take the last leaf.
 	    TreePath path 

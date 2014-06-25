@@ -20,7 +20,11 @@ import java.io.File;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -33,6 +37,7 @@ import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.util.Debug;
 
 public abstract class AbstractUserInterface implements UserInterface {
    private boolean autoMode;
@@ -42,26 +47,74 @@ public abstract class AbstractUserInterface implements UserInterface {
     */
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
-	protected ProblemLoader getProblemLoader(File file, List<File> classPath,
-	        File bootClassPath, KeYMediator mediator) {
-		final ProblemLoader pl = new ProblemLoader(file, classPath,
-		        bootClassPath, AbstractProfile.getDefaultProfile(), mediator);
-		pl.addTaskListener(this);
-		return pl;
-	}
+    private ProofMacro autoMacro = new SkipMacro();
+
+    protected ProblemLoader getProblemLoader(File file, List<File> classPath,
+                                             File bootClassPath, KeYMediator mediator) {
+        final ProblemLoader pl =
+                new ProblemLoader(file, classPath, bootClassPath,
+                                  AbstractProfile.getDefaultProfile(), mediator);
+        pl.addTaskListener(this);
+        return pl;
+    }
 
     @Override
-	public  IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
-	app = forced? app.forceInstantiate(goal): app.tryToInstantiate(goal);
-		// cannot complete that app
-		return app.complete() ? app : null;
-	}
+    public  IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
+        app = forced? app.forceInstantiate(goal): app.tryToInstantiate(goal);
+        // cannot complete that app
+        return app.complete() ? app : null;
+    }
+
+    public void setMacro(ProofMacro macro) {
+        assert macro != null;
+        this.autoMacro = macro;
+    }
+
+    public ProofMacro getMacro() {
+        return this.autoMacro;
+    }
+
+    protected abstract String getMacroConsoleOutput();
+
+    public boolean macroChosen() {
+        return !(getMacro() instanceof SkipMacro);
+    }
+
+    public boolean applyMacro() {
+        assert macroChosen();
+        if (getMacro().canApplyTo(getMediator(), null)) {
+            System.out.println(getMacroConsoleOutput());
+            try {
+                getMediator().stopInterface(true);
+                getMediator().setInteractive(false);
+                getMacro().applyTo(getMediator(), null, this);
+                getMediator().setInteractive(true);
+                getMediator().startInterface(true);
+            } catch(InterruptedException ex) {
+                Debug.out("Proof macro has been interrupted:");
+                Debug.out(ex);
+            } finally {
+                Proof proof = getMediator().getSelectedProof();
+                TaskFinishedInfo info =
+                        new DefaultTaskFinishedInfo(getMacro(), null, proof, proof.getAutoModeTime(),
+                                                    proof.countNodes(), proof.openGoals().size());
+                taskFinished(info);
+            }
+            return true;
+        } else {
+            System.out.println(getMacro().getClass().getSimpleName() + " not applicable!");
+        }
+        return false;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public DefaultProblemLoader load(Profile profile, File file, List<File> classPath, File bootClassPath) throws ProblemLoaderException {
+    public DefaultProblemLoader load(Profile profile,
+                                     File file,
+                                     List<File> classPath,
+                                     File bootClassPath) throws ProblemLoaderException {
        DefaultProblemLoader loader = null;
        try {
           getMediator().stopInterface(true);

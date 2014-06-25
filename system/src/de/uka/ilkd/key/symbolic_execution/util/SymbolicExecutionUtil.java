@@ -560,8 +560,7 @@ public final class SymbolicExecutionUtil {
          return operator;
       }
    }
-   
-   
+
    /**
     * Checks if the given {@link Term} represents a heap update,
     * in particular a store or create operation on a heap.

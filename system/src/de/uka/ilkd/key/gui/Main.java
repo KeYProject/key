@@ -16,6 +16,7 @@ package de.uka.ilkd.key.gui;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.List;
+import java.util.ServiceLoader;
 
 import de.uka.ilkd.key.gui.RecentFileMenu.RecentFileEntry;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
@@ -23,6 +24,8 @@ import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
+import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.ui.BatchMode;
@@ -52,6 +55,7 @@ public final class Main {
     private static final String AUTOSAVE = "--autosave";
     private static final String EXPERIMENTAL = "--experimental";
     private static final String DEBUG = "--debug";
+    private static final String MACRO = "--macro";
     private static final String NO_DEBUG = "--no_debug";
     private static final String ASSERTION = "--assertion";
     private static final String NO_ASSERTION = "--no-assertion";
@@ -146,6 +150,7 @@ public final class Main {
     private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES =
         {de.uka.ilkd.key.proof.delayedcut.DelayedCut.FEATURE};
 
+    private static ProofMacro autoMacro = new SkipMacro();
 
     /**
      * <p>
@@ -192,8 +197,9 @@ public final class Main {
 
     public static void loadCommandLineFile(UserInterface ui) {
         if (Main.getFileNameOnStartUp() != null) {
-            ui.loadProblem(new File(Main.getFileNameOnStartUp()));
-
+            final File fnos = new File(Main.getFileNameOnStartUp());
+            ui.setMacro(autoMacro);
+            ui.loadProblem(fnos);
         } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
             ui.openExamples();
         }
@@ -238,6 +244,7 @@ public final class Main {
         cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "save or drop proofs (then stored to path given by "+ JPATH_OF_RESULT + ")");
         cl.addOption(JFILE_FOR_AXIOMS, "<filename>", "read axioms from given file");
         cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "read definitions from given file");
+        cl.addOption(MACRO, "<proofMacro>", "apply automatic proof macro");
         return cl;
     }
     /**
@@ -367,6 +374,28 @@ public final class Main {
             Debug.ENABLE_DEBUG = true;
         }
 
+        if (cl.isSet(MACRO)) {
+            String macro = cl.getString(MACRO, "");
+            for (ProofMacro m: ServiceLoader.load(ProofMacro.class)) {
+                if (macro.equals(m.getClass().getSimpleName())) {
+                    // memorize macro for later
+                    try {
+                        autoMacro = m.getClass().newInstance();
+                    } catch (InstantiationException e) {
+                        System.err.println("Automatic proof macro can not be instantiated!");
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        System.err.println("Automatic proof macro can not be accessed!");
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+            }
+            if (macro.equals("") || autoMacro instanceof SkipMacro) {
+                System.err.println("No automatic proof macro specified.");
+            }
+        }
+
         //arguments not assigned to a command line option may be files
 
         if(!fileArguments.isEmpty()){
@@ -412,7 +441,8 @@ public final class Main {
                 @Override
                 public void uncaughtException(Thread t, Throwable e) {
                     if (verbosity > Verbosity.SILENT) {
-                        System.out.println("Auto mode was terminated by an exception:"+e.getClass().toString().substring(5));
+                        System.out.println("Auto mode was terminated by an exception:"
+                                            + e.getClass().toString().substring(5));
                         if (verbosity >= Verbosity.DEBUG) e.printStackTrace();
                         final String msg = e.getMessage();
                         if (msg!=null) System.out.println(msg);

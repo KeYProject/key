@@ -24,6 +24,10 @@ import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
  */
 public class MinimizeInteraction extends KeYMenuCheckBox {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -3381517803006651928L;
     private final MainWindow mainWindow;
 
     public MinimizeInteraction(MainWindow mainWindow) {

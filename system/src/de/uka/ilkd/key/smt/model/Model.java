@@ -597,7 +597,7 @@ public class Model {
 			String value = constants.get(c);
 			SMTSort s = types.getTypeForConstant(c);
 			if(s == null){
-				System.err.println("No sort for: "+c);
+				//System.err.println("No sort for: "+c);
 			}
 			else{
 				newConstants.put(c, processConstantValue(value,s));
