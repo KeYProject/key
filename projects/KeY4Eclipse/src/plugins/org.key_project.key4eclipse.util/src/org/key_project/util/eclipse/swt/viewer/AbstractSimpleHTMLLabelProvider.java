@@ -105,7 +105,6 @@ public abstract class AbstractSimpleHTMLLabelProvider extends OwnerDrawLabelProv
     */
    protected Point render(Event event, String text, boolean printToGC) {
       if (text != null) {
-         System.out.println(text);
          StringBuffer textSb = new StringBuffer();
          char[] signs = text.toCharArray();
          boolean inTag = false;
