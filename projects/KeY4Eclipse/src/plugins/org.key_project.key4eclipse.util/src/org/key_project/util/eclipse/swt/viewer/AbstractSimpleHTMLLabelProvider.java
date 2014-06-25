@@ -105,6 +105,7 @@ public abstract class AbstractSimpleHTMLLabelProvider extends OwnerDrawLabelProv
     */
    protected Point render(Event event, String text, boolean printToGC) {
       if (text != null) {
+         System.out.println(text);
          StringBuffer textSb = new StringBuffer();
          char[] signs = text.toCharArray();
          boolean inTag = false;
@@ -129,17 +130,22 @@ public abstract class AbstractSimpleHTMLLabelProvider extends OwnerDrawLabelProv
                      String entity = entitySB.toString();
                      if ("amp".equals(entity)) {
                         textSb.append('&');
+                        lastTextIsWhitespace = false;
                      }
                      else if ("lt".equals(entity)) {
                         textSb.append('<');
+                        lastTextIsWhitespace = false;
                      }
                      else if ("gt".equals(entity)) {
                         textSb.append('>');
+                        lastTextIsWhitespace = false;
                      }
                      else if (entity.startsWith("#")) {
                         try {
                            int integer = Integer.parseInt(entity.substring(1));
-                           textSb.append((char)integer);
+                           final char character = (char)integer;
+                           textSb.append(character);
+                           lastTextIsWhitespace = StringUtil.WHITESPACE.contains(character + "");
                         }
                         catch (NumberFormatException e) {
                            // Nothing to do, just ignore invalid number
