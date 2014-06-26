@@ -50,9 +50,9 @@ It provides the following file structure:
 
 (4) Setup development IDE
 -------------------------
-1. Download Eclipse 3.7 SR2 (Indigo) (e.g. in 32 bit version) as bundle 
+1. Download Eclipse 4.2 SR2 (Juno) as bundle 
    "Eclipse Modeling Tools" from
-   http://www.eclipse.org/downloads/packages/eclipse-modeling-tools/indigosr2
+   http://www.eclipse.org/downloads/packages/eclipse-modeling-tools/junosr2
 2. Install Graphiti
    => Help -> Install New Software...
    => Select "--All Available Sites--" in field "Work with:"
