@@ -21,8 +21,10 @@ Visualization of program specification with design by contract
    <launcherArgs>
       <vmArgs>-Xms128m
 -Xmx1024m
--XX:MaxPermSize=256m</vmArgs>
-      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
+-XX:MaxPermSize=256m
+      </vmArgs>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts
+      </vmArgsMac>
    </launcherArgs>
 
    <windowImages i16="/de.hentschel.visualdbc.product.ui/icons/logo16.gif" i32="/de.hentschel.visualdbc.product.ui/icons/logo32.gif" i48="/de.hentschel.visualdbc.product.ui/icons/logo48.gif" i64="/de.hentschel.visualdbc.product.ui/icons/logo64.gif" i128="/de.hentschel.visualdbc.product.ui/icons/logo128.gif"/>
@@ -131,8 +133,9 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
       <feature id="org.eclipse.ocl"/>
       <feature id="org.eclipse.gmf"/>
       <feature id="org.eclipse.gmf.runtime.notation"/>
+      <feature id="org.eclipse.ecf.core.feature"/>
+      <feature id="org.eclipse.ecf.filetransfer.feature"/>
       <feature id="de.hentschel.visualdbc.feature" version="1.0.0.qualifier"/>
-      <feature id="org.eclipse.gmf.runtime.thirdparty" version="1.7.0.201306111432"/>
    </features>
 
 

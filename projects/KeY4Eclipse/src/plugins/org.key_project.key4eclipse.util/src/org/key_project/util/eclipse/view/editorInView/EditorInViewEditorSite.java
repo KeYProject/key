@@ -28,7 +28,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.PartSite;
 import org.eclipse.ui.services.IDisposable;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
@@ -44,24 +43,24 @@ import org.key_project.util.eclipse.WorkbenchUtil;
  * @see AbstractEditorInViewView
  * @see EditorInViewWorkbenchPage
  */
-@SuppressWarnings({ "deprecation", "restriction" })
-public class EditorInViewEditorSite extends PartSite implements IEditorSite, IDisposable {
+@SuppressWarnings({ "deprecation" })
+public class EditorInViewEditorSite implements IEditorSite, IDisposable {
    /**
     * The {@link IViewSite} of an {@link IViewPart} which contains an {@link IEditorPart}.
     */
-   private IViewSite wrapperViewSite;
+   private final IViewSite wrapperViewSite;
    
    /**
     * The {@link IEditorActionBarContributor} of the {@link IEditorPart} which 
     * is shown in the {@link IViewSite} of {@link #wrapperViewSite}.
     */
-   private IEditorActionBarContributor wrappedEditorContributor;
+   private final IEditorActionBarContributor wrappedEditorContributor;
    
    /**
     * The used {@link IWorkbenchPage} used to let the {@link IEditorPart} believe
     * that he is a normal {@link IEditorPart}.
     */
-   private EditorInViewWorkbenchPage page;
+   private final EditorInViewWorkbenchPage page;
    
    /**
     * Indicates that this {@link IEditorSite} is disposed or not.
@@ -77,7 +76,6 @@ public class EditorInViewEditorSite extends PartSite implements IEditorSite, IDi
    public EditorInViewEditorSite(IViewSite wrapperViewSite, 
                                  EditorInViewWorkbenchPage page, 
                                  IEditorActionBarContributor wrappedEditorContributor) {
-      super(((PartSite)wrapperViewSite).getModel(), wrapperViewSite.getPart(), null, null);
       Assert.isNotNull(page);
       Assert.isNotNull(wrapperViewSite);
       this.page = page;
@@ -295,6 +293,45 @@ public class EditorInViewEditorSite extends PartSite implements IEditorSite, IDi
    }
 
    /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * The call is delegated to the {@link IViewSite}.
+    * </p>
+    */
+   @Override
+   public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
+      return wrapperViewSite.getAdapter(adapter);
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * The call is delegated to the {@link IViewSite}.
+    * </p>
+    */
+   @Override
+   public Object getService(@SuppressWarnings("rawtypes") Class api) {
+      return wrapperViewSite.getService(api);
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * The call is delegated to the {@link IViewSite}.
+    * </p>
+    */
+   @Override
+   public boolean hasService(@SuppressWarnings("rawtypes") Class api) {
+      return wrapperViewSite.hasService(api);
+   }
+
+   /**
     * Checks if this {@link IEditorSite} is disposed or not.
     * @return {@code true} disposed, {@code false} not disposed.
     */
@@ -309,7 +346,6 @@ public class EditorInViewEditorSite extends PartSite implements IEditorSite, IDi
    public void dispose() {
       if (!isDisposed()) {
          disposed = true;
-         super.dispose();
       }
    }
 }

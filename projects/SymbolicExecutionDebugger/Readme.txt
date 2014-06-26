@@ -50,9 +50,9 @@ It provides the following file structure:
 
 (4) Setup development IDE
 -------------------------
-1. Download Eclipse 4.3 SR2 (Kepler) as bundle 
+1. Download Eclipse 4.4 Luna as bundle 
    "Eclipse Modeling Tools" from
-   http://www.eclipse.org/downloads/packages/eclipse-modeling-tools/keplersr2
+   https://eclipse.org/downloads/packages/eclipse-modeling-tools/lunar
 2. Install Graphiti
    => Help -> Install New Software...
    => Select "--All Available Sites--" in field "Work with:"
