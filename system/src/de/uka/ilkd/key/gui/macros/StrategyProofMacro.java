@@ -116,7 +116,9 @@ public abstract class StrategyProofMacro implements ProofMacro {
         }
         
         if(applyStrategy.hasBeenInterrupted()) {
-            throw new InterruptedException();
+            synchronized(applyStrategy) { // wait for applyStrategy to finish it last rule application
+                throw new InterruptedException();
+            }
         }
 
     }
