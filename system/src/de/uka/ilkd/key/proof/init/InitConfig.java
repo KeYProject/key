@@ -250,7 +250,7 @@ public class InitConfig {
     /**
      * fills the active taclet cache
      */
-    private synchronized void fillActiveTacletCache() {
+    private void fillActiveTacletCache() {
        if (activatedTacletCache != null) {
           return;
        }
