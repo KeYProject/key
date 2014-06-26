@@ -136,13 +136,4 @@ public final class ProblemLoader extends DefaultProblemLoader {
         worker.execute();
     }
 
-    @Override
-    protected ProblemLoaderException selectProofObligation() {
-        ProofManagementDialog.showInstance(getInitConfig());
-        if (ProofManagementDialog.startedProof()) {
-            return null;
-        } else {
-            return new ProblemLoaderException(this, "Aborted.");
-        }
-    }
 }
