@@ -131,6 +131,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
       labelProvider = new ProofTreeLabelProvider(getTreeViewer(), proof);
       getTreeViewer().setLabelProvider(labelProvider);
       getTreeViewer().setInput(proof);
+      contentProvider.injectTopLevelElements();
       // Create context menu of TreeViewer
       MenuManager menuManager = new MenuManager("Outline popup", "org.key_project.keyide.ui.view.outline.popup");
       Menu menu = menuManager.createContextMenu(getTreeViewer().getControl());
