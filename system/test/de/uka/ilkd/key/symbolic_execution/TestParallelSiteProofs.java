@@ -85,7 +85,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
       // Create threads
       List<SiteProofThread<?>> threads = new LinkedList<SiteProofThread<?>>();
       ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(env.getBuilder().getStartNode());
-      while (iter.hasNext()) {
+      while (iter.hasNext() && threads.size() < 30) {
          IExecutionNode next = iter.next(); 
          if (next instanceof IExecutionStateNode) {
             threads.add(new ExecutionVariableSiteProofThread((IExecutionStateNode<?>)next));
@@ -95,7 +95,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
          }
       }
       // Make sure that the correct number of threads are available
-      assertEquals(58, threads.size());
+      assertEquals(31, threads.size());
       // Start threads
       for (SiteProofThread<?> thread : threads) {
          thread.start();
