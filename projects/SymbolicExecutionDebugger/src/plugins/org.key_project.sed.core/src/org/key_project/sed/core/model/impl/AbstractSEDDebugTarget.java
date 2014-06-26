@@ -19,11 +19,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IMarkerDelta;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
@@ -34,6 +36,9 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentPr
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.annotation.impl.BreakpointAnnotation;
+import org.key_project.sed.core.annotation.impl.BreakpointAnnotationLink;
+import org.key_project.sed.core.annotation.impl.BreakpointAnnotationType;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
@@ -44,6 +49,8 @@ import org.key_project.sed.core.model.event.SEDAnnotationEvent;
 import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.LogUtil;
+import org.key_project.sed.core.util.SEDAnnotationUtil;
+import org.key_project.sed.core.util.SEDBreadthFirstIterator;
 import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
@@ -114,7 +121,7 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     * {@inheritDoc}
     */
    @Override
-   public ISEDDebugTarget getDebugTarget() {
+   public AbstractSEDDebugTarget getDebugTarget() {
       return this;
    }
 
@@ -299,13 +306,16 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public void breakpointAdded(IBreakpoint breakpoint) {
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
+      try {
+         // Add annotation if required
+         if (!updateBreakpointAnnotation()) {
+            // Update links if annotation was already present
+            updateBreakpointAnnotationLinks(breakpoint);
+         }
+      }
+      catch (DebugException e) {
+         LogUtil.getLogger().logError(e);
+      }
    }
 
    /**
@@ -313,7 +323,184 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {
+      try {
+         // Add annotation if required
+         if (!updateBreakpointAnnotation()) {
+            // Update links if annotation was already present
+            updateBreakpointAnnotationLinks(breakpoint);
+         }
+      }
+      catch (DebugException e) {
+         LogUtil.getLogger().logError(e);
+      }
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
+      try {
+         // Remove annotation if required
+         if (!updateBreakpointAnnotation()) {
+            // If annotation was not removed remove all links of the given breakpoint.
+            ISEDAnnotationType breakpointType = SEDAnnotationUtil.getAnnotationtype(BreakpointAnnotationType.TYPE_ID);
+            ISEDAnnotation[] annotations = getRegisteredAnnotations(breakpointType);
+            for (ISEDAnnotation annotation : annotations) {
+               ISEDAnnotationLink[] links = annotation.getLinks();
+               for (ISEDAnnotationLink link : links) {
+                  if (link instanceof BreakpointAnnotationLink) {
+                     BreakpointAnnotationLink blink = (BreakpointAnnotationLink)link;
+                     if (blink.getBreakpoint() == breakpoint) {
+                        annotation.removeLink(blink);
+                     }
+                  }
+               }
+            }
+         }
+      }
+      catch (DebugException e) {
+         LogUtil.getLogger().logError(e);
+      }
+   }
+   
+   /**
+    * Adds all Breakpoints to this {@link ISEDDebugTarget}. 
+    * Is called only when the {@link ISEDDebugTarget} is initially created.
+    */
+   protected void initBreakpoints() throws DebugException {
+      IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints();     
+      // Initialize all available breakpoints
+      for(int i = 0; i < breakpoints.length; i++){
+         initBreakpoint(breakpoints[i]);
+      }
+      // Add breakpoint annotation if at least one breakpoint is supported
+      updateBreakpointAnnotation();
+   }
+   
+   /**
+    * Adds the given {@link IBreakpoint} to this {@link ISEDDebugTarget}.
+    * @param breakpoints The initial {@link IBreakpoint}s.
+    */
+   protected abstract void initBreakpoint(IBreakpoint breakpoint) throws DebugException;
+   
+   /**
+    * Ensures that this {@link ISEDDebugTarget} has a {@link BreakpointAnnotation}
+    * only if at least one breakpoint is supported and returned via {@link #getBreakpoints()}.
+    * @return {@code true} if annotation was added or removed, {@code false} if nothing has changed
+    */
+   protected boolean updateBreakpointAnnotation() throws DebugException {
+      ISEDAnnotationType breakpointType = SEDAnnotationUtil.getAnnotationtype(BreakpointAnnotationType.TYPE_ID);
+      ISEDAnnotation[] annotations = getRegisteredAnnotations(breakpointType);
+      IBreakpoint[] supportedBreakpoints = getBreakpoints();
+      if (!ArrayUtil.isEmpty(supportedBreakpoints)) {
+         if (ArrayUtil.isEmpty(annotations)) {
+            // Add annotation
+            ISEDAnnotation breakpointAnnotation = breakpointType.createAnnotation();
+            registerAnnotation(breakpointAnnotation);
+            // Add annotation links
+            ISEDIterator iterator = new SEDBreadthFirstIterator(this);
+            while (iterator.hasNext()) {
+               ISEDDebugElement next = iterator.next();
+               if (next instanceof ISEDDebugNode) {
+                  breakpointType.initializeNode((ISEDDebugNode)next, breakpointAnnotation);
+               }
+            }
+            return true;
+         }
+         else {
+            return false;
+         }
+      }
+      else {
+         if (!ArrayUtil.isEmpty(annotations)) {
+            for (ISEDAnnotation annotation : annotations) {
+               unregisterAnnotation(annotation);
+            }
+            return true;
+         }
+         else {
+            return false;
+         }
+      }
+   }
+
+   /**
+    * Updates the available {@link BreakpointAnnotationLink}s.
+    * @param breakpoint The {@link IBreakpoint} to update.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void updateBreakpointAnnotationLinks(IBreakpoint breakpoint) throws DebugException {
+      try {
+         BreakpointAnnotationType breakpointType = (BreakpointAnnotationType)SEDAnnotationUtil.getAnnotationtype(BreakpointAnnotationType.TYPE_ID);
+         ISEDIterator iterator = new SEDBreadthFirstIterator(this);
+         while (iterator.hasNext()) {
+            ISEDDebugElement next = iterator.next();
+            if (next instanceof ISEDDebugNode) {
+               ISEDDebugNode node = (ISEDDebugNode)next;
+               boolean hit = breakpoint.isEnabled() && checkBreakpointHit(breakpoint, node);
+               if (hit) {
+                  ISEDAnnotationLink[] links = node.getAnnotationLinks(breakpointType);
+                  boolean found = false;
+                  for (ISEDAnnotationLink link : links) {
+                     if (breakpointType.isBreakpointLink(link, breakpoint)) {
+                        found = true;
+                        ((BreakpointAnnotationLink)link).updateBreakpointName();
+                     }
+                  }
+                  if (!found) {
+                     ISEDAnnotation[] annotations = getRegisteredAnnotations(breakpointType);
+                     for (ISEDAnnotation annotation : annotations) {
+                        breakpointType.addBreakpointLink(node, annotation, breakpoint);
+                     }
+                  }
+               }
+               else {
+                  // Remove may available links of the given breakpoint
+                  ISEDAnnotationLink[] links = node.getAnnotationLinks(breakpointType);
+                  for (ISEDAnnotationLink link : links) {
+                     if (breakpointType.isBreakpointLink(link, breakpoint)) {
+                        node.removeAnnotationLink(link);
+                     }
+                  }
+               }
+            }
+         }
+      }
+      catch (CoreException e) {
+         throw new DebugException(e.getStatus());
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IBreakpoint[] computeHitBreakpoints(ISEDDebugNode node) throws DebugException {
+      try {
+         List<IBreakpoint> result = new LinkedList<IBreakpoint>();
+         IBreakpoint[] supportedBreakpoints = getBreakpoints();
+         if (supportedBreakpoints != null) {
+            for (IBreakpoint breakpoint : supportedBreakpoints) {
+               if (breakpoint.isEnabled() && checkBreakpointHit(breakpoint, node)) {
+                  result.add(breakpoint);
+               }
+            }
+         }
+         return result.toArray(new IBreakpoint[result.size()]);
+      }
+      catch (CoreException e) {
+         throw new DebugException(e.getStatus());
+      }
+   }
+   
+   /**
+    * Checks if the given {@link IBreakpoint} is fulfilled in the given {@link ISEDDebugNode}.
+    * @param breakpoint The {@link IBreakpoint} to check.
+    * @param node the {@link ISEDDebugNode} to check.
+    * @return {@code true} hit, {@code false} not hit.
+    */
+   protected abstract boolean checkBreakpointHit(IBreakpoint breakpoint, ISEDDebugNode node);
 
    /**
     * {@inheritDoc}

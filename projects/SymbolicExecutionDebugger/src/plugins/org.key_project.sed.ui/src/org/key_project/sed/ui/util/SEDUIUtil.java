@@ -35,8 +35,10 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.debug.internal.ui.viewers.model.TreeModelContentProvider;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
+import org.eclipse.jface.viewers.ContentViewer;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.ILazyTreePathContentProvider;
@@ -84,6 +86,7 @@ import org.key_project.util.java.thread.IRunnableWithResult;
  * SED UI easier.
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public final class SEDUIUtil {
    /**
     * The ID Of the extension point with the annotation actions.
@@ -459,7 +462,17 @@ public final class SEDUIUtil {
                   for (Job job : jobs) {
                      SWTUtil.checkCanceled(monitor);
                      JobUtil.waitFor(job, 10);
-                  }         
+                  }
+                  // Wait until the element is known by the viewer since sometimes waiting for jobs is not enough.
+                  while (SWTUtil.testFindItem(treeViewer, toInject) == null) {
+                     SWTUtil.checkCanceled(monitor);
+                     try {
+                        Thread.sleep(10);
+                     }
+                     catch (InterruptedException e) {
+                     // Nothing to do.
+                     }
+                  }
                   // Update tree path for next loop iteration
                   tpElements.add(toInject);
                   // Update monitor
@@ -473,7 +486,7 @@ public final class SEDUIUtil {
          }
       }
    }
-   
+
    /**
     * Returns all available annotation action descriptions.
     * @return All available annotation action descriptions.
@@ -889,6 +902,25 @@ public final class SEDUIUtil {
       }
       else {
          LogUtil.getLogger().logError("Extension point registry is not loaded.");
+      }
+      return result;
+   }
+   
+   /**
+    * Returns the {@link TreeModelContentProvider} used in the given {@link IDebugView}.
+    * @param debugView The {@link IDebugView} to get its {@link TreeModelContentProvider}.
+    * @return The {@link TreeModelContentProvider} or {@code null} if not available.
+    */
+   public static TreeModelContentProvider getContentProvider(IDebugView debugView) {
+      TreeModelContentProvider result = null;
+      if (debugView != null) {
+         Viewer viewer = debugView.getViewer();
+         if (viewer instanceof ContentViewer) {
+            IContentProvider cp = ((ContentViewer)viewer).getContentProvider();
+            if (cp instanceof TreeModelContentProvider) {
+               result = (TreeModelContentProvider)cp;
+            }
+         }
       }
       return result;
    }

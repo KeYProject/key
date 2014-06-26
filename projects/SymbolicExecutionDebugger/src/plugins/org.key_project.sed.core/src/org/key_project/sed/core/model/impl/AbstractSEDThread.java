@@ -25,7 +25,7 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.util.ISEDIterator;
-import org.key_project.sed.core.util.SEDPreorderIterator;
+import org.key_project.sed.core.util.SEDBreadthFirstIterator;
 import org.key_project.util.java.ArrayUtil;
 
 /**
@@ -266,23 +266,33 @@ public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements 
    }
    
    /**
-    * Collects a leaf nodes starting at the given node.
+    * Collects all leaf nodes starting at the given node. If at some leafs
+    * breakpoints are hit only nodes were breakpoints are hit are returned.
     * @param start The {@link ISEDDebugNode} to start at.
     * @return The found leafs.
     * @throws DebugException Occurred Exception.
     */
    protected ISEDDebugNode[] collectLeafs(ISEDDebugNode start) throws DebugException {
       List<ISEDDebugNode> leafs = new LinkedList<ISEDDebugNode>();
-      ISEDIterator iter = new SEDPreorderIterator(start);
+      List<ISEDDebugNode> leafsWithBreakpointHit = new LinkedList<ISEDDebugNode>();
+      ISEDIterator iter = new SEDBreadthFirstIterator(start);
       while (iter.hasNext()) {
          ISEDDebugElement next = iter.next();
          if (next instanceof ISEDDebugNode) {
             ISEDDebugNode node = (ISEDDebugNode)next;
             if (ArrayUtil.isEmpty(node.getChildren())) {
                leafs.add(node);
+               if (!ArrayUtil.isEmpty(node.computeHitBreakpoints())) {
+                  leafsWithBreakpointHit.add(node);
+               }
             }
          }
       }
-      return leafs.toArray(new ISEDDebugNode[leafs.size()]);
+      if (!leafsWithBreakpointHit.isEmpty()) {
+         return leafsWithBreakpointHit.toArray(new ISEDDebugNode[leafsWithBreakpointHit.size()]);
+      }
+      else {
+         return leafs.toArray(new ISEDDebugNode[leafs.size()]);
+      }
    }
 }

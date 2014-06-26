@@ -205,7 +205,11 @@ while [ $# -ne 0 ]; do
 	    continue;;
 	    
 
-         # key options beginning with a minus or filenames  
+         # key options beginning with a minus or filenames 
+	--auto)
+             keysysprops="${keysysprops}-Djava.awt.headless=true "
+	     break;;
+
          *) break;;
 
     esac

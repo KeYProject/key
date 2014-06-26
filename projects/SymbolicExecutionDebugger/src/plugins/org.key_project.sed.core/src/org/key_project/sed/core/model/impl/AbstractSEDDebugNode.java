@@ -22,6 +22,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IStep;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentProvider;
@@ -315,6 +316,14 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
    public boolean hasChildren() throws DebugException {
       ISEDDebugNode[] children = getChildren();
       return !ArrayUtil.isEmpty(children);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IBreakpoint[] computeHitBreakpoints() throws DebugException {
+      return getDebugTarget().computeHitBreakpoints(this);
    }
    
    /**

@@ -33,6 +33,26 @@ public final class StringUtil {
    public static final String NEW_LINE = System.getProperty("line.separator");
    
    /**
+    * The latin alphabet with big capitals.
+    */
+   public static final String LATIN_ALPHABET_BIG = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+   
+   /**
+    * The latin alphabet with small capitals.
+    */
+   public static final String LATIN_ALPHABET_SMALL = LATIN_ALPHABET_BIG.toLowerCase();
+   
+   /**
+    * The numerals.
+    */
+   public static final String NUMERALS = "0123456789";
+   
+   /**
+    * All characters representing whitespace.
+    */
+   public static final String WHITESPACE = " \n\r\t";
+   
+   /**
     * Forbid instances by this private constructor.
     */
    private StringUtil() {

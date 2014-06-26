@@ -347,7 +347,12 @@ public class AnnotationLinksDialog extends TitleAreaDialog {
     */
    protected void handleAnnotationUnregistered(SEDAnnotationEvent e) {
       if (e.getAnnotation() == annotation) {
-         close();
+         getShell().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               close();
+            }
+         });
       }
    }
 

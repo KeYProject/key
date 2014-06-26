@@ -10,6 +10,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -718,7 +719,7 @@ public final class SideProofUtil {
       assert !source.isDisposed();
       // Get required source instances
       final ProofEnvironment sourceEnv = source.env();
-      InitConfig sourceInitConfig = sourceEnv.getInitConfig();
+      final InitConfig sourceInitConfig = sourceEnv.getInitConfig();
       RuleJustificationInfo sourceJustiInfo = sourceEnv.getJustifInfo();
       // Create new profile which has separate OneStepSimplifier instance
       JavaProfile profile;
@@ -755,14 +756,15 @@ public final class SideProofUtil {
          };
       }
       // Create new InitConfig
-      InitConfig initConfig = new InitConfig(source.getServices().copy(profile, true));
+      final InitConfig initConfig = new InitConfig(source.getServices().copy(profile, true));
       // Set modified taclet options in which runtime exceptions are banned.
       ImmutableSet<Choice> choices = sourceInitConfig.getActivatedChoices();
       choices = choices.remove(new Choice("allow", "runtimeExceptions"));
       choices = choices.add(new Choice("ban", "runtimeExceptions"));
       initConfig.setActivatedChoices(choices);
       // Initialize InitConfig with settings from the original InitConfig.
-      initConfig.setSettings(sourceInitConfig.getSettings());
+      final ProofSettings clonedSettings = sourceInitConfig.getSettings() != null ? new ProofSettings(sourceInitConfig.getSettings()) : null;
+      initConfig.setSettings(clonedSettings);
       initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
       initConfig.setTaclets(sourceInitConfig.getTaclets());
       // Create new ProofEnvironment and initialize it with values from initial one.

@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -246,6 +248,26 @@ public final class BundleUtil {
                                 null);
             }
             else {
+               // Make sure that parents exist, this is required in Eclipse 4.4
+               List<IContainer> parents = new LinkedList<IContainer>();
+               IContainer parent = file.getParent();
+               while (parent != null && !parent.exists()) {
+                  parents.add(0, parent);
+                  parent = parent.getParent();
+               }
+               for (IContainer toCreate : parents) {
+                  if (toCreate instanceof IFolder) {
+                     ((IFolder)toCreate).create(true, true, null);
+                  }
+                  else if (toCreate instanceof IProject) {
+                     IProject project = (IProject)toCreate;
+                     project.create(null);
+                     if (!project.isOpen()) {
+                        project.open(null);
+                     }
+                  }
+               }
+               // Create file
                file.create(unifyLineBreaks ? IOUtil.unifyLineBreaks(in) : in, 
                            true, 
                            null);
