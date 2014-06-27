@@ -332,12 +332,10 @@ public class ProofManager {
       InitConfig initConfig = new InitConfig(environment.getServices().copy(profile, false));
       initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
       initConfig.setSettings(sourceInitConfig.getSettings());
-      initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
       initConfig.setTaclets(sourceInitConfig.getTaclets());
       // Create new ProofEnvironment and initialize it with values from initial one.
       ProofEnvironment env = initConfig.getProofEnv();
       env.setJavaModel(sourceInitConfig.getProofEnv().getJavaModel());
-      env.setRuleConfig(sourceInitConfig.getProofEnv().getRuleConfig());
       for (Taclet taclet : sourceInitConfig.activatedTaclets()) {
          env.getJustifInfo().addJustification(taclet, sourceInitConfig.getProofEnv().getJustifInfo().getJustification(taclet));
       }

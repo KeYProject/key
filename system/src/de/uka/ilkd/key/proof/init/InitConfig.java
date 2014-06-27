@@ -33,7 +33,6 @@ import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
 /**
  * an instance of this class describes the initial configuration of the prover.
@@ -53,7 +52,6 @@ public class InitConfig {
      */
     private final ProofEnvironment env;
 
-
     private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
 
     /**
@@ -62,16 +60,6 @@ public class InitConfig {
      */
     private HashMap<String,String> category2DefaultChoice =
         new LinkedHashMap<String,String>();
-
-    /**
-     * maps taclets to their TacletBuilders. This information is needed when
-     * a taclet contains GoalTemplates annotated with taclet-options because
-     * in this case a new taclet has to be created containing only those
-     * GoalTemplates whose options are activated and those who don't belong
-     * to any specific option.
-     */
-    private HashMap<Taclet, TacletBuilder> taclet2Builder =
-        new LinkedHashMap<Taclet, TacletBuilder>();
 
     /**
      * Set of the rule options activated for the current proof. The rule options
@@ -83,7 +71,6 @@ public class InitConfig {
 
     /** HashMap for quick lookups taclet name->taclet */
     private Map<Name, Taclet> activatedTacletCache = null;
-    
     
     private String originalKeYFileName;
     
@@ -109,7 +96,25 @@ public class InitConfig {
     //internal methods
     //-------------------------------------------------------------------------
     
-    
+    /**
+     * fills the active taclet cache
+     */
+    private void fillActiveTacletCache() {
+       if (activatedTacletCache != null) {
+          return;
+       }
+       final LinkedHashMap<Name,Taclet> tacletCache = new LinkedHashMap<Name, Taclet>(2300);
+       for (Taclet t : taclets) {
+          
+          if(t.getChoices().subset(activatedChoices)){      
+             if (t != null) {
+                tacletCache.put(t.name(), t);
+             }
+          }
+       }
+       activatedTacletCache = Collections.unmodifiableMap(tacletCache);
+    }
+
     
     //-------------------------------------------------------------------------
     //public interface
@@ -126,7 +131,7 @@ public class InitConfig {
 
 
     public Profile getProfile() {
-	return services.getProfile();
+       return services.getProfile();
     }
 
 
@@ -154,30 +159,14 @@ public class InitConfig {
                 category2DefaultChoice.put(entry.getKey(), entry.getValue());
             }
         }
-        if(changed) {
+        if (changed) {
             @SuppressWarnings("unchecked")
             HashMap<String, String> clone = (HashMap<String, String>)category2DefaultChoice.clone();            
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
+            // invalidate active taclet cache
+            activatedTacletCache = null;
         }
     }
-
-
-    public void setTaclet2Builder(HashMap<Taclet, TacletBuilder> taclet2Builder){
-        this.taclet2Builder = taclet2Builder;
-    }
-
-
-    /**
-     * {@link Taclet}s are constructed using {@link TacletBuilder}s this map
-     * contains the pair of a taclet and its builder which is important as
-     * goals of a taclet may depend of the selected choices. Instead of
-     * creating all possible combinations in advance this is done by demand
-     * @return the map from a taclet to its builder
-     */
-    public HashMap<Taclet, TacletBuilder> getTaclet2Builder(){
-        return taclet2Builder;
-    }
-
 
     /**
      * sets the set of activated choices of this initial configuration.
@@ -185,8 +174,8 @@ public class InitConfig {
      * in category2DefaultChoice is added.
      */
     public void setActivatedChoices(ImmutableSet<Choice> activatedChoices) {
-        category2DefaultChoice =
-	    ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().
+       category2DefaultChoice =
+             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().
 	    getDefaultChoices();
 
         @SuppressWarnings("unchecked")
@@ -221,6 +210,9 @@ public class InitConfig {
 
     public void setTaclets(ImmutableSet<Taclet> taclets){
         this.taclets = taclets;
+
+        // invalidate active taclet cache
+        activatedTacletCache = null;
     }
 
 
@@ -246,31 +238,7 @@ public class InitConfig {
        return activatedTacletCache.values();
     }
 
-
-    /**
-     * fills the active taclet cache
-     */
-    private void fillActiveTacletCache() {
-       if (activatedTacletCache != null) {
-          return;
-       }
-       final LinkedHashMap<Name,Taclet> tacletCache = new LinkedHashMap<Name, Taclet>();
-       for (Taclet t : taclets) {
-          TacletBuilder b = taclet2Builder.get(t);
-          
-          if(t.getChoices().subset(activatedChoices)){
-             if (b != null && b.getGoal2Choices() != null){
-                t = b.getTacletWithoutInactiveGoalTemplates(activatedChoices);
-             }
-
-             if (t != null) {
-                tacletCache.put(t.name(), t);
-             }
-          }
-       }
-       activatedTacletCache = Collections.unmodifiableMap(tacletCache);
-    }
-
+   
 
     /** returns the built-in rules of this initial configuration
      */
@@ -370,8 +338,6 @@ public class InitConfig {
         InitConfig ic = new InitConfig(services.copyPreservesLDTInformation());
         ic.setActivatedChoices(activatedChoices);
         ic.category2DefaultChoice = ((HashMap<String,String>) category2DefaultChoice.clone());
-        ic.setTaclet2Builder(
-                (HashMap<Taclet, TacletBuilder>) taclet2Builder.clone());
         ic.setTaclets(taclets);
         ic.originalKeYFileName = originalKeYFileName;
         return ic;
@@ -388,8 +354,6 @@ public class InitConfig {
         InitConfig ic = new InitConfig(services.copy(false));
         ic.setActivatedChoices(activatedChoices);
         ic.category2DefaultChoice = ((HashMap<String,String>) category2DefaultChoice.clone());
-        ic.setTaclet2Builder(
-                (HashMap<Taclet, TacletBuilder>) taclet2Builder.clone());
         ic.setTaclets(taclets);
         ic.originalKeYFileName = originalKeYFileName;
         ic.env.setJavaModel(env.getJavaModel());

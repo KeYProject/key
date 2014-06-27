@@ -200,7 +200,6 @@ public class KeYFile implements EnvInput {
                                 null),
                                 pc, 
                                 pc, 
-                                null, 
                                 null); 
                 problemParser.parseIncludes(); 
                 includes = problemParser.getIncludes();
@@ -328,7 +327,6 @@ public class KeYFile implements EnvInput {
                                 .getExceptionHandler()), 
                                 schemaConfig, 
                                 normalConfig, 
-                                initConfig.getTaclet2Builder(), 
                                 initConfig.getTaclets()); 
                 problemParser.problem(); 
                 initConfig.addCategory2DefaultChoices(problemParser.
@@ -425,7 +423,6 @@ public class KeYFile implements EnvInput {
                                 .getExceptionHandler()), 
                                 schemaConfig,
                                 normalConfig,
-                                initConfig.getTaclet2Builder(),
                                 initConfig.getTaclets());
                 problemParser.parseTacletsAndProblem();
                 initConfig.setTaclets(problemParser.getTaclets());

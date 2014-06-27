@@ -765,13 +765,11 @@ public final class SideProofUtil {
       // Initialize InitConfig with settings from the original InitConfig.
       final ProofSettings clonedSettings = sourceInitConfig.getSettings() != null ? new ProofSettings(sourceInitConfig.getSettings()) : null;
       initConfig.setSettings(clonedSettings);
-      initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
       initConfig.setTaclets(sourceInitConfig.getTaclets());
       // Create new ProofEnvironment and initialize it with values from initial one.
       ProofEnvironment env = new ProofEnvironment(initConfig);
       env.setJavaModel(sourceEnv.getJavaModel());
       env.setNumber(sourceEnv.getNumber());
-      env.setRuleConfig(sourceEnv.getRuleConfig());
       for (Taclet taclet : initConfig.activatedTaclets()) {
          env.getJustifInfo().addJustification(taclet, sourceJustiInfo.getJustification(taclet));
       }

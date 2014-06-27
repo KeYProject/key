@@ -57,8 +57,7 @@ public class KeYFileForTests extends KeYFile {
 		new ParserConfig(initConfig.getServices(), 
 				 initConfig.namespaces());
 	    KeYParserF problemParser = new KeYParserF
-		(ParserMode.PROBLEM,new KeYLexerF(cinp, file.toString(), null), pc, pc,initConfig.
-		 getTaclet2Builder(), initConfig.getTaclets()); 
+		(ParserMode.PROBLEM,new KeYLexerF(cinp, file.toString(), null), pc, pc,initConfig.getTaclets()); 
             problemParser.problem(); 
 	    initConfig.setTaclets(problemParser.getTaclets()); 
 	    variables = problemParser.namespaces().variables().copy();

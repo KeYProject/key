@@ -42,18 +42,18 @@ public class KeYParserF {
 
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF,
 	    ParserConfig schemaConfig, ParserConfig normalConfig,
-	    HashMap taclet2Builder, ImmutableSet<Taclet> taclets) {
+	    ImmutableSet<Taclet> taclets) {
 	LegacyCommonTokenStream stream = new LegacyCommonTokenStream(
 		keYLexerF.getKeYLexer());
 	this.keYParser = new KeYParser(mode, stream, schemaConfig,
-		normalConfig, taclet2Builder, taclets);
+		normalConfig, taclets);
     }
 
     public KeYParserF(ParserMode mode, TokenStream lexer,
 	    ParserConfig schemaConfig, ParserConfig normalConfig,
-	    HashMap taclet2Builder, ImmutableSet<Taclet> taclets) {
+	    ImmutableSet<Taclet> taclets) {
 	this.keYParser = new KeYParser(mode, lexer, schemaConfig,
-		normalConfig, taclet2Builder, taclets);
+		normalConfig, taclets);
     }
 
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF) {
