@@ -165,7 +165,7 @@ public class ProofEnvironment {
  	ProofEnvironment pe = (ProofEnvironment) cmp;
  	return pe.getJavaModel().equals(getJavaModel()) &&
  	      pe.initConfig.getActivatedChoices().equals(initConfig.getActivatedChoices()) &&
-	    pe.getNumber() == (getNumber());
+ 	      pe.getNumber() == getNumber();
     }
 
     public int hashCode() {
