@@ -130,6 +130,7 @@ options {
    private boolean onlyWith=false;
    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
    private HashSet usedChoiceCategories = new LinkedHashSet();
+   private HashMap taclet2Builder;
    private AbbrevMap scm;
    private KeYExceptionHandler keh = null;
    
@@ -245,7 +246,8 @@ options {
              lexer,
              new SchemaRecoder2KeY(services, nss),
              services,
-             nss);
+             nss,
+             new LinkedHashMap());
     }
 
     /**
@@ -255,11 +257,13 @@ options {
                      TokenStream lexer,
                      SchemaJavaReader jr, 
                      Services services,  
-                     NamespaceSet nss) {
+                     NamespaceSet nss, 
+                     HashMap taclet2Builder) {
         this(lexer, services, nss, mode);
         switchToSchemaMode();
         this.scm = new AbbrevMap();
         this.javaReader = jr;
+        this.taclet2Builder = taclet2Builder;
     }
 
 
@@ -270,6 +274,7 @@ options {
     		     TokenStream lexer, 
                      ParserConfig schemaConfig,
                      ParserConfig normalConfig, 
+                     HashMap taclet2Builder,
                      ImmutableSet<Taclet> taclets) { 
         this(lexer, null, null, mode);
         if (lexer instanceof DeclPicker) {
@@ -280,6 +285,7 @@ options {
         this.schemaConfig = schemaConfig;
         this.normalConfig = normalConfig;       
 	switchToNormalMode();
+        this.taclet2Builder = taclet2Builder;
         this.taclets = taclets;
         if(normalConfig != null){
             this.keh = normalConfig.services().getExceptionHandler();
@@ -297,6 +303,7 @@ options {
         this.schemaConfig = null;
         this.normalConfig = null;       
 	switchToNormalMode();
+        this.taclet2Builder = null;
         this.taclets = null;
         this.keh = new KeYRecoderExcHandler();
     }
@@ -1283,7 +1290,8 @@ options {
                                  Object rwObj,
                                  Sequent addSeq,
                                  ImmutableList<Taclet> addRList,
-                                 ImmutableSet<SchemaVariable> pvs) 
+                                 ImmutableSet<SchemaVariable> pvs,
+                                 ImmutableSet<Choice> soc) 
         throws RecognitionException/*SemanticException*/
         {
             TacletGoalTemplate gt = null;
@@ -1328,6 +1336,7 @@ options {
             }
             gt.setName(id); 
             b.addTacletGoalTemplate(gt);
+            if(soc != null) b.addGoal2ChoicesMapping(gt,soc);
         }
      
     public void testLiteral(String l1, String l2)
@@ -3504,6 +3513,7 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
         { 
             b.setChoices(choices_);
             r = b.getTaclet(); 
+            taclet2Builder.put(r,b);
 	  // dump local schema var decls
 	  namespaces().setVariables(variables().parent());
         }
@@ -4049,8 +4059,20 @@ varcond_subFormulas [TacletBuilder b, boolean negated]
 
 goalspecs[TacletBuilder b, boolean ruleWithFind] :
         CLOSEGOAL
-    | goalspec[b, ruleWithFind] ( SEMI goalspec[b, ruleWithFind] )* ;
+    | goalspecwithoption[b, ruleWithFind] ( SEMI goalspecwithoption[b, ruleWithFind] )* ;
 
+goalspecwithoption[TacletBuilder b, boolean ruleWithFind]
+@init{
+    soc = DefaultImmutableSet.<Choice>nil();
+} :
+        (( soc = option_list[soc]
+                LBRACE
+                goalspec[b,soc,ruleWithFind] 
+                RBRACE)
+        |  
+            goalspec[b,null,ruleWithFind] 
+        )
+    ;
 
 option returns [Choice c=null]
 :
@@ -4072,7 +4094,7 @@ LPAREN {result = soc; }
 RPAREN
 ;
 
-goalspec[TacletBuilder b, boolean ruleWithFind] 
+goalspec[TacletBuilder b, ImmutableSet<Choice> soc, boolean ruleWithFind] 
 @init{
     addSeq = Sequent.EMPTY_SEQUENT;
     addRList = ImmutableSLList.<Taclet>nil();
@@ -4089,7 +4111,7 @@ goalspec[TacletBuilder b, boolean ruleWithFind]
         | ( addRList=addrules )
         )
         {
-            addGoalTemplate(b,name,rwObj,addSeq,addRList,addpv);
+            addGoalTemplate(b,name,rwObj,addSeq,addRList,addpv,soc);
         }
         
     ;

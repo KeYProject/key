@@ -17,6 +17,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -35,6 +37,7 @@ import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public abstract class TacletLoader {
@@ -102,6 +105,7 @@ public abstract class TacletLoader {
         sysTaclets.addAll(addedList);
 
         ImmutableSet<Taclet> newTaclets = DefaultImmutableSet.nil();
+        HashMap<Taclet, TacletBuilder> map = initConfig.getTaclet2Builder();
         boolean tacletfound = false;
         for (Taclet taclet : sysTaclets) {
             if (tacletsToProve.contains(taclet)) {
@@ -110,6 +114,8 @@ public abstract class TacletLoader {
 
             if(!tacletfound) {
                 newTaclets = newTaclets.add(taclet);
+            } else {
+                map.remove(taclet);
             }
         }
 
@@ -242,6 +248,7 @@ public abstract class TacletLoader {
         private InitConfig createInitConfig(InitConfig reference) {
             InitConfig newConfig = reference.deepCopy();
             newConfig.setTaclets(DefaultImmutableSet.<Taclet> nil());
+            newConfig.setTaclet2Builder(new LinkedHashMap<Taclet, TacletBuilder>());
 
             return newConfig;
         }

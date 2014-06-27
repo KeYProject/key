@@ -186,6 +186,7 @@ public class TestTermParser extends TestCase {
 			    null),
 		    new ParserConfig(serv, nss),
 		    new ParserConfig(serv, nss),
+		    null,
 		    DefaultImmutableSet.<Taclet> nil()).problem();
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
