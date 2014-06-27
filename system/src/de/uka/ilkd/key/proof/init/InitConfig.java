@@ -258,8 +258,8 @@ public class InitConfig {
        for (Taclet t : taclets) {
           TacletBuilder b = taclet2Builder.get(t);
           
-          if(b!=null && t.getChoices().subset(activatedChoices)){
-             if (b.getGoal2Choices() != null){
+          if(t.getChoices().subset(activatedChoices)){
+             if (b != null && b.getGoal2Choices() != null){
                 t = b.getTacletWithoutInactiveGoalTemplates(activatedChoices);
              }
 
