@@ -143,44 +143,47 @@ public class DefaultProblemLoader {
     * @throws IOException Occurred Exception.
     */
    public ProblemLoaderException load() throws ProblemLoaderException {
-      try {
-          // Read environment
-          boolean oneStepSimplifier =
-                  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
-          ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
-          envInput = createEnvInput();
-          problemInitializer = createProblemInitializer();
-          initConfig = createInitConfig();
-          // Read proof obligation settings
-          LoadedPOContainer poContainer = createProofObligationContainer();
-          try {
-            if (poContainer == null) {
-               return selectProofObligation();
-            }
-            // Create proof and apply rules again if possible
-            proof = createProof(poContainer);
-            if (proof != null) {
-               replayProof(proof);
-            }
-
-            // this message is propagated to the top level in console mode
-            return null; // Everything fine
-          }
-          finally {
-              ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
-                                  .setOneStepSimplification(oneStepSimplifier);
-              getMediator().resetNrGoalsClosedByHeuristics();
-              if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
-                  ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
-              }
-          }
-      }
-      catch (ProblemLoaderException e) {
-          throw(e);
-      }
-      catch (Exception e) { // TODO give more specific exception message
-          throw new ProblemLoaderException(this, e);
-      }
+       try {
+           // Read environment
+           boolean oneStepSimplifier =
+                   ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+           ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
+           envInput = createEnvInput();
+           problemInitializer = createProblemInitializer();
+           initConfig = createInitConfig();
+           // Read proof obligation settings
+           LoadedPOContainer poContainer = createProofObligationContainer();
+           try {
+               if (poContainer == null) {
+                   if (mediator.getUI().selectProofObligation(initConfig)) {
+                      return null;
+                   } else {
+                      return new ProblemLoaderException(this, "Aborted.");
+                   }
+               }
+               // Create proof and apply rules again if possible
+               proof = createProof(poContainer);
+               if (proof != null) {
+                   replayProof(proof);
+               }
+               // this message is propagated to the top level in console mode
+               return null; // Everything fine
+         }         
+         finally {
+               ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                                   .setOneStepSimplification(oneStepSimplifier);
+               getMediator().resetNrGoalsClosedByHeuristics();
+               if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
+                   ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
+               }
+           }
+       }
+       catch (ProblemLoaderException e) {
+           throw(e);
+       }
+       catch (Exception e) { // TODO give more specific exception message
+           throw new ProblemLoaderException(this, e);
+       }
    }
 
    private File chooseFile(ContractPO po) {
@@ -406,16 +409,6 @@ public class DefaultProblemLoader {
       else {
           return null;
       }
-   }
-
-   /**
-    * This method is called if no {@link LoadedPOContainer} was created
-    * via {@link #createProofObligationContainer()} and can be overwritten
-    * for instance to open the proof management dialog as done by {@link ProblemLoader}.
-    * @return An error message or {@code null} if everything is fine.
-    */
-   protected ProblemLoaderException selectProofObligation() {
-      return null; // Do nothing
    }
 
    /**

@@ -639,7 +639,7 @@ public final class MainWindow extends JFrame  {
 
 
         fileMenu.add(loadUserDefinedTacletsAction);
-        JMenu submenu = new JMenu("Prove...");
+        JMenu submenu = new JMenu("Prove");
         fileMenu.add(submenu);
 
         submenu.add(loadUserDefinedTacletsForProvingAction);
@@ -931,7 +931,11 @@ public final class MainWindow extends JFrame  {
 
         private void setToolBarEnabled() {
             assert EventQueue.isDispatchThread() : "toolbar enabled from wrong thread";
-            if (doNotReenable == null) return; // XXX ignore this problem for the moment XXX
+            if (doNotReenable == null) {
+                // bug #1105 occurred
+                System.err.println("toolbar enabled w/o prior disable");
+                return;
+            }
 
             Component[] cs = controlToolBar.getComponents();
             for (int i = 0; i < cs.length; i++) {

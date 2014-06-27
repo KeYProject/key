@@ -103,6 +103,7 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.util.TestNodePreorderIterator.class,
         de.uka.ilkd.key.symbolic_execution.TestExecutionNodePreorderIterator.class,
         de.uka.ilkd.key.symbolic_execution.TestExecutionNodeWriterAndReader.class,
+        de.uka.ilkd.key.symbolic_execution.TestParallelSiteProofs.class,
         de.uka.ilkd.key.symbolic_execution.TestSymbolicLayoutExtractor.class,
         de.uka.ilkd.key.symbolic_execution.TestSymbolicLayoutWriterAndReader.class,
         de.uka.ilkd.key.symbolic_execution.TestSymbolicExecutionTreeBuilder.class,
@@ -118,6 +119,7 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.symbolic_execution.util.TestProofUserManager.class,
         de.uka.ilkd.key.symbolic_execution.util.TestSideProofStore.class,
         de.uka.ilkd.key.symbolic_execution.util.TestSymbolicExecutionUtil.class
+        
     };
     
     static Class<? extends TestCase>[] breakpointTests = new Class[] {

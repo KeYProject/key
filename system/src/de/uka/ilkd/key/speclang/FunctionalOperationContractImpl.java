@@ -1029,7 +1029,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                    ProgramVariable resultVar,
                                    Map<LocationVariable, ? extends ProgramVariable> atPreVars,
                                    Services services) {
-        assert (selfVar == null) == (originalSelfVar == null);
+        assert (selfVar == null) == (originalSelfVar == null):
+            "Illegal instantiation:" + (originalSelfVar == null?
+                            "this is a static contract, instantiated with self variable '"+selfVar+"'"
+                            : "this is an instance contract, instantiated without a self variable");
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert (resultVar == null) == (originalResultVar == null);

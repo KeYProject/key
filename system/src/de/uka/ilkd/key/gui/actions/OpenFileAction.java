@@ -36,7 +36,7 @@ public class OpenFileAction extends MainWindowAction {
 
     public OpenFileAction(MainWindow mainWindow) {
 	super(mainWindow);
-        setName("Load...");
+        setName("Load");
         setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Browse and load problem or proof files.");
         setAcceleratorLetter(KeyEvent.VK_O);

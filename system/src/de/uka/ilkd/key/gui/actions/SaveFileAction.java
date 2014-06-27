@@ -36,7 +36,7 @@ public final class SaveFileAction extends MainWindowAction {
 
     public SaveFileAction(MainWindow mainWindow) {
 	super(mainWindow);
-        setName("Save ...");
+        setName("Save");
         setIcon(IconFactory.saveFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Save current proof.");
         setAcceleratorLetter(KeyEvent.VK_S);

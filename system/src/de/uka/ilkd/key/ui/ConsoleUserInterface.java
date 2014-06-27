@@ -36,6 +36,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -291,27 +292,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
       return true; // All proofs are supported.
    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void removeProof(Proof proof) {
-       if (proof != null) {
-           if (!proofStack.isEmpty()) {
-               Proof p = proofStack.head();
-               proofStack = proofStack.removeAll(p);
-               assert p.name().equals(proof.name());
-               getMediator().setProof(proofStack.head());
-           } else {
-               // proofStack might be empty, though proof != null. This can
-               // happen for symbolic execution tests, if proofCreated was not
-               // called by the test setup.
-           }
-           proof.dispose();
-       }
-   }
-
-
    @Override
    public File saveProof(Proof proof, String fileExtension) {
        if (batchMode.isLoadOnly()) {
@@ -342,5 +322,33 @@ public class ConsoleUserInterface extends AbstractUserInterface {
            e.printStackTrace();
        }
        return file;
+   }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeProof(Proof proof) {
+        if (proof != null) {
+            if (!proofStack.isEmpty()) {
+                Proof p = proofStack.head();
+                proofStack = proofStack.removeAll(p);
+                assert p.name().equals(proof.name());
+                getMediator().setProof(proofStack.head());
+            } else {
+                // proofStack might be empty, though proof != null. This can
+                // happen for symbolic execution tests, if proofCreated was not
+                // called by the test setup.
+            }
+            proof.dispose();
+        }
+    }
+
+   @Override
+   public boolean selectProofObligation(InitConfig initConfig) {
+      if(verbosity >= DEBUG) {
+         System.out.println("Proof Obligation selection not supported by console.");
+        }
+      return false;
    }
 }

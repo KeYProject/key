@@ -139,20 +139,20 @@ while [ $# -ne 0 ]; do
 	    list_help
 	    exit;;
 
-        --K-headless)
-            keysysprops="${keysysprops}-Djava.awt.headless=true "
-            shift
-            continue;;
+	--K-headless)
+		echo "Warning: --K-headless option is deprecated"
+		shift
+		continue;;
 
-        --K-keydebug)
-            keysysprops="${keysysprops}-DKeyDebugFlag=on "
-            shift
-            continue;;
+	--K-keydebug)
+		keysysprops="${keysysprops}-DKeyDebugFlag=on "
+		shift
+		continue;;
 
-        --K-debugclassloader)
-            keysysprops="${keysysprops}-DKeyDebugClassLoader=on "
-            shift
-            continue;;
+	--K-debugclassloader)
+		keysysprops="${keysysprops}-DKeyDebugClassLoader=on "
+		shift
+		continue;;
 
 	--K-debugprefix) keysysprops="${keysysprops}-Dkey.debug.prefix=${2} "
 	    shift
@@ -179,8 +179,8 @@ while [ $# -ne 0 ]; do
 
 
 	--K-server) keysysprops="${keysysprops}-server "
-            shift
-            continue;;
+		shift
+		continue;;
 
         # -J options following conventions of Java for -J options
         #special treatment of the options which are also set by default
@@ -204,8 +204,21 @@ while [ $# -ne 0 ]; do
 	    shift
 	    continue;;
 
-
          # key options beginning with a minus or filenames
+         # set headless mode for all of them
+	--auto)
+             keysysprops="${keysysprops}-Djava.awt.headless=true "
+	     break;;
+	--auto-loadonly)
+             keysysprops="${keysysprops}-Djava.awt.headless=true "
+	     break;;
+	--help)
+             keysysprops="${keysysprops}-Djava.awt.headless=true "
+	     break;;
+	--show-properties)
+             keysysprops="${keysysprops}-Djava.awt.headless=true "
+	     break;;
+
          *) break;;
 
     esac

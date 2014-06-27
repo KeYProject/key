@@ -26,7 +26,8 @@ public class RuleJustificationInfo {
 
     private Map<Rule, RuleJustification> rule2justif 
     	= new LinkedHashMap<Rule, RuleJustification>();
-
+    
+    
     public void addJustification(Rule r, RuleJustification j) {
 	rule2justif.put(r, j);
     }

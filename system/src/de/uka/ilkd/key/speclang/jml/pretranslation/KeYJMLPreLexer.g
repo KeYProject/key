@@ -372,9 +372,10 @@ EQUALITY : '=';
 EMPTYBRACKETS : '[]';
         
 
+COMMA : ',' ;
 JAVASEPARATOR
     :
-       '{' | '}' | '[' | ']' | ';' | ',' | '.'
+       '{' | '}' | ';' | '.'
     ;
 
 JAVAOPERATOR

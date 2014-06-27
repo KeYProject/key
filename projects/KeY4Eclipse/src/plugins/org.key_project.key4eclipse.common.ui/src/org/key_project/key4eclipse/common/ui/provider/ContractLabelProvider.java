@@ -13,17 +13,9 @@
 
 package org.key_project.key4eclipse.common.ui.provider;
 
-import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.widgets.Display;
-import org.key_project.util.eclipse.swt.ImageUtil;
+import org.key_project.util.eclipse.swt.viewer.AbstractSimpleHTMLLabelProvider;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.Contract;
@@ -32,16 +24,11 @@ import de.uka.ilkd.key.speclang.Contract;
  * An {@link ILabelProvider} that can be used to show {@link Contract}s.
  * @author Martin Hentschel
  */
-public class ContractLabelProvider extends LabelProvider {
+public class ContractLabelProvider extends AbstractSimpleHTMLLabelProvider {
     /**
      * The {@link Services} to use.
      */
-    private Services services;
-    
-    /**
-     * Contains rendered HTML images.
-     */
-    private Map<Object, Image> cache = new HashMap<Object, Image>();
+    private final Services services;
     
     /**
      * Constructor.
@@ -51,61 +38,33 @@ public class ContractLabelProvider extends LabelProvider {
         Assert.isNotNull(services);
         this.services = services;
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public Image getImage(Object element) {
-        if (element instanceof Contract) {
-            Image image = cache.get(element);
-            if (image == null) {
-                // Convert contract to HTML 
-                Contract contract = (Contract)element;
-                String html = contract.getHTMLText(services);
-                // Insert contract name into HTML
-                int index = html.indexOf("<html>");
-                if (index >= 0) {
-                    // A real border with tile via <fieldset><legend>Title</legend>Content</fieldset> is not supported by Swing 
-                    html = html.substring(0, index) + 
-                           "<html><h2>" + contract.getName() + "</h2>" + 
-                           html.substring(index + "<html>".length());
-                }
-                // Create image
-                BufferedImage javaImage = ImageUtil.renderHTML(html, true, true);
-                ImageData data = ImageUtil.convertToImageData(javaImage);
-                image = new Image(Display.getDefault(), data);
-                cache.put(element, image);
-            }
-            return image;
-        }
-        else {
-            return super.getImage(element);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getText(Object element) {
-        if (element instanceof Contract) {
-            return null; // Don't show text because an Image is shown, with text the columns are to big
-        }
-        else {
-            return super.getText(element);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void dispose() {
-        for (Image image : cache.values()) {
-            image.dispose();
-        }
-        cache.clear();
-        super.dispose();
+    protected String getHtml(Object element) {
+       if (element instanceof Contract) {
+          // Convert contract to HTML 
+          Contract contract = (Contract)element;
+          String html = contract.getHTMLText(services);
+          // Insert contract name into HTML
+          int start = html.indexOf("<html>");
+          if (start >= 0) {
+              // A real border with tile via <fieldset><legend>Title</legend>Content</fieldset> is not supported by Swing
+              int end = html.indexOf("</html>", start + "<html>".length());
+              String text = end >= 0 ?
+                            html.substring(start + "<html>".length(), end) :
+                            html.substring(start + "<html>".length());
+              html = "<html><body><h2>" + 
+                     contract.getDisplayName() + "</h2><br>" + 
+                     text +
+                     "</body></html>";
+          }
+          return html;
+       }
+       else {
+           return null;
+       }
     }
 }

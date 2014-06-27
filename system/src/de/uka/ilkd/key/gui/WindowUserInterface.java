@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -286,6 +287,30 @@ public class WindowUserInterface extends AbstractUserInterface {
       return mainWindow.getProofList().containsProof(proof);
    }
 
+   @Override
+   public File saveProof(Proof proof, String fileExtension) {
+       final MainWindow mainWindow = MainWindow.getInstance();
+       final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
+       final String defaultName = MiscTools.toValidFileName(proof.name().toString()).toString();
+       boolean autoSave = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave();
+       final Pair<Boolean, Pair<File, Boolean>> res =
+               jFC.showSaveDialog(mainWindow, defaultName + fileExtension, autoSave);
+       final boolean saved = res.first;
+       final boolean newDir = res.second.second;
+       File file = null;
+       if (saved) {
+           file = jFC.getSelectedFile();
+           mainWindow.saveProof(jFC.getSelectedFile());
+       } else if (newDir) {
+           final File dir = res.second.first;
+           if (!dir.delete()) {
+               dir.deleteOnExit();
+           }
+       }
+       jFC.resetPath();
+       return file;
+   }
+
    /**
     * {@inheritDoc}
     */
@@ -315,27 +340,9 @@ public class WindowUserInterface extends AbstractUserInterface {
         }
     }
 
-    @Override
-    public File saveProof(Proof proof, String fileExtension) {
-        final MainWindow mainWindow = MainWindow.getInstance();
-        final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
-        final String defaultName = MiscTools.toValidFileName(proof.name().toString()).toString();
-        boolean autoSave = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave();
-        final Pair<Boolean, Pair<File, Boolean>> res =
-                jFC.showSaveDialog(mainWindow, defaultName + fileExtension, autoSave);
-        final boolean saved = res.first;
-        final boolean newDir = res.second.second;
-        File file = null;
-        if (saved) {
-            file = jFC.getSelectedFile();
-            mainWindow.saveProof(jFC.getSelectedFile());
-        } else if (newDir) {
-            final File dir = res.second.first;
-            if (!dir.delete()) {
-                dir.deleteOnExit();
-            }
-        }
-        jFC.resetPath();
-        return file;
-    }
+   @Override
+   public boolean selectProofObligation(InitConfig initConfig) {
+      ProofManagementDialog.showInstance(initConfig);
+      return ProofManagementDialog.startedProof();
+   }
 }

@@ -27,11 +27,13 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -236,4 +238,12 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
     void removeProof(Proof proof);
 
     File saveProof(Proof proof, String fileExtension);
+    
+    /**
+     * This method is called if no {@link LoadedPOContainer} was created
+     * via {@link #createProofObligationContainer()} and can be overwritten
+     * for instance to open the proof management dialog as done by {@link ProblemLoader}.
+     * @return true if the proof obligation was selected, and false if action was aborted
+     */
+    public boolean selectProofObligation(InitConfig initConfig);
 }
