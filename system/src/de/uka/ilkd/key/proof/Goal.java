@@ -170,14 +170,6 @@ public final class Goal  {
 	return node.getGlobalProgVars();
     }
 
-    public Namespace createGlobalProgVarNamespace() {
-        final Namespace ns = new Namespace();        
-        for (final ProgramVariable pv : getGlobalProgVars()) {
-            ns.add(pv);
-        }
-        return ns;
-    }
-
     /**
      * adds the listener l to the list of goal listeners.
      * Attention: A listener added to this goal will be taken over when

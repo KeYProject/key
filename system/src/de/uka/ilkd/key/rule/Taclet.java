@@ -1118,33 +1118,33 @@ public abstract class Taclet implements Rule, Named {
                                     PosInOccurrence posOfFind,
                                     Services services, 
                                     MatchConditions matchCond) {
-        ImmutableList<RenamingTable> renamings = ImmutableSLList.<RenamingTable>nil();
-	for (final SchemaVariable sv : pvs) {
-	    ProgramVariable inst
-		= (ProgramVariable)matchCond.getInstantiations ().getInstantiation(sv);
-	    //if the goal already contains the variable to be added 
-	    //(not just a variable with the same name), then there is nothing to do
-	    if(goal.getGlobalProgVars().contains(inst)) {
-		continue;
-	    }
-	    
-	    final VariableNamer vn = services.getVariableNamer();
-	    ProgramVariable renamedInst = vn.rename(inst, goal, posOfFind);
-	    goal.addProgramVariable(renamedInst);
-	    goal.proof().getServices().addNameProposal(renamedInst.name());
-            
-            HashMap<ProgramVariable, ProgramVariable> renamingMap =
-                    vn.getRenamingMap();
-            if (!renamingMap.isEmpty()) {        
-                //execute renaming
-                ProgVarReplacer pvr = new ProgVarReplacer(vn.getRenamingMap(), services);
-                pvr.replace(goal);
-                final RenamingTable rt = 
-                RenamingTable.getRenamingTable(vn.getRenamingMap());
-                renamings = renamings.append(rt);
-            }
-	}
-	goal.node().setRenamings(renamings);
+       ImmutableList<RenamingTable> renamings = ImmutableSLList.<RenamingTable>nil();
+       for (final SchemaVariable sv : pvs) {
+          final ProgramVariable inst 
+          = (ProgramVariable)matchCond.getInstantiations ().getInstantiation(sv);
+          //if the goal already contains the variable to be added 
+          //(not just a variable with the same name), then there is nothing to do
+          if(goal.getGlobalProgVars().contains(inst)) {
+             continue;
+          }
+
+          final VariableNamer vn = services.getVariableNamer();
+          final ProgramVariable renamedInst = vn.rename(inst, goal, posOfFind);
+          goal.addProgramVariable(renamedInst);
+          goal.proof().getServices().addNameProposal(renamedInst.name());
+
+          HashMap<ProgramVariable, ProgramVariable> renamingMap =
+                vn.getRenamingMap();
+          if (!renamingMap.isEmpty()) {        
+             //execute renaming
+             final ProgVarReplacer pvr = new ProgVarReplacer(vn.getRenamingMap(), services);
+             pvr.replace(goal);
+             final RenamingTable rt = 
+                   RenamingTable.getRenamingTable(vn.getRenamingMap());
+             renamings = renamings.append(rt);
+          }
+       }
+       goal.node().setRenamings(renamings);
     }
 
 
