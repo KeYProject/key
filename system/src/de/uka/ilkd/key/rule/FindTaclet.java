@@ -275,9 +275,10 @@ public abstract class FindTaclet extends Taclet {
 	    find ().execPostOrder ( svc );
 	    
 	    ifFindVariables             = getIfVariables ();
-	    Iterator<SchemaVariable> it = svc.varIterator ();
-	    while ( it.hasNext () )
-		ifFindVariables = ifFindVariables.add ( it.next () );
+	    
+	    for (final SchemaVariable sv : svc.vars ()) {
+	       ifFindVariables = ifFindVariables.add ( sv );
+	    }
 	}
 
 	return ifFindVariables;

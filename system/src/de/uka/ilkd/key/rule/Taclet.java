@@ -47,6 +47,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -1062,63 +1063,52 @@ public abstract class Taclet implements Rule, Named {
      * the instantiations of the schemavariables
      */
     protected void applyAddrule(ImmutableList<Taclet> rules, Goal goal, 
-				Services services,
-				MatchConditions matchCond) {
-                                
-	final Iterator<Taclet> it = rules.iterator();
-	while (it.hasNext()) {
-	    Taclet tacletToAdd = it.next(); 
-	    String uniqueTail=""; // we need to name the new taclet uniquely
-            if ("".equals(uniqueTail)) { // otherwise just number it
-               de.uka.ilkd.key.proof.Node n = goal.node();
-               uniqueTail = AUTONAME+n.getUniqueTacletNr()+"_"+n.parent().siblingNr();
-            }
+          Services services,
+          MatchConditions matchCond) {
 
-            tacletToAdd=tacletToAdd.setName(tacletToAdd.name()+uniqueTail);
+       for (Taclet tacletToAdd : rules) { 
+          final Node n = goal.node();
+          final StringBuilder uniqueTail = new StringBuilder(tacletToAdd.name().toString());                   
+          uniqueTail.append(AUTONAME).append(n.getUniqueTacletNr()).append("_").append(n.parent().siblingNr());
+          tacletToAdd = tacletToAdd.setName(uniqueTail.toString());
 
 
-	    // the new Taclet may contain variables with a known
-	    // instantiation. These must be used by the new Taclet and all
-	    // further rules it contains in the addrules-sections. Therefore all
-	    // appearing (including the addrules) SchemaVariables have to be
-	    // collected, then it is looked if an instantiation is known and if
-	    // positive the instantiation is memorized. At last the Taclet with
-	    // its required instantiations is handed over to the goal, where a
-	    // new TacletApp should be built including the necessary instantiation
-	    // information
+          // the new Taclet may contain variables with a known
+          // instantiation. These must be used by the new Taclet and all
+          // further rules it contains in the addrules-sections. Therefore all
+          // appearing (including the addrules) SchemaVariables have to be
+          // collected, then it is looked if an instantiation is known and if
+          // positive the instantiation is memorized. At last the Taclet with
+          // its required instantiations is handed over to the goal, where a
+          // new TacletApp should be built including the necessary instantiation
+          // information
 
-	    SVInstantiations neededInstances = SVInstantiations.
-		EMPTY_SVINSTANTIATIONS.addUpdateList
-		(matchCond.getInstantiations ().getUpdateContext());
-	    final TacletSchemaVariableCollector collector = new
-		TacletSchemaVariableCollector(); 
-	    collector.visit(tacletToAdd, true);// true, because
-	                                     // descend into
-					     // addrules
-	    final Iterator<SchemaVariable> svIt = collector.varIterator();
-	    while (svIt.hasNext()) {
-		SchemaVariable sv = svIt.next();
-		if (matchCond.getInstantiations ().isInstantiated(sv)) {
-		    neededInstances = neededInstances.add(
-			    	sv, 
-			    	matchCond.getInstantiations ().getInstantiationEntry(sv), 
-				services);
-		} 
-	    }
+          SVInstantiations neededInstances = SVInstantiations.
+                EMPTY_SVINSTANTIATIONS.addUpdateList
+                (matchCond.getInstantiations ().getUpdateContext());
+          final TacletSchemaVariableCollector collector = new
+                TacletSchemaVariableCollector(); 
+          collector.visit(tacletToAdd, true);// true, because
+          // descend into addrules
+          for (SchemaVariable sv : collector.vars()) {
+             if (matchCond.getInstantiations ().isInstantiated(sv)) {
+                neededInstances = neededInstances.add(
+                      sv, 
+                      matchCond.getInstantiations ().getInstantiationEntry(sv), 
+                      services);
+             } 
+          }
 
-	    {
-		final ImmutableList<GenericSortCondition>     cs  =
-		    matchCond.getInstantiations ()
-		    .getGenericSortInstantiations ().toConditions ();
-		final Iterator<GenericSortCondition> cit = cs.iterator ();
+          final ImmutableList<GenericSortCondition>     cs  =
+                matchCond.getInstantiations ()
+                .getGenericSortInstantiations ().toConditions ();
 
-		while ( cit.hasNext () )
-		    neededInstances = neededInstances.add(cit.next (), 
-			    				  services );
-	    }
+          for (final GenericSortCondition gsc : cs) {
+             neededInstances = neededInstances.add(gsc, services );
+          }
 
-	    goal.addTaclet(tacletToAdd, neededInstances, true);
-	}
+          goal.addTaclet(tacletToAdd, neededInstances, true);
+       }
     }
 
 
@@ -1263,9 +1253,9 @@ public abstract class Taclet implements Rule, Named {
 	    svc.visit( ifSequent () );
 	    
 	    ifVariables                 = DefaultImmutableSet.<SchemaVariable>nil();
-	    Iterator<SchemaVariable> it = svc.varIterator ();
-	    while ( it.hasNext () )
-		ifVariables = ifVariables.add ( it.next () );
+	    for (final SchemaVariable sv : svc.vars()) {
+		  ifVariables = ifVariables.add ( sv );
+	    }
 	}
 
 	return ifVariables;
