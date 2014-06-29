@@ -1,8 +1,7 @@
 package org.key_project.key4eclipse.resources.builder;
 
-import org.eclipse.core.internal.resources.Folder;
-import org.eclipse.core.internal.resources.Project;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 public class MutexRule implements ISchedulingRule{
@@ -10,7 +9,7 @@ public class MutexRule implements ISchedulingRule{
    @Override
    public boolean contains(ISchedulingRule rule) {
       if(rule != null){
-         if(rule instanceof Folder){
+         if(rule instanceof IFolder){
             IFolder ruleFolder = (IFolder) rule;
             IFolder proofFolder = ruleFolder.getProject().getFolder("proofs");
             if(proofFolder.exists()){
@@ -20,7 +19,7 @@ public class MutexRule implements ISchedulingRule{
                return false;
             }
          }
-         else if(rule instanceof Project){
+         else if(rule instanceof IProject){
             return true;
          }
       }

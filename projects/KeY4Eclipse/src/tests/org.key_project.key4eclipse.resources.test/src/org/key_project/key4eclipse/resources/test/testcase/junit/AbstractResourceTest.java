@@ -21,7 +21,7 @@ public class AbstractResourceTest extends AbstractSetupTestCase {
    public void setUp() throws Exception {
       super.setUp();
       // Store current settings
-      oldAutoBuildEnabled = KeY4EclipseResourcesTestUtil.enableAutoBuild(false);
+      oldAutoBuildEnabled = KeY4EclipseResourcesTestUtil.isAutoBuilding();
       spToRestore = ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties();
       maxStepsToRestore = ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getMaxSteps();
       // Update settings

@@ -139,21 +139,24 @@ public class KeY4EclipseResourcesTestUtil {
     * @throws CoreException
     */
    public static void build(IProject project) throws CoreException{
-      project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
-      IJobManager jobMan = Job.getJobManager();
-      Job[] jobs = jobMan.find("KeYProjectBuildJob");
-      if (jobs != null) {
-         for (Job job : jobs) {
-             TestUtilsUtil.waitForJob(job);
-         }
-      }
-      project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
-      jobs = jobMan.find("KeYProjectBuildJob");
-      if (jobs != null) {
-         for (Job job : jobs) {
-             TestUtilsUtil.waitForJob(job);
-         }
-      }
+      
+      
+      
+//      project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
+//      IJobManager jobMan = Job.getJobManager();
+//      Job[] jobs = jobMan.find("KeYProjectBuildJob");
+//      if (jobs != null) {
+//         for (Job job : jobs) {
+//             TestUtilsUtil.waitForJob(job);
+//         }
+//      }
+//      project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
+//      jobs = jobMan.find("KeYProjectBuildJob");
+//      if (jobs != null) {
+//         for (Job job : jobs) {
+//             TestUtilsUtil.waitForJob(job);
+//         }
+//      }
    }
    
    public static void cleanBuild(IProject project) throws CoreException{
@@ -239,7 +242,7 @@ public class KeY4EclipseResourcesTestUtil {
    
    public static IProject initializeTest(String projectName, boolean buildProofs, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles, boolean hideMetaFiles) throws CoreException, InterruptedException{
       //turn off autobuild
-      enableAutoBuild(false);
+//      enableAutoBuild(false);
       //create a KeYProject
       IJavaProject keyProject = createKeYProject(projectName);
       IProject project = keyProject.getProject();

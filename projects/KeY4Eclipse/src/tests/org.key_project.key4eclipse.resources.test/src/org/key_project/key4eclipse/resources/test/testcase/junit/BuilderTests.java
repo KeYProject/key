@@ -558,6 +558,8 @@ public class BuilderTests extends AbstractResourceTest {
    
    
    private void testFileDeleted(IProject project, boolean proofDeleted) throws CoreException{
+      ResourcesPlugin.getWorkspace().addResourceChangeListener(listener, IProject.b)
+      
       IFolder proofFolder = KeY4EclipseResourcesTestUtil.getProofFolder(project);
       IFile javaFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("src").append("File.java"));
@@ -570,8 +572,10 @@ public class BuilderTests extends AbstractResourceTest {
       assertTrue(!proofFile.exists());
       assertTrue(!metaFile.exists());
       
-      
+      int oldBuildCount = buildListener.getBuildCount();
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/BuilderTests/testFileDeleted/", project.getFolder("src"));
+      // TODO: Wait until buildListener.getBuildCount() > oldBuildCount 
+      // TODO: Wait until Job is done
       
       assertTrue(javaFile.exists());
       
