@@ -210,7 +210,7 @@ public final class Goal  {
      * @param l the GoalListener to be removed
      */
     public void removeGoalListener(GoalListener l) {
-	listeners.remove(l);
+       listeners.remove(l);
     }
 
     /**
@@ -221,16 +221,16 @@ public final class Goal  {
     protected void fireSequentChanged(SequentChangeInfo sci) {
 	getFormulaTagManager().sequentChanged(this, sci);
 	ruleAppIndex()        .sequentChanged(this, sci);
-	for (int i = 0, sz = listeners.size(); i<sz; i++) {
-	    listeners.get(i).sequentChanged(this, sci);
+   for (GoalListener listener : listeners) {
+	    listener.sequentChanged(this, sci);
 	}
     }
 
     protected void fireGoalReplaced(Goal       goal,
 				    Node       parent,
 				    ImmutableList<Goal> newGoals) {
-	for (int i = 0, sz = listeners.size(); i<sz; i++) {
-	    listeners.get(i).goalReplaced(goal, parent, newGoals);
+	for (GoalListener listener : listeners) {
+	    listener.goalReplaced(goal, parent, newGoals);
 	}
     }
 

@@ -158,6 +158,8 @@ public class InitConfig {
             @SuppressWarnings("unchecked")
             HashMap<String, String> clone = (HashMap<String, String>)category2DefaultChoice.clone();            
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
+            // invalidate active taclet cache
+            activatedTacletCache = null;
         }
     }
 
@@ -221,6 +223,8 @@ public class InitConfig {
 
     public void setTaclets(ImmutableSet<Taclet> taclets){
         this.taclets = taclets;
+        // invalidate active taclet cache
+        this.activatedTacletCache = null;
     }
 
 

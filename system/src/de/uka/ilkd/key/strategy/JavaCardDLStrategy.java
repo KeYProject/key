@@ -269,7 +269,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
               loopInvF,
               blockFeature,
               ifMatchedF,
-                dispatcher);
+              dispatcher);
     }
     
     private Feature loopInvFeature(Feature cost) {
