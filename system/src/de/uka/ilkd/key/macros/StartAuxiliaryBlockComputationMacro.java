@@ -90,20 +90,20 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro {
     }
 
     @Override
-    public void applyTo(KeYMediator mediator,
-                        ImmutableList<Goal> goals,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) {
-        if (goals == null || goals.head() == null
-                || goals.head().node().parent() == null) {
-            return;
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) {
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
+        final Proof proof = goals.head().proof();
+        if (goals.head().node().parent() == null) {
+            return info;
         }
         RuleApp app = goals.head().node().parent().getAppliedRuleApp();
         if (!(app instanceof BlockContractBuiltInRuleApp)) {
-            return;
+            return info;
         }
 
-        Proof proof = goals.head().proof();
         InitConfig initConfig = proof.env().getInitConfig();
 
         BlockContractBuiltInRuleApp blockRuleApp = (BlockContractBuiltInRuleApp) app;
@@ -127,9 +127,11 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro {
             // it again at the right time
             mediator.stopInterface(true);
             mediator.setInteractive(false);
+            info = new ProofMacroFinishedInfo(this, p.openEnabledGoals(), p);
         } catch (ProofInputException exc) {
             ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
         }
+        return info;
     }
 
 

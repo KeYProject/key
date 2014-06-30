@@ -105,29 +105,35 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
     }
 
     @Override
-	public void applyTo(KeYMediator mediator,
-						ImmutableList<Goal> goals,
-						PosInOccurrence posInOcc,
-						ProverTaskListener listener) throws InterruptedException {
-		for (Goal goal : goals) {
-			final ProofMacro macro = getProofMacro();
-			if (!applicableOnNodeAtPos.containsKey(goal.node())) {
-				// node has not been checked before, so do it
-				boolean canBeApplied =
-						canApplyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc);
-				if (!canBeApplied) {
-					// canApplyTo checks all open goals. thus, if it returns
-					// false, then this macro is not applicable at all and
-					// we can return
-					return;
-				}
-			}
-			PosInOccurrence applicableAt =
-					applicableOnNodeAtPos.get(goal.node());
-			if (applicableAt != null) {
-				macro.applyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal), applicableAt, listener);
-			}
-		}
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
+        for (Goal goal : goals) {
+            final ProofMacro macro = getProofMacro();
+            if (!applicableOnNodeAtPos.containsKey(goal.node())) {
+                // node has not been checked before, so do it
+                boolean canBeApplied =
+                        canApplyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc);
+                if (!canBeApplied) {
+                    // canApplyTo checks all open goals. thus, if it returns
+                    // false, then this macro is not applicable at all and
+                    // we can return
+                    return new ProofMacroFinishedInfo(this, goal);
+                }
+            }
+            PosInOccurrence applicableAt = applicableOnNodeAtPos.get(goal.node());
+            if (applicableAt != null) {
+                final ProverTaskListener pml = getListener();
+                pml.taskStarted(getName(), 0);
+                info = macro.applyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal),
+                                    applicableAt, new CompositePTListener(listener, pml));
+                pml.taskFinished(info);
+                info = new ProofMacroFinishedInfo(this, info);
+            }
+        }
+        return info;
     }
 
     /**

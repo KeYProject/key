@@ -76,10 +76,10 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
      * If the automation is interrupted, report the interruption as an exception.
      */
     @Override
-    public void applyTo(KeYMediator mediator,
-                        ImmutableList<Goal> goals,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
         IGoalChooser goalChooser = mediator.getProfile().getSelectedGoalChooserBuilder().create();
         final ApplyStrategy applyStrategy = new ApplyStrategy(goalChooser, false);
 
@@ -104,10 +104,13 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         Strategy oldStrategy = proof.getActiveStrategy();
         proof.setActiveStrategy(createStrategy(mediator, posInOcc));
 
+        ProofMacroFinishedInfo info =
+                new ProofMacroFinishedInfo(this, proof.openEnabledGoals(), proof);
         try {
             // find the relevant goals
             // and start
             applyStrategy.start(proof, proof.getSubtreeEnabledGoals(mediator.getSelectedNode()));
+            info = new ProofMacroFinishedInfo(this, proof.openEnabledGoals(), proof);
         } finally {
             // this resets the proof strategy and the managers after the automation
             // has run
@@ -132,6 +135,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
                 throw new InterruptedException();
             }
         }
+        return info;
     }
 
     @Override

@@ -41,18 +41,20 @@ public class FinishAuxiliaryLoopComputationMacro extends
     }
 
     @Override
-    public void applyTo(final KeYMediator mediator,
-                        ImmutableList<Goal> goals,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) {
+    public ProofMacroFinishedInfo applyTo(final KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) {
         final Proof proof = mediator.getSelectedProof();
         if (proof == null) {
-            return;
+            return null;
         }
+
+        final ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals, proof);
         final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
         if (!(poForProof instanceof LoopInvExecutionPO)) {
-            return;
+            return info;
         }
         final LoopInvExecutionPO loopInvExecPO = (LoopInvExecutionPO) poForProof;
 
@@ -60,11 +62,11 @@ public class FinishAuxiliaryLoopComputationMacro extends
         final Services services = initiatingGoal.proof().getServices();
 
         if (initiatingGoal.node().parent() == null) {
-            return;
+            return info;
         }
         final RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
         if (!(app instanceof LoopInvariantBuiltInRuleApp)) {
-            return;
+            return info;
         }
         final LoopInvariantBuiltInRuleApp loopInvRuleApp =
                 (LoopInvariantBuiltInRuleApp)app;
@@ -102,6 +104,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
                 mediator.stopInterface(true);
             }
         });
+        return new ProofMacroFinishedInfo(this, initiatingGoal);
     }
 
     @Override

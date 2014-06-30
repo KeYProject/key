@@ -76,18 +76,20 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro {
     }
 
     @Override
-    public void applyTo(KeYMediator mediator,
-                        ImmutableList<Goal> goals,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) {
-        Proof proof = goals.head().proof();
-        Services services = proof.getServices();
-        InitConfig initConfig = proof.env().getInitConfig();
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) {
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
+        final Proof proof = goals.head().proof();
 
+        Services services = proof.getServices();
         ProofOblInput poForProof = services.getSpecificationRepository().getProofOblInput(proof);
         if (!(poForProof instanceof InfFlowContractPO)) {
-            return;
+            return info;
         }
+
+        InitConfig initConfig = proof.env().getInitConfig();
         InfFlowContractPO po = (InfFlowContractPO) poForProof;
 
         SymbolicExecutionPO symbExecPO =
@@ -106,9 +108,11 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro {
             // it again at the right time
             mediator.stopInterface(true);
             mediator.setInteractive(false);
+            info = new ProofMacroFinishedInfo(this, p.openEnabledGoals(), p);
         } catch (ProofInputException exc) {
             ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
         }
+        return info;
     }
 
 

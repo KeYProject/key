@@ -51,29 +51,31 @@ public class FinishAuxiliaryBlockComputationMacro
 
 
     @Override
-    public void applyTo(final KeYMediator mediator,
-                        ImmutableList<Goal> goals,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) {
+    public ProofMacroFinishedInfo applyTo(final KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) {
         final Proof proof = mediator.getSelectedProof();
         if (proof == null) {
-            return;
+            return null;
         }
+
+        final ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals, proof);
         final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
         if (!(poForProof instanceof BlockExecutionPO)) {
-            return;
+            return info;
         }
 
         final Goal initiatingGoal = ((BlockExecutionPO) poForProof).getInitiatingGoal();
         final Services services = initiatingGoal.proof().getServices();
 
         if (initiatingGoal.node().parent() == null) {
-            return;
+            return info;
         }
         final RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
         if (!(app instanceof BlockContractBuiltInRuleApp)) {
-            return;
+            return info;
         }
         final BlockContractBuiltInRuleApp blockRuleApp =
                 (BlockContractBuiltInRuleApp)app;
@@ -109,6 +111,7 @@ public class FinishAuxiliaryBlockComputationMacro
                 mediator.stopInterface(true);
             }
         });
+        return new ProofMacroFinishedInfo(this, initiatingGoal);
     }
 
 

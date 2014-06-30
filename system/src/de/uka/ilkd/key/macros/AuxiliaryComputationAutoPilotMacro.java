@@ -98,7 +98,7 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                     new StartAuxiliaryComputationMacro() {
                         @Override
                         public boolean finishAfterMacro() { return false; } },
-                    finishSymbExecAndTryToClose,};
+                    finishSymbExecAndTryToClose};
             }
         };
     }

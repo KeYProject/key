@@ -50,18 +50,20 @@ public class FinishAuxiliaryMethodComputationMacro
 
 
     @Override
-    public void applyTo(final KeYMediator mediator,
-                        ImmutableList<Goal> goals,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) {
+    public ProofMacroFinishedInfo applyTo(final KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) {
         final Proof proof = mediator.getSelectedProof();
         if (proof == null) {
-            return;
+            return null;
         }
+
+        final ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals, proof);
         final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
         if (!(poForProof instanceof SymbolicExecutionPO)) {
-            return;
+            return info;
         }
         final Goal initiatingGoal = ((SymbolicExecutionPO) poForProof).getInitiatingGoal();
         final Proof initiatingProof = initiatingGoal.proof();
@@ -99,6 +101,7 @@ public class FinishAuxiliaryMethodComputationMacro
                 mediator.stopInterface(true);
             }
         });
+        return new ProofMacroFinishedInfo(this, initiatingGoal);
     }
 
 

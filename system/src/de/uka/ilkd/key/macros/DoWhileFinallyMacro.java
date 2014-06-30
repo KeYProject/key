@@ -41,8 +41,8 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
 
     @Override
 	public boolean canApplyTo(KeYMediator mediator,
-							  ImmutableList<Goal> goals,
-							  PosInOccurrence posInOcc) {
+	                          ImmutableList<Goal> goals,
+	                          PosInOccurrence posInOcc) {
         if (getCondition()) {
             return getProofMacro().canApplyTo(mediator, goals, posInOcc);
         } else {
@@ -51,20 +51,32 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
     }
 
     @Override
-    public void applyTo(KeYMediator mediator,
-                        ImmutableList<Goal> goals,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         int steps = getMaxSteps(mediator);
         while (steps > 0 && getCondition() && canApplyTo(mediator, goals, posInOcc)) {
-            getProofMacro().applyTo(mediator, goals, posInOcc, listener);
+            final ProverTaskListener pml = getListener();
+            pml.taskStarted(getProofMacro().getName(), 0);
+            info = getProofMacro().applyTo(mediator, goals, posInOcc,
+                                           new CompositePTListener(listener, pml));
+            pml.taskFinished(info);
+            info = new ProofMacroFinishedInfo(this, info);
+            goals = getGoals();
             posInOcc = null;
             steps--;
         }
         if (steps > 0 && getAltProofMacro().canApplyTo(mediator, goals, posInOcc)) {
-            getAltProofMacro().applyTo(mediator, goals, posInOcc, listener);
+            final ProverTaskListener pml = getListener();
+            pml.taskStarted(getAltProofMacro().getName(), 0);
+            info = getAltProofMacro().applyTo(mediator, goals, posInOcc,
+                                              new CompositePTListener(listener, pml));
+            pml.taskFinished(info);
+            info = new ProofMacroFinishedInfo(this, info);
         }
-
+        return info;
     }
 
     /**

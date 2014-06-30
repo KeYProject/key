@@ -25,6 +25,8 @@ import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+
 import java.util.ArrayList;
 
 /**
@@ -88,20 +90,31 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      *             if one of the wrapped macros is interrupted.
      */
     @Override
-    public void applyTo(KeYMediator mediator,
-                        ImmutableList<Goal> goals,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
         final List<Node> initNodes = new ArrayList<Node>(goals.size());
         for (Goal goal : goals) {
             initNodes.add(goal.node());
         }
+        final Proof proof = initNodes.isEmpty() ?
+                mediator.getSelectedProof() : initNodes.get(0).proof();
+        final ImmutableList<Goal> gs = initNodes.isEmpty() ?
+                proof.openEnabledGoals() : proof.getSubtreeEnabledGoals(initNodes.get(0));
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, gs, proof);
         for (ProofMacro macro : getProofMacros()) {
             // reverse to original nodes
             for (Node initNode : initNodes) {
-                macro.applyTo(mediator, initNode, posInOcc, listener);
+                final ProverTaskListener pml = getListener();
+                pml.taskStarted(macro.getName(), 0);
+                info = macro.applyTo(mediator, initNode, posInOcc,
+                                     new CompositePTListener(listener, pml));
+                pml.taskFinished(info);
+                info = new ProofMacroFinishedInfo(this, info);
             }
         }
+        return info;
     }
 
     /**

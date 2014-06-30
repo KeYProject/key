@@ -21,7 +21,7 @@ public class StateExpansionAndInfFlowContractApplicationMacro extends Sequential
 
     @Override
     public String getName() {
-        return "Self-composition state expansion with inf flow contracs";
+        return "Self-composition state expansion with inf flow contracts";
     }
 
     @Override

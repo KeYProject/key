@@ -110,11 +110,17 @@ public class FullInformationFlowAutoPilotMacro extends AbstractProofMacro {
 
 
     @Override
-    public void applyTo(KeYMediator mediator,
-                        ImmutableList<Goal> goals,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
-        wrappedMacro.applyTo(mediator, goals, posInOcc, listener);
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
+        final ProverTaskListener pml = getListener();
+        pml.taskStarted(wrappedMacro.getName(), 0);
+        ProofMacroFinishedInfo info = wrappedMacro.applyTo(mediator, goals, posInOcc,
+                                                           new CompositePTListener(listener, pml));
+        pml.taskFinished(info);
+        info = new ProofMacroFinishedInfo(this, info);
+        return info;
     }
 
 
