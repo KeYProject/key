@@ -109,5 +109,12 @@ public class FunctionalOperationContractCompletion extends AbstractInteractiveRu
       public IBuiltInRuleApp finish() {
          return null;
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void dispose() {
+      }
    }
 }
