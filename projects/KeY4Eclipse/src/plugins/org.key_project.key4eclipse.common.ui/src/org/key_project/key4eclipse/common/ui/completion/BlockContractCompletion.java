@@ -93,5 +93,12 @@ public class BlockContractCompletion extends AbstractInteractiveRuleApplicationC
       public IBuiltInRuleApp finish() {
          return null;
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void dispose() {
+      }
    }
 }
