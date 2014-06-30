@@ -8,9 +8,9 @@ import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -21,7 +21,6 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.Function;
@@ -48,6 +47,7 @@ import de.uka.ilkd.key.symbolic_execution.profile.SimplifyTermProfile;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.Triple;
 
@@ -91,51 +91,8 @@ public final class SideProofUtil {
    }
    
    /**
-    * Starts the side proof and evaluates the {@link Sequent} to prove into a single {@link Term}.
-    * @param services The {@link Services} to use.
-    * @param proof The {@link Proof} from on which the side proof si performed.
-    * @param originalSequent The original {@link Sequent} from which the side proof was created.
-    * @param sequentToProve The {@link Sequent} to prove in a side proof.
-    * @param label The {@link TermLabel} which is used to compute the result.
-    * @param description The side proof description.
-    * @param splittingOption The splitting options to use.
-    * @return The result {@link Term}.
-    * @throws ProofInputException Occurred Exception.
-    */
-   public static Term evaluateInSideProof(Services services, 
-                                          Proof proof, 
-                                          Sequent originalSequent,
-                                          Sequent sequentToProve, 
-                                          TermLabel label, 
-                                          String description, 
-                                          String splittingOption) throws ProofInputException {
-      List<Triple<Term, Set<Term>, Node>> resultValuesAndConditions = SideProofUtil.computeResultsAndConditions(services, 
-                                                                                                                proof, 
-                                                                                                                sequentToProve, 
-                                                                                                                label, 
-                                                                                                                description, 
-                                                                                                                StrategyProperties.METHOD_NONE, // Stop at methods to avoid endless executions and scenarios in which a precondition or null pointer check can't be shown
-                                                                                                                StrategyProperties.LOOP_NONE, // Stop at loops to avoid endless executions and scenarios in which the invariant can't be shown to be initially valid or preserved.
-                                                                                                                StrategyProperties.QUERY_OFF, // Stop at queries to to avoid endless executions and scenarios in which a precondition or null pointer check can't be shown
-                                                                                                                splittingOption, 
-                                                                                                                false);
-      ImmutableList<Term> goalCondtions = ImmutableSLList.<Term>nil();
-      for (Triple<Term, Set<Term>, Node> triple : resultValuesAndConditions) {
-         List<Term> negatedGoalConditions = new LinkedList<Term>();
-         for (Term term : triple.second) {
-            negatedGoalConditions.add(services.getTermBuilder().not(term));
-         }
-         Term conditionsTerm = services.getTermBuilder().or(negatedGoalConditions);
-         Term goalCondition = services.getTermBuilder().or(conditionsTerm, triple.first);
-         goalCondition = SymbolicExecutionUtil.replaceSkolemConstants(originalSequent, goalCondition, services);
-         goalCondtions = goalCondtions.append(goalCondition);
-      }
-      return services.getTermBuilder().and(goalCondtions);
-   }
-   
-   /**
     * <p>
-    * Starts the side proof and extracts the result {@link Term} and conditions.
+    * Starts the side proof and extracts the result {@link Term}.
     * </p>
     * <p>
     * New used names are automatically added to the {@link Namespace} of the {@link Services}.
@@ -150,32 +107,30 @@ public final class SideProofUtil {
     * @return The found result {@link Term} and the conditions.
     * @throws ProofInputException Occurred Exception.
     */
-   public static List<Triple<Term, Set<Term>, Node>> computeResultsAndConditions(Services services, 
-                                                                                 Proof proof, 
-                                                                                 Sequent sequentToProve, 
-                                                                                 TermLabel label, 
-                                                                                 String description,
-                                                                                 String methodTreatment,
-                                                                                 String loopTreatment,
-                                                                                 String queryTreatment,
-                                                                                 String splittingOption,
-                                                                                 boolean addNamesToServices) throws ProofInputException {
+   public static List<Pair<Term, Node>> computeResults(Services services, 
+                                                       Proof proof, 
+                                                       Sequent sequentToProve, 
+                                                       TermLabel label, 
+                                                       String description,
+                                                       String methodTreatment,
+                                                       String loopTreatment,
+                                                       String queryTreatment,
+                                                       String splittingOption,
+                                                       boolean addNamesToServices) throws ProofInputException {
       // Execute side proof
       ApplyStrategyInfo info = SideProofUtil.startSideProof(proof, sequentToProve, methodTreatment, loopTreatment, queryTreatment, splittingOption, true);
       try {
          // Extract results and conditions from side proof
-         List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap = new LinkedList<Triple<Term, Set<Term>, Node>>();
+         List<Pair<Term, Node>> conditionsAndResultsMap = new LinkedList<Pair<Term, Node>>();
          for (Goal resultGoal : info.getProof().openGoals()) {
             if (SymbolicExecutionUtil.hasApplicableRules(resultGoal)) {
                throw new IllegalStateException("Not all applicable rules are applied.");
             }
             Sequent sequent = resultGoal.sequent();
-            Set<Term> resultConditions = new LinkedHashSet<Term>();
             List<Term> results = new LinkedList<Term>();
             for (SequentFormula sf : sequent.antecedent()) {
                if (sf.formula().containsLabel(label)) {
                   Term result = sf.formula();
-                  result = removeLabelRecursive(services.getTermFactory(), result, label);
                   result = services.getTermBuilder().not(result);
                   results.add(result);
                }
@@ -183,7 +138,6 @@ public final class SideProofUtil {
             for (SequentFormula sf : sequent.succedent()) {
                if (sf.formula().containsLabel(label)) {
                   Term result = sf.formula();
-                  result = removeLabelRecursive(services.getTermFactory(), result, label);
                   results.add(result);
                }
             }
@@ -194,99 +148,13 @@ public final class SideProofUtil {
             else {
                result = services.getTermBuilder().or(results);
             }
-            conditionsAndResultsMap.add(new Triple<Term, Set<Term>, Node>(result, resultConditions, resultGoal.node()));
+            conditionsAndResultsMap.add(new Pair<Term, Node>(result, resultGoal.node()));
          }
          return conditionsAndResultsMap;
       }
       finally {
          SideProofUtil.disposeOrStore(description, info);
       }
-   }
-
-   /**
-    * Adds the given {@link TermLabel} to the given {@link Term} and to all of its children.
-    * @param tf The {@link TermFactory} to use.
-    * @param term The {@link Term} to add label to.
-    * @param label The {@link TermLabel} to add.
-    * @return A new {@link Term} with the given {@link TermLabel}.
-    */
-   public static Term addLabelRecursive(TermFactory tf, Term term, TermLabel label) {
-      List<Term> newSubs = new LinkedList<Term>();
-      for (Term oldSub : term.subs()) {
-         newSubs.add(addLabelRecursive(tf, oldSub, label));
-      }
-      List<TermLabel> newLabels = new LinkedList<TermLabel>();
-      for (TermLabel oldLabel : term.getLabels()) {
-         newLabels.add(oldLabel);
-      }
-      newLabels.add(label);
-      return tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), new ImmutableArray<TermLabel>(newLabels));
-   }
-   
-   /**
-    * Removes the given {@link TermLabel} from the given {@link Term} and from all of its children.
-    * @param tf The {@link TermFactory} to use.
-    * @param term The {@link Term} to remove label from.
-    * @param label The {@link TermLabel} to remove.
-    * @return A new {@link Term} without the given {@link TermLabel}.
-    */
-   public static Term removeLabelRecursive(TermFactory tf, Term term, TermLabel label) {
-      // Update children
-      List<Term> newSubs = new LinkedList<Term>();
-      ImmutableArray<Term> oldSubs = term.subs();
-      for (Term oldSub : oldSubs) {
-         newSubs.add(removeLabelRecursive(tf, oldSub, label));
-      }
-      // Update label
-      List<TermLabel> newLabels = new LinkedList<TermLabel>();
-      ImmutableArray<TermLabel> oldLabels = term.getLabels();
-      for (TermLabel oldLabel : oldLabels) {
-         if (oldLabel != label) {
-            newLabels.add(oldLabel);
-         }
-      }
-      return tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), new ImmutableArray<TermLabel>(newLabels));
-   }
-   
-   /**
-    * Starts the side proof and evaluates the {@link Sequent} to prove into a single {@link Term}.
-    * @param services The {@link Services} to use.
-    * @param proof The {@link Proof} from on which the side proof si performed.
-    * @param sequentToProve The {@link Sequent} to prove in a side proof.
-    * @param operator The {@link Operator} which is used to compute the result.
-    * @param description The side proof description.
-    * @param splittingOption The splitting options to use.
-    * @return The result {@link Term}.
-    * @throws ProofInputException Occurred Exception.
-    */
-   public static Term evaluateInSideProof(Services services, 
-                                          Proof proof, 
-                                          Sequent sequentToProve, 
-                                          Operator operator, 
-                                          String description, 
-                                          String splittingOption) throws ProofInputException {
-      List<Triple<Term, Set<Term>, Node>> resultValuesAndConditions = SideProofUtil.computeResultsAndConditions(services, 
-                                                                                                                proof, 
-                                                                                                                sequentToProve, 
-                                                                                                                operator, 
-                                                                                                                description, 
-                                                                                                                StrategyProperties.METHOD_NONE, // Stop at methods to avoid endless executions and scenarios in which a precondition or null pointer check can't be shown
-                                                                                                                StrategyProperties.LOOP_NONE, // Stop at loops to avoid endless executions and scenarios in which the invariant can't be shown to be initially valid or preserved.
-                                                                                                                StrategyProperties.QUERY_OFF, // Stop at queries to to avoid endless executions and scenarios in which a precondition or null pointer check can't be shown
-                                                                                                                splittingOption, 
-                                                                                                                false);
-      ImmutableList<Term> goalCondtions = ImmutableSLList.<Term>nil();
-      for (Triple<Term, Set<Term>, Node> triple : resultValuesAndConditions) {
-         List<Term> negatedGoalConditions = new LinkedList<Term>();
-         for (Term term : triple.second) {
-            negatedGoalConditions.add(services.getTermBuilder().not(term));
-         }
-         Term conditionsTerm = services.getTermBuilder().or(negatedGoalConditions);
-         Term goalCondition = services.getTermBuilder().or(conditionsTerm, triple.first);
-         goalCondition = SymbolicExecutionUtil.replaceSkolemConstants(triple.third.sequent(), goalCondition, services);
-         goalCondtions = goalCondtions.append(goalCondition);
-      }
-      return services.getTermBuilder().and(goalCondtions);
    }
    
    /**
@@ -757,7 +625,7 @@ public final class SideProofUtil {
       sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NON_SPLITTING);
       starter.setStrategy(sp);
       // Execute proof in the current thread
-      return starter.start();
+      return starter.start(false);
    }
 
    /**
@@ -851,7 +719,7 @@ public final class SideProofUtil {
       assert !source.isDisposed();
       // Get required source instances
       final ProofEnvironment sourceEnv = source.env();
-      InitConfig sourceInitConfig = sourceEnv.getInitConfig();
+      final InitConfig sourceInitConfig = sourceEnv.getInitConfig();
       RuleJustificationInfo sourceJustiInfo = sourceEnv.getJustifInfo();
       // Create new profile which has separate OneStepSimplifier instance
       JavaProfile profile;
@@ -888,21 +756,21 @@ public final class SideProofUtil {
          };
       }
       // Create new InitConfig
-      InitConfig initConfig = new InitConfig(source.getServices().copy(profile, true));
+      final InitConfig initConfig = new InitConfig(source.getServices().copy(profile, true));
       // Set modified taclet options in which runtime exceptions are banned.
       ImmutableSet<Choice> choices = sourceInitConfig.getActivatedChoices();
       choices = choices.remove(new Choice("allow", "runtimeExceptions"));
       choices = choices.add(new Choice("ban", "runtimeExceptions"));
       initConfig.setActivatedChoices(choices);
       // Initialize InitConfig with settings from the original InitConfig.
-      initConfig.setSettings(sourceInitConfig.getSettings());
+      final ProofSettings clonedSettings = sourceInitConfig.getSettings() != null ? new ProofSettings(sourceInitConfig.getSettings()) : null;
+      initConfig.setSettings(clonedSettings);
       initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
       initConfig.setTaclets(sourceInitConfig.getTaclets());
       // Create new ProofEnvironment and initialize it with values from initial one.
       ProofEnvironment env = new ProofEnvironment(initConfig);
       env.setJavaModel(sourceEnv.getJavaModel());
       env.setNumber(sourceEnv.getNumber());
-      env.setRuleConfig(sourceEnv.getRuleConfig());
       for (Taclet taclet : initConfig.activatedTaclets()) {
          env.getJustifInfo().addJustification(taclet, sourceJustiInfo.getJustification(taclet));
       }

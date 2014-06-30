@@ -50,6 +50,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.impl.AbstractSEDDebugTarget;
 import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
@@ -158,12 +159,14 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
       // Update initial model
       setModelIdentifier(MODEL_IDENTIFIER);
       setName(proof.name() != null ? proof.name().toString() : "Unnamed");
+      // Init breakpoints
+      initBreakpoints();
+      // Add thread
       KeYThread thread = new KeYThread(this, environment.getBuilder().getStartNode());
       registerDebugNode(thread);
       threads = new KeYThread[] {thread};
       // Initialize proof to use the symbolic execution strategy
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun());
-      addBreakpoints();
       ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
    }
 
@@ -181,6 +184,28 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
     */
    public KeYBreakpointManager getBreakpointManager() {
       return breakpointManager;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IBreakpoint[] getBreakpoints() {
+      return breakpointManager.getBreakpoints();
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @SuppressWarnings("unchecked")
+   @Override
+   protected boolean checkBreakpointHit(IBreakpoint breakpoint, ISEDDebugNode node) {
+      if (node instanceof IKeYSEDDebugNode) {
+         return breakpointManager.checkBreakpointHit(breakpoint, ((IKeYSEDDebugNode<IExecutionNode>)node));
+      }
+      else {
+         return false;
+      }
    }
 
    /**
@@ -292,13 +317,11 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
    }
    
    /**
-    * Adds all Breakpoints to this DebugTarget. Is called only when the DebugTarget is initially created.
+    * {@inheritDoc}
     */
-   private void addBreakpoints(){ 
-      IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints();      
-      for(int i = 0; i < breakpoints.length; i++){
-         breakpointAdded(breakpoints[i]);
-      }
+   @Override
+   protected void initBreakpoint(IBreakpoint breakpoint) {
+      breakpointAdded(breakpoint);
    }
    
    /**
@@ -350,6 +373,9 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
       catch(TermCreationException e){
          handleFailedToParse(e, breakpoint);
       }
+      finally {
+         super.breakpointAdded(breakpoint);
+      }
    }
 
 
@@ -359,6 +385,7 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
    @Override
    public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
       breakpointManager.breakpointRemoved(breakpoint, delta);
+      super.breakpointRemoved(breakpoint, delta);
    }
 
    /**
@@ -424,8 +451,8 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
             handleFailedToParse(e, breakpoint);
          }
       }
+      super.breakpointChanged(breakpoint, delta);
    }
-
  
    /**
     * Opens a dialog to tell the user that the hot code replace failed and gives options to handle that.

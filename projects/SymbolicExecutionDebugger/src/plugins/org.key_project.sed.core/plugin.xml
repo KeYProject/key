@@ -33,5 +33,8 @@
          <annotationType
                class="org.key_project.sed.core.annotation.impl.CommentAnnotationType">
          </annotationType>
+         <annotationType
+               class="org.key_project.sed.core.annotation.impl.BreakpointAnnotationType">
+         </annotationType>
       </extension>
 </plugin>

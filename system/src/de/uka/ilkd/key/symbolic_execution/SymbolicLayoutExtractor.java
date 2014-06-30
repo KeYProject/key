@@ -512,7 +512,7 @@ public class SymbolicLayoutExtractor {
          }
       }
       starter.setMaxRuleApplications(maxProofSteps);
-      starter.start();
+      starter.start(false);
    }
 
    /**
@@ -539,7 +539,7 @@ public class SymbolicLayoutExtractor {
             TacletApp t2 = c.addInstantiation(cutF, term, false, getServices());
 
             final ImmutableList<Goal> branches = g.apply(t2);
-            starter.start(branches);
+            starter.start(branches, false);
         }
       }
    }
@@ -1171,7 +1171,7 @@ public class SymbolicLayoutExtractor {
                                                  Set<Term> objectsToIgnore) throws ProofInputException {
       Set<Term> result = new LinkedHashSet<Term>();
       for (SequentFormula sf : sequent) {
-         if (!SymbolicExecutionUtil.isSkolemEquality(sf)) {
+         if (SymbolicExecutionUtil.checkSkolemEquality(sf) == 0) {
             result.addAll(collectSymbolicObjectsFromTerm(sf.formula(), objectsToIgnore));
          }
       }

@@ -22,15 +22,18 @@ import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -103,6 +106,8 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      */
     boolean confirmTaskRemoval(String message);
 
+    void finish(Proof proof);
+
     /**
      * loads the problem or proof from the given file
      * @param file the File with the problem description or the proof
@@ -116,6 +121,14 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @param bootClassPath the boot class path to use. 
      */
     void loadProblem(File file, List<File> classPath, File bootClassPath);
+
+    void setMacro(ProofMacro macro);
+
+    ProofMacro getMacro();
+
+    boolean macroChosen();
+
+    boolean applyMacro();
 
     /** 
      * called to open the build in examples 
@@ -219,4 +232,13 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @param proof The {@link Proof} to remove.
      */
     void removeProof(Proof proof);
+
+    
+    /**
+     * This method is called if no {@link LoadedPOContainer} was created
+     * via {@link #createProofObligationContainer()} and can be overwritten
+     * for instance to open the proof management dialog as done by {@link ProblemLoader}.
+     * @return true if the proof obligation was selected, and false if action was aborted
+     */
+    public boolean selectProofObligation(InitConfig initConfig);
 }

@@ -32,7 +32,7 @@ public final class OpenExampleAction extends MainWindowAction {
 
     public OpenExampleAction(MainWindow mainWindow) {
 	super(mainWindow);
-        setName("Load Example...");
+        setName("Load Example");
         setTooltip("Browse and load included examples.");
     }
     

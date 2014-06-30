@@ -195,7 +195,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
      * Deactivate one-step simplification: clear caches, restore taclets to
      * the goals' taclet indices.
      */
-    private void shutdownIndices() {
+    public void shutdownIndices() {
         if (lastProof != null) {
             if (!lastProof.isDisposed()) {
                 for(Goal g : lastProof.openGoals()) {

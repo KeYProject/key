@@ -47,7 +47,7 @@ public class TestProofStarter extends AbstractSymbolicExecutionTestCase {
          ProofStarter ps = new ProofStarter(false);
          ps.init(proof);
          setOneStepSimplificationEnabled(proof, oneStepSimplification);
-         ApplyStrategyInfo info = ps.start();
+         ApplyStrategyInfo info = ps.start(true);
          assertNotNull(info);
          assertTrue(proof.closed());
       }

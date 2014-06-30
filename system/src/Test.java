@@ -13,7 +13,7 @@ public class Test {
       Proof proof = env.getLoadedProof();
       ProofStarter ps = new ProofStarter(true);
       ps.init(proof);
-      ApplyStrategyInfo info = ps.start();
+      ApplyStrategyInfo info = ps.start(true);
 //      env.getUi().startAndWaitForAutoMode(proof);
       System.out.println(proof.openGoals().size());
       System.out.println(info);

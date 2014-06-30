@@ -29,8 +29,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 
-@SuppressWarnings("serial")
-
 /**
  * This action is one part of the previous UndoLastStepAction: Only enabled when the last node is selected
  *
@@ -40,6 +38,10 @@ public final class GoalBackAction extends MainWindowAction {
 
     /**
      * 
+     */
+    private static final long serialVersionUID = 4574670781882014062L;
+    /**
+     *
      */
     private boolean longName = false;
     

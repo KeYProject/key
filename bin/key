@@ -95,7 +95,7 @@ done
 
 list_help(){
   echo "Runscript for the KeY system\n"
-  echo "Usage: ./runProver [technical options] [options for KeY prover] [filename]\n"
+  echo "Usage: ./key [technical options] [options for KeY prover] [filename]\n"
   echo "\nOptions for using this script"
   echo "  --J-option: pass option to the JVM following the -J option convention of javac\n"
   echo "Debugging:\n"
@@ -140,7 +140,7 @@ while [ $# -ne 0 ]; do
 	    exit;;
 
         --K-headless) 
-            keysysprops="${keysysprops}-Djava.awt.headless=true "
+            echo "Warning: --K-headless option is deprecated"
             shift
             continue;;
 
@@ -205,7 +205,21 @@ while [ $# -ne 0 ]; do
 	    continue;;
 	    
 
-         # key options beginning with a minus or filenames  
+         # key options beginning with a minus or filenames 
+         # set headless mode for all of them
+	--auto)
+             keysysprops="${keysysprops}-Djava.awt.headless=true "
+	     break;;
+	--auto-loadonly)
+             keysysprops="${keysysprops}-Djava.awt.headless=true "
+	     break;;
+	--help)
+             keysysprops="${keysysprops}-Djava.awt.headless=true "
+	     break;;
+	--show-properties)
+             keysysprops="${keysysprops}-Djava.awt.headless=true "
+	     break;;
+
          *) break;;
 
     esac

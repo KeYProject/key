@@ -15,6 +15,7 @@ package de.uka.ilkd.key.proof.io;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import java.io.File;
@@ -63,6 +64,7 @@ public final class ProblemLoader extends DefaultProblemLoader {
             getMediator().getUI().reportStatus(this, errorMessage);
             return exception;
         } catch (final Throwable throwable) {
+        	throwable.printStackTrace();
             reportException(throwable);
             return throwable;
         }
@@ -79,7 +81,13 @@ public final class ProblemLoader extends DefaultProblemLoader {
             final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, message,
                     getProof(), runningTime, (getProof() != null ? getProof().countNodes() : 0),
                     (getProof() != null ? getProof().countBranches() - getProof().openGoals().size() : 0));
+            final UserInterface ui = getMediator().getUI();
             ptl.taskFinished(tfi);
+            if (ui.macroChosen()) {
+    			ui.applyMacro();
+    		} else if (ptl instanceof UserInterface) {
+    			((UserInterface)ptl).finish(getProof());
+    		}
         }
     }
 
@@ -94,7 +102,8 @@ public final class ProblemLoader extends DefaultProblemLoader {
     }
 
     public void runAsynchronously() {
-        final SwingWorker worker = new SwingWorker<Throwable, Void>() {
+        final SwingWorker<Throwable, Void> worker =
+                new SwingWorker<Throwable, Void>() {
 
             private long runTime;
 
@@ -127,13 +136,4 @@ public final class ProblemLoader extends DefaultProblemLoader {
         worker.execute();
     }
 
-    @Override
-    protected ProblemLoaderException selectProofObligation() {
-        ProofManagementDialog.showInstance(getInitConfig());
-        if (ProofManagementDialog.startedProof()) {
-            return null;
-        } else {
-            return new ProblemLoaderException(this, "Aborted.");
-        }
-    }
 }

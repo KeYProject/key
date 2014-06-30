@@ -337,7 +337,6 @@ public class ProofManager {
       // Create new ProofEnvironment and initialize it with values from initial one.
       ProofEnvironment env = initConfig.getProofEnv();
       env.setJavaModel(sourceInitConfig.getProofEnv().getJavaModel());
-      env.setRuleConfig(sourceInitConfig.getProofEnv().getRuleConfig());
       for (Taclet taclet : sourceInitConfig.activatedTaclets()) {
          env.getJustifInfo().addJustification(taclet, sourceInitConfig.getProofEnv().getJustifInfo().getJustification(taclet));
       }
@@ -718,7 +717,7 @@ public class ProofManager {
          
          ProofStarter ps = new ProofStarter(false);
          ps.init(new SingleProof(proof, pe.getProofObl().name()));
-         ps.start();
+         ps.start(true);
          
          OneStepSimplifier oss = MiscTools.findOneStepSimplifier(proof);
          if (oss != null) {
