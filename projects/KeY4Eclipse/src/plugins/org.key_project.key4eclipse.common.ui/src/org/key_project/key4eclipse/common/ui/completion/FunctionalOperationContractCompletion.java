@@ -1,11 +1,9 @@
 package org.key_project.key4eclipse.common.ui.completion;
 
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Shell;
-import org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog;
+import org.key_project.key4eclipse.common.ui.provider.ContractLabelProvider;
 import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
-import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.java.CollectionUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
@@ -14,7 +12,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule.Instantiation;
-import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 /**
@@ -54,6 +51,21 @@ public class FunctionalOperationContractCompletion extends AbstractInteractiveRu
       private final ImmutableSet<FunctionalOperationContract> contracts;
       
       /**
+       * The used {@link Services}.
+       */
+      private final Services services;
+      
+      /**
+       * The {@link TableViewer} which shows the contracts.
+       */
+      private TableViewer viewer;
+      
+      /**
+       * The {@link ContractLabelProvider} used in {@link #viewer}.
+       */
+      private ContractLabelProvider labelViewer;
+      
+      /**
        * Constructor.
        * @param app The DefaultBuiltInRuleApp to be completed.
        * @param goal The Goal where the app will later be applied to.
@@ -61,20 +73,9 @@ public class FunctionalOperationContractCompletion extends AbstractInteractiveRu
        */
       public Perform(IBuiltInRuleApp app, Goal goal, boolean forced) {
          super(app, goal, forced);
-         Services services = goal.proof().getServices();
+         services = goal.proof().getServices();
          inst = UseOperationContractRule.computeInstantiation(app.posInOccurrence().subTerm(), getServices());
          contracts = UseOperationContractRule.getApplicableContracts(inst, getServices());
-         Shell parent = WorkbenchUtil.getActiveShell();
-         ImmutableCollectionContentProvider contentProvider = ImmutableCollectionContentProvider.getInstance();
-         ContractSelectionDialog dialog = new ContractSelectionDialog(parent, contentProvider, services);
-         dialog.setTitle("Select Contract for Proof in KeY");
-         dialog.setMessage("Select contract to prove.");
-         dialog.setInput(contracts);
-         
-         if(!contracts.isEmpty()){
-            dialog.setInitialSelections(new Contract[] {CollectionUtil.getFirst(contracts)});
-         }
-         
       }
 
       /**
@@ -98,8 +99,12 @@ public class FunctionalOperationContractCompletion extends AbstractInteractiveRu
        */
       @Override
       public void createControl(Composite root) {
-//         Label label = new Label(root, SWT.NONE);
-//         label.setText("This functionality will be available soon...");
+         viewer = new TableViewer(root);
+         viewer.setContentProvider(ImmutableCollectionContentProvider.getInstance());
+         labelViewer = new ContractLabelProvider(services);
+         viewer.setLabelProvider(labelViewer);
+         viewer.setInput(contracts);
+         // TODO: Ensure that "Finish" is only available when at least one contract is selected (use setErrorMessage)
       }
 
       /**
@@ -107,7 +112,7 @@ public class FunctionalOperationContractCompletion extends AbstractInteractiveRu
        */
       @Override
       public IBuiltInRuleApp finish() {
-         return null;
+         return null; // TODO: Implement similar as de.uka.ilkd.key.collection.ImmutableSet.FunctionalOperationContractCompletion
       }
 
       /**
@@ -115,6 +120,9 @@ public class FunctionalOperationContractCompletion extends AbstractInteractiveRu
        */
       @Override
       public void dispose() {
+         if (labelViewer != null) {
+            labelViewer.dispose();
+         }
       }
    }
 }
