@@ -169,7 +169,8 @@ options {
    private DeclPicker capturer = null;
    private IProgramMethod pm = null;
 
-   private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
+   private LinkedHashMap<RuleKey, Taclet> taclets = new LinkedHashMap<RuleKey, Taclet>();
+            
    private ImmutableSet<Contract> contracts = DefaultImmutableSet.<Contract>nil();
    private ImmutableSet<ClassInvariant> invs = DefaultImmutableSet.<ClassInvariant>nil();
 
@@ -286,10 +287,16 @@ options {
         this.normalConfig = normalConfig;       
 	switchToNormalMode();
         this.taclet2Builder = taclet2Builder;
-        this.taclets = taclets;
-        if(normalConfig != null){
+        
+        if (taclets != null && !taclets.isEmpty()) {
+        	for (Taclet t : taclets) {
+	  		this.taclets.put(new RuleKey(t), t);        	
+        	}
+        }        
+        
+        if (normalConfig != null){
             this.keh = normalConfig.services().getExceptionHandler();
-        }else{
+        } else{
             this.keh = new KeYRecoderExcHandler();
         }
     }
@@ -304,7 +311,7 @@ options {
         this.normalConfig = null;       
 	switchToNormalMode();
         this.taclet2Builder = null;
-        this.taclets = null;
+        this.taclets = new LinkedHashMap<RuleKey, Taclet>();
         this.keh = new KeYRecoderExcHandler();
     }
 
@@ -440,7 +447,11 @@ options {
     }
 
     public ImmutableSet<Taclet> getTaclets(){
-        return taclets;
+	ImmutableSet<Taclet> tacletSet = DefaultImmutableSet.<Taclet>nil(); 
+	for (Taclet t : taclets.values()) {
+		tacletSet = tacletSet.add(t);
+	}
+        return tacletSet;
     }
 
     public ImmutableSet<Contract> getContracts(){
@@ -4325,16 +4336,18 @@ problem returns [ Term _problem = null ]
             ( 
                 s = taclet[choices] SEMI
                 {
-                    try {
                         if (!skip_taclets) {
-                            taclets = taclets.addUnique(s);
+                            final RuleKey key = new RuleKey(s); 
+                            if (taclets.containsKey(key)) {
+	                        semanticError
+        	                ("Cannot add taclet \"" + s.name() + 
+                	            "\" to rule base as a taclet with the same "+
+                        	    "name already exists.");
+                            	
+                            } else {
+                            	taclets.put(key, s);
+                            }
                         }
-                    } catch(de.uka.ilkd.key.collection.NotUniqueException e) {
-                        semanticError
-                        ("Cannot add taclet \"" + s.name() + 
-                            "\" to rule base as a taclet with the same "+
-                            "name already exists.");
-                    }
                 }
             )*
             RBRACE {choices=DefaultImmutableSet.<Choice>nil();}

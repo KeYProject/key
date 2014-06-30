@@ -19,28 +19,36 @@ import java.util.Map;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
-
+import de.uka.ilkd.key.rule.RuleKey;
 
 public class RuleJustificationInfo {
+   private Map<RuleKey, RuleJustification> rule2justif = new LinkedHashMap<RuleKey, RuleJustification>();
 
-    private Map<Rule, RuleJustification> rule2justif 
-    	= new LinkedHashMap<Rule, RuleJustification>();
-    
-    
-    public void addJustification(Rule r, RuleJustification j) {
-	rule2justif.put(r, j);
-    }
+   public void addJustification(Rule r, RuleJustification j) {
+      if (rule2justif.containsKey(new RuleKey(r))) {
+         
+         if (r.name().toString().equals("replaceKnownAuxiliaryConstant_taclet23_0")) {
+            try { throw null; } catch (Exception e) {e.printStackTrace(); }
+         }
+         
+         throw new IllegalArgumentException("Rule " + r.name()
+               + " already in registered.");
+      }
+      rule2justif.put(new RuleKey(r), j);
+   }
 
-    public RuleJustification getJustification(Rule r) {
-	return rule2justif.get(r);
-    }
+   public RuleJustification getJustification(Rule r) {
+      return rule2justif.get(new RuleKey(r));
+   }
 
-    public RuleJustification getJustification(RuleApp r, TermServices services) {
-	RuleJustification just = getJustification(r.rule());
-        if (just instanceof ComplexRuleJustification) {
-            return ((ComplexRuleJustification) just).getSpecificJustification(r, services);
-        } else {
-	    return just;
-	}
-    }    
+   public RuleJustification getJustification(RuleApp r, TermServices services) {
+      RuleJustification just = getJustification(r.rule());
+      if (just instanceof ComplexRuleJustification) {
+         return ((ComplexRuleJustification) just).getSpecificJustification(r,
+               services);
+      }
+      else {
+         return just;
+      }
+   }
 }

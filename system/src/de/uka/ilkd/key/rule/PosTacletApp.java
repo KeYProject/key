@@ -359,18 +359,14 @@ public class PosTacletApp extends TacletApp {
     }
 
     public boolean equals(Object o) {
-        if (o instanceof PosTacletApp) {
-	        return super.equals(o)
-	            && ((PosTacletApp)o).posInOccurrence().equals(posInOccurrence());
-        }
-        return false;
+       if (!super.equals(o)) {
+          return false;
+       }
+       return ((PosTacletApp)o).posInOccurrence().equals(posInOccurrence());
     }
 
     public int hashCode(){
-    	int result = 17;
-    	result = 37 * result + super.hashCode();
-    	result = 37 * result + posInOccurrence().hashCode();
-    	return result;
+    	return super.hashCode() + 13 * posInOccurrence().hashCode();
     }
 
     public String toString() {

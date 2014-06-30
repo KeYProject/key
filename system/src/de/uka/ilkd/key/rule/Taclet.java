@@ -241,6 +241,7 @@ public abstract class Taclet implements Rule, Named {
 	}	
     }
 
+    
     /** 
      * computes and returns all variables that occur bound in the taclet
      * including the taclets defined in <tt>addrules</tt> sections. The result
@@ -802,34 +803,37 @@ public abstract class Taclet implements Rule, Named {
      */
     public boolean equals(Object o) {
         if (o == this) return true;
+        
+        if (o == null || o.getClass() != this.getClass() ){
+           return false;
+        }	
 
-        if ( ! ( o instanceof Taclet ) ){
-	    return false;
-	}	
-	      
-	final Taclet t2 = (Taclet)o;
+        final Taclet t2 = (Taclet)o;
+        if (!name.equals(t2.name)) { 
+           return false;
+        }
 
-	if (!name.equals(t2.name)) return false;
+        if ((ifSequent == null && t2.ifSequent != null) || 
+              (ifSequent != null && t2.ifSequent == null)) {
+           return false;
+        } else if (ifSequent != null && !ifSequent.equals(t2.ifSequent)) {
+           return false;
+        }
+         
+        if (!choices.equals(t2.choices)) {
+           return false;
+        }
 
-        final Iterator<Choice> it1 = choices.iterator();
-	        
-	while (it1.hasNext()) {
-            final Choice c1 = it1.next(); 
-            final Iterator<Choice> it2 = t2.getChoices().iterator();
-	    while (it2.hasNext()){
-                final Choice c2 = it2.next();
-		if(c1 != c2 && c1.category().equals(c2.category())){
-		    return false;
-		}
-	    }
-	}
-
+       if (!goalTemplates.equals(t2.goalTemplates)) {
+          return false;
+       }
+        
         return true;
     }
 
     public int hashCode() {
         if (hashcode == 0) {
-	    hashcode = 37 * name.hashCode() + 17;
+           hashcode = 37 * name.hashCode() + 17;
             if (hashcode == 0) {
                 hashcode = -1;
             }

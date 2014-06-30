@@ -286,9 +286,21 @@ public abstract class FindTaclet extends Taclet {
 
 
     protected Taclet setName(String s, FindTacletBuilder b) {
-	return super.setName(s, b); 
+       return super.setName(s, b); 
     }
 
+    @Override
+    public boolean equals(Object o) {
+       if (!super.equals(o)) {
+          return false;
+       }
+       return find.equals(((FindTaclet)o).find);       
+    }
+      
+    
+    public int hashCode() {
+       return 13* super.hashCode() + find.hashCode(); 
+    }
 
     /**
      * returns the variables that occur bound in the find part
