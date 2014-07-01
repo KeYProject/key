@@ -309,27 +309,27 @@ public abstract class TacletBuilder {
     public abstract Taclet getTaclet();
 
     public Taclet getTacletWithoutInactiveGoalTemplates(ImmutableSet<Choice> active){
-	if(goal2Choices==null || goals.isEmpty()){
-	    return getTaclet();
-	}else{
-	    ImmutableList<TacletGoalTemplate> oldGoals = goals;
-	    Iterator<TacletGoalTemplate> it = oldGoals.iterator();
-	    Taclet result;
-	    while(it.hasNext()){
-		TacletGoalTemplate goal = it.next();
-		if(goal2Choices.get(goal) != null && 
-		   !goal2Choices.get(goal).subset(active)){
-		    goals = goals.removeAll(goal);
-		}
-	    }
-	    if(goals.isEmpty()){
-		result = null;
-	    }else{
-		result = getTaclet();
-	    }
-	    goals = oldGoals;
-	    return result;
-	}
+       if(goal2Choices==null || goals.isEmpty()){
+          return getTaclet();
+       }else{
+          ImmutableList<TacletGoalTemplate> oldGoals = goals;
+          Iterator<TacletGoalTemplate> it = oldGoals.iterator();
+          Taclet result;
+          while(it.hasNext()){
+             TacletGoalTemplate goal = it.next();
+             if(goal2Choices.get(goal) != null && 
+                   !goal2Choices.get(goal).subset(active)){
+                goals = goals.removeAll(goal);
+             }
+          }
+          if(goals.isEmpty()){
+             result = null;
+          }else{
+             result = getTaclet();
+          }
+          goals = oldGoals;
+          return result;
+       }
     }
 
     static class TacletBuilderException extends IllegalArgumentException {

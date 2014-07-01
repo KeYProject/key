@@ -771,7 +771,6 @@ public final class SideProofUtil {
       ProofEnvironment env = new ProofEnvironment(initConfig);
       env.setJavaModel(sourceEnv.getJavaModel());
       env.setNumber(sourceEnv.getNumber());
-      env.setRuleConfig(sourceEnv.getRuleConfig());
       for (Taclet taclet : initConfig.activatedTaclets()) {
          env.getJustifInfo().addJustification(taclet, sourceJustiInfo.getJustification(taclet));
       }
