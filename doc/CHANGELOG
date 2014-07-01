@@ -1,6 +1,11 @@
 ChangeLog
 =========
 
+Revision 2.2.2:
+===============
+ * Support for CVC3 version 2.4.1 SMT backend
+ * Bug fixes
+
 Revision 2.2.1:
 ===============
  * Test case generation using bounded SMT (requires Z3, OpenJML)
