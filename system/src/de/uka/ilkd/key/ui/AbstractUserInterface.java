@@ -22,6 +22,7 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.SkipMacro;
@@ -96,7 +97,8 @@ public abstract class AbstractUserInterface implements UserInterface {
             try {
                 getMediator().stopInterface(true);
                 getMediator().setInteractive(false);
-                getMacro().applyTo(getMediator(), null, this);
+                getMacro().applyTo(getMediator(), null,
+                                   new ProofMacroListenerAdapter());
                 synchronized(getMacro()) {
                     // wait for macro to terminate
                     getMediator().setInteractive(true);
@@ -329,5 +331,32 @@ public abstract class AbstractUserInterface implements UserInterface {
      */
     protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
         pcs.firePropertyChange(propertyName, oldValue, newValue);
+    }
+
+    abstract protected void macroStarted(String message, int size);
+    abstract protected void macroFinished(TaskFinishedInfo info);
+
+
+    private class ProofMacroListenerAdapter implements ProverTaskListener {
+
+
+        @Override
+        public void taskStarted(String message,
+                                int size) {
+            macroStarted(message, size);
+        }
+
+
+        @Override
+        public void taskProgress(int position) {
+            // not needed yet
+        }
+
+
+        @Override
+        public void taskFinished(TaskFinishedInfo info) {
+            macroFinished(info);
+        }
+
     }
 }

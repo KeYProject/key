@@ -250,16 +250,6 @@ public interface ProofMacro {
 
     ImmutableList<Goal> getGoals();
 
-    /**
-     * Used to determine whether {@link ProverTaskListener#taskFinished(TaskFinishedInfo)}
-     * can be called after applying the macro. For the state being, this is only important
-     * for invoking a macro from the command line. When creating a composite macro, which
-     * consists of more than one macro applied after another, this method should be redefined
-     * for all macros preceding the last macro application.
-     * @return <code>true</code>, if the macro is not being directly followed by another macro
-     */
-    public boolean finishAfterMacro();
-
     void innerMacroFinished(TaskFinishedInfo info);
 
     ProofMacroListener getListener();
@@ -305,15 +295,18 @@ public interface ProofMacro {
     }
 
     static class ProofMacroListener implements ProverTaskListener {
-        ProofMacro macro;
+        private ProofMacro macro;
+        private int numOfInvokedMacros;
 
         ProofMacroListener(ProofMacro macro) {
             this.macro = macro;
+            this.numOfInvokedMacros = 0;
         }
 
         @Override
         public void taskStarted(String message, int size) {
             assert message != null;
+            numOfInvokedMacros++;
         }
 
         @Override
@@ -323,6 +316,7 @@ public interface ProofMacro {
         @Override
         public void taskFinished(TaskFinishedInfo info) {
             macro.innerMacroFinished(info);
+            numOfInvokedMacros--;
         }
     }
 

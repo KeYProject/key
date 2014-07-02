@@ -44,16 +44,10 @@ public class FullInformationFlowAutoPilotMacro extends AbstractProofMacro {
         final SequentialProofMacro stateExpansionAndCloseMacro =
                 new SequentialProofMacro() {
             @Override
-            public boolean finishAfterMacro() { return false; }
-            @Override
             protected ProofMacro[] createProofMacroArray() {
                 return new ProofMacro[] {
-                        new StateExpansionAndInfFlowContractApplicationMacro() {
-                            @Override
-                            public boolean finishAfterMacro() { return false; }
-                            },new TryCloseMacro(NUMBER_OF_TRY_STEPS) {
-                                    @Override
-                                    public boolean finishAfterMacro() { return false; }}};
+                        new StateExpansionAndInfFlowContractApplicationMacro(),
+                        new TryCloseMacro(NUMBER_OF_TRY_STEPS)};
             }
             @Override
             public String getName() { return "Anonymous Macro"; }
@@ -65,16 +59,12 @@ public class FullInformationFlowAutoPilotMacro extends AbstractProofMacro {
             @Override
             protected ProofMacro[] createProofMacroArray() {
                 return new ProofMacro[] {
-                        new FinishAuxiliaryComputationMacro() {
-                            @Override
-                            public boolean finishAfterMacro() { return false; }},
+                        new FinishAuxiliaryComputationMacro(),
                             stateExpansionAndCloseMacro};}
             @Override
             public String getName() { return "Anonymous Macro"; }
             @Override
             public String getDescription() { return "Anonymous Macro"; }
-            @Override
-            public boolean finishAfterMacro() { return false; }
         };
         final AlternativeMacro alternativesMacro =
                 new AlternativeMacro() {
@@ -83,12 +73,8 @@ public class FullInformationFlowAutoPilotMacro extends AbstractProofMacro {
                     @Override
                     public String getDescription() { return "Anonymous Macro"; }
                     @Override
-                    public boolean finishAfterMacro() { return false; }
-                    @Override
                     protected ProofMacro[] createProofMacroArray() {
-                        return new ProofMacro[] {new AuxiliaryComputationAutoPilotMacro() {
-                                                        @Override
-                                                        public boolean finishAfterMacro() { return false; }},
+                        return new ProofMacro[] {new AuxiliaryComputationAutoPilotMacro(),
                                                  finishMainCompMacro};}
         };
         return new DoWhileFinallyMacro() {
@@ -114,11 +100,12 @@ public class FullInformationFlowAutoPilotMacro extends AbstractProofMacro {
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
-        final ProverTaskListener pml = getListener();
-        pml.taskStarted(wrappedMacro.getName(), 0);
-        ProofMacroFinishedInfo info = wrappedMacro.applyTo(mediator, goals, posInOcc,
-                                                           new CompositePTListener(listener, pml));
-        pml.taskFinished(info);
+        final ProverTaskListener cptl =
+                new CompositePTListener(listener, getListener());
+        cptl.taskStarted(wrappedMacro.getName(), 0);
+        ProofMacroFinishedInfo info = wrappedMacro.applyTo(mediator, goals,
+                                                           posInOcc, cptl);
+        cptl.taskFinished(info);
         info = new ProofMacroFinishedInfo(this, info);
         return info;
     }

@@ -89,13 +89,7 @@ public final class ProblemLoader extends DefaultProblemLoader {
            final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, message,
                    getProof(), runningTime, (getProof() != null ? getProof().countNodes() : 0),
                    (getProof() != null ? getProof().countBranches() - getProof().openGoals().size() : 0));
-           final UserInterface ui = getMediator().getUI();
            ptl.taskFinished(tfi);
-           if (ui.macroChosen()) {
-               ui.applyMacro();
-           } else if (ptl instanceof UserInterface) {
-               ((UserInterface)ptl).finish(getProof());
-           }
        }
    }
 

@@ -79,11 +79,6 @@ public abstract class AbstractProofMacro implements ProofMacro {
     }
 
     @Override
-    public boolean finishAfterMacro() {
-        return true;
-    }
-
-    @Override
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
         return canApplyTo(mediator, getGoals(mediator.getSelectedNode()), posInOcc);
     }

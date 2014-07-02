@@ -106,12 +106,12 @@ public class TryCloseMacro extends AbstractProofMacro {
         final IGoalChooser chooser =
                 mediator.getProfile().getSelectedGoalChooserBuilder().create();
         final ApplyStrategy applyStrategy =
-                new ApplyStrategy(chooser, finishAfterMacro());
+                new ApplyStrategy(chooser);
         final Proof proof = mediator.getInteractiveProver().getProof();
 
         //
         // The observer to handle the progress bar
-        TaskObserver taskObserver = new TaskObserver(mediator.getUI(), finishAfterMacro());
+        TaskObserver taskObserver = new TaskObserver(mediator.getUI());
         taskObserver.setNumberGoals(goals.size());
 
         //
@@ -188,13 +188,10 @@ public class TryCloseMacro extends AbstractProofMacro {
         private int numberGoals;
         private int numberSteps;
         private final ProverTaskListener backListener;
-        private final boolean finishAfterMacro;
         private int completedGoals;
 
-        public TaskObserver(ProverTaskListener backListener,
-                            boolean finishAfterMacro) {
+        public TaskObserver(ProverTaskListener backListener) {
             this.backListener = backListener;
-            this.finishAfterMacro = finishAfterMacro;
         }
 
         @Override
@@ -231,13 +228,7 @@ public class TryCloseMacro extends AbstractProofMacro {
             TaskFinishedInfo info =
                     new DefaultTaskFinishedInfo(this, null, proof, time,
                                                 appliedRules, closedGoals);
-            assert backListener instanceof UserInterface;
-            final UserInterface ui = (UserInterface)backListener;
-            if (finishAfterMacro) {
-                backListener.taskFinished(info);
-            } else if (!ui.macroChosen()) {
-                ui.finish(proof);
-            }
+            backListener.taskFinished(info);
         }
     }
 }

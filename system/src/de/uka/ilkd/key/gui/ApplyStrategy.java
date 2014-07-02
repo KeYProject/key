@@ -404,15 +404,12 @@ public class ApplyStrategy {
 
     IGoalChooser goalChooser;
 
-    private boolean finishAfterStrategy;
-
 
     // Please create this object beforehand and re-use it.
     // Otherwise the addition/removal of the InteractiveProofListener
     // can cause a ConcurrentModificationException during ongoing operation
-    public ApplyStrategy(IGoalChooser defaultGoalChooser, boolean finishAfterStrategy) {
+    public ApplyStrategy(IGoalChooser defaultGoalChooser) {
         this.defaultGoalChooser = defaultGoalChooser;
-        this.finishAfterStrategy = finishAfterStrategy;
     }
 
     /** applies rules that are chosen by the active strategy
@@ -528,16 +525,8 @@ public class ApplyStrategy {
     }
 
     private synchronized void fireTaskFinished (TaskFinishedInfo info) {
-        if (finishAfterStrategy) {
-            for (ProverTaskListener ptl : proverTaskObservers) {
-                ptl.taskFinished(info);
-            }
-        } else {
-            for (ProverTaskListener ptl : proverTaskObservers) {
-                if (ptl instanceof UserInterface && !((UserInterface)ptl).macroChosen()) {
-                    ((UserInterface)ptl).finish(info.getProof());
-                }
-            }
+        for (ProverTaskListener ptl : proverTaskObservers) {
+            ptl.taskFinished(info);
         }
     }
 

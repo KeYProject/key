@@ -57,30 +57,18 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
             }
 
             @Override
-            public boolean finishAfterMacro() {
-                return false;
-            }
-
-            @Override
             protected ProofMacro[] createProofMacroArray() {
                 // The FinishSymbolicExecutionMacro and the TryCloseMacro shall be
                 // started at the same node. Therefore they are encapsulated in an
                 // own (anonymous) SequentialProofMacro.
                 SequentialProofMacro finishSymbExecAndTryToClose =
                         new SequentialProofMacro() {
-                    @Override
-                    public boolean finishAfterMacro() { return false; }
 
                     @Override
                     protected ProofMacro[] createProofMacroArray() {
                         return new ProofMacro[]{
-                            new FinishSymbolicExecutionMacro() {
-                                @Override
-                                public boolean finishAfterMacro() { return false; }
-                            },
-                            new TryCloseMacro(NUMBER_OF_TRY_STEPS) {
-                                @Override
-                                public boolean finishAfterMacro() { return false; }}
+                            new FinishSymbolicExecutionMacro() {},
+                            new TryCloseMacro(NUMBER_OF_TRY_STEPS) {}
                         };
                     }
 
@@ -95,9 +83,7 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                     }
                 };
                 return new ProofMacro[]{
-                    new StartAuxiliaryComputationMacro() {
-                        @Override
-                        public boolean finishAfterMacro() { return false; } },
+                    new StartAuxiliaryComputationMacro() {},
                     finishSymbExecAndTryToClose};
             }
         };
