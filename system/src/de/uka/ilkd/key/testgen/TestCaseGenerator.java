@@ -61,7 +61,7 @@ public class TestCaseGenerator {
 	final String DummyPostfix = "DummyImpl";
 	// TODO: in future remove this string and provide the file in the
 	// KeY-project
-	final String compileWithOpenJML = "#!/bin/bash\n\n"
+	private String compileWithOpenJML = "#!/bin/bash\n\n"
 	        + "if [ -e \"openjml.jar\" ]\n"
 	        + "then\n"
 	        + "   java -jar openjml.jar -cp \".\" -rac *.java\n"
@@ -70,34 +70,49 @@ public class TestCaseGenerator {
 	        + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"
 	        + "   echo \"Copy openjml.jar into the directory with test files.\"\n"
 	        + "fi\n";
+	
+	private String createCompileWithOpenJML(String path){
+		return "#!/bin/bash\n\n"
+		        + "if [ -e \""+path+File.separator+"openjml.jar\" ]\n"
+		        + "then\n"
+		        + "   java -jar "+path+File.separator+"openjml.jar -cp \".\" -rac *.java\n"
+		        + "else\n"
+		        + "   echo \"openjml.jar not found!\"\n"
+		        + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"
+		        + "   echo \"Copy openjml.jar into the directory with test files.\"\n"
+		        + "fi\n";
+	}
 	// TODO: in future remove this string and provide the file in the
 	// KeY-project
-	final String executeWithOpenJML = "#!/bin/bash\n"
-	        + "if [ -e \"jmlruntime.jar\" ]\n"
-	        + "then"
-	        + "  if [ -e \"jmlspecs.jar\" ]\n"
-	        + "  then\n"
-	        + "   if [ \"$1\" = \"\" ] ; then\n"
-	        + "    echo \"Provide the test driver as an argument (without .java postfix). For example:\"\n"
-	        + "    echo \"  executeWithOpenJML.sh TestGeneric0 \"\n"
-	        + "    echo \"Make sure that jmlruntime.jar and jmlspecs.jar are in the\"\n"
-	        + "    echo \"current directory.\"\n"
-	        + "    quit\n"
-	        + "   else\n"
-	        + "     java -cp jmlruntime.jar:jmlspecs.jar:. $1\n"
-	        + "   fi\n"
-	        + "else\n"
-	        + "  echo \"jmlspecs.jar not found!\"\n"
-	        + "  echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"
-	        + "  echo \"Copy jmlspecs.jar into the directory with test files.\"\n"
-	        + "  quit\n"
-	        + "fi\n"
-	        + "else\n"
-	        + "   echo \"jmlruntime.jar not found!\"\n"
-	        + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"
-	        + "   echo \"Copy jmlruntime.jar into the directory with test files.\"\n"
-	        + "   quit\n" + "fi\n";
+	private String executeWithOpenJML;
 
+	private String createExecuteWithOpenJML(String path){
+		return "#!/bin/bash\n"
+		        + "if [ -e \""+path+File.separator+"jmlruntime.jar\" ]\n"
+		        + "then"
+		        + "  if [ -e \""+path+File.separator+"jmlspecs.jar\" ]\n"
+		        + "  then\n"
+		        + "   if [ \"$1\" = \"\" ] ; then\n"
+		        + "    echo \"Provide the test driver as an argument (without .java postfix). For example:\"\n"
+		        + "    echo \"  executeWithOpenJML.sh TestGeneric0 \"\n"
+		        + "    echo \"Make sure that jmlruntime.jar and jmlspecs.jar are in the\"\n"
+		        + "    echo \"current directory.\"\n"
+		        + "    quit\n"
+		        + "   else\n"
+		        + "     java -cp "+path+File.separator+"jmlruntime.jar:"+path+File.separator+"jmlspecs.jar:. $1\n"
+		        + "   fi\n"
+		        + "else\n"
+		        + "  echo \"jmlspecs.jar not found!\"\n"
+		        + "  echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"
+		        + "  echo \"Copy jmlspecs.jar into the directory with test files.\"\n"
+		        + "  quit\n"
+		        + "fi\n"
+		        + "else\n"
+		        + "   echo \"jmlruntime.jar not found!\"\n"
+		        + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"
+		        + "   echo \"Copy jmlruntime.jar into the directory with test files.\"\n"
+		        + "   quit\n" + "fi\n";
+	}
 	public TestCaseGenerator(Proof proof) {
 		super();
 		final TestGenerationSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE
@@ -110,7 +125,9 @@ public class TestCaseGenerator {
 		directory = settings.getOutputFolderPath();
 		sortDummyClass = new HashMap<Sort, StringBuffer>();		
 		info = new ProofInfo(proof);
-		MUTName = info.getMUT().getFullName();		
+		MUTName = info.getMUT().getFullName();	
+		executeWithOpenJML = createExecuteWithOpenJML(settings.getOpenjmlPath());
+		compileWithOpenJML = createCompileWithOpenJML(settings.getOpenjmlPath());		
 	}
 	
 	public String getMUTCall(){
@@ -125,13 +142,22 @@ public class TestCaseGenerator {
 		}		
 		if(params.length() > 0){
 			params = params.substring(1);
-		}		
+		}
+		
+		String caller;
+		if(m.isStatic()){
+			caller = info.getTypeOfClassUnderTest().getName();
+		}
+		else{
+			caller = "self";
+		}
+		
 		if(m.getReturnType().equals(KeYJavaType.VOID_TYPE)){
-			return "self."+name+"("+params+");";
+			return caller+"."+name+"("+params+");";
 		}
 		else{
 			String returnType = m.getReturnType().getFullName();
-			return returnType +" result = self."+name+"("+params+");";
+			return returnType +" result = "+caller+"."+name+"("+params+");";
 		}		
 	}
 
