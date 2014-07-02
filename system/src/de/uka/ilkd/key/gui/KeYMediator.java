@@ -150,66 +150,76 @@ public class KeYMediator {
      * @return the variable namespace
      */
     public Namespace var_ns() {
-	return getSelectedProof().getNamespaces().variables();
+       NamespaceSet namespaces = namespaces();
+       return namespaces != null ? namespaces.variables() : null;
     }
 
     /** returns the program variable namespace
      * @return the program variable namespace
      */
     public Namespace progVar_ns() {
-	return getSelectedProof().getNamespaces().programVariables();
+       NamespaceSet namespaces = namespaces();
+       return namespaces != null ? namespaces.programVariables() : null;
     }
 
     /** returns the function namespace
      * @return the function namespace
      */
     public Namespace func_ns() {
-	return getSelectedProof().getNamespaces().functions();
+       NamespaceSet namespaces = namespaces();
+       return namespaces != null ? namespaces.functions() : null;
     }
 
     /** returns the sort namespace
      * @return the sort namespace
      */
     public Namespace sort_ns() {
-	return getSelectedProof().getNamespaces().sorts();
+       NamespaceSet namespaces = namespaces();
+       return namespaces != null ? namespaces.sorts() : null;
     }
 
     /** returns the heuristics namespace
      * @return the heuristics namespace
      */
     public Namespace heur_ns() {
-	return getSelectedProof().getNamespaces().ruleSets();
+       NamespaceSet namespaces = namespaces();
+       return namespaces != null ? namespaces.ruleSets() : null;
     }
 
     /** returns the choice namespace
      * @return the choice namespace
      */
     public Namespace choice_ns() {
-	return getSelectedProof().getNamespaces().choices();
+       NamespaceSet namespaces = namespaces();
+       return namespaces != null ? namespaces.choices() : null;
     }
 
     /** returns the prog var namespace
      * @return the prog var namespace
      */
     public Namespace pv_ns() {
-	return getSelectedProof().getNamespaces().programVariables();
+       NamespaceSet namespaces = namespaces();
+       return namespaces != null ? namespaces.programVariables() : null;
     }
 
     /** returns the namespace set
      * @return the  namespace set
      */
     public NamespaceSet namespaces() {
-	return getSelectedProof().getNamespaces();
+       Proof selectedProof = getSelectedProof();
+       return selectedProof != null ? selectedProof.getNamespaces() : null;
     }
 
     /** returns the JavaInfo with the java type information */
     public JavaInfo getJavaInfo() {
-       return getSelectedProof().getJavaInfo();
+       Proof selectedProof = getSelectedProof();
+       return selectedProof != null ? selectedProof.getJavaInfo() : null;
     }
 
     /** returns the Services with the java service classes */
     public Services getServices() {
-       return getSelectedProof().getServices();
+       Proof selectedProof = getSelectedProof();
+       return selectedProof != null ? selectedProof.getServices() : null;
     }
 
     /** simplified user interface? */
