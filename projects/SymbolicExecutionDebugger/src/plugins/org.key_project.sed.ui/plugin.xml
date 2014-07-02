@@ -322,4 +322,40 @@
             </enabledWhen>
          </handler>
       </extension>
+      <extension
+            point="org.eclipse.ui.editors.annotationTypes">
+         <type
+               markerType="org.eclipse.core.resources.textmarker"
+               name="org.key_project.sed.ui.SymbolicallyReachedAnnotation">
+         </type>
+      </extension>
+      <extension
+            point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationImageProvider="org.key_project.sed.ui.text.SymbolicallyReachedAnnotationImageProvider"
+            annotationType="org.key_project.sed.ui.SymbolicallyReachedAnnotation"
+            colorPreferenceKey="executedSEDNode_color"
+            colorPreferenceValue="254,248,226"
+            contributesToHeader="false"
+            highlightPreferenceKey="executedSEDNode_highlight"
+            highlightPreferenceValue="true"
+            includeOnPreferencePage="true"
+            isGoToNextNavigationTarget="false"
+            isGoToNextNavigationTargetKey="executedSEDNode_isGoToNextNavigationTargetKey"
+            isGoToPreviousNavigationTarget="false"
+            isGoToPreviousNavigationTargetKey="executedSEDNode_isGoToPreviousNavigationTargetKey"
+            label="Symbolically Reached"
+            overviewRulerPreferenceKey="executedSEDNode_overviewRuler"
+            overviewRulerPreferenceValue="false"
+            presentationLayer="0"
+            showInNextPrevDropdownToolbarAction="false"
+            showInNextPrevDropdownToolbarActionKey="executedSEDNode_showInNextPrevDropdownToolbarAction"
+            textPreferenceKey="executedSEDNode_text"
+            textPreferenceValue="true"
+            textStylePreferenceKey="executedSEDNode_stylePreferences"
+            textStylePreferenceValue="BOX"
+            verticalRulerPreferenceKey="executedSEDNode_verticalRuler"
+            verticalRulerPreferenceValue="true">
+      </specification>
+      </extension>
 </plugin>
