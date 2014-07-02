@@ -60,7 +60,6 @@ import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.proof.mgt.RuleConfig;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -394,17 +393,12 @@ public final class ProblemInitializer {
     }
     
         
+    // what is the purpose of this method?
     private InitConfig determineEnvironment(ProofOblInput po, 
                                             InitConfig initConfig)
                 throws ProofInputException {
-        ProofEnvironment env = initConfig.getProofEnv();
-
         //TODO: what does this actually do?
         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().updateChoices(initConfig.choiceNS(), false);
-
-        //init ruleConfig
-        RuleConfig ruleConfig = new RuleConfig(initConfig.getActivatedChoices());
-        env.setRuleConfig(ruleConfig);
 
         return initConfig;
     }

@@ -142,7 +142,11 @@ public class DefaultProblemLoader {
            LoadedPOContainer poContainer = createProofObligationContainer();
            try {
                if (poContainer == null) {
-                   return selectProofObligation();
+                   if (mediator.getUI().selectProofObligation(initConfig)) {
+                      return null;
+                   } else {
+                      return new ProblemLoaderException(this, "Aborted.");
+                   }
                }
                // Create proof and apply rules again if possible
                proof = createProof(poContainer);
@@ -304,16 +308,6 @@ public class DefaultProblemLoader {
       else {
          return null;
       }
-   }
-
-   /**
-    * This method is called if no {@link LoadedPOContainer} was created
-    * via {@link #createProofObligationContainer()} and can be overwritten
-    * for instance to open the proof management dialog as done by {@link ProblemLoader}.
-    * @return An error message or {@code null} if everything is fine.
-    */
-   protected ProblemLoaderException selectProofObligation() {
-      return null; // Do nothing
    }
 
    /**

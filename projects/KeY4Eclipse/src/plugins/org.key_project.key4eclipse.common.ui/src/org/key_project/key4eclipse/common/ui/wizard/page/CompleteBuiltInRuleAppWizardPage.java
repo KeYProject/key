@@ -51,6 +51,7 @@ public class CompleteBuiltInRuleAppWizardPage extends WizardPage {
    @Override
    public void dispose() {
       perform.removePropertyChangeListener(IInteractiveRuleApplicationCompletionPerform.PROP_ERROR_MESSAGE, performListener);
+      perform.dispose();
       super.dispose();
    }
 

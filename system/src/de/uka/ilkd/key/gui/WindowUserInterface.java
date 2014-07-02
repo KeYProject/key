@@ -25,6 +25,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -302,7 +303,7 @@ public class WindowUserInterface extends AbstractUserInterface {
                p.dispose();
            }
            proof.dispose();
-           mainWindow.getProofView().removeProofs(rootTaskProofs);
+           mainWindow.getProofTreeView().removeProofs(rootTaskProofs);
 
            // The original code of this method. Neccessary?
            mainWindow.getProofList().removeProof(proof);
@@ -311,5 +312,11 @@ public class WindowUserInterface extends AbstractUserInterface {
            Runtime r = Runtime.getRuntime();
            r.gc();
        }
+   }
+
+   @Override
+   public boolean selectProofObligation(InitConfig initConfig) {
+      ProofManagementDialog.showInstance(initConfig);
+      return ProofManagementDialog.startedProof();
    }
 }

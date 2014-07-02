@@ -62,5 +62,4 @@ public class SWTBotKeYDebugTargetProofFileTest extends AbstractKeYDebugTargetTes
                            14, 
                            executor);
    }
-
 }

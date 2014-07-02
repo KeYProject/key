@@ -158,7 +158,7 @@ public class StatisticsPropertySection extends AbstractSEDDebugTargetPropertySec
     * Disposes the currently shown content.
     */
    protected void disposeContent() {
-      if (composite != null) {
+      if (composite != null && !composite.isDisposed()) {
          composite.setVisible(false);
          composite.dispose();
          composite = null;
