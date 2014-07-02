@@ -2818,21 +2818,24 @@ heap_selection_suffix [Term term] returns [Term result]
     :
     AT heap=accessterm
     {
-      if(!isHeapTerm(heap)) {
-          semanticError("Heap term expected, not sort + " + heap.sort());
-      }
-      if(term.arity() == 0 || !isHeapTerm(term.sub(0))) {
-          semanticError("select or an observer expected before '@', not " + term);
-      }
-      /////// WORK TO BE DONE! ///// REPLACE THE HEAP
-      result = term;
-    {
-        System.out.println(term.subs().size());
-        for(Term t:term.subs()){
+        if(!isHeapTerm(heap)) {
+            semanticError("Heap term expected, not sort + " + heap.sort());
+        }
+        if(term.arity() == 0 || !isHeapTerm(term.sub(0))) {
+            semanticError("select or an observer expected before '@', not " + term);
+        }
+        /////// WORK TO BE DONE! ///// REPLACE THE HEAP
+        result = term;
+        {
+            System.out.println(term.subs().size());
+            for(Term t:term.subs()){
             System.out.println(t);
         }
         System.out.println("\nX\n"+result+"\nX\n");
-    }
+        }
+        
+        // reset globalImplicitHeapSuffixCounter
+        globalImplicitHeapSuffixCounter = 0;
     }
     ;
 
