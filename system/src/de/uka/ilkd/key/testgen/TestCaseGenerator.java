@@ -127,8 +127,7 @@ public class TestCaseGenerator {
 		info = new ProofInfo(proof);
 		MUTName = info.getMUT().getFullName();	
 		executeWithOpenJML = createExecuteWithOpenJML(settings.getOpenjmlPath());
-		compileWithOpenJML = createCompileWithOpenJML(settings.getOpenjmlPath());
-		
+		compileWithOpenJML = createCompileWithOpenJML(settings.getOpenjmlPath());		
 	}
 	
 	public String getMUTCall(){
