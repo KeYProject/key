@@ -149,6 +149,7 @@ public class WindowUserInterface extends AbstractUserInterface {
             }
             mainWindow.displayResults(info.toString());
         } else if (info.getSource() instanceof ProblemLoader) {
+            resetStatus(this);
             if (info.getResult() != null) {
                 final KeYExceptionHandler exceptionHandler = ((ProblemLoader) info
                         .getSource()).getExceptionHandler();
@@ -156,7 +157,6 @@ public class WindowUserInterface extends AbstractUserInterface {
                         mainWindow, exceptionHandler.getExceptions());
                 exceptionHandler.clear();
             } else {
-                resetStatus(this);
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(
                         mediator.getServices());
