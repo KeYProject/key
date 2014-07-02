@@ -177,10 +177,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
           }
           // build precondition
           final List<LocationVariable> heaps = new ArrayList<LocationVariable>();
-          if(target.getStateCount() >= 1) {
-              heaps.addAll(modHeaps);
-              if(target.getStateCount() == 2) {
-                  for(LocationVariable heap : modHeaps) {
+          for(LocationVariable heap : modHeaps) {
+        	  if(target.getStateCount() >= 1) {
+        		  heaps.add(heap);
+        		  if(target.getStateCount() == 2) {
                       heaps.add(atPreVars.get(heap));
                   }
               }
