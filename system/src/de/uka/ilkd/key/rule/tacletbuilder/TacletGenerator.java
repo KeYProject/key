@@ -394,8 +394,7 @@ public class TacletGenerator {
             functionalRepresentsAddSatisfiabilityBranch(target, services, heapSVs,
                     selfSV, paramSVs, schemaRepresents, tacletBuilder);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
-        result = result.add(tacletBuilder.getTaclet());
-
+        result = result.add(tacletBuilder.getTaclet());        
         //return
         return result;
     }

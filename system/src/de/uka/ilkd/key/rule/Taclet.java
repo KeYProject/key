@@ -1073,7 +1073,7 @@ public abstract class Taclet implements Rule, Named {
        for (Taclet tacletToAdd : rules) { 
           final Node n = goal.node();
           final StringBuilder uniqueTail = new StringBuilder(tacletToAdd.name().toString());                   
-          uniqueTail.append(AUTONAME).append(n.getUniqueTacletNr()).append("_").append(n.parent().siblingNr());
+          uniqueTail.append(AUTONAME).append(n.getUniqueTacletId());
           tacletToAdd = tacletToAdd.setName(uniqueTail.toString());
 
 
@@ -1360,6 +1360,7 @@ public abstract class Taclet implements Rule, Named {
 
     StringBuffer toStringAttribs(StringBuffer sb) {
 //	if (noninteractive()) sb = sb.append(" \\noninteractive");
+       sb.append("\nChoices: ").append(choices);
 	return sb;
     }
     

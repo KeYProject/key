@@ -100,8 +100,15 @@ public class KeYJavaType implements Type {
 	return getJavaType().getName();
     }
     
-    public boolean equals (Object o){
-        try {
+    @Override
+    public boolean equals (Object o){       
+       if (o == this) {
+          return true;
+       }       
+       if (o == null || o.getClass() != this.getClass()) {
+          return false;
+       }
+       try {
             return MiscTools.equalsOrNull(javaType,((KeYJavaType)o).javaType) && 
                     MiscTools.equalsOrNull(sort,((KeYJavaType)o).sort);
         } catch (Exception e) {
@@ -109,6 +116,12 @@ public class KeYJavaType implements Type {
         }
     }
 
+    @Override
+    public int hashCode() {
+       return 0;
+    }
+    
+    
     public PackageReference createPackagePrefix() {
 	PackageReference ref = null;
 	String rest = getFullName();

@@ -206,10 +206,10 @@ public abstract class AbstractPO implements IPersistablePO {
         for (ClassAxiom axiom : axioms) {
             final ImmutableSet<Pair<Sort, IObserverFunction>> scc =
                     getSCC(axiom, axioms);
+            
             for (Taclet axiomTaclet : axiom.getTaclets(scc, services)) {
                 assert axiomTaclet != null : "class axiom returned null taclet: "
                         + axiom.getName();
-
                 // only include if choices are appropriate
                 if (choicesApply(axiomTaclet, initConfig.getActivatedChoices())) {
                     register(axiomTaclet);

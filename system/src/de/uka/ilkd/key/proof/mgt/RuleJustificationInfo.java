@@ -26,11 +26,6 @@ public class RuleJustificationInfo {
 
    public void addJustification(Rule r, RuleJustification j) {
       if (rule2justif.containsKey(new RuleKey(r))) {
-         
-         if (r.name().toString().equals("replaceKnownAuxiliaryConstant_taclet23_0")) {
-            try { throw null; } catch (Exception e) {e.printStackTrace(); }
-         }
-         
          throw new IllegalArgumentException("Rule " + r.name()
                + " already in registered.");
       }

@@ -365,7 +365,7 @@ public final class SpecificationRepository {
             }
             for (ClassAxiom ax : e.getValue()) {
                 if (JavaInfo.isVisibleTo(ax, visibleTo)) {
-                    result = result.add(ax);
+                   result = result.add(ax);
                 }
             }
         }
@@ -1044,7 +1044,6 @@ public final class SpecificationRepository {
         if (result == null) {
             // get visible registered axioms of other classes
             result = getVisibleAxiomsOfOtherClasses(selfKjt);
-
             // add registered axioms of own class
             ImmutableSet<ClassAxiom> ownAxioms = axioms.get(selfKjt);
             if (ownAxioms != null) {
@@ -1052,6 +1051,7 @@ public final class SpecificationRepository {
                     result = result.add(ax);
                 }
             }
+
             final JavaInfo ji = services.getJavaInfo();
 
             // add invariant axiom for own class and other final classes
@@ -1067,6 +1067,7 @@ public final class SpecificationRepository {
                 invDef = tb.tf().createTerm(Equality.EQV,
                         tb.inv(tb.var(selfVar)), invDef);
                 final IObserverFunction invSymbol = services.getJavaInfo().getInv();
+                
                 final ClassAxiom invRepresentsAxiom
                 = new RepresentsAxiom("Class invariant axiom for " + kjt.getFullName(),
                                       invSymbol,
@@ -1079,7 +1080,6 @@ public final class SpecificationRepository {
                                       null);
                 result = result.add(invRepresentsAxiom);
             }
-
             // add query axioms for own class
             for (IProgramMethod pm : services.getJavaInfo()
                     .getAllProgramMethods(selfKjt)) {
