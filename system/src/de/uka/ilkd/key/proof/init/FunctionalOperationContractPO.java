@@ -233,7 +233,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      */
     @Override
     protected Term buildFrameClause(List<LocationVariable> modHeaps,
-                                    Map<LocationVariable, Map<Term, Term>> heapToAtPre,
+                                    Map<Term, Term> heapToAtPre,
                                     ProgramVariable selfVar,
                                     ImmutableList<ProgramVariable> paramVars) {
        Term frameTerm = null;
@@ -241,9 +241,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
           final Term ft;
           if(!getContract().hasModifiesClause(heap)) {
             // strictly pure have a different contract.
-            ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre.get(heap));
+            ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre);
           }else{
-            ft = tb.frame(tb.var(heap), heapToAtPre.get(heap),
+            ft = tb.frame(tb.var(heap), heapToAtPre,
                  getContract().getMod(heap, selfVar,
                          paramVars, services));
           }
