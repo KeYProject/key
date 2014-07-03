@@ -53,7 +53,7 @@ public abstract class AbstractUserInterface implements UserInterface {
                                              File bootClassPath, KeYMediator mediator) {
         final ProblemLoader pl =
                 new ProblemLoader(file, classPath, bootClassPath,
-                                  AbstractProfile.getDefaultProfile(), mediator);
+                                  AbstractProfile.getDefaultProfile(), mediator, true);
         pl.addTaskListener(this);
         return pl;
     }
@@ -118,7 +118,7 @@ public abstract class AbstractUserInterface implements UserInterface {
        DefaultProblemLoader loader = null;
        try {
           getMediator().stopInterface(true);
-          loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile, getMediator());
+          loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile, getMediator(), false);
           loader.load();
           return loader;
        }

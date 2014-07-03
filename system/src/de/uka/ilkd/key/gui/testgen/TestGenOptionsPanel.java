@@ -17,6 +17,7 @@ class TestGenOptionsPanel extends TablePanel{
 	private TestGenerationSettings settings;
 	
 	private FileChooserPanel saveToFilePanel;
+	private FileChooserPanel openJMLPanel;
 	private JTextField maxProcesses;
 	private JTextField maxUnwinds;
 	private JCheckBox useJUnit;
@@ -31,6 +32,7 @@ class TestGenOptionsPanel extends TablePanel{
 	private static final String infoInvariantForAll = "Require the invariant of all created objects to be true.";
 	private static final String infoMaxUnwinds = "Maximal number of loop unwinds or method calls on a branch.";
 	private static final String infoRemoveDuplicates = "Generate a single testcase for two ore more identical nodes.";
+	private static final String infoOpenJMLPath = "Set location of openjml.jar";
 	
 	public TestGenOptionsPanel(TestGenerationSettings settings){
 		super();
@@ -46,6 +48,7 @@ class TestGenOptionsPanel extends TablePanel{
 	@Override
     protected void createComponents() {
 	   getSaveToFilePanel();
+	   getOpenJMLPanel();
 	   getMaxProcesses();
 	   getMaxUnwinds();
 	   getInvariantForall();
@@ -69,6 +72,7 @@ class TestGenOptionsPanel extends TablePanel{
 						value = settings.getNumberOfProcesses();
 					}
 					settings.setConcurrentProcesses(value);
+					settings.fireSettingsChanged();
 				}                                
 			});
 		}
@@ -90,6 +94,7 @@ class TestGenOptionsPanel extends TablePanel{
 						value = settings.getMaximalUnwinds();
 					}
 					settings.setMaxUnwinds(value);
+					settings.fireSettingsChanged();
 				}                                
 			});
 		}
@@ -105,13 +110,29 @@ class TestGenOptionsPanel extends TablePanel{
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					settings.setOutputPath(saveToFilePanel.getPath());
+					settings.fireSettingsChanged();
 
 				}
 			});
 		}
 		return saveToFilePanel;
 	}
-	
+	public FileChooserPanel getOpenJMLPanel() {
+		if(openJMLPanel == null){
+			openJMLPanel = addFileChooserPanel("Location of openjml:",
+					settings.getOpenjmlPath(), infoOpenJMLPath, 
+                        false,true,new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					settings.setOpenjmlPath(openJMLPanel.getPath());
+					settings.fireSettingsChanged();
+
+				}
+			});
+		}
+		return saveToFilePanel;
+	}
 	public JCheckBox getJUnitPanel(){
 		if(useJUnit == null){
 			
@@ -119,6 +140,7 @@ class TestGenOptionsPanel extends TablePanel{
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					settings.setUseJunit(useJUnit.isSelected());
+					settings.fireSettingsChanged();
 				}
 			});			
 		}		
@@ -131,6 +153,7 @@ class TestGenOptionsPanel extends TablePanel{
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					settings.setRemoveDuplicates(removeDuplicates.isSelected());
+					settings.fireSettingsChanged();
 				}
 			});
 		}
@@ -145,6 +168,7 @@ class TestGenOptionsPanel extends TablePanel{
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					settings.setInvariantForAll(invariantForAll.isSelected());
+					settings.fireSettingsChanged();
 				}
 			});
 			
