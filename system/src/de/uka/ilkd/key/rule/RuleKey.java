@@ -13,15 +13,17 @@ import de.uka.ilkd.key.logic.Name;
 public class RuleKey {
    public final Name name;
    public final ImmutableSet<Choice> choices;
+   public final Rule r;
 
-   RuleKey(Name name, ImmutableSet<Choice> choices) {
+   RuleKey(Name name, ImmutableSet<Choice> choices, Rule r) {
       this.name = name;
       this.choices = choices;
+      this.r = r;
    }
 
    public RuleKey(Rule r) {
       this(r.name(), (r instanceof Taclet ? ((Taclet) r).getChoices()
-            : DefaultImmutableSet.<Choice> nil()));
+            : DefaultImmutableSet.<Choice> nil()), r);
    }
 
    public boolean equals(Object o) {
