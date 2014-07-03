@@ -29,6 +29,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -1035,6 +1036,7 @@ public final class SpecificationRepository {
         }
     }
 
+    
     /**
      * Returns all class axioms visible in the passed class, including the
      * axioms induced by invariant declarations.
@@ -1085,8 +1087,16 @@ public final class SpecificationRepository {
                     .getAllProgramMethods(selfKjt)) {
                 if (!pm.isVoid() && !pm.isConstructor() && !pm.isImplicit() && !pm.isModel()) {
                     pm = services.getJavaInfo().getToplevelPM(selfKjt, pm);
+
+                    StringBuffer sb = new StringBuffer();
+                    for (KeYJavaType pd : pm.getParamTypes()) {
+                       sb.append(pd.getJavaType().getFullName());
+                       sb.append("_");
+                    }
+                
+                    
                     final ClassAxiom queryAxiom
-                    = new QueryAxiom("Query axiom for " + pm.getName() +
+                    = new QueryAxiom("Query axiom for " + pm.getName() + "_" + sb +
                                          " in " + selfKjt.getFullName(),
                                      pm,
                                      selfKjt);
