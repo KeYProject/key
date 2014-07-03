@@ -160,6 +160,20 @@ public final class SpecificationRepository {
     // internal methods
     // -------------------------------------------------------------------------
 
+    private static String getUniqueNameForObserver(IObserverFunction obs) {
+       StringBuffer sb = new StringBuffer(obs.name().toString());
+       
+       if (obs.isStatic()) {
+          sb.append("_static_");
+       }
+       
+       for (KeYJavaType pType : obs.getParamTypes()) {
+          sb.append(pType.getFullName());
+       }
+       
+       return sb.toString();
+    }
+    
     private static Taclet getLimitedToUnlimitedTaclet(IObserverFunction limited,
                                                       IObserverFunction unlimited, 
                                                       TermServices services) {
@@ -183,8 +197,7 @@ public final class SpecificationRepository {
                 Sequent.EMPTY_SEQUENT, ImmutableSLList.<Taclet> nil(),
                 unlimitedTerm));
         tacletBuilder.setName(MiscTools.toValidTacletName("unlimit "
-                + unlimited.name()));
-
+                + getUniqueNameForObserver(unlimited)));
         return tacletBuilder.getTaclet();
     }
 
@@ -216,7 +229,7 @@ public final class SpecificationRepository {
                         subs)));
         tacletBuilder.setApplicationRestriction(RewriteTaclet.IN_SEQUENT_STATE);
         tacletBuilder.setName(MiscTools.toValidTacletName("limit "
-                + unlimited.name()));
+                + getUniqueNameForObserver(unlimited)));
         tacletBuilder.addRuleSet(new RuleSet(new Name("limitObserver")));
 
         return tacletBuilder.getTaclet();
