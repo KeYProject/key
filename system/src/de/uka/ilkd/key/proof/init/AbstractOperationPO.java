@@ -240,19 +240,21 @@ public abstract class AbstractOperationPO extends AbstractPO {
          final Map<LocationVariable, LocationVariable> atPreVars =
                  HeapContext.getBeforeAtPreVars(modHeaps, services, "AtPre");
 
-         final Map<LocationVariable, Map<Term, Term>> heapToAtPre =
-                 new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+//         final Map<LocationVariable, Map<Term, Term>> heapToAtPre =
+//                 new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+         final Map<Term, Term> heapToAtPre = new LinkedHashMap<Term, Term>();
 
          for (LocationVariable heap : modHeaps) {
-            heapToAtPre.put(heap, new LinkedHashMap<Term, Term>());
-            heapToAtPre.get(heap).put(tb.var(heap), tb.var(atPreVars.get(heap)));
+           	heapToAtPre.put(tb.var(heap), tb.var(atPreVars.get(heap)));
          }
 
          // FIXME Wojtek: This is a fiddly bit that needs to be rechecked eventually
+/*
          if (modHeaps.contains(getSavedHeap())) {
             heapToAtPre.get(getSavedHeap())
                 .put(tb.getBaseHeap(), tb.var(atPreVars.get(getSavedHeap())));
          }
+*/
 
          // register the variables so they are declared in proof header if the proof is saved to a file
          register(paramVars);
@@ -607,8 +609,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @return The created {@link Term} representing the frame clause.
     */
    protected abstract Term buildFrameClause(List<LocationVariable> modHeaps,
-                                            Map<LocationVariable,
-                                            Map<Term, Term>> heapToAtPre,
+                                            Map<Term, Term> heapToAtPre,
                                             ProgramVariable selfVar,
                                             ImmutableList<ProgramVariable> paramVars);
 
