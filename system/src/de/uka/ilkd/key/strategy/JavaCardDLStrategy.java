@@ -1380,13 +1380,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // integers; cross-multiplication + case distinctions for nonlinear
         // inequalities
             
-        bindRuleSet ( d, "inEqSimp_expand", -4500 );
-        bindRuleSet ( d, "inEqSimp_directInEquations", -3000 );
-        bindRuleSet ( d, "inEqSimp_propagation", -2500 );
-        bindRuleSet ( d, "inEqSimp_pullOutGcd", -2250 );
-        bindRuleSet ( d, "inEqSimp_saturate", -2000 );
-        bindRuleSet ( d, "inEqSimp_forNormalisation", -1000 );
-        bindRuleSet ( d, "inEqSimp_special_nonLin", -1400 );
+        bindRuleSet ( d, "inEqSimp_expand", -4400);
+        bindRuleSet ( d, "inEqSimp_directInEquations", -2900);
+        bindRuleSet ( d, "inEqSimp_propagation", -2400 );
+        bindRuleSet ( d, "inEqSimp_pullOutGcd", -2150);
+        bindRuleSet ( d, "inEqSimp_saturate", -1900 );
+        bindRuleSet ( d, "inEqSimp_forNormalisation", -1000);
+        bindRuleSet ( d, "inEqSimp_special_nonLin", -1400);
         
         if ( arithNonLinInferences () )
             bindRuleSet ( d, "inEqSimp_nonLin", IN_EQ_SIMP_NON_LIN_COST );
