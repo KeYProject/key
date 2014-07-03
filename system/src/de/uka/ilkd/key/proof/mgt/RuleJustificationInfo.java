@@ -36,8 +36,9 @@ public class RuleJustificationInfo {
                
             }
          }         
+      } else {
+         rule2justif.put(ruleKey, j);
       }
-      rule2justif.put(ruleKey, j);
    }
 
    public RuleJustification getJustification(Rule r) {
