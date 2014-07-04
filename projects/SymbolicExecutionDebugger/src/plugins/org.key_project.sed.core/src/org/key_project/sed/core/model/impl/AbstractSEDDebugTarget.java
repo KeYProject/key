@@ -31,6 +31,8 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.debug.core.model.ISourceLocator;
+import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentProvider;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
@@ -47,6 +49,10 @@ import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.event.ISEDAnnotationListener;
 import org.key_project.sed.core.model.event.SEDAnnotationEvent;
 import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
+import org.key_project.sed.core.sourcesummary.ISEDSourceModel;
+import org.key_project.sed.core.sourcesummary.impl.SEDMemorySourceModel;
+import org.key_project.sed.core.sourcesummary.impl.SEDMemorySourceRange;
+import org.key_project.sed.core.sourcesummary.impl.SEDMemorySourceSummary;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.LogUtil;
 import org.key_project.sed.core.util.SEDAnnotationUtil;
@@ -58,7 +64,14 @@ import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 
 /**
+ * <p>
  * Provides a basic implementation of {@link ISEDDebugTarget}.
+ * </p>
+ * <p>
+ * For each {@link ISEDDebugNode} as child of this {@link ISEDDebugTarget}
+ * {@link #addToSourceModel(ISEDDebugNode)} has to be called to ensure
+ * that the {@link ISEDDebugNode} is part of the {@link ISEDSourceModel} ({@link #getSourceModel()}).
+ * </p>
  * @author Martin Hentschel
  * @see ISEDDebugTarget
  */
@@ -106,6 +119,11 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
    private final List<ISEDAnnotationListener> annotationListener = new LinkedList<ISEDAnnotationListener>();
    
    /**
+    * The used {@link ISEDSourceModel}.
+    */
+   private final SEDMemorySourceModel sourceModel = new SEDMemorySourceModel();
+
+   /**
     * Constructor.
     * @param launch The {@link ILaunch} in that this {@link IDebugTarget} is used.
     * @param executable {@code true} Support suspend, resume, etc.; {@code false} Do not support suspend, resume, etc.
@@ -114,7 +132,6 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
       super(null);
       this.executable = executable;
       this.launch = launch;
-      
    }
    
    /**
@@ -749,6 +766,46 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
       statistics.put("Number of not completed paths", notTerminatedBranchesCount + "");
       monitor.done();
       return statistics;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SEDMemorySourceModel getSourceModel() {
+      return sourceModel;
+   }
+   
+   /**
+    * This method has to be called once for each {@link ISEDDebugNode}
+    * to add it to the {@link ISEDSourceModel}.
+    * @param node The new {@link ISEDDebugNode} to add to the {@link ISEDSourceModel}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void addToSourceModel(ISEDDebugNode node) throws DebugException {
+      if (node instanceof IStackFrame && getLaunch() != null) {
+         IStackFrame stackFrame = (IStackFrame)node;
+         ISourceLocator locator = getLaunch().getSourceLocator();
+         if (locator != null) {
+            Object source = locator.getSourceElement(stackFrame);
+            if (source != null) {
+               SEDMemorySourceSummary summary = sourceModel.getSourceSummary(source);
+               if (summary == null) {
+                  summary = new SEDMemorySourceSummary(source);
+                  sourceModel.addSourceSummary(summary);
+               }
+               int lineNumber = stackFrame.getLineNumber();
+               int charStart = stackFrame.getCharStart();
+               int charEnd = stackFrame.getCharEnd();
+               SEDMemorySourceRange range = summary.getSourceRange(lineNumber, charStart, charEnd);
+               if (range == null) {
+                  range = new SEDMemorySourceRange(lineNumber, charStart, charEnd);
+                  summary.addSourceRange(range);
+               }
+               range.addDebugNode(node);
+            }
+         }
+      }
    }
 
    /**

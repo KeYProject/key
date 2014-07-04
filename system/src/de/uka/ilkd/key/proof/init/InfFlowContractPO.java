@@ -302,7 +302,7 @@ public class InfFlowContractPO extends AbstractOperationPO
     @Override
     @Deprecated
     protected Term buildFrameClause(List<LocationVariable> modHeaps,
-                                    Map<LocationVariable, Map<Term, Term>> heapToAtPre,
+                                    Map<Term, Term> heapToAtPre,
                                     ProgramVariable selfVar,
                                     ImmutableList<ProgramVariable> paramVars) {
         throw new UnsupportedOperationException("Not supported any more. " +

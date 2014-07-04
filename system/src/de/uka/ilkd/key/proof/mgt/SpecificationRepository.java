@@ -1107,8 +1107,8 @@ public final class SpecificationRepository {
     private ImmutableSet<ClassAxiom> getModelMethodAxioms() {
         ImmutableSet<ClassAxiom> result  = DefaultImmutableSet.<ClassAxiom>nil();
         for(KeYJavaType kjt : services.getJavaInfo().getAllKeYJavaTypes()) {
-            final ProgramVariable selfVar = tb.selfVar(kjt, false);
             for(IProgramMethod pm : services.getJavaInfo().getAllProgramMethods(kjt)) {
+                final ProgramVariable selfVar = pm.isStatic() ? null : tb.selfVar(kjt, false);
                 if(!pm.isVoid() && pm.isModel()) {
                     pm = services.getJavaInfo().getToplevelPM(kjt, pm);
                     ImmutableList<ProgramVariable> paramVars = tb.paramVars(pm, false);
@@ -1148,7 +1148,6 @@ public final class SpecificationRepository {
                             // TODO Wojtek: I do not understand the visibility issues of model fields/methods.
                             // VisibilityModifier visibility = pm.isPrivate() ? new Private() :
                             //    (pm.isProtected() ? new Protected() : (pm.isPublic() ? new Public() : null));
-
                             final ClassAxiom modelMethodRepresentsAxiom
                                 = new RepresentsAxiom("Definition axiom for " + pm.getName() +
                                                         " in " + kjt.getFullName(),
@@ -1161,6 +1160,7 @@ public final class SpecificationRepository {
                         }
                     }
                     for(FunctionalOperationContract fop : getOperationContracts(kjt,pm)) {
+                    	if(!fop.getSpecifiedIn().equals(kjt)) continue;
                     	Term preFromContract =
                     	        fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
                     	Term postFromContract =

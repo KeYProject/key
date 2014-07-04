@@ -21,7 +21,6 @@ import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import javax.swing.SwingWorker;
@@ -39,8 +38,10 @@ public final class ProblemLoader extends DefaultProblemLoader {
    private ProverTaskListener ptl;
 
    public ProblemLoader(File file, List<File> classPath, File bootClassPath,
-                        Profile profileOfNewProofs, KeYMediator mediator) {
-      super(file, classPath, bootClassPath, profileOfNewProofs, mediator);
+                        Profile profileOfNewProofs, KeYMediator mediator,
+                        boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
+      super(file, classPath, bootClassPath, profileOfNewProofs, mediator,
+            askUiToSelectAProofObligationIfNotDefinedByLoadedFile);
    }
 
    public void addTaskListener(ProverTaskListener ptl) {

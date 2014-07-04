@@ -38,6 +38,7 @@ import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
@@ -434,12 +435,16 @@ public final class JMLSpecExtractor implements SpecExtractor {
             if(modelMethodDecl != null && modelMethodDecl.getMethodDefinition() != null) {
                specCase.addAxioms(modelMethodDecl.getMethodDefinition());
             }
-
+            ;
             //add purity. Strict purity overrides purity.
             if(isStrictlyPure || pm.isModel()) {
-                specCase.addAssignable(new PositionedString("assignable \\strictly_nothing"));
+            	for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+            		specCase.addAssignable(new PositionedString("<"+heap.name().toString()+">assignable \\strictly_nothing"));
+            	}
             } else if(isPure) {
-                specCase.addAssignable(new PositionedString("assignable \\nothing"));
+            	for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+                	specCase.addAssignable(new PositionedString("<"+heap.name().toString()+">assignable \\nothing"));
+            	}
             }
 
             //add invariants

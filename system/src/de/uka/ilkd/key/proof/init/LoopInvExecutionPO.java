@@ -300,8 +300,9 @@ public class LoopInvExecutionPO extends AbstractOperationPO
     @Override
     @Deprecated
     protected Term buildFrameClause(List<LocationVariable> modHeaps,
-            Map<LocationVariable, Map<Term, Term>> heapToAtPre,
-            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars) {
+                                    Map<Term, Term> heapToAtPre,
+                                    ProgramVariable selfVar,
+                                    ImmutableList<ProgramVariable> paramVars) {
         throw new UnsupportedOperationException("Not supported any more. " +
                 "Please use the POSnippetFactory instead.");
     }

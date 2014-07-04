@@ -69,27 +69,34 @@ public class DefaultProblemLoader {
    /**
     * The file or folder to load.
     */
-   private File file;
+   private final File file;
 
    /**
     * The optional class path entries to use.
     */
-   private List<File> classPath;
+   private final List<File> classPath;
 
    /**
     * An optional boot class path.
     */
-   private File bootClassPath;
+   private final File bootClassPath;
 
    /**
     * The {@link KeYMediator} to use.
     */
-   private KeYMediator mediator;
+   private final KeYMediator mediator;
 
    /**
     * The {@link Profile} to use for new {@link Proof}s.
     */
-   private Profile profileOfNewProofs;
+   private final Profile profileOfNewProofs;
+   
+   /**
+    * {@code true} to call {@link UserInterface#selectProofObligation(InitConfig)}
+    * if no {@link Proof} is defined by the loaded proof or 
+    * {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
+    */
+   private final boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
 
    /**
     * The instantiated {@link EnvInput} which describes the file to load.
@@ -122,18 +129,21 @@ public class DefaultProblemLoader {
     * @param bootClassPath An optional boot class path.
     * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
     * @param mediator The {@link KeYMediator} to use.
+    * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call {@link UserInterface#selectProofObligation(InitConfig)} if no {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
     */
-   public DefaultProblemLoader(File file, List<File> classPath, File bootClassPath,
-                               Profile profileOfNewProofs, KeYMediator mediator) {
+   public DefaultProblemLoader(File file, 
+                               List<File> classPath, 
+                               File bootClassPath,
+                               Profile profileOfNewProofs, 
+                               KeYMediator mediator,
+                               boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
       assert mediator != null;
       this.file = file;
       this.classPath = classPath;
       this.bootClassPath = bootClassPath;
       this.mediator = mediator;
-      this.profileOfNewProofs = profileOfNewProofs;
-      if (this.profileOfNewProofs == null) {
-         this.profileOfNewProofs = AbstractProfile.getDefaultProfile();
-      }
+      this.profileOfNewProofs = profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile();
+      this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile = askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
    }
 
    /**
@@ -155,10 +165,15 @@ public class DefaultProblemLoader {
            LoadedPOContainer poContainer = createProofObligationContainer();
            try {
                if (poContainer == null) {
-                   if (mediator.getUI().selectProofObligation(initConfig)) {
-                      return null;
-                   } else {
-                      return new ProblemLoaderException(this, "Aborted.");
+                   if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
+                      if (mediator.getUI().selectProofObligation(initConfig)) {
+                         return null;
+                      } else {
+                         return new ProblemLoaderException(this, "Aborted.");
+                      }
+                   }
+                   else {
+                      return null; // Do not instantiate any proof but allow the user of the DefaultProblemLoader to access the loaded InitConfig.
                    }
                }
                // Create proof and apply rules again if possible

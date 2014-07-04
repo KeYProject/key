@@ -67,7 +67,6 @@ public final class DependencyContractPO extends AbstractPO
     
     private Term buildFreePre(
     		              List<LocationVariable> heaps,
-    		              Collection<LocationVariable> preHeaps,
     		              ProgramVariable selfVar,
 	                      KeYJavaType selfKJT,
 	                      ImmutableList<ProgramVariable> paramVars,
@@ -89,16 +88,6 @@ public final class DependencyContractPO extends AbstractPO
                     selfCreated = sc;
                 }else{
                     selfCreated = tb.and(selfCreated, sc);
-                }
-            }
-            if (preHeaps != null) {
-                for(LocationVariable h : preHeaps) {
-                    final Term sc = tb.created(tb.var(h), tb.var(selfVar));
-                    if (selfCreated == null) {
-                       selfCreated = sc;
-                    } else {
-                       selfCreated = tb.and(selfCreated, sc);
-                    }
                 }
             }
         } else {
@@ -185,17 +174,14 @@ public final class DependencyContractPO extends AbstractPO
 	    LocationVariable preVar = twoState ?
 	            tb.heapAtPreVar(h.name()+"AtPre", h.sort(), true)
 	            : null ;
-	    if(preVar != null) { register(preVar); }
+	    if(preVar != null) { register(preVar); heaps.add(preVar); }
 	    preHeapVars.put(h, preVar);
 	    if(preVar != null) {
 	        preHeapVarsReverse.put(preVar, h);
 	    }
 	}
-	if(twoState) {
-	    heaps.addAll(preHeapVars.values());
-	}
 
-        //register the variables and anon heap so they are declared in proof 
+	//register the variables and anon heap so they are declared in proof 
 	//header if the proof is saved to a file
         register(selfVar);	
         register(paramVars);
@@ -237,7 +223,7 @@ public final class DependencyContractPO extends AbstractPO
 
 	//translate contract
 	final Term pre = tb.and(
-	   buildFreePre(heaps, twoState ? preHeapVars.values() : null, selfVar,
+	   buildFreePre(heaps, selfVar,
 	                contract.getKJT(), paramVars, wellFormedHeaps),
 	                contract.getPre(heapLDT.getHeap(), selfVar, paramVars,
 	                                null, services));
